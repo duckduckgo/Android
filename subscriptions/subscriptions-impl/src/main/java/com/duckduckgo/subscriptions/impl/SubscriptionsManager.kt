@@ -222,16 +222,9 @@ interface SubscriptionsManager {
     suspend fun canSupportEncryption(): Boolean
 
     /**
-     * Checks whether the user has previously used a trial.
-     *
-     * @return [Boolean] indicating if the user has had a trial before.
+     * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
-    suspend fun hadTrial(): Boolean
-
-    /**
-     * Checks whether free trials feature is enabled.
-     */
-    suspend fun isFreeTrialsEnabled(): Boolean
+    suspend fun isFreeTrialEligible(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -348,15 +341,14 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
-    override suspend fun hadTrial(): Boolean {
-        return try {
-            return subscriptionsService.offerStatus().hadTrial
+    override suspend fun isFreeTrialEligible(): Boolean {
+        val userHadFreeTrial = try {
+            subscriptionsService.offerStatus().hadTrial
         } catch (e: Exception) {
             false
         }
+        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled()
     }
-
-    override suspend fun isFreeTrialsEnabled(): Boolean = privacyProFeature.get().privacyProFreeTrial().isEnabled()
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
 

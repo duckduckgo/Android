@@ -128,7 +128,7 @@ class RealSubscriptions @Inject constructor(
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
-        return !subscriptionsManager.hadTrial() && subscriptionsManager.isFreeTrialsEnabled()
+        return subscriptionsManager.isFreeTrialEligible()
     }
 }
 
