@@ -63,6 +63,7 @@ import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CoroutineScope
@@ -115,6 +116,15 @@ class RealPirActionsRunner @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted private val pirScriptToLoad: String,
 ) : PirActionsRunner, ActionResultListener {
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            context: Context,
+            pirScriptToLoad: String,
+            runType: RunType,
+        ): RealPirActionsRunner
+    }
+
     private var engine: PirActionsRunnerStateEngine? = null
     private var detachedWebView: WebView? = null
 

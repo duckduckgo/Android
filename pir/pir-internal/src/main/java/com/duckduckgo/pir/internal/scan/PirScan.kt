@@ -24,10 +24,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.PirActionsRunner
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
 import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
@@ -89,7 +89,7 @@ class RealPirScan @Inject constructor(
     private val repository: PirRepository,
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
-    private val pirActionsRunnerFactory: PirActionsRunnerFactory,
+    private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val pixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
