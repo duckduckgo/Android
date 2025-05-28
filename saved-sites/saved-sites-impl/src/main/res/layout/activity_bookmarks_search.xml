@@ -12,7 +12,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/keyline_2"
         app:clearActionContentDescription="@string/searchbar_cleartextaction_content_description_default"
-        app:searchHint="@string/searchBookmarks" />
+        app:searchHint="@string/searchBookmarks"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler"
