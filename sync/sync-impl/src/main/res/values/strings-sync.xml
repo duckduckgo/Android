@@ -61,6 +61,9 @@
     <string name="login_screen_title">Scan QR Code</string>
     <string name="login_screen_enter_code_cta">Manually Enter Code</string>
     <string name="login_screen_barcode_hint">Point camera at QR code to sync</string>
+    <string name="login_screen_cant_scan_label">Can\'t Scan?</string>
+    <string name="login_screen_cant_scan_button_text">Copy Text Code</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
@@ -196,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Switch Sync</string>
     <string name="sync_dialog_switch_account_secondary_button">Cancel</string>
     <string name="sync_dialog_switch_account_description">This device is already synced, are you sure you want to sync it with a different back up or device? Switching won\'t remove any data already synced to this device.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Sync new device?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" will be able to access your synced DuckDuckGo data.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sync Now</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Cancel</string>
+
+    <string name="deep_link_auth_prompt_title">Set up Sync &amp; Backup</string>
+    <string name="deep_link_auth_prompt_message">Unlock device to set up Sync &amp; Backup</string>
 </resources>

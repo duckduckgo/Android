@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skeniranje kode QR</string>
-    <string name="login_screen_enter_code_cta">Ali ročno vnesite kodo</string>
+    <string name="login_screen_enter_code_cta">Ročno vnesite kodo</string>
     <string name="login_screen_barcode_hint">Za sinhronizacijo usmerite fotoaparat proti kodi QR</string>
-    <string name="login_screen_cant_scan">Ne morete skenirati? <font color="#7295F6">Delite besedilno kodo</font></string>
+    <string name="login_screen_cant_scan_label">Skeniranje ni mogoče?</string>
+    <string name="login_screen_cant_scan_button_text">Kopiraj besedilno kodo</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skeniranje kode QR</string>
-    <string name="connect_screen_scan_qr_hint">V brskalniku DuckDuckGo v drugi napravi pojdite v <b>Nastavitve &gt; Sinhronizacija in varnostno kopiranje</b> in izberite »Sinhroniziraj z drugo napravo«.</string>
-    <string name="connect_screen_enter_code_cta">Ali ročno vnesite kodo</string>
-    <string name="connect_screen_connect_qr_hint_title">Sinhronizirate mobilni telefon z mobilnim telefonom?</string>
-    <string name="connect_screen_connect_qr_hint_content">Skenirajte to kodo z drugo napravo za sinhronizacijo.</string>
+    <string name="connect_screen_scan_qr_hint">Odprite aplikacijo DuckDuckGo v drugi napravi in odprite <b>Nastavitve &gt; Sinhronizacija in varnostno kopiranje &gt; Sinhronizacija z drugo napravo</b>.</string>
+    <string name="connect_screen_enter_code_cta">Ročno vnesite kodo</string>
+    <string name="connect_screen_connect_qr_hint_title">Ali pa skeniranje z DuckDuckGo v drugi napravi</string>
+    <string name="connect_screen_connect_qr_hint_content">V drugi napravi odprite DuckDuckGo in za sinhronizacijo poskenirajte to kodo.</string>
     <string name="connect_screen_share_code">Kopiraj kodo</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Preklop sinhronizacije</string>
     <string name="sync_dialog_switch_account_secondary_button">Prekliči</string>
     <string name="sync_dialog_switch_account_description">Ta naprava je že sinhronizirana, ste prepričani, da jo želite sinhronizirati z drugo varnostno kopijo ali napravo? Preklop ne bo odstranil nobenih podatkov, ki so že sinhronizirani s to napravo.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Želite sinhronizirati novo napravo?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">Naprava »%1$s« bo lahko dostopala do vaših sinhroniziranih podatkov DuckDuckGo.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sinhroniziraj zdaj</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Prekliči</string>
+
+    <string name="deep_link_auth_prompt_title">Nastavitev funkcije Sync &amp; Backup</string>
+    <string name="deep_link_auth_prompt_message">Odklenite napravo, da nastavite funkcijo Sync &amp; Backup (Sinhronizacija in varnostno kopiranje)</string>
 </resources>
