@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Сканиране на QR код</string>
-    <string name="login_screen_enter_code_cta">Или въведете кода ръчно</string>
+    <string name="login_screen_enter_code_cta">Ръчно въвеждане на код</string>
     <string name="login_screen_barcode_hint">Насочете камерата към QR кода за синхронизиране</string>
-    <string name="login_screen_cant_scan">Не можете да сканирате? <font color="#7295F6">Споделяне на текстов код</font></string>
+    <string name="login_screen_cant_scan_label">Не можете да сканирате?</string>
+    <string name="login_screen_cant_scan_button_text">Копирайте текстов код</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Сканиране на QR код</string>
-    <string name="connect_screen_scan_qr_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране</b> в браузъра DuckDuckGo на друго устройство и изберете „Синхронизиране с друго устройство“.</string>
-    <string name="connect_screen_enter_code_cta">Или въведете кода ръчно</string>
-    <string name="connect_screen_connect_qr_hint_title">От мобилно към мобилно устройство?</string>
-    <string name="connect_screen_connect_qr_hint_content">Сканирайте този код с друго устройство, за да синхронизирате.</string>
+    <string name="connect_screen_scan_qr_hint">Отворете приложението DuckDuckGo на другото си устройство и отидете на <b>Настройки &gt; Синхронизиране и Архивиране &gt; Синхронизиране с друго устройство</b>.</string>
+    <string name="connect_screen_enter_code_cta">Ръчно въвеждане на код</string>
+    <string name="connect_screen_connect_qr_hint_title">Или сканирайте с DuckDuckGo на другото си устройство</string>
+    <string name="connect_screen_connect_qr_hint_content">Отворете DuckDuckGo на другото си устройство и сканирайте този код, за да синхронизирате.</string>
     <string name="connect_screen_share_code">Копиране на кода</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Превключване на синхронизирането</string>
     <string name="sync_dialog_switch_account_secondary_button">Отмени</string>
     <string name="sync_dialog_switch_account_description">Това устройство вече е синхронизирано, сигурни ли сте, че искате да го синхронизирате с друго резервно копие или устройство? Превключването няма да изтрие данните, които вече са синхронизирани с това устройство.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Синхронизиране на ново устройство?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ ще има достъп до синхронизираните Ви данни от DuckDuckGo.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Синхронизиране сега</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Отмени</string>
+
+    <string name="deep_link_auth_prompt_title">Настройка на Синхронизиране и архивиране</string>
+    <string name="deep_link_auth_prompt_message">Отключете устройството, за да настроите Sync &amp; Backup.</string>
 </resources>
