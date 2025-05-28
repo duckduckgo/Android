@@ -64,9 +64,9 @@ jobs:
             echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is not valid JSON or is empty."
             final_status="unknown_format"
           else
-            # Check for any flow with status "FAILURE"
-            if echo "$flow_results_json" | jq -e '.[] | select(.status=="FAILURE")' > /dev/null; then
-              echo "::error::At least one Maestro flow has status: FAILURE."
+            # Check for any flow with status "ERROR"
+            if echo "$flow_results_json" | jq -e '.[] | select(.status=="ERROR")' > /dev/null; then
+              echo "::error::At least one Maestro flow has status: ERROR."
               final_status="failure"
             fi
 
@@ -80,11 +80,11 @@ jobs:
               fi
             fi
 
-            # If after all checks, final_status is still "success", it means no "FAILURE" or "CANCELED" (if you treat canceled as non-success)
+            # If after all checks, final_status is still "success", it means no "ERROR" or "CANCELED"
             if [ "$final_status" == "success" ]; then
                 # Additional check: ensure there's at least one flow and it's not empty array if that's a concern
                 if echo "$flow_results_json" | jq -e '. | length > 0' > /dev/null; then
-                    echo "All flows appear to be successful (no FAILURE or CANCELED statuses found that are treated as errors)."
+                    echo "All flows appear to be successful (no ERROR or CANCELED statuses found that are treated as errors)."
                 else
                     echo "::warning::MAESTRO_CLOUD_FLOW_RESULTS is an empty array. No flows reported."
                     final_status="empty_results" # Or "success" if empty results are acceptable
@@ -94,4 +94,58 @@ jobs:
 
           echo "Final determined status: $final_status"
           echo "flow_summary_status=$final_status" >> $GITHUB_OUTPUT
-        shell: bash
+
+      - name: Access Outputs (for debugging)
+        if: always()
+        run: |
+          echo "Console URL: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}"
+          echo "Flow Results (JSON): ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}"
+          echo "Release Tests Step Conclusion: ${{ steps.release-tests.conclusion }}" # From Maestro action itself
+          echo "Analyzed Flow Summary Status: ${{ steps.analyze-flow-results.outputs.flow_summary_status }}" # From our script
+
+      - name: Notify Mattermost - Maestro Tests ALL SUCCEEDED
+        # Condition 1: Our script says success
+        # Condition 2: The Maestro action itself also reported overall success
+        if: steps.analyze-flow-results.outputs.flow_summary_status == 'success' && steps.release-tests.conclusion == 'success'
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-message: |
+            ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: All Release Tests PASSED successfully.
+            Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+          action: 'send-mattermost-message'
+
+      - name: Notify Mattermost - Maestro Tests FAILURES or ISSUES DETECTED
+        # Condition: Our script detected 'failure' OR the Maestro action itself reported failure
+        if: steps.analyze-flow-results.outputs.flow_summary_status == 'failure' || steps.release-tests.conclusion == 'failure'
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-message: |
+            ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Release Tests FAILED or encountered issues.
+            Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
+            Analyzed Status: `${{ steps.analyze-flow-results.outputs.flow_summary_status }}`
+            Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
+            
+
+      - name: Notify Mattermost - Maestro Tests  CANCELED Flows Present (Informational or Warning)
+        # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
+        # AND Maestro action itself didn't mark the whole run as a 'failure'
+        if: steps.analyze-flow-results.outputs.flow_summary_status == 'canceled_present' && steps.release-tests.conclusion != 'failure'
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-message: |
+            :warning: Release ${{ github.event.inputs.app-version }}: Some Release Tests were CANCELED. Please review.
+            Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
+            Analyzed Status: `${{ steps.analyze-flow-results.outputs.flow_summary_status }}`
+            Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
+            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
