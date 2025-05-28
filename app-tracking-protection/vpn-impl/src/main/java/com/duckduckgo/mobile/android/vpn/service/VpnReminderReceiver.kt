@@ -57,7 +57,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
                 vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
             }
         } else {
-            logcat(WARN) { "VpnReminderReceiver: unknown action" }
+            logcat(WARN) { "VpnReminderReceiver: unknown action: ${intent.action}" }
             pendingResult?.finish()
         }
     }

@@ -84,7 +84,7 @@ class VpnActionReceiver : BroadcastReceiver() {
             }
 
             else -> {
-                logcat(WARN) { "VpnActionReceiver: unknown action" }
+                logcat(WARN) { "VpnActionReceiver: unknown action: ${intent.action}" }
                 pendingResult?.finish()
             }
         }
