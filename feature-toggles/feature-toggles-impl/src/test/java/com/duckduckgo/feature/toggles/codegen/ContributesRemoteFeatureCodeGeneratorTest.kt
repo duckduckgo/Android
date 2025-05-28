@@ -1835,7 +1835,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets not matching and minSdkVersion not matching as sdkVersion is lower than minSdkVersion`() = runTest {
+    fun `test feature with multiple separate targets not matching and minSdkVersion not matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)

@@ -351,12 +351,12 @@ class DefaultBrowserPromptsExperimentImplTest {
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         whenever(additionalPromptsToggleMock.getCohort()).thenReturn(null)
-        whenever(additionalPromptsToggleMock.isEnabled(any())).thenReturn(false)
+        whenever(additionalPromptsToggleMock.isEnabled()).thenReturn(false)
 
         testee.onResume(lifecycleOwnerMock)
 
         AdditionalPromptsCohortName.entries.forEach {
-            verify(additionalPromptsToggleMock).isEnabled(it)
+            verify(additionalPromptsToggleMock).isEnabled()
         }
         verify(dataStoreMock, never()).storeExperimentStage(any())
         assertEquals(ExperimentStage.NOT_ENROLLED, dataStoreMock.experimentStage.first())
@@ -608,7 +608,7 @@ class DefaultBrowserPromptsExperimentImplTest {
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         whenever(additionalPromptsToggleMock.getCohort()).thenReturn(null)
-        whenever(additionalPromptsToggleMock.isEnabled(any())).thenReturn(false)
+        whenever(additionalPromptsToggleMock.isEnabled()).thenReturn(false)
         mockFeatureSettings(
             activeDaysUntilStage1 = 1,
             activeDaysUntilStage2 = 3,
@@ -1062,14 +1062,14 @@ class DefaultBrowserPromptsExperimentImplTest {
         ),
     )
 
-    private fun mockActiveCohort(cohortName: AdditionalPromptsCohortName): Cohort {
+    private suspend fun mockActiveCohort(cohortName: AdditionalPromptsCohortName): Cohort {
         val cohort = Cohort(
             name = cohortName.name,
             weight = 1,
             enrollmentDateET = fakeEnrollmentDateETString,
         )
         whenever(additionalPromptsToggleMock.getCohort()).thenReturn(cohort)
-        whenever(additionalPromptsToggleMock.isEnabled(cohortName)).thenReturn(true)
+        whenever(additionalPromptsToggleMock.isEnabled()).thenReturn(true)
 
         return cohort
     }

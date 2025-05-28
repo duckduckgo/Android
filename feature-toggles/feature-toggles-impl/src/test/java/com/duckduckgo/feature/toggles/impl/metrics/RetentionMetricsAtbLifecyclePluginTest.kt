@@ -168,6 +168,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             State(
                 remoteEnableState = false,
                 enable = false,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
             ),
         )
@@ -175,6 +176,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
             ),
         )
@@ -199,6 +201,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
             ),
         )
@@ -217,6 +220,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             State(
                 remoteEnableState = false,
                 enable = false,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
             ),
         )
@@ -224,6 +228,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
             ),
         )
@@ -249,6 +254,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
             State(
                 remoteEnableState = true,
                 enable = true,
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
             ),
         )
@@ -259,12 +265,13 @@ class RetentionMetricsAtbLifecyclePluginTest {
         assertFalse(pixel.firedPixels.none { it.contains("fooFeature") })
     }
 
-    private fun setCohorts(today: String) {
+    private suspend fun setCohorts(today: String) {
         testFeature.experimentFooFeature().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
             ),
         )
         testFeature.fooFeature().setRawStoredState(
@@ -272,6 +279,7 @@ class RetentionMetricsAtbLifecyclePluginTest {
                 remoteEnableState = true,
                 enable = true,
                 assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = today),
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = today)),
             ),
         )
     }
