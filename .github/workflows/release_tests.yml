@@ -127,9 +127,7 @@ jobs:
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
-            ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Release Tests FAILED or encountered issues.
-            Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
-            Analyzed Status: `${{ steps.analyze-flow-results.outputs.flow_summary_status }}`
+            ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Release Tests FAILED or encountered issues.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
@@ -144,8 +142,6 @@ jobs:
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
-            :warning: Release ${{ github.event.inputs.app-version }}: Some Release Tests were CANCELED. Please review.
-            Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
-            Analyzed Status: `${{ steps.analyze-flow-results.outputs.flow_summary_status }}`
+            :warning: Release ${{ github.event.inputs.app-version }}: Some Release Tests were CANCELED. Please review.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
