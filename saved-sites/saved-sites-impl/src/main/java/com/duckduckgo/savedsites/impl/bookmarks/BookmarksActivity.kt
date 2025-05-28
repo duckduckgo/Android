@@ -156,6 +156,40 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         viewModel.userReturnedFromSyncSettings()
     }
 
+    private val searchBookmarksLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            val savedSiteUrl = data?.getStringExtra(BookmarksSearchActivity.RESULT_URL_EXTRA)
+            val bookmarkFolder = data?.getSerializableExtra<BookmarkFolder>(BookmarksSearchActivity.RESULT_FOLDER)
+            when {
+                savedSiteUrl != null -> {
+                    openSavedSite(savedSiteUrl)
+                }
+                bookmarkFolder != null -> {
+                    openBookmarkFolder(bookmarkFolder)
+                }
+            }
+        }
+    }
+
+    private val importBookmarksLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedFile = result.data?.data
+            if (selectedFile != null) {
+                viewModel.importBookmarks(selectedFile)
+            }
+        }
+    }
+
+    private val exportBookmarksLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            val selectedFile = result.data?.data
+            if (selectedFile != null) {
+                viewModel.exportSavedSites(selectedFile)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         contentBookmarksBinding = ContentBookmarksBinding.bind(binding.root)
@@ -240,50 +274,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private suspend fun ViewGroup.getFirstEligiblePromo(numberBookmarks: Int): View? {
         val context = this.context ?: return null
         return screenPromotionPlugins.getPlugins().firstNotNullOfOrNull { it.getView(context, numberBookmarks) }
-    }
-
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?,
-    ) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        when (requestCode) {
-            IMPORT_BOOKMARKS_REQUEST_CODE -> {
-                if (resultCode == RESULT_OK) {
-                    val selectedFile = data?.data
-                    if (selectedFile != null) {
-                        viewModel.importBookmarks(selectedFile)
-                    }
-                }
-            }
-
-            EXPORT_BOOKMARKS_REQUEST_CODE -> {
-                if (resultCode == RESULT_OK) {
-                    val selectedFile = data?.data
-                    if (selectedFile != null) {
-                        viewModel.exportSavedSites(selectedFile)
-                    }
-                }
-            }
-
-            SEARCH_BOOKMARKS_REQUEST_CODE -> {
-                if (resultCode == RESULT_OK) {
-                    val savedSiteUrl = data?.getStringExtra(BookmarksSearchActivity.RESULT_URL_EXTRA)
-                    val bookmarkFolder = data?.getSerializableExtra<BookmarkFolder>(BookmarksSearchActivity.RESULT_FOLDER)
-
-                    when {
-                        savedSiteUrl != null -> {
-                            openSavedSite(savedSiteUrl)
-                        }
-                        bookmarkFolder != null -> {
-                            openBookmarkFolder(bookmarkFolder)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -426,12 +416,11 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             .setType("text/html")
             .setAction(Intent.ACTION_GET_CONTENT)
 
-        startActivityForResult(
+        importBookmarksLauncher.launch(
             Intent.createChooser(
                 intent,
                 getString(R.string.importBookmarksFileTitle),
             ),
-            IMPORT_BOOKMARKS_REQUEST_CODE,
         )
     }
 
@@ -442,7 +431,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
             .addCategory(Intent.CATEGORY_OPENABLE)
             .putExtra(Intent.EXTRA_TITLE, EXPORT_BOOKMARKS_FILE_NAME)
 
-        startActivityForResult(intent, EXPORT_BOOKMARKS_REQUEST_CODE)
+        exportBookmarksLauncher.launch(intent)
     }
 
     private fun launchAddFolder() {
@@ -516,7 +505,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         val intent = BookmarksSearchActivity.intent(
             this,
         )
-        startActivityForResult(intent, SEARCH_BOOKMARKS_REQUEST_CODE)
+        searchBookmarksLauncher.launch(intent)
     }
 
     private fun showBookmarksPopupMenu(
@@ -791,10 +780,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         private const val EDIT_BOOKMARK_FOLDER_FRAGMENT_TAG = "EDIT_BOOKMARK_FOLDER"
 
         private const val KEY_BOOKMARK_FOLDER = "KEY_BOOKMARK_FOLDER"
-
-        private const val IMPORT_BOOKMARKS_REQUEST_CODE = 111
-        private const val EXPORT_BOOKMARKS_REQUEST_CODE = 112
-        private const val SEARCH_BOOKMARKS_REQUEST_CODE = 113
 
         private val EXPORT_BOOKMARKS_FILE_NAME: String
             get() = "bookmarks_ddg_${formattedTimestamp()}.html"
