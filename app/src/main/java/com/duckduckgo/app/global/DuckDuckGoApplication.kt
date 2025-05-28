@@ -40,6 +40,7 @@ import logcat.AndroidLogcatLogger
 import logcat.LogPriority.DEBUG
 import logcat.LogPriority.WARN
 import logcat.LogcatLogger
+import logcat.asLog
 import logcat.logcat
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -127,7 +128,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         Thread.setDefaultUncaughtExceptionHandler(uncaughtExceptionHandler)
         RxJavaPlugins.setErrorHandler { throwable ->
             if (throwable is UndeliverableException) {
-                logcat(WARN) { "An exception happened inside RxJava code but no subscriber was still around to handle it: ${throwable.message}" }
+                logcat(WARN) { "An exception happened inside RxJava code but no subscriber was still around to handle it: ${throwable.asLog()}" }
             } else {
                 uncaughtExceptionHandler.uncaughtException(Thread.currentThread(), throwable)
             }

@@ -257,7 +257,7 @@ class DragLinearLayout @JvmOverloads constructor(
                             observer.removeOnPreDrawListener(this)
                             mDragItem.updateTargetLocation()
                             if (mDragItem.settling()) {
-                                logcat { "Updating settle animation TAG: $TAG" }
+                                logcat(tag = TAG) { "Updating settle animation" }
                                 mDragItem.mSettleAnimation!!.removeAllListeners()
                                 mDragItem.mSettleAnimation!!.cancel()
                                 onDragStop()

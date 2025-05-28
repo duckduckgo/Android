@@ -71,8 +71,11 @@ class RealAutofillProviderSuggestions @Inject constructor(
     ): FillResponse {
         val fillableFields = nodeToAutofill.parsedAutofillFields.filter { it.type != UNKNOWN }
         logcat(INFO) {
-            "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n" +
-                fillableFields.joinToString(separator = "\n")
+            "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n${
+            fillableFields.joinToString(
+                separator = "\n",
+            )
+            }"
         }
 
         val response = FillResponse.Builder()
@@ -81,8 +84,10 @@ class RealAutofillProviderSuggestions @Inject constructor(
             var inlineSuggestionsToShow = getMaxInlinedSuggestions(request) - RESERVED_SUGGESTIONS_SIZE
             val credentials = loginCredentials(nodeToAutofill)
             logcat(INFO) {
-                "DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}" +
-                    "credentials: ${credentials?.joinToString(separator = "\n")}"
+                """
+                    DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}credentials: 
+                    ${credentials.joinToString(separator = "\n")}
+                """.trimIndent()
             }
             credentials?.forEach { credential ->
                 val datasetBuilder = Dataset.Builder()
@@ -107,8 +112,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
                     suggestionUISpecs.icon,
                 )
                 logcat(INFO) {
-                    "DDGAutofillService adding suggestion: " +
-                        "${fieldsToAutofill.autofillId}-${fieldsToAutofill.type} with ${suggestionUISpecs.title}"
+                    "DDGAutofillService adding suggestion: ${fieldsToAutofill.autofillId}-${fieldsToAutofill.type} with ${suggestionUISpecs.title}"
                 }
                 datasetBuilder.setValue(
                     fieldsToAutofill.autofillId,

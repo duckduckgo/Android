@@ -85,7 +85,6 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import logcat.LogPriority
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN

@@ -140,9 +140,11 @@ class AutofillDisablingDeclineCounter @Inject constructor(
 
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
         logcat {
-            "Autofill: declineCounterIsActive? " +
-                "monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, " +
-                "autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}"
+            """
+                Autofill: declineCounterIsActive? 
+                monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, 
+                autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}
+            """.trimIndent()
         }
         return withContext(dispatchers.io()) {
             autofillPrefsStore.monitorDeclineCounts && !autofillPrefsStore.autofillStateSetByUser

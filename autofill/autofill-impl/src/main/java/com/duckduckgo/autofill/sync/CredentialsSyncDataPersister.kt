@@ -36,6 +36,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.*
+import logcat.LogPriority.INFO
 import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataPersister::class)
@@ -97,7 +98,7 @@ class CredentialsSyncDataPersister @Inject constructor(
         if (result is Success) {
             if (conflictResolution == SyncConflictResolution.DEDUPLICATION) {
                 credentialsSyncMetadata.getAllCredentials().filter { it.modified_at != null }.forEach {
-                    logcat { "Sync-autofill-Persist: post-dedup adding to syncmetadata localId ${it.localId}" }
+                    logcat(INFO) { "Sync-autofill-Persist: post-dedup adding to syncmetadata localId ${it.localId}" }
                     credentialsSyncMetadata.addOrUpdate(
                         CredentialsSyncMetadataEntity(localId = it.localId, modified_at = SyncDateProvider.now(), deleted_at = null),
                     )

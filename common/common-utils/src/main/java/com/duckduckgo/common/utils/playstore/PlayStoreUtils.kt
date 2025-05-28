@@ -64,7 +64,7 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
             }
 
             val isAppEnabled = isPlayStoreAppEnabled()
-            logcat(INFO) { "The Play Store app is installed " + if (isAppEnabled) "and enabled" else "but disabled" }
+            logcat(INFO) { "The Play Store app is installed ${if (isAppEnabled) "and enabled" else "but disabled"}" }
             return isAppEnabled
         } catch (e: PackageManager.NameNotFoundException) {
             logcat(INFO) { "Could not find package details for $PLAY_STORE_PACKAGE; Play Store is not installed" }

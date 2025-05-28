@@ -35,6 +35,7 @@ import dagger.WrongScope
 import java.lang.UnsupportedOperationException
 import javax.inject.Inject
 import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 
 @WrongScope("This should be one instance per BrowserTabFragment", FragmentScope::class)
@@ -100,7 +101,7 @@ class RealTrackingParameters @Inject constructor(
             lastCleanedUrl = cleanedUrl
             cleanedUrl
         } catch (exception: UnsupportedOperationException) {
-            logcat(ERROR) { "Tracking Parameter Removal: ${exception.message}" }
+            logcat(ERROR) { "Tracking Parameter Removal: ${exception.asLog()}" }
             null
         }
     }

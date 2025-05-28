@@ -291,7 +291,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         // important to call suppressor as soon as possible
         systemAutofillServiceSuppressor.suppressAutofill(webView)
 
-        logcat(INFO) { "storeFormData called: credentials provided to be persisted" }
+        logcat(INFO) { "storeFormData called, credentials provided to be persisted" }
 
         storeFormDataJob += coroutineScope.launch(dispatcherProvider.io()) {
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
