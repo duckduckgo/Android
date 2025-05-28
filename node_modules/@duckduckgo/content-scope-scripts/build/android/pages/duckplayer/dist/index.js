@@ -1194,20 +1194,20 @@
   var a;
   var h;
   var p = {};
-  var v = [];
-  var y = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
-  var d = Array.isArray;
-  function w(n2, l3) {
+  var y = [];
+  var v = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord|itera/i;
+  var w = Array.isArray;
+  function d(n2, l3) {
     for (var u3 in l3) n2[u3] = l3[u3];
     return n2;
   }
-  function _(n2) {
+  function g(n2) {
     n2 && n2.parentNode && n2.parentNode.removeChild(n2);
   }
-  function g(l3, u3, t3) {
+  function _(l3, u3, t3) {
     var i3, r3, o3, e3 = {};
     for (o3 in u3) "key" == o3 ? i3 = u3[o3] : "ref" == o3 ? r3 = u3[o3] : e3[o3] = u3[o3];
-    if (arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), "function" == typeof l3 && null != l3.defaultProps) for (o3 in l3.defaultProps) void 0 === e3[o3] && (e3[o3] = l3.defaultProps[o3]);
+    if (arguments.length > 2 && (e3.children = arguments.length > 3 ? n.call(arguments, 2) : t3), "function" == typeof l3 && null != l3.defaultProps) for (o3 in l3.defaultProps) null == e3[o3] && (e3[o3] = l3.defaultProps[o3]);
     return m(l3, e3, i3, r3, null);
   }
   function m(n2, t3, i3, r3, o3) {
@@ -1220,38 +1220,37 @@
   function x(n2, l3) {
     this.props = n2, this.context = l3;
   }
-  function C(n2, l3) {
-    if (null == l3) return n2.__ ? C(n2.__, n2.__i + 1) : null;
+  function S(n2, l3) {
+    if (null == l3) return n2.__ ? S(n2.__, n2.__i + 1) : null;
     for (var u3; l3 < n2.__k.length; l3++) if (null != (u3 = n2.__k[l3]) && null != u3.__e) return u3.__e;
-    return "function" == typeof n2.type ? C(n2) : null;
+    return "function" == typeof n2.type ? S(n2) : null;
   }
-  function S(n2) {
+  function C(n2) {
     var l3, u3;
     if (null != (n2 = n2.__) && null != n2.__c) {
       for (n2.__e = n2.__c.base = null, l3 = 0; l3 < n2.__k.length; l3++) if (null != (u3 = n2.__k[l3]) && null != u3.__e) {
         n2.__e = n2.__c.base = u3.__e;
         break;
       }
-      return S(n2);
+      return C(n2);
     }
   }
   function M(n2) {
-    (!n2.__d && (n2.__d = true) && i.push(n2) && !P.__r++ || r !== l.debounceRendering) && ((r = l.debounceRendering) || o)(P);
+    (!n2.__d && (n2.__d = true) && i.push(n2) && !$.__r++ || r != l.debounceRendering) && ((r = l.debounceRendering) || o)($);
   }
-  function P() {
-    var n2, u3, t3, r3, o3, f3, c3, s3;
-    for (i.sort(e); n2 = i.shift(); ) n2.__d && (u3 = i.length, r3 = void 0, f3 = (o3 = (t3 = n2).__v).__e, c3 = [], s3 = [], t3.__P && ((r3 = w({}, o3)).__v = o3.__v + 1, l.vnode && l.vnode(r3), j(t3.__P, r3, o3, t3.__n, t3.__P.namespaceURI, 32 & o3.__u ? [f3] : null, c3, null == f3 ? C(o3) : f3, !!(32 & o3.__u), s3), r3.__v = o3.__v, r3.__.__k[r3.__i] = r3, z(c3, r3, s3), r3.__e != f3 && S(r3)), i.length > u3 && i.sort(e));
-    P.__r = 0;
+  function $() {
+    for (var n2, u3, t3, r3, o3, f3, c3, s3 = 1; i.length; ) i.length > s3 && i.sort(e), n2 = i.shift(), s3 = i.length, n2.__d && (t3 = void 0, o3 = (r3 = (u3 = n2).__v).__e, f3 = [], c3 = [], u3.__P && ((t3 = d({}, r3)).__v = r3.__v + 1, l.vnode && l.vnode(t3), O(u3.__P, t3, r3, u3.__n, u3.__P.namespaceURI, 32 & r3.__u ? [o3] : null, f3, null == o3 ? S(r3) : o3, !!(32 & r3.__u), c3), t3.__v = r3.__v, t3.__.__k[t3.__i] = t3, z(f3, t3, c3), t3.__e != o3 && C(t3)));
+    $.__r = 0;
   }
-  function $(n2, l3, u3, t3, i3, r3, o3, e3, f3, c3, s3) {
-    var a3, h3, y3, d3, w3, _3, g3 = t3 && t3.__k || v, m3 = l3.length;
-    for (f3 = I(u3, l3, g3, f3, m3), a3 = 0; a3 < m3; a3++) null != (y3 = u3.__k[a3]) && (h3 = -1 === y3.__i ? p : g3[y3.__i] || p, y3.__i = a3, _3 = j(n2, y3, h3, i3, r3, o3, e3, f3, c3, s3), d3 = y3.__e, y3.ref && h3.ref != y3.ref && (h3.ref && V(h3.ref, null, y3), s3.push(y3.ref, y3.__c || d3, y3)), null == w3 && null != d3 && (w3 = d3), 4 & y3.__u || h3.__k === y3.__k ? f3 = A(y3, f3, n2) : "function" == typeof y3.type && void 0 !== _3 ? f3 = _3 : d3 && (f3 = d3.nextSibling), y3.__u &= -7);
-    return u3.__e = w3, f3;
+  function I(n2, l3, u3, t3, i3, r3, o3, e3, f3, c3, s3) {
+    var a3, h3, v3, w3, d3, g3, _3 = t3 && t3.__k || y, m3 = l3.length;
+    for (f3 = P(u3, l3, _3, f3, m3), a3 = 0; a3 < m3; a3++) null != (v3 = u3.__k[a3]) && (h3 = -1 == v3.__i ? p : _3[v3.__i] || p, v3.__i = a3, g3 = O(n2, v3, h3, i3, r3, o3, e3, f3, c3, s3), w3 = v3.__e, v3.ref && h3.ref != v3.ref && (h3.ref && q(h3.ref, null, v3), s3.push(v3.ref, v3.__c || w3, v3)), null == d3 && null != w3 && (d3 = w3), 4 & v3.__u || h3.__k === v3.__k ? f3 = A(v3, f3, n2) : "function" == typeof v3.type && void 0 !== g3 ? f3 = g3 : w3 && (f3 = w3.nextSibling), v3.__u &= -7);
+    return u3.__e = d3, f3;
   }
-  function I(n2, l3, u3, t3, i3) {
+  function P(n2, l3, u3, t3, i3) {
     var r3, o3, e3, f3, c3, s3 = u3.length, a3 = s3, h3 = 0;
-    for (n2.__k = new Array(i3), r3 = 0; r3 < i3; r3++) null != (o3 = l3[r3]) && "boolean" != typeof o3 && "function" != typeof o3 ? (f3 = r3 + h3, (o3 = n2.__k[r3] = "string" == typeof o3 || "number" == typeof o3 || "bigint" == typeof o3 || o3.constructor == String ? m(null, o3, null, null, null) : d(o3) ? m(k, { children: o3 }, null, null, null) : void 0 === o3.constructor && o3.__b > 0 ? m(o3.type, o3.props, o3.key, o3.ref ? o3.ref : null, o3.__v) : o3).__ = n2, o3.__b = n2.__b + 1, e3 = null, -1 !== (c3 = o3.__i = L(o3, u3, f3, a3)) && (a3--, (e3 = u3[c3]) && (e3.__u |= 2)), null == e3 || null === e3.__v ? (-1 == c3 && h3--, "function" != typeof o3.type && (o3.__u |= 4)) : c3 != f3 && (c3 == f3 - 1 ? h3-- : c3 == f3 + 1 ? h3++ : (c3 > f3 ? h3-- : h3++, o3.__u |= 4))) : n2.__k[r3] = null;
-    if (a3) for (r3 = 0; r3 < s3; r3++) null != (e3 = u3[r3]) && 0 == (2 & e3.__u) && (e3.__e == t3 && (t3 = C(e3)), q(e3, e3));
+    for (n2.__k = new Array(i3), r3 = 0; r3 < i3; r3++) null != (o3 = l3[r3]) && "boolean" != typeof o3 && "function" != typeof o3 ? (f3 = r3 + h3, (o3 = n2.__k[r3] = "string" == typeof o3 || "number" == typeof o3 || "bigint" == typeof o3 || o3.constructor == String ? m(null, o3, null, null, null) : w(o3) ? m(k, { children: o3 }, null, null, null) : null == o3.constructor && o3.__b > 0 ? m(o3.type, o3.props, o3.key, o3.ref ? o3.ref : null, o3.__v) : o3).__ = n2, o3.__b = n2.__b + 1, e3 = null, -1 != (c3 = o3.__i = L(o3, u3, f3, a3)) && (a3--, (e3 = u3[c3]) && (e3.__u |= 2)), null == e3 || null == e3.__v ? (-1 == c3 && (i3 > s3 ? h3-- : i3 < s3 && h3++), "function" != typeof o3.type && (o3.__u |= 4)) : c3 != f3 && (c3 == f3 - 1 ? h3-- : c3 == f3 + 1 ? h3++ : (c3 > f3 ? h3-- : h3++, o3.__u |= 4))) : n2.__k[r3] = null;
+    if (a3) for (r3 = 0; r3 < s3; r3++) null != (e3 = u3[r3]) && 0 == (2 & e3.__u) && (e3.__e == t3 && (t3 = S(e3)), B(e3, e3));
     return t3;
   }
   function A(n2, l3, u3) {
@@ -1260,7 +1259,7 @@
       for (t3 = n2.__k, i3 = 0; t3 && i3 < t3.length; i3++) t3[i3] && (t3[i3].__ = n2, l3 = A(t3[i3], l3, u3));
       return l3;
     }
-    n2.__e != l3 && (l3 && n2.type && !u3.contains(l3) && (l3 = C(n2)), u3.insertBefore(n2.__e, l3 || null), l3 = n2.__e);
+    n2.__e != l3 && (l3 && n2.type && !u3.contains(l3) && (l3 = S(n2)), u3.insertBefore(n2.__e, l3 || null), l3 = n2.__e);
     do {
       l3 = l3 && l3.nextSibling;
     } while (null != l3 && 8 == l3.nodeType);
@@ -1268,30 +1267,30 @@
   }
   function L(n2, l3, u3, t3) {
     var i3, r3, o3 = n2.key, e3 = n2.type, f3 = l3[u3];
-    if (null === f3 || f3 && o3 == f3.key && e3 === f3.type && 0 == (2 & f3.__u)) return u3;
+    if (null === f3 && null == n2.key || f3 && o3 == f3.key && e3 == f3.type && 0 == (2 & f3.__u)) return u3;
     if (t3 > (null != f3 && 0 == (2 & f3.__u) ? 1 : 0)) for (i3 = u3 - 1, r3 = u3 + 1; i3 >= 0 || r3 < l3.length; ) {
       if (i3 >= 0) {
-        if ((f3 = l3[i3]) && 0 == (2 & f3.__u) && o3 == f3.key && e3 === f3.type) return i3;
+        if ((f3 = l3[i3]) && 0 == (2 & f3.__u) && o3 == f3.key && e3 == f3.type) return i3;
         i3--;
       }
       if (r3 < l3.length) {
-        if ((f3 = l3[r3]) && 0 == (2 & f3.__u) && o3 == f3.key && e3 === f3.type) return r3;
+        if ((f3 = l3[r3]) && 0 == (2 & f3.__u) && o3 == f3.key && e3 == f3.type) return r3;
         r3++;
       }
     }
     return -1;
   }
   function T(n2, l3, u3) {
-    "-" == l3[0] ? n2.setProperty(l3, null == u3 ? "" : u3) : n2[l3] = null == u3 ? "" : "number" != typeof u3 || y.test(l3) ? u3 : u3 + "px";
+    "-" == l3[0] ? n2.setProperty(l3, null == u3 ? "" : u3) : n2[l3] = null == u3 ? "" : "number" != typeof u3 || v.test(l3) ? u3 : u3 + "px";
   }
-  function F(n2, l3, u3, t3, i3) {
-    var r3;
+  function j(n2, l3, u3, t3, i3) {
+    var r3, o3;
     n: if ("style" == l3) if ("string" == typeof u3) n2.style.cssText = u3;
     else {
       if ("string" == typeof t3 && (n2.style.cssText = t3 = ""), t3) for (l3 in t3) u3 && l3 in u3 || T(n2.style, l3, "");
-      if (u3) for (l3 in u3) t3 && u3[l3] === t3[l3] || T(n2.style, l3, u3[l3]);
+      if (u3) for (l3 in u3) t3 && u3[l3] == t3[l3] || T(n2.style, l3, u3[l3]);
     }
-    else if ("o" == l3[0] && "n" == l3[1]) r3 = l3 != (l3 = l3.replace(f, "$1")), l3 = l3.toLowerCase() in n2 || "onFocusOut" == l3 || "onFocusIn" == l3 ? l3.toLowerCase().slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + r3] = u3, u3 ? t3 ? u3.u = t3.u : (u3.u = c, n2.addEventListener(l3, r3 ? a : s, r3)) : n2.removeEventListener(l3, r3 ? a : s, r3);
+    else if ("o" == l3[0] && "n" == l3[1]) r3 = l3 != (l3 = l3.replace(f, "$1")), o3 = l3.toLowerCase(), l3 = o3 in n2 || "onFocusOut" == l3 || "onFocusIn" == l3 ? o3.slice(2) : l3.slice(2), n2.l || (n2.l = {}), n2.l[l3 + r3] = u3, u3 ? t3 ? u3.u = t3.u : (u3.u = c, n2.addEventListener(l3, r3 ? a : s, r3)) : n2.removeEventListener(l3, r3 ? a : s, r3);
     else {
       if ("http://www.w3.org/2000/svg" == i3) l3 = l3.replace(/xlink(H|:h)/, "h").replace(/sName$/, "s");
       else if ("width" != l3 && "height" != l3 && "href" != l3 && "list" != l3 && "form" != l3 && "tabIndex" != l3 && "download" != l3 && "rowSpan" != l3 && "colSpan" != l3 && "role" != l3 && "popover" != l3 && l3 in n2) try {
@@ -1302,7 +1301,7 @@
       "function" == typeof u3 || (null == u3 || false === u3 && "-" != l3[4] ? n2.removeAttribute(l3) : n2.setAttribute(l3, "popover" == l3 && 1 == u3 ? "" : u3));
     }
   }
-  function O(n2) {
+  function F(n2) {
     return function(u3) {
       if (this.l) {
         var t3 = this.l[u3.type + n2];
@@ -1312,44 +1311,44 @@
       }
     };
   }
-  function j(n2, u3, t3, i3, r3, o3, e3, f3, c3, s3) {
-    var a3, h3, p3, v3, y3, g3, m3, b, C3, S2, M2, P2, I2, A3, H, L2, T3, F2 = u3.type;
-    if (void 0 !== u3.constructor) return null;
+  function O(n2, u3, t3, i3, r3, o3, e3, f3, c3, s3) {
+    var a3, h3, p3, y3, v3, _3, m3, b, S2, C3, M2, $2, P2, A3, H, L2, T3, j3 = u3.type;
+    if (null != u3.constructor) return null;
     128 & t3.__u && (c3 = !!(32 & t3.__u), o3 = [f3 = u3.__e = t3.__e]), (a3 = l.__b) && a3(u3);
-    n: if ("function" == typeof F2) try {
-      if (b = u3.props, C3 = "prototype" in F2 && F2.prototype.render, S2 = (a3 = F2.contextType) && i3[a3.__c], M2 = a3 ? S2 ? S2.props.value : a3.__ : i3, t3.__c ? m3 = (h3 = u3.__c = t3.__c).__ = h3.__E : (C3 ? u3.__c = h3 = new F2(b, M2) : (u3.__c = h3 = new x(b, M2), h3.constructor = F2, h3.render = B), S2 && S2.sub(h3), h3.props = b, h3.state || (h3.state = {}), h3.context = M2, h3.__n = i3, p3 = h3.__d = true, h3.__h = [], h3._sb = []), C3 && null == h3.__s && (h3.__s = h3.state), C3 && null != F2.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = w({}, h3.__s)), w(h3.__s, F2.getDerivedStateFromProps(b, h3.__s))), v3 = h3.props, y3 = h3.state, h3.__v = u3, p3) C3 && null == F2.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), C3 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
+    n: if ("function" == typeof j3) try {
+      if (b = u3.props, S2 = "prototype" in j3 && j3.prototype.render, C3 = (a3 = j3.contextType) && i3[a3.__c], M2 = a3 ? C3 ? C3.props.value : a3.__ : i3, t3.__c ? m3 = (h3 = u3.__c = t3.__c).__ = h3.__E : (S2 ? u3.__c = h3 = new j3(b, M2) : (u3.__c = h3 = new x(b, M2), h3.constructor = j3, h3.render = D), C3 && C3.sub(h3), h3.props = b, h3.state || (h3.state = {}), h3.context = M2, h3.__n = i3, p3 = h3.__d = true, h3.__h = [], h3._sb = []), S2 && null == h3.__s && (h3.__s = h3.state), S2 && null != j3.getDerivedStateFromProps && (h3.__s == h3.state && (h3.__s = d({}, h3.__s)), d(h3.__s, j3.getDerivedStateFromProps(b, h3.__s))), y3 = h3.props, v3 = h3.state, h3.__v = u3, p3) S2 && null == j3.getDerivedStateFromProps && null != h3.componentWillMount && h3.componentWillMount(), S2 && null != h3.componentDidMount && h3.__h.push(h3.componentDidMount);
       else {
-        if (C3 && null == F2.getDerivedStateFromProps && b !== v3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(b, M2), !h3.__e && (null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(b, h3.__s, M2) || u3.__v == t3.__v)) {
+        if (S2 && null == j3.getDerivedStateFromProps && b !== y3 && null != h3.componentWillReceiveProps && h3.componentWillReceiveProps(b, M2), !h3.__e && null != h3.shouldComponentUpdate && false === h3.shouldComponentUpdate(b, h3.__s, M2) || u3.__v == t3.__v) {
           for (u3.__v != t3.__v && (h3.props = b, h3.state = h3.__s, h3.__d = false), u3.__e = t3.__e, u3.__k = t3.__k, u3.__k.some(function(n3) {
             n3 && (n3.__ = u3);
-          }), P2 = 0; P2 < h3._sb.length; P2++) h3.__h.push(h3._sb[P2]);
+          }), $2 = 0; $2 < h3._sb.length; $2++) h3.__h.push(h3._sb[$2]);
           h3._sb = [], h3.__h.length && e3.push(h3);
           break n;
         }
-        null != h3.componentWillUpdate && h3.componentWillUpdate(b, h3.__s, M2), C3 && null != h3.componentDidUpdate && h3.__h.push(function() {
-          h3.componentDidUpdate(v3, y3, g3);
+        null != h3.componentWillUpdate && h3.componentWillUpdate(b, h3.__s, M2), S2 && null != h3.componentDidUpdate && h3.__h.push(function() {
+          h3.componentDidUpdate(y3, v3, _3);
         });
       }
-      if (h3.context = M2, h3.props = b, h3.__P = n2, h3.__e = false, I2 = l.__r, A3 = 0, C3) {
-        for (h3.state = h3.__s, h3.__d = false, I2 && I2(u3), a3 = h3.render(h3.props, h3.state, h3.context), H = 0; H < h3._sb.length; H++) h3.__h.push(h3._sb[H]);
+      if (h3.context = M2, h3.props = b, h3.__P = n2, h3.__e = false, P2 = l.__r, A3 = 0, S2) {
+        for (h3.state = h3.__s, h3.__d = false, P2 && P2(u3), a3 = h3.render(h3.props, h3.state, h3.context), H = 0; H < h3._sb.length; H++) h3.__h.push(h3._sb[H]);
         h3._sb = [];
       } else do {
-        h3.__d = false, I2 && I2(u3), a3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
+        h3.__d = false, P2 && P2(u3), a3 = h3.render(h3.props, h3.state, h3.context), h3.state = h3.__s;
       } while (h3.__d && ++A3 < 25);
-      h3.state = h3.__s, null != h3.getChildContext && (i3 = w(w({}, i3), h3.getChildContext())), C3 && !p3 && null != h3.getSnapshotBeforeUpdate && (g3 = h3.getSnapshotBeforeUpdate(v3, y3)), f3 = $(n2, d(L2 = null != a3 && a3.type === k && null == a3.key ? a3.props.children : a3) ? L2 : [L2], u3, t3, i3, r3, o3, e3, f3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && e3.push(h3), m3 && (h3.__E = h3.__ = null);
+      h3.state = h3.__s, null != h3.getChildContext && (i3 = d(d({}, i3), h3.getChildContext())), S2 && !p3 && null != h3.getSnapshotBeforeUpdate && (_3 = h3.getSnapshotBeforeUpdate(y3, v3)), L2 = a3, null != a3 && a3.type === k && null == a3.key && (L2 = N(a3.props.children)), f3 = I(n2, w(L2) ? L2 : [L2], u3, t3, i3, r3, o3, e3, f3, c3, s3), h3.base = u3.__e, u3.__u &= -161, h3.__h.length && e3.push(h3), m3 && (h3.__E = h3.__ = null);
     } catch (n3) {
       if (u3.__v = null, c3 || null != o3) if (n3.then) {
         for (u3.__u |= c3 ? 160 : 128; f3 && 8 == f3.nodeType && f3.nextSibling; ) f3 = f3.nextSibling;
         o3[o3.indexOf(f3)] = null, u3.__e = f3;
-      } else for (T3 = o3.length; T3--; ) _(o3[T3]);
+      } else for (T3 = o3.length; T3--; ) g(o3[T3]);
       else u3.__e = t3.__e, u3.__k = t3.__k;
       l.__e(n3, u3, t3);
     }
-    else null == o3 && u3.__v == t3.__v ? (u3.__k = t3.__k, u3.__e = t3.__e) : f3 = u3.__e = N(t3.__e, u3, t3, i3, r3, o3, e3, c3, s3);
+    else null == o3 && u3.__v == t3.__v ? (u3.__k = t3.__k, u3.__e = t3.__e) : f3 = u3.__e = V(t3.__e, u3, t3, i3, r3, o3, e3, c3, s3);
     return (a3 = l.diffed) && a3(u3), 128 & u3.__u ? void 0 : f3;
   }
   function z(n2, u3, t3) {
-    for (var i3 = 0; i3 < t3.length; i3++) V(t3[i3], t3[++i3], t3[++i3]);
+    for (var i3 = 0; i3 < t3.length; i3++) q(t3[i3], t3[++i3], t3[++i3]);
     l.__c && l.__c(u3, n2), n2.some(function(u4) {
       try {
         n2 = u4.__h, u4.__h = [], n2.some(function(n3) {
@@ -1360,11 +1359,14 @@
       }
     });
   }
-  function N(u3, t3, i3, r3, o3, e3, f3, c3, s3) {
-    var a3, h3, v3, y3, w3, g3, m3, b = i3.props, k3 = t3.props, x3 = t3.type;
+  function N(n2) {
+    return "object" != typeof n2 || null == n2 || n2.__b && n2.__b > 0 ? n2 : w(n2) ? n2.map(N) : d({}, n2);
+  }
+  function V(u3, t3, i3, r3, o3, e3, f3, c3, s3) {
+    var a3, h3, y3, v3, d3, _3, m3, b = i3.props, k3 = t3.props, x3 = t3.type;
     if ("svg" == x3 ? o3 = "http://www.w3.org/2000/svg" : "math" == x3 ? o3 = "http://www.w3.org/1998/Math/MathML" : o3 || (o3 = "http://www.w3.org/1999/xhtml"), null != e3) {
-      for (a3 = 0; a3 < e3.length; a3++) if ((w3 = e3[a3]) && "setAttribute" in w3 == !!x3 && (x3 ? w3.localName == x3 : 3 == w3.nodeType)) {
-        u3 = w3, e3[a3] = null;
+      for (a3 = 0; a3 < e3.length; a3++) if ((d3 = e3[a3]) && "setAttribute" in d3 == !!x3 && (x3 ? d3.localName == x3 : 3 == d3.nodeType)) {
+        u3 = d3, e3[a3] = null;
         break;
       }
     }
@@ -1372,23 +1374,23 @@
       if (null == x3) return document.createTextNode(k3);
       u3 = document.createElementNS(o3, x3, k3.is && k3), c3 && (l.__m && l.__m(t3, e3), c3 = false), e3 = null;
     }
-    if (null === x3) b === k3 || c3 && u3.data === k3 || (u3.data = k3);
+    if (null == x3) b === k3 || c3 && u3.data == k3 || (u3.data = k3);
     else {
-      if (e3 = e3 && n.call(u3.childNodes), b = i3.props || p, !c3 && null != e3) for (b = {}, a3 = 0; a3 < u3.attributes.length; a3++) b[(w3 = u3.attributes[a3]).name] = w3.value;
-      for (a3 in b) if (w3 = b[a3], "children" == a3) ;
-      else if ("dangerouslySetInnerHTML" == a3) v3 = w3;
+      if (e3 = e3 && n.call(u3.childNodes), b = i3.props || p, !c3 && null != e3) for (b = {}, a3 = 0; a3 < u3.attributes.length; a3++) b[(d3 = u3.attributes[a3]).name] = d3.value;
+      for (a3 in b) if (d3 = b[a3], "children" == a3) ;
+      else if ("dangerouslySetInnerHTML" == a3) y3 = d3;
       else if (!(a3 in k3)) {
         if ("value" == a3 && "defaultValue" in k3 || "checked" == a3 && "defaultChecked" in k3) continue;
-        F(u3, a3, null, w3, o3);
+        j(u3, a3, null, d3, o3);
       }
-      for (a3 in k3) w3 = k3[a3], "children" == a3 ? y3 = w3 : "dangerouslySetInnerHTML" == a3 ? h3 = w3 : "value" == a3 ? g3 = w3 : "checked" == a3 ? m3 = w3 : c3 && "function" != typeof w3 || b[a3] === w3 || F(u3, a3, w3, b[a3], o3);
-      if (h3) c3 || v3 && (h3.__html === v3.__html || h3.__html === u3.innerHTML) || (u3.innerHTML = h3.__html), t3.__k = [];
-      else if (v3 && (u3.innerHTML = ""), $(u3, d(y3) ? y3 : [y3], t3, i3, r3, "foreignObject" == x3 ? "http://www.w3.org/1999/xhtml" : o3, e3, f3, e3 ? e3[0] : i3.__k && C(i3, 0), c3, s3), null != e3) for (a3 = e3.length; a3--; ) _(e3[a3]);
-      c3 || (a3 = "value", "progress" == x3 && null == g3 ? u3.removeAttribute("value") : void 0 !== g3 && (g3 !== u3[a3] || "progress" == x3 && !g3 || "option" == x3 && g3 !== b[a3]) && F(u3, a3, g3, b[a3], o3), a3 = "checked", void 0 !== m3 && m3 !== u3[a3] && F(u3, a3, m3, b[a3], o3));
+      for (a3 in k3) d3 = k3[a3], "children" == a3 ? v3 = d3 : "dangerouslySetInnerHTML" == a3 ? h3 = d3 : "value" == a3 ? _3 = d3 : "checked" == a3 ? m3 = d3 : c3 && "function" != typeof d3 || b[a3] === d3 || j(u3, a3, d3, b[a3], o3);
+      if (h3) c3 || y3 && (h3.__html == y3.__html || h3.__html == u3.innerHTML) || (u3.innerHTML = h3.__html), t3.__k = [];
+      else if (y3 && (u3.innerHTML = ""), I("template" == t3.type ? u3.content : u3, w(v3) ? v3 : [v3], t3, i3, r3, "foreignObject" == x3 ? "http://www.w3.org/1999/xhtml" : o3, e3, f3, e3 ? e3[0] : i3.__k && S(i3, 0), c3, s3), null != e3) for (a3 = e3.length; a3--; ) g(e3[a3]);
+      c3 || (a3 = "value", "progress" == x3 && null == _3 ? u3.removeAttribute("value") : null != _3 && (_3 !== u3[a3] || "progress" == x3 && !_3 || "option" == x3 && _3 != b[a3]) && j(u3, a3, _3, b[a3], o3), a3 = "checked", null != m3 && m3 != u3[a3] && j(u3, a3, m3, b[a3], o3));
     }
     return u3;
   }
-  function V(n2, u3, t3) {
+  function q(n2, u3, t3) {
     try {
       if ("function" == typeof n2) {
         var i3 = "function" == typeof n2.__u;
@@ -1398,9 +1400,9 @@
       l.__e(n3, t3);
     }
   }
-  function q(n2, u3, t3) {
+  function B(n2, u3, t3) {
     var i3, r3;
-    if (l.unmount && l.unmount(n2), (i3 = n2.ref) && (i3.current && i3.current !== n2.__e || V(i3, null, u3)), null != (i3 = n2.__c)) {
+    if (l.unmount && l.unmount(n2), (i3 = n2.ref) && (i3.current && i3.current != n2.__e || q(i3, null, u3)), null != (i3 = n2.__c)) {
       if (i3.componentWillUnmount) try {
         i3.componentWillUnmount();
       } catch (n3) {
@@ -1408,40 +1410,40 @@
       }
       i3.base = i3.__P = null;
     }
-    if (i3 = n2.__k) for (r3 = 0; r3 < i3.length; r3++) i3[r3] && q(i3[r3], u3, t3 || "function" != typeof n2.type);
-    t3 || _(n2.__e), n2.__c = n2.__ = n2.__e = void 0;
+    if (i3 = n2.__k) for (r3 = 0; r3 < i3.length; r3++) i3[r3] && B(i3[r3], u3, t3 || "function" != typeof n2.type);
+    t3 || g(n2.__e), n2.__c = n2.__ = n2.__e = void 0;
   }
-  function B(n2, l3, u3) {
+  function D(n2, l3, u3) {
     return this.constructor(n2, u3);
   }
-  function D(u3, t3, i3) {
+  function E(u3, t3, i3) {
     var r3, o3, e3, f3;
-    t3 == document && (t3 = document.documentElement), l.__ && l.__(u3, t3), o3 = (r3 = "function" == typeof i3) ? null : i3 && i3.__k || t3.__k, e3 = [], f3 = [], j(t3, u3 = (!r3 && i3 || t3).__k = g(k, null, [u3]), o3 || p, p, t3.namespaceURI, !r3 && i3 ? [i3] : o3 ? null : t3.firstChild ? n.call(t3.childNodes) : null, e3, !r3 && i3 ? i3 : o3 ? o3.__e : t3.firstChild, r3, f3), z(e3, u3, f3);
+    t3 == document && (t3 = document.documentElement), l.__ && l.__(u3, t3), o3 = (r3 = "function" == typeof i3) ? null : i3 && i3.__k || t3.__k, e3 = [], f3 = [], O(t3, u3 = (!r3 && i3 || t3).__k = _(k, null, [u3]), o3 || p, p, t3.namespaceURI, !r3 && i3 ? [i3] : o3 ? null : t3.firstChild ? n.call(t3.childNodes) : null, e3, !r3 && i3 ? i3 : o3 ? o3.__e : t3.firstChild, r3, f3), z(e3, u3, f3);
   }
-  function J(n2, l3) {
-    var u3 = { __c: l3 = "__cC" + h++, __: n2, Consumer: function(n3, l4) {
-      return n3.children(l4);
-    }, Provider: function(n3) {
-      var u4, t3;
-      return this.getChildContext || (u4 = /* @__PURE__ */ new Set(), (t3 = {})[l3] = this, this.getChildContext = function() {
+  function K(n2) {
+    function l3(n3) {
+      var u3, t3;
+      return this.getChildContext || (u3 = /* @__PURE__ */ new Set(), (t3 = {})[l3.__c] = this, this.getChildContext = function() {
         return t3;
       }, this.componentWillUnmount = function() {
-        u4 = null;
+        u3 = null;
       }, this.shouldComponentUpdate = function(n4) {
-        this.props.value !== n4.value && u4.forEach(function(n5) {
+        this.props.value != n4.value && u3.forEach(function(n5) {
           n5.__e = true, M(n5);
         });
       }, this.sub = function(n4) {
-        u4.add(n4);
+        u3.add(n4);
         var l4 = n4.componentWillUnmount;
         n4.componentWillUnmount = function() {
-          u4 && u4.delete(n4), l4 && l4.call(n4);
+          u3 && u3.delete(n4), l4 && l4.call(n4);
         };
       }), n3.children;
-    } };
-    return u3.Provider.__ = u3.Consumer.contextType = u3;
+    }
+    return l3.__c = "__cC" + h++, l3.__ = n2, l3.Provider = l3.__l = (l3.Consumer = function(n3, l4) {
+      return n3.children(l4);
+    }).contextType = l3, l3;
   }
-  n = v.slice, l = { __e: function(n2, l3, u3, t3) {
+  n = y.slice, l = { __e: function(n2, l3, u3, t3) {
     for (var i3, r3, o3; l3 = l3.__; ) if ((i3 = l3.__c) && !i3.__) try {
       if ((r3 = i3.constructor) && null != r3.getDerivedStateFromError && (i3.setState(r3.getDerivedStateFromError(n2)), o3 = i3.__d), null != i3.componentDidCatch && (i3.componentDidCatch(n2, t3 || {}), o3 = i3.__d), o3) return i3.__E = i3;
     } catch (l4) {
@@ -1452,12 +1454,12 @@
     return null != n2 && null == n2.constructor;
   }, x.prototype.setState = function(n2, l3) {
     var u3;
-    u3 = null != this.__s && this.__s !== this.state ? this.__s : this.__s = w({}, this.state), "function" == typeof n2 && (n2 = n2(w({}, u3), this.props)), n2 && w(u3, n2), null != n2 && this.__v && (l3 && this._sb.push(l3), M(this));
+    u3 = null != this.__s && this.__s != this.state ? this.__s : this.__s = d({}, this.state), "function" == typeof n2 && (n2 = n2(d({}, u3), this.props)), n2 && d(u3, n2), null != n2 && this.__v && (l3 && this._sb.push(l3), M(this));
   }, x.prototype.forceUpdate = function(n2) {
     this.__v && (this.__e = true, n2 && this.__h.push(n2), M(this));
   }, x.prototype.render = k, i = [], o = "function" == typeof Promise ? Promise.prototype.then.bind(Promise.resolve()) : setTimeout, e = function(n2, l3) {
     return n2.__v.__b - l3.__v.__b;
-  }, P.__r = 0, f = /(PointerCapture)$|Capture$/i, c = 0, s = O(false), a = O(true), h = 0;
+  }, $.__r = 0, f = /(PointerCapture)$|Capture$/i, c = 0, s = F(false), a = F(true), h = 0;
 
   // ../node_modules/preact/hooks/dist/hooks.module.js
   var t2;
@@ -1473,20 +1475,20 @@
   var l2 = c2.__c;
   var m2 = c2.unmount;
   var s2 = c2.__;
-  function d2(n2, t3) {
+  function p2(n2, t3) {
     c2.__h && c2.__h(r2, n2, o2 || t3), o2 = 0;
     var u3 = r2.__H || (r2.__H = { __: [], __h: [] });
     return n2 >= u3.__.length && u3.__.push({}), u3.__[n2];
   }
-  function h2(n2) {
-    return o2 = 1, p2(D2, n2);
+  function d2(n2) {
+    return o2 = 1, h2(D2, n2);
   }
-  function p2(n2, u3, i3) {
-    var o3 = d2(t2++, 2);
+  function h2(n2, u3, i3) {
+    var o3 = p2(t2++, 2);
     if (o3.t = n2, !o3.__c && (o3.__ = [i3 ? i3(u3) : D2(void 0, u3), function(n3) {
       var t3 = o3.__N ? o3.__N[0] : o3.__[0], r3 = o3.t(t3, n3);
       t3 !== r3 && (o3.__N = [r3, o3.__[1]], o3.__c.setState({}));
-    }], o3.__c = r2, !r2.u)) {
+    }], o3.__c = r2, !r2.__f)) {
       var f3 = function(n3, t3, r3) {
         if (!o3.__c.__H) return true;
         var u4 = o3.__c.__H.__.filter(function(n4) {
@@ -1503,7 +1505,7 @@
           }
         }), c3 && c3.call(this, n3, t3, r3) || i4;
       };
-      r2.u = true;
+      r2.__f = true;
       var c3 = r2.shouldComponentUpdate, e3 = r2.componentWillUpdate;
       r2.componentWillUpdate = function(n3, t3, r3) {
         if (this.__e) {
@@ -1516,12 +1518,12 @@
     return o3.__N || o3.__;
   }
   function y2(n2, u3) {
-    var i3 = d2(t2++, 3);
-    !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.i = u3, r2.__H.__h.push(i3));
+    var i3 = p2(t2++, 3);
+    !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.u = u3, r2.__H.__h.push(i3));
   }
   function _2(n2, u3) {
-    var i3 = d2(t2++, 4);
-    !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.i = u3, r2.__h.push(i3));
+    var i3 = p2(t2++, 4);
+    !c2.__s && C2(i3.__H, u3) && (i3.__ = n2, i3.u = u3, r2.__h.push(i3));
   }
   function A2(n2) {
     return o2 = 5, T2(function() {
@@ -1529,7 +1531,7 @@
     }, []);
   }
   function T2(n2, r3) {
-    var u3 = d2(t2++, 7);
+    var u3 = p2(t2++, 7);
     return C2(u3.__H, r3) && (u3.__ = n2(), u3.__H = r3, u3.__h = n2), u3.__;
   }
   function q2(n2, t3) {
@@ -1538,11 +1540,11 @@
     }, t3);
   }
   function x2(n2) {
-    var u3 = r2.context[n2.__c], i3 = d2(t2++, 9);
+    var u3 = r2.context[n2.__c], i3 = p2(t2++, 9);
     return i3.c = n2, u3 ? (null == i3.__ && (i3.__ = true, u3.sub(r2)), u3.props.value) : n2.__;
   }
   function g2() {
-    var n2 = d2(t2++, 11);
+    var n2 = p2(t2++, 11);
     if (!n2.__) {
       for (var u3 = r2.__v; null !== u3 && !u3.__m && null !== u3.__; ) u3 = u3.__;
       var i3 = u3.__m || (u3.__m = [0, 0]);
@@ -1565,13 +1567,13 @@
     a2 && a2(n2), t2 = 0;
     var i3 = (r2 = n2.__c).__H;
     i3 && (u2 === r2 ? (i3.__h = [], r2.__h = [], i3.__.forEach(function(n3) {
-      n3.__N && (n3.__ = n3.__N), n3.i = n3.__N = void 0;
+      n3.__N && (n3.__ = n3.__N), n3.u = n3.__N = void 0;
     })) : (i3.__h.forEach(z2), i3.__h.forEach(B2), i3.__h = [], t2 = 0)), u2 = r2;
   }, c2.diffed = function(n2) {
     v2 && v2(n2);
     var t3 = n2.__c;
     t3 && t3.__H && (t3.__H.__h.length && (1 !== f2.push(t3) && i2 === c2.requestAnimationFrame || ((i2 = c2.requestAnimationFrame) || w2)(j2)), t3.__H.__.forEach(function(n3) {
-      n3.i && (n3.__H = n3.i), n3.i = void 0;
+      n3.u && (n3.__H = n3.u), n3.u = void 0;
     })), u2 = r2 = null;
   }, c2.__c = function(n2, t3) {
     t3.some(function(n3) {
@@ -1600,7 +1602,7 @@
   function w2(n2) {
     var t3, r3 = function() {
       clearTimeout(u3), k2 && cancelAnimationFrame(t3), setTimeout(n2);
-    }, u3 = setTimeout(r3, 100);
+    }, u3 = setTimeout(r3, 35);
     k2 && (t3 = requestAnimationFrame(r3));
   }
   function z2(n2) {
@@ -1621,7 +1623,7 @@
   }
 
   // shared/components/EnvironmentProvider.js
-  var EnvironmentContext = J({
+  var EnvironmentContext = K({
     isReducedMotion: false,
     isDarkMode: false,
     debugState: false,
@@ -1636,8 +1638,8 @@
   var THEME_QUERY = "(prefers-color-scheme: dark)";
   var REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
   function EnvironmentProvider({ children, debugState, env = "production", willThrow = false, injectName = "windows" }) {
-    const [theme, setTheme] = h2(window.matchMedia(THEME_QUERY).matches ? "dark" : "light");
-    const [isReducedMotion, setReducedMotion] = h2(window.matchMedia(REDUCED_MOTION_QUERY).matches);
+    const [theme, setTheme] = d2(window.matchMedia(THEME_QUERY).matches ? "dark" : "light");
+    const [isReducedMotion, setReducedMotion] = d2(window.matchMedia(REDUCED_MOTION_QUERY).matches);
     y2(() => {
       const mediaQueryList = window.matchMedia(THEME_QUERY);
       const listener = (e3) => setTheme(e3.matches ? "dark" : "light");
@@ -1658,7 +1660,7 @@
       });
       return () => mediaQueryList.removeEventListener("change", listener);
     }, []);
-    return /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(
       EnvironmentContext.Provider,
       {
         value: {
@@ -1715,7 +1717,7 @@
   }
 
   // shared/components/TranslationsProvider.js
-  var TranslationContext = J({
+  var TranslationContext = K({
     /** @type {LocalTranslationFn} */
     t: () => {
       throw new Error("must implement");
@@ -1726,7 +1728,7 @@
       const subject = translationObject?.[inputKey]?.title || fallback?.[inputKey]?.title;
       return apply(subject, replacements, textLength);
     }
-    return /* @__PURE__ */ g(TranslationContext.Provider, { value: { t: t3 } }, children);
+    return /* @__PURE__ */ _(TranslationContext.Provider, { value: { t: t3 } }, children);
   }
 
   // shared/components/ErrorBoundary.js
@@ -2175,24 +2177,24 @@
       t: x2(TranslationContext).t
     };
   }
-  var MessagingContext2 = J(
+  var MessagingContext2 = K(
     /** @type {import("../src/index.js").DuckplayerPage} */
     {}
   );
   var useMessaging = () => x2(MessagingContext2);
-  var TelemetryContext = J(
+  var TelemetryContext = K(
     /** @type {import("../src/index.js").Telemetry} */
     {}
   );
   var useTelemetry = () => x2(TelemetryContext);
 
   // pages/duckplayer/app/providers/SettingsProvider.jsx
-  var SettingsContext = J(
+  var SettingsContext = K(
     /** @type {{settings: Settings}} */
     {}
   );
   function SettingsProvider({ settings, children }) {
-    return /* @__PURE__ */ g(SettingsContext.Provider, { value: { settings } }, children);
+    return /* @__PURE__ */ _(SettingsContext.Provider, { value: { settings } }, children);
   }
   function usePlatformName() {
     return x2(SettingsContext).settings.platform.name;
@@ -2249,7 +2251,7 @@
   }
 
   // pages/duckplayer/app/providers/UserValuesProvider.jsx
-  var UserValuesContext = J({
+  var UserValuesContext = K({
     /** @type {UserValues} */
     value: {
       privatePlayerMode: { alwaysAsk: {} },
@@ -2262,7 +2264,7 @@
     }
   });
   function UserValuesProvider({ initial, children }) {
-    const [value, setValue] = h2(initial);
+    const [value, setValue] = d2(initial);
     const messaging2 = useMessaging();
     y2(() => {
       window.addEventListener("toggle-user-values-enabled", () => {
@@ -2290,7 +2292,7 @@
         messaging2.reportPageException({ message: "could not set the enabled flag: " + err.toString() });
       });
     }
-    return /* @__PURE__ */ g(UserValuesContext.Provider, { value: { value, setEnabled } }, children);
+    return /* @__PURE__ */ _(UserValuesContext.Provider, { value: { value, setEnabled } }, children);
   }
   function useUserValues() {
     return x2(UserValuesContext).value;
@@ -2306,7 +2308,7 @@
 
   // shared/components/Fallback/Fallback.jsx
   function Fallback({ showDetails, children }) {
-    return /* @__PURE__ */ g("div", { class: Fallback_default.fallback }, /* @__PURE__ */ g("div", null, /* @__PURE__ */ g("p", null, "Something went wrong!"), children, showDetails && /* @__PURE__ */ g("p", null, "Please check logs for a message called ", /* @__PURE__ */ g("code", null, "reportPageException"))));
+    return /* @__PURE__ */ _("div", { class: Fallback_default.fallback }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", null, "Something went wrong!"), children, showDetails && /* @__PURE__ */ _("p", null, "Please check logs for a message called ", /* @__PURE__ */ _("code", null, "reportPageException"))));
   }
 
   // pages/duckplayer/app/components/Components.module.css
@@ -2328,7 +2330,7 @@
 
   // pages/duckplayer/app/components/PlayerContainer.jsx
   function PlayerContainer({ children, inset }) {
-    return /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(
       "div",
       {
         class: (0, import_classnames.default)(PlayerContainer_default.container, {
@@ -2339,7 +2341,7 @@
     );
   }
   function PlayerInternal({ children, inset }) {
-    return /* @__PURE__ */ g("div", { class: (0, import_classnames.default)(PlayerContainer_default.internals, { [PlayerContainer_default.insetInternals]: inset }) }, children);
+    return /* @__PURE__ */ _("div", { class: (0, import_classnames.default)(PlayerContainer_default.internals, { [PlayerContainer_default.insetInternals]: inset }) }, children);
   }
 
   // pages/duckplayer/app/img/info.data.svg
@@ -2370,7 +2372,7 @@
       [Button_default.fill]: fill === true,
       [Button_default.iconOnly]: icon === true
     });
-    return /* @__PURE__ */ g("button", { class: classes, type: "button", ...buttonProps }, children);
+    return /* @__PURE__ */ _("button", { class: classes, type: "button", ...buttonProps }, children);
   }
   function ButtonLink({ children, formfactor = "mobile", icon = false, fill = false, highlight = false, anchorProps = {} }) {
     const classes = (0, import_classnames2.default)({
@@ -2380,10 +2382,10 @@
       [Button_default.fill]: fill === true,
       [Button_default.iconOnly]: icon === true
     });
-    return /* @__PURE__ */ g("a", { class: classes, type: "button", ...anchorProps }, children);
+    return /* @__PURE__ */ _("a", { class: classes, type: "button", ...anchorProps }, children);
   }
   function Icon({ src }) {
-    return /* @__PURE__ */ g("span", { class: Button_default.icon }, /* @__PURE__ */ g("img", { src, alt: "" }));
+    return /* @__PURE__ */ _("span", { class: Button_default.icon }, /* @__PURE__ */ _("img", { src, alt: "" }));
   }
 
   // pages/duckplayer/app/components/FloatingBar.module.css
@@ -2396,7 +2398,7 @@
   // pages/duckplayer/app/components/FloatingBar.jsx
   var import_classnames3 = __toESM(require_classnames(), 1);
   function FloatingBar({ children, inset = false }) {
-    return /* @__PURE__ */ g("div", { class: (0, import_classnames3.default)(FloatingBar_default.floatingBar, { [FloatingBar_default.inset]: inset }) }, children);
+    return /* @__PURE__ */ _("div", { class: (0, import_classnames3.default)(FloatingBar_default.floatingBar, { [FloatingBar_default.inset]: inset }) }, children);
   }
 
   // pages/duckplayer/app/components/SwitchBarMobile.jsx
@@ -2415,7 +2417,7 @@
   };
 
   // pages/duckplayer/app/providers/SwitchProvider.jsx
-  var SwitchContext = J({
+  var SwitchContext = K({
     /** @type {SwitchState} */
     state: "showing",
     /** @type {() => void} */
@@ -2431,7 +2433,7 @@
     const userValues = useUserValues();
     const setEnabled = useSetEnabled();
     const initialState = "enabled" in userValues.privatePlayerMode ? "completed" : "showing";
-    const [state, dispatch] = p2((state2, event) => {
+    const [state, dispatch] = h2((state2, event) => {
       console.log("\u{1F4E9}", { state: state2, event });
       switch (state2) {
         case "showing": {
@@ -2471,7 +2473,7 @@
     function onDone() {
       dispatch("done");
     }
-    return /* @__PURE__ */ g(SwitchContext.Provider, { value: { state, onChange, onDone } }, children);
+    return /* @__PURE__ */ _(SwitchContext.Provider, { value: { state, onChange, onDone } }, children);
   }
 
   // pages/duckplayer/app/components/Switch.module.css
@@ -2484,7 +2486,7 @@
   // pages/duckplayer/app/components/Switch.jsx
   var import_classnames4 = __toESM(require_classnames(), 1);
   function Switch({ checked, onChange, id, platformName = "ios" }) {
-    return /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(
       "button",
       {
         role: "switch",
@@ -2496,7 +2498,7 @@
           [Switch_default.android]: platformName === "android"
         })
       },
-      /* @__PURE__ */ g("span", { className: Switch_default.thumb })
+      /* @__PURE__ */ _("span", { className: Switch_default.thumb })
     );
   }
 
@@ -2520,7 +2522,7 @@
       [SwitchBarMobile_default.stateExiting]: state === "exiting",
       [SwitchBarMobile_default.stateHidden]: state === "completed"
     });
-    return /* @__PURE__ */ g("div", { class: classes, "data-state": state, "data-allow-animation": "true", onTransitionEnd }, /* @__PURE__ */ g("div", { class: SwitchBarMobile_default.labelRow, onClick: blockClick }, /* @__PURE__ */ g("label", { for: inputId, class: SwitchBarMobile_default.label }, /* @__PURE__ */ g("span", { className: SwitchBarMobile_default.text }, t3("keepEnabled"))), /* @__PURE__ */ g(Switch, { checked: state !== "showing", onChange, platformName, id: inputId })));
+    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, "data-allow-animation": "true", onTransitionEnd }, /* @__PURE__ */ _("div", { class: SwitchBarMobile_default.labelRow, onClick: blockClick }, /* @__PURE__ */ _("label", { for: inputId, class: SwitchBarMobile_default.label }, /* @__PURE__ */ _("span", { className: SwitchBarMobile_default.text }, t3("keepEnabled"))), /* @__PURE__ */ _(Switch, { checked: state !== "showing", onChange, platformName, id: inputId })));
   }
 
   // pages/duckplayer/app/components/InfoBar.module.css
@@ -2567,7 +2569,7 @@
       [SwitchBarDesktop_default.stateExiting]: state === "exiting",
       [SwitchBarDesktop_default.stateCompleted]: state === "completed"
     });
-    return /* @__PURE__ */ g("div", { class: classes, "data-state": state, "data-allow-animation": true, onTransitionEnd: onDone }, /* @__PURE__ */ g("label", { class: SwitchBarDesktop_default.label, onClick: blockClick }, /* @__PURE__ */ g("span", { class: SwitchBarDesktop_default.checkbox }, /* @__PURE__ */ g("input", { class: SwitchBarDesktop_default.input, onChange, name: "enabled", type: "checkbox", checked: state !== "showing" })), /* @__PURE__ */ g("span", { class: SwitchBarDesktop_default.text }, t3("alwaysWatchHere"))));
+    return /* @__PURE__ */ _("div", { class: classes, "data-state": state, "data-allow-animation": true, onTransitionEnd: onDone }, /* @__PURE__ */ _("label", { class: SwitchBarDesktop_default.label, onClick: blockClick }, /* @__PURE__ */ _("span", { class: SwitchBarDesktop_default.checkbox }, /* @__PURE__ */ _("input", { class: SwitchBarDesktop_default.input, onChange, name: "enabled", type: "checkbox", checked: state !== "showing" })), /* @__PURE__ */ _("span", { class: SwitchBarDesktop_default.text }, t3("alwaysWatchHere"))));
   }
 
   // pages/duckplayer/app/components/Tooltip.jsx
@@ -2584,7 +2586,7 @@
   // pages/duckplayer/app/components/Tooltip.jsx
   function Tooltip({ id, isVisible, position }) {
     const { t: t3 } = useTypedTranslation();
-    return /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(
       "div",
       {
         class: (0, import_classnames7.default)(Tooltip_default.tooltip, {
@@ -2663,7 +2665,7 @@
       [FocusMode_default.fade]: style === "fade",
       [FocusMode_default.slide]: style === "slide"
     });
-    return /* @__PURE__ */ g("div", { class: classes, "data-style": style }, children);
+    return /* @__PURE__ */ _("div", { class: classes, "data-style": style }, children);
   }
   function useSetFocusMode() {
     return q2((action) => {
@@ -2673,12 +2675,12 @@
 
   // pages/duckplayer/app/components/InfoBar.jsx
   function InfoBar({ embed }) {
-    return /* @__PURE__ */ g("div", { class: InfoBar_default.infoBar }, /* @__PURE__ */ g("div", { class: InfoBar_default.lhs }, /* @__PURE__ */ g("div", { class: InfoBar_default.dax }, /* @__PURE__ */ g("img", { src: dax_data_default, class: InfoBar_default.img })), /* @__PURE__ */ g("div", { class: InfoBar_default.text }, "Duck Player"), /* @__PURE__ */ g(InfoIcon, null)), /* @__PURE__ */ g("div", { class: InfoBar_default.rhs }, /* @__PURE__ */ g(SwitchProvider, null, /* @__PURE__ */ g("div", { class: InfoBar_default.switch }, /* @__PURE__ */ g(SwitchBarDesktop, null)), /* @__PURE__ */ g(ControlBarDesktop, { embed }))));
+    return /* @__PURE__ */ _("div", { class: InfoBar_default.infoBar }, /* @__PURE__ */ _("div", { class: InfoBar_default.lhs }, /* @__PURE__ */ _("div", { class: InfoBar_default.dax }, /* @__PURE__ */ _("img", { src: dax_data_default, class: InfoBar_default.img })), /* @__PURE__ */ _("div", { class: InfoBar_default.text }, "Duck Player"), /* @__PURE__ */ _(InfoIcon, null)), /* @__PURE__ */ _("div", { class: InfoBar_default.rhs }, /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _("div", { class: InfoBar_default.switch }, /* @__PURE__ */ _(SwitchBarDesktop, null)), /* @__PURE__ */ _(ControlBarDesktop, { embed }))));
   }
   function InfoIcon({ debugStyles = false }) {
     const setFocusMode = useSetFocusMode();
-    const [isVisible, setIsVisible] = h2(debugStyles);
-    const [isBottom, setIsBottom] = h2(false);
+    const [isVisible, setIsVisible] = d2(debugStyles);
+    const [isBottom, setIsBottom] = d2(false);
     const tooltipRef = A2(null);
     function show() {
       setIsVisible(true);
@@ -2699,7 +2701,7 @@
       }
       return setIsBottom(true);
     }, [isVisible]);
-    return /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(
       "button",
       {
         className: InfoBar_default.info,
@@ -2712,8 +2714,8 @@
         onBlur: hide,
         ref: tooltipRef
       },
-      /* @__PURE__ */ g(Icon, { src: info_data_default }),
-      /* @__PURE__ */ g(Tooltip, { id: "tooltip1", isVisible, position: isBottom ? "bottom" : "top" })
+      /* @__PURE__ */ _(Icon, { src: info_data_default }),
+      /* @__PURE__ */ _(Tooltip, { id: "tooltip1", isVisible, position: isBottom ? "bottom" : "top" })
     );
   }
   function ControlBarDesktop({ embed }) {
@@ -2721,7 +2723,7 @@
     const openOnYoutube = useOpenOnYoutubeHandler();
     const { t: t3 } = useTypedTranslation();
     const { state } = x2(SwitchContext);
-    return /* @__PURE__ */ g("div", { className: InfoBar_default.controls }, /* @__PURE__ */ g(
+    return /* @__PURE__ */ _("div", { className: InfoBar_default.controls }, /* @__PURE__ */ _(
       ButtonLink,
       {
         formfactor: "desktop",
@@ -2733,8 +2735,8 @@
           "aria-label": t3("openSettingsButton")
         }
       },
-      /* @__PURE__ */ g(Icon, { src: cog_data_default })
-    ), /* @__PURE__ */ g(
+      /* @__PURE__ */ _(Icon, { src: cog_data_default })
+    ), /* @__PURE__ */ _(
       Button,
       {
         formfactor: "desktop",
@@ -2748,7 +2750,7 @@
     ));
   }
   function InfoBarContainer({ children }) {
-    return /* @__PURE__ */ g("div", { class: InfoBar_default.container }, children);
+    return /* @__PURE__ */ _("div", { class: InfoBar_default.container }, children);
   }
 
   // pages/duckplayer/app/components/Wordmark.module.css
@@ -2768,10 +2770,10 @@
 
   // pages/duckplayer/app/components/Wordmark.jsx
   function Wordmark() {
-    return /* @__PURE__ */ g("div", { class: Wordmark_default.wordmark }, /* @__PURE__ */ g("div", { className: Wordmark_default.logo }, /* @__PURE__ */ g("img", { src: dax_data_default, className: Wordmark_default.img, alt: "DuckDuckGo logo" })), /* @__PURE__ */ g("div", { className: Wordmark_default.text }, "Duck Player"));
+    return /* @__PURE__ */ _("div", { class: Wordmark_default.wordmark }, /* @__PURE__ */ _("div", { className: Wordmark_default.logo }, /* @__PURE__ */ _("img", { src: dax_data_default, className: Wordmark_default.img, alt: "DuckDuckGo logo" })), /* @__PURE__ */ _("div", { className: Wordmark_default.text }, "Duck Player"));
   }
   function MobileWordmark() {
-    return /* @__PURE__ */ g("div", { class: Wordmark_mobile_default.logo }, /* @__PURE__ */ g("span", { class: Wordmark_mobile_default.logoSvg }, /* @__PURE__ */ g("img", { src: dax_data_default, className: Wordmark_mobile_default.img, alt: "DuckDuckGo logo" })), /* @__PURE__ */ g("span", { class: Wordmark_mobile_default.text }, "Duck Player"));
+    return /* @__PURE__ */ _("div", { class: Wordmark_mobile_default.logo }, /* @__PURE__ */ _("span", { class: Wordmark_mobile_default.logoSvg }, /* @__PURE__ */ _("img", { src: dax_data_default, className: Wordmark_mobile_default.img, alt: "DuckDuckGo logo" })), /* @__PURE__ */ _("span", { class: Wordmark_mobile_default.text }, "Duck Player"));
   }
 
   // pages/duckplayer/app/components/Player.jsx
@@ -3057,7 +3059,7 @@
     unknown: "unknown"
   };
   var YOUTUBE_ERROR_IDS = Object.values(YOUTUBE_ERRORS);
-  var YouTubeErrorContext = J({
+  var YouTubeErrorContext = K({
     /** @type {YouTubeError|null} */
     error: null
   });
@@ -3066,7 +3068,7 @@
     if (initial && YOUTUBE_ERROR_IDS.includes(initial)) {
       initialError = initial;
     }
-    const [error, setError] = h2(initialError);
+    const [error, setError] = d2(initialError);
     const messaging2 = useMessaging();
     const setFocusMode = useSetFocusMode();
     y2(() => {
@@ -3085,7 +3087,7 @@
       window.addEventListener(YOUTUBE_ERROR_EVENT, errorEventHandler);
       return () => window.removeEventListener(YOUTUBE_ERROR_EVENT, errorEventHandler);
     }, []);
-    return /* @__PURE__ */ g(YouTubeErrorContext.Provider, { value: { error } }, children);
+    return /* @__PURE__ */ _(YouTubeErrorContext.Provider, { value: { error } }, children);
   }
   function useYouTubeError() {
     return x2(YouTubeErrorContext).error;
@@ -3282,7 +3284,7 @@
       [Player_default.desktop]: layout === "desktop",
       [Player_default.mobile]: layout === "mobile"
     });
-    return /* @__PURE__ */ g("div", { class: wrapperClasses }, /* @__PURE__ */ g(
+    return /* @__PURE__ */ _("div", { class: wrapperClasses }, /* @__PURE__ */ _(
       "iframe",
       {
         class: iframeClasses,
@@ -3299,10 +3301,10 @@
   function PlayerError({ kind, layout }) {
     const { t: t3 } = useTypedTranslation();
     const errors = {
-      ["invalid-id"]: /* @__PURE__ */ g("span", { dangerouslySetInnerHTML: { __html: t3("invalidIdError") } })
+      ["invalid-id"]: /* @__PURE__ */ _("span", { dangerouslySetInnerHTML: { __html: t3("invalidIdError") } })
     };
     const text = errors[kind] || errors["invalid-id"];
-    return /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(
       "div",
       {
         class: (0, import_classnames9.default)(Player_default.root, {
@@ -3310,7 +3312,7 @@
           [Player_default.mobile]: layout === "mobile"
         })
       },
-      /* @__PURE__ */ g("div", { className: Player_default.error }, /* @__PURE__ */ g("p", null, text))
+      /* @__PURE__ */ _("div", { className: Player_default.error }, /* @__PURE__ */ _("p", null, text))
     );
   }
   function useIframeEffects(src) {
@@ -3399,7 +3401,7 @@
       [YouTubeError_default.desktop]: layout === "desktop",
       [YouTubeError_default.mobile]: layout === "mobile"
     });
-    return /* @__PURE__ */ g("div", { className: classes }, /* @__PURE__ */ g("div", { className: YouTubeError_default.container }, /* @__PURE__ */ g("span", { className: YouTubeError_default.icon }), /* @__PURE__ */ g("div", { className: YouTubeError_default.content }, /* @__PURE__ */ g("h1", { className: YouTubeError_default.heading }, heading), messages && variant === "inline" && /* @__PURE__ */ g("p", { className: YouTubeError_default.messages }, messages.map((item) => /* @__PURE__ */ g("span", { key: item }, item))), messages && variant === "paragraphs" && /* @__PURE__ */ g("div", { className: YouTubeError_default.messages }, messages.map((item) => /* @__PURE__ */ g("p", { key: item }, item))), messages && variant === "list" && /* @__PURE__ */ g("ul", { className: YouTubeError_default.messages }, messages.map((item) => /* @__PURE__ */ g("li", { key: item }, item))))));
+    return /* @__PURE__ */ _("div", { className: classes }, /* @__PURE__ */ _("div", { className: YouTubeError_default.container }, /* @__PURE__ */ _("span", { className: YouTubeError_default.icon }), /* @__PURE__ */ _("div", { className: YouTubeError_default.content }, /* @__PURE__ */ _("h1", { className: YouTubeError_default.heading }, heading), messages && variant === "inline" && /* @__PURE__ */ _("p", { className: YouTubeError_default.messages }, messages.map((item) => /* @__PURE__ */ _("span", { key: item }, item))), messages && variant === "paragraphs" && /* @__PURE__ */ _("div", { className: YouTubeError_default.messages }, messages.map((item) => /* @__PURE__ */ _("p", { key: item }, item))), messages && variant === "list" && /* @__PURE__ */ _("ul", { className: YouTubeError_default.messages }, messages.map((item) => /* @__PURE__ */ _("li", { key: item }, item))))));
   }
 
   // pages/duckplayer/app/components/Components.jsx
@@ -3410,7 +3412,7 @@
     let embed = EmbedSettings.fromHref("https://localhost?videoID=123");
     let url = embed?.toEmbedUrl();
     if (!url) throw new Error("unreachable");
-    return /* @__PURE__ */ g(k, null, /* @__PURE__ */ g("main", { class: Components_default.main }, /* @__PURE__ */ g("div", { class: Components_default.tube }, /* @__PURE__ */ g(Wordmark, null), /* @__PURE__ */ g("h2", null, "Floating Bar"), /* @__PURE__ */ g("div", { style: "position: relative; padding-left: 10em; min-height: 150px;" }, /* @__PURE__ */ g(InfoIcon, { debugStyles: true })), /* @__PURE__ */ g("h2", null, "Info Tooltip"), /* @__PURE__ */ g(FloatingBar, null, /* @__PURE__ */ g(Button, { icon: true }, /* @__PURE__ */ g(Icon, { src: info_data_default })), /* @__PURE__ */ g(Button, { icon: true }, /* @__PURE__ */ g(Icon, { src: cog_data_default })), /* @__PURE__ */ g(Button, { fill: true }, "Open in YouTube")), /* @__PURE__ */ g("h2", null, "Info Bar"), /* @__PURE__ */ g(SettingsProvider, { settings }, /* @__PURE__ */ g(SwitchProvider, null, /* @__PURE__ */ g(InfoBar, { embed }))), /* @__PURE__ */ g("br", null), /* @__PURE__ */ g("h2", null, "Mobile Switch Bar (ios)"), /* @__PURE__ */ g(SwitchProvider, null, /* @__PURE__ */ g(SwitchBarMobile, { platformName: "ios" })), /* @__PURE__ */ g("h2", null, "Mobile Switch Bar (android)"), /* @__PURE__ */ g(SwitchProvider, null, /* @__PURE__ */ g(SwitchBarMobile, { platformName: "android" })), /* @__PURE__ */ g("h2", null, "Desktop Switch bar"), /* @__PURE__ */ g("h3", null, "idle"), /* @__PURE__ */ g(SwitchProvider, null, /* @__PURE__ */ g(SwitchBarDesktop, null))), /* @__PURE__ */ g("h2", null, /* @__PURE__ */ g("code", null, "inset=false (desktop)")), /* @__PURE__ */ g(SettingsProvider, { settings }, /* @__PURE__ */ g(PlayerContainer, null, /* @__PURE__ */ g(Player, { src: url, layout: "desktop" }), /* @__PURE__ */ g(InfoBarContainer, null, /* @__PURE__ */ g(InfoBar, { embed })))), /* @__PURE__ */ g("br", null), /* @__PURE__ */ g(SettingsProvider, { settings }, /* @__PURE__ */ g(PlayerContainer, null, /* @__PURE__ */ g(YouTubeError, { layout: "desktop", kind: "sign-in-required" }), /* @__PURE__ */ g(InfoBarContainer, null, /* @__PURE__ */ g(InfoBar, { embed })))), /* @__PURE__ */ g("br", null), /* @__PURE__ */ g(SettingsProvider, { settings }, /* @__PURE__ */ g(PlayerContainer, null, /* @__PURE__ */ g(YouTubeError, { layout: "desktop", kind: "no-embed" }), /* @__PURE__ */ g(InfoBarContainer, null, /* @__PURE__ */ g(InfoBar, { embed })))), /* @__PURE__ */ g("br", null), /* @__PURE__ */ g("h2", null, /* @__PURE__ */ g("code", null, "inset=true (mobile)")), /* @__PURE__ */ g(PlayerContainer, { inset: true }, /* @__PURE__ */ g(PlayerInternal, { inset: true }, /* @__PURE__ */ g(PlayerError, { layout: "mobile", kind: "invalid-id" }), /* @__PURE__ */ g(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ g("br", null), /* @__PURE__ */ g(PlayerContainer, { inset: true }, /* @__PURE__ */ g(PlayerInternal, { inset: true }, /* @__PURE__ */ g(YouTubeError, { layout: "mobile", kind: "sign-in-required" }), /* @__PURE__ */ g(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ g("br", null), /* @__PURE__ */ g(PlayerContainer, { inset: true }, /* @__PURE__ */ g(PlayerInternal, { inset: true }, /* @__PURE__ */ g(YouTubeError, { layout: "mobile", kind: "no-embed" }), /* @__PURE__ */ g(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ g("br", null)));
+    return /* @__PURE__ */ _(k, null, /* @__PURE__ */ _("main", { class: Components_default.main }, /* @__PURE__ */ _("div", { class: Components_default.tube }, /* @__PURE__ */ _(Wordmark, null), /* @__PURE__ */ _("h2", null, "Floating Bar"), /* @__PURE__ */ _("div", { style: "position: relative; padding-left: 10em; min-height: 150px;" }, /* @__PURE__ */ _(InfoIcon, { debugStyles: true })), /* @__PURE__ */ _("h2", null, "Info Tooltip"), /* @__PURE__ */ _(FloatingBar, null, /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: info_data_default })), /* @__PURE__ */ _(Button, { icon: true }, /* @__PURE__ */ _(Icon, { src: cog_data_default })), /* @__PURE__ */ _(Button, { fill: true }, "Open in YouTube")), /* @__PURE__ */ _("h2", null, "Info Bar"), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(InfoBar, { embed }))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (ios)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" })), /* @__PURE__ */ _("h2", null, "Mobile Switch Bar (android)"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName: "android" })), /* @__PURE__ */ _("h2", null, "Desktop Switch bar"), /* @__PURE__ */ _("h3", null, "idle"), /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarDesktop, null))), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=false (desktop)")), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(PlayerContainer, null, /* @__PURE__ */ _(Player, { src: url, layout: "desktop" }), /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(PlayerContainer, null, /* @__PURE__ */ _(YouTubeError, { layout: "desktop", kind: "sign-in-required" }), /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(PlayerContainer, null, /* @__PURE__ */ _(YouTubeError, { layout: "desktop", kind: "no-embed" }), /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _("h2", null, /* @__PURE__ */ _("code", null, "inset=true (mobile)")), /* @__PURE__ */ _(PlayerContainer, { inset: true }, /* @__PURE__ */ _(PlayerInternal, { inset: true }, /* @__PURE__ */ _(PlayerError, { layout: "mobile", kind: "invalid-id" }), /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _(PlayerContainer, { inset: true }, /* @__PURE__ */ _(PlayerInternal, { inset: true }, /* @__PURE__ */ _(YouTubeError, { layout: "mobile", kind: "sign-in-required" }), /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ _("br", null), /* @__PURE__ */ _(PlayerContainer, { inset: true }, /* @__PURE__ */ _(PlayerInternal, { inset: true }, /* @__PURE__ */ _(YouTubeError, { layout: "mobile", kind: "no-embed" }), /* @__PURE__ */ _(SwitchBarMobile, { platformName: "ios" }))), /* @__PURE__ */ _("br", null)));
   }
 
   // pages/duckplayer/app/components/MobileApp.jsx
@@ -3434,7 +3436,7 @@
     return {
       focusMode: () => {
         if (settings.focusMode.state === "enabled") {
-          return /* @__PURE__ */ g(FocusMode, null);
+          return /* @__PURE__ */ _(FocusMode, null);
         } else {
           return null;
         }
@@ -3453,7 +3455,7 @@
     const openInfo = useOpenInfoHandler();
     const openOnYoutube = useOpenOnYoutubeHandler();
     const { t: t3 } = useTypedTranslation();
-    return /* @__PURE__ */ g("div", { class: MobileButtons_default.buttons }, /* @__PURE__ */ g(
+    return /* @__PURE__ */ _("div", { class: MobileButtons_default.buttons }, /* @__PURE__ */ _(
       Button,
       {
         icon: true,
@@ -3462,8 +3464,8 @@
           onClick: openInfo
         }
       },
-      /* @__PURE__ */ g(Icon, { src: info_data_default })
-    ), /* @__PURE__ */ g(
+      /* @__PURE__ */ _(Icon, { src: info_data_default })
+    ), /* @__PURE__ */ _(
       Button,
       {
         icon: true,
@@ -3472,8 +3474,8 @@
           onClick: openSettings
         }
       },
-      /* @__PURE__ */ g(Icon, { src: cog_data_default })
-    ), /* @__PURE__ */ g(
+      /* @__PURE__ */ _(Icon, { src: cog_data_default })
+    ), /* @__PURE__ */ _(
       Button,
       {
         fill: true,
@@ -3526,7 +3528,7 @@
     const telemetry2 = useTelemetry();
     const youtubeError = useYouTubeError();
     const features = createAppFeaturesFrom(settings);
-    return /* @__PURE__ */ g(k, null, !youtubeError && features.focusMode(), /* @__PURE__ */ g(
+    return /* @__PURE__ */ _(k, null, !youtubeError && features.focusMode(), /* @__PURE__ */ _(
       OrientationProvider,
       {
         onChange: (orientation) => {
@@ -3542,14 +3544,14 @@
           return FocusMode.enable();
         }
       }
-    ), /* @__PURE__ */ g(MobileLayout, { embed }));
+    ), /* @__PURE__ */ _(MobileLayout, { embed }));
   }
   function MobileLayout({ embed }) {
     const platformName = usePlatformName();
     const youtubeError = useYouTubeError();
     const settings = useSettings();
     const showCustomError = youtubeError && settings.customError?.state === "enabled";
-    return /* @__PURE__ */ g("main", { class: MobileApp_default.main, "data-youtube-error": !!youtubeError }, /* @__PURE__ */ g("div", { class: (0, import_classnames11.default)(MobileApp_default.filler, MobileApp_default.hideInFocus) }), /* @__PURE__ */ g("div", { class: MobileApp_default.embed }, embed === null && /* @__PURE__ */ g(PlayerError, { layout: "mobile", kind: "invalid-id" }), embed !== null && showCustomError && /* @__PURE__ */ g(YouTubeError, { layout: "mobile", kind: youtubeError }), embed !== null && !showCustomError && /* @__PURE__ */ g(Player, { src: embed.toEmbedUrl(), layout: "mobile" })), /* @__PURE__ */ g("div", { class: (0, import_classnames11.default)(MobileApp_default.logo, MobileApp_default.hideInFocus) }, /* @__PURE__ */ g(MobileWordmark, null)), /* @__PURE__ */ g("div", { class: (0, import_classnames11.default)(MobileApp_default.switch, MobileApp_default.hideInFocus) }, /* @__PURE__ */ g(SwitchProvider, null, /* @__PURE__ */ g(SwitchBarMobile, { platformName }))), /* @__PURE__ */ g("div", { class: (0, import_classnames11.default)(MobileApp_default.buttons, MobileApp_default.hideInFocus) }, /* @__PURE__ */ g(MobileButtons, { embed })));
+    return /* @__PURE__ */ _("main", { class: MobileApp_default.main, "data-youtube-error": !!youtubeError }, /* @__PURE__ */ _("div", { class: (0, import_classnames11.default)(MobileApp_default.filler, MobileApp_default.hideInFocus) }), /* @__PURE__ */ _("div", { class: MobileApp_default.embed }, embed === null && /* @__PURE__ */ _(PlayerError, { layout: "mobile", kind: "invalid-id" }), embed !== null && showCustomError && /* @__PURE__ */ _(YouTubeError, { layout: "mobile", kind: youtubeError }), embed !== null && !showCustomError && /* @__PURE__ */ _(Player, { src: embed.toEmbedUrl(), layout: "mobile" })), /* @__PURE__ */ _("div", { class: (0, import_classnames11.default)(MobileApp_default.logo, MobileApp_default.hideInFocus) }, /* @__PURE__ */ _(MobileWordmark, null)), /* @__PURE__ */ _("div", { class: (0, import_classnames11.default)(MobileApp_default.switch, MobileApp_default.hideInFocus) }, /* @__PURE__ */ _(SwitchProvider, null, /* @__PURE__ */ _(SwitchBarMobile, { platformName }))), /* @__PURE__ */ _("div", { class: (0, import_classnames11.default)(MobileApp_default.buttons, MobileApp_default.hideInFocus) }, /* @__PURE__ */ _(MobileButtons, { embed })));
   }
 
   // pages/duckplayer/app/components/DesktopApp.module.css
@@ -3571,13 +3573,13 @@
     const settings = useSettings();
     const features = createAppFeaturesFrom(settings);
     const youtubeError = useYouTubeError();
-    return /* @__PURE__ */ g(k, null, features.focusMode(), /* @__PURE__ */ g("main", { class: DesktopApp_default.app, "data-youtube-error": !!youtubeError }, /* @__PURE__ */ g(DesktopLayout, { embed })));
+    return /* @__PURE__ */ _(k, null, features.focusMode(), /* @__PURE__ */ _("main", { class: DesktopApp_default.app, "data-youtube-error": !!youtubeError }, /* @__PURE__ */ _(DesktopLayout, { embed })));
   }
   function DesktopLayout({ embed }) {
     const youtubeError = useYouTubeError();
     const settings = useSettings();
     const showCustomError = youtubeError && settings.customError?.state === "enabled";
-    return /* @__PURE__ */ g("div", { class: DesktopApp_default.desktop }, /* @__PURE__ */ g(PlayerContainer, null, embed === null && /* @__PURE__ */ g(PlayerError, { layout: "desktop", kind: "invalid-id" }), embed !== null && showCustomError && /* @__PURE__ */ g(YouTubeError, { layout: "desktop", kind: youtubeError }), embed !== null && !showCustomError && /* @__PURE__ */ g(Player, { src: embed.toEmbedUrl(), layout: "desktop" }), /* @__PURE__ */ g(HideInFocusMode, { style: "slide" }, /* @__PURE__ */ g(InfoBarContainer, null, /* @__PURE__ */ g(InfoBar, { embed })))));
+    return /* @__PURE__ */ _("div", { class: DesktopApp_default.desktop }, /* @__PURE__ */ _(PlayerContainer, null, embed === null && /* @__PURE__ */ _(PlayerError, { layout: "desktop", kind: "invalid-id" }), embed !== null && showCustomError && /* @__PURE__ */ _(YouTubeError, { layout: "desktop", kind: youtubeError }), embed !== null && !showCustomError && /* @__PURE__ */ _(Player, { src: embed.toEmbedUrl(), layout: "desktop" }), /* @__PURE__ */ _(HideInFocusMode, { style: "slide" }, /* @__PURE__ */ _(InfoBarContainer, null, /* @__PURE__ */ _(InfoBar, { embed })))));
   }
 
   // pages/duckplayer/app/index.js
@@ -3608,29 +3610,29 @@
     const root = document.querySelector("body");
     if (!root) throw new Error("could not render, root element missing");
     if (environment.display === "app") {
-      D(
-        /* @__PURE__ */ g(EnvironmentProvider, { debugState: environment.debugState, injectName: environment.injectName, willThrow: environment.willThrow }, /* @__PURE__ */ g(ErrorBoundary, { didCatch, fallback: /* @__PURE__ */ g(Fallback, { showDetails: environment.env === "development" }) }, /* @__PURE__ */ g(UpdateEnvironment, { search: window.location.search }), /* @__PURE__ */ g(TelemetryContext.Provider, { value: telemetry2 }, /* @__PURE__ */ g(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ g(SettingsProvider, { settings }, /* @__PURE__ */ g(YouTubeErrorProvider, { initial: initialYouTubeError }, /* @__PURE__ */ g(UserValuesProvider, { initial: init2.userValues }, settings.layout === "desktop" && /* @__PURE__ */ g(
+      E(
+        /* @__PURE__ */ _(EnvironmentProvider, { debugState: environment.debugState, injectName: environment.injectName, willThrow: environment.willThrow }, /* @__PURE__ */ _(ErrorBoundary, { didCatch, fallback: /* @__PURE__ */ _(Fallback, { showDetails: environment.env === "development" }) }, /* @__PURE__ */ _(UpdateEnvironment, { search: window.location.search }), /* @__PURE__ */ _(TelemetryContext.Provider, { value: telemetry2 }, /* @__PURE__ */ _(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ _(SettingsProvider, { settings }, /* @__PURE__ */ _(YouTubeErrorProvider, { initial: initialYouTubeError }, /* @__PURE__ */ _(UserValuesProvider, { initial: init2.userValues }, settings.layout === "desktop" && /* @__PURE__ */ _(
           TranslationProvider,
           {
             translationObject: duckplayer_default,
             fallback: duckplayer_default,
             textLength: environment.textLength
           },
-          /* @__PURE__ */ g(DesktopApp, { embed })
-        ), settings.layout === "mobile" && /* @__PURE__ */ g(
+          /* @__PURE__ */ _(DesktopApp, { embed })
+        ), settings.layout === "mobile" && /* @__PURE__ */ _(
           TranslationProvider,
           {
             translationObject: strings,
             fallback: duckplayer_default,
             textLength: environment.textLength
           },
-          /* @__PURE__ */ g(MobileApp, { embed })
-        ), /* @__PURE__ */ g(WillThrow, null)))))))),
+          /* @__PURE__ */ _(MobileApp, { embed })
+        ), /* @__PURE__ */ _(WillThrow, null)))))))),
         root
       );
     } else if (environment.display === "components") {
-      D(
-        /* @__PURE__ */ g(EnvironmentProvider, { debugState: false, injectName: environment.injectName }, /* @__PURE__ */ g(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ g(TranslationProvider, { translationObject: duckplayer_default, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ g(Components, null)))),
+      E(
+        /* @__PURE__ */ _(EnvironmentProvider, { debugState: false, injectName: environment.injectName }, /* @__PURE__ */ _(MessagingContext2.Provider, { value: messaging2 }, /* @__PURE__ */ _(TranslationProvider, { translationObject: duckplayer_default, fallback: duckplayer_default, textLength: environment.textLength }, /* @__PURE__ */ _(Components, null)))),
         root
       );
     }
