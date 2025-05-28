@@ -7,6 +7,10 @@ on:
         description: 'App Version for Testing'
         required: true
         default: 'PLACEHOLDER'
+      test-tag:
+        description: 'Maestro Tests tags to run'
+        required: true
+        default: 'releaseTest'
 
 env:
   ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -65,7 +69,7 @@ jobs:
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Running Release Tests https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
 
@@ -79,7 +83,7 @@ jobs:
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           android-api-level: 30
           workspace: .maestro
-          include-tags: releaseTest
+          include-tags: ${{ github.event.inputs.test-tag }}
 
       - name: Analyze Maestro Flow Results
         id: analyze-flow-results
