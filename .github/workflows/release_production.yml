@@ -47,20 +47,21 @@ jobs:
         if: steps.analyze-flow-results.outputs.flow_summary_status == 'success' && steps.release-tests.conclusion == 'success'
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
+          action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: 'david-mattermost-test'
           mattermost-message: |
             ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: All Release Tests PASSED successfully.
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-          action: 'send-mattermost-message'
+            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}          
 
       - name: Notify Mattermost - Maestro Tests FAILURES or ISSUES DETECTED
         # Condition: Our script detected 'failure' OR the Maestro action itself reported failure
         if: steps.analyze-flow-results.outputs.flow_summary_status == 'failure' || steps.release-tests.conclusion == 'failure'
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
+          action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: 'david-mattermost-test'
@@ -69,8 +70,7 @@ jobs:
             Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
             Analyzed Status: `${{ steps.analyze-flow-results.outputs.flow_summary_status }}`
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-            
+            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}          
 
       - name: Notify Mattermost - Maestro Tests  CANCELED Flows Present (Informational or Warning)
         # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
@@ -78,6 +78,7 @@ jobs:
         if: steps.analyze-flow-results.outputs.flow_summary_status == 'canceled_present' && steps.release-tests.conclusion != 'failure'
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
+          action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: 'david-mattermost-test'
