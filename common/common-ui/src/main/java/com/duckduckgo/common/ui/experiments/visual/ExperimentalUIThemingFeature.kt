@@ -28,4 +28,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 interface ExperimentalUIThemingFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun duckAIPoCFeature(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun visualUpdatesFeature(): Toggle
 }

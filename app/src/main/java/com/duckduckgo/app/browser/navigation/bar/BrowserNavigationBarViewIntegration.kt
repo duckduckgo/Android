@@ -23,13 +23,12 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.Browser
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.keyboardVisibilityFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
@@ -43,7 +42,7 @@ import kotlinx.coroutines.launch
 class BrowserNavigationBarViewIntegration(
     private val lifecycleScope: CoroutineScope,
     private val browserTabFragmentBinding: FragmentBrowserTabBinding,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    isExperimentEnabled: Boolean,
     private val omnibar: Omnibar,
     browserNavigationBarObserver: BrowserNavigationBarObserver,
 ) {
@@ -53,18 +52,14 @@ class BrowserNavigationBarViewIntegration(
         browserTabFragmentBinding.rootView.removeView(browserTabFragmentBinding.navigationBar)
     } ?: browserTabFragmentBinding.navigationBar
 
-    private var stateObserverJob: Job? = null
-    private var keyboardVisibilityJob: Job? = null
+    private var keyboardVisibilityObserverJob: Job? = null
+    private var navigationBarVisibilityChangeJob: Job? = null
 
     init {
-        stateObserverJob = lifecycleScope.launch {
-            visualDesignExperimentDataStore.isExperimentEnabled.collect { isExperimentEnabled ->
-                if (isExperimentEnabled) {
-                    onEnabled()
-                } else {
-                    onDisabled()
-                }
-            }
+        if (isExperimentEnabled) {
+            onEnabled()
+        } else {
+            onDisabled()
         }
         navigationBarView.browserNavigationBarObserver = browserNavigationBarObserver
     }
@@ -86,38 +81,30 @@ class BrowserNavigationBarViewIntegration(
     }
 
     fun onDestroyView() {
-        stateObserverJob?.cancel()
         onDisabled()
     }
 
     private fun onEnabled() {
+        navigationBarView.show()
         // we're hiding the navigation bar when keyboard is shown,
         // to prevent it from being "pushed up" within the coordinator layout
-        keyboardVisibilityJob = lifecycleScope.launch {
+        keyboardVisibilityObserverJob = lifecycleScope.launch {
             omnibar.textInputRootView.keyboardVisibilityFlow().distinctUntilChanged().collect { keyboardVisible ->
+                navigationBarVisibilityChangeJob?.cancel()
                 if (keyboardVisible) {
                     navigationBarView.gone()
                 } else {
-                    navigationBarView.postDelayed(
-                        { navigationBarView.show() },
-                        BrowserTabFragment.KEYBOARD_DELAY,
-                    )
+                    navigationBarVisibilityChangeJob = launch {
+                        delay(BrowserTabFragment.KEYBOARD_DELAY)
+                        navigationBarView.show()
+                    }
                 }
             }
         }
     }
 
     private fun onDisabled() {
-        keyboardVisibilityJob?.cancel()
-    }
-
-    fun setContentCanScroll(
-        canScrollUp: Boolean,
-        canScrollDown: Boolean,
-        topOfPage: Boolean,
-    ) {
-        if (omnibar.omnibarPosition == OmnibarPosition.TOP) {
-            navigationBarView.showShadow(canScrollDown)
-        }
+        navigationBarView.gone()
+        keyboardVisibilityObserverJob?.cancel()
     }
 }

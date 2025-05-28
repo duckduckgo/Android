@@ -20,8 +20,20 @@
     android:id="@+id/daxPromptDuckPlayerContainer"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/yellowBackground"
+    android:background="@color/daxPromptBackground"
     tools:context=".ui.DaxPromptDuckPlayerActivity">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/orangeShape"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="-56dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/daxShape"
+        app:srcCompat="@drawable/background_shape" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/daxPromptDuckPlayerCloseButton"
@@ -37,91 +49,62 @@
         android:paddingEnd="@dimen/keyline_4"
         android:paddingBottom="@dimen/keyline_2"
         android:text="@string/dax_prompt_duck_player_close"
+        android:textColor="?attr/daxColorPrimaryText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:typography="body2_bold" />
+        app:typography="body1_bold" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/daxShape"
+        android:layout_width="316dp"
+        android:layout_height="408dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="-50dp"
+        app:layout_constraintBottom_toTopOf="@id/daxPromptDuckPlayerMessageContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/dax" />
+
+    <LinearLayout
+        android:id="@+id/daxPromptDuckPlayerMessageContainer"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="76dp"
+        android:background="@drawable/background_dax_message"
+        android:orientation="vertical"
+        android:padding="@dimen/keyline_6"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintStart_toStartOf="parent">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/orangeShape"
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/daxPromptDuckPlayerTitle"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="116dp"
-            android:scaleType="fitXY"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/daxShape"
-            app:srcCompat="@drawable/orange_shape" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/daxShape"
-            android:layout_width="280dp"
-            android:layout_height="360dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginBottom="-40dp"
-            app:layout_constraintBottom_toTopOf="@id/daxPromptDuckPlayerMessageContainer"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/dax" />
-
-        <LinearLayout
-            android:id="@+id/daxPromptDuckPlayerMessageContainer"
-            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:layout_marginEnd="@dimen/keyline_4"
-            android:layout_marginBottom="76dp"
-            android:background="@drawable/background_dax_message"
-            android:orientation="vertical"
-            android:padding="@dimen/keyline_5"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            android:text="@string/dax_prompt_duck_player_message_title"
+            app:typography="title" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/daxPromptDuckPlayerTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                android:text="@string/dax_prompt_duck_player_message_title"
-                app:typography="title" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/daxPromptDuckPlayerDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:text="@string/dax_prompt_duck_player_message_description"
+            app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/daxPromptDuckPlayerDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/dax_prompt_duck_player_message_description"
-                app:typography="body2" />
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/daxPromptDuckPlayerPrimaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:background="@drawable/background_button_with_ripple"
+            android:text="@string/dax_prompt_duck_player_message_primary_button"
+            app:backgroundTint="@null"
+            app:daxButtonSize="small"
+            app:icon="@drawable/ic_duck_player"
+            app:iconGravity="textStart" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/daxPromptDuckPlayerPrimaryButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/dax_prompt_duck_player_message_primary_button"
-                app:daxButtonSize="large"
-                app:icon="@drawable/ic_duck_player"
-                app:iconTint="@null" />
+    </LinearLayout>
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
-                android:id="@+id/daxPromptDuckPlayerSecondaryButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/dax_prompt_duck_player_message_secondary_button"
-                app:daxButtonSize="large"
-                app:icon="@drawable/ic_dismiss"
-                app:iconTint="@null" />
-        </LinearLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

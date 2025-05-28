@@ -22,7 +22,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autoconsent.impl.MessageHandlerPlugin
 import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
-import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureSettingsRepository
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
@@ -41,7 +42,7 @@ class InitMessageHandlerPlugin @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val settingsRepository: AutoconsentSettingsRepository,
-    private val autoconsentFeatureSettingsRepository: AutoconsentFeatureSettingsRepository,
+    private val autoconsentFeature: AutoconsentFeature,
 ) : MessageHandlerPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -58,7 +59,7 @@ class InitMessageHandlerPlugin @Inject constructor(
                         return@launch
                     }
 
-                    // Remove comment to promote feature
+                    // Remove comment to promote feature and remove @Ignore from tests
                     val isAutoconsentDisabled = !settingsRepository.userSetting // && settingsRepository.firstPopupHandled
 
                     if (isAutoconsentDisabled) {
@@ -68,13 +69,16 @@ class InitMessageHandlerPlugin @Inject constructor(
                     // Reset site
                     autoconsentCallback.onResultReceived(consentManaged = false, optOutFailed = false, selfTestFailed = false, isCosmetic = false)
 
-                    val disabledCmps = autoconsentFeatureSettingsRepository.disabledCMPs
+                    val settingsAdapter = moshi.adapter(AutoconsentSettings::class.java)
+                    val settingsJson = autoconsentFeature.self().getSettings() ?: return@launch
+                    val settings = settingsAdapter.fromJson(settingsJson) ?: return@launch
+
                     val autoAction = getAutoAction()
                     val enablePreHide = settingsRepository.userSetting
                     val detectRetries = 20
-
+                    val disabledCmps = settings.disabledCMPs
                     val config = Config(enabled = true, autoAction, disabledCmps, enablePreHide, detectRetries, enableCosmeticRules = true)
-                    val initResp = InitResp(config = config)
+                    val initResp = InitResp(config = config, rules = AutoconsentRuleset(settings.compactRuleList))
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
@@ -115,5 +119,7 @@ class InitMessageHandlerPlugin @Inject constructor(
         val enableCosmeticRules: Boolean,
     )
 
-    data class InitResp(val type: String = "initResp", val config: Config)
+    data class AutoconsentRuleset(val compact: Any?)
+
+    data class InitResp(val type: String = "initResp", val config: Config, val rules: AutoconsentRuleset)
 }

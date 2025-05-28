@@ -24,11 +24,13 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import java.util.Date
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -37,6 +39,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.whenever
 
 class SenseOfProtectionExperimentImplTest {
 
@@ -45,6 +48,9 @@ class SenseOfProtectionExperimentImplTest {
 
     @Mock
     private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
+
+    @Mock
+    private lateinit var mockExperimentDataStore: VisualDesignExperimentDataStore
 
     private lateinit var testee: SenseOfProtectionExperimentImpl
     private lateinit var fakeUserBrowserProperties: FakeUserBrowserProperties
@@ -70,14 +76,16 @@ class SenseOfProtectionExperimentImplTest {
             userBrowserProperties = fakeUserBrowserProperties,
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
+            visualDesignExperimentDataStore = mockExperimentDataStore,
             pixel = FakePixel(),
         )
     }
 
     @Test
-    fun `when user is new and enrolUserInNewExperimentIfEligible then user is in enrolled`() {
+    fun `when user is new and and visual design updates not enabled then user can be enrolled`() {
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -92,9 +100,28 @@ class SenseOfProtectionExperimentImplTest {
     }
 
     @Test
+    fun `when user is new and and visual design updates not enabled then user can't be enrolled`() {
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
+        fakeUserBrowserProperties.setDaysSinceInstalled(28)
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                assignedCohort = State.Cohort(name = MODIFIED_CONTROL.cohortName, weight = 1),
+                cohorts = cohorts,
+            ),
+        )
+
+        testee.enrolUserInNewExperimentIfEligible()
+
+        assertFalse(testee.enrolUserInNewExperimentIfEligible())
+    }
+
+    @Test
     fun `when user is new and experiment is enabled but for different cohort then isEnabled returns false`() {
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -108,8 +135,9 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and experiment is disabled then isEnabled returns false`() {
+        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(10)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = false,
                 enable = false,
@@ -123,7 +151,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is enrolled in new user experiment then getTabManagerPixelParams returns new user experiment params`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -135,12 +163,12 @@ class SenseOfProtectionExperimentImplTest {
         val params = testee.getTabManagerPixelParams()
 
         assertEquals(VARIANT_1.cohortName, params["cohort"])
-        assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name, params["experiment"])
+        assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name, params["experiment"])
     }
 
     @Test
     fun `when user is enrolled in new user experiment but experiment is disabled then getTabManagerPixelParams returns empty map`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = false,
                 enable = false,
@@ -156,7 +184,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is enrolled in existing user experiment then getTabManagerPixelParams returns existing user experiment params`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -168,12 +196,12 @@ class SenseOfProtectionExperimentImplTest {
         val params = testee.getTabManagerPixelParams()
 
         assertEquals(VARIANT_2.cohortName, params["cohort"])
-        assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name, params["experiment"])
+        assertEquals(fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().featureName().name, params["experiment"])
     }
 
     @Test
     fun `when user is enrolled in existing user experiment but experiment is disabled then getTabManagerPixelParams returns empty map`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = false,
                 enable = false,
@@ -190,7 +218,7 @@ class SenseOfProtectionExperimentImplTest {
     @Test
     fun `when user is not enrolled in any experiment then getTabManagerPixelParams returns empty map`() {
         fakeUserBrowserProperties.setDaysSinceInstalled(30)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = false,
                 enable = false,
@@ -198,7 +226,7 @@ class SenseOfProtectionExperimentImplTest {
                 cohorts = emptyList(),
             ),
         )
-        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = false,
                 enable = false,
@@ -214,7 +242,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is enrolled in modified control variant then we can detect it`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -232,7 +260,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is enrolled in variant 1 then other variants are not enabled`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -250,7 +278,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is enrolled in variant 2 then other variants are not enabled`() {
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -269,7 +297,7 @@ class SenseOfProtectionExperimentImplTest {
     @Test
     fun `when user is enrolled in modified control then legacy privacy shield is shown`() {
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -284,7 +312,7 @@ class SenseOfProtectionExperimentImplTest {
     @Test
     fun `when user is not enrolled in any variant`() {
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -298,7 +326,7 @@ class SenseOfProtectionExperimentImplTest {
     @Test
     fun `when user is enrolled in variant 1 then new privacy shield is shown`() {
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,
@@ -313,7 +341,7 @@ class SenseOfProtectionExperimentImplTest {
     @Test
     fun `when user is enrolled in variant 2 then new privacy shield is shown`() {
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
-        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().setRawStoredState(
+        fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
                 remoteEnableState = true,
                 enable = true,

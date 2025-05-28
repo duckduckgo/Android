@@ -25,8 +25,8 @@
     <string name="dax_prompt_browser_comparison_title" translatable="false">Browser Comparison</string>
     <string name="dax_prompt_browser_comparison_close" translatable="false">Close</string>
     <string name="dax_prompt_browser_comparison_message_title" translatable="false">DuckDuckGo has protections other browsers don’t.</string>
-    <string name="dax_prompt_browser_comparison_message_primary_button" translatable="false">Choose Your Browser</string>
-    <string name="dax_prompt_browser_comparison_more_link" translatable="false"><annotation type="more_link">Plus Even More Protections...</annotation></string>
+    <string name="dax_prompt_browser_comparison_message_primary_button" translatable="false">Open Links With DuckDuckGo</string>
+    <string name="dax_prompt_browser_comparison_more_link" translatable="false"><annotation type="more_link">Plus even more protections...</annotation></string>
 
     <string name="dax_prompt_browser_comparison_item1" translatable="false">Search privately by default</string>
     <string name="dax_prompt_browser_comparison_item2" translatable="false">Block 3rd-party trackers</string>

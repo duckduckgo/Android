@@ -17,9 +17,12 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLearnMore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -41,13 +44,14 @@ class DuckChatSettingsViewModelTest {
     private lateinit var testee: DuckChatSettingsViewModel
 
     private val duckChat: DuckChatInternal = mock()
+    private val mockPixel: Pixel = mock()
 
     @Before
     fun setUp() = runTest {
         whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
     }
 
     @Test
@@ -89,7 +93,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(true))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInBrowserMenu)
@@ -99,7 +103,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInBrowserIsDisabledThenEmitDisabled() = runTest {
         whenever(duckChat.observeShowInBrowserMenuUserSetting()).thenReturn(flowOf(false))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInBrowserMenu)
@@ -109,7 +113,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInAddressBarIsEnabledThenEmitEnabled() = runTest {
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(true))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             assertTrue(awaitItem().showInAddressBar)
@@ -119,7 +123,7 @@ class DuckChatSettingsViewModelTest {
     @Test
     fun whenViewModelIsCreatedAndShowInAddressBarIsDisabledThenEmitDisabled() = runTest {
         whenever(duckChat.observeShowInAddressBarUserSetting()).thenReturn(flowOf(false))
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             assertFalse(awaitItem().showInAddressBar)
@@ -130,7 +134,7 @@ class DuckChatSettingsViewModelTest {
     fun whenDuckChatEnabledAndAddressBarEntryPointEnabledThenBothSubTogglesShown() = runTest {
         whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -144,7 +148,7 @@ class DuckChatSettingsViewModelTest {
     fun whenDuckChatEnabledAndAddressBarEntryPointDisabledThenOnlyBrowserToggleShown() = runTest {
         whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(true))
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(false)
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -157,7 +161,7 @@ class DuckChatSettingsViewModelTest {
     fun whenDuckChatDisabledThenNoSubTogglesShown() = runTest {
         whenever(duckChat.observeEnableDuckChatUserSetting()).thenReturn(flowOf(false))
         whenever(duckChat.isAddressBarEntryPointEnabled()).thenReturn(true)
-        testee = DuckChatSettingsViewModel(duckChat)
+        testee = DuckChatSettingsViewModel(duckChat, mockPixel)
 
         testee.viewState.test {
             val state = awaitItem()
@@ -172,13 +176,35 @@ class DuckChatSettingsViewModelTest {
 
         testee.commands.test {
             val command = awaitItem()
-            assertTrue(command is OpenLearnMore)
-            command as OpenLearnMore
+            assertTrue(command is OpenLink)
+            command as OpenLink
             assertEquals(
                 "https://duckduckgo.com/duckduckgo-help-pages/aichat/",
-                command.learnMoreLink,
+                command.link,
             )
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenDuckChatSearchAISettingsClickedThenOpenSettingsLinkCommandEmitted() = runTest {
+        testee.duckChatSearchAISettingsClicked()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is OpenLinkInNewTab)
+            command as OpenLinkInNewTab
+            assertEquals(
+                "https://duckduckgo.com/settings?ko=-1#aifeatures",
+                command.link,
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckChatSearchAISettingsClickedThenPixelIsSent() = runTest {
+        testee.duckChatSearchAISettingsClicked()
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
     }
 }

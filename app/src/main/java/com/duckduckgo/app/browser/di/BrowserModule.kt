@@ -57,6 +57,7 @@ import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
@@ -205,6 +206,10 @@ class BrowserModule {
         requestFilterer: RequestFilterer,
         duckPlayer: DuckPlayer,
         maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        dispatchers: DispatcherProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        @IsMainProcess isMainProcess: Boolean,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -218,6 +223,10 @@ class BrowserModule {
             requestFilterer,
             duckPlayer,
             maliciousSiteBlockerWebViewIntegration,
+            dispatchers,
+            androidBrowserConfigFeature,
+            appCoroutineScope,
+            isMainProcess,
         )
 
     @Provides

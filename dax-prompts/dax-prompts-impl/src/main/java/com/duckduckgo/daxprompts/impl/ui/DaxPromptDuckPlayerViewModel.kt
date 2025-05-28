@@ -19,10 +19,9 @@ package com.duckduckgo.daxprompts.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -32,8 +31,8 @@ import kotlinx.coroutines.launch
 
 @ContributesViewModel(ActivityScope::class)
 class DaxPromptDuckPlayerViewModel @Inject constructor(
-    private val duckPlayer: DuckPlayer,
     private val daxPromptsRepository: DaxPromptsRepository,
+    private val reactivateUsersExperiment: ReactivateUsersExperiment,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -45,24 +44,14 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     fun onCloseButtonClicked() {
         viewModelScope.launch {
             command.send(Command.CloseScreen)
+            reactivateUsersExperiment.fireCloseScreen()
         }
     }
 
     fun onPrimaryButtonClicked() {
         viewModelScope.launch {
             command.send(Command.TryDuckPlayer(DUCK_PLAYER_DEMO_URL))
-        }
-    }
-
-    fun onSecondaryButtonClicked() {
-        viewModelScope.launch {
-            command.send(Command.Dismiss)
-        }
-    }
-
-    fun updateDuckPlayerSettings() {
-        viewModelScope.launch {
-            duckPlayer.setUserPreferences(overlayInteracted = false, privatePlayerMode = PrivatePlayerMode.AlwaysAsk.value)
+            reactivateUsersExperiment.fireDuckPlayerClick()
         }
     }
 
@@ -75,10 +64,9 @@ class DaxPromptDuckPlayerViewModel @Inject constructor(
     sealed class Command {
         data object CloseScreen : Command()
         data class TryDuckPlayer(val url: String) : Command()
-        data object Dismiss : Command()
     }
 
     companion object {
-        internal const val DUCK_PLAYER_DEMO_URL = "duck://player/yKWIA-Pys4c"
+        internal const val DUCK_PLAYER_DEMO_URL = "https://www.youtube.com/watch?v=yKWIA-Pys4c"
     }
 }

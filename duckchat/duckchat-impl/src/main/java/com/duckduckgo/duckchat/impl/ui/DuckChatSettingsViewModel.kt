@@ -19,9 +19,12 @@ package com.duckduckgo.duckchat.impl.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLearnMore
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
+import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -34,6 +37,7 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ActivityScope::class)
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
+    private val pixel: Pixel,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -62,7 +66,8 @@ class DuckChatSettingsViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 
     sealed class Command {
-        data class OpenLearnMore(val learnMoreLink: String) : Command()
+        data class OpenLink(val link: String) : Command()
+        data class OpenLinkInNewTab(val link: String) : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -85,7 +90,19 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun duckChatLearnMoreClicked() {
         viewModelScope.launch {
-            commandChannel.send(OpenLearnMore("https://duckduckgo.com/duckduckgo-help-pages/aichat/"))
+            commandChannel.send(OpenLink(DUCK_CHAT_LEARN_MORE_LINK))
         }
+    }
+
+    fun duckChatSearchAISettingsClicked() {
+        viewModelScope.launch {
+            commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
+        }
+    }
+
+    companion object {
+        const val DUCK_CHAT_LEARN_MORE_LINK = "https://duckduckgo.com/duckduckgo-help-pages/aichat/"
+        const val DUCK_CHAT_SEARCH_AI_SETTINGS_LINK = "https://duckduckgo.com/settings?ko=-1#aifeatures"
     }
 }

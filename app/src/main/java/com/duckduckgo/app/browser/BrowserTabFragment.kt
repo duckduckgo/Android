@@ -1046,7 +1046,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            visualDesignExperimentDataStore = visualDesignExperimentDataStore,
+            isExperimentEnabled = visualDesignExperimentDataStore.isExperimentEnabled.value,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -2664,7 +2664,6 @@ class BrowserTabFragment :
             val topOfPage = scrollY == 0
 
             omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
-            browserNavigationBarIntegration.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 

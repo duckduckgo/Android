@@ -33,12 +33,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import timber.log.Timber
 
-interface DefaultBrowserDetector {
-    fun deviceSupportsDefaultBrowserConfiguration(): Boolean
-    fun isDefaultBrowser(): Boolean
-    fun hasDefaultBrowser(): Boolean
-}
-
 @ContributesMultibinding(scope = AppScope::class, boundType = BrowserFeatureStateReporterPlugin::class)
 @ContributesBinding(scope = AppScope::class, boundType = DefaultBrowserDetector::class)
 class AndroidDefaultBrowserDetector @Inject constructor(

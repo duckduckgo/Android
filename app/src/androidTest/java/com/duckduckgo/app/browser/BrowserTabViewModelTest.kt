@@ -222,6 +222,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
+import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -276,9 +277,9 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.messaging.RealSubscriptionsJSHelper.Companion.SUBSCRIPTIONS_FEATURE_NAME
-import com.duckduckgo.subscriptions.impl.messaging.SubscriptionsJSHelper
+import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -553,6 +554,7 @@ class BrowserTabViewModelTest {
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
+    private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
 
     private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
 
@@ -728,7 +730,14 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
-            duckPlayerJSHelper = DuckPlayerJSHelper(mockDuckPlayer, mockAppBuildConfig, mockPixel, mockDuckDuckGoUrlDetector, mockPagesSettingPlugin),
+            duckPlayerJSHelper = DuckPlayerJSHelper(
+                mockDuckPlayer,
+                mockAppBuildConfig,
+                mockPixel,
+                mockDuckDuckGoUrlDetector,
+                mockPagesSettingPlugin,
+                mockReactivateUsersExperiment,
+            ),
             duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
             changeOmnibarPositionFeature = changeOmnibarPositionFeature,

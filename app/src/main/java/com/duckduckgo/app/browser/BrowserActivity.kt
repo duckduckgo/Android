@@ -206,9 +206,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private val tabPagerAdapter by lazy {
         TabPagerAdapter(
-            fragmentManager = supportFragmentManager,
-            lifecycleOwner = this,
-            activityIntent = intent,
+            activity = this,
             swipingTabsFeature = swipingTabsFeature,
         )
     }
@@ -876,7 +874,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             tabPager.setPageTransformer(MarginPageTransformer(resources.getDimension(com.duckduckgo.mobile.android.R.dimen.keyline_1).toPx().toInt()))
 
             savedInstanceState?.getBundle(KEY_TAB_PAGER_STATE)?.let {
-                tabPagerAdapter.restoreState(it)
+                tabPagerAdapter.restore(it)
             }
         }
 

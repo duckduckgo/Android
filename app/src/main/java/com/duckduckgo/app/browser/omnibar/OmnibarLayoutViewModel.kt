@@ -97,13 +97,24 @@ class OmnibarLayoutViewModel @Inject constructor(
             showChatMenu = duckChat.showInAddressBar.value,
         ),
     )
+
+    // We need to do this since the max overloads for combine is 5
+    private val visualDesignExperimentFlags =
+        combine(
+            visualDesignExperimentDataStore.isExperimentEnabled,
+            visualDesignExperimentDataStore.isDuckAIPoCEnabled,
+        ) { isExperimentEnabled, isDuckAIPoCEnabled ->
+            isExperimentEnabled to isDuckAIPoCEnabled
+        }
+
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentDataStore.isExperimentEnabled,
+        visualDesignExperimentFlags,
         duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
+    ) { state, tabs, highlightOverflowMenu, visualDesignExperimentFlags, showInAddressBar ->
+        val (isVisualDesignExperimentEnabled, isDuckAIPoCEnabled) = visualDesignExperimentFlags
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
@@ -112,6 +123,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
             showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
                 (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || isVisualDesignExperimentEnabled),
+            showClickCatcher = isDuckAIPoCEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
 
@@ -148,6 +160,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
+        val showClickCatcher: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
@@ -708,7 +721,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         if (customTabMode is CustomTab) {
             _viewState.update {
                 it.copy(
-                    viewMode = customTabMode.copy(title = decoration.title),
+                    viewMode = customTabMode.copy(
+                        title = decoration.title,
+                        domain = decoration.domain,
+                        showDuckPlayerIcon = decoration.showDuckPlayerIcon,
+                    ),
                 )
             }
         }
@@ -725,12 +742,12 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onNewTabScrollingStateChanged(scrollingState: Decoration.NewTabScrollingState) {
         val viewMode = viewState.value.viewMode
-        if (viewMode is NewTab) {
-            _viewState.update {
-                it.copy(
-                    showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
-                )
-            }
-        }
+        // if (viewMode is NewTab) {
+        //     _viewState.update {
+        //         it.copy(
+        //             showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
+        //         )
+        //     }
+        // }
     }
 }

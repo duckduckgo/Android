@@ -47,8 +47,8 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/yellowBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@color/yellowBackground&quot;"
+        message="Possible overdraw: Root element paints background `@color/daxPromptBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_dax_prompt_browser_comparison.xml"
@@ -58,8 +58,8 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/yellowBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="    android:background=&quot;@color/yellowBackground&quot;"
+        message="Possible overdraw: Root element paints background `@color/daxPromptBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_dax_prompt_duck_player.xml"
@@ -224,7 +224,7 @@
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="    android:background=&quot;@color/yellowBackground&quot;"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_dax_prompt_browser_comparison.xml"
@@ -235,7 +235,7 @@
     <issue
         id="InvalidColorAttribute"
         message="@colors are not allowed, used ?attr/daxColor instead"
-        errorLine1="    android:background=&quot;@color/yellowBackground&quot;"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/activity_dax_prompt_duck_player.xml"

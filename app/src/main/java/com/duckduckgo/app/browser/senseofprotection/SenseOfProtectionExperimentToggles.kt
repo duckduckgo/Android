@@ -40,10 +40,10 @@ interface SenseOfProtectionToggles {
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun senseOfProtectionNewUserExperimentApr25(): Toggle
+    fun senseOfProtectionNewUserExperiment27May25(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun senseOfProtectionExistingUserExperimentApr25(): Toggle
+    fun senseOfProtectionExistingUserExperiment27May25(): Toggle
 
     enum class Cohorts(override val cohortName: String) : CohortName {
         MODIFIED_CONTROL("modifiedControl"), // without grey tracker logos from original animation

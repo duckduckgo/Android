@@ -19,6 +19,7 @@ package com.duckduckgo.malicioussiteprotection.impl.domain
 import android.net.Uri
 import android.util.Patterns.IP_ADDRESS
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
 import java.net.InetAddress
@@ -29,7 +30,9 @@ interface UrlCanonicalization {
 }
 
 @ContributesBinding(AppScope::class)
-class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
+class RealUrlCanonicalization @Inject constructor(
+    private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
+) : UrlCanonicalization {
 
     private val multipleDotsRegex = Regex("\\.{2,}")
     private val multipleSlashesRegex = Regex("/+")
@@ -42,6 +45,13 @@ class RealUrlCanonicalization @Inject constructor() : UrlCanonicalization {
             .replace(multipleDotsRegex, ".")
             .normalizeIpAddress()
             .percentEncodeDomain()
+            .let {
+                if (maliciousSiteProtectionRCFeature.stripWWWPrefix()) {
+                    it.removePrefix("www.")
+                } else {
+                    it
+                }
+            }
             .split('.')
             .takeLast(6)
             .joinToString(".")

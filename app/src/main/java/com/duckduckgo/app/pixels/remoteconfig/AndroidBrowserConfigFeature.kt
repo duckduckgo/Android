@@ -86,6 +86,14 @@ interface AndroidBrowserConfigFeature {
     fun webLocalStorage(): Toggle
 
     /**
+     * @return `true` when the remote config has the global "indexedDB" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun indexedDB(): Toggle
+
+    /**
      * @return `true` when the remote config has the global "enableMaliciousSiteProtection" androidBrowserConfig
      * sub-feature flag enabled
      * If the remote feature is not present defaults to `false`
@@ -100,6 +108,14 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun fireproofedWebLocalStorage(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "fireproofedIndexedDB" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun fireproofedIndexedDB(): Toggle
 
     /**
      * @return `true` when the remote config has the global "httpError5xxPixel" androidBrowserConfig
@@ -122,4 +138,12 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
+
+    /**
+     * @return `true` when the remote config has the global "checkMaliciousAfterHttpsUpgrade" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun checkMaliciousAfterHttpsUpgrade(): Toggle
 }

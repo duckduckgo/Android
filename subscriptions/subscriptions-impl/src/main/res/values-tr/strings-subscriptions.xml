@@ -68,6 +68,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">VPN, Personal Information Removal ve Identity Theft Restoration\'ı içerir.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">VPN ve Identity Theft Restoration hizmetlerimizi içerir.</string>
     <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
+    <string name="subscriptionSettingTryFreeTrial">Privacy Pro\'yu Ücretsiz Deneyin</string>
     <string name="subscriptionSettingRestore">Aboneliğim Var</string>
     <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
     <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>

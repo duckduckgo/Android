@@ -129,10 +129,10 @@ android {
 }
 
 tasks.register('installForAutofillTesting', Exec) {
-    commandLine "$rootDir/gradlew", ':app:installInternalRelease', "-P$autofillDisableAuthRequirementBuildFlag"
+    commandLine "$rootDir/gradlew", ':app:installInternalRelease', "-Pforce-default-variant", "-P$autofillDisableAuthRequirementBuildFlag"
 }
 
 tasks.register('autofillTestLocal', Exec) {
-    commandLine 'maestro', 'test', '--include-tags', 'autofillNoAuthTests', "$rootDir/.maestro"
+    commandLine 'maestro', 'test', '--include-tags', 'autofillNoAuthTests,autofillPasswordGeneration,autofillBackfillingUsername', "$rootDir/.maestro"
     dependsOn 'installForAutofillTesting'
 }

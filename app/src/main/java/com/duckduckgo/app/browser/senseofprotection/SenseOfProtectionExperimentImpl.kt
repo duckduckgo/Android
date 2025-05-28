@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
@@ -31,6 +32,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
@@ -57,6 +59,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
     private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
 
@@ -64,19 +67,27 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
-                if (!isEnrolledInNewUserExperiment()) {
+                if (canBeEnrolledInExistingUserExperiment()) {
                     enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
                 }
             }
         }
     }
 
+    private fun canBeEnrolledInExistingUserExperiment(): Boolean {
+        return !isEnrolledInNewUserExperiment() && !seesNewVisualDesign()
+    }
+
     override fun enrolUserInNewExperimentIfEligible(): Boolean {
-        return if (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) {
+        return if (canBeEnrolledInNewUserExperiment()) {
             enrollInNewUserExperiment(cohortName = MODIFIED_CONTROL)
         } else {
             false
         }
+    }
+
+    private fun canBeEnrolledInNewUserExperiment(): Boolean {
+        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) && !seesNewVisualDesign()
     }
 
     override fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
@@ -132,11 +143,11 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun enrollInNewUserExperiment(cohortName: CohortName): Boolean {
-        return senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnabled(cohortName)
+        return senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().isEnabled(cohortName)
     }
 
     private fun enrollInExistingUserExperiment(cohortName: CohortName): Boolean {
-        return senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnabled(cohortName)
+        return senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().isEnabled(cohortName)
     }
 
     private fun isUserEnrolledInNewUserExperimentModifiedControlCohortAndExperimentEnabled(): Boolean =
@@ -172,24 +183,30 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun isNewUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().isEnrolledAndEnabled(cohortName)
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().isEnrolledAndEnabled(cohortName)
 
     private fun isExistingUserExperimentEnabled(cohortName: CohortName): Boolean =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().isEnrolledAndEnabled(cohortName)
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().isEnrolledAndEnabled(cohortName)
 
     private fun getNewUserExperimentCohortName(): String? =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().getCohort()?.name
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().getCohort()?.name
 
     private fun getNewUserExperimentName(): String =
-        senseOfProtectionToggles.senseOfProtectionNewUserExperimentApr25().featureName().name
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().featureName().name
 
     private fun getExistingUserExperimentCohortName(): String? =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().getCohort()?.name
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().getCohort()?.name
 
     private fun getExistingUserExperimentName(): String =
-        senseOfProtectionToggles.senseOfProtectionExistingUserExperimentApr25().featureName().name
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().featureName().name
 
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
+    }
+
+    private fun seesNewVisualDesign(): Boolean {
+        val seesNewVisualDesing = visualDesignExperimentDataStore.isExperimentEnabled.value
+        Timber.d("VisualDesign: seesNewVisualDesign $seesNewVisualDesing")
+        return seesNewVisualDesing
     }
 }
