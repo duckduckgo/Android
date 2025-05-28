@@ -8,7 +8,7 @@ on:
         required: true
         default: 'PLACEHOLDER'
       test-tag:
-        description: 'Maestro Tests tags to run'
+        description: 'Maestro Tests tag to include'
         required: true
         default: 'releaseTest'
 
@@ -70,7 +70,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Running Release Tests https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Running Maestro tests for tag ${{ github.event.inputs.test-tag }} https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
 
       - name: Release tests flows
