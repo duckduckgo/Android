@@ -61,7 +61,7 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
             val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(stripped, PackageManager.GET_META_DATA)) as String
             AppNameResolver.OriginatingApp(packageId, appName)
         } catch (e: PackageManager.NameNotFoundException) {
-            logcat(ERROR) { "Failed to find app name for: $stripped. ${e.message}" }
+            logcat(ERROR) { "Failed to find app name for: $stripped. ${e.asLog()}" }
             AppNameResolver.OriginatingApp(packageId, UNKNOWN)
         }
     }
