@@ -1,4 +1,4 @@
-name: Release - Android App Production Release
+name: Release - Run E2E Maestro Tests
 
 on:
   workflow_dispatch:
