@@ -67,7 +67,9 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
         return if (shouldInterceptRequest) {
             logcat { "[AppTP]: Intercepted AppTP TDS Request: ${chain.request()}" }
             val activeExperiment = runBlocking {
-                inventory.activeAppTpTdsFlag()
+                inventory.activeAppTpTdsFlag()?.also {
+                    it.enroll()
+                }
             }
             logcat { "[AppTP]: Active experiment: ${activeExperiment?.featureName()}" }
             logcat { "[AppTP]: Cohort: ${runBlocking { activeExperiment?.getCohort() }}" }

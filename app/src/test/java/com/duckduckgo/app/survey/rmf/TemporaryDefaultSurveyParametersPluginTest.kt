@@ -20,7 +20,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
         val modifiedControlCohort = Cohort(Cohorts.MODIFIED_CONTROL.cohortName, 1)
         val mockToggle: Toggle = mock {
             on { it.isEnabled() } doReturn true
-            on { it.getCohort() } doReturn modifiedControlCohort
+            onBlocking { it.getCohort() } doReturn modifiedControlCohort
         }
         whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
@@ -34,7 +34,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
         val modifiedControlCohort = Cohort(Cohorts.VARIANT_1.cohortName, 1)
         val mockToggle: Toggle = mock {
             on { it.isEnabled() } doReturn true
-            on { it.getCohort() } doReturn modifiedControlCohort
+            onBlocking { it.getCohort() } doReturn modifiedControlCohort
         }
         whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
@@ -48,7 +48,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
         val modifiedControlCohort = Cohort(Cohorts.VARIANT_2.cohortName, 2)
         val mockToggle: Toggle = mock {
             on { it.isEnabled() } doReturn true
-            on { it.getCohort() } doReturn modifiedControlCohort
+            onBlocking { it.getCohort() } doReturn modifiedControlCohort
         }
         whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
@@ -61,7 +61,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
     fun givenNotAssignedOnSenseOfProtectionExperimentThenCohortParamEvaluatesToEmptyString() = runTest {
         val mockToggle: Toggle = mock {
             on { it.isEnabled() } doReturn false
-            on { it.getCohort() } doReturn null
+            onBlocking { it.getCohort() } doReturn null
         }
         whenever(mockSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25()).thenReturn(mockToggle)
 
