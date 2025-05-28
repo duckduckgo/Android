@@ -149,7 +149,7 @@ class WebViewDataManager @Inject constructor(
             }.onSuccess {
                 excludedDirectories.add("IndexedDB")
             }.onFailure { t ->
-                logcat(WARN) { "Failed to clear IndexedDB, will delete it instead" + ": " + t.asLog() }
+                logcat(WARN) { "Failed to clear IndexedDB, will delete it instead: ${t.asLog()}" }
             }
         }
         fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)

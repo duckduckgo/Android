@@ -147,7 +147,7 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
         try {
             launcher.launch(inputAction)
         } catch (e: Exception) {
-            logcat(WARN) { e.asLog() + "exception launching camera / sound recorder" }
+            logcat(WARN) { "exception launching camera / sound recorder: ${e.asLog()}" }
             if (inputAction == MediaStore.ACTION_IMAGE_CAPTURE || inputAction == MediaStore.ACTION_VIDEO_CAPTURE) {
                 callback.invoke(MediaCaptureResult.ErrorAccessingMediaApp(R.string.imageCaptureCameraUnavailable))
             } else if (inputAction == MediaStore.Audio.Media.RECORD_SOUND_ACTION) {

@@ -85,7 +85,7 @@ class AppleSharedCredentialsParser @Inject constructor(
         val rules = try {
             adapter.fromJson(json) ?: return CONFIG_WHEN_ERROR_HAPPENED
         } catch (e: IOException) {
-            logcat(ERROR) { "Failed to load Apple shared credential config" + ": " + e.asLog() }
+            logcat(ERROR) { "Failed to load Apple shared credential config: ${e.asLog()}" }
             return CONFIG_WHEN_ERROR_HAPPENED
         }
 

@@ -214,7 +214,7 @@ class RemoteMessageView @JvmOverloads constructor(
         try {
             context.startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Activity not found" + ": " + e.asLog() }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

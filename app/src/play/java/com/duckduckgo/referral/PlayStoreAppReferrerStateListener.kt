@@ -102,7 +102,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 referralResult = ParseFailure(ReferralServiceUnavailable)
             }
         } catch (e: RuntimeException) {
-            logcat(WARN) { "Failed to obtain referrer information" + ": " + e.asLog() }
+            logcat(WARN) { "Failed to obtain referrer information: ${e.asLog()}" }
             referralResult = ParseFailure(UnknownError)
         }
     }
@@ -144,7 +144,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             referralClient.endConnection()
         } catch (e: RuntimeException) {
-            logcat(WARN) { "Failed to retrieve referrer data" + ": " + e.asLog() }
+            logcat(WARN) { "Failed to retrieve referrer data: ${e.asLog()}" }
             referralResultFailed(UnknownError)
         }
     }

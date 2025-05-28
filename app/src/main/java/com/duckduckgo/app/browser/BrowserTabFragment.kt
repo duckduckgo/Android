@@ -3496,7 +3496,7 @@ class BrowserTabFragment :
         try {
             startActivity(Intent.createChooser(intent, null))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { e.asLog() + "Activity not found" }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 
@@ -3520,7 +3520,7 @@ class BrowserTabFragment :
         try {
             startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { e.asLog() + "Activity not found" }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

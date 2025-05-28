@@ -99,7 +99,7 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         try {
             startActivity(Intent.createChooser(share, null))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Activity not found" + ": " + e.asLog() }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

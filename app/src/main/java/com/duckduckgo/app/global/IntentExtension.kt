@@ -34,10 +34,10 @@ fun Intent.sanitize() {
         getStringExtra("")
         getBooleanExtra("", false)
     } catch (e: BadParcelableException) {
-        logcat(ERROR) { "Failed to read Parcelable from intent" + ": " + e.asLog() }
+        logcat(ERROR) { "Failed to read Parcelable from intent: ${e.asLog()}" }
         replaceExtras(Bundle())
     } catch (e: RuntimeException) {
-        logcat(ERROR) { "Failed to receive extras from intent" + ": " + e.asLog() }
+        logcat(ERROR) { "Failed to receive extras from intent: ${e.asLog()}" }
         replaceExtras(Bundle())
     }
 }

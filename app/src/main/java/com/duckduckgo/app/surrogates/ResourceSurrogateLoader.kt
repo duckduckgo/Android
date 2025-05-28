@@ -63,7 +63,7 @@ class ResourceSurrogateLoader @Inject constructor(
         return try {
             parse(bytes)
         } catch (e: Throwable) {
-            logcat(WARN) { "Failed to parse surrogates file; file may be corrupt or badly formatted" + ": " + e.asLog() }
+            logcat(WARN) { "Failed to parse surrogates file; file may be corrupt or badly formatted: ${e.asLog()}" }
             emptyList()
         }
     }

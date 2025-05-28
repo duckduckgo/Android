@@ -804,7 +804,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         try {
             startActivity(Intent.createChooser(intent, null))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Activity not found" + ": " + e.asLog() }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 
@@ -821,7 +821,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         try {
             startActivity(Intent.createChooser(intent, null))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Activity not found" + ": " + e.asLog() }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

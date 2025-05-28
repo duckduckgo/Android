@@ -95,7 +95,7 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            logcat(ERROR) { "Could not launch the Play Store" + ": " + e.asLog() }
+            logcat(ERROR) { "Could not launch the Play Store: ${e.asLog()}" }
         }
     }
 
@@ -105,7 +105,7 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            logcat(ERROR) { "Could not launch the Play Store" + ": " + e.asLog() }
+            logcat(ERROR) { "Could not launch the Play Store: ${e.asLog()}" }
         }
     }
 

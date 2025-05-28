@@ -103,7 +103,7 @@ class WindowsActivity : DuckDuckGoActivity() {
         try {
             startActivity(Intent.createChooser(share, getString(R.string.windows_share_title), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            logcat(WARN) { "Activity not found" + ": " + e.asLog() }
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

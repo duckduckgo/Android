@@ -116,7 +116,7 @@ class SpecialUrlDetectorImpl(
                     return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
                 }
             } catch (e: URISyntaxException) {
-                logcat(WARN) { "Failed to parse uri $uriString" + ": " + e.asLog() }
+                logcat(WARN) { "Failed to parse uri $uriString: ${e.asLog()}" }
             }
         }
 
@@ -192,7 +192,7 @@ class SpecialUrlDetectorImpl(
             val fallbackIntent = buildFallbackIntent(fallbackUrl)
             UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
         } catch (e: URISyntaxException) {
-            logcat(WARN) { "Failed to parse uri $uriString" + ": " + e.asLog() }
+            logcat(WARN) { "Failed to parse uri $uriString: ${e.asLog()}" }
             return UrlType.Unknown(uriString)
         }
     }
