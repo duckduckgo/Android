@@ -41,6 +41,7 @@ import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -321,13 +322,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         val coroutineScope = requireNotNull(findViewTreeLifecycleOwner()?.lifecycleScope)
 
         conflatedStateJob += coroutineScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).collectLatest {
                 render(it)
             }
         }
 
         conflatedCommandJob += coroutineScope.launch {
-            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
+            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).collectLatest {
                 processCommand(it)
             }
         }
