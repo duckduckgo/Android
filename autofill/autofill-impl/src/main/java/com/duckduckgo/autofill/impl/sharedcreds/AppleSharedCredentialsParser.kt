@@ -71,7 +71,7 @@ class AppleSharedCredentialsParser @Inject constructor(
                 convertJsonToRules(json)
             }
                 .getOrElse {
-                    logcat(ERROR) { "Failed to parse shared credentials json" + ": " + it.asLog() }
+                    logcat(ERROR) { "Failed to parse shared credentials json: ${it.asLog()}" }
                     CONFIG_WHEN_ERROR_HAPPENED
                 }
         }

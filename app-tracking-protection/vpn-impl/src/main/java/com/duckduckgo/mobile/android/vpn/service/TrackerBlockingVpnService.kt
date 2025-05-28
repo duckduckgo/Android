@@ -831,7 +831,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 //                }
 //            }.onFailure {
 //                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
-//                logcat(WARN) { "VPN log: Failed to start trampoline service" + ": " + it.asLog() }
+//                logcat(WARN) { "VPN log: Failed to start trampoline service: ${it.asLog()} }
 //                startVpnService(applicationContext)
 //            }
 //        }

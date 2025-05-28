@@ -70,7 +70,7 @@ class AutofillJsonRequestParser @Inject constructor(
             val result = kotlin.runCatching {
                 autofillStoreFormDataRequestParser.fromJson(request)
             }
-                .onFailure { logcat(WARN) { "Failed to parse autofill JSON for AutofillStoreFormDataRequest" + ": " + it.asLog() } }
+                .onFailure { logcat(WARN) { "Failed to parse autofill JSON for AutofillStoreFormDataRequest: ${it.asLog()}" } }
                 .getOrNull()
 
             return@withContext if (result == null) {

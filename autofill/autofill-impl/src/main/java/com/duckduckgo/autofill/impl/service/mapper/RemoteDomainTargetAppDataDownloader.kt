@@ -69,7 +69,7 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
                 }
             }
         }.onFailure {
-            logcat(ERROR) { "Autofill-mapping: Dataset download failed" + ": " + it.asLog() }
+            logcat(ERROR) { "Autofill-mapping: Dataset download failed: ${it.asLog()}" }
         }
     }
 

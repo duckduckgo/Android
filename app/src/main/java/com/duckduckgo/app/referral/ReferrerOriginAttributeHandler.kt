@@ -55,10 +55,10 @@ class ReferrerOriginAttributeHandlerImpl @Inject constructor(
             return null
         }
 
-        logcat(VERBOSE) { originAttributePart + ": " + "Found referrer origin attribute: %s" }
+        logcat(VERBOSE) { "Found referrer origin attribute: $originAttributePart" }
 
         return originAttributePart.removePrefix("$ORIGIN_ATTRIBUTE_KEY=").also {
-            logcat(INFO) { it + ": " + "Found referrer origin attribute value: %s" }
+            logcat(INFO) { "Found referrer origin attribute value: $it" }
         }
     }
 

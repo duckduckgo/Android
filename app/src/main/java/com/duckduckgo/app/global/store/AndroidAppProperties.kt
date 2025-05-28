@@ -57,7 +57,7 @@ class AndroidAppProperties(
         return kotlin.runCatching {
             WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
         }.getOrElse {
-            logcat(ERROR) { "Error getting current WebView package" + ": " + it.asLog() }
+            logcat(ERROR) { "Error getting current WebView package: ${it.asLog()}" }
             WEBVIEW_UNKNOWN_VERSION
         }
     }

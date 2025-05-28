@@ -53,7 +53,7 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
             }
             Success(credentials)
         }.onFailure {
-            logcat(ERROR) { "Failed to parse CSV" + ": " + it.asLog() }
+            logcat(ERROR) { "Failed to parse CSV: ${it.asLog()}" }
             Error
         }.getOrElse {
             Error

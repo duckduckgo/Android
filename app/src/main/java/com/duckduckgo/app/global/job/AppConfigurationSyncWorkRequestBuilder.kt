@@ -63,7 +63,7 @@ class AppConfigurationWorker(
                 Result.success()
             }
             .onErrorReturn {
-                logcat(WARN) { "App configuration sync work failed" + ": " + it.asLog() }
+                logcat(WARN) { "App configuration sync work failed: ${it.asLog()}" }
                 Result.retry()
             }
     }

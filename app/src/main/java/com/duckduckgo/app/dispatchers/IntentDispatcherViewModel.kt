@@ -74,7 +74,7 @@ class IntentDispatcherViewModel @Inject constructor(
                     ),
                 )
             }.onFailure {
-                logcat(WARN) { it.message + ": " + "Error handling custom tab intent %s" }
+                logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
             }
         }
     }

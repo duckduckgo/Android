@@ -54,7 +54,7 @@ fun ImageView.loadFavicon(
             .error(defaultDrawable)
             .into(this)
     }.onFailure {
-        logcat(ERROR) { "Error loading favicon" + ": " + it.asLog() }
+        logcat(ERROR) { "Error loading favicon: ${it.asLog()}" }
     }
 }
 
@@ -75,7 +75,7 @@ fun ImageView.loadFavicon(
             .error(defaultDrawable)
             .into(this)
     }.onFailure {
-        logcat(ERROR) { "Error loading favicon" + ": " + it.asLog() }
+        logcat(ERROR) { "Error loading favicon: ${it.asLog()}" }
     }
 }
 
@@ -83,7 +83,7 @@ fun ImageView.loadDefaultFavicon(domain: String) {
     runCatching {
         this.setImageDrawable(generateDefaultDrawable(this.context, domain))
     }.onFailure {
-        logcat(ERROR) { "Error loading default favicon" + ": " + it.asLog() }
+        logcat(ERROR) { "Error loading default favicon: ${it.asLog()}" }
     }
 }
 

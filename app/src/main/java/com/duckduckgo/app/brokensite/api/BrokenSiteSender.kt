@@ -181,7 +181,7 @@ class BrokenSiteSubmitter @Inject constructor(
                         brokenSiteLastSentReport.setLastSentDay(domain)
                     }
                 }
-                .onFailure { logcat(WARN) { "Feedback submission failed" + ": " + it.asLog() } }
+                .onFailure { logcat(WARN) { "Feedback submission failed: ${it.asLog()}" } }
 
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,

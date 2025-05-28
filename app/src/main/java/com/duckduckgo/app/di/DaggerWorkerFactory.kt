@@ -51,7 +51,7 @@ class DaggerWorkerFactory(
 
             return instance
         } catch (exception: Exception) {
-            logcat(ERROR) { "Worker $workerClassName could not be created" + ": " + exception.asLog() }
+            logcat(ERROR) { "Worker $workerClassName could not be created: ${exception.asLog()}" }
             return null
         }
     }

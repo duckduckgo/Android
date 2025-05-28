@@ -455,7 +455,7 @@ class BrowserWebViewClient @Inject constructor(
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        logcat(LogPriority.VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
+        logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {

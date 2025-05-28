@@ -131,7 +131,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                         val parsedResult = appInstallationReferrerParser.parse(referrer)
                         referralResultReceived(parsedResult)
                     }.onFailure {
-                        logcat(ERROR) { "Error getting install referrer" + ": " + it.asLog() }
+                        logcat(ERROR) { "Error getting install referrer: ${it.asLog()}" }
                         referralResultFailed(UnknownError)
                     }
                 }

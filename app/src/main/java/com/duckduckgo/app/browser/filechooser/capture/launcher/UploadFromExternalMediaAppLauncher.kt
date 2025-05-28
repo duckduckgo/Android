@@ -225,7 +225,7 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
         if (granted) {
             launchMediaApp(inputAction)
         } else {
-            callback.invoke(MediaCaptureResult.CouldNotCapturePermissionDenied(inputAction))
+            callback(MediaCaptureResult.CouldNotCapturePermissionDenied(inputAction))
         }
     }
 

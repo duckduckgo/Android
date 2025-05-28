@@ -308,7 +308,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
             val parseResult = requestParser.parseStoreFormDataRequest(data)
             val request = parseResult.getOrElse {
-                logcat(WARN) { "Unable to parse storeFormData request" + ": " + it.asLog() }
+                logcat(WARN) { "Unable to parse storeFormData request: ${it.asLog()}" }
                 return@launch
             }
 
