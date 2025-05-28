@@ -73,7 +73,7 @@ jobs:
           mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Running Maestro tests for tag ${{ github.event.inputs.test-tag }} https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
 
-      - name: Release tests flows
+      - name: Maestro tests flows
         id: release-tests
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
@@ -154,7 +154,7 @@ jobs:
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
-            ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: All Release Tests PASSED successfully.
+            ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: Tests for for tag ${{ github.event.inputs.test-tag }} PASSED successfully.
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
@@ -168,11 +168,11 @@ jobs:
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
-            ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Release Tests FAILED or encountered issues.          
+            ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Tests for tag ${{ github.event.inputs.test-tag }} FAILED or encountered issues.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
-      - name: Notify Mattermost - Maestro Tests  CANCELED Flows Present (Informational or Warning)
+      - name: Notify Mattermost - Maestro Tests CANCELED Flows Present (Informational or Warning)
         # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
         # AND Maestro action itself didn't mark the whole run as a 'failure'
         if: always() && steps.analyze-flow-results.outputs.flow_summary_status == 'canceled_present' && steps.release-tests.conclusion != 'failure'
@@ -183,7 +183,7 @@ jobs:
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
-            :warning: Release ${{ github.event.inputs.app-version }}: Some Release Tests were CANCELED. Please review.          
+            :warning: Release ${{ github.event.inputs.app-version }}: Some tests for tag ${{ github.event.inputs.test-tag }} were CANCELED. Please review.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
