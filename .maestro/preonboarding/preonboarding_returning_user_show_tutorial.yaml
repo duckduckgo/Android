@@ -23,5 +23,7 @@ tags:
 - tapOn: "Show Tutorial"
 - assertVisible:
     text: "Protections activated!"
-- assertVisible:
-    text: "Choose Your Browser"
+- tapOn: "Choose Your Browser"
+- tapOn: Cancel
+- tapOn: Next
+- assertVisible: Try a search!
