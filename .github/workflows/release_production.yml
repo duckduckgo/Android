@@ -37,7 +37,7 @@ jobs:
         if: always()
         run: |        
           # Default to success, change if issues are found
-          final_status="canceled_present" 
+          final_status="success" 
           echo "Final determined status: $final_status"
           echo "flow_summary_status=$final_status" >> $GITHUB_OUTPUT
 
