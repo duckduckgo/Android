@@ -21,6 +21,43 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          ref: ${{ github.event.inputs.app-version }}
+
+      - name: Set up JDK version
+        uses: actions/setup-java@v4
+        with:
+          java-version-file: .github/.java-version
+          distribution: 'adopt'
+
+      - name: Create folder
+        if: always()
+        run: mkdir apk
+
+      - name: Decode keys
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_PROPERTIES }}
+          fileName: ddg_android_build.properties
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Decode key file
+        uses: davidSchuppa/base64Secret-toFile-action@v2
+        with:
+          secret: ${{ secrets.FAKE_RELEASE_KEY }}
+          fileName: android
+          destination-path: $HOME/jenkins_static/com.duckduckgo.mobile.android/
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Assemble release APK
+        run: ./gradlew assemblePlayRelease -Pforce-default-variant -Pskip-onboarding
+
+      - name: Move APK to new folder
+        if: always()
+        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
