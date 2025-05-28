@@ -40,10 +40,9 @@ jobs:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-binary-id: 'd3f35f59729e610100752bf258dfa5d298007493'
           android-api-level: 30
           workspace: .maestro
-          include-tags: androidDesignSystemTest
+          include-tags: releaseTest
 
       - name: Analyze Maestro Flow Results
         id: analyze-flow-results
@@ -111,7 +110,7 @@ jobs:
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
             ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: All Release Tests PASSED successfully.
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
@@ -125,14 +124,13 @@ jobs:
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
             ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Release Tests FAILED or encountered issues.
             Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
             Analyzed Status: `${{ steps.analyze-flow-results.outputs.flow_summary_status }}`
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
             Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
-
 
       - name: Notify Mattermost - Maestro Tests  CANCELED Flows Present (Informational or Warning)
         # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
@@ -142,7 +140,7 @@ jobs:
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: 'david-mattermost-test'
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
             :warning: Release ${{ github.event.inputs.app-version }}: Some Release Tests were CANCELED. Please review.
             Maestro Action Conclusion: `${{ steps.release-tests.conclusion }}`
