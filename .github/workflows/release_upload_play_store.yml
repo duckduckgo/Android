@@ -117,7 +117,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_end}} Release ${{ github.event.inputs.app-version }} completed successfully and is new in review.
+          mattermost-message: ${{env.emoji_end}} Release ${{ github.event.inputs.app-version }} completed successfully and is now in review.
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed

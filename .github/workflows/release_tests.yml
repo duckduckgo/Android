@@ -19,7 +19,7 @@ env:
   emoji_failure: ":x:" # ❌
 
 jobs:
-  create_release_task:
+  run-release-tests:
     name: Create and Push git tag for version
     runs-on: ubuntu-latest
     steps:
