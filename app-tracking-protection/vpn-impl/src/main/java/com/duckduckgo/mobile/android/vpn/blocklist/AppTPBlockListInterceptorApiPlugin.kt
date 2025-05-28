@@ -70,7 +70,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
                 inventory.activeAppTpTdsFlag()
             }
             logcat { "[AppTP]: Active experiment: ${activeExperiment?.featureName()}" }
-            logcat { "[AppTP]: Cohort: ${activeExperiment?.getCohort()}" }
+            logcat { "[AppTP]: Cohort: ${runBlocking { activeExperiment?.getCohort() }}" }
 
             activeExperiment?.let {
                 val config = activeExperiment.getSettings()?.let {
@@ -79,8 +79,8 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
                     }.getOrDefault(emptyMap())
                 } ?: emptyMap()
                 val path = when {
-                    activeExperiment.isEnabled(TREATMENT) -> config["treatmentUrl"]
-                    activeExperiment.isEnabled(CONTROL) -> config["controlUrl"]
+                    runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
+                    runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
                     else -> config["nextUrl"]
                 } ?: return chain.proceed(request.build())
                 val newURL = "$APPTP_TDS_BASE_URL$path"
@@ -90,7 +90,7 @@ class AppTPBlockListInterceptorApiPlugin @Inject constructor(
                         pixel.appTPBlocklistExperimentDownloadFailure(
                             response.code,
                             activeExperiment.featureName().name,
-                            activeExperiment.getCohort()?.name.toString(),
+                            runBlocking { activeExperiment.getCohort() }?.name.toString(),
                         )
                     }
                 }

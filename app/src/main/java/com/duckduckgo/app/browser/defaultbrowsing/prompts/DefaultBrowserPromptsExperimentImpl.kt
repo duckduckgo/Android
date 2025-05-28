@@ -391,9 +391,10 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
         }
     }
 
-    private fun DefaultBrowserPromptsFeatureToggles.getOrAssignCohort(): AdditionalPromptsCohortName? {
+    private suspend fun DefaultBrowserPromptsFeatureToggles.getOrAssignCohort(): AdditionalPromptsCohortName? {
         for (cohort in AdditionalPromptsCohortName.entries) {
-            if (defaultBrowserAdditionalPrompts202501().isEnabled(cohort)) {
+            defaultBrowserAdditionalPrompts202501().enroll()
+            if (defaultBrowserAdditionalPrompts202501().isEnrolledAndEnabled(cohort)) {
                 return cohort
             }
         }
