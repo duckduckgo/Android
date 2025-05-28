@@ -51,6 +51,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.WindowManager
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -68,12 +69,15 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -189,6 +193,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -283,6 +288,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -550,6 +556,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1435,6 +1444,12 @@ class BrowserTabFragment :
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
+        viewModel.buckTryASearchAnimationEnabled.onEach {
+            if (it) {
+                renderer.renderBuckOnboardingTryASearchAnimation()
+            }
+        }.launchIn(lifecycleScope)
+
         viewModel.command.observe(
             viewLifecycleOwner,
             Observer {
@@ -2056,7 +2071,9 @@ class BrowserTabFragment :
             }
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
+            is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
+            is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
@@ -2105,8 +2122,16 @@ class BrowserTabFragment :
         newBrowserTab.browserBackground.setImageResource(backgroundRes)
     }
 
+    private fun setNewTabBackgroundColor(@ColorRes colorRes: Int) {
+        newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
+    }
+
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
         daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+    }
+
+    private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
+        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -2992,6 +3017,11 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
+                hideBuckEndAnimation()
+            }
+        }
         renderer.showNewTab()
         showKeyboard()
     }
@@ -4232,6 +4262,9 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
+                        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                            hideBuckEndAnimation()
+                        }
                         showNewTab()
                     }
                 }
@@ -4264,6 +4297,17 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaDismissButton(configuration)
                 }
             }
+
+            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if (configuration is DaxBubbleCta.DaxEndCta) {
+                    requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+                    with(newBrowserTab.buckEndAnimation) {
+                        isVisible = true
+                        playAnimation()
+                    }
+                }
+            }
+
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
@@ -4406,6 +4450,17 @@ class BrowserTabFragment :
             (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
+
+        fun renderBuckOnboardingTryASearchAnimation() {
+            newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
+            newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
+        }
+    }
+
+    private fun hideBuckEndAnimation() {
+        newBrowserTab.buckEndAnimation.isGone = true
+        val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
+        newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
     }
 
     private fun launchPrint(

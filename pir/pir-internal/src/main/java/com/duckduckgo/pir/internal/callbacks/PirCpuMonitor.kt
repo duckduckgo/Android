@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pir.internal.callbacks
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -40,12 +41,13 @@ class PirCpuMonitor @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val dispatcherProvider: DispatcherProvider,
     private val cpuUsageReader: CPUUsageReader,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirCallbacks {
     private val alertThresholds = listOf(30, 20, 10).sortedDescending()
     private val monitorJob = ConflatedJob()
 
-    override fun onPirJobStarted(coroutineScope: CoroutineScope) {
-        monitorJob += coroutineScope.launch(dispatcherProvider.io()) {
+    override fun onPirJobStarted() {
+        monitorJob += appCoroutineScope.launch(dispatcherProvider.io()) {
             logcat { "PIR-MONITOR: ${this@PirCpuMonitor} onPirJobStarted " }
             delay(10_000) // Add delay before measuring
             while (isActive) {
@@ -61,7 +63,9 @@ class PirCpuMonitor @Inject constructor(
                     delay(60_000)
                 } catch (e: Exception) {
                     logcat(ERROR) { e.asLog() }
-                    monitorJob.cancel()
+                    if (monitorJob.isActive) {
+                        monitorJob.cancel()
+                    }
                 }
             }
         }
@@ -69,11 +73,15 @@ class PirCpuMonitor @Inject constructor(
 
     override fun onPirJobCompleted() {
         logcat { "PIR-MONITOR: ${this@PirCpuMonitor} onPirJobCompleted" }
-        monitorJob.cancel()
+        if (monitorJob.isActive) {
+            monitorJob.cancel()
+        }
     }
 
     override fun onPirJobStopped() {
         logcat { "PIR-MONITOR: ${this@PirCpuMonitor} onPirJobStopped" }
-        monitorJob.cancel()
+        if (monitorJob.isActive) {
+            monitorJob.cancel()
+        }
     }
 }
