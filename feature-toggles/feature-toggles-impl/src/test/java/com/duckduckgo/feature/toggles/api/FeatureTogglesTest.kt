@@ -549,7 +549,7 @@ class FeatureTogglesTest {
     }
 
     @Test
-    fun whenAssigningCohortOnCohortAssignedCallbackCalled() {
+    fun whenAssigningCohortOnCohortAssignedCallbackCalled() = runTest {
         val state = Toggle.State(
             remoteEnableState = true,
             enable = true,
@@ -569,13 +569,13 @@ class FeatureTogglesTest {
         toggleStore.set("test_enabledByDefault", state)
 
         // isEnabled triggers callback on first assignment
-        assertTrue(feature.enabledByDefault().isEnabled(TREATMENT))
+        assertTrue(feature.enabledByDefault().isEnrolledAndEnabled(TREATMENT))
         assertEquals(1, callback.times)
         assertEquals("enabledByDefault", callback.experimentName)
         assertEquals("treatment", callback.cohortName)
         assertNotNull(callback.enrollmentDate)
 
-        assertFalse(feature.enabledByDefault().isEnabled(CONTROL))
+        assertFalse(feature.enabledByDefault().isEnrolledAndEnabled(CONTROL))
         assertEquals(1, callback.times)
     }
 }

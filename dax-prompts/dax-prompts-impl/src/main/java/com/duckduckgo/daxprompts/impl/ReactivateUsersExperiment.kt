@@ -55,13 +55,13 @@ class ReactivateUsersExperimentImpl @Inject constructor(
 ) : ReactivateUsersExperiment {
 
     override suspend fun isControl(): Boolean =
-        reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(CONTROL)
+        reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(CONTROL)
 
     override suspend fun isDuckPlayerPrompt(): Boolean =
-        reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_DUCKPLAYER_PROMPT)
+        reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_DUCKPLAYER_PROMPT)
 
     override suspend fun isBrowserComparisonPrompt(): Boolean =
-        reactivateUsersToggles.reactivateUsersExperimentMay25().isEnabled(VARIANT_BROWSER_PROMPT)
+        reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(VARIANT_BROWSER_PROMPT)
 
     override suspend fun fireDuckPlayerUseIfInExperiment() {
         withContext(dispatcherProvider.io()) {
