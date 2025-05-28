@@ -729,11 +729,12 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
         val popup = androidx.appcompat.widget.PopupMenu(wrapper, anchor)
         popup.menuInflater.inflate(R.menu.bookmark_popup_menu, popup.menu)
 
-        if (bookmark.isFavorite) {
-            popup.menu.findItem(R.id.bookmark_add_to_favorites).title = getString(R.string.removeFromFavorites)
+        val title: String = if (bookmark.isFavorite) {
+            getString(R.string.removeFromFavorites)
         } else {
-            popup.menu.findItem(R.id.bookmark_add_to_favorites).title = getString(R.string.addToFavoritesMenu)
+            getString(R.string.addToFavoritesMenu)
         }
+        popup.menu.findItem(R.id.bookmark_add_to_favorites).title = title
 
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             when (menuItem.itemId) {
