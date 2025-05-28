@@ -33,6 +33,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -120,6 +121,11 @@ interface DuckChatInternal : DuckChat {
      * Returns the current chat state.
      */
     val chatState: StateFlow<ChatState>
+
+    /**
+     * Returns whether image upload is enabled or not.
+     */
+    fun isImageUploadEnabled(): Boolean
 }
 
 enum class ChatState(val value: String) {
@@ -162,6 +168,7 @@ class RealDuckChat @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
     private val experimentDataStore: VisualDesignExperimentDataStore,
+    private val imageUploadFeature: AIChatImageUploadFeature,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
@@ -178,6 +185,7 @@ class RealDuckChat @Inject constructor(
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
+    private var isImageUploadEnabled: Boolean = false
 
     init {
         if (isMainProcess) {
@@ -275,6 +283,8 @@ class RealDuckChat @Inject constructor(
     override val showInAddressBar: StateFlow<Boolean> get() = _showInAddressBar.asStateFlow()
 
     override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
+
+    override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let { originalQuery ->
@@ -383,6 +393,7 @@ class RealDuckChat @Inject constructor(
                     bangRegex = settingsJson.aiChatBangRegex?.replace("{bangs}", bangAlternation)?.toRegex()
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
+            isImageUploadEnabled = imageUploadFeature.self().isEnabled()
             cacheUserSettings()
         }
     }

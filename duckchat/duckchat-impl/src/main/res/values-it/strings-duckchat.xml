@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Apri</string>
     <string name="duck_chat_cannot_open_file_error_message">Impossibile aprire il file. Verifica la disponibilità di un\'app compatibile.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Impossibile accedere alla fotocamera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Carica un\'immagine</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Scegli un file</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Scatta una foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Consenti a DuckDuckGo di richiedere l\'accesso alla fotocamera su questo dispositivo</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">I siti possono utilizzare la fotocamera solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Apri Impostazioni</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Annulla</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Impossibile accedere al registratore audio</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Consenti a DuckDuckGo di richiedere l\'accesso al registratore audio su questo dispositivo</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">I siti possono utilizzare il registratore audio solo se consenti a DuckDuckGo di richiederne l\'accesso.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai è una funzionalità opzionale che consente di chattare in forma anonima con i più diffusi modelli di chat AI di terze parti. Le chat non vengono usate per addestrare l\'IA.\n<annotation type="learn_more_link">Scopri di più</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Abilita Duck.ai</string>

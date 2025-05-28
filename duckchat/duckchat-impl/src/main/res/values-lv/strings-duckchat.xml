@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Atvērt</string>
     <string name="duck_chat_cannot_open_file_error_message">Nevar atvērt failu. Pārbaudīt saderīgu lietotni.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nevar piekļūt kamerai</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Augšupielādēt attēlu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izvēlēties failu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Uzņemt foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi kamerai šajā ierīcē</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Vietnes var izmantot tavu kameru tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atvērt iestatījumus</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atcelt</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Nevar piekļūt skaņas ierakstītājam</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Atļaut DuckDuckGo pieprasīt piekļuvi skaņas ierakstītājam šajā ierīcē</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Vietnes var izmantot skaņas ierakstītāju tikai tad, ja tu atļauj DuckDuckGo prasīt piekļuvi.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai ir papildu līdzeklis, kas ļauj anonīmi tērzēt ar populāriem trešo pušu Ml tērzēšanas modeļiem. Tavas tērzēšanas sarunas netiek izmantotas AMI apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Iespējot Duck.ai</string>

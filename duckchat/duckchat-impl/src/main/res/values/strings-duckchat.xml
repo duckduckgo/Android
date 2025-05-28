@@ -20,6 +20,21 @@
     <string name="duck_chat_download_finished_action_name">Open</string>
     <string name="duck_chat_cannot_open_file_error_message">Can\'t open file. Check for compatible app.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Could not access camera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Upload an image</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Choose File</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Take Photo</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Allow DuckDuckGo to ask for camera access on this device</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Sites can only use your camera if you allow DuckDuckGo to ask for access.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Open Settings</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancel</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Could not access sound recorder</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Allow DuckDuckGo to ask for sound recorder access on this device</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Sites can only use the sound recorder if you allow DuckDuckGo to ask for access.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party Al chat models. Your chats are not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Enable Duck.ai</string>
