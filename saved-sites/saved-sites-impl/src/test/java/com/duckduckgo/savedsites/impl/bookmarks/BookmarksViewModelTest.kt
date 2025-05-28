@@ -516,7 +516,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBrowserMenuPressedAndBookmarksEmptyThenCommandSent() {
+    fun whenBrowserMenuPressedAndBookmarksEmptyThenSortByNameButtonDisabled() {
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
             flowOf(SavedSites(emptyList(), emptyList())),
         )
@@ -531,7 +531,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBrowserMenuPressedAndBookmarksNotEmptyThenCommandSent() {
+    fun whenBrowserMenuPressedAndBookmarksNotEmptyThenSortByNameButtonEnabled() {
         testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
         testee.onBrowserMenuPressed()
@@ -542,7 +542,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBrowserMenuPressedAndManualSortingModeThenCommandSent() {
+    fun whenBrowserMenuPressedAndManualSortingModeThenManualSortingButtonEnabled() {
         whenever(bookmarksDataStore.getSortingMode()).thenReturn(MANUAL)
         testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
