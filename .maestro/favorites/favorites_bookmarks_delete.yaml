@@ -16,15 +16,13 @@ tags:
           id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - assertVisible:
           text: "add bookmark"
       - tapOn:
           text: "add bookmark"
       # Add favorite from edit saved site
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - assertVisible:
           text: "edit bookmark"
       - tapOn:
@@ -35,8 +33,7 @@ tags:
           text: "add to favorites"
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/action_confirm_changes"
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - assertVisible:
           text: "bookmarks"
       - tapOn:

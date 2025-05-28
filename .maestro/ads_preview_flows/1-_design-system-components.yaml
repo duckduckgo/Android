@@ -11,9 +11,7 @@ tags:
 
         - runFlow: ../shared/skip_all_onboarding.yaml
 
-        - hideKeyboard
-        - tapOn:
-            id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+        - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
         - tapOn:
             text: "Settings"
             index: 0

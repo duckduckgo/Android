@@ -1,0 +1,13 @@
+appId: com.duckduckgo.mobile.android
+---
+- runFlow:
+    when:
+        notVisible:
+            id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
+    commands:
+        - hideKeyboard
+        - assertVisible:
+            id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'
+
+- tapOn:
+    id: 'com.duckduckgo.mobile.android:id/browserMenuImageView'

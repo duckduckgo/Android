@@ -1,0 +1,36 @@
+appId: com.duckduckgo.mobile.android
+---
+
+# This flow opens the Privacy Dashboard from the Omnibar.
+#
+# Unfortunately, we can't click the privacy shield directly because the shield is a Lottie animation view which extends beyond the bounds of the text input field.
+# Trying to click it directly will result in a tap on the text input field instead.
+#
+# I tried using the "point" and "leftOf" selector features to click the shield directly, the former is a known issue (https://github.com/mobile-dev-inc/Maestro/issues/1421)
+# and trying to click to the left of the input text field didn't work for me either.
+#
+# To work around this, when view_new_omnibar is used, we tap on the Omnibar icon container
+# which aligns with the shield and has a non-zero size because of an invisible pulse animation placeholder that's within it.
+# That shield animation placeholder is in a different place for the view_fade_omnibar, so we're using a conditional flow to handle both cases.
+
+# flow for view_new_omnibar
+- runFlow:
+      when:
+          notVisible:
+              id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"
+      commands:
+          - assertVisible:
+              id: "com.duckduckgo.mobile.android:id/shieldIcon"
+          - tapOn:
+              id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+
+# flow for view_fade_omnibar
+- runFlow:
+      when:
+          visible:
+              id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"
+      commands:
+          - assertVisible:
+                id: "com.duckduckgo.mobile.android:id/shieldIconExperiment"
+          - tapOn:
+                id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"
