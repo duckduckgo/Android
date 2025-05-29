@@ -19,11 +19,9 @@ package com.duckduckgo.app.onboarding.ui.page
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.DrawableRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.global.install.AppInstallStore
@@ -36,7 +34,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboarding
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
@@ -96,7 +93,6 @@ class WelcomePageViewModel @Inject constructor(
         data object ShowAddressBarPositionDialog : Command
         data object Finish : Command
         data object OnboardingSkipped : Command
-        data class SetBackgroundResource(@DrawableRes val backgroundRes: Int) : Command
         data class SetAddressBarPositionOptions(val defaultOption: Boolean) : Command
     }
 
@@ -224,17 +220,6 @@ class WelcomePageViewModel @Inject constructor(
             COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
             ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
-        }
-    }
-
-    fun setBackgroundResource(lightModeEnabled: Boolean) {
-        val backgroundRes = if (lightModeEnabled) {
-            R.drawable.onboarding_background_bitmap_light
-        } else {
-            R.drawable.onboarding_background_bitmap_dark
-        }
-        viewModelScope.launch {
-            _commands.send(SetBackgroundResource(backgroundRes))
         }
     }
 
