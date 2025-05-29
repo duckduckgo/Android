@@ -35,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -73,8 +74,10 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -171,6 +174,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+
+    @Inject
+    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
 
     private val lastActiveTabs = TabList()
 
@@ -697,6 +706,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             dispatcherProvider = dispatcherProvider,
             fireButtonStore = fireButtonStore,
             appBuildConfig = appBuildConfig,
+            onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
+            onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
         )
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
