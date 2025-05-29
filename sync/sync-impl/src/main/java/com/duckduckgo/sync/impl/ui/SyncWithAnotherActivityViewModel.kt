@@ -49,6 +49,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.DeepLinkSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ReadTextCode
@@ -180,7 +181,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             @StringRes val message: Int,
             val reason: String = "",
         ) : Command()
-
+        data class DeepLinkSuccess(val wasAlreadyLoggedIn: Boolean) : Command()
         data class AskToSwitchAccount(val encodedStringCode: String) : Command()
     }
 
@@ -199,6 +200,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
+            val userAlreadyLoggedIn = previousPrimaryKey.isNotBlank()
             val codeType = syncAccountRepository.parseSyncAuthCode(qrCode).also { it.onCodeScanned() }
             when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
@@ -210,20 +212,25 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                     if (codeType is SyncAuthCode.Exchange) {
                         pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
                     } else {
-                        onLoginSuccess(previousPrimaryKey)
+                        onLoginSuccess(previousPrimaryKey, wasAlreadyLoggedIn = userAlreadyLoggedIn)
                     }
                 }
             }
         }
     }
 
-    private suspend fun onLoginSuccess(previousPrimaryKey: String) {
+    private suspend fun onLoginSuccess(
+        previousPrimaryKey: String,
+        wasAlreadyLoggedIn: Boolean,
+    ) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
         fireLoginPixels()
         val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
         val commandSuccess = if (userSwitchedAccount) {
             syncPixels.fireUserSwitchedAccount()
             SwitchAccountSuccess
+        } else if (isDeepLink) {
+            DeepLinkSuccess(wasAlreadyLoggedIn = wasAlreadyLoggedIn)
         } else {
             LoginSuccess
         }
@@ -260,7 +267,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                             is LoggedIn -> {
                                 polling = false
                                 cancelTimeout()
-                                onLoginSuccess(previousPrimaryKey)
+                                onLoginSuccess(previousPrimaryKey = previousPrimaryKey, wasAlreadyLoggedIn = previousPrimaryKey.isNotBlank())
                             }
                         }
                     }.onFailure {

@@ -22,6 +22,7 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity.Companion.EXTRA_USER_SWITCHED_ACCOUNT
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity.Companion.EXTRA_WAS_ALREADY_LOGGED_IN
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput
 
 /**
@@ -29,6 +30,8 @@ import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithA
  * Or, input can be a sync setup URL which includes the pairing code
  */
 internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, SyncWithAnotherDeviceContractOutput>() {
+
+    private var isDeepLink = false
 
     /**
      * @param input can be null if not required. or, input can be a sync setup URL which includes the pairing code
@@ -40,6 +43,7 @@ internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, S
         return if (input == null) {
             SyncWithAnotherDeviceActivity.intent(context)
         } else {
+            isDeepLink = true
             SyncWithAnotherDeviceActivity.intentForDeepLink(context, input)
         }
     }
@@ -50,11 +54,16 @@ internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, S
     ): SyncWithAnotherDeviceContractOutput {
         when {
             resultCode == Activity.RESULT_OK -> {
-                val userSwitchedAccount = intent?.getBooleanExtra(EXTRA_USER_SWITCHED_ACCOUNT, false) ?: false
-                return if (userSwitchedAccount) {
-                    SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
+                return if (isDeepLink) {
+                    val userWasAlreadyLoggedIn = intent?.getBooleanExtra(EXTRA_WAS_ALREADY_LOGGED_IN, false) ?: false
+                    SyncWithAnotherDeviceContractOutput.DeepLinkSuccess(userWasAlreadyLoggedIn)
                 } else {
-                    SyncWithAnotherDeviceContractOutput.DeviceConnected
+                    val userSwitchedAccount = intent?.getBooleanExtra(EXTRA_USER_SWITCHED_ACCOUNT, false) ?: false
+                    if (userSwitchedAccount) {
+                        SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
+                    } else {
+                        SyncWithAnotherDeviceContractOutput.DeviceConnected
+                    }
                 }
             }
             else -> return SyncWithAnotherDeviceContractOutput.Error
@@ -64,6 +73,7 @@ internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, S
     sealed class SyncWithAnotherDeviceContractOutput {
         data object DeviceConnected : SyncWithAnotherDeviceContractOutput()
         data object SwitchAccountSuccess : SyncWithAnotherDeviceContractOutput()
+        data class DeepLinkSuccess(val wasAlreadyLoggedIn: Boolean) : SyncWithAnotherDeviceContractOutput()
         data object Error : SyncWithAnotherDeviceContractOutput()
     }
 }
