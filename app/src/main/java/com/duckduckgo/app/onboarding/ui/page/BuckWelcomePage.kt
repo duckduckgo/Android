@@ -17,17 +17,23 @@
 package com.duckduckgo.app.onboarding.ui.page
 
 import android.Manifest
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RawRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -37,6 +43,7 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBuckBinding
+import com.duckduckgo.app.onboarding.ui.page.LottieOnboardingAnimationSpec.AnimationPhase.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -55,6 +62,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
@@ -80,17 +88,14 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
     }
 
-    private var hikerAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
-    private var typingAnimation: ViewPropertyAnimatorCompat? = null
-    private var welcomeAnimationFinished = false
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
             viewModel.notificationRuntimePermissionGranted()
         }
         if (view?.windowVisibility == View.VISIBLE) {
-            scheduleWelcomeAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
+            startDaxDialogAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
         }
     }
 
@@ -140,8 +145,13 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             },
         )
 
-        requestNotificationsPermissions()
-        setSkipAnimationListener()
+        ViewCompat.setOnApplyWindowInsetsListener(binding.onboardingPageAnimation) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.updatePadding(bottom = systemBars.bottom)
+            insets
+        }
+
+        startWelcomeAnimation()
     }
 
     override fun onResume() {
@@ -152,7 +162,6 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     override fun onDestroyView() {
         super.onDestroyView()
         welcomeAnimation?.cancel()
-        typingAnimation?.cancel()
     }
 
     override fun onActivityResult(
@@ -177,187 +186,163 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            scheduleWelcomeAnimation()
+            startDaxDialogAnimation()
         }
     }
 
     private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
         context?.let {
-            var afterAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL_REINSTALL_USER -> {
                     binding.daxDialogCta.root.show()
-                    binding.daxDialogCta.progressBarText.gone()
-                    binding.daxDialogCta.progressBar.gone()
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.show()
 
                     val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
-                    afterAnimation = {
-                        binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
-                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
-                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
-                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
-                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                    }
-                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                    binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
+                    binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
+
+                    binding.daxDialogCta.cardView.animateEntrance()
+
+                    playAnimation(
+                        animation = LottieOnboardingAnimationSpec.POPUP,
+                        phase = ENTER,
+                    )
                 }
 
                 INITIAL -> {
                     binding.daxDialogCta.root.show()
-                    binding.daxDialogCta.progressBarText.gone()
-                    binding.daxDialogCta.progressBar.gone()
                     binding.daxDialogCta.descriptionCta.gone()
                     binding.daxDialogCta.secondaryCta.gone()
 
                     val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
+                    binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.daxDialogContentImage.gone()
-                    afterAnimation = {
-                        binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
-                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
-                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                    }
-                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
+
+                    binding.daxDialogCta.cardView.animateEntrance()
+
+                    playAnimation(
+                        animation = LottieOnboardingAnimationSpec.POPUP,
+                        phase = ENTER,
+                    )
                 }
 
                 COMPARISON_CHART -> {
-                    binding.daxDialogCta.descriptionCta.gone()
-                    binding.daxDialogCta.secondaryCta.gone()
-                    binding.daxDialogCta.dialogTextCta.text = ""
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                    binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "1 / 2"
-                    binding.daxDialogCta.progressBar.show()
-                    binding.daxDialogCta.progressBar.progress = 1
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.comparisonChart.root.show()
-                    binding.daxDialogCta.comparisonChart.root.alpha = MIN_ALPHA
+                    playExitAnimation(
+                        onAnimationEnd = {
+                            binding.daxDialogCta.descriptionCta.gone()
+                            binding.daxDialogCta.secondaryCta.gone()
+                            TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                            val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
+                            binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
+                            binding.daxDialogCta.comparisonChart.root.show()
+                            binding.daxDialogCta.comparisonChart.root.alpha = 1f
 
-                    afterAnimation = {
-                        binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
-                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
-                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.comparisonChart.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                    }
-                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                            binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
+                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+
+                            playAnimation(
+                                animation = LottieOnboardingAnimationSpec.WING,
+                                phase = ENTER,
+                            )
+                        },
+                    )
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
                     binding.daxDialogCta.descriptionCta.show()
-                    binding.daxDialogCta.descriptionCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.secondaryCta.show()
-                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.dialogTextCta.text = ""
 
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
 
                     val ctaDialog3Text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaDialog3Text.html(it)
+                    binding.daxDialogCta.dialogTextCta.text = ctaDialog3Text.html(it)
                     val ctaDialog3Description = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
                     binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
-                    afterAnimation = {
-                        binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
-                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
-                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
-                        binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
-                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                    }
-                    scheduleTypingAnimation(ctaDialog3Text) { afterAnimation() }
+                    binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                    binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                    binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
                 }
 
                 ADDRESS_BAR_POSITION -> {
-                    binding.daxDialogCta.descriptionCta.gone()
-                    binding.daxDialogCta.secondaryCta.gone()
-                    binding.daxDialogCta.dialogTextCta.text = ""
-                    binding.daxDialogCta.comparisonChart.root.gone()
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                    binding.daxDialogCta.progressBarText.show()
-                    binding.daxDialogCta.progressBarText.text = "2 / 2"
-                    binding.daxDialogCta.progressBar.show()
-                    binding.daxDialogCta.progressBar.progress = 2
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
-                    binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                    binding.daxDialogCta.addressBarPosition.root.show()
-                    binding.daxDialogCta.addressBarPosition.root.alpha = MIN_ALPHA
+                    playExitAnimation(
+                        onAnimationEnd = {
+                            binding.daxDialogCta.descriptionCta.gone()
+                            binding.daxDialogCta.secondaryCta.gone()
+                            binding.daxDialogCta.dialogTextCta.text = ""
+                            binding.daxDialogCta.comparisonChart.root.gone()
+                            TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                            val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                            binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
+                            binding.daxDialogCta.addressBarPosition.root.show()
 
-                    afterAnimation = {
-                        binding.daxDialogCta.dialogTextCta.finishAnimation()
-                        setAddressBarPositionOptions(true)
-                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
-                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
-                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                        binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(true)
-                        }
-                        binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
-                            viewModel.onAddressBarPositionOptionSelected(false)
-                        }
-                        binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
-                    }
+                            setAddressBarPositionOptions(true)
+                            binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
+                            binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
+                                viewModel.onAddressBarPositionOptionSelected(true)
+                            }
+                            binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
+                                viewModel.onAddressBarPositionOptionSelected(false)
+                            }
+                            binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
 
-                    scheduleTypingAnimation(ctaText) { afterAnimation() }
+                            playAnimation(LottieOnboardingAnimationSpec.POPUP_SMALL)
+                        },
+                    )
                 }
             }
-            binding.sceneBg.setOnClickListener { afterAnimation() }
-            binding.daxDialogCta.cardContainer.setOnClickListener { afterAnimation() }
         }
     }
 
-    private fun setSkipAnimationListener() {
-        val dialogAnimationStarted = binding.daxDialogCta.dialogTextCta.hasAnimationStarted()
-        binding.longDescriptionContainer.setOnClickListener {
-            if (dialogAnimationStarted) {
-                finishTypingAnimation()
-            } else if (!welcomeAnimationFinished) {
-                welcomeAnimation?.cancel()
-                hikerAnimation?.cancel()
-                scheduleWelcomeAnimation(0L)
-            }
-            welcomeAnimationFinished = true
-        }
+    private fun startWelcomeAnimation() {
+        binding.welcomeDialog.animateEntrance()
+
+        playAnimation(
+            animation = LottieOnboardingAnimationSpec.WALK_WAVE,
+            phase = ENTER,
+            onAnimationEnd = { requestNotificationsPermissions() },
+        )
     }
 
-    private fun scheduleWelcomeAnimation(startDelay: Long = ANIMATION_DELAY) {
-        ViewCompat.animate(binding.foregroundImageView)
-            .alpha(MIN_ALPHA)
-            .setDuration(ANIMATION_DURATION).startDelay = startDelay
-        welcomeAnimation = ViewCompat.animate(binding.welcomeContent as View)
-            .alpha(MIN_ALPHA)
-            .setDuration(ANIMATION_DURATION)
-            .setStartDelay(startDelay)
-            .withEndAction {
+    private fun startDaxDialogAnimation(animationDelay: Long = ANIMATION_DELAY) {
+        var welcomeContentFadedAway = false
+        var welcomeDaxFadedAway = false
+
+        fun onAnimationFinished() {
+            if (welcomeContentFadedAway && welcomeDaxFadedAway) {
                 viewModel.loadDaxDialog()
             }
-    }
+        }
 
-    private fun scheduleTypingAnimation(ctaText: String, afterAnimation: () -> Unit = {}) {
-        typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
-            .alpha(MAX_ALPHA)
+        ViewCompat.animate(binding.welcomeContent as View)
+            .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
-            .withEndAction {
-                welcomeAnimationFinished = true
-                binding.daxDialogCta.dialogTextCta.startTypingAnimation(ctaText, afterAnimation = afterAnimation)
+            .setStartDelay(animationDelay)
+            .withStartAction {
+                playAnimation(
+                    animation = LottieOnboardingAnimationSpec.WALK_WAVE,
+                    phase = EXIT,
+                    onAnimationEnd = {
+                        welcomeDaxFadedAway = true
+                        onAnimationFinished()
+                    },
+                )
             }
-    }
-
-    private fun finishTypingAnimation() {
-        welcomeAnimation?.cancel()
-        hikerAnimation?.cancel()
+            .withEndAction {
+                welcomeContentFadedAway = true
+                onAnimationFinished()
+            }
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
@@ -369,13 +354,63 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             WindowCompat.setDecorFitsSystemWindows(this, false)
             statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.BLACK
+            navigationBarColor = Color.TRANSPARENT
         }
         ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
     }
 
     private fun setBackgroundRes(backgroundRes: Int) {
         binding.sceneBg.setImageResource(backgroundRes)
+    }
+
+    private fun playAnimation(
+        animation: LottieOnboardingAnimationSpec,
+        phase: LottieOnboardingAnimationSpec.AnimationPhase? = null,
+        onAnimationEnd: () -> Unit = {},
+    ) = with(binding.onboardingPageAnimation) {
+        if (tag != animation) {
+            setAnimation(animation.resId)
+            tag = animation
+        }
+
+        val (minProgress, maxProgress) = when (phase) {
+            ENTER -> 0f to animation.enterPhaseMaxProgress
+            EXIT -> animation.enterPhaseMaxProgress to 1f
+            null -> 0f to 1f
+        }
+        setMinAndMaxProgress(minProgress, maxProgress)
+
+        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = animation.viewLayoutParamsOverride.marginStart
+            marginEnd = animation.viewLayoutParamsOverride.marginEnd
+            topMargin = animation.viewLayoutParamsOverride.marginTop
+            bottomMargin = animation.viewLayoutParamsOverride.marginBottom
+        }
+
+        addAnimatorListener(
+            object : Animator.AnimatorListener {
+                override fun onAnimationStart(animation: Animator) = Unit
+
+                override fun onAnimationEnd(animation: Animator) {
+                    removeAnimatorListener(this)
+                    onAnimationEnd()
+                }
+
+                override fun onAnimationCancel(animation: Animator) = Unit
+                override fun onAnimationRepeat(animation: Animator) = Unit
+            },
+        )
+
+        playAnimation()
+    }
+
+    private fun playExitAnimation(onAnimationEnd: () -> Unit = {}) {
+        val animation = (binding.onboardingPageAnimation.tag as? LottieOnboardingAnimationSpec) ?: return
+        playAnimation(
+            animation = animation,
+            phase = EXIT,
+            onAnimationEnd = onAnimationEnd,
+        )
     }
 
     companion object {
@@ -387,4 +422,54 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
+}
+
+private enum class LottieOnboardingAnimationSpec(
+    @RawRes val resId: Int,
+    val enterPhaseMaxProgress: Float = 1.0f,
+    val viewLayoutParamsOverride: LottieAnimationViewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(),
+) {
+    WALK_WAVE(
+        resId = R.raw.ob_1_walk_wave,
+        enterPhaseMaxProgress = 0.92f,
+        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+            marginStart = (-112).toPx(),
+            marginEnd = (16).toPx(),
+            marginBottom = 16.toPx(),
+        ),
+    ),
+    POPUP(
+        resId = R.raw.ob_2_popup,
+        enterPhaseMaxProgress = 0.75f,
+        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+            marginTop = (-32).toPx(),
+            marginEnd = (-128).toPx(),
+        ),
+    ),
+    WING(
+        resId = R.raw.ob_3_wing,
+        enterPhaseMaxProgress = 0.8f,
+        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+            marginTop = (-300).toPx(),
+            marginStart = (-64).toPx(),
+            marginEnd = (-64).toPx(),
+        ),
+    ),
+    POPUP_SMALL(
+        resId = R.raw.ob_4_popup,
+        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+            marginTop = (-64).toPx(),
+            marginEnd = (-64).toPx(),
+        ),
+    ),
+    ;
+
+    data class LottieAnimationViewLayoutParamsOverride(
+        val marginStart: Int = 0,
+        val marginEnd: Int = 0,
+        val marginTop: Int = 0,
+        val marginBottom: Int = 0,
+    )
+
+    enum class AnimationPhase { ENTER, EXIT }
 }
