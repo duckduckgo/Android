@@ -21,7 +21,8 @@ import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MessageActionMapperPlugin
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.impl.models.RemoteConfig
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class RemoteMessagingConfigJsonMapper(
     private val appBuildConfig: AppBuildConfig,
@@ -30,7 +31,7 @@ class RemoteMessagingConfigJsonMapper(
 ) {
     fun map(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig): RemoteConfig {
         val messages = jsonRemoteMessagingConfig.messages.mapToRemoteMessage(appBuildConfig.deviceLocale, actionMappers)
-        Timber.i("RMF: messages parsed $messages")
+        logcat(INFO) { "RMF: messages parsed $messages" }
         val rules = jsonRemoteMessagingConfig.rules.mapToMatchingRules(matchingAttributeMappers)
         return RemoteConfig(
             messages = messages,

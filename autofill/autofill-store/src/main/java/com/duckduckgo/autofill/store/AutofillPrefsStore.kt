@@ -20,7 +20,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface AutofillPrefsStore {
     var isEnabled: Boolean
@@ -120,7 +121,7 @@ class RealAutofillPrefsStore(
     ) {
         if (enabledByDefault) {
             prefs.edit { putBoolean(ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED, true) }
-            Timber.i("yyy Updated default state for Autofill; originally enabled: %s", true)
+            logcat(INFO) { "Updated default state for Autofill; originally enabled: $enabledByDefault" }
         }
     }
 

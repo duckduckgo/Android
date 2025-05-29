@@ -37,7 +37,9 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @SuppressLint("DenyListedApi")
 @ContributesMultibinding(
@@ -63,14 +65,14 @@ class InstallSourcePrivacyConfigObserver @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             if (!hasAlreadyProcessed()) {
                 val installationSource = installSourceExtractor.extract()
-                Timber.i("Installation source extracted: $installationSource")
+                logcat(INFO) { "Installation source extracted: $installationSource" }
 
                 sendPixelIndicatingIfPlayStoreInstall(installationSource)
                 conditionallySendFullInstallerPackage(installationSource)
 
                 recordInstallSourceProcessed()
             } else {
-                Timber.v("Already processed")
+                logcat(VERBOSE) { "Already processed" }
             }
         }
     }

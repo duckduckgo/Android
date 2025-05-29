@@ -33,7 +33,7 @@ import dagger.android.AndroidInjection
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
@@ -84,7 +84,7 @@ class VpnActionReceiver : BroadcastReceiver() {
             }
 
             else -> {
-                logcat(LogPriority.WARN) { "VpnActionReceiver: unknown action" }
+                logcat(WARN) { "VpnActionReceiver: unknown action: ${intent.action}" }
                 pendingResult?.finish()
             }
         }

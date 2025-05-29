@@ -38,7 +38,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
-import logcat.LogPriority
+import logcat.LogPriority.DEBUG
 import logcat.LogcatLogger
 import logcat.logcat
 
@@ -54,7 +54,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         super.onCreate()
         AndroidInjection.inject(this)
         // TODO find correct place.
-        LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
+        LogcatLogger.install(AndroidLogcatLogger(DEBUG))
     }
 
     override fun onBind(intent: Intent?): IBinder? {

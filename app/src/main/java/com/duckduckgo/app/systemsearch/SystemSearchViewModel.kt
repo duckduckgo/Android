@@ -67,7 +67,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 data class SystemSearchResult(
     val autocomplete: AutoCompleteResult,
@@ -191,7 +193,7 @@ class SystemSearchViewModel @Inject constructor(
                 updateResults(result)
             }
             .flowOn(dispatchers.main())
-            .catch { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .launchIn(viewModelScope)
     }
 

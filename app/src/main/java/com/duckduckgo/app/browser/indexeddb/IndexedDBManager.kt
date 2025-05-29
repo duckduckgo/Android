@@ -29,7 +29,7 @@ import com.squareup.moshi.Moshi
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface IndexedDBManager {
     suspend fun clearIndexedDB()
@@ -55,7 +55,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
 
     override suspend fun clearIndexedDB() = withContext(dispatcherProvider.io()) {
         val allowedDomains = getAllowedDomains()
-        Timber.d("IndexedDBManager: Allowed domains: $allowedDomains")
+        logcat { "IndexedDBManager: Allowed domains: $allowedDomains" }
 
         val rootFolder = File(context.applicationInfo.dataDir, "app_webview/Default/IndexedDB")
         val excludedFolders = getExcludedFolders(rootFolder, allowedDomains)

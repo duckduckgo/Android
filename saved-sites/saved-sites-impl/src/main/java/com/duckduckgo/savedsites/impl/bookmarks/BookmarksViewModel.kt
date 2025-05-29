@@ -71,7 +71,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarksViewModel @Inject constructor(
@@ -152,7 +152,7 @@ class BookmarksViewModel @Inject constructor(
         updateFavorite: Boolean,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            Timber.d("Bookmark: $bookmark from $oldFolderId")
+            logcat { "Bookmark: $bookmark from $oldFolderId" }
             savedSitesRepository.updateBookmark(bookmark, oldFolderId, updateFavorite)
         }
     }
@@ -397,7 +397,7 @@ class BookmarksViewModel @Inject constructor(
         parentId: String,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            Timber.d("Bookmarks: parentId: $parentId, updateBookmarks $bookmarksAndFolders")
+            logcat { "Bookmarks: parentId: $parentId, updateBookmarks $bookmarksAndFolders" }
             savedSitesRepository.updateFolderRelation(parentId, bookmarksAndFolders)
         }
     }

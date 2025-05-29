@@ -59,7 +59,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import timber.log.Timber;
+import logcat.LogPriority;
+import logcat.LogcatKt;
 
 /**
  * Similar in behavior to {@link androidx.fragment.app.FragmentStatePagerAdapter
@@ -641,8 +642,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                     Fragment fragment = mFragmentManager.getFragment(bundle, key);
                     mFragments.put(itemId, fragment);
                 } catch (IllegalStateException e) {
-                    Timber.w("FragmentManager is in a bad state, unable to restore fragment %d",
-                            itemId);
+                    LogcatKt.logcat(FragmentStateAdapter.class.getSimpleName(), LogPriority.WARN, () ->
+                            String.format("FragmentManager is in a bad state, unable to restore fragment %d", itemId)
+                    );
                 }
             }
         }

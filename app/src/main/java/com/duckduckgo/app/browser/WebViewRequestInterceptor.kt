@@ -53,7 +53,7 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface RequestInterceptor {
 
@@ -352,13 +352,13 @@ class WebViewRequestInterceptor(
         trackingEvent.surrogateId?.let { surrogateId ->
             val surrogate = resourceSurrogates.get(surrogateId)
             if (surrogate.responseAvailable) {
-                Timber.d("Surrogate found for ${request.url}")
+                logcat { "Surrogate found for ${request.url}" }
                 webViewClientListener?.surrogateDetected(surrogate)
                 return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
             }
         }
 
-        Timber.d("Blocking request ${request.url}")
+        logcat { "Blocking request ${request.url}" }
         privacyProtectionCountDao.incrementBlockedTrackerCount()
         return WebResourceResponse(null, null, null)
     }

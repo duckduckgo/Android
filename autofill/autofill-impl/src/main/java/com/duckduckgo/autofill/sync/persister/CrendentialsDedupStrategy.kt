@@ -24,7 +24,8 @@ import com.duckduckgo.sync.api.engine.SyncMergeResult
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Error
 import com.duckduckgo.sync.api.engine.SyncMergeResult.Success
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class CredentialsDedupStrategy(
     private val credentialsSync: CredentialsSync,
@@ -35,7 +36,7 @@ class CredentialsDedupStrategy(
         credentials: credentialsSyncEntries,
         clientModifiedSince: String,
     ): SyncMergeResult {
-        Timber.d("Sync-autofill-Persist: ======= MERGING DEDUPLICATION =======")
+        logcat { "Sync-autofill-Persist: ======= MERGING DEDUPLICATION =======" }
 
         return kotlin.runCatching {
             runBlocking(dispatchers.io()) {
@@ -46,22 +47,22 @@ class CredentialsDedupStrategy(
 
                     val localMatchesForDomain = credentialsSync.getCredentialsForDomain(remoteLoginCredential.domain)
                     if (localMatchesForDomain.isEmpty()) {
-                        Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
+                        logcat { "Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential" }
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     } else {
                         val duplicateFound = findDuplicates(localMatchesForDomain, remoteLoginCredential, remoteEntry.id)
                         if (duplicateFound) return@forEach
 
-                        Timber.d("Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential")
+                        logcat { "Sync-autofill-Persist: >>> no duplicate found, save remote $remoteLoginCredential" }
                         credentialsSync.saveCredential(remoteLoginCredential, remoteId = remoteEntry.id)
                     }
                 }
             }
         }.getOrElse {
-            Timber.d("Sync-autofill-Persist: merging failed with error $it")
+            logcat { "Sync-autofill-Persist: merging failed with error $it" }
             return Error(reason = "DeDup merge failed with error $it")
         }.let {
-            Timber.d("Sync-autofill-Persist: merging completed")
+            logcat { "Sync-autofill-Persist: merging completed" }
             Success()
         }
     }
@@ -77,14 +78,14 @@ class CredentialsDedupStrategy(
             when {
                 result == null -> {}
                 result <= 0 -> {
-                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update remote $remoteLoginCredential")
+                    logcat { "Sync-autofill-Persist: >>> duplicate found $localMatch, update remote $remoteLoginCredential" }
                     remoteLoginCredential.copy(id = localMatch.id).also {
                         credentialsSync.updateCredentials(it, remoteId = remoteId)
                     }
                     duplicateFound = true
                 }
                 result > 0 -> {
-                    Timber.d("Sync-autofill-Persist: >>> duplicate found $localMatch, update local $localMatch")
+                    logcat { "Sync-autofill-Persist: >>> duplicate found $localMatch, update local $localMatch" }
                     val localCredential = credentialsSync.getCredentialWithId(localMatch.id!!)!!
                     credentialsSync.updateCredentials(
                         loginCredential = localCredential,
@@ -101,7 +102,7 @@ class CredentialsDedupStrategy(
         localCredential: LoginCredentials,
         loginCredential: LoginCredentials,
     ): Int? {
-        Timber.i("Duplicate: compareCredentials local $localCredential vs remote $loginCredential")
+        logcat(INFO) { "Duplicate: compareCredentials local $localCredential vs remote $loginCredential" }
         val isDuplicated = with(localCredential) {
             domain.orEmpty() == loginCredential.domain.orEmpty() &&
                 username.orEmpty() == loginCredential.username.orEmpty() &&
@@ -115,6 +116,7 @@ class CredentialsDedupStrategy(
 
         return comparison
     }
+
     private fun mapRemoteToLocalLoginCredential(
         remoteEntry: CredentialsSyncEntryResponse,
         clientModifiedSince: String,

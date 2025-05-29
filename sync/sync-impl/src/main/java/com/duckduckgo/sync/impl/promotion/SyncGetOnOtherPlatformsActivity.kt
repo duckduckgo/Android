@@ -39,7 +39,9 @@ import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncGetOnOtherPlatformsParams::class)
@@ -97,7 +99,7 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
         try {
             startActivity(Intent.createChooser(share, null))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

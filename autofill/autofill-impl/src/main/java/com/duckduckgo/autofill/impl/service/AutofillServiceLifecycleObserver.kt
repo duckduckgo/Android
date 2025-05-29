@@ -33,7 +33,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -54,12 +55,12 @@ class AutofillServiceLifecycleObserver @Inject constructor(
 
                 autofillServiceFeature.self().isEnabled().let { remoteState ->
                     if (currentState != remoteState) {
-                        Timber.d("DDGAutofillService: Updating state to $remoteState")
+                        logcat { "DDGAutofillService: Updating state to $remoteState" }
                         newState(context, remoteState)
                     }
                 }
             }.onFailure {
-                Timber.e("DDGAutofillService: Failed to update Service state: $it")
+                logcat(ERROR) { "DDGAutofillService: Failed to update Service state: $it" }
             }
         }
     }

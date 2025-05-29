@@ -31,7 +31,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.time.OffsetDateTime
 import java.util.*
-import timber.log.*
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class RealSyncSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
@@ -105,7 +106,7 @@ class RealSyncSavedSitesRepository(
         savedSite: SavedSite,
         favoriteFolder: String,
     ): SavedSite {
-        Timber.d("Sync-Bookmarks: inserting Saved Site $savedSite")
+        logcat { "Sync-Bookmarks: inserting Saved Site $savedSite" }
         val titleOrFallback = savedSite.titleOrFallback()
         return when (savedSite) {
             is Favorite -> {
@@ -137,7 +138,7 @@ class RealSyncSavedSitesRepository(
         folder: BookmarkFolder,
         children: List<String>,
     ) {
-        Timber.d("Sync-Bookmarks: replacing ${folder.id} with children $children")
+        logcat { "Sync-Bookmarks: replacing ${folder.id} with children $children" }
         savedSitesRelationsDao.replaceBookmarkFolder(folder.id, children)
         savedSitesEntitiesDao.update(
             Entity(
@@ -154,7 +155,7 @@ class RealSyncSavedSitesRepository(
         favouriteFolder: String,
         children: List<String>,
     ) {
-        Timber.d("Sync-Bookmarks: adding $children to $favouriteFolder")
+        logcat { "Sync-Bookmarks: adding $children to $favouriteFolder" }
         val relations = children.map {
             Relation(folderId = favouriteFolder, entityId = it)
         }
@@ -166,7 +167,7 @@ class RealSyncSavedSitesRepository(
         favouriteFolder: String,
         children: List<String>,
     ) {
-        Timber.d("Sync-Bookmarks: replacing $favouriteFolder with children $children")
+        logcat { "Sync-Bookmarks: replacing $favouriteFolder with children $children" }
         savedSitesRelationsDao.replaceFavouriteFolder(favouriteFolder, children)
     }
 
@@ -224,7 +225,7 @@ class RealSyncSavedSitesRepository(
 
     override fun getFoldersModifiedSince(since: String): List<BookmarkFolder> {
         val folders = savedSitesEntitiesDao.allEntitiesByTypeSync(FOLDER).filter { it.modifiedAfter(since) }
-        Timber.d("Sync-Bookmarks: folders modified since $since are ${folders.map { it.entityId }}")
+        logcat { "Sync-Bookmarks: folders modified since $since are ${folders.map { it.entityId }}" }
         return folders.map { mapBookmarkFolder(it) }
     }
 
@@ -256,7 +257,7 @@ class RealSyncSavedSitesRepository(
 
     override fun getBookmarksModifiedSince(since: String): List<Bookmark> {
         val bookmarks = savedSitesEntitiesDao.allEntitiesByTypeSync(BOOKMARK).filter { it.modifiedAfter(since) }
-        Timber.d("Sync-Bookmarks: bookmarks modified since $since are ${bookmarks.map { it.entityId }}")
+        logcat { "Sync-Bookmarks: bookmarks modified since $since are ${bookmarks.map { it.entityId }}" }
         return bookmarks.map { mapToBookmark(it)!! }
     }
 
@@ -301,7 +302,7 @@ class RealSyncSavedSitesRepository(
     }
 
     private fun confirmPendingFolderRequests() {
-        Timber.d("Sync-Bookmarks-Metadata: updating children metadata column with values from request column")
+        logcat { "Sync-Bookmarks-Metadata: updating children metadata column with values from request column" }
         savedSitesSyncMetadataDao.confirmAllChildrenRequests()
     }
 
@@ -311,12 +312,12 @@ class RealSyncSavedSitesRepository(
             storedMetadata?.copy(childrenRequest = stringListAdapter.toJson(it.folder?.children?.current))
                 ?: SavedSitesSyncMetadataEntity(it.id, null, stringListAdapter.toJson(it.folder?.children?.current))
         }
-        Timber.d("Sync-Bookmarks-Metadata: adding children request metadata for folders: $children")
+        logcat { "Sync-Bookmarks-Metadata: adding children request metadata for folders: $children" }
         savedSitesSyncMetadataDao.addOrUpdate(children)
     }
 
     override fun discardRequestMetadata() {
-        Timber.d("Sync-Bookmarks-Metadata: removing all local metadata.")
+        logcat { "Sync-Bookmarks-Metadata: removing all local metadata." }
         savedSitesSyncMetadataDao.discardRequestMetadata()
     }
 
@@ -331,21 +332,21 @@ class RealSyncSavedSitesRepository(
             val allFolders = entities.filter { it.isFolder() }
             val folders = allFolders.filter { it.deleted == null }
             if (folders.isEmpty()) {
-                Timber.d("Sync-Bookmarks-Metadata: no folders received in the response, nothing to add")
+                logcat { "Sync-Bookmarks-Metadata: no folders received in the response, nothing to add" }
                 confirmPendingFolderRequests()
             } else {
                 val children = folders.map {
                     val response = stringListAdapter.toJson(it.folder?.children)
-                    Timber.d("Sync-Bookmarks-Metadata: new children response $response for ${it.id}")
+                    logcat { "Sync-Bookmarks-Metadata: new children response $response for ${it.id}" }
                     SavedSitesSyncMetadataEntity(it.id, response, null)
                 }
-                Timber.d("Sync-Bookmarks-Metadata: storing children response metadata for: $children")
+                logcat { "Sync-Bookmarks-Metadata: storing children response metadata for: $children" }
                 savedSitesSyncMetadataDao.addResponseMetadata(children)
             }
 
             val deletedFolders = allFolders.filter { it.deleted != null }.map { it.id }
             if (deletedFolders.isNotEmpty()) {
-                Timber.d("Sync-Bookmarks-Metadata: deleting metadata for deleted folders $deletedFolders")
+                logcat { "Sync-Bookmarks-Metadata: deleting metadata for deleted folders $deletedFolders" }
                 savedSitesSyncMetadataDao.deleteMetadata(deletedFolders)
             }
         }
@@ -358,19 +359,19 @@ class RealSyncSavedSitesRepository(
     override fun fixOrphans(): Boolean {
         val orphans = savedSitesRelationsDao.getOrphans()
         return if (orphans.isNotEmpty()) {
-            Timber.d("Sync-Bookmarks: Found ${orphans.size} orphans, $orphans attaching them to bookmarks root")
+            logcat { "Sync-Bookmarks: Found ${orphans.size} orphans $orphans attaching them to bookmarks root" }
             orphans.map { Relation(folderId = SavedSitesNames.BOOKMARKS_ROOT, entityId = it.entityId) }.also {
                 savedSitesRelationsDao.insertList(it)
             }
             true
         } else {
-            Timber.d("Sync-Bookmarks: Orphans not present")
+            logcat { "Sync-Bookmarks: Orphans not present" }
             false
         }
     }
 
     override fun pruneDeleted() {
-        Timber.d("Sync-Bookmarks: pruning soft deleted entities and metadata")
+        logcat { "Sync-Bookmarks: pruning soft deleted entities and metadata" }
         savedSitesEntitiesDao.allDeleted().forEach {
             savedSitesRelationsDao.deleteRelationByEntity(it.entityId)
             savedSitesEntitiesDao.deletePermanently(it)
@@ -387,14 +388,14 @@ class RealSyncSavedSitesRepository(
     // for bookmarks -> is parent folder in metadata table? -> mark bookmark and parent
     // if not present -> keep going up until the first parent folder is in the response table
     override fun setLocalEntitiesForNextSync(startTimestamp: String) {
-        Timber.d("Sync-Bookmarks: looking for folders that need modifiedSince updated after a Deduplication")
+        logcat { "Sync-Bookmarks: looking for folders that need modifiedSince updated after a Deduplication" }
         val entitiesToUpdate = mutableListOf<String>()
         val modifiedSince = OffsetDateTime.now().plusSeconds(1)
         getEntitiesModifiedBefore(startTimestamp).forEach {
             traverseParents(it, entitiesToUpdate)
         }
 
-        Timber.d("Sync-Bookmarks: updating $entitiesToUpdate modifiedSince to $modifiedSince")
+        logcat { "Sync-Bookmarks: updating $entitiesToUpdate modifiedSince to $modifiedSince" }
         savedSitesEntitiesDao.updateModified(entitiesToUpdate.toList(), DatabaseDateFormatter.iso8601(modifiedSince))
     }
 
@@ -405,7 +406,7 @@ class RealSyncSavedSitesRepository(
     }
 
     override fun markSavedSitesAsInvalid(ids: List<String>) {
-        Timber.i("Sync-Bookmarks: Storing invalid items: $ids")
+        logcat(INFO) { "Sync-Bookmarks: Storing invalid items: $ids" }
         savedSitesEntitiesStore.invalidEntitiesIds = ids
     }
 
@@ -429,7 +430,7 @@ class RealSyncSavedSitesRepository(
             .filter { it.modifiedBefore(date) }
             .filterNot { it.lastModified.isNullOrEmpty() }
             .map { it.entityId }
-        Timber.d("Sync-Bookmarks: entities modified before $date are $entities")
+        logcat { "Sync-Bookmarks: entities modified before $date are $entities" }
         return entities
     }
 

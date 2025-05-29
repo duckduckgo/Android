@@ -37,7 +37,7 @@ dependencies {
     implementation project(':statistics-api')
     implementation project(':content-scope-scripts-api')
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.retrofit2.converter.moshi
 
     implementation KotlinX.coroutines.core
@@ -48,7 +48,6 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation AndroidX.work.runtimeKtx

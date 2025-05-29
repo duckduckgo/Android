@@ -377,10 +377,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import org.json.JSONArray
 import org.json.JSONObject
-import timber.log.Timber
 
 private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
 private const val MALICIOUS_SITE_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
@@ -569,7 +574,7 @@ class BrowserTabViewModel @Inject constructor(
 
     @ExperimentalCoroutinesApi
     private val fireButtonAnimation = Observer<Boolean> { shouldShowAnimation ->
-        Timber.i("shouldShowAnimation $shouldShowAnimation")
+        logcat(INFO) { "shouldShowAnimation $shouldShowAnimation" }
         if (currentBrowserViewState().fireButton is HighlightableButton.Visible) {
             browserViewState.value = currentBrowserViewState().copy(fireButton = HighlightableButton.Visible(highlighted = shouldShowAnimation))
         }
@@ -593,7 +598,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private val loginDetectionObserver = Observer<LoginDetected> { loginEvent ->
-        Timber.i("LoginDetection for $loginEvent")
+        logcat(INFO) { "LoginDetection for $loginEvent" }
         viewModelScope.launch(dispatchers.io()) {
             val canPromptAboutFireproofing = !autofillFireproofDialogSuppressor.isAutofillPreventingFireproofPrompts()
 
@@ -674,7 +679,7 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             ctaChangedTicker.asStateFlow()
                 .onEach { ticker ->
-                    Timber.v("RMF: $ticker")
+                    logcat(VERBOSE) { "RMF: $ticker" }
 
                     if (ticker.isEmpty()) return@onEach
                     if (currentBrowserViewState().browserShowing) return@onEach
@@ -742,7 +747,7 @@ class BrowserTabViewModel @Inject constructor(
         accessibilityObserver = accessibilitySettingsDataStore.settingsFlow()
             .combine(refreshOnViewVisible.asStateFlow(), ::Pair)
             .onEach { (settings, viewVisible) ->
-                Timber.v("Accessibility: newSettings $settings, $viewVisible")
+                logcat(VERBOSE) { "Accessibility: newSettings $settings, $viewVisible" }
                 val shouldRefreshWebview =
                     (currentAccessibilityViewState().forceZoom != settings.forceZoom) || currentAccessibilityViewState().refreshWebView
                 accessibilityViewState.value =
@@ -772,9 +777,15 @@ class BrowserTabViewModel @Inject constructor(
         updateMaliciousSiteStatus: Boolean = false,
         maliciousSiteStatus: MaliciousSiteStatus? = null,
     ) {
-        Timber.v("buildSiteFactory for url=$url, updateMaliciousSiteStatus=$updateMaliciousSiteStatus, maliciousSiteStatus=$maliciousSiteStatus")
+        logcat(VERBOSE) {
+            """
+            buildSiteFactory for url=$url, 
+            updateMaliciousSiteStatus=$updateMaliciousSiteStatus, 
+            maliciousSiteStatus=$maliciousSiteStatus
+            """.trimIndent()
+        }
         if (buildingSiteFactoryJob?.isCompleted == false) {
-            Timber.i("Cancelling existing work to build SiteMonitor for $url")
+            logcat(INFO) { "Cancelling existing work to build SiteMonitor for $url" }
             buildingSiteFactoryJob?.cancel()
         }
         val externalLaunch = stillExternal ?: false
@@ -808,7 +819,7 @@ class BrowserTabViewModel @Inject constructor(
                 onAutoCompleteResultReceived(result)
             }
             .flowOn(dispatchers.main())
-            .catch { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .launchIn(viewModelScope)
     }
 
@@ -1090,10 +1101,10 @@ class BrowserTabViewModel @Inject constructor(
 
             else -> {
                 if (type is SpecialUrlDetector.UrlType.ExtractedAmpLink) {
-                    Timber.d("AMP link detection: Using extracted URL: ${type.extractedUrl}")
+                    logcat { "AMP link detection: Using extracted URL: ${type.extractedUrl}" }
                     urlToNavigate = type.extractedUrl
                 } else if (type is SpecialUrlDetector.UrlType.TrackingParameterLink) {
-                    Timber.d("Loading parameter cleaned URL: ${type.cleanedUrl}")
+                    logcat { "Loading parameter cleaned URL: ${type.cleanedUrl}" }
                     urlToNavigate = type.cleanedUrl
                 }
 
@@ -1175,7 +1186,7 @@ class BrowserTabViewModel @Inject constructor(
 
     override fun willOverrideUrl(newUrl: String) {
         site?.nextUrl = newUrl
-        Timber.d("SSLError: willOverride is $newUrl")
+        logcat { "SSLError: willOverride is $newUrl" }
         navigationAwareLoginDetector.onEvent(NavigationEvent.Redirect(newUrl))
         val previousSiteStillLoading = currentLoadingViewState().isLoading
         if (previousSiteStillLoading) {
@@ -1200,7 +1211,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
         if (currentUrl != url) {
-            Timber.d("Favicon received for a url $url, different than the current one $currentUrl")
+            logcat { "Favicon received for a url $url, different than the current one $currentUrl" }
             return
         }
         viewModelScope.launch(dispatchers.io()) {
@@ -1218,7 +1229,7 @@ class BrowserTabViewModel @Inject constructor(
         val currentTab = tabRepository.liveSelectedTab.value ?: return
         val currentUrl = currentTab.url ?: return
         if (currentUrl.toUri().host != visitedUrl.toUri().host) {
-            Timber.d("Favicon received for a url $visitedUrl, different than the current one $currentUrl")
+            logcat { "Favicon received for a url $visitedUrl, different than the current one $currentUrl" }
             return
         }
         viewModelScope.launch {
@@ -1375,7 +1386,7 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         if (!isCustomTab) {
-            Timber.d("User pressed back and tab is set to skip home; need to generate WebView preview now")
+            logcat { "User pressed back and tab is set to skip home; need to generate WebView preview now" }
             command.value = GenerateWebViewPreviewImage
         }
         return false
@@ -1512,18 +1523,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showBlankContentfNewContentDelayed() {
-        Timber.i("Blank: cancel job $deferredBlankSite")
+        logcat(INFO) { "Blank: cancel job $deferredBlankSite" }
         deferredBlankSite?.cancel()
         deferredBlankSite = viewModelScope.launch(dispatchers.io()) {
             withContext(dispatchers.main()) {
                 command.value = HideWebContent
             }
         }
-        Timber.i("Blank: schedule new blank $deferredBlankSite")
+        logcat(INFO) { "Blank: schedule new blank $deferredBlankSite" }
     }
 
     private fun showWebContent() {
-        Timber.i("Blank: onsite changed cancel $deferredBlankSite")
+        logcat(INFO) { "Blank: onsite changed cancel $deferredBlankSite" }
         deferredBlankSite?.cancel()
         command.value = ShowWebContent
     }
@@ -1532,7 +1543,7 @@ class BrowserTabViewModel @Inject constructor(
         url: String,
         title: String?,
     ) {
-        Timber.v("Page changed: $url")
+        logcat(VERBOSE) { "Page changed: $url" }
         cleanupBlobDownloadReplyProxyMaps()
 
         hasCtaBeenShownForCurrentPage.set(false)
@@ -1705,12 +1716,12 @@ class BrowserTabViewModel @Inject constructor(
     private fun notifyPermanentLocationPermission(domain: String) {
         viewModelScope.launch(dispatchers.io()) {
             if (sitePermissionsManager.hasSitePermanentPermission(domain, LocationPermissionRequest.RESOURCE_LOCATION_PERMISSION)) {
-                Timber.d("Location Permission: domain $domain site url ${site?.url} has location permission")
+                logcat { "Location Permission: domain $domain site url ${site?.url} has location permission" }
                 if (!locationPermissionMessages.containsKey(domain)) {
-                    Timber.d("Location Permission: We haven't shown message for $domain this session")
+                    logcat { "Location Permission: We haven't shown message for $domain this session" }
                     setDomainHasLocationPermissionShown(domain)
                     if (shouldShowLocationPermissionMessage()) {
-                        Timber.d("Location Permission: Show location permission for $domain")
+                        logcat { "Location Permission: Show location permission for $domain" }
                         withContext(dispatchers.main()) {
                             command.postValue(ShowDomainHasPermissionMessage(domain))
                         }
@@ -1730,7 +1741,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun urlUpdated(url: String) {
-        Timber.v("Page url updated: $url")
+        logcat(VERBOSE) { "Page url updated: $url" }
         site?.url = url
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
@@ -1757,7 +1768,7 @@ class BrowserTabViewModel @Inject constructor(
                 return "${uri.scheme}://${uri.host}$portStr${uri.path}$queryStr$uriFragment"
             }
         } catch (e: URISyntaxException) {
-            Timber.e(e, "Failed to parse url for auth stripping")
+            logcat(ERROR) { "Failed to parse url for auth stripping: ${e.asLog()}" }
             return url
         }
         return url
@@ -1774,7 +1785,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun pageCleared() {
-        Timber.v("Page cleared: $url")
+        logcat(VERBOSE) { "Page cleared: $url" }
         site = null
         onSiteChanged()
 
@@ -1788,12 +1799,12 @@ class BrowserTabViewModel @Inject constructor(
             canFireproofSite = false,
             canPrintPage = false,
         )
-        Timber.d("showPrivacyShield=false, showSearchIcon=true, showClearButton=true")
+        logcat { "showPrivacyShield=false, showSearchIcon=true, showClearButton=true" }
     }
 
     override fun pageRefreshed(refreshedUrl: String) {
         if (url == null || refreshedUrl == url) {
-            Timber.v("Page refreshed: $refreshedUrl")
+            logcat(VERBOSE) { "Page refreshed: $refreshedUrl" }
             pageChanged(refreshedUrl, title)
         }
     }
@@ -1802,7 +1813,7 @@ class BrowserTabViewModel @Inject constructor(
         newProgress: Int,
         webViewNavigationState: WebViewNavigationState,
     ) {
-        Timber.v("Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}")
+        logcat(VERBOSE) { "Loading in progress $newProgress, url: ${webViewNavigationState.currentUrl}" }
 
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
@@ -1864,7 +1875,7 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         if (request is LocationPermissionRequest) {
             if (!sameEffectiveTldPlusOne(site, request.origin)) {
-                Timber.d("Permissions: sameEffectiveTldPlusOne false")
+                logcat { "Permissions: sameEffectiveTldPlusOne false" }
                 request.deny()
                 return
             }
@@ -1936,7 +1947,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun trackerDetected(event: TrackingEvent) {
-        Timber.d("Tracker detected while on $url and the document was ${event.documentUrl}")
+        logcat { "Tracker detected while on $url and the document was ${event.documentUrl}" }
         if (site?.domainMatchesUrl(event.documentUrl) == true) {
             site?.trackerDetected(event)
             onSiteChanged()
@@ -2062,9 +2073,9 @@ class BrowserTabViewModel @Inject constructor(
         errorResponse: SslErrorResponse,
     ) {
         if (sslCertificatesFeature.allowBypass().isEnabled()) {
-            Timber.d("SSLError: error received for ${errorResponse.url} and nextUrl is ${site?.nextUrl} and currentUrl is ${site?.url}")
+            logcat { "SSLError: error received for ${errorResponse.url} and nextUrl is ${site?.nextUrl} and currentUrl is ${site?.url}" }
             if (site?.nextUrl != null && errorResponse.url != site?.nextUrl) {
-                Timber.d("SSLError: received ssl error for a page we are not loading, cancelling request")
+                logcat { "SSLError: received ssl error for a page we are not loading, cancelling request" }
                 handler.cancel()
             } else {
                 browserViewState.value =
@@ -2076,7 +2087,7 @@ class BrowserTabViewModel @Inject constructor(
                 command.postValue(ShowSSLError(handler, errorResponse))
             }
         } else {
-            Timber.d("SSLError: allow bypass certificates feature disabled, cancelling request")
+            logcat { "SSLError: allow bypass certificates feature disabled, cancelling request" }
             handler.cancel()
         }
     }
@@ -2476,7 +2487,7 @@ class BrowserTabViewModel @Inject constructor(
         target: LongPressTarget,
         menu: ContextMenu,
     ) {
-        Timber.i("Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})")
+        logcat(INFO) { "Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})" }
         longPressHandler.handleLongPress(target.type, target.url, menu)
     }
 
@@ -2485,7 +2496,7 @@ class BrowserTabViewModel @Inject constructor(
         item: MenuItem,
     ): Boolean {
         val requiredAction = longPressHandler.userSelectedMenuItem(longPressTarget, item)
-        Timber.d("Required action from long press is $requiredAction")
+        logcat { "Required action from long press is $requiredAction" }
 
         return when (requiredAction) {
             is RequiredAction.OpenInNewTab -> {
@@ -2593,7 +2604,7 @@ class BrowserTabViewModel @Inject constructor(
 
         if (desktopSiteRequested && uri.isMobileSite) {
             val desktopUrl = uri.toDesktopUri().toString()
-            Timber.i("Original URL $url - attempting $desktopUrl with desktop site UA string")
+            logcat(INFO) { "Original URL $url - attempting $desktopUrl with desktop site UA string" }
             command.value = NavigationCommand.Navigate(desktopUrl, getUrlHeaders(desktopUrl))
         } else {
             command.value = NavigationCommand.Refresh
@@ -2718,11 +2729,11 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         val sessionRestored = webViewSessionStorage.restoreSession(webView, tabId)
         if (sessionRestored) {
-            Timber.v("Successfully restored session")
+            logcat(VERBOSE) { "Successfully restored session" }
             onWebSessionRestored()
         } else {
             if (lastUrl.isNotBlank()) {
-                Timber.w("Restoring last url but page history has been lost - url=[$lastUrl]")
+                logcat(WARN) { "Restoring last url but page history has been lost - url=[$lastUrl]" }
                 onUserSubmittedQuery(lastUrl)
             }
         }
@@ -3366,12 +3377,12 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!exempted) {
             if (currentBrowserViewState().maliciousSiteBlocked && previousSite?.url == url.toString()) {
-                Timber.d("maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}")
+                logcat { "maliciousSiteBlocked already shown for $url, previousSite: ${previousSite.url}" }
             } else {
                 val params = mapOf(CATEGORY_KEY to feed.name.lowercase(), CLIENT_SIDE_HIT_KEY to clientSideHit.toString())
                 pixel.fire(AppPixelName.MALICIOUS_SITE_PROTECTION_ERROR_SHOWN, params)
             }
-            Timber.d("Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit")
+            logcat { "Received MaliciousSiteWarning for $url, feed: $feed, exempted: false, clientSideHit: $clientSideHit" }
 
             viewModelScope.launch(dispatchers.main()) {
                 loadingViewState.value =
@@ -3445,7 +3456,7 @@ class BrowserTabViewModel @Inject constructor(
             }
             site?.onErrorDetected(error)
         }
-        Timber.d("recordErrorCode $error in ${site?.url}")
+        logcat { "recordErrorCode $error in ${site?.url}" }
     }
 
     override fun recordHttpErrorCode(
@@ -3462,7 +3473,7 @@ class BrowserTabViewModel @Inject constructor(
             }
             site?.onHttpErrorDetected(statusCode)
         }
-        Timber.d("recordHttpErrorCode $statusCode in ${site?.url}")
+        logcat { "recordHttpErrorCode $statusCode in ${site?.url}" }
         updateHttpErrorCount(statusCode)
     }
 
@@ -3954,12 +3965,12 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onStartPrint() {
-        Timber.d("Print started")
+        logcat { "Print started" }
         browserViewState.value = currentBrowserViewState().copy(isPrinting = true)
     }
 
     fun onFinishPrint() {
-        Timber.d("Print finished")
+        logcat { "Print finished" }
         browserViewState.value = currentBrowserViewState().copy(isPrinting = false)
     }
 

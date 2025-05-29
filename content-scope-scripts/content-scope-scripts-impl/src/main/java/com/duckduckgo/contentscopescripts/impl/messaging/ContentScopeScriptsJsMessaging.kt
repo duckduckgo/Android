@@ -37,7 +37,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -77,7 +77,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            logcat(LogPriority.ERROR) { "Exception is ${e.asLog()}" }
+            logcat(ERROR) { "Exception is ${e.asLog()}" }
         }
     }
 

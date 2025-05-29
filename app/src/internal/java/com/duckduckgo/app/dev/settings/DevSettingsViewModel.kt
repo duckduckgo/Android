@@ -36,7 +36,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class DevSettingsViewModel @Inject constructor(
@@ -92,7 +93,7 @@ class DevSettingsViewModel @Inject constructor(
     }
 
     fun onStartupTraceToggled(value: Boolean) {
-        Timber.v("User toggled startup trace, is now enabled: $value")
+        logcat(VERBOSE) { "User toggled startup trace, is now enabled: $value" }
         startupTraces.isTraceEnabled = value
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(startupTraceEnabled = value))

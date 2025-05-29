@@ -24,8 +24,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import logcat.logcat
 import okhttp3.internal.publicsuffix.PublicSuffixDatabase
-import timber.log.Timber
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -70,17 +70,17 @@ class DuckDuckGoAdClickManager @Inject constructor(
     }
 
     override fun clearTabId(tabId: String) {
-        Timber.d("Clear data for tab $tabId.")
+        logcat { "Clear data for tab $tabId." }
         adClickData.remove(tabId)
     }
 
     override fun clearAll() {
-        Timber.d("Clear all data.")
+        logcat { "Clear all data." }
         adClickData.removeAll()
     }
 
     override fun clearAllExpiredAsync() {
-        Timber.d("Clear all expired entries (asynchronous).")
+        logcat { "Clear all expired entries (asynchronous)." }
         adClickData.removeAllExpired()
     }
 
@@ -105,13 +105,13 @@ class DuckDuckGoAdClickManager @Inject constructor(
 
         val expired = adClickData.getExemption()?.isExpired() ?: false
         if (expired) {
-            Timber.d("isExemption: Url $url is EXPIRED.")
+            logcat { "isExemption: Url $url is EXPIRED." }
             adClickData.removeExemption()
             return false
         }
 
         if (adClickAttribution.isAllowed(url)) {
-            Timber.d("isExemption: Url $url MATCHES the allow list")
+            logcat { "isExemption: Url $url MATCHES the allow list" }
             val exemption = adClickData.getExemption()
             if (adClickData.getCurrentPage().isNotEmpty()) {
                 adClickData.setCurrentPage("")

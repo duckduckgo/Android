@@ -30,7 +30,7 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class IntentDispatcherActivity : DuckDuckGoActivity() {
@@ -40,7 +40,7 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("onCreate called with intent $intent")
+        logcat { "onCreate called with intent $intent" }
 
         viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
             dispatch(it)

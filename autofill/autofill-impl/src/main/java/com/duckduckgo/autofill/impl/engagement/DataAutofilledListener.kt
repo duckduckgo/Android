@@ -25,7 +25,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesPluginPoint(AppScope::class)
 interface DataAutofilledListener {
@@ -42,17 +43,17 @@ class DefaultDataAutofilledListener @Inject constructor(
 ) : DataAutofilledListener {
 
     override fun onAutofilledSavedPassword() {
-        Timber.v("onAutofilledSavedPassword, recording autofilled today")
+        logcat(VERBOSE) { "onAutofilledSavedPassword, recording autofilled today" }
         recordAutofilledToday()
     }
 
     override fun onAutofilledDuckAddress() {
-        Timber.v("onAutofilledDuckAddress, recording autofilled today")
+        logcat(VERBOSE) { "onAutofilledDuckAddress, recording autofilled today" }
         recordAutofilledToday()
     }
 
     override fun onUsedGeneratedPassword() {
-        Timber.v("onUsedGeneratedPassword, recording autofilled today")
+        logcat(VERBOSE) { "onUsedGeneratedPassword, recording autofilled today" }
         recordAutofilledToday()
     }
 

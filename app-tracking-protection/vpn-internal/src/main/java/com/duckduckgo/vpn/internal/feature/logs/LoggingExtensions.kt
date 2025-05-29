@@ -20,7 +20,7 @@ import logcat.AndroidLogcatLogger
 import logcat.LogcatLogger
 import logcat.logcat
 
-class TimberExtensions {
+class LoggingExtensions {
     companion object {
         @JvmStatic
         fun isLoggingEnabled(): Boolean {

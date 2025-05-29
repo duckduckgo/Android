@@ -25,7 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -40,7 +41,7 @@ class OfflinePixelScheduler @Inject constructor(
     }
 
     private fun scheduleOfflinePixels() {
-        Timber.v("Scheduling offline pixels to be sent")
+        logcat(VERBOSE) { "Scheduling offline pixels to be sent" }
 
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

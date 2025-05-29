@@ -34,7 +34,9 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 class SpecialUrlDetectorImpl(
     private val packageManager: PackageManager,
@@ -114,7 +116,7 @@ class SpecialUrlDetectorImpl(
                     return UrlType.AppLink(appIntent = nonBrowserIntent, uriString = uriString)
                 }
             } catch (e: URISyntaxException) {
-                Timber.w(e, "Failed to parse uri $uriString")
+                logcat(WARN) { "Failed to parse uri $uriString: ${e.asLog()}" }
             }
         }
 
@@ -190,7 +192,7 @@ class SpecialUrlDetectorImpl(
             val fallbackIntent = buildFallbackIntent(fallbackUrl)
             UrlType.NonHttpAppLink(uriString = uriString, intent = intent, fallbackUrl = fallbackUrl, fallbackIntent = fallbackIntent)
         } catch (e: URISyntaxException) {
-            Timber.w(e, "Failed to parse uri $uriString")
+            logcat(WARN) { "Failed to parse uri $uriString: ${e.asLog()}" }
             return UrlType.Unknown(uriString)
         }
     }

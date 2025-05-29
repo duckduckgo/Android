@@ -30,8 +30,9 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import logcat.LogPriority.WARN
+import logcat.logcat
 import retrofit2.HttpException
-import timber.log.Timber
 
 /** Public interface for download remote privacy config */
 interface PrivacyConfigDownloader {
@@ -58,7 +59,7 @@ class RealPrivacyConfigDownloader @Inject constructor(
 ) : PrivacyConfigDownloader {
 
     override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult {
-        Timber.d("Downloading privacy config")
+        logcat { "Downloading privacy config" }
 
         val response = runCatching {
             privacyConfigService.privacyConfig()
@@ -89,7 +90,7 @@ class RealPrivacyConfigDownloader @Inject constructor(
                 "code" to (code ?: "unknown"),
                 "message" to (it.localizedMessage ?: "unknown"),
             )
-            Timber.w(it.localizedMessage)
+            logcat(WARN) { it.localizedMessage ?: "unknown" }
             notifyErrorToCallbacks(DOWNLOAD_ERROR, params)
         }
 

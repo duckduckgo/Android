@@ -47,7 +47,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
@@ -125,7 +126,7 @@ class NetworkTypeMonitor @Inject constructor(
         kotlin.runCatching {
             registerNetworkCallback(networkRequest, networkCallback)
         }.onFailure {
-            logcat(LogPriority.ERROR) { it.asLog() }
+            logcat(ERROR) { it.asLog() }
         }
     }
 
@@ -133,7 +134,7 @@ class NetworkTypeMonitor @Inject constructor(
         kotlin.runCatching {
             unregisterNetworkCallback(networkCallback)
         }.onFailure {
-            logcat(LogPriority.ERROR) { it.asLog() }
+            logcat(ERROR) { it.asLog() }
         }
     }
 
@@ -175,7 +176,7 @@ class NetworkTypeMonitor @Inject constructor(
                 currentNetworkInfo = jsonInfo
                 logcat { "New network info $jsonInfo" }
             } catch (t: Throwable) {
-                logcat(LogPriority.WARN) { t.asLog() }
+                logcat(WARN) { t.asLog() }
             }
         }
     }
