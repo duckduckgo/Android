@@ -16,8 +16,7 @@ tags:
                 id: "ad-id-5"
             - assertVisible:
                 text: "Publisher site"
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+            - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
             - assertVisible:
                 text: "View Tracker Companies"
             - tapOn:
@@ -81,8 +80,7 @@ tags:
                 id: "pay-button"
             - assertVisible:
                 text: ".*Order complete.*"
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+            - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
             - assertVisible:
                 text: "View Tracker Companies"
             - tapOn:

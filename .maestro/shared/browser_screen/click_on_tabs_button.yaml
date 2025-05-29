@@ -1,0 +1,13 @@
+appId: com.duckduckgo.mobile.android
+---
+- runFlow:
+    when:
+        notVisible:
+            id: 'com.duckduckgo.mobile.android:id/tabCount'
+    commands:
+        - hideKeyboard
+        - assertVisible:
+            id: 'com.duckduckgo.mobile.android:id/tabCount'
+
+- tapOn:
+    id: 'com.duckduckgo.mobile.android:id/tabCount'
