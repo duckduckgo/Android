@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
-name: "ReleaseTest: Launch Privacy Pro from special URL is working"
+name: "Launch Privacy Pro from special URL is working"
 tags:
-  - releaseTest
+  - pproTest
 ---
 - retry:
     maxRetries: 3
