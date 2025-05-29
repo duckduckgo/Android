@@ -47,7 +47,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage.Companion.PreOnboarding
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.Finish
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.OnboardingSkipped
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetAddressBarPositionOptions
-import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.SetBackgroundResource
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowAddressBarPositionDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowComparisonChart
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDefaultBrowserDialog
@@ -103,7 +102,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ): View {
         val binding = ContentOnboardingWelcomePageBinding.inflate(inflater, container, false)
-        viewModel.setBackgroundResource(appTheme.isLightModeEnabled())
+
         viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
             when (it) {
                 is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
@@ -114,7 +113,6 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                 is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
                 is Finish -> onContinuePressed()
                 is OnboardingSkipped -> onSkipPressed()
-                is SetBackgroundResource -> setBackgroundRes(it.backgroundRes)
                 is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
             }
         }.launchIn(lifecycleScope)
@@ -140,6 +138,15 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        setBackgroundRes(
+            if (appTheme.isLightModeEnabled()) {
+                R.drawable.onboarding_background_bitmap_light
+            } else {
+                R.drawable.onboarding_background_bitmap_dark
+            },
+        )
+
         requestNotificationsPermissions()
         setSkipAnimationListener()
     }
