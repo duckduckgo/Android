@@ -61,6 +61,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyn
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
@@ -72,10 +73,12 @@ import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
+import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.DeviceConnected
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
 import com.google.android.material.snackbar.Snackbar
@@ -146,6 +149,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             DeviceConnected -> viewModel.onDeviceConnected()
             SwitchAccountSuccess -> viewModel.onLoginSuccess()
+            is SyncWithAnotherDeviceContractOutput.DeepLinkSuccess -> viewModel.onDeepLinkSetupSuccess(result.wasAlreadyLoggedIn)
             else -> {}
         }
     }
@@ -281,6 +285,10 @@ class SyncActivity : DuckDuckGoActivity() {
                 authenticate {
                     syncIntroLauncher.launch(SyncIntroContractInput(RECOVERY_CODE, extractSource()))
                 }
+            }
+
+            is ShowDeviceConnected -> {
+                syncIntroLauncher.launch(SyncIntroContractInput(SETUP_COMPLETE, extractSource()))
             }
 
             is AskTurnOffSync -> askTurnOffSync(it.device)

@@ -183,6 +183,7 @@ class SyncActivityViewModel @Inject constructor(
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
         object ShowRecoveryCode : Command()
+        object ShowDeviceConnected : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
@@ -230,6 +231,17 @@ class SyncActivityViewModel @Inject constructor(
     fun onLoginSuccess() {
         viewModelScope.launch {
             command.send(Command.ShowRecoveryCode)
+        }
+    }
+
+    fun onDeepLinkSetupSuccess(wasAlreadyLoggedIn: Boolean) {
+        viewModelScope.launch {
+            Timber.i("Sync-setup: deep link setup success, was already logged in: $wasAlreadyLoggedIn")
+            if (wasAlreadyLoggedIn) {
+                command.send(Command.ShowDeviceConnected)
+            } else {
+                command.send(Command.ShowRecoveryCode)
+            }
         }
     }
 

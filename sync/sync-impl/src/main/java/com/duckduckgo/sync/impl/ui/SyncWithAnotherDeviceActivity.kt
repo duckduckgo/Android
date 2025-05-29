@@ -36,6 +36,7 @@ import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.DeepLinkSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ReadTextCode
@@ -44,7 +45,6 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Show
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkConnectedActivity
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -143,10 +143,6 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             is LoginSuccess -> {
                 setResult(RESULT_OK)
                 finish()
-
-                if (isDeepLinkSetup()) {
-                    startActivity(SyncSetupDeepLinkConnectedActivity.intent(this))
-                }
             }
             FinishWithError -> {
                 setResult(RESULT_CANCELED)
@@ -158,6 +154,12 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()
                 resultIntent.putExtra(EXTRA_USER_SWITCHED_ACCOUNT, true)
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+            is DeepLinkSuccess -> {
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_WAS_ALREADY_LOGGED_IN, it.wasAlreadyLoggedIn)
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
@@ -220,6 +222,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
 
     companion object {
         const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
+        const val EXTRA_WAS_ALREADY_LOGGED_IN = "wasAlreadyLoggedIn"
         private const val EXTRA_DEEP_LINK_CODE = "deepLinkCode"
         private const val FRAGMENT_TAG_DEVICE_CONNECTING = "device-connecting"
 
