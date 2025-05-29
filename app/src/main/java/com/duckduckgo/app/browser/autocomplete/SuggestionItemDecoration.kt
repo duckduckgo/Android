@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.autocomplete
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.graphics.withSave
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.toPx
@@ -30,36 +31,34 @@ class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.Ite
         parent: RecyclerView,
         state: RecyclerView.State,
     ) {
-        canvas.save()
+        canvas.withSave {
+            val childCount = parent.childCount
+            val parentRight = parent.width - parent.paddingRight
 
-        val childCount = parent.childCount
-        val parentRight = parent.width - parent.paddingRight
+            for (i in 0 until childCount - 1) {
+                val currentView = parent.getChildAt(i)
+                val currentParams = currentView.layoutParams as MarginLayoutParams
+                val currentViewType = currentView.tag
 
-        for (i in 0 until childCount - 1) {
-            val currentView = parent.getChildAt(i)
-            val currentParams = currentView.layoutParams as MarginLayoutParams
-            val currentViewType = currentView.tag
+                val nextView = parent.getChildAt(i + 1)
+                val nextViewType = nextView.tag
+                val nextViewParams = nextView.layoutParams as MarginLayoutParams
 
-            val nextView = parent.getChildAt(i + 1)
-            val nextViewType = nextView.tag
-            val nextViewParams = nextView.layoutParams as MarginLayoutParams
-
-            if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM || currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
-                currentView.updateLayoutParams {
-                    currentParams.apply {
-                        bottomMargin = DIVIDER_PADDING_DP.toPx()
+                if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM || currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
+                    currentView.updateLayoutParams {
+                        currentParams.apply {
+                            bottomMargin = DIVIDER_PADDING_DP.toPx()
+                        }
                     }
-                }
-                nextView.updateLayoutParams {
-                    nextViewParams.apply {
-                        topMargin = DIVIDER_PADDING_DP.toPx()
+                    nextView.updateLayoutParams {
+                        nextViewParams.apply {
+                            topMargin = DIVIDER_PADDING_DP.toPx()
+                        }
                     }
+                    drawDivider(this, currentView, currentParams, parentRight)
                 }
-                drawDivider(canvas, currentView, currentParams, parentRight)
             }
         }
-
-        canvas.restore()
     }
 
     private fun drawDivider(
