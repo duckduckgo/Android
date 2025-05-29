@@ -46,6 +46,7 @@ import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListMo
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementEmpty
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapterLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapterLegacy.ContextMenuAction.CopyPassword
@@ -244,7 +245,7 @@ class AutofillManagementListModeLegacy : DuckDuckGoFragment(R.layout.fragment_au
     private fun configureImportPasswordsButton() {
         binding.emptyStateLayout.importPasswordsFromGoogleButton.setOnClickListener {
             viewModel.onImportPasswordsFromGooglePasswordManager()
-            importPasswordsPixelSender.onImportPasswordsButtonTapped()
+            importPasswordsPixelSender.onImportPasswordsButtonTapped(PasswordManagementEmpty)
         }
 
         binding.emptyStateLayout.importPasswordsViaDesktopSyncButton.setOnClickListener {

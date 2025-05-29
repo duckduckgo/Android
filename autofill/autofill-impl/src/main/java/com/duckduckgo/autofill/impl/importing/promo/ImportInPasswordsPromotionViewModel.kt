@@ -20,8 +20,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
 import com.duckduckgo.autofill.impl.store.AutofillEffect
 import com.duckduckgo.autofill.impl.store.AutofillEffectDispatcher
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -55,13 +57,20 @@ class ImportInPasswordsPromotionViewModel @Inject constructor(
     fun onPromoShown() {
         if (!promoDisplayedPixelSent) {
             promoDisplayedPixelSent = true
-            pixel.fire(AutofillPixelNames.AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED)
+            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementPromo.value)
+            pixel.fire(AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN, params)
         }
     }
 
     fun onUserClickedToImport() {
         viewModelScope.launch(dispatchers.io()) {
-            promoEventDispatcher.emit(AutofillEffect.ImportPasswords)
+            promoEventDispatcher.emit(
+                AutofillEffect.LaunchImportPasswords(
+                    source = AutofillImportLaunchSource.PasswordManagementPromo,
+                ),
+            )
+            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementPromo.value)
+            pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED, params)
         }
     }
 

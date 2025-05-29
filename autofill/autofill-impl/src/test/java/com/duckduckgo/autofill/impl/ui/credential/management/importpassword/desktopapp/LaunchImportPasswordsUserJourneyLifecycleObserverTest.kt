@@ -17,7 +17,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-class ImportPasswordsUserJourneyLifecycleObserverTest {
+class LaunchImportPasswordsUserJourneyLifecycleObserverTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()

@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.impl.databinding.ViewImportPasswordsPromoBinding
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.common.ui.view.MessageCta.Message
+import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -47,7 +48,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class)
 @PriorityKey(PRIORITY_KEY_IMPORT_PROMO)
@@ -59,9 +60,8 @@ class ImportInPasswordsPromotion @Inject constructor(
         context: Context,
         numberSavedPasswords: Int,
     ): View? {
-        if (numberSavedPasswords > 25) return null
-        if (importInPasswordsVisibility.canShowImportInPasswords().not()) return null
-        Timber.i("Autofill: returning view for ImportInPasswordsPromotion")
+        if (importInPasswordsVisibility.canShowImportInPasswords(numberSavedPasswords).not()) return null
+        logcat { "Autofill: returning view for ImportInPasswordsPromotion" }
         return ImportInPasswordsPromotionView(context)
     }
 }
@@ -121,12 +121,17 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
         with(binding.importPromo) {
             setMessage(
                 Message(
-                    topIllustration = R.drawable.ic_passwords_ddg_96,
+                    topAnimation = R.raw.anim_password_keys,
                     title = context.getString(R.string.passwords_import_promo_title),
                     subtitle = context.getString(R.string.passwords_import_promo_subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
+                    messageType = REMOTE_MESSAGE,
                 ),
             )
+            onTopAnimationConfigured { view ->
+                view.repeatCount = 2
+                view.playAnimation()
+            }
             onPrimaryActionClicked {
                 viewModel.onUserClickedToImport()
             }

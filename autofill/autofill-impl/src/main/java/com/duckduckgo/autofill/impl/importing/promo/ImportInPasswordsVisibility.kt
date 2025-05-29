@@ -28,10 +28,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 interface ImportInPasswordsVisibility {
-    fun canShowImportInPasswords(): Boolean
+    fun canShowImportInPasswords(numberSavedPasswords: Int): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -47,24 +47,32 @@ class RealImportInPasswordsVisibility @Inject constructor(
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            Timber.i("Autofill: Evaluating if user can show import promo")
-            evaluateIfUserCanShowImportPromo()
-            Timber.i("Autofill: Evaluation result, can show import promo? $canShowImportPasswords")
+            logcat { "Autofill: Evaluating if user can show import promo" }
+            canShowImportPasswords = evaluateIfUserCanShowImportPromo()
+            logcat { "Autofill: Evaluation result, can show import promo? $canShowImportPasswords" }
         }
     }
 
-    override fun canShowImportInPasswords(): Boolean {
+    override fun canShowImportInPasswords(numberSavedPasswords: Int): Boolean {
+        if (numberSavedPasswords < MIN_PASSWORDS_TO_SHOW_PROMO || numberSavedPasswords > MAX_PASSWORDS_TO_SHOW_PROMO) return false
         return canShowImportPasswords
     }
 
-    private suspend fun evaluateIfUserCanShowImportPromo() {
-        if (internalAutofillStore.hasEverImportedPasswords || internalAutofillStore.hasDismissedImportedPasswordsPromo) {
-            canShowImportPasswords = false
-            return
-        }
+    private suspend fun evaluateIfUserCanShowImportPromo(): Boolean {
+        if (autofillFeature.canPromoteImportPasswords().isEnabled().not()) return false
+
+        if (internalAutofillStore.hasEverImportedPasswords || internalAutofillStore.hasDismissedImportedPasswordsPromo) return false
+
         val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
         val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
         val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
         canShowImportPasswords = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+
+        return canShowImportPasswords
+    }
+
+    companion object {
+        private const val MAX_PASSWORDS_TO_SHOW_PROMO = 25
+        private const val MIN_PASSWORDS_TO_SHOW_PROMO = 1
     }
 }
