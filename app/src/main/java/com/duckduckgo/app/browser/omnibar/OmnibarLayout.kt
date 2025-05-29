@@ -322,13 +322,13 @@ open class OmnibarLayout @JvmOverloads constructor(
         val coroutineScope = requireNotNull(findViewTreeLifecycleOwner()?.lifecycleScope)
 
         conflatedStateJob += coroutineScope.launch {
-            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).collectLatest {
+            viewModel.viewState.flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 render(it)
             }
         }
 
         conflatedCommandJob += coroutineScope.launch {
-            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED).collectLatest {
+            viewModel.commands().flowWithLifecycle(lifecycleOwner.lifecycle).collectLatest {
                 processCommand(it)
             }
         }
