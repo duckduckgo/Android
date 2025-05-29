@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Открыть</string>
     <string name="duck_chat_cannot_open_file_error_message">Не удается открыть файл. Попробуйте найти совместимое приложение.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Нет доступа к камере</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Загрузка изображения</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Выбрать файл</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Снять фото</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Разрешить DuckDuckGo запрашивать доступ к камере на этом устройстве</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Если вы разрешите DuckDuckGo запрашивать доступ, сайты смогут использовать камеру.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Открыть Настройки</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отменить</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Нет доступа к диктофону</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Разрешить DuckDuckGo запрашивать доступ к диктофону на этом устройстве</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Сайты получат возможность пользоваться диктофоном, только если вы разрешите DuckDuckGo запрашивать доступ.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai — дополнительная функция, позволяющая анонимно беседовать с популярными сторонними чат-моделями на базе искусственного интеллекта. Содержимое чатов не применяется для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Включить Duck.ai</string>
