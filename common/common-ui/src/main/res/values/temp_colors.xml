@@ -24,6 +24,8 @@
     <attr name="daxColorPreonboardingProgressBarCenter" format="color" />
     <attr name="daxColorPreonboardingProgressBarEnd" format="color" />
 
+    <attr name="daxColorOnboardingDialogBackground" format="color" />
+
     <!-- Design System Raw Colors -->
     <color name="purple20">#A591DC</color>
     <color name="purple100">#6B4EBA</color>
@@ -32,5 +34,8 @@
     <!-- Should be moved to theme if experiment is successful -->
     <color name="buckYellow">#FFE080</color>
     <color name="buckLightBlue">#4284F4</color>
+
+    <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
+    <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 
 </resources>
