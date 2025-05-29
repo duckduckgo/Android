@@ -19,7 +19,9 @@ package com.duckduckgo.app.browser.autocomplete
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup.MarginLayoutParams
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.common.ui.view.toPx
 
 class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.ItemDecoration() {
 
@@ -33,22 +35,27 @@ class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.Ite
         val childCount = parent.childCount
         val parentRight = parent.width - parent.paddingRight
 
-        for (i in 0 until childCount) {
-            val child = parent.getChildAt(i)
-            val params = child.layoutParams as MarginLayoutParams
-            val currentViewType = child.tag
-            val nextViewType = if (i + 1 < childCount) parent.getChildAt(i + 1).tag else UNKNOWN
+        for (i in 0 until childCount - 1) {
+            val currentView = parent.getChildAt(i)
+            val currentParams = currentView.layoutParams as MarginLayoutParams
+            val currentViewType = currentView.tag
 
-            if (nextViewType == UNKNOWN) {
-                continue
-            }
+            val nextView = parent.getChildAt(i + 1)
+            val nextViewType = nextView.tag
+            val nextViewParams = nextView.layoutParams as MarginLayoutParams
 
-            if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM) {
-                drawDivider(canvas, child, params, parentRight)
-            }
-
-            if (currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
-                drawDivider(canvas, child, params, parentRight)
+            if (currentViewType == SEARCH_ITEM && nextViewType == OTHER_ITEM || currentViewType == OTHER_ITEM && nextViewType == SEARCH_ITEM) {
+                currentView.updateLayoutParams {
+                    currentParams.apply {
+                        bottomMargin = DIVIDER_PADDING_DP.toPx()
+                    }
+                }
+                nextView.updateLayoutParams {
+                    nextViewParams.apply {
+                        topMargin = DIVIDER_PADDING_DP.toPx()
+                    }
+                }
+                drawDivider(canvas, currentView, currentParams, parentRight)
             }
         }
 
@@ -70,6 +77,7 @@ class SuggestionItemDecoration(private val divider: Drawable) : RecyclerView.Ite
     companion object {
         internal const val SEARCH_ITEM = "SEARCH_ITEM"
         internal const val OTHER_ITEM = "OTHER_ITEM"
-        internal const val UNKNOWN = "UNKNOWN"
+
+        internal const val DIVIDER_PADDING_DP = 8
     }
 }
