@@ -50,18 +50,13 @@ data class ExtractedProfile(
     val addressCityState: List<AddressCityState>? = emptyList(),
     val phoneNumbers: List<String>? = null,
     val relativesList: List<String>? = null,
-    val profileUrl: ProfileUrl? = null,
+    val profileUrl: String? = null,
     val reportId: String? = null,
     val age: String? = null,
     val email: String? = null,
     val removedDate: String? = null,
     val fullName: String? = null,
     val identifier: String? = null,
-)
-
-data class ProfileUrl(
-    val profileUrl: String,
-    val identifier: String,
 )
 
 data class AddressCityState(

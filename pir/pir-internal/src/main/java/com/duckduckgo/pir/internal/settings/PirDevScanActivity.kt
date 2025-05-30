@@ -122,14 +122,12 @@ class PirDevScanActivity : DuckDuckGoActivity() {
     private fun render(results: List<ScanResult>) {
         val allExtracted = results.filterIsInstance<ExtractedProfileResult>()
         val brokersWithRecords = allExtracted.filter {
-            it.extractResults.isNotEmpty() && it.extractResults.any { result ->
-                result.result
-            }
+            it.extractResults.isNotEmpty()
         }
         val brokersWithRecordsCount = brokersWithRecords.size
 
         val totalRecordCount = brokersWithRecords.sumOf {
-            it.extractResults.filter { result -> result.result }.size
+            it.extractResults.size
         }
 
         with(binding) {
@@ -141,7 +139,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
             recordStringBuilder.append("\nRecords found:\n")
             brokersWithRecords.forEach { broker ->
-                val recordCount = broker.extractResults.filter { it.result }.size
+                val recordCount = broker.extractResults.size
                 recordStringBuilder.append("${broker.brokerName} - records: $recordCount\n")
             }
             this.records.text = recordStringBuilder.toString()

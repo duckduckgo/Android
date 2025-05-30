@@ -105,11 +105,7 @@ class RealBrokerStepsParser @Inject constructor(
                 if (this is OptOutStep) {
                     this.copy(
                         brokerName = brokerName,
-                        profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.filter {
-                            it.result
-                        }?.map {
-                            it.scrapedData
-                        } ?: emptyList(),
+                        profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults ?: emptyList(),
                     )
                 } else {
                     (this as ScanStep).copy(brokerName = brokerName)
