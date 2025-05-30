@@ -18,7 +18,6 @@ package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
@@ -67,7 +66,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_O
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRIVACY_PRO_REDIRECT
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PURCHASE_WITH_RESTORED_ACCOUNT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -109,7 +107,6 @@ interface SubscriptionPixelSender {
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
     fun reportPrivacyProRedirect()
-    fun reportPurchaseWithRestoredAccount(hasEmail: Boolean)
     fun reportAuthV2InvalidRefreshTokenDetected()
     fun reportAuthV2InvalidRefreshTokenSignedOut()
     fun reportAuthV2InvalidRefreshTokenRecovered()
@@ -241,9 +238,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportPrivacyProRedirect() =
         fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
-
-    override fun reportPurchaseWithRestoredAccount(hasEmail: Boolean) =
-        fire(SUBSCRIPTION_PURCHASE_WITH_RESTORED_ACCOUNT, mapOf("hasEmail" to hasEmail.toBinaryString()))
 
     override fun reportAuthV2InvalidRefreshTokenDetected() {
         fire(AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED)

@@ -1185,39 +1185,6 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
     }
 
     @Test
-    fun whenPurchaseIsSuccessfulAndAccountWasRestoredThenPixelIsSent() = runTest {
-        givenUserIsNotSignedIn()
-        givenPurchaseStored()
-        givenStoreLoginSucceeds()
-        givenSubscriptionSucceedsWithoutEntitlements(status = EXPIRED.statusName)
-        givenConfirmPurchaseSucceeds()
-        givenAccessTokenSucceeds()
-        givenV2AccessTokenRefreshSucceeds()
-
-        val purchaseState = MutableSharedFlow<PurchaseState>()
-        whenever(playBillingManager.purchaseState).thenReturn(purchaseState)
-
-        subscriptionsManager.currentPurchaseState.test {
-            purchase()
-            assertTrue(awaitItem() is CurrentPurchase.PreFlowInProgress)
-            assertTrue(awaitItem() is CurrentPurchase.PreFlowFinished)
-
-            purchaseState.emit(PurchaseState.Purchased("any", "any"))
-            givenSubscriptionSucceedsWithEntitlements()
-
-            assertTrue(awaitItem() is CurrentPurchase.InProgress)
-            assertTrue(awaitItem() is CurrentPurchase.Success)
-
-            verify(pixelSender).reportPurchaseSuccess()
-            verify(pixelSender).reportPurchaseWithRestoredAccount(any())
-            verify(pixelSender).reportSubscriptionActivated()
-            verifyNoMoreInteractions(pixelSender)
-
-            cancelAndConsumeRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenPurchaseFailsThenPixelIsSent() = runTest {
         givenUserIsSignedIn()
         givenValidateTokenFails("failure")
