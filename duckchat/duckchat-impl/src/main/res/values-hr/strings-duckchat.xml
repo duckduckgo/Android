@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Otvori</string>
     <string name="duck_chat_cannot_open_file_error_message">Datoteka se ne može otvoriti. Provjerite postoji li kompatibilna aplikacija.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nije moguće pristupiti kameri</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Učitaj sliku</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Odaberi datoteku</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Snimi fotografiju</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Dopusti DuckDuckGou da zatraži pristup kameri na ovom uređaju</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Stranice mogu koristiti tvoju kameru samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otvori postavke</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Odustani</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Pristup snimaču zvuka nije bio moguć</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Dopusti DuckDuckGou da zatraži pristup snimaču zvuka na ovom uređaju</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Mrežne lokacije mogu koristiti snimač zvuka samo ako dopustiš DuckDuckGou da zatraži pristup.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai izborna je značajka koja ti omogućuje anonimno čavrljanje s popularnim AI modelima \'chata\' trećih strana. Tvoja čavrljanja se ne koriste za obuku AI-a.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Omogući Duck.ai</string>

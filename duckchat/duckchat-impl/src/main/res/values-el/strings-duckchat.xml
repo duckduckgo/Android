@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Άνοιγμα</string>
     <string name="duck_chat_cannot_open_file_error_message">Δεν ήταν δυνατό το άνοιγμα του αρχείου. Ελέγξτε για μια συμβατή εφαρμογή.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Δεν ήταν δυνατή η πρόσβαση στην κάμερα</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Μεταφορτώστε μια εικόνα</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Επιλέξτε αρχείο</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Τραβήξτε φωτογραφία</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα της συσκευής αυτής</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Άνοιγμα ρυθμίσεων</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Ακύρωση</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Δεν ήταν δυνατή η πρόσβαση στην εγγραφή ήχου</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην εγγραφή ήχου της συσκευής αυτής</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Οι ιστότοποι μπορούν να χρησιμοποιούν την εγγραφή ήχου μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Το Duck.ai αποτελεί προαιρετική λειτουργία που σας επιτρέπει να συνομιλείτε ανώνυμα με δημοφιλή μοντέλα τρίτων για συνομιλία μέσω τεχνητής νοημοσύνης. Οι συνομιλίες σας δεν χρησιμοποιούνται για την εκπαίδευση τεχνητής συνομιλίας.\n<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Ενεργοποίηση του Duck.ai</string>

@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
+import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -79,6 +80,7 @@ class RealDuckChatTest {
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
     private val mockExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
 
     private lateinit var testee: RealDuckChat
 
@@ -89,6 +91,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
+        imageUploadFeature.self().setRawStoredState(State(enable = true))
 
         testee = spy(
             RealDuckChat(
@@ -102,6 +105,7 @@ class RealDuckChatTest {
                 coroutineRule.testScope,
                 mockPixel,
                 mockExperimentDataStore,
+                imageUploadFeature,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()
@@ -577,6 +581,15 @@ class RealDuckChatTest {
 
         assertEquals(listOf(ChatState.HIDE, ChatState.READY), emissions)
         collectJob.cancel()
+    }
+
+    @Test
+    fun whenImageUploadFeatureDisabledThenDisableImageUpload() = runTest {
+        imageUploadFeature.self().setRawStoredState(State(enable = false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isImageUploadEnabled())
     }
 
     companion object {

@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Отваряне</string>
     <string name="duck_chat_cannot_open_file_error_message">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Няма достъп до камерата</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Качване на изображение</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Изберете файл</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Направете снимка</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Разрешаване на DuckDuckGo да иска достъп до камерата на това устройство</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Сайтовете могат да използват камерата, само ако разрешите на DuckDuckGo да поиска достъп.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Отвори Настройки</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отмени</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Няма достъп до звукозаписно устройство</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Разрешаване на DuckDuckGo да иска достъп за звукозапис на това устройство</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Сайтовете могат да използват звукозаписното устройство, само ако разрешите на DuckDuckGo да поиска достъп.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai е незадължителна функция, чрез която можете да разговаряте анонимно с популярни AI чат модели от трети страни. Чатовете Ви не се използват за обучение на AI.\n<annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Активиране на Duck.ai</string>

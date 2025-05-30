@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Atviras</string>
     <string name="duck_chat_cannot_open_file_error_message">Nepavyko atidaryti failo. Patikrinkite, ar yra suderinama programa.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nepavyko pasiekti fotoaparato</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Įkelti vaizdą</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Pasirinkti failą</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Padaryti nuotrauką</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Leisti „DuckDuckGo“ prašyti prieigos prie kameros šiame įrenginyje</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Svetainės gali naudoti jūsų kamerą tik tada, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Atidaryti nustatymus</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Atšaukti</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Nepavyko pasiekti garso įrašytuvo</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Leisti „DuckDuckGo“ prašyti prieigos prie garso įrašymo įrenginio šiame įrenginyje</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Svetainės gali naudoti garso įrašymo įrenginį tik tuo atveju, jei leisite „DuckDuckGo“ prašyti prieigos.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">„Duck.ai“ yra pasirenkama funkcija, leidžianti anonimiškai kalbėtis su populiariais trečiųjų šalių DI pokalbių modeliais. Tavo pokalbiai nenaudojami dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinok daugiau</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Įjungti „Duck.ai“</string>

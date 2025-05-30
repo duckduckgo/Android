@@ -104,6 +104,7 @@ class RealDuckChatJSHelper @Inject constructor(
             put(SUPPORTS_CLOSING_AI_CHAT, true)
             put(SUPPORTS_OPENING_SETTINGS, true)
             put(SUPPORTS_NATIVE_CHAT_INPUT, experimentDataStore.isExperimentEnabled.value && experimentDataStore.isDuckAIPoCEnabled.value)
+            put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -129,6 +130,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_CLOSING_AI_CHAT = "supportsClosingAIChat"
         private const val SUPPORTS_OPENING_SETTINGS = "supportsOpeningSettings"
         private const val SUPPORTS_NATIVE_CHAT_INPUT = "supportsNativeChatInput"
+        private const val SUPPORTS_IMAGE_UPLOAD = "supportsImageUpload"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
     }

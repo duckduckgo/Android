@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Deschide</string>
     <string name="duck_chat_cannot_open_file_error_message">Nu se poate deschide fișierul. Caută o aplicație compatibilă.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nu s-a putut accesa camera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Încarcă o imagine</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Alege fișierul</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fă o fotografie</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Permite ca DuckDuckGo să solicite accesul la cameră pe acest dispozitiv</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Site-urile îți pot utiliza camera numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Deschide Setări</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anulare</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Nu s-a putut accesa înregistratorul de sunet</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Permite ca DuckDuckGo să solicite accesul la înregistratorul de sunet pe acest dispozitiv</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Site-urile pot utiliza înregistratorul de sunet numai dacă permiți ca DuckDuckGo să solicite accesul.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai este o caracteristică opțională care îți permite să discuți anonim cu modele populare de chat AI de la terțe părți. Chaturile tale nu sunt folosite pentru a antrena AI.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Activează Duck.ai</string>
