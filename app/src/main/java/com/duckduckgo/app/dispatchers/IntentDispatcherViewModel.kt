@@ -27,6 +27,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,6 +41,7 @@ class IntentDispatcherViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val syncUrlIdentifier: SyncUrlIdentifier,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -60,7 +62,9 @@ class IntentDispatcherViewModel @Inject constructor(
                 val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
-                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl
+
+                val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
+                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl
 
                 logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 

@@ -45,14 +45,17 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.databinding.DialogEditDeviceBinding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskSetupSyncDeepLink
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyncData
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -64,6 +67,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCod
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.SyncWithAnotherDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.SetupFlows
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.ViewState
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
@@ -84,6 +88,7 @@ import logcat.logcat
 @InjectWith(ActivityScope::class, delayGeneration = true)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
 @ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding: ActivitySyncBinding by viewBinding()
     private val viewModel: SyncActivityViewModel by bindViewModel()
@@ -159,7 +164,13 @@ class SyncActivity : DuckDuckGoActivity() {
 
         setupClickListeners()
         setupRecyclerView()
+
+        syncSetupUrl()?.let { setupUrl ->
+            viewModel.processSetupDeepLink(setupUrl)
+        }
     }
+
+    private fun syncSetupUrl() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
 
     private fun registerForPermission() {
         storagePermission.registerResultsCallback(this) {
@@ -300,10 +311,40 @@ class SyncActivity : DuckDuckGoActivity() {
             }
             is RequestSetupAuthentication -> launchDeviceAuthEnrollment()
             is LaunchSyncGetOnOtherPlatforms -> launchSyncGetOnOtherPlatforms(it.source)
+            is AskSetupSyncDeepLink -> askSetupSyncDeepLink(it.syncBarcodeUrl)
+            is DeepLinkIntoSetup -> {
+                val authConfig = AuthConfiguration(
+                    displayTitleResource = R.string.deep_link_auth_prompt_title,
+                    displayTextResource = R.string.deep_link_auth_prompt_message,
+                )
+                authenticate(config = authConfig) {
+                    deepLinkIntoSetup(it.barcodeSyncUrl.asUrl())
+                }
+            }
         }
     }
 
-    private fun launchSyncGetOnOtherPlatforms(source: String) {
+    private fun deepLinkIntoSetup(barcodeSyncUrl: String) {
+        Timber.i("Sync-setup: launching sync with another device flow with deep link")
+        syncWithAnotherDeviceFlow.launch(barcodeSyncUrl)
+    }
+
+    private fun askSetupSyncDeepLink(barcodeSyncUrl: SyncBarcodeUrl) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.sync_setup_deep_link_confirmation_dialog_title)
+            .setMessage(getString(R.string.sync_setup_deep_link_confirmation_dialog_message, barcodeSyncUrl.deviceName))
+            .setPositiveButton(R.string.sync_setup_deep_link_confirmation_dialog_button_positive)
+            .setNegativeButton(R.string.sync_setup_deep_link_confirmation_dialog_button_negative)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl)
+                    }
+                },
+            ).show()
+    }
+
+    private fun launchSyncGetOnOtherPlatforms(source: SyncGetOnOtherPlatformsLaunchSource) {
         globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(source))
     }
 
@@ -417,9 +458,9 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun authenticate(onSuccess: () -> Unit) {
+    private fun authenticate(config: AuthConfiguration = AuthConfiguration(), onSuccess: () -> Unit) {
         if (deviceAuthenticator.hasValidDeviceAuthentication()) {
-            deviceAuthenticator.authenticate(config = AuthConfiguration(), fragmentActivity = this) {
+            deviceAuthenticator.authenticate(config = config, fragmentActivity = this) {
                 when (it) {
                     Success -> onSuccess()
                     else -> { }

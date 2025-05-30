@@ -49,8 +49,8 @@ class SyncDeviceConnectedFragment : DuckDuckGoFragment(R.layout.fragment_device_
         ViewModelProvider(this, viewModelFactory)[SyncDeviceConnectedViewModel::class.java]
     }
 
-    private val listener: SetupFlowListener?
-        get() = activity as? SetupFlowListener
+    private val listener: SyncSetupFlowFinishedListener?
+        get() = activity as? SyncSetupFlowFinishedListener
 
     override fun onViewCreated(
         view: View,

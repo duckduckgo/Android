@@ -85,6 +85,10 @@
             android:screenOrientation="portrait"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"/>
 
+        <activity android:name=".ui.setup.SyncSetupDeepLinkConnectedActivity"
+            android:exported="false"
+            android:parentActivityName=".ui.SyncActivity" />
+
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"

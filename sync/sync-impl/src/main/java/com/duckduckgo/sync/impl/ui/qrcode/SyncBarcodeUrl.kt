@@ -16,24 +16,48 @@
 
 package com.duckduckgo.sync.impl.ui.qrcode
 
+import android.os.Parcelable
 import androidx.core.net.toUri
+import java.net.URLDecoder
+import java.net.URLEncoder
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class SyncBarcodeUrl(
+    /**
+     * The sync setup code, base64 encoded and URL safe (Base64Url).
+     */
     val webSafeB64EncodedCode: String,
-    val urlEncodedDeviceName: String? = null,
-) {
+    /**
+     * The human readable device name (i.e., not URL-encoded). This is optional and can be null.
+     */
+    val deviceName: String? = null,
+) : Parcelable {
 
     fun asUrl(): String {
         val sb = StringBuilder(URL_BASE)
             .append("&")
             .append(CODE_PARAM).append("=").append(webSafeB64EncodedCode)
 
-        if (urlEncodedDeviceName?.isNotBlank() == true) {
+        // Encode device name to make it URL safe
+        getEncodedDeviceName()?.let { encodedDeviceName ->
             sb.append("&")
-            sb.append(DEVICE_NAME_PARAM).append("=").append(urlEncodedDeviceName)
+            sb.append(DEVICE_NAME_PARAM).append("=").append(encodedDeviceName)
         }
 
         return sb.toString()
+    }
+
+    private fun getEncodedDeviceName(): String? {
+        return deviceName?.let {
+            if (it.isBlank()) {
+                null
+            } else {
+                return runCatching {
+                    it.urlEncode()
+                }.getOrNull()
+            }
+        }
     }
 
     companion object {
@@ -59,9 +83,18 @@ data class SyncBarcodeUrl(
                 val deviceName = fragmentParts
                     .find { it.startsWith("deviceName=") }
                     ?.substringAfter("deviceName=")
+                    ?.urlDecode()
 
-                SyncBarcodeUrl(webSafeB64EncodedCode = code, urlEncodedDeviceName = deviceName)
+                SyncBarcodeUrl(webSafeB64EncodedCode = code, deviceName = deviceName)
             }.getOrNull()
+        }
+
+        private fun String.urlEncode(): String? {
+            return runCatching { URLEncoder.encode(this, "UTF-8") }.getOrNull()
+        }
+
+        private fun String.urlDecode(): String? {
+            return runCatching { URLDecoder.decode(this, "UTF-8") }.getOrNull()
         }
     }
 }

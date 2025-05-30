@@ -104,8 +104,14 @@ class SyncGetOnOtherPlatformsActivity : DuckDuckGoActivity() {
     }
 
     private fun extractLaunchSource(): String? {
-        return intent.getActivityParams(SyncGetOnOtherPlatformsParams::class.java)?.source
+        return intent.getActivityParams(SyncGetOnOtherPlatformsParams::class.java)?.source?.value
     }
 }
 
-data class SyncGetOnOtherPlatformsParams(val source: String?) : GlobalActivityStarter.ActivityParams
+data class SyncGetOnOtherPlatformsParams(val source: SyncGetOnOtherPlatformsLaunchSource) : GlobalActivityStarter.ActivityParams
+
+enum class SyncGetOnOtherPlatformsLaunchSource(val value: String) {
+    SOURCE_ACTIVATING("activating"),
+    SOURCE_SYNC_DISABLED("not_activated"),
+    SOURCE_SYNC_ENABLED("activated"),
+}

@@ -81,8 +81,14 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     private var barcodeContents: AuthCode? = null
 
+    // this can be true during deep linking setup.
+    // when the timeout expires, an error message will show to the user
+    // When finished, user input needed or a suitable error state reached it can be disabled
+    private var canTimeout = false
+
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(): Flow<ViewState> = viewState.onStart {
+    fun viewState(canTimeout: Boolean = false): Flow<ViewState> = viewState.onStart {
+        this@SyncWithAnotherActivityViewModel.canTimeout = canTimeout
         startExchangeProcess()
     }
 
@@ -90,11 +96,20 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             showQRCode()
             var polling = syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()
+            val startTime = System.currentTimeMillis()
             while (polling) {
                 delay(POLLING_INTERVAL_EXCHANGE_FLOW)
                 syncAccountRepository.pollSecondDeviceExchangeAcknowledgement()
                     .onSuccess { success ->
-                        if (!success) return@onSuccess // continue polling
+                        if (!success) {
+                            Timber.v("Sync-setup: can timeout = $canTimeout. time since start: ${System.currentTimeMillis() - startTime}")
+                            if (canTimeout && (System.currentTimeMillis() - startTime) > POLLING_TIMEOUT_DURING_DEEP_LINKING) {
+                                polling = false
+                                syncPixels.fireTimeoutOnDeepLinkSetup()
+                                command.send(ShowError(string.sync_connect_login_error))
+                            }
+                            return@onSuccess // continue polling
+                        }
                         command.send(Command.LoginSuccess)
                         polling = false
                     }.onFailure {
@@ -169,6 +184,11 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         }
     }
 
+    fun onDeepLinkCodeReceived(syncBarcodeUrl: String) {
+        Timber.i("Sync-setup: onDeepLinkCodeReceived $syncBarcodeUrl")
+        onQRCodeScanned(syncBarcodeUrl)
+    }
+
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
@@ -217,19 +237,26 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                             is Pending -> return@onSuccess // continue polling
                             is AccountSwitchingRequired -> {
                                 polling = false
+                                cancelTimeout()
                                 command.send(AskToSwitchAccount(success.recoveryCode))
                             }
                             is LoggedIn -> {
                                 polling = false
+                                cancelTimeout()
                                 onLoginSuccess(previousPrimaryKey)
                             }
                         }
                     }.onFailure {
                         polling = false
+                        cancelTimeout()
                         emitError(it, qrCode)
                     }
             }
         }
+    }
+
+    private fun cancelTimeout() {
+        canTimeout = false
     }
 
     private suspend fun emitError(result: Error, qrCode: String) {
@@ -303,5 +330,9 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onUserAskedToSwitchAccount() {
         syncPixels.fireAskUserToSwitchAccount()
+    }
+
+    companion object {
+        private const val POLLING_TIMEOUT_DURING_DEEP_LINKING = 10_000L
     }
 }

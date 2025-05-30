@@ -134,7 +134,7 @@ class SetupAccountViewModelTest {
         testee.onGetAppOnOtherDevicesClicked()
         testee.commands().test {
             awaitItem().also {
-                assertEquals("activating", (it as LaunchSyncGetOnOtherPlatforms).source)
+                assertEquals("activating", (it as LaunchSyncGetOnOtherPlatforms).source.value)
             }
             cancelAndIgnoreRemainingEvents()
         }
