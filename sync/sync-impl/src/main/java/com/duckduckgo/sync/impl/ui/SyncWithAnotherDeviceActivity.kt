@@ -44,7 +44,6 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Show
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkConnectedActivity
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -140,18 +139,19 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             ReadTextCode -> {
                 enterCodeLauncher.launch(RECOVERY_CODE)
             }
-            is LoginSuccess -> {
-                setResult(RESULT_OK)
-                finish()
 
-                if (isDeepLinkSetup()) {
-                    startActivity(SyncSetupDeepLinkConnectedActivity.intent(this))
-                }
+            is LoginSuccess -> {
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_SHOW_RECOVERY_CODE, it.showRecovery)
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
+
             FinishWithError -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
+
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
             is AskToSwitchAccount -> askUserToSwitchAccount(it)
@@ -219,6 +219,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val EXTRA_SHOW_RECOVERY_CODE = "showRecoveryCode"
         const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
         private const val EXTRA_DEEP_LINK_CODE = "deepLinkCode"
         private const val FRAGMENT_TAG_DEVICE_CONNECTING = "device-connecting"
@@ -227,7 +228,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java)
         }
 
-        internal fun intentForDeepLink(context: Context, syncBarcodeUrl: String): Intent {
+        internal fun intentForDeepLink(
+            context: Context,
+            syncBarcodeUrl: String,
+        ): Intent {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java).apply {
                 putExtra(EXTRA_DEEP_LINK_CODE, syncBarcodeUrl)
             }

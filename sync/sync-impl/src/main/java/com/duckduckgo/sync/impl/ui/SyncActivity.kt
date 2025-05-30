@@ -61,6 +61,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.IntroRecoverSyn
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.RequestSetupAuthentication
+import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceConnected
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowRecoveryCode
@@ -72,11 +73,13 @@ import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContract
 import com.duckduckgo.sync.impl.ui.setup.ConnectFlowContractInput
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
+import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SETUP_COMPLETE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.SYNC_INTRO
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.DeviceConnected
+import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.LoginSuccess
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -146,6 +149,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             DeviceConnected -> viewModel.onDeviceConnected()
             SwitchAccountSuccess -> viewModel.onLoginSuccess()
+            LoginSuccess -> viewModel.onLoginSuccess()
             else -> {}
         }
     }
@@ -283,6 +287,10 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
             }
 
+            is ShowDeviceConnected -> {
+                syncIntroLauncher.launch(SyncIntroContractInput(SETUP_COMPLETE, extractSource()))
+            }
+
             is AskTurnOffSync -> askTurnOffSync(it.device)
             is AskDeleteAccount -> askDeleteAccount()
             is RecoveryCodePDFSuccess -> {
@@ -325,7 +333,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun deepLinkIntoSetup(barcodeSyncUrl: String) {
-        Timber.i("Sync-setup: launching sync with another device flow with deep link")
+        logcat { "Sync-setup: launching sync with another device flow with deep link" }
         syncWithAnotherDeviceFlow.launch(barcodeSyncUrl)
     }
 

@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity
+import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity.Companion.EXTRA_SHOW_RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherDeviceActivity.Companion.EXTRA_USER_SWITCHED_ACCOUNT
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput
 
@@ -51,8 +52,11 @@ internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, S
         when {
             resultCode == Activity.RESULT_OK -> {
                 val userSwitchedAccount = intent?.getBooleanExtra(EXTRA_USER_SWITCHED_ACCOUNT, false) ?: false
+                val showRecoveryCode = intent?.getBooleanExtra(EXTRA_SHOW_RECOVERY_CODE, false) ?: false
                 return if (userSwitchedAccount) {
                     SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
+                } else if (showRecoveryCode) {
+                    SyncWithAnotherDeviceContractOutput.LoginSuccess
                 } else {
                     SyncWithAnotherDeviceContractOutput.DeviceConnected
                 }
@@ -64,6 +68,7 @@ internal class SyncWithAnotherDeviceContract : ActivityResultContract<String?, S
     sealed class SyncWithAnotherDeviceContractOutput {
         data object DeviceConnected : SyncWithAnotherDeviceContractOutput()
         data object SwitchAccountSuccess : SyncWithAnotherDeviceContractOutput()
+        data object LoginSuccess : SyncWithAnotherDeviceContractOutput()
         data object Error : SyncWithAnotherDeviceContractOutput()
     }
 }
