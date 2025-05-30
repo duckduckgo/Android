@@ -36,7 +36,6 @@ import com.duckduckgo.sync.impl.databinding.ActivityConnectSyncBinding
 import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
-import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.DeepLinkSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.ReadTextCode
@@ -140,26 +139,25 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             ReadTextCode -> {
                 enterCodeLauncher.launch(RECOVERY_CODE)
             }
+
             is LoginSuccess -> {
-                setResult(RESULT_OK)
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_SHOW_RECOVERY_CODE, it.showRecovery)
+                setResult(RESULT_OK, resultIntent)
                 finish()
             }
+
             FinishWithError -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
+
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
             is AskToSwitchAccount -> askUserToSwitchAccount(it)
             SwitchAccountSuccess -> {
                 val resultIntent = Intent()
                 resultIntent.putExtra(EXTRA_USER_SWITCHED_ACCOUNT, true)
-                setResult(RESULT_OK, resultIntent)
-                finish()
-            }
-            is DeepLinkSuccess -> {
-                val resultIntent = Intent()
-                resultIntent.putExtra(EXTRA_WAS_ALREADY_LOGGED_IN, it.wasAlreadyLoggedIn)
                 setResult(RESULT_OK, resultIntent)
                 finish()
             }
@@ -221,8 +219,8 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val EXTRA_SHOW_RECOVERY_CODE = "showRecoveryCode"
         const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
-        const val EXTRA_WAS_ALREADY_LOGGED_IN = "wasAlreadyLoggedIn"
         private const val EXTRA_DEEP_LINK_CODE = "deepLinkCode"
         private const val FRAGMENT_TAG_DEVICE_CONNECTING = "device-connecting"
 
@@ -230,7 +228,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java)
         }
 
-        internal fun intentForDeepLink(context: Context, syncBarcodeUrl: String): Intent {
+        internal fun intentForDeepLink(
+            context: Context,
+            syncBarcodeUrl: String,
+        ): Intent {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java).apply {
                 putExtra(EXTRA_DEEP_LINK_CODE, syncBarcodeUrl)
             }
