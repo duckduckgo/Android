@@ -170,6 +170,10 @@ interface Toggle {
      * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that.
      * WARNING: Calling this method with a cohort different from [ANY_COHORT] WILL ALWAYS try to enroll the user into an experiment.
      * This method enrolls users as long as they match the targets, even if the feature is disabled or the min version does not match.
+     *
+     * **Note:** Each toggle checks its state conditions independently of the parent feature toggle.
+     * Even if a parent feature toggle evaluates to a disabled state, it does not automatically disable its sub-features.
+     *
      * @return `true` if the feature should be enabled, `false` otherwise
      */
     fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
