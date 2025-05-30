@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Otwórz</string>
     <string name="duck_chat_cannot_open_file_error_message">Nie można otworzyć pliku. Poszukaj zgodnej aplikacji.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nie można uzyskać dostępu do aparatu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Prześlij obraz</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Wybierz plik</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Zrób zdjęcie</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Pozwól DuckDuckGo prosić o dostęp do kamery na tym urządzeniu</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Witryny mogą korzystać z Twojej kamery tylko wtedy, gdy pozwolisz DuckDuckGo poprosić o dostęp.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otwórz ustawienia</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Anuluj</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Nie można uzyskać dostępu do rejestratora dźwięku</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Zezwól DuckDuckGo na żądanie dostępu do rejestratora dźwięku na tym urządzeniu</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Witryny mogą korzystać z rejestratora dźwięku tylko po zezwoleniu DuckDuckGo na żądanie dostępu.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai to opcjonalna funkcja, która umożliwia prowadzenie anonimowych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Włącz Duck.ai</string>
