@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">DNS сървър</string>
     <string name="netpPrivateDns">Поверителен DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Блокиране на рискови домейни)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Блокиране на измами)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Препоръчително)</string>
     <string name="netpCustomDnsCustom">Потребителско</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 адрес</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo пренасочва DNS заявките през нашите DNS сървъри, за да не вижда интернет доставчикът какви уебсайтове посещавате.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Блокиране и филтриране на съдържание</string>
-    <string name="netpDnsBlockMalwarePrimary">Блокиране на рискови домейни</string>
+    <string name="netpDnsBlockMalwareHeader">Блокиране на злонамерено съдържание</string>
+    <string name="netpDnsBlockMalwarePrimary">Блокиране на измами</string>
     <string name="netpDnsBlockMalwareByline">Блокиране на над 150 000 домейна, маркирани за хостинг на зловреден софтуер, фишинг атаки и онлайн измами чрез списък за блокиране на ниво DNS. <annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Списъци за блокиране при DNS</string>
 

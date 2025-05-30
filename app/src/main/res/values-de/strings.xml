@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Wenn du deine Tabs und Daten löschst, wird der Verlauf deiner Tracker-Blockade gelöscht und diese Zahl auf Null zurückgesetzt.\n\nBlende dieses Banner aus, wenn du es nicht in der Tab-Ansicht sehen willst.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner ausblenden</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warnung: Diese Website stellt möglicherweise ein Sicherheitsrisiko dar</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo hat diese Seite blockiert, weil sie möglicherweise Malware verbreitet, die darauf abzielt, dein Gerät zu kompromittieren oder deine persönlichen Daten zu stehlen.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Diese Website gibt sich möglicherweise als legitime Website aus, um dich dazu zu verleiten, personenbezogene Daten wie Passwörter oder Kreditkartennummern preiszugeben.\n<a href=\"\">Mehr erfahren</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Warne mich vor Websites, die als Phishing- oder Malware-Websites gekennzeichnet sind</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="maliciousSiteSettingDisabled">Das Deaktivieren dieser Funktion kann deine Daten gefährden.</string>
-
+    <string name="threatProtectionTitle">Schutz vor Bedrohungen</string>
+    <string name="threatProtectionDescription">Der erweitere Schutz von DuckDuckGo schützt deine Verbindung und stoppt gängige Bedrohungen.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Links nach Möglichkeit automatisch auf HTTPS aktualisieren.<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="scamBlockerTitle">Betrugsblocker</string>
+    <string name="scamBlockerDescription">Warnt vor Websites, die als betrügerische, Phishing- und Malware-Websites gekennzeichnet sind.</string>
+    <string name="threatProtectionLearnMoreTitle">Mehr erfahren</string>
 </resources>

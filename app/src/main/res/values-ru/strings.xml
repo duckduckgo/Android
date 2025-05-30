@@ -888,7 +888,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">В результате закрытия вкладок и очистки данных также будет удалена история блокировки трекеров, а их счетчик будет сброшен до нуля.\n\nЭтот баннер на вкладках можно при желании скрыть.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скрыть баннер</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: этот сайт может быть опасным</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу: возможно, она распространяет вредоносное ПО для взлома устройств или кражи личной информации.\n<a href=\"\">Подробнее</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Возможно, это лишь имитация настоящего сайта, созданная с целью собрать ваши данные (например, пароли и номера платежных карт) обманным путем.\n<a href=\"\">Подробнее</a>]]></string>
@@ -903,5 +903,11 @@
     <string name="maliciousSiteToggleHint">Предупреждать о вредоносных и фишинговых сайтах</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="maliciousSiteSettingDisabled">Отключение этой функции может поставить ваши данные под угрозу.</string>
-
+    <string name="threatProtectionTitle">Защита от угроз</string>
+    <string name="threatProtectionDescription">Функции повышенной защиты DuckDuckGo пресекают распространенные угрозы, одновременно обеспечивая вам безопасное соединение.</string>
+    <string name="smarterEncryptionTitle">Усовершенствованное шифрование</string>
+    <string name="smarterEncryptionDescription"><![CDATA[По возможности автоматически переводит ссылки на более безопасный протокол HTTPS.<br><a href=\"\">Подробнее...</a>]]></string>
+    <string name="scamBlockerTitle">Блокировщик мошенничества</string>
+    <string name="scamBlockerDescription">Предупреждать о мошеннических, фишинговых и вредоносных сайтах.</string>
+    <string name="threatProtectionLearnMoreTitle">Подробнее</string>
 </resources>

@@ -50,6 +50,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
+const val SCAM_PROTECTION_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/scam-blocker"
+
 interface MaliciousSiteBlockerWebViewIntegration {
 
     suspend fun shouldIntercept(

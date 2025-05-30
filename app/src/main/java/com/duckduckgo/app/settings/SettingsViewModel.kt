@@ -40,6 +40,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PASSWORDS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -109,6 +110,7 @@ class SettingsViewModel @Inject constructor(
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
     private val autofillFeature: AutofillFeature,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -121,6 +123,7 @@ class SettingsViewModel @Inject constructor(
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
+        val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
     )
@@ -186,6 +189,7 @@ class SettingsViewModel @Inject constructor(
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
+                    isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                 ),

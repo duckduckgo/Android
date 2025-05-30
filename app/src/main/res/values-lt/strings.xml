@@ -888,7 +888,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ši svetainė gali apsimesti teisėta svetaine, siekiant apgauti jus pateikti asmeninę informaciją, pvz., slaptažodžius ar kredito kortelių numerius.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
@@ -903,5 +903,11 @@
     <string name="maliciousSiteToggleHint">Gauti saugos įspėjimą svetainėse, pažymėtose dėl sukčiavimo ar kenkėjiškų programų</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="maliciousSiteSettingDisabled">Išjungus šią funkciją, gali kilti pavojus jūsų informacijai.</string>
-
+    <string name="threatProtectionTitle">Grėsmių apsauga</string>
+    <string name="threatProtectionDescription">„DuckDuckGo“ patobulintos apsaugos priemonės sustabdo įprastas grėsmes ir užtikrina tavo ryšio saugumą.</string>
+    <string name="smarterEncryptionTitle">Išmanesnis šifravimas</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatiškai atnaujina saitus į HTTPS, kai tik įmanoma.<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="scamBlockerTitle">Sukčiavimo blokavimo įrankis</string>
+    <string name="scamBlockerDescription">Įspėti svetainėse, pažymėtose dėl sukčiavimo, apgaulingo duomenų išviliojimo ir kenkėjiškų programų.</string>
+    <string name="threatProtectionLearnMoreTitle">Sužinoti daugiau</string>
 </resources>

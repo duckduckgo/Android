@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityGeneralSettingsBinding
+import com.duckduckgo.app.browser.webview.SCAM_PROTECTION_LEARN_MORE_URL
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.LaunchShowOnAppLaunchScreen
 import com.duckduckgo.app.generalsettings.GeneralSettingsViewModel.Command.OpenMaliciousLearnMore
@@ -170,15 +171,11 @@ class GeneralSettingsActivity : DuckDuckGoActivity() {
                 globalActivityStarter.start(
                     this,
                     WebViewActivityWithParams(
-                        url = MALICIOUS_SITE_LEARN_MORE_URL,
+                        url = SCAM_PROTECTION_LEARN_MORE_URL,
                         screenTitle = getString(R.string.maliciousSiteLearnMoreTitle),
                     ),
                 )
             }
         }
-    }
-
-    companion object {
-        private const val MALICIOUS_SITE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/phishing-and-malware-protection/"
     }
 }
