@@ -343,7 +343,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 type = offerType.type,
                 id = it,
                 durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
-                isUserEligible = !subscriptionsManager.isFreeTrialEligible(),
+                isUserEligible = subscriptionsManager.isFreeTrialEligible(),
             )
         }
     }
