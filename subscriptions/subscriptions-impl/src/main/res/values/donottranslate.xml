@@ -15,10 +15,5 @@
   -->
 
 <resources>
-    <!-- Free Trial Experiment -->
-    <string name="subscriptionStatusFreeTrial">Free Trial Active</string>
-    <string name="monthly">monthly</string>
-    <string name="yearly">yearly</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Your free trial ends on %1$s &amp; automatically converts to a %2$s paid subscription on that day.</string>
-    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Your free trial ends on %1$s &amp; will not convert to a paid subscription.</string>
+
 </resources>
