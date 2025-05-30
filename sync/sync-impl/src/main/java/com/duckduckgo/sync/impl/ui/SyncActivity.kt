@@ -78,8 +78,8 @@ import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.S
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContract
 import com.duckduckgo.sync.impl.ui.setup.SyncIntroContractInput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract
-import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.DeviceConnected
+import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.LoginSuccess
 import com.duckduckgo.sync.impl.ui.setup.SyncWithAnotherDeviceContract.SyncWithAnotherDeviceContractOutput.SwitchAccountSuccess
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
@@ -149,7 +149,7 @@ class SyncActivity : DuckDuckGoActivity() {
         when (result) {
             DeviceConnected -> viewModel.onDeviceConnected()
             SwitchAccountSuccess -> viewModel.onLoginSuccess()
-            is SyncWithAnotherDeviceContractOutput.DeepLinkSuccess -> viewModel.onDeepLinkSetupSuccess(result.wasAlreadyLoggedIn)
+            LoginSuccess -> viewModel.onLoginSuccess()
             else -> {}
         }
     }
@@ -333,7 +333,7 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun deepLinkIntoSetup(barcodeSyncUrl: String) {
-        Timber.i("Sync-setup: launching sync with another device flow with deep link")
+        logcat { "Sync-setup: launching sync with another device flow with deep link" }
         syncWithAnotherDeviceFlow.launch(barcodeSyncUrl)
     }
 

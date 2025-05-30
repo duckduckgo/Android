@@ -72,7 +72,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -190,7 +190,11 @@ class SyncActivityViewModel @Inject constructor(
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
-        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+        data class ShowError(
+            @StringRes val message: Int,
+            val reason: String = "",
+        ) : Command()
+
         object ShowDeviceUnsupported : Command()
         object RequestSetupAuthentication : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
@@ -231,17 +235,6 @@ class SyncActivityViewModel @Inject constructor(
     fun onLoginSuccess() {
         viewModelScope.launch {
             command.send(Command.ShowRecoveryCode)
-        }
-    }
-
-    fun onDeepLinkSetupSuccess(wasAlreadyLoggedIn: Boolean) {
-        viewModelScope.launch {
-            Timber.i("Sync-setup: deep link setup success, was already logged in: $wasAlreadyLoggedIn")
-            if (wasAlreadyLoggedIn) {
-                command.send(Command.ShowDeviceConnected)
-            } else {
-                command.send(Command.ShowRecoveryCode)
-            }
         }
     }
 
@@ -432,6 +425,7 @@ class SyncActivityViewModel @Inject constructor(
             action()
         }
     }
+
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })
     private fun ViewState.showDeviceListItemLoading() = copy(syncedDevices = syncedDevices + LoadingItem)
@@ -451,13 +445,13 @@ class SyncActivityViewModel @Inject constructor(
     private fun ViewState.hideAccount() = copy(showAccount = false)
 
     fun processSetupDeepLink(setupUrl: String) {
-        Timber.i("Sync-setup: got setup deep link $setupUrl")
+        logcat { "Sync-setup: got setup deep link $setupUrl" }
         viewModelScope.launch(dispatchers.io()) {
             // parse here to test validity before asking user to use it
             val parsed = SyncBarcodeUrl.parseUrl(setupUrl)
 
             if (parsed == null) {
-                Timber.w("Sync-setup: failed to parse setup URL $setupUrl")
+                logcat { "Sync-setup: failed to parse setup URL $setupUrl" }
             } else {
                 command.send(Command.AskSetupSyncDeepLink(parsed))
             }

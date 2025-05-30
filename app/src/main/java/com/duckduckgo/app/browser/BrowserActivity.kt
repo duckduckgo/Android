@@ -35,7 +35,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -531,7 +530,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         intent.intentText?.let {
             if (syncUrlIdentifier.shouldDelegateToSyncSetup(it)) {
                 globalActivityStarter.start(this, SyncActivityFromSetupUrl(it))
-                Timber.v("Sync setup link was consumed, so don't allow it to open in a new tab")
+                logcat { "Sync setup link was consumed, so don't allow it to open in a new tab" }
                 return
             }
         }
@@ -1033,7 +1032,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
     }
 
-    fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) {
+    fun launchNewTab(
+        query: String? = null,
+        sourceTabId: String? = null,
+        skipHome: Boolean = false,
+    ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
                 tabManager.openNewTab(query, sourceTabId, skipHome)
