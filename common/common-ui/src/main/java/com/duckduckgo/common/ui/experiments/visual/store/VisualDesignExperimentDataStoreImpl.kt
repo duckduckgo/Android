@@ -17,6 +17,8 @@
 package com.duckduckgo.common.ui.experiments.visual.store
 
 import android.annotation.SuppressLint
+import android.os.Looper
+import android.util.Log
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.di.scopes.AppScope
@@ -62,13 +64,13 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         )
     }
 
-    private val _anyConflictingExperimentEnabled = MutableStateFlow(isAnyConflictingExperimentEnabled())
-    override val anyConflictingExperimentEnabled = _anyConflictingExperimentEnabled.asStateFlow()
+    private val _anyConflictingExperimentEnabled by lazy { MutableStateFlow(isAnyConflictingExperimentEnabled()) }
+    override val anyConflictingExperimentEnabled by lazy { _anyConflictingExperimentEnabled.asStateFlow() }
 
-    private val _experimentFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
-    private val _duckAIFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
+    private val _experimentFeatureFlagEnabled by lazy { MutableStateFlow(experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()) }
+    private val _duckAIFeatureFlagEnabled by lazy { MutableStateFlow(experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()) }
 
-    override val isExperimentEnabled: StateFlow<Boolean> =
+    override val isExperimentEnabled: StateFlow<Boolean> by lazy {
         combine(
             _experimentFeatureFlagEnabled,
             _anyConflictingExperimentEnabled,
@@ -79,8 +81,9 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
             started = SharingStarted.Eagerly,
             initialValue = _experimentFeatureFlagEnabled.value && !_anyConflictingExperimentEnabled.value,
         )
+    }
 
-    override val isDuckAIPoCEnabled: StateFlow<Boolean> =
+    override val isDuckAIPoCEnabled: StateFlow<Boolean> by lazy {
         combine(_duckAIFeatureFlagEnabled, isExperimentEnabled) { duckAIFeatureFlagEnabled, experimentEnabled ->
             duckAIFeatureFlagEnabled && experimentEnabled
         }.stateIn(
@@ -88,12 +91,14 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
             started = SharingStarted.Eagerly,
             initialValue = _duckAIFeatureFlagEnabled.value && isExperimentEnabled.value,
         )
+    }
 
     /**
      * This is a blocking call but it only blocks the main thread when the class initializes, so when the splash screen is visible.
      * All subsequent calls are moved off of the main thread.
      */
     private fun isAnyConflictingExperimentEnabled(): Boolean = runBlocking {
+        Log.d("lp_test", "Thread info: id=${Thread.currentThread().id}, isMainThread=${Looper.myLooper() == Looper.getMainLooper()}")
         val activeExperimentsNames = featureTogglesInventory.getAllActiveExperimentToggles().map { it.featureName().name }
         conflictingExperimentsNames.any { activeExperimentsNames.contains(it) }
     }

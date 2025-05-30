@@ -20,24 +20,40 @@ import android.os.Bundle
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.daxprompts.api.DaxPromptBrowserComparisonNoParams
 import com.duckduckgo.daxprompts.api.DaxPromptDuckPlayerNoParams
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptBrowserComparisonActivity.Companion.DAX_PROMPT_BROWSER_COMPARISON_SET_DEFAULT_EXTRA
 import com.duckduckgo.daxprompts.impl.ui.DaxPromptDuckPlayerActivity.Companion.DAX_PROMPT_DUCK_PLAYER_ACTIVITY_URL_EXTRA
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import dagger.android.AndroidInjection
+import dagger.android.DaggerActivity
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @InjectWith(ActivityScope::class)
-class LaunchBridgeActivity : DuckDuckGoActivity() {
+class LaunchBridgeActivity : DaggerActivity() {
+
+    @Inject lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+
+    @Inject lateinit var viewModelFactory: ViewModelProvider.NewInstanceFactory
 
     private val viewModel: LaunchViewModel by bindViewModel()
 
@@ -69,6 +85,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         splashScreen.setKeepOnScreenCondition { true }
@@ -77,7 +94,12 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
         configureObservers()
 
-        lifecycleScope.launch { viewModel.determineViewToShow() }
+        lifecycleScope.launch {
+            withContext(dispatcherProvider.io()) {
+                visualDesignExperimentDataStore.isExperimentEnabled
+            }
+            viewModel.determineViewToShow()
+        }
     }
 
     private fun configureObservers() {
@@ -139,5 +161,9 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
         intentDaxPromptComparisonChart?.let {
             startDaxPromptBrowserComparisonActivityForResult.launch(it)
         }
+    }
+
+    protected inline fun <reified V : ViewModel> bindViewModel() = lazy {
+        ViewModelProvider(this, viewModelFactory).get(V::class.java)
     }
 }
