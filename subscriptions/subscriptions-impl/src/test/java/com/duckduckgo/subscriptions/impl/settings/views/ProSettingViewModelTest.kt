@@ -65,6 +65,7 @@ class ProSettingViewModelTest {
     fun whenOnResumeEmitViewState() = runTest {
         whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
         whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
 
         viewModel.onCreate(mock())
         viewModel.viewState.test {
@@ -79,6 +80,19 @@ class ProSettingViewModelTest {
             viewModel.onRestore()
             verify(pixelSender).reportAppSettingsRestorePurchaseClick()
             verifyNoMoreInteractions(pixelSender)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun givenFreeTrialEligibleWhenOnCreateThenFreeTrialEligibleViewStateTrue() = runTest {
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertEquals(true, awaitItem().freeTrialEligible)
             cancelAndConsumeRemainingEvents()
         }
     }
