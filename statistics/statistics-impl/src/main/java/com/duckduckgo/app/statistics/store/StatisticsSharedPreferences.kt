@@ -20,18 +20,39 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.model.Atb
+import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
+import com.squareup.anvil.annotations.ContributesMultibinding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class StatisticsSharedPreferences @Inject constructor(private val context: Context) :
-    StatisticsDataStore {
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = BrowserLifecycleObserver::class,
+)
+class StatisticsSharedPreferences @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+    private val context: Context,
+) : StatisticsDataStore {
 
-    override var variant: String?
-        get() = preferences.getString(KEY_VARIANT, null)
-        set(value) = preferences.edit { putString(KEY_VARIANT, value) }
+    override suspend fun getVariant(): String? = withContext(dispatcherProvider.io()) {
+        preferences.getString(KEY_VARIANT, null)
+    }
 
-    override var referrerVariant: String?
-        get() = preferences.getString(KEY_REFERRER_VARIANT, null)
-        set(value) = preferences.edit { putString(KEY_REFERRER_VARIANT, value) }
+    override suspend fun setVariant(variant: String) = withContext(dispatcherProvider.io()) {
+        preferences.edit { putString(KEY_VARIANT, variant) }
+    }
+
+    override suspend fun getReferrerVariant(): String? = withContext(dispatcherProvider.io()) {
+        preferences.getString(KEY_REFERRER_VARIANT, null)
+    }
+
+    override suspend fun setReferrerVariant(variant: String) {
+        withContext(dispatcherProvider.io()) {
+            preferences.edit { putString(KEY_REFERRER_VARIANT, variant) }
+        }
+    }
 
     override val hasInstallationStatistics: Boolean
         get() = preferences.contains(KEY_ATB)

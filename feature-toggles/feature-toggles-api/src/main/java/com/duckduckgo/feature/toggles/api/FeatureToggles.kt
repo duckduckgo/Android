@@ -36,7 +36,7 @@ class FeatureToggles private constructor(
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String,
     private val featureName: String,
-    private val appVariantProvider: () -> String?,
+    private val appVariantProvider: suspend () -> String?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
 ) {
@@ -172,7 +172,7 @@ interface Toggle {
      * This method enrolls users as long as they match the targets, even if the feature is disabled or the min version does not match.
      * @return `true` if the feature should be enabled, `false` otherwise
      */
-    fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
+    suspend fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
@@ -208,7 +208,7 @@ interface Toggle {
     /**
      * @return `true` if the user is enrolled in the given cohort and the experiment is enabled or `false` otherwise
      */
-    fun isEnrolledAndEnabled(cohort: CohortName): Boolean
+    suspend fun isEnrolledAndEnabled(cohort: CohortName): Boolean
 
     /**
      * @return the list of domain exceptions`exceptions` of the feature or empty list if not present in the remote config
@@ -300,7 +300,7 @@ interface Toggle {
          * Implement this method when adding a new target property.
          * @return `true` if the target matches else false
          */
-        fun matchesTargetProperty(target: State.Target): Boolean
+        suspend fun matchesTargetProperty(target: State.Target): Boolean
     }
 
     /**
@@ -354,7 +354,7 @@ internal class ToggleImpl constructor(
     private val isExperiment: Boolean,
     private val appVersionProvider: () -> Int,
     private val flavorNameProvider: () -> String = { "" },
-    private val appVariantProvider: () -> String?,
+    private val appVariantProvider: suspend () -> String?,
     private val forceDefaultVariant: () -> Unit,
     private val callback: FeatureTogglesCallback?,
 ) : Toggle {
@@ -379,7 +379,7 @@ internal class ToggleImpl constructor(
         }
     }
 
-    override fun isEnabled(cohort: CohortName): Boolean {
+    override suspend fun isEnabled(cohort: CohortName): Boolean {
         if (cohort == ANY_COHORT) {
             return isRolloutEnabled()
         }
@@ -414,9 +414,9 @@ internal class ToggleImpl constructor(
         } ?: cohortDefaultValue
     }
 
-    private fun isRolloutEnabled(): Boolean {
+    private suspend fun isRolloutEnabled(): Boolean {
         // This fun is in there because it should never be called outside this method
-        fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
+        suspend fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
             val variant = appVariantProvider.invoke()
             // no targets then consider always treated
             if (this.targets.isEmpty()) {
@@ -436,7 +436,7 @@ internal class ToggleImpl constructor(
         }
 
         // This fun is in there because it should never be called outside this method
-        fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
+        suspend fun evaluateLocalEnable(state: State, isExperiment: Boolean): Boolean {
             // variants are only considered for Experiment feature flags
             val doTargetsMatch = state.evaluateTargetMatching(isExperiment)
 
@@ -574,5 +574,5 @@ internal class ToggleImpl constructor(
 
     override fun isEnrolled(): Boolean = getCohort() != null
 
-    override fun isEnrolledAndEnabled(cohort: CohortName): Boolean = isEnrolled() && isEnabled(cohort)
+    override suspend fun isEnrolledAndEnabled(cohort: CohortName): Boolean = isEnrolled() && isEnabled(cohort)
 }

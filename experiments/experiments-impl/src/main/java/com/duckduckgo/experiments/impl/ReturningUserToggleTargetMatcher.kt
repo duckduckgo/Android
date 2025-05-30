@@ -28,7 +28,7 @@ import javax.inject.Inject
 class ReturningUserToggleTargetMatcher @Inject constructor(
     private val variantManager: VariantManager,
 ) : TargetMatcherPlugin {
-    override fun matchesTargetProperty(target: Target): Boolean {
+    override suspend fun matchesTargetProperty(target: Target): Boolean {
         return target.isReturningUser?.let { isReturningUserTarget ->
             val isReturningUser = variantManager.getVariantKey() == REINSTALL_VARIANT
             isReturningUserTarget == isReturningUser

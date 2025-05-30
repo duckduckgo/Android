@@ -51,7 +51,7 @@ class RealFeatureTogglesCallback @Inject constructor(
         pixel.fire(pixelName = pixelName, parameters = params, type = Pixel.PixelType.Unique(tag = tag))
     }
 
-    override fun matchesToggleTargets(targets: List<Any>): Boolean {
+    override suspend fun matchesToggleTargets(targets: List<Any>): Boolean {
         // no targets mean any target
         if (targets.isEmpty()) return true
 
@@ -91,7 +91,7 @@ private interface TargetMatcherPluginTrigger
 class LocaleToggleTargetMatcher @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : TargetMatcherPlugin {
-    override fun matchesTargetProperty(target: Target): Boolean {
+    override suspend fun matchesTargetProperty(target: Target): Boolean {
         val country = appBuildConfig.deviceLocale.country.lowercase()
         val language = appBuildConfig.deviceLocale.language.lowercase()
 
@@ -110,7 +110,7 @@ class LocaleToggleTargetMatcher @Inject constructor(
 class MinSdkToggleTargetMatcher @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : TargetMatcherPlugin {
-    override fun matchesTargetProperty(target: Target): Boolean {
+    override suspend fun matchesTargetProperty(target: Target): Boolean {
         val sdkInt = appBuildConfig.sdkInt
 
         val isSdkIntMatching = target.minSdkVersion?.let {

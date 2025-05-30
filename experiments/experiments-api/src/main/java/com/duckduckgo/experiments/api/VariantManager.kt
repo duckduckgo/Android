@@ -26,17 +26,17 @@ interface VariantManager {
     /**
      * Returns the variant key assigned to the user
      */
-    fun getVariantKey(): String?
+    suspend fun getVariantKey(): String?
 
     /**
      * Updates user experimental variant when referralResultReceived from PlayStore
      */
-    fun updateAppReferrerVariant(variant: String)
+    suspend fun updateAppReferrerVariant(variant: String)
 
     /**
      * Updated experimental variants received
      *
      * @param variants Updated list of VariantConfig objects
      */
-    fun updateVariants(variants: List<VariantConfig>)
+    suspend fun updateVariants(variants: List<VariantConfig>)
 }

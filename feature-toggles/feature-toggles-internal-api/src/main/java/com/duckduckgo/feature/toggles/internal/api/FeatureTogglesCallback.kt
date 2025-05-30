@@ -30,5 +30,5 @@ interface FeatureTogglesCallback {
     /**
      * @return `true` if the ANY of the remote feature targets match the device configuration, `false` otherwise
      */
-    fun matchesToggleTargets(targets: List<Any>): Boolean
+    suspend fun matchesToggleTargets(targets: List<Any>): Boolean
 }

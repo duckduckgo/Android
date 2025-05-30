@@ -79,8 +79,7 @@ class RealAppBuildConfig @Inject constructor(
     override val deviceLocale: Locale
         get() = Locale.getDefault()
 
-    override val variantName: String?
-        get() = variantManager.get().getVariantKey()
+    override suspend fun getVariantName(): String? = variantManager.get().getVariantKey()
 
     override suspend fun isAppReinstall(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {

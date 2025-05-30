@@ -117,7 +117,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
                                 .appVersionProvider({ appBuildConfig.versionCode })
                                 .flavorNameProvider({ appBuildConfig.flavor.name })
                                 .featureName(%S)
-                                .appVariantProvider({ appBuildConfig.variantName })
+                                .appVariantProvider({ appBuildConfig.getVariantName() })
                                 .callback(callback)
                                 // save empty variants will force the default variant to be set
                                 .forceDefaultVariantProvider({ variantManager.updateVariants(emptyList()) })

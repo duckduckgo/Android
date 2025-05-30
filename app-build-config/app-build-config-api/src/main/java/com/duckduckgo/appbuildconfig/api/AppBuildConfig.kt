@@ -38,7 +38,7 @@ interface AppBuildConfig {
     /**
      * You should call [variantName] in a background thread
      */
-    val variantName: String?
+    suspend fun getVariantName(): String?
 
     /**
      * @return `true` if the user re-installed the app, `false` otherwise

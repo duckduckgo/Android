@@ -26,10 +26,10 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 
 interface ExperimentVariantRepository {
-    fun getUserVariant(): String?
-    fun updateVariant(variantKey: String)
-    fun getAppReferrerVariant(): String?
-    fun updateAppReferrerVariant(variant: String)
+    suspend fun getUserVariant(): String?
+    suspend fun updateVariant(variant: String)
+    suspend fun getAppReferrerVariant(): String?
+    suspend fun updateAppReferrerVariant(variant: String)
 }
 
 @ContributesBinding(AppScope::class)
@@ -37,24 +37,25 @@ class ExperimentVariantRepositoryImpl @Inject constructor(
     private val store: StatisticsDataStore,
 ) : ExperimentVariantRepository {
 
-    override fun getUserVariant(): String? = store.variant
+    override suspend fun getUserVariant(): String? = store.getVariant()
 
-    override fun updateVariant(variantKey: String) {
-        logcat(INFO) { "Updating variant for user: $variantKey" }
+    override suspend fun updateVariant(variant: String) {
+        logcat(INFO) { "Updating variant for user: $variant" }
         if (updateVariantIsAllowed()) {
-            store.variant = variantKey
+            store.setVariant(variant)
         }
     }
 
-    private fun updateVariantIsAllowed(): Boolean {
-        return store.variant != DEFAULT_VARIANT.key && store.variant != REINSTALL_VARIANT
+    private suspend fun updateVariantIsAllowed(): Boolean {
+        val variant = store.getVariant()
+        return variant != DEFAULT_VARIANT.key && variant != REINSTALL_VARIANT
     }
 
-    override fun getAppReferrerVariant(): String? = store.referrerVariant
+    override suspend fun getAppReferrerVariant(): String? = store.getReferrerVariant()
 
-    override fun updateAppReferrerVariant(variant: String) {
+    override suspend fun updateAppReferrerVariant(variant: String) {
         logcat(INFO) { "Updating variant for app referer: $variant" }
-        store.variant = variant
-        store.referrerVariant = variant
+        store.setVariant(variant)
+        store.setReferrerVariant(variant)
     }
 }

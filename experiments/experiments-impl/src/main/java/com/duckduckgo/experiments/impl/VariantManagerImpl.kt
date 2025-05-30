@@ -41,15 +41,15 @@ class VariantManagerImpl @Inject constructor(
         return DEFAULT_VARIANT.key
     }
 
-    override fun getVariantKey(): String? {
+    override suspend fun getVariantKey(): String? {
         return experimentVariantRepository.getUserVariant()
     }
 
-    override fun updateAppReferrerVariant(variant: String) {
+    override suspend fun updateAppReferrerVariant(variant: String) {
         experimentVariantRepository.updateAppReferrerVariant(variant)
     }
 
-    override fun updateVariants(variants: List<VariantConfig>) {
+    override suspend fun updateVariants(variants: List<VariantConfig>) {
         val activeVariants = variants.toVariants()
         logcat { "Variants update $variants" }
         val currentVariantKey = experimentVariantRepository.getUserVariant()
@@ -57,7 +57,7 @@ class VariantManagerImpl @Inject constructor(
         updateUserVariant(activeVariants, currentVariantKey)
     }
 
-    private fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {
+    private suspend fun updateUserVariant(activeVariants: List<Variant>, currentVariantKey: String?) {
         if (currentVariantKey == DEFAULT_VARIANT.key) {
             return
         }
@@ -100,11 +100,11 @@ class VariantManagerImpl @Inject constructor(
         return activeVariants
     }
 
-    private fun matchesReferrerVariant(key: String): Boolean {
+    private suspend fun matchesReferrerVariant(key: String): Boolean {
         return key == experimentVariantRepository.getAppReferrerVariant()
     }
 
-    private fun allocateNewVariant(activeVariants: List<Variant>): Variant {
+    private suspend fun allocateNewVariant(activeVariants: List<Variant>): Variant {
         var newVariant = generateVariant(activeVariants)
         val compliesWithFilters = newVariant.filterBy(appBuildConfig)
 

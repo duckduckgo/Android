@@ -43,7 +43,7 @@ class ReinstallAtbListener @Inject constructor(
         backupDataStore.clearBackupPreferences()
 
         if (appBuildConfig.isAppReinstall()) {
-            statisticsDataStore.variant = REINSTALL_VARIANT
+            statisticsDataStore.setVariant(REINSTALL_VARIANT)
             logcat(INFO) { "Variant update for returning user" }
         }
     }
