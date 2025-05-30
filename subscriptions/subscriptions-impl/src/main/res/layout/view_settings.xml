@@ -48,7 +48,7 @@
             android:layout_marginBottom="@dimen/keyline_3"
             app:textType="primary"
             app:typography="body1"
-            android:text="@string/subscriptionSettingGet" />
+            tools:text="@string/subscriptionSettingGet" />
 
     </com.duckduckgo.subscriptions.impl.ui.SelectableLinearLayout>
 

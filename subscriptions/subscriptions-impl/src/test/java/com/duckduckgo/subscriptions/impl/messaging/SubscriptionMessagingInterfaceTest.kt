@@ -587,32 +587,6 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun `when process and monthly price clicked then experiment pixel sent`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsMonthlyPriceClicked","id":"myId","params":{}}
-        """.trimIndent()
-
-        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
-
-        verify(pixelSender).reportFreeTrialOnStartClickedMonthly()
-    }
-
-    @Test
-    fun `when process and yearly price clicked then experiment pixel sent`() = runTest {
-        givenInterfaceIsRegistered()
-
-        val message = """
-            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsYearlyPriceClicked","id":"myId","params":{}}
-        """.trimIndent()
-
-        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
-
-        verify(pixelSender).reportFreeTrialOnStartClickedYearly()
-    }
-
-    @Test
     fun `when process and add email success then pixel sent`() = runTest {
         givenInterfaceIsRegistered()
 

@@ -76,6 +76,11 @@ interface Subscriptions {
      * @return `true` if the given Uri leads to the Privacy Pro page, or `false` otherwise
      */
     fun isPrivacyProUrl(uri: Uri): Boolean
+
+    /**
+     * @return `true` if a Free Trial offer is available for the user, `false` otherwise
+     */
+    suspend fun isFreeTrialEligible(): Boolean
 }
 
 enum class Product(val value: String) {

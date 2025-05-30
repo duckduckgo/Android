@@ -175,7 +175,12 @@ class ProSettingView @JvmOverloads constructor(
                             else -> ""
                         },
                     )
-                    subscriptionGet.setText(R.string.subscriptionSettingGet)
+                    subscriptionGet.setText(
+                        when (viewState.freeTrialEligible) {
+                            true -> R.string.subscriptionSettingTryFreeTrial
+                            false -> R.string.subscriptionSettingGet
+                        },
+                    )
 
                     subscriptionBuyContainer.isVisible = true
                     subscriptionRestoreContainer.isVisible = true
