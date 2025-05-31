@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya Privacy Pro destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
     <string name="subscriptionStatusSubscribed">Abone olundu</string>
     <string name="privacyPolicyAndTermsOfService">Gizlilik Politikası ve Hizmet Koşulları</string>
+    <string name="subscriptionStatusFreeTrial">Ücretsiz Deneme Süresi Aktif</string>
+    <string name="monthly">aylık</string>
+    <string name="yearly">yıllık</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Ücretsiz deneme sürümünüz %1$s tarihinde sona erecek ve aynı gün otomatik olarak %2$s ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz deneme sürümünüz %1$s tarihinde sona erecek ve ücretli aboneliğe dönüşmeyecektir.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonelik Ayarları</string>
