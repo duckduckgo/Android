@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Krijg antwoorden op veelgestelde vragen of neem contact op met de klantenservice van Privacy Pro via onze hulppagina\'s. De beschikbaarheid van functies verschilt per land.</string>
     <string name="subscriptionStatusSubscribed">Geabonneerd</string>
     <string name="privacyPolicyAndTermsOfService">Privacybeleid en servicevoorwaarden</string>
+    <string name="subscriptionStatusFreeTrial">Gratis proefversie actief</string>
+    <string name="monthly">per maand</string>
+    <string name="yearly">Jaarlijks</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Je gratis proefperiode eindigt op %1$s en wordt op die dag automatisch omgezet in een %2$s betaald abonnement.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Je gratis proefperiode eindigt op %1$s en wordt niet omgezet naar een betaald abonnement.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnementinstellingen</string>
