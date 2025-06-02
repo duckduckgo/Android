@@ -25,16 +25,20 @@ import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import logcat.logcat
 
 interface ImportInPasswordsVisibility {
     fun canShowImportInPasswords(numberSavedPasswords: Int): Boolean
+    fun onPromoDismissed()
 }
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class RealImportInPasswordsVisibility @Inject constructor(
     private val internalAutofillStore: InternalAutofillStore,
     private val autofillFeature: AutofillFeature,
@@ -50,12 +54,28 @@ class RealImportInPasswordsVisibility @Inject constructor(
             logcat { "Autofill: Evaluating if user can show import promo" }
             canShowImportPasswords = evaluateIfUserCanShowImportPromo()
             logcat { "Autofill: Evaluation result, can show import promo? $canShowImportPasswords" }
+
+            if (!canShowImportPasswords) return@launch
+
+            // Observe changes of hasEverImportedPasswordsFlow only if the promo can be shown
+            internalAutofillStore.hasEverImportedPasswordsFlow().collect { hasImported ->
+                logcat { "Autofill: hasEverImportedPasswords changed to $hasImported" }
+                if (hasImported) {
+                    canShowImportPasswords = false
+                    logcat { "Autofill: User has imported passwords, hiding promo" }
+                }
+            }
         }
     }
 
     override fun canShowImportInPasswords(numberSavedPasswords: Int): Boolean {
         if (numberSavedPasswords < MIN_PASSWORDS_TO_SHOW_PROMO || numberSavedPasswords > MAX_PASSWORDS_TO_SHOW_PROMO) return false
         return canShowImportPasswords
+    }
+
+    override fun onPromoDismissed() {
+        internalAutofillStore.hasDismissedImportedPasswordsPromo = true
+        canShowImportPasswords = false
     }
 
     private suspend fun evaluateIfUserCanShowImportPromo(): Boolean {

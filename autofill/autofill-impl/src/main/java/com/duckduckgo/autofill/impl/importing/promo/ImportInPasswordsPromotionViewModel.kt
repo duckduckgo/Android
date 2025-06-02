@@ -26,7 +26,6 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
 import com.duckduckgo.autofill.impl.store.AutofillEffect
 import com.duckduckgo.autofill.impl.store.AutofillEffectDispatcher
-import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
@@ -40,8 +39,8 @@ import kotlinx.coroutines.launch
 class ImportInPasswordsPromotionViewModel @Inject constructor(
     private val pixel: Pixel,
     private val dispatchers: DispatcherProvider,
-    private val internalAutofillStore: InternalAutofillStore,
     private val promoEventDispatcher: AutofillEffectDispatcher,
+    private val importInPasswordsVisibility: ImportInPasswordsVisibility,
 ) : ViewModel() {
 
     sealed interface Command {
@@ -76,7 +75,7 @@ class ImportInPasswordsPromotionViewModel @Inject constructor(
 
     fun onUserDismissedPromo() {
         viewModelScope.launch(dispatchers.io()) {
-            internalAutofillStore.hasDismissedImportedPasswordsPromo = true
+            importInPasswordsVisibility.onPromoDismissed()
             command.send(DismissImport)
         }
     }

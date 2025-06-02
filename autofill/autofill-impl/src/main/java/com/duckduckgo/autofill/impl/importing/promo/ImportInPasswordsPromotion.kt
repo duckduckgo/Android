@@ -129,7 +129,7 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
                 ),
             )
             onTopAnimationConfigured { view ->
-                view.repeatCount = 2
+                view.repeatCount = 1
                 view.playAnimation()
             }
             onPrimaryActionClicked {

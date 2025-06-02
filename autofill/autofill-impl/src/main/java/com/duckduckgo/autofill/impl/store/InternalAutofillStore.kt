@@ -42,6 +42,8 @@ interface InternalAutofillStore : AutofillStore {
 
     var hasEverImportedPasswords: Boolean
 
+    fun hasEverImportedPasswordsFlow(): Flow<Boolean>
+
     var hasDismissedImportedPasswordsPromo: Boolean
 
     /**
