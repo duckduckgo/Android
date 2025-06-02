@@ -48,7 +48,6 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.mobile.android.R as CommonR
@@ -133,8 +132,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         val navBar = rootContainer.findViewById<BrowserNavigationBarView>(R.id.omnibarNavigationBar)
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
-
-            omnibarCard.elevation = 1f.toDp(context)
         } else {
             navigationBar = navBar
 
@@ -148,8 +145,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             navBar.findViewById<LinearLayout>(R.id.barView).updatePadding(
                 top = 0,
             )
-
-            omnibarCard.elevation = 0.5f.toDp(context)
         }
         omniBarClickCatcher.setOnClickListener {
             globalActivityStarter.start(context, SearchInterstitialActivityParams)
@@ -191,8 +186,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     override fun render(viewState: ViewState) {
         super.render(viewState)
-
-        renderShadows(viewState.showShadows)
 
         if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
@@ -361,14 +354,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             viewModel.onBackButtonPressed()
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
         }
-    }
-
-    private fun renderShadows(showShadows: Boolean) {
-        // outlineProvider = if (showShadows) {
-        //     ViewOutlineProvider.BACKGROUND
-        // } else {
-        //     null
-        // }
     }
 
     companion object {
