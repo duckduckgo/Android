@@ -271,7 +271,6 @@ class RealSubscriptionsManager @Inject constructor(
     private var purchaseStateJob: Job? = null
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
-    private var purchaseFlowStartedUsingRestoredAccount: Boolean = false
 
     // Indicates whether the user is part of any FE experiment at the time of purchase
     private var experimentAssigned: Experiment? = null
@@ -474,11 +473,6 @@ class RealSubscriptionsManager @Inject constructor(
                 }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
-                if (purchaseFlowStartedUsingRestoredAccount) {
-                    purchaseFlowStartedUsingRestoredAccount = false
-                    val hasEmail = !authRepository.getAccount()?.email.isNullOrBlank()
-                    pixelSender.reportPurchaseWithRestoredAccount(hasEmail)
-                }
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
             } else {
@@ -494,7 +488,6 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
-        purchaseFlowStartedUsingRestoredAccount = false
         authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
@@ -834,20 +827,16 @@ class RealSubscriptionsManager @Inject constructor(
                 isSignedInV1() -> fetchAndStoreAllData()
             }
 
-            var restoredAccount = false
-
             if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
-                restoredAccount = isSignedIn()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
                         recoverSubscriptionFromStore()
-                        val accountIdChanged = accountId != null && accountId != authRepository.getAccount()?.externalId
-                        removeExpiredSubscriptionOnCancelledPurchase = accountIdChanged
-                        restoredAccount = accountIdChanged
+                        removeExpiredSubscriptionOnCancelledPurchase =
+                            accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
                 }
             }
@@ -874,8 +863,6 @@ class RealSubscriptionsManager @Inject constructor(
                 Experiment(experimentName, experimentCohort)
             }
 
-            purchaseFlowStartedUsingRestoredAccount = restoredAccount
-
             logcat { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
             playBillingManager.launchBillingFlow(
@@ -889,7 +876,6 @@ class RealSubscriptionsManager @Inject constructor(
             logcat(ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther()
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
-            purchaseFlowStartedUsingRestoredAccount = false
         }
     }
 
