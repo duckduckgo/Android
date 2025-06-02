@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust Privacy Pro klienditoega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
     <string name="subscriptionStatusSubscribed">Tellitud</string>
     <string name="privacyPolicyAndTermsOfService">Privaatsuspoliitika ja teenusetingimused</string>
+    <string name="subscriptionStatusFreeTrial">Tasuta prooviperiood aktiveeritud</string>
+    <string name="monthly">igakuine</string>
+    <string name="yearly">aastane</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt %2$s tasuliseks tellimuseks.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ega muutu tasuliseks tellimuseks.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tellimuse seaded</string>
