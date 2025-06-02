@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Ottieni risposte alle domande frequenti o contatta l\'assistenza di Privacy Pro dalle nostre pagine di assistenza. La disponibilità delle funzioni varia in base al paese.</string>
     <string name="subscriptionStatusSubscribed">Iscritto</string>
     <string name="privacyPolicyAndTermsOfService">Privacy policy e Termini del servizio</string>
+    <string name="subscriptionStatusFreeTrial">Prova gratuita attiva</string>
+    <string name="monthly">mensile</string>
+    <string name="yearly">Annuale</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">La prova gratuita termina il %1$s e lo stesso giorno si converte automaticamente in un abbonamento %2$s a pagamento.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">La prova gratuita termina il %1$s e non si convertirà in un abbonamento a pagamento.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Impostazioni dell\'abbonamento</string>
