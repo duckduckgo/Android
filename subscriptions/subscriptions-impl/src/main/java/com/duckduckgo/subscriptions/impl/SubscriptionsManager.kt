@@ -81,6 +81,8 @@ import dagger.SingleInstanceIn
 import java.io.IOException
 import java.time.Duration
 import java.time.Instant
+import java.time.Period
+import java.time.format.DateTimeParseException
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
@@ -95,6 +97,7 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
 
@@ -1106,18 +1109,12 @@ data class PricingPhase(
 
 ) {
     internal fun getBillingPeriodInDays(): Int? {
-        val regex = Regex("""P(\d+)([DWMY])""")
-        val match = regex.matchEntire(billingPeriod) ?: return null
-
-        val (amountStr, unit) = match.destructured
-        val amount = amountStr.toIntOrNull() ?: return null
-
-        return when (unit) {
-            "D" -> amount
-            "W" -> amount * 7
-            "M" -> amount * 30
-            "Y" -> amount * 365
-            else -> null
+        return try {
+            val period = Period.parse(billingPeriod)
+            return period.days + period.months * 30 + period.years * 365
+        } catch (e: DateTimeParseException) {
+            logcat { "Subs: Failed to parse billing period \"$billingPeriod\": ${e.asLog()}" }
+            null
         }
     }
 }

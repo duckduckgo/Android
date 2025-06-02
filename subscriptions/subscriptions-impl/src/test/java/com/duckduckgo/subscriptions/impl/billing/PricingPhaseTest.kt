@@ -23,50 +23,45 @@ import org.junit.Test
 
 class PricingPhaseTest {
     @Test
-    fun returnsCorrectDaysForDays() {
-        val phase = PricingPhase("Free", "P10D")
+    fun billingPeriodParsesDaysCorrectly() {
+        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P10D")
         assertEquals(10, phase.getBillingPeriodInDays())
     }
 
     @Test
-    fun returnsCorrectDaysForWeeks() {
-        val phase = PricingPhase("Free", "P2W")
+    fun billingPeriodParsesWeeksCorrectly() {
+        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P2W")
         assertEquals(14, phase.getBillingPeriodInDays())
     }
 
     @Test
-    fun returnsCorrectDaysForMonths() {
-        val phase = PricingPhase("Free", "P3M")
-        assertEquals(90, phase.getBillingPeriodInDays())
+    fun billingPeriodParsesMonthsCorrectly() {
+        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P2M")
+        assertEquals(60, phase.getBillingPeriodInDays())
     }
 
     @Test
-    fun returnsCorrectDaysForYears() {
-        val phase = PricingPhase("Free", "P1Y")
+    fun billingPeriodParsesYearsCorrectly() {
+        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P1Y")
         assertEquals(365, phase.getBillingPeriodInDays())
     }
 
     @Test
-    fun returnsNullForInvalidFormat() {
-        val phase = PricingPhase("Free", "XYZ")
+    fun billingPeriodParsesMixedPeriodCorrectly() {
+        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "P1Y2M10D")
+        val expectedDays = 1 * 365 + 2 * 30 + 10 // 365 + 60 + 10 = 435
+        assertEquals(expectedDays, phase.getBillingPeriodInDays())
+    }
+
+    @Test
+    fun billingPeriodEmptyReturnsNull() {
+        val phase = PricingPhase(formattedPrice = "$0", billingPeriod = "")
         assertNull(phase.getBillingPeriodInDays())
     }
 
     @Test
-    fun returnsNullForMissingNumber() {
-        val phase = PricingPhase("Free", "PM")
+    fun billingPeriodReturnsNullForInvalidFormat() {
+        val phase = PricingPhase(formattedPrice = "Free", billingPeriod = "INVALID")
         assertNull(phase.getBillingPeriodInDays())
-    }
-
-    @Test
-    fun returnsNullForEmptyString() {
-        val phase = PricingPhase("Free", "")
-        assertNull(phase.getBillingPeriodInDays())
-    }
-
-    @Test
-    fun returnsNullForMixedPeriods() {
-        val phase = PricingPhase("Free", "P1M2W")
-        assertNull(phase.getBillingPeriodInDays()) // Not supported in simplified version
     }
 }
