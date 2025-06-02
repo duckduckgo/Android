@@ -275,11 +275,20 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(
+            context,
+            SEARCH_AND_FAVORITES_WIDGET_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
         application.daggerAppComponent.inject(this)
+    }
+
+    companion object {
+        private const val SEARCH_AND_FAVORITES_WIDGET_REQUEST_CODE = 1540
     }
 }

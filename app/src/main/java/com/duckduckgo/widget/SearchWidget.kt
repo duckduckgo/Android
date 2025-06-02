@@ -120,7 +120,12 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
 
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromWidget(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(
+            context,
+            SEARCH_WIDGET_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     override fun onDeleted(
@@ -135,5 +140,6 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
 
     companion object {
         private const val SEARCH_BAR_MIN_HINT_WIDTH_SIZE = 168
+        private const val SEARCH_WIDGET_REQUEST_CODE = 1530
     }
 }
