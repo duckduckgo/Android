@@ -130,8 +130,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         val rootContainer = root.findViewById<LinearLayout>(R.id.rootContainer)
         val navBar = rootContainer.findViewById<BrowserNavigationBarView>(R.id.omnibarNavigationBar)
+        val shadowTop = rootContainer.findViewById<View>(R.id.shadowViewTop)
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
+
+            shadowTop.gone()
         } else {
             navigationBar = navBar
 

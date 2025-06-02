@@ -48,6 +48,7 @@
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
+    <attr name="daxColorShadow" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>

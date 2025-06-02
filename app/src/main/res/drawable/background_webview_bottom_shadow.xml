@@ -17,7 +17,7 @@
     android:shape="rectangle">
     <gradient
         android:angle="270"
-        android:endColor="#00000000"
-        android:startColor="#1A000000"
+        android:endColor="?attr/daxColorToolbar"
+        android:startColor="?attr/daxColorShadow"
         android:type="linear" />
 </shape>
