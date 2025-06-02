@@ -35,6 +35,7 @@ import com.duckduckgo.app.browser.databinding.ActivityThreatProtectionSettingsBi
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenScamProtectionLearnMore
 import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenSmarterEncryptionLearnMore
+import com.duckduckgo.app.browser.threatprotection.ThreatProtectionSettingsViewModel.Command.OpenThreatProtectionLearnMore
 import com.duckduckgo.app.browser.webview.SCAM_PROTECTION_LEARN_MORE_URL
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -101,6 +102,17 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
                     },
                 ),
             )
+
+            binding.threatProtectionLearnMore.addClickableSpan(
+                textSequence = getText(R.string.maliciousSiteSettingLearnMore),
+                spans = listOf(
+                    "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                        override fun onClick(widget: View) {
+                            viewModel.threatProtectionLearnMoreClicked()
+                        }
+                    },
+                ),
+            )
         }
     }
 
@@ -127,6 +139,15 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
+            OpenThreatProtectionLearnMore -> {
+                globalActivityStarter.start(
+                    this,
+                    WebViewActivityWithParams(
+                        url = THREAT_PROTECTION_LEARN_MORE,
+                        screenTitle = getString(R.string.maliciousSiteLearnMoreTitle),
+                    ),
+                )
+            }
             OpenScamProtectionLearnMore -> {
                 globalActivityStarter.start(
                     this,
@@ -178,5 +199,6 @@ class ThreatProtectionSettingsActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val SMARTER_ENCRYPTION_LEARN_MORE = "https://duckduckgo.com/duckduckgo-help-pages/privacy/smarter-encryption"
+        private const val THREAT_PROTECTION_LEARN_MORE = "https://duckduckgo.com/duckduckgo-help-pages/threat-protection"
     }
 }

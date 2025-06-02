@@ -77,6 +77,17 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/threatProtectionLearnMore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:gravity="center"
+                tools:text="Learn More"
+                android:visibility="visible"
+                app:textType="secondary"
+                app:typography="body2"/>
+
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

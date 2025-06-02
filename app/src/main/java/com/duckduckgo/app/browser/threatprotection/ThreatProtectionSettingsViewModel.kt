@@ -50,6 +50,7 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
+        data object OpenThreatProtectionLearnMore : Command()
         data object OpenScamProtectionLearnMore : Command()
         data object OpenSmarterEncryptionLearnMore : Command()
     }
@@ -82,6 +83,10 @@ class ThreatProtectionSettingsViewModel @Inject constructor(
                 scamProtectionUserEnabled = enabled,
             )
         }
+    }
+
+    fun threatProtectionLearnMoreClicked() {
+        sendCommand(Command.OpenThreatProtectionLearnMore)
     }
 
     fun scamProtectionLearnMoreClicked() {
