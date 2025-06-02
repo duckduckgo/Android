@@ -1105,13 +1105,21 @@ data class PricingPhase(
     val billingPeriod: String,
 
 ) {
-    internal fun getBillingPeriodInDays(): Int? =
-        when (billingPeriod) {
-            "P1W" -> 7
-            "P1M" -> 30
-            "P1Y" -> 365
+    internal fun getBillingPeriodInDays(): Int? {
+        val regex = Regex("""P(\d+)([DWMY])""")
+        val match = regex.matchEntire(billingPeriod) ?: return null
+
+        val (amountStr, unit) = match.destructured
+        val amount = amountStr.toIntOrNull() ?: return null
+
+        return when (unit) {
+            "D" -> amount
+            "W" -> amount * 7
+            "M" -> amount * 30
+            "Y" -> amount * 365
             else -> null
         }
+    }
 }
 
 data class ValidatedTokenPair(
