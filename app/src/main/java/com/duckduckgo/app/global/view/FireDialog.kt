@@ -32,14 +32,17 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
+import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.clear.getPixelValue
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -70,6 +73,8 @@ class FireDialog(
     private val dispatcherProvider: DispatcherProvider,
     private val fireButtonStore: FireButtonStore,
     private val appBuildConfig: AppBuildConfig,
+    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper,
 ) : BottomSheetDialog(context, CommonR.style.Widget_DuckDuckGo_FireDialog) {
 
     private lateinit var binding: SheetFireClearDataBinding
@@ -137,7 +142,14 @@ class FireDialog(
     }
 
     private fun configureFireAnimationView() {
-        binding.fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            val selectedFireAnimation = settingsDataStore.selectedFireAnimation
+            val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)
+
+            binding.fireAnimationView.setAnimation(resId)
+        } else {
+            binding.fireAnimationView.setAnimation(settingsDataStore.selectedFireAnimation.resId)
+        }
         /**
          * BottomSheetDialog wraps provided Layout into a CoordinatorLayout.
          * We need to set FitsSystemWindows false programmatically to all parents in order to render layout and animation full screen

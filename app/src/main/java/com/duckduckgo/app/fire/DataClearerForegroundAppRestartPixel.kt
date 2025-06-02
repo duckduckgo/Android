@@ -31,7 +31,8 @@ import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 /**
  * Stores information about unsent automatic data clearer restart Pixels, detecting if user started the app from an external Intent.
@@ -54,13 +55,13 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.i("onAppCreated firePendingPixels")
+        logcat(INFO) { "onAppCreated firePendingPixels" }
         firePendingPixels()
     }
 
     @UiThread
     override fun onStop(owner: LifecycleOwner) {
-        Timber.i("Registered App on_stop")
+        logcat(INFO) { "Registered App on_stop" }
         detectedUserIntent = false
     }
 
@@ -70,10 +71,10 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
 
     fun incrementCount() {
         if (detectedUserIntent) {
-            Timber.i("Registered restart with intent")
+            logcat(INFO) { "Registered restart with intent" }
             incrementCount(pendingAppForegroundRestart, KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS)
         } else {
-            Timber.i("Registered restart without intent")
+            logcat(INFO) { "Registered restart without intent" }
             incrementCount(pendingAppForegroundRestartWithIntent, KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS)
         }
     }
@@ -100,7 +101,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
     ) {
         if (counter > 0) {
             for (i in 1..counter) {
-                Timber.i("Fired pixel: ${pixelName.pixelName}/$counter")
+                logcat(INFO) { "Fired pixel: ${pixelName.pixelName}/$counter" }
                 pixel.fire(pixelName)
             }
         }
@@ -111,7 +112,7 @@ class DataClearerForegroundAppRestartPixel @Inject constructor(
             putInt(KEY_UNSENT_CLEAR_APP_RESTARTED_PIXELS, 0)
             putInt(KEY_UNSENT_CLEAR_APP_RESTARTED_WITH_INTENT_PIXELS, 0)
         }
-        Timber.i("counter reset")
+        logcat(INFO) { "counter reset" }
     }
 
     private fun widgetActivity(intent: Intent?): Boolean =

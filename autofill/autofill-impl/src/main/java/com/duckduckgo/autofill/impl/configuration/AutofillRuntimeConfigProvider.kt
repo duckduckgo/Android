@@ -28,7 +28,8 @@ import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillRuntimeConfigProvider {
     suspend fun getRuntimeConfiguration(
@@ -53,7 +54,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         rawJs: String,
         url: String?,
     ): String {
-        Timber.v("BrowserAutofill: getRuntimeConfiguration called")
+        logcat(VERBOSE) { "BrowserAutofill: getRuntimeConfiguration called" }
 
         val contentScope = runtimeConfigurationWriter.generateContentScope(siteSpecificFixesStore.getConfig())
         val userUnprotectedDomains = runtimeConfigurationWriter.generateUserUnprotectedDomains()
@@ -67,7 +68,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
             canCategorizePasswordVariant = canCategorizePasswordVariant(),
             partialFormSaves = partialFormSaves(),
         ).also {
-            Timber.v("autofill-config: userPreferences for %s: \n%s", url, it)
+            logcat(VERBOSE) { "autofill-config: userPreferences for $url: \n$it" }
         }
         val availableInputTypes = generateAvailableInputTypes(url)
 
@@ -91,7 +92,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         val emailAvailable = determineIfEmailAvailable()
 
         val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
-            Timber.v("autofill-config: availableInputTypes for %s: \n%s", url, it)
+            logcat(VERBOSE) { "autofill-config: availableInputTypes for $url: \n$it" }
         }
         return "availableInputTypes = $json"
     }

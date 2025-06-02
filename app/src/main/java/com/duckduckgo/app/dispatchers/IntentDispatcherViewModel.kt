@@ -31,7 +31,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class IntentDispatcherViewModel @Inject constructor(
@@ -61,7 +62,7 @@ class IntentDispatcherViewModel @Inject constructor(
                 val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
                 val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl
 
-                Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
+                logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 
                 customTabDetector.setCustomTab(false)
                 _viewState.emit(
@@ -73,7 +74,7 @@ class IntentDispatcherViewModel @Inject constructor(
                     ),
                 )
             }.onFailure {
-                Timber.w("Error handling custom tab intent %s", it.message)
+                logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
             }
         }
     }

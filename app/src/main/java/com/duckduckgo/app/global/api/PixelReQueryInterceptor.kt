@@ -17,10 +17,10 @@
 package com.duckduckgo.app.global.api
 
 import com.duckduckgo.common.utils.device.DeviceInfo
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.Response
-import timber.log.Timber
 
 /**
  * This interceptor fixes the re-query pixels without being invasive to the Pixel APIs.
@@ -40,7 +40,7 @@ class PixelReQueryInterceptor : Interceptor {
         url = url.toUrl().toString().replace("rq_1_android_${DeviceInfo.FormFactor.PHONE.description}", "rq_1").toHttpUrl()
         url = url.toUrl().toString().replace("rq_1_android_${DeviceInfo.FormFactor.TABLET.description}", "rq_1").toHttpUrl()
 
-        Timber.d("Pixel interceptor: $url")
+        logcat { "Pixel interceptor: $url" }
 
         return chain.proceed(request.url(url).build())
     }

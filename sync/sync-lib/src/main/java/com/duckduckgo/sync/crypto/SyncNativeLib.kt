@@ -21,7 +21,10 @@ import android.util.Base64
 import com.duckduckgo.library.loader.LibraryLoader
 import java.util.*
 import kotlin.system.exitProcess
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.VERBOSE
+import logcat.asLog
+import logcat.logcat
 
 interface SyncLib {
     fun generateAccountKeys(
@@ -105,10 +108,10 @@ internal class SyncNativeLib constructor(context: Context) : SyncLib {
 
     init {
         try {
-            Timber.v("Loading native SYNC library")
+            logcat(VERBOSE) { "Loading native SYNC library" }
             LibraryLoader.loadLibrary(context, "ddgcrypto")
         } catch (ignored: Throwable) {
-            Timber.e(ignored, "Error loading sync library")
+            logcat(ERROR) { "Error loading sync library: ${ignored.asLog()}" }
             exitProcess(1)
         }
     }

@@ -94,7 +94,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.logcat
 import retrofit2.HttpException
 
@@ -271,7 +271,6 @@ class RealSubscriptionsManager @Inject constructor(
     private var purchaseStateJob: Job? = null
 
     private var removeExpiredSubscriptionOnCancelledPurchase: Boolean = false
-    private var purchaseFlowStartedUsingRestoredAccount: Boolean = false
 
     // Indicates whether the user is part of any FE experiment at the time of purchase
     private var experimentAssigned: Experiment? = null
@@ -474,11 +473,6 @@ class RealSubscriptionsManager @Inject constructor(
                 }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
-                if (purchaseFlowStartedUsingRestoredAccount) {
-                    purchaseFlowStartedUsingRestoredAccount = false
-                    val hasEmail = !authRepository.getAccount()?.email.isNullOrBlank()
-                    pixelSender.reportPurchaseWithRestoredAccount(hasEmail)
-                }
                 emitEntitlementsValues()
                 _currentPurchaseState.emit(CurrentPurchase.Success)
             } else {
@@ -494,7 +488,6 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun handlePurchaseFailed() {
-        purchaseFlowStartedUsingRestoredAccount = false
         authRepository.purchaseToWaitingStatus()
         pixelSender.reportPurchaseFailureBackend()
         _currentPurchaseState.emit(CurrentPurchase.Waiting)
@@ -736,7 +729,7 @@ class RealSubscriptionsManager @Inject constructor(
                     authRepository.setAuthToken(response.authToken)
                     exchangeAuthToken(response.authToken)
                     if (fetchAndStoreAllData()) {
-                        logcat(LogPriority.DEBUG) { "Subs: store login succeeded" }
+                        logcat { "Subs: store login succeeded" }
                         val subscription = authRepository.getSubscription()
                         if (subscription?.isActive() == true) {
                             RecoverSubscriptionResult.Success(subscription)
@@ -751,7 +744,7 @@ class RealSubscriptionsManager @Inject constructor(
                 }
             }
         } catch (e: Exception) {
-            logcat(LogPriority.DEBUG) { "Subs: Exception!" }
+            logcat { "Subs: Exception!" }
             RecoverSubscriptionResult.Failure(extractError(e))
         }
     }
@@ -834,20 +827,16 @@ class RealSubscriptionsManager @Inject constructor(
                 isSignedInV1() -> fetchAndStoreAllData()
             }
 
-            var restoredAccount = false
-
             if (!isSignedIn()) {
                 recoverSubscriptionFromStore()
-                restoredAccount = isSignedIn()
             } else {
                 authRepository.getSubscription()?.run {
                     if (status.isExpired() && platform == "google") {
                         // re-authenticate in case previous subscription was bought using different google account
                         val accountId = authRepository.getAccount()?.externalId
                         recoverSubscriptionFromStore()
-                        val accountIdChanged = accountId != null && accountId != authRepository.getAccount()?.externalId
-                        removeExpiredSubscriptionOnCancelledPurchase = accountIdChanged
-                        restoredAccount = accountIdChanged
+                        removeExpiredSubscriptionOnCancelledPurchase =
+                            accountId != null && accountId != authRepository.getAccount()?.externalId
                     }
                 }
             }
@@ -874,9 +863,7 @@ class RealSubscriptionsManager @Inject constructor(
                 Experiment(experimentName, experimentCohort)
             }
 
-            purchaseFlowStartedUsingRestoredAccount = restoredAccount
-
-            logcat(LogPriority.DEBUG) { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
+            logcat { "Subs: external id is ${authRepository.getAccount()!!.externalId}" }
             _currentPurchaseState.emit(CurrentPurchase.PreFlowFinished)
             playBillingManager.launchBillingFlow(
                 activity = activity,
@@ -886,10 +873,9 @@ class RealSubscriptionsManager @Inject constructor(
             )
         } catch (e: Exception) {
             val error = extractError(e)
-            logcat(LogPriority.ERROR) { "Subs: $error" }
+            logcat(ERROR) { "Subs: $error" }
             pixelSender.reportPurchaseFailureOther()
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
-            purchaseFlowStartedUsingRestoredAccount = false
         }
     }
 
@@ -913,7 +899,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             return when (extractError(e)) {
                 "expired_token" -> {
-                    logcat(LogPriority.DEBUG) { "Subs: auth token expired" }
+                    logcat { "Subs: auth token expired" }
                     val result = recoverSubscriptionFromStore(authRepository.getAccount()?.externalId)
                     if (result is RecoverSubscriptionResult.Success) {
                         AuthTokenResult.Success(authRepository.getAuthToken()!!)

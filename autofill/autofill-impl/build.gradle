@@ -37,7 +37,6 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
-    implementation project(path: ':autofill-store')
     implementation project(path: ':statistics-api')
     testImplementation project(path: ':autofill-test')
     implementation project(path: ':sync-api')
@@ -52,10 +51,13 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
+    implementation AndroidX.security.crypto
+    implementation Square.okio
+
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation "androidx.autofill:autofill:_"
 
     implementation KotlinX.coroutines.core
@@ -126,6 +128,13 @@ android {
             buildConfigField "boolean", "AUTH_REQUIRED", "true"
         }
     }
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 tasks.register('installForAutofillTesting', Exec) {

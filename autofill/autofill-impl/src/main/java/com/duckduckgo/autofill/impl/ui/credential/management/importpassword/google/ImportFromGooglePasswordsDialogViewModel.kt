@@ -31,7 +31,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(FragmentScope::class)
 class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
@@ -50,12 +50,12 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         credentialImporter.getImportStatus().collect {
             when (it) {
                 is ImportResult.InProgress -> {
-                    Timber.d("Import in progress")
+                    logcat { "Import in progress" }
                     _viewState.value = ViewState(viewMode = Importing)
                 }
 
                 is ImportResult.Finished -> {
-                    Timber.d("Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped.")
+                    logcat { "Import finished: ${it.savedCredentials} imported. ${it.numberSkipped} skipped." }
                     fireImportSuccessPixel(savedCredentials = it.savedCredentials, numberSkipped = it.numberSkipped)
                     _viewState.value = ViewState(viewMode = ViewMode.ImportSuccess(it))
                 }

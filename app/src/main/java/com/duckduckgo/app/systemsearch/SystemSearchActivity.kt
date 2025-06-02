@@ -77,7 +77,8 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.WIDGET
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class SystemSearchActivity : DuckDuckGoActivity() {
@@ -502,12 +503,12 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun showKeyboardDelayed() {
-        Timber.v("Keyboard now showing")
+        logcat(VERBOSE) { "Keyboard now showing" }
         omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput.showKeyboard() }
     }
 
     private fun hideKeyboardDelayed() {
-        Timber.v("Keyboard now hiding")
+        logcat(VERBOSE) { "Keyboard now hiding" }
         omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibarTextInput.hideKeyboard() }
     }
 

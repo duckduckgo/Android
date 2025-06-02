@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Åpne</string>
     <string name="duck_chat_cannot_open_file_error_message">Kan ikke åpne filen. Se etter kompatibel app.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Fikk ikke tilgang til kameraet</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Last opp et bilde</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Velg fil</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ta bilde</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillat DuckDuckGo å be om kameratilgang på denne enheten</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Nettsteder kan bare bruke kameraet ditt hvis du lar DuckDuckGo be om tilgang.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Åpne innstillinger</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Fikk ikke tilgang til lydopptaker</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Tillat DuckDuckGo å be om tilgang til lydopptaker på denne enheten</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Nettsteder kan bare bruke lydopptakeren hvis du lar DuckDuckGo be om tilgang.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai er en valgfri funksjon der du kan chatte anonymt med populære tredjeparts AI-chat-modeller. Chattene dine brukes ikke til å trene AI.\n<annotation type="learn_more_link">Les mer</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Aktiver Duck.ai</string>

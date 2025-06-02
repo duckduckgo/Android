@@ -46,6 +46,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation Google.android.material
     implementation Google.dagger
+    implementation AndroidX.work.runtimeKtx
 
     implementation "com.squareup.logcat:logcat:_"
 

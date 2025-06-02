@@ -48,9 +48,9 @@ class PirWebViewActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         val brokersToOptOut = params?.brokers
-        lifecycleScope.launch(dispatcherProvider.io()) {
+        lifecycleScope.launch {
             if (!brokersToOptOut.isNullOrEmpty()) {
-                pirOptOut.debugExecute(brokersToOptOut, binding.pirDebugWebView, this).also {
+                pirOptOut.debugExecute(brokersToOptOut, binding.pirDebugWebView).also {
                     finish()
                 }
             } else {

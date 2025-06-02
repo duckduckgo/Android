@@ -29,7 +29,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 // Cannot be a Singleton
 @ContributesBinding(AppScope::class)
@@ -61,35 +61,35 @@ class SitePermissionsManagerImpl @Inject constructor(
             .filter { sitePermissionsRepository.isDomainAllowedToAsk(url, it) }
             .toTypedArray()
 
-        Timber.d("Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}")
+        logcat { "Permissions: sitePermissionsAllowedToAsk in $url ${sitePermissionsAllowedToAsk.asList()}" }
 
         val sitePermissionsGranted = getSitePermissionsGranted(url, tabId, sitePermissionsAllowedToAsk)
         if (sitePermissionsGranted.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
-                Timber.d("Permissions: site permission granted")
+                logcat { "Permissions: site permission granted" }
                 autoAccept.addAll(sitePermissionsGranted)
             }
         }
 
-        Timber.d("Permissions: sitePermissionsGranted for $url are ${sitePermissionsGranted.asList()}")
+        logcat { "Permissions: sitePermissionsGranted for $url are ${sitePermissionsGranted.asList()}" }
 
         val userList = sitePermissionsAllowedToAsk.filter { !sitePermissionsGranted.contains(it) }
         if (userList.isEmpty() && sitePermissionsGranted.isEmpty()) {
             withContext(dispatcherProvider.main()) {
-                Timber.d("Permissions: site permission not granted, deny")
+                logcat { "Permissions: site permission not granted, deny" }
                 request.deny()
             }
         }
         if (userList.isEmpty() && autoAccept.isNotEmpty()) {
             withContext(dispatcherProvider.main()) {
-                Timber.d("Permissions: site permission granted, auto accept")
+                logcat { "Permissions: site permission granted, auto accept" }
                 request.grant(autoAccept.toTypedArray())
                 autoAccept.clear()
             }
         }
 
         val sitePermissions = SitePermissions(autoAccept = autoAccept, userHandled = userList)
-        Timber.d("Permissions: site permissions $sitePermissions")
+        logcat { "Permissions: site permissions $sitePermissions" }
         return sitePermissions
     }
 

@@ -65,7 +65,9 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class RemoteMessageView @JvmOverloads constructor(
@@ -178,7 +180,7 @@ class RemoteMessageView @JvmOverloads constructor(
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
             val errorMessage = context.getString(R.string.cannotLaunchDefaultAppSettings)
-            Timber.w(errorMessage)
+            logcat(WARN) { errorMessage }
             Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
         }
     }
@@ -212,7 +214,7 @@ class RemoteMessageView @JvmOverloads constructor(
         try {
             context.startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

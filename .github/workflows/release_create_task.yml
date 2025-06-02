@@ -63,6 +63,14 @@ jobs:
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
 
+      - name: Get Asana Task Permalink
+        id: get-task-permalink
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:          
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
+          action: 'get-asana-task-permalink'
+
       - name: Notify Mattermost of Task created
         id: send-mm-task-created
         uses: duckduckgo/native-github-asana-sync@v1.8
@@ -70,7 +78,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }} Asana task successfully created. See https://app.asana.com/0/1184843898389381/1205105962934096
+          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed

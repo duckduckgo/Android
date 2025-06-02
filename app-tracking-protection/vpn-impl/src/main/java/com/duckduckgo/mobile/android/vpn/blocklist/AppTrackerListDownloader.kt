@@ -26,7 +26,8 @@ import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerPackage
 import com.duckduckgo.mobile.android.vpn.trackers.JsonAppBlockingList
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import logcat.LogPriority
+import logcat.LogPriority.WARN
+import logcat.asLog
 import logcat.logcat
 import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
@@ -57,12 +58,12 @@ class RealAppTrackerListDownloader @Inject constructor(
         val response = runCatching {
             appTrackerListService.appTrackerBlocklist().execute()
         }.getOrElse {
-            logcat(LogPriority.WARN) { "Error downloading tracker rules list: $it" }
+            logcat(WARN) { "Error downloading tracker rules list: ${it.asLog()}" }
             Response.error(400, "".toResponseBody(null))
         }
 
         if (!response.isSuccessful) {
-            logcat(LogPriority.WARN) { "Fail to download the app tracker blocklist, error code: ${response.code()}" }
+            logcat(WARN) { "Fail to download the app tracker blocklist, error code: ${response.code()}" }
             return AppTrackerBlocklist()
         }
 

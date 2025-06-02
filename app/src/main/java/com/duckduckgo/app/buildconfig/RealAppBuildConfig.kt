@@ -34,7 +34,10 @@ import java.lang.IllegalStateException
 import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealAppBuildConfig @Inject constructor(
@@ -112,7 +115,7 @@ class RealAppBuildConfig @Inject constructor(
     private fun getDownloadsDirectory(): File {
         val downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         if (!downloadDirectory.exists()) {
-            Timber.i("Download directory doesn't exist; trying to create it. %s", downloadDirectory.absolutePath)
+            logcat(INFO) { "Download directory doesn't exist; trying to create it. ${downloadDirectory.absolutePath}" }
             downloadDirectory.mkdirs()
         }
         return downloadDirectory
@@ -121,14 +124,14 @@ class RealAppBuildConfig @Inject constructor(
     private fun createNewDirectory(directoryName: String) {
         val directory = File(getDownloadsDirectory(), directoryName)
         val success = directory.mkdirs()
-        Timber.i("Directory creation success: %s", success)
+        logcat(INFO) { "Directory creation success: $success" }
         if (!success) {
-            Timber.e("Directory creation failed")
+            logcat(ERROR) { "Directory creation failed" }
             kotlin.runCatching {
                 val directoryCreationSuccess = directory.createNewFile()
-                Timber.i("File creation success: %s", directoryCreationSuccess)
+                logcat(INFO) { "File creation success: $directoryCreationSuccess" }
             }.onFailure {
-                Timber.w("Failed to create file: %s", it.message)
+                logcat(WARN) { "Failed to create file: ${it.message}" }
             }
         }
     }

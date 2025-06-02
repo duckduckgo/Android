@@ -21,7 +21,8 @@ import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 internal class VariantManagerPlugin constructor(
     private val variantManager: VariantManager,
@@ -38,12 +39,12 @@ internal class VariantManagerPlugin constructor(
         val variantManagerConfig: VariantManagerConfig? = runCatching {
             jsonAdapter.fromJson(jsonString)
         }.onFailure {
-            Timber.e(
+            logcat(ERROR) {
                 """
                     Error: ${it.message}
                     Parsing jsonString: $jsonString
-                """.trimIndent(),
-            )
+                """.trimIndent()
+            }
         }.getOrThrow()
 
         return variantManagerConfig?.variants?.takeIf { it.isNotEmpty() }?.let { variants ->

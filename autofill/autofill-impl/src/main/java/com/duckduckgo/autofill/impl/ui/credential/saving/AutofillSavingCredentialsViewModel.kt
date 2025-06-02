@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(FragmentScope::class)
 class AutofillSavingCredentialsViewModel @Inject constructor(
@@ -46,7 +46,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val shouldShowExpandedView = autofillDeclineCounter.declineCount() < 2 && autofillDeclineCounter.isDeclineCounterActive()
             _viewState.value = ViewState(shouldShowExpandedView)
-            Timber.d("Autofill: AutofillSavingCredentialsViewModel initialized with expanded view state: $shouldShowExpandedView")
+            logcat { "Autofill: AutofillSavingCredentialsViewModel initialized with expanded view state: $shouldShowExpandedView" }
         }
     }
 
@@ -63,7 +63,7 @@ class AutofillSavingCredentialsViewModel @Inject constructor(
     }
 
     fun addSiteToNeverSaveList(originalUrl: String) {
-        Timber.d("Autofill: User selected to never save for this site %s", originalUrl)
+        logcat { "Autofill: User selected to never save for this site $originalUrl" }
         viewModelScope.launch(dispatchers.io()) {
             neverSavedSiteRepository.addToNeverSaveList(originalUrl)
         }

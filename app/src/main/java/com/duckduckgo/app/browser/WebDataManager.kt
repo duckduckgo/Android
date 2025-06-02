@@ -40,7 +40,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface WebDataManager {
     suspend fun clearData(
@@ -96,7 +99,7 @@ class WebViewDataManager @Inject constructor(
                     webLocalStorageManager.clearWebLocalStorage()
                     continuation.resume(Unit)
                 }.onFailure { e ->
-                    Timber.e(e, "WebDataManager: Could not selectively clear web storage")
+                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
                     if (appBuildConfig.isInternalBuild()) {
                         sendCrashPixel(e)
                     }
@@ -146,7 +149,7 @@ class WebViewDataManager @Inject constructor(
             }.onSuccess {
                 excludedDirectories.add("IndexedDB")
             }.onFailure { t ->
-                Timber.w(t, "Failed to clear IndexedDB, will delete it instead")
+                logcat(WARN) { "Failed to clear IndexedDB, will delete it instead: ${t.asLog()}" }
             }
         }
         fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)

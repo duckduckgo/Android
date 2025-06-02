@@ -28,20 +28,17 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.MANUAL
+import com.duckduckgo.pir.internal.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import dagger.android.AndroidInjection
-import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
-import logcat.LogPriority
+import logcat.LogPriority.DEBUG
 import logcat.LogcatLogger
 import logcat.logcat
 
@@ -53,13 +50,11 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
-    private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
         // TODO find correct place.
-        LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
+        LogcatLogger.install(AndroidLogcatLogger(DEBUG))
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -76,20 +71,16 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             createNotification(getString(R.string.pirNotificationMessageInProgress))
         startForeground(1, notification)
 
-        synchronized(this) {
-            launch(serviceDispatcher) {
-                async {
-                    val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService, MANUAL, this)
-                    if (result.isSuccess) {
-                        notificationManagerCompat.checkPermissionAndNotify(
-                            applicationContext,
-                            NOTIF_ID_STATUS_COMPLETE,
-                            createNotification(getString(R.string.pirNotificationMessageComplete)),
-                        )
-                    }
-                    stopSelf()
-                }.await()
+        launch {
+            val result = pirScan.execute(supportedBrokers, this@PirForegroundScanService, MANUAL)
+            if (result.isSuccess) {
+                notificationManagerCompat.checkPermissionAndNotify(
+                    applicationContext,
+                    NOTIF_ID_STATUS_COMPLETE,
+                    createNotification(getString(R.string.pirNotificationMessageComplete)),
+                )
             }
+            stopSelf()
         }
 
         logcat { "PIR-SCAN: START_NOT_STICKY" }

@@ -29,7 +29,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class EvalMessageHandlerPlugin @Inject constructor(
@@ -51,7 +51,7 @@ class EvalMessageHandlerPlugin @Inject constructor(
                         webView.evaluateJavascript("javascript:$response", null)
                     }
                 } catch (e: Exception) {
-                    Timber.d(e.localizedMessage)
+                    logcat { e.localizedMessage }
                 }
             }
         }

@@ -32,7 +32,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -51,7 +52,7 @@ class AutofillServiceStatusLifecycleObserver@Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            Timber.e("Autofill service component observer status")
+            logcat(ERROR) { "Autofill service component observer status" }
             runCatching {
                 autofillManager ?: return@runCatching
                 val isDefault = autofillManager.hasEnabledAutofillServices()
@@ -67,7 +68,7 @@ class AutofillServiceStatusLifecycleObserver@Inject constructor(
                     autofillServiceStore.updateDefaultAutofillProvider(newDefaultState)
                 }
             }.onFailure {
-                Timber.e("Failed to update autofill service status")
+                logcat(ERROR) { "Failed to update autofill service status" }
             }
         }
     }

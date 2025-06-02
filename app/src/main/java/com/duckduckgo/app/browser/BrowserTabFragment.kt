@@ -51,6 +51,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.WindowManager
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -68,12 +69,15 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.fragment.app.DialogFragment
@@ -189,6 +193,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -283,6 +288,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
@@ -321,7 +327,6 @@ import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
@@ -330,9 +335,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
-import timber.log.Timber
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -547,6 +557,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -743,19 +756,19 @@ class BrowserTabFragment :
             val password = credentials.password
 
             if (username == null && password == null) {
-                Timber.w("Not saving credentials with null username and password")
+                logcat(WARN) { "Not saving credentials with null username and password" }
                 return
             }
 
             val matchType = existingCredentialMatchDetector.determine(currentUrl, username, password)
-            Timber.v("MatchType is %s", matchType.javaClass.simpleName)
+            logcat(VERBOSE) { "MatchType is ${matchType.javaClass.simpleName}" }
 
             // we need this delay to ensure web navigation / form submission events aren't blocked
             delay(NAVIGATION_DELAY)
 
             withContext(dispatchers.main()) {
                 when (matchType) {
-                    ExactMatch -> Timber.w("Credentials already exist for %s", currentUrl)
+                    ExactMatch -> logcat(WARN) { "Credentials already exist for $currentUrl" }
                     UsernameMatchMissingPassword, UsernameMatchDifferentPassword -> showAutofillDialogUpdatePassword(currentUrl, credentials)
                     UsernameMissing -> showAutofillDialogUpdateUsername(currentUrl, credentials)
                     NoMatch -> showAutofillDialogSaveCredentials(currentUrl, credentials)
@@ -771,7 +784,7 @@ class BrowserTabFragment :
         ) {
             val url = webView?.url ?: return
             if (url != originalUrl) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return
             }
             val dialog = credentialAutofillDialogFactory.autofillGeneratePasswordDialog(url, username, generatedPassword, tabId)
@@ -786,12 +799,12 @@ class BrowserTabFragment :
             if (triggerType == LoginTriggerType.AUTOPROMPT &&
                 !(viewModel.canAutofillSelectCredentialsDialogCanAutomaticallyShow()) && omnibar.isEditing()
             ) {
-                Timber.d("AutoPrompt is disabled, not showing dialog")
+                logcat { "AutoPrompt is disabled, not showing dialog" }
                 return
             }
             val url = webView?.url ?: return
             if (url != originalUrl) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return
             }
             val dialog = credentialAutofillDialogFactory.autofillSelectCredentialsDialog(url, credentials, triggerType, tabId)
@@ -848,7 +861,7 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("onCreate called for tabId=$tabId")
+        logcat { "onCreate called for tabId=$tabId" }
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
@@ -889,7 +902,7 @@ class BrowserTabFragment :
     }
 
     private fun resumeWebView() {
-        Timber.d("Resuming webview: $tabId")
+        logcat { "Resuming webview: $tabId" }
         webView?.let { webView ->
             if (webView.isShown) {
                 webView.ensureVisible()
@@ -904,7 +917,7 @@ class BrowserTabFragment :
                     }
                 }
             } else {
-                Timber.d("WebView is not shown, not resuming")
+                logcat { "WebView is not shown, not resuming" }
             }
         }
     }
@@ -968,7 +981,7 @@ class BrowserTabFragment :
 
     private fun updateOrDeleteWebViewPreview() {
         val url = viewModel.url
-        Timber.d("Updating or deleting WebView preview for $url")
+        logcat { "Updating or deleting WebView preview for $url" }
         if (url == null) {
             viewModel.deleteTabPreview(tabId)
         } else {
@@ -1431,6 +1444,12 @@ class BrowserTabFragment :
 
         viewModel.ctaViewState.observe(viewLifecycleOwner, ctaViewStateObserver)
 
+        viewModel.buckTryASearchAnimationEnabled.onEach {
+            if (it) {
+                renderer.renderBuckOnboardingTryASearchAnimation()
+            }
+        }.launchIn(lifecycleScope)
+
         viewModel.command.observe(
             viewLifecycleOwner,
             Observer {
@@ -1487,7 +1506,7 @@ class BrowserTabFragment :
                     val wasActive = isActiveTab
                     isActiveTab = it.tabId == tabId
                     if (wasActive && !isActiveTab) {
-                        Timber.v("Tab %s is newly inactive", tabId)
+                        logcat { "Tab $tabId is newly inactive" }
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
@@ -1611,7 +1630,7 @@ class BrowserTabFragment :
                 refresh()
             }
         } else {
-            Timber.d("MaliciousSite: no previous page to load, showing home")
+            logcat { "MaliciousSite: no previous page to load, showing home" }
             viewModel.recoverFromWarningPage(false)
             renderer.showNewTab()
             maliciousWarningView.gone()
@@ -1679,11 +1698,11 @@ class BrowserTabFragment :
         val currentIndex = navList?.currentIndex ?: 0
 
         if (currentIndex >= 0) {
-            Timber.d("SSLError: hiding warning page and triggering a reload of the previous")
+            logcat { "SSLError: hiding warning page and triggering a reload of the previous" }
             viewModel.recoverFromWarningPage(true)
             refresh()
         } else {
-            Timber.d("SSLError: no previous page to load, showing home")
+            logcat { "SSLError: no previous page to load, showing home" }
             viewModel.recoverFromWarningPage(false)
         }
     }
@@ -2052,7 +2071,9 @@ class BrowserTabFragment :
             }
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
+            is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
+            is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
                 hideOnboardingDaxDialog(it.onboardingCta)
                 browserActivity?.launchFire()
@@ -2101,8 +2122,16 @@ class BrowserTabFragment :
         newBrowserTab.browserBackground.setImageResource(backgroundRes)
     }
 
+    private fun setNewTabBackgroundColor(@ColorRes colorRes: Int) {
+        newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
+    }
+
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
         daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+    }
+
+    private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
+        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -2186,12 +2215,12 @@ class BrowserTabFragment :
             val client = urlExtractingWebViewClient.get()
             client.urlExtractionListener = viewModel
 
-            Timber.d("AMP link detection: Creating WebView for URL extraction")
+            logcat { "AMP link detection: Creating WebView for URL extraction" }
             urlExtractingWebView = UrlExtractingWebView(requireContext(), client, urlExtractorUserAgent.get(), urlExtractor.get())
 
             urlExtractingWebView?.urlExtractionListener = viewModel
 
-            Timber.d("AMP link detection: Loading AMP URL for extraction")
+            logcat { "AMP link detection: Loading AMP URL for extraction" }
             urlExtractingWebView?.loadUrl(initialUrl)
         }
     }
@@ -2208,7 +2237,7 @@ class BrowserTabFragment :
     ) {
         webView?.let {
             if (it.url != originalUrl) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return
             }
 
@@ -2304,14 +2333,14 @@ class BrowserTabFragment :
             bitmapGeneratorJob?.cancel()
 
             bitmapGeneratorJob = launch {
-                Timber.d("Generating WebView preview")
+                logcat { "Generating WebView preview" }
                 try {
                     val preview = previewGenerator.generatePreview(webView)
                     val fileName = previewPersister.save(preview, tabId)
                     viewModel.updateTabPreview(tabId, fileName)
-                    Timber.d("Saved and updated tab preview")
+                    logcat { "Saved and updated tab preview" }
                 } catch (e: Exception) {
-                    Timber.d(e, "Failed to generate WebView preview")
+                    logcat { "Failed to generate WebView preview: ${e.asLog()}" }
                 }
             }
         }
@@ -2384,7 +2413,7 @@ class BrowserTabFragment :
         isOpenedInNewTab: Boolean,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
+            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
             return
         }
 
@@ -2392,7 +2421,7 @@ class BrowserTabFragment :
             if (activities.size == 1 || useFirstActivityFound) {
                 val activity = activities.first()
                 val appTitle = activity.loadLabel(pm)
-                Timber.i("Exactly one app available for intent: $appTitle")
+                logcat(INFO) { "Exactly one app available for intent: $appTitle" }
                 launchExternalAppDialog(context) { context.startActivity(intent) }
             } else {
                 val title = getString(R.string.openExternalApp)
@@ -2400,7 +2429,7 @@ class BrowserTabFragment :
                 launchExternalAppDialog(context) { context.startActivity(intentChooser) }
             }
         }.onFailure { exception ->
-            Timber.e(exception, "Failed to launch external app")
+            logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }
             showToast(R.string.unableToOpenLink)
         }
     }
@@ -2410,7 +2439,7 @@ class BrowserTabFragment :
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
         if (!isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
+            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
             return
         }
 
@@ -2446,7 +2475,7 @@ class BrowserTabFragment :
         fireproofWebsite: FireproofWebsiteEntity,
     ) {
         if (!isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
+            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
             return
         }
 
@@ -2557,7 +2586,7 @@ class BrowserTabFragment :
         intent: Intent?,
     ) {
         if (resultCode != RESULT_OK || intent == null) {
-            Timber.i("Received resultCode $resultCode (or received null intent) indicating user did not select any files")
+            logcat(INFO) { "Received resultCode $resultCode (or received null intent) indicating user did not select any files" }
             pendingUploadTask?.onReceiveValue(null)
             return
         }
@@ -2575,7 +2604,7 @@ class BrowserTabFragment :
 
     private fun showAuthenticationDialog(request: BasicAuthenticationRequest) {
         if (!isActiveCustomTab() && !isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
+            logcat(VERBOSE) { "Will not launch a dialog for an inactive tab" }
             return
         }
 
@@ -2648,7 +2677,10 @@ class BrowserTabFragment :
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
         binding.autoCompleteSuggestionsList.addItemDecoration(
-            SuggestionItemDecoration(ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!),
+            SuggestionItemDecoration(
+                divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
+                addExtraDividerPadding = visualDesignExperimentDataStore.isExperimentEnabled.value,
+            ),
         )
     }
 
@@ -2987,6 +3019,11 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
+                hideBuckEndAnimation()
+            }
+        }
         renderer.showNewTab()
         showKeyboard()
     }
@@ -3113,7 +3150,7 @@ class BrowserTabFragment :
     ) {
         webView?.let {
             if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return
             }
             browserAutofill.injectCredentials(credentials)
@@ -3123,7 +3160,7 @@ class BrowserTabFragment :
     private fun acceptGeneratedPassword(url: String) {
         webView?.let {
             if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return
             }
             browserAutofill.acceptGeneratedPassword()
@@ -3133,7 +3170,7 @@ class BrowserTabFragment :
     private fun rejectGeneratedPassword(url: String) {
         webView?.let {
             if (it.url != url) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return
             }
             browserAutofill.rejectGeneratedPassword()
@@ -3214,17 +3251,17 @@ class BrowserTabFragment :
             val currentUrl = webView?.url
             val urlMatch = requiredUrl == null || requiredUrl == currentUrl
             if ((isActiveCustomTab() || isActiveTab) && urlMatch) {
-                Timber.i("Showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
+                logcat(INFO) { "Showing dialog ($tag), hidden=$isHidden, requiredUrl=$requiredUrl, currentUrl=$currentUrl, tabId=$tabId" }
                 dialog.show(childFragmentManager, tag)
             } else {
-                Timber.w("Not showing dialog (%s), hidden=%s, requiredUrl=%s, currentUrl=%s, tabId=%s", tag, isHidden, requiredUrl, currentUrl, tabId)
+                logcat(WARN) { "Not showing dialog ($tag), hidden=$isHidden, requiredUrl=$requiredUrl, currentUrl=$currentUrl, tabId=$tabId" }
             }
         }
     }
 
     private fun hideDialogWithTag(tag: String) {
         childFragmentManager.findFragmentByTag(tag)?.let {
-            Timber.i("Found existing dialog for %s; removing it now", tag)
+            logcat(INFO) { "Found existing dialog for $tag; removing it now" }
             if (it is DaxDialog) {
                 it.setDaxDialogListener(null) // Avoids calling onDaxDialogDismiss()
             }
@@ -3327,7 +3364,7 @@ class BrowserTabFragment :
                     }
                 }
             }.onFailure { exception ->
-                Timber.e(exception, "Failed to get HitTestResult")
+                logcat(ERROR) { "Failed to get HitTestResult: ${exception.asLog()}" }
             }
         }
         return super.onContextItemSelected(item)
@@ -3484,7 +3521,7 @@ class BrowserTabFragment :
         try {
             startActivity(Intent.createChooser(intent, null))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 
@@ -3508,7 +3545,7 @@ class BrowserTabFragment :
         try {
             startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 
@@ -3522,7 +3559,7 @@ class BrowserTabFragment :
 
     private fun hideKeyboard() {
         if (!isHidden) {
-            Timber.v("Keyboard now hiding")
+            logcat(VERBOSE) { "Keyboard now hiding" }
             hideKeyboard(omnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
             omnibar.showOutline(false)
@@ -3531,14 +3568,14 @@ class BrowserTabFragment :
 
     private fun hideKeyboardRetainFocus() {
         if (!isHidden) {
-            Timber.v("Keyboard now hiding")
+            logcat(VERBOSE) { "Keyboard now hiding" }
             omnibar.omnibarTextInput.postDelayed(KEYBOARD_DELAY) { omnibar.omnibarTextInput.hideKeyboard() }
         }
     }
 
     private fun showKeyboard() {
         if (!isHidden) {
-            Timber.v("Keyboard now showing")
+            logcat(VERBOSE) { "Keyboard now showing" }
             showKeyboard(omnibar.omnibarTextInput)
             omnibar.showOutline(true)
         }
@@ -3553,7 +3590,7 @@ class BrowserTabFragment :
         if (newAgent != currentAgent) {
             webView?.safeSettings?.userAgentString = newAgent
         }
-        Timber.d("User Agent is $newAgent")
+        logcat(INFO) { "User Agent is $newAgent" }
     }
 
     /**
@@ -3785,10 +3822,10 @@ class BrowserTabFragment :
         when (requestCode) {
             PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Timber.i("Write external storage permission granted")
+                    logcat(INFO) { "Write external storage permission granted" }
                     downloadFile(requestUserConfirmation = true)
                 } else {
-                    Timber.i("Write external storage permission refused")
+                    logcat(INFO) { "Write external storage permission refused" }
                     omnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
                 }
             }
@@ -4169,22 +4206,22 @@ class BrowserTabFragment :
         }
 
         fun applyAccessibilitySettings(viewState: AccessibilityViewState) {
-            Timber.v("Accessibility: render state applyAccessibilitySettings $viewState")
+            logcat(INFO) { "Accessibility: render state applyAccessibilitySettings $viewState" }
             val webView = webView ?: return
 
             val fontSizeChanged = webView.settings.textZoom != viewState.fontSize.toInt()
             if (fontSizeChanged) {
-                Timber.v(
+                logcat(INFO) {
                     "Accessibility: UpdateAccessibilitySetting fontSizeChanged " +
-                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}",
-                )
+                        "from ${webView.settings.textZoom} to ${viewState.fontSize.toInt()}"
+                }
 
                 webView.settings.textZoom = viewState.fontSize.toInt()
             }
 
             if (this@BrowserTabFragment.isHidden && viewState.refreshWebView) return
             if (viewState.refreshWebView) {
-                Timber.v("Accessibility: UpdateAccessibilitySetting forceZoomChanged")
+                logcat(INFO) { "Accessibility: UpdateAccessibilitySetting forceZoomChanged" }
                 refresh()
             }
         }
@@ -4220,6 +4257,9 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
+                        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                            hideBuckEndAnimation()
+                        }
                         showNewTab()
                     }
                 }
@@ -4252,6 +4292,17 @@ class BrowserTabFragment :
                     viewModel.onUserClickCtaDismissButton(configuration)
                 }
             }
+
+            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if (configuration is DaxBubbleCta.DaxEndCta) {
+                    requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
+                    with(newBrowserTab.buckEndAnimation) {
+                        isVisible = true
+                        playAnimation()
+                    }
+                }
+            }
+
             viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
             viewModel.onCtaShown()
         }
@@ -4394,6 +4445,17 @@ class BrowserTabFragment :
             (activity as? DuckDuckGoActivity)?.toggleFullScreen()
             binding.focusDummy.requestFocus()
         }
+
+        fun renderBuckOnboardingTryASearchAnimation() {
+            newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
+            newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
+        }
+    }
+
+    private fun hideBuckEndAnimation() {
+        newBrowserTab.buckEndAnimation.isGone = true
+        val backgroundColor = requireActivity().getColorFromAttr(attrColor = CommonR.attr.daxColorBackground)
+        newBrowserTab.newTabLayout.setBackgroundColor(backgroundColor)
     }
 
     private fun launchPrint(
@@ -4424,7 +4486,7 @@ class BrowserTabFragment :
         request: PermissionRequest,
     ) {
         if (!isActiveCustomTab() && !isActiveTab) {
-            Timber.v("Will not launch a dialog for an inactive tab")
+            logcat(INFO) { "Will not launch a dialog for an inactive tab" }
             return
         }
 
@@ -4434,7 +4496,7 @@ class BrowserTabFragment :
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
-        Timber.i("Continuing to download %s", pendingFileDownload)
+        logcat(INFO) { "Continuing to download ${pendingFileDownload.url}" }
         viewModel.download(pendingFileDownload)
     }
 

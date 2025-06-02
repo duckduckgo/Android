@@ -19,7 +19,9 @@ package com.duckduckgo.app.global
 import android.content.Intent
 import android.os.BadParcelableException
 import android.os.Bundle
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 val Intent.intentText: String?
     get() {
@@ -32,10 +34,10 @@ fun Intent.sanitize() {
         getStringExtra("")
         getBooleanExtra("", false)
     } catch (e: BadParcelableException) {
-        Timber.e(e, "Failed to read Parcelable from intent")
+        logcat(ERROR) { "Failed to read Parcelable from intent: ${e.asLog()}" }
         replaceExtras(Bundle())
     } catch (e: RuntimeException) {
-        Timber.e(e, "Failed to receive extras from intent")
+        logcat(ERROR) { "Failed to receive extras from intent: ${e.asLog()}" }
         replaceExtras(Bundle())
     }
 }

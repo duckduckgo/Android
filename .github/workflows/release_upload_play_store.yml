@@ -12,6 +12,7 @@ env:
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
   GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
   emoji_info: ":information_source:" # ℹ️
+  emoji_end: ":flight_arrival:" # 🛫
 
 jobs:
   release-production:
@@ -91,7 +92,7 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }}. AAB uploaded to Play Store. See https://play.google.com/console/u/0/developers/5949020878215944484/app/4974643806384870294/releases/overview
+          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }} uploaded to Play Store. See https://play.google.com/console/u/0/developers/5949020878215944484/app/4974643806384870294/releases/overview
           action: 'send-mattermost-message'
 
       - name: Upload Universal APK to Github
@@ -106,7 +107,17 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }}. Universal APK uploaded to Github. See https://github.com/duckduckgo/Android/releases
+          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }} uploaded to Github https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.app-version }}
+          action: 'send-mattermost-message'
+
+      - name: Notify Mattermost of Release completed
+        id: send-mm-message-gh-upload
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-message: ${{env.emoji_end}} Release ${{ github.event.inputs.app-version }} completed successfully and is now in review.
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed

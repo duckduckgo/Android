@@ -33,7 +33,8 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillPixelSender {
     suspend fun hasDeterminedCapabilities(): Boolean
@@ -67,7 +68,7 @@ class AutofillUniquePixelSender @Inject constructor(
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             sendPixel(secureStorageAvailable, deviceAuthAvailable).let {
-                Timber.v("Autofill capability pixel fired: %s", it)
+                logcat(VERBOSE) { "Autofill capability pixel fired: $it" }
             }
             preferences.edit { putBoolean(KEY_CAPABILITIES_DETERMINED, true) }
         }

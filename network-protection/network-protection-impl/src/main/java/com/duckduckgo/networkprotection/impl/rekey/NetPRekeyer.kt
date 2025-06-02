@@ -37,7 +37,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Qualifier
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
@@ -77,7 +77,7 @@ class RealNetPRekeyer @Inject constructor(
             if (vpnFeaturesRegistry.isFeatureRegistered(NetPVpnFeature.NETP_VPN)) {
                 val config = wgTunnel.createAndSetWgConfig(KeyPair())
                     .onFailure {
-                        logcat(LogPriority.ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
+                        logcat(ERROR) { "Failed registering the new key during re-keying: ${it.asLog()}" }
                     }.getOrNull() ?: return
 
                 logcat { "Re-keying with public key: ${config.`interface`.keyPair.publicKey.toBase64()}" }
@@ -86,7 +86,7 @@ class RealNetPRekeyer @Inject constructor(
                 networkProtectionPixels.reportRekeyCompleted()
                 vpnFeaturesRegistry.refreshFeature(NetPVpnFeature.NETP_VPN)
             } else {
-                logcat(LogPriority.ERROR) { "Re-key work should not happen" }
+                logcat(ERROR) { "Re-key work should not happen" }
             }
         } else {
             logcat { "Device not locked, skip re-keying" }
@@ -98,7 +98,7 @@ class RealNetPRekeyer @Inject constructor(
             forceRekey.set(true)
             doRekey()
         } else {
-            logcat(LogPriority.ERROR) { "Force re-key not allowed in production builds" }
+            logcat(ERROR) { "Force re-key not allowed in production builds" }
         }
     }
 }

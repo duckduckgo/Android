@@ -343,6 +343,7 @@
             </androidx.appcompat.widget.Toolbar>
 
             <FrameLayout
+                android:id="@+id/shieldIconPulseAnimationContainer"
                 android:layout_width="74dp"
                 android:layout_height="match_parent"
                 android:paddingTop="@dimen/experimentalOmnibarCardMarginTop"

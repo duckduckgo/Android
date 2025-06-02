@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.urlextraction
 
 import android.webkit.JavascriptInterface
-import timber.log.Timber
+import logcat.logcat
 
 class UrlExtractionJavascriptInterface(private val onUrlExtracted: (extractedUrl: String?) -> Unit) {
 
@@ -28,7 +28,7 @@ class UrlExtractionJavascriptInterface(private val onUrlExtracted: (extractedUrl
 
     @JavascriptInterface
     fun log(message: String?) {
-        Timber.d("AMP link detection: $message")
+        logcat { "AMP link detection: $message" }
     }
 
     companion object {

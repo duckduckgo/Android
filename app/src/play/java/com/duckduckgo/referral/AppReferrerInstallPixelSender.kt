@@ -29,7 +29,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(scope = AppScope::class)
 class AppReferrerInstallPixelSender @Inject constructor(
@@ -43,7 +44,7 @@ class AppReferrerInstallPixelSender @Inject constructor(
     private val pixelSent = AtomicBoolean(false)
 
     override fun onAppAtbInitialized() {
-        Timber.v("AppReferrerInstallPixelSender: onAppAtbInitialized")
+        logcat(VERBOSE) { "AppReferrerInstallPixelSender: onAppAtbInitialized" }
         sendPixelIfUnsent()
     }
 

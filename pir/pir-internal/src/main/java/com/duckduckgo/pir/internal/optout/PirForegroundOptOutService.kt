@@ -32,15 +32,12 @@ import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import dagger.android.AndroidInjection
-import java.util.concurrent.Executors
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import logcat.AndroidLogcatLogger
-import logcat.LogPriority
+import logcat.LogPriority.DEBUG
 import logcat.LogcatLogger
 import logcat.logcat
 
@@ -52,13 +49,11 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
 
-    private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
-
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
         // TODO find correct place.
-        LogcatLogger.install(AndroidLogcatLogger(LogPriority.DEBUG))
+        LogcatLogger.install(AndroidLogcatLogger(DEBUG))
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -75,27 +70,23 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
             createNotification(getString(R.string.pirOptOutNotificationMessageInProgress))
         startForeground(1, notification)
 
-        synchronized(this) {
-            launch(serviceDispatcher) {
-                async {
-                    val brokers = intent?.getStringExtra(EXTRA_BROKER_TO_OPT_OUT)
+        launch {
+            val brokers = intent?.getStringExtra(EXTRA_BROKER_TO_OPT_OUT)
 
-                    val result = if (!brokers.isNullOrEmpty()) {
-                        pirOptOut.execute(listOf(brokers), this@PirForegroundOptOutService, this)
-                    } else {
-                        pirOptOut.executeForBrokersWithRecords(this@PirForegroundOptOutService, this)
-                    }
-
-                    if (result.isSuccess) {
-                        notificationManagerCompat.checkPermissionAndNotify(
-                            applicationContext,
-                            NOTIF_ID_STATUS_COMPLETE,
-                            createNotification(getString(R.string.pirOptOutNotificationMessageComplete)),
-                        )
-                    }
-                    stopSelf()
-                }.await()
+            val result = if (!brokers.isNullOrEmpty()) {
+                pirOptOut.execute(listOf(brokers), this@PirForegroundOptOutService)
+            } else {
+                pirOptOut.executeForBrokersWithRecords(this@PirForegroundOptOutService)
             }
+
+            if (result.isSuccess) {
+                notificationManagerCompat.checkPermissionAndNotify(
+                    applicationContext,
+                    NOTIF_ID_STATUS_COMPLETE,
+                    createNotification(getString(R.string.pirOptOutNotificationMessageComplete)),
+                )
+            }
+            stopSelf()
         }
 
         logcat { "PIR-OPT-OUT: START_NOT_STICKY" }

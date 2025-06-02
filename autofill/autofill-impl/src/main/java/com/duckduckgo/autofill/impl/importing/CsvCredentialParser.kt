@@ -26,7 +26,11 @@ import de.siegmar.fastcsv.reader.CsvReader
 import de.siegmar.fastcsv.reader.CsvRow
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface CsvCredentialParser {
     suspend fun parseCsv(csv: String): ParseResult
@@ -45,11 +49,11 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
     override suspend fun parseCsv(csv: String): ParseResult {
         return kotlin.runCatching {
             val credentials = convertToCredentials(csv).also {
-                Timber.i("Parsed CSV. Found %d credentials", it.size)
+                logcat(INFO) { "Parsed CSV. Found ${it.size} credentials" }
             }
             Success(credentials)
         }.onFailure {
-            Timber.e(it, "Failed to parse CSV")
+            logcat(ERROR) { "Failed to parse CSV: ${it.asLog()}" }
             Error
         }.getOrElse {
             Error
@@ -65,7 +69,7 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
             val lines = mutableListOf<CsvRow>()
             val iter = CsvReader.builder().build(csv).spliterator()
             iter.forEachRemaining { lines.add(it) }
-            Timber.d("Found %d lines in the CSV", lines.size)
+            logcat { "Found ${lines.size} lines in the CSV" }
 
             lines.firstOrNull().verifyExpectedFormat()
 
@@ -75,7 +79,7 @@ class GooglePasswordManagerCsvCredentialParser @Inject constructor(
             return@withContext credentialLines
                 .mapNotNull {
                     if (it.fields.size != EXPECTED_HEADERS_ORDERED.size) {
-                        Timber.w("Line is unexpected format. Expected ${EXPECTED_HEADERS_ORDERED.size} parts, found ${it.fields.size}")
+                        logcat(WARN) { "Line is unexpected format. Expected ${EXPECTED_HEADERS_ORDERED.size} parts, found ${it.fields.size}" }
                         return@mapNotNull null
                     }
 

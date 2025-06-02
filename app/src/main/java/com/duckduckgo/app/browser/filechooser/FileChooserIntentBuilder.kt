@@ -20,7 +20,8 @@ import android.content.Intent
 import android.net.Uri
 import java.util.*
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 class FileChooserIntentBuilder @Inject constructor() {
 
@@ -67,7 +68,7 @@ class FileChooserIntentBuilder @Inject constructor() {
         }
 
         // failing that, give up
-        Timber.w("Failed to extract selected file information")
+        logcat(WARN) { "Failed to extract selected file information" }
         return null
     }
 
@@ -84,10 +85,10 @@ class FileChooserIntentBuilder @Inject constructor() {
             .forEach { acceptedMimeTypes.add(it.lowercase(Locale.getDefault())) }
 
         if (acceptedMimeTypes.isNotEmpty()) {
-            Timber.d("Selectable file types limited to $acceptedMimeTypes")
+            logcat { "Selectable file types limited to $acceptedMimeTypes" }
             intent.putExtra(Intent.EXTRA_MIME_TYPES, acceptedMimeTypes.toTypedArray())
         } else {
-            Timber.d("No selectable file type filters applied")
+            logcat { "No selectable file type filters applied" }
         }
     }
 

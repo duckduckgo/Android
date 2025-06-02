@@ -20,7 +20,10 @@ import android.os.Bundle
 import android.os.Parcel
 import android.util.LruCache
 import android.webkit.WebView
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface WebViewSessionStorage {
     fun saveSession(
@@ -57,7 +60,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
             newValue: Bundle?,
         ) {
             if (evicted) {
-                Timber.v("Evicted $key from WebView session storage")
+                logcat(VERBOSE) { "Evicted $key from WebView session storage" }
             }
         }
     }
@@ -67,11 +70,11 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         tabId: String,
     ) {
         if (webView == null) {
-            Timber.w("WebView is null; cannot save session")
+            logcat(WARN) { "WebView is null; cannot save session" }
             return
         }
 
-        Timber.i("Saving WebView session for $tabId")
+        logcat(INFO) { "Saving WebView session for $tabId" }
 
         val webViewBundle = createWebViewBundle(webView)
 
@@ -80,7 +83,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         bundle.putInt(CACHE_KEY_SCROLL_POSITION, webView.scrollY)
         cache.put(tabId, bundle)
 
-        Timber.d("Stored ${bundle.sizeInBytes()} bytes for WebView $webView")
+        logcat { "Stored ${bundle.sizeInBytes()} bytes for WebView $webView" }
         logCacheSize()
     }
 
@@ -95,15 +98,15 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
         tabId: String,
     ): Boolean {
         if (webView == null) {
-            Timber.w("WebView is null; cannot restore session")
+            logcat(WARN) { "WebView is null; cannot restore session" }
             return false
         }
 
-        Timber.i("Restoring WebView session for $tabId")
+        logcat(INFO) { "Restoring WebView session for $tabId" }
 
         val bundle = cache[tabId]
         if (bundle == null) {
-            Timber.v("No saved bundle for tab $tabId")
+            logcat(VERBOSE) { "No saved bundle for tab $tabId" }
             return false
         }
 
@@ -121,7 +124,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
 
     override fun deleteSession(tabId: String) {
         cache.remove(tabId)
-        Timber.i("Deleted web session for $tabId")
+        logcat(INFO) { "Deleted web session for $tabId" }
         logCacheSize()
     }
 
@@ -131,7 +134,7 @@ class WebViewSessionInMemoryStorage : WebViewSessionStorage {
     }
 
     private fun logCacheSize() {
-        Timber.v("Cache size is now ~${cache.size()} bytes out of a max size of ${cache.maxSize()} bytes")
+        logcat(VERBOSE) { "Cache size is now ~${cache.size()} bytes out of a max size of ${cache.maxSize()} bytes" }
     }
 
     private fun Bundle.sizeInBytes(): Int {

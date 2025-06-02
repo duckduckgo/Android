@@ -46,7 +46,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(FireButtonScreenNoParams::class)
@@ -196,7 +196,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val clearWhenSelected = selectedItem.getClearWhenForIndex()
                         viewModel.onAutomaticallyWhenOptionSelected(clearWhenSelected)
-                        Timber.d("Option selected: $clearWhenSelected")
+                        logcat { "Option selected: $clearWhenSelected" }
                     }
                 },
             )

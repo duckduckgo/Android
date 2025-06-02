@@ -21,10 +21,10 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.store.db.ALL_MIGRATIONS
+import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
-import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
-import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
@@ -32,8 +32,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
-import timber.log.Timber
 
 interface SecureStorageDatabaseFactory {
     suspend fun getDatabase(): SecureStorageDatabase?
@@ -58,12 +60,12 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     private val mutex = Mutex()
 
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.d("Loading the sqlcipher native library")
+        logcat { "Loading the sqlcipher native library" }
         try {
             LibraryLoader.loadLibrary(context, "sqlcipher")
         } catch (t: Throwable) {
             // error loading the library, return null db
-            Timber.e(t, "Error loading sqlcipher library")
+            logcat(ERROR) { "Error loading sqlcipher library: ${t.asLog()}" }
         }
     }
 

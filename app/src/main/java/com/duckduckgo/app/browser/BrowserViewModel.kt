@@ -80,7 +80,8 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
@@ -157,11 +158,11 @@ class BrowserViewModel @Inject constructor(
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
             ApplicationClearDataState.INITIALIZING -> {
-                Timber.i("App clear state initializing")
+                logcat(INFO) { "App clear state initializing" }
                 viewState.value = currentViewState.copy(hideWebContent = true)
             }
             ApplicationClearDataState.FINISHED -> {
-                Timber.i("App clear state finished")
+                logcat(INFO) { "App clear state finished" }
                 viewState.value = currentViewState.copy(hideWebContent = false)
             }
         }
@@ -255,7 +256,7 @@ class BrowserViewModel @Inject constructor(
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs.isNullOrEmpty()) {
-            Timber.i("Tabs list is null or empty; adding default tab")
+            logcat(INFO) { "Tabs list is null or empty; adding default tab" }
             tabRepository.addDefaultTab()
             return
         }

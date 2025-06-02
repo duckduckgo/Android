@@ -19,7 +19,8 @@ package com.duckduckgo.widget
 import android.content.Context
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.mobile.android.R as CommonR
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class SearchAndFavoritesGridCalculator {
     fun calculateColumns(
@@ -32,11 +33,11 @@ class SearchAndFavoritesGridCalculator {
         var n = 2
         var totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
 
-        Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
+        logcat(INFO) { "SearchAndFavoritesWidget width n:$n $totalSize vs $width" }
         while (totalSize <= width) {
             ++n
             totalSize = (n * item) + ((n - 1) * divider) + (margins * 2)
-            Timber.i("SearchAndFavoritesWidget width n:$n $totalSize vs $width")
+            logcat(INFO) { "SearchAndFavoritesWidget width n:$n $totalSize vs $width" }
         }
 
         return WIDGET_COLUMNS_MIN.coerceAtLeast(n - 1)
@@ -54,11 +55,11 @@ class SearchAndFavoritesGridCalculator {
         var n = 1
         var totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
 
-        Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
+        logcat(INFO) { "SearchAndFavoritesWidget height n:$n $totalSize vs $height" }
         while (totalSize <= height) {
             ++n
             totalSize = searchBar + (n * item) + ((n - 1) * divider) + margins
-            Timber.i("SearchAndFavoritesWidget height n:$n $totalSize vs $height")
+            logcat(INFO) { "SearchAndFavoritesWidget height n:$n $totalSize vs $height" }
         }
 
         var rows = n - 1
