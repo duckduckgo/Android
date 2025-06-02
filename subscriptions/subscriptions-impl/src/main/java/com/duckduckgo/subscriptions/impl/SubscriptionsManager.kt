@@ -81,6 +81,8 @@ import dagger.SingleInstanceIn
 import java.io.IOException
 import java.time.Duration
 import java.time.Instant
+import java.time.Period
+import java.time.format.DateTimeParseException
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
@@ -95,6 +97,7 @@ import kotlinx.coroutines.flow.onSubscription
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
+import logcat.asLog
 import logcat.logcat
 import retrofit2.HttpException
 
@@ -1105,13 +1108,15 @@ data class PricingPhase(
     val billingPeriod: String,
 
 ) {
-    internal fun getBillingPeriodInDays(): Int? =
-        when (billingPeriod) {
-            "P1W" -> 7
-            "P1M" -> 30
-            "P1Y" -> 365
-            else -> null
+    internal fun getBillingPeriodInDays(): Int? {
+        return try {
+            val period = Period.parse(billingPeriod)
+            return period.days + period.months * 30 + period.years * 365
+        } catch (e: DateTimeParseException) {
+            logcat { "Subs: Failed to parse billing period \"$billingPeriod\": ${e.asLog()}" }
+            null
         }
+    }
 }
 
 data class ValidatedTokenPair(
