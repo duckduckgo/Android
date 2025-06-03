@@ -36,6 +36,7 @@
 
         <!-- Lines-->
         <item name="daxColorLines">@color/lines_dark</item>
+        <item name="daxColorLineShadow">@color/lines_dark</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
@@ -77,6 +78,7 @@
 
         <!-- Lines-->
         <item name="daxColorLines">@color/lines_light</item>
+        <item name="daxColorLineShadow">@color/line_shadow_light</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>

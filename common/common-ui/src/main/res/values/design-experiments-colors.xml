@@ -40,6 +40,7 @@
 
     <!-- Lines-->
     <color name="lines_dark">#1FF9F9F9</color>
+    <color name="line_shadow_dark">#08F9F9F9</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -67,6 +68,7 @@
 
     <!-- Lines-->
     <color name="lines_light">#171F1F1F</color>
+    <color name="line_shadow_light">#00000000</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
