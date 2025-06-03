@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -25,7 +26,7 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Message
 import android.provider.MediaStore
-import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.MimeTypeMap
 import android.webkit.ValueCallback
@@ -37,17 +38,17 @@ import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
 import com.duckduckgo.downloads.api.DownloadCommand
@@ -58,6 +59,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatWebviewBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -70,8 +72,6 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -83,13 +83,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-internal data class DuckChatWebViewActivityWithParams(
-    val url: String,
-) : GlobalActivityStarter.ActivityParams
-
-@InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(DuckChatWebViewActivityWithParams::class)
-open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
+@InjectWith(FragmentScope::class)
+open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_chat_webview), DownloadConfirmationDialogListener {
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -141,29 +136,31 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private var pendingFileDownload: PendingFileDownload? = null
     private val downloadMessagesJob = ConflatedJob()
 
+    private val binding: ActivityDuckChatWebviewBinding by viewBinding()
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
 
-    private val root: ViewGroup by lazy { findViewById(android.R.id.content) }
-    private val toolbar: Toolbar? by lazy { findViewById(com.duckduckgo.mobile.android.R.id.toolbar) }
-    internal val simpleWebview: WebView by lazy { findViewById(R.id.simpleWebview) }
-
-    protected open val layoutResId: Int = R.layout.activity_duck_chat_webview
+    private val root: ViewGroup by lazy { binding.root }
+    private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
+    internal val simpleWebview: WebView by lazy { binding.simpleWebview }
 
     @SuppressLint("SetJavaScriptEnabled")
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        duckChat.observeCloseEvent(this) {
-            finish()
-        }
-
-        setContentView(layoutResId)
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
         toolbar?.let {
-            setupToolbar(it)
+            it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
+            it.setNavigationOnClickListener {
+                requireActivity().onBackPressed()
+            }
+            it.setTitle(R.string.duck_chat_title)
         }
 
-        val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
-        val url = params?.url
+        // TODO
+        // val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
+        // val url = params?.url
+        val url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -177,7 +174,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     view?.requestFocusNodeHref(resultMsg)
                     val newWindowUrl = resultMsg?.data?.getString("url")
                     if (newWindowUrl != null) {
-                        startActivity(browserNav.openInNewTab(this@DuckChatWebViewActivity, newWindowUrl))
+                        startActivity(browserNav.openInNewTab(requireContext(), newWindowUrl))
                         return true
                     }
                     return false
@@ -256,7 +253,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
                 is CouldNotCapturePermissionDenied -> {
                     pendingUploadTask?.onReceiveValue(null)
-                    externalCameraLauncher.showPermissionRationaleDialog(this, it.inputAction)
+                    externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), it.inputAction)
                 }
 
                 is NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
@@ -325,7 +322,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         fileChooserParams: FileChooserRequestedParams,
         inputAction: String,
     ) {
-        if (Intent(inputAction).resolveActivity(packageManager) == null) {
+        if (Intent(inputAction).resolveActivity(requireActivity().packageManager) == null) {
             launchFilePicker(filePathCallback, fileChooserParams)
             return
         }
@@ -345,7 +342,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         val galleryString = getString(R.string.imageCaptureCameraGalleryDisambiguationGalleryOption)
         val galleryIcon = com.duckduckgo.mobile.android.R.drawable.ic_image_24
 
-        ActionBottomSheetDialog.Builder(this)
+        ActionBottomSheetDialog.Builder(requireContext())
             .setTitle(getString(R.string.imageCaptureCameraGalleryDisambiguationTitle))
             .setPrimaryItem(galleryString, galleryIcon)
             .setSecondaryItem(cameraString, cameraIcon)
@@ -392,21 +389,16 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         return mimeTypes.toList()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                super.onBackPressed()
-                return true
+    fun onBackPressed(): Boolean {
+        if (isVisible) {
+            if (simpleWebview.canGoBack()) {
+                simpleWebview.goBack()
+            } else {
+                duckChat.closeDuckChat()
             }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onBackPressed() {
-        if (simpleWebview.canGoBack()) {
-            simpleWebview.goBack()
+            return true
         } else {
-            super.onBackPressed()
+            return false
         }
     }
 
@@ -496,7 +488,7 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Suppress("NewApi")
     private fun hasWriteStoragePermission(): Boolean {
         return minSdk30() ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestWriteStoragePermission() {
