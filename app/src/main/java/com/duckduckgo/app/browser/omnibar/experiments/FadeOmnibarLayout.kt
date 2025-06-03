@@ -75,6 +75,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
+    private val shadowTop: View by lazy { findViewById<View>(R.id.shadowViewTop) }
+    private val shadowBottom: View by lazy { findViewById<View>(R.id.shadowViewBottom) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -128,13 +130,12 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
 
+        outlineProvider = null
+
         val rootContainer = root.findViewById<LinearLayout>(R.id.rootContainer)
         val navBar = rootContainer.findViewById<BrowserNavigationBarView>(R.id.omnibarNavigationBar)
-        val shadowTop = rootContainer.findViewById<View>(R.id.shadowViewTop)
         if (omnibarPosition == OmnibarPosition.TOP) {
             rootContainer.removeView(navBar)
-
-            shadowTop.gone()
         } else {
             navigationBar = navBar
 
@@ -189,6 +190,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     override fun render(viewState: ViewState) {
         super.render(viewState)
+
+        renderShadows(viewState.showTopShadow, viewState.showBottomShadow)
 
         if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
@@ -357,6 +360,11 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             viewModel.onBackButtonPressed()
             fadeOmnibarItemPressedListener?.onBackButtonPressed()
         }
+    }
+
+    private fun renderShadows(showTopShadow: Boolean, showBottomShadow: Boolean) {
+        shadowTop.isVisible = showTopShadow && omnibarPosition == OmnibarPosition.BOTTOM
+        shadowBottom.isVisible = showBottomShadow && omnibarPosition == OmnibarPosition.TOP
     }
 
     companion object {

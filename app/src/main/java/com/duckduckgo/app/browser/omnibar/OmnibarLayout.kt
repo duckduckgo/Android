@@ -139,7 +139,6 @@ open class OmnibarLayout @JvmOverloads constructor(
         data class NewTabScrollingState(
             val canScrollUp: Boolean,
             val canScrollDown: Boolean,
-            val topOfPage: Boolean,
         ) : Decoration()
     }
 

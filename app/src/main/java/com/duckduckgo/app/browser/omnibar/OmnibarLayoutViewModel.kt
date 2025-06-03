@@ -159,7 +159,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val isVisualDesignExperimentEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
-        val showShadows: Boolean = false,
+        val showTopShadow: Boolean = false,
+        val showBottomShadow: Boolean = false,
         val showClickCatcher: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(): Boolean {
@@ -341,7 +342,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                             showBrowserMenu = true,
                             showTabsMenu = false,
                             showFireIcon = false,
-                            showShadows = true,
+                            showTopShadow = true,
+                            showBottomShadow = true,
                         )
                     }
                 }
@@ -370,7 +372,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 hasQueryChanged = false,
                                 urlLoaded = _viewState.value.url,
                             ),
-                            showShadows = false,
+                            showTopShadow = viewMode !is NewTab,
+                            showBottomShadow = viewMode !is NewTab,
                         )
                     }
                 }
@@ -742,12 +745,13 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onNewTabScrollingStateChanged(scrollingState: Decoration.NewTabScrollingState) {
         val viewMode = viewState.value.viewMode
-        // if (viewMode is NewTab) {
-        //     _viewState.update {
-        //         it.copy(
-        //             showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
-        //         )
-        //     }
-        // }
+        if (viewMode is NewTab) {
+            _viewState.update {
+                it.copy(
+                    showTopShadow = scrollingState.canScrollDown,
+                    showBottomShadow = scrollingState.canScrollUp,
+                )
+            }
+        }
     }
 }
