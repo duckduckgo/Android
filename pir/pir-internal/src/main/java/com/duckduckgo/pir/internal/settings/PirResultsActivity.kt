@@ -126,9 +126,7 @@ class PirResultsActivity : DuckDuckGoActivity() {
                         }
 
                         is ExtractedProfileResult -> {
-                            val records = it.extractResults.filter {
-                                it.result
-                            }.size
+                            val records = it.extractResults.size
                             stringBuilder.append("VALID RECORDS FOUND COUNT: $records\n")
                         }
 
