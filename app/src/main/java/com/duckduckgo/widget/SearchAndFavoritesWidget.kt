@@ -31,6 +31,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -77,6 +79,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var searchWidgetLifecycleDelegate: SearchWidgetLifecycleDelegate
+
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
     override fun onReceive(
@@ -85,6 +90,11 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     ) {
         inject(context)
         super.onReceive(context, intent)
+    }
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        searchWidgetLifecycleDelegate.handleOnWidgetEnabled(SEARCH_AND_FAVORITES_WIDGET_ADDED)
     }
 
     override fun onUpdate(
@@ -124,6 +134,11 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             }
         }
         super.onDeleted(context, appWidgetIds)
+    }
+
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        searchWidgetLifecycleDelegate.handleOnWidgetDisabled(SEARCH_AND_FAVORITES_WIDGET_DELETED)
     }
 
     private suspend fun updateWidget(

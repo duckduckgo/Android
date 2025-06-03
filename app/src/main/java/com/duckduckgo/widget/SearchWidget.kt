@@ -26,12 +26,9 @@ import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.global.DuckDuckGoApplication
-import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_ADDED
-import com.duckduckgo.app.pixels.AppPixelName.WIDGETS_DELETED
-import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_WIDGET_ADDED
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
-import com.duckduckgo.app.widget.ui.AppWidgetCapabilities
 import javax.inject.Inject
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
@@ -39,16 +36,10 @@ class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWidgetProvider() {
 
     @Inject
-    lateinit var appInstallStore: AppInstallStore
-
-    @Inject
-    lateinit var pixel: Pixel
-
-    @Inject
-    lateinit var widgetCapabilities: AppWidgetCapabilities
-
-    @Inject
     lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+
+    @Inject
+    lateinit var searchWidgetLifecycleDelegate: SearchWidgetLifecycleDelegate
 
     override fun onReceive(
         context: Context,
@@ -64,10 +55,8 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
     }
 
     override fun onEnabled(context: Context) {
-        if (!appInstallStore.widgetInstalled) {
-            appInstallStore.widgetInstalled = true
-            pixel.fire(WIDGETS_ADDED)
-        }
+        super.onEnabled(context)
+        searchWidgetLifecycleDelegate.handleOnWidgetEnabled(SEARCH_WIDGET_ADDED)
     }
 
     override fun onUpdate(
@@ -128,14 +117,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
         )
     }
 
-    override fun onDeleted(
-        context: Context,
-        appWidgetIds: IntArray?,
-    ) {
-        if (appInstallStore.widgetInstalled && !widgetCapabilities.hasInstalledWidgets) {
-            appInstallStore.widgetInstalled = false
-            pixel.fire(WIDGETS_DELETED)
-        }
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        searchWidgetLifecycleDelegate.handleOnWidgetDisabled(SEARCH_WIDGET_DELETED)
     }
 
     companion object {
