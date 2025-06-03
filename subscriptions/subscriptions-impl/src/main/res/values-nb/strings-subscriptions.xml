@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Få svar på ofte stilte spørsmål eller kontakt Privacy Pro-støtte fra hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
     <string name="subscriptionStatusSubscribed">Abonnerer</string>
     <string name="privacyPolicyAndTermsOfService">Personvernerklæring og vilkår for bruk</string>
+    <string name="subscriptionStatusFreeTrial">Gratis prøveperiode er aktiv</string>
+    <string name="monthly">månedlige</string>
+    <string name="yearly">årlig</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Din gratis prøveperiode avsluttes %1$s og blir automatisk omgjort til et %2$s betalt abonnement den dagen.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din gratis prøveperioden avsluttes %1$s og blir ikke omgjort til et betalt abonnement.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnementsinnstillinger</string>
