@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInternalSettingsViewModel
@@ -283,7 +283,7 @@ constructor(
     }
 
     fun resetFaviconsPrompt() {
-        Timber.d("Sync-Internal: Reset Favicons Prompt")
+        logcat { "Sync-Internal: Reset Favicons Prompt" }
         syncFaviconFetchingStore.isFaviconsFetchingEnabled = false
         syncFaviconFetchingStore.promptShown = false
     }

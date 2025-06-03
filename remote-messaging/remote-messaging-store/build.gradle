@@ -48,7 +48,7 @@ dependencies {
     implementation AndroidX.room.ktx
     implementation AndroidX.core.ktx
     ksp AndroidX.room.compiler
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation project(path: ':common-utils')
 
     testImplementation project(path: ':common-test')

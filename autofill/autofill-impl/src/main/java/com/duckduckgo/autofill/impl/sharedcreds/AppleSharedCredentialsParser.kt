@@ -30,7 +30,10 @@ import dagger.SingleInstanceIn
 import java.io.IOException
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface SharedCredentialsParser {
     suspend fun read(): SharedCredentialConfig
@@ -68,7 +71,7 @@ class AppleSharedCredentialsParser @Inject constructor(
                 convertJsonToRules(json)
             }
                 .getOrElse {
-                    Timber.e(it, "Failed to parse shared credentials json")
+                    logcat(ERROR) { "Failed to parse shared credentials json: ${it.asLog()}" }
                     CONFIG_WHEN_ERROR_HAPPENED
                 }
         }
@@ -82,7 +85,7 @@ class AppleSharedCredentialsParser @Inject constructor(
         val rules = try {
             adapter.fromJson(json) ?: return CONFIG_WHEN_ERROR_HAPPENED
         } catch (e: IOException) {
-            Timber.e(e, "Failed to load Apple shared credential config")
+            logcat(ERROR) { "Failed to load Apple shared credential config: ${e.asLog()}" }
             return CONFIG_WHEN_ERROR_HAPPENED
         }
 
@@ -96,7 +99,7 @@ class AppleSharedCredentialsParser @Inject constructor(
                 processUnidirectionalRule(rule.from, rule.to, unidirectionalRules, rule)
             } else {
                 // not a rule we understand
-                Timber.w("Could not process rule as it appears to be invalid: %s", rule)
+                logcat(WARN) { "Could not process rule as it appears to be invalid: $rule" }
             }
         }
 

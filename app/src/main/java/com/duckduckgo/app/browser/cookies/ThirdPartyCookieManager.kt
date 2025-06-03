@@ -26,7 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface ThirdPartyCookieManager {
     suspend fun processUriForThirdPartyCookies(
@@ -67,10 +67,10 @@ class AppThirdPartyCookieManager(
         val domain = authCookiesAllowedDomainsRepository.getDomain(host)
         withContext(dispatchers.main()) {
             if (domain != null && hasExcludedCookieName()) {
-                Timber.d("Cookies enabled for $uri")
+                logcat { "Cookies enabled for $uri" }
                 cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, true)
             } else {
-                Timber.d("Cookies disabled for $uri")
+                logcat { "Cookies disabled for $uri" }
                 cookieManagerProvider.get()?.setAcceptThirdPartyCookies(webView, false)
             }
             domain?.let { deleteHost(it) }

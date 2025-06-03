@@ -50,7 +50,9 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 class TabDataRepository @Inject constructor(
@@ -151,10 +153,10 @@ class TabDataRepository @Inject constructor(
     ) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
-            Timber.i("Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}")
+            logcat(INFO) { "Trying to add tab, is default? $isDefaultTab, current tabs count: ${tabsDao.tabs().size}" }
 
             if (isDefaultTab && tabsDao.tabs().isNotEmpty()) {
-                Timber.i("Default tab being added but there are already tabs; will not add this tab")
+                logcat(INFO) { "Default tab being added but there are already tabs; will not add this tab" }
                 return@scheduleDirect
             }
 
@@ -164,7 +166,7 @@ class TabDataRepository @Inject constructor(
             } else {
                 lastTab.position + 1
             }
-            Timber.i("About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position")
+            logcat(INFO) { "About to add a new tab, isDefaultTab: $isDefaultTab. $tabId, position: $position" }
 
             tabsDao.addAndSelectTab(
                 TabEntity(
@@ -358,7 +360,7 @@ class TabDataRepository @Inject constructor(
     }
 
     override suspend fun deleteAll() {
-        Timber.i("Deleting tabs right now")
+        logcat(INFO) { "Deleting tabs right now" }
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
         faviconManager.deleteAllTemp()
@@ -386,10 +388,10 @@ class TabDataRepository @Inject constructor(
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId)
             if (tab == null) {
-                Timber.w("Cannot find tab for tab ID")
+                logcat(WARN) { "Cannot find tab for tab ID" }
                 return@scheduleDirect
             }
-            Timber.i("Updated tab favicon. $tabId now uses $fileName")
+            logcat(INFO) { "Updated tab favicon. $tabId now uses $fileName" }
             deleteOldFavicon(tabId, fileName)
         }
     }
@@ -401,12 +403,12 @@ class TabDataRepository @Inject constructor(
         databaseExecutor().scheduleDirect {
             val tab = tabsDao.tab(tabId)
             if (tab == null) {
-                Timber.w("Cannot find tab for tab ID")
+                logcat(WARN) { "Cannot find tab for tab ID" }
                 return@scheduleDirect
             }
             tabsDao.updateTab(tab.copy(tabPreviewFile = fileName))
 
-            Timber.i("Updated tab preview image. $tabId now uses $fileName")
+            logcat(INFO) { "Updated tab preview image. $tabId now uses $fileName" }
             deleteOldPreviewImages(tabId, fileName)
         }
     }
@@ -415,7 +417,7 @@ class TabDataRepository @Inject constructor(
         tabId: String,
         currentFavicon: String? = null,
     ) {
-        Timber.i("Deleting old favicon for $tabId. Current favicon is $currentFavicon")
+        logcat(INFO) { "Deleting old favicon for $tabId. Current favicon is $currentFavicon" }
         appCoroutineScope.launch(dispatchers.io()) { faviconManager.deleteOldTempFavicon(tabId, currentFavicon) }
     }
 
@@ -423,7 +425,7 @@ class TabDataRepository @Inject constructor(
         tabId: String,
         currentPreviewImage: String? = null,
     ) {
-        Timber.i("Deleting old preview image for $tabId. Current image is $currentPreviewImage")
+        logcat(INFO) { "Deleting old preview image for $tabId. Current image is $currentPreviewImage" }
         appCoroutineScope.launch(dispatchers.io()) { webViewPreviewPersister.deletePreviewsForTab(tabId, currentPreviewImage) }
     }
 

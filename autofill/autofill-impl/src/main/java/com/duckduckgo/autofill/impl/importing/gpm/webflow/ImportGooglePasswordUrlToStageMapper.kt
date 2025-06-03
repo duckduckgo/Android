@@ -20,7 +20,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPassword
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.logcat
 
 interface ImportGooglePasswordUrlToStageMapper {
     suspend fun getStage(url: String?): String
@@ -34,7 +34,7 @@ class ImportGooglePasswordUrlToStageMapperImpl @Inject constructor(
     override suspend fun getStage(url: String?): String {
         val config = importPasswordConfigStore.getConfig()
         val stage = config.urlMappings.firstOrNull { url?.startsWith(it.url) == true }?.key ?: UNKNOWN
-        return stage.also { Timber.d("Mapped as stage $it for $url") }
+        return stage.also { logcat { "Mapped as stage $it for $url" } }
     }
 
     companion object {

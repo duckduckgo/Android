@@ -17,7 +17,9 @@
 package com.duckduckgo.remote.messaging.impl
 
 import com.duckduckgo.remote.messaging.impl.network.RemoteMessagingService
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface RemoteMessagingConfigDownloader {
     suspend fun download(): Boolean
@@ -29,12 +31,12 @@ class RealRemoteMessagingConfigDownloader constructor(
 ) : RemoteMessagingConfigDownloader {
     override suspend fun download(): Boolean {
         val response = kotlin.runCatching {
-            Timber.v("RMF: downloading config")
+            logcat(VERBOSE) { "RMF: downloading config" }
             remoteConfig.config()
         }.onSuccess {
             remoteMessagingConfigProcessor.process(it)
         }.onFailure {
-            Timber.e("RMF: error at RealRemoteMessagingConfigDownloader, %s", it.localizedMessage)
+            logcat(ERROR) { "RMF: error at RealRemoteMessagingConfigDownloader, ${it.localizedMessage}" }
         }
 
         return response.isSuccess

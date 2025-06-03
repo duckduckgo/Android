@@ -33,8 +33,9 @@ import javax.inject.Named
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.VERBOSE
 import logcat.asLog
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @Named("cookieManagerRemover")
@@ -42,7 +43,7 @@ class CookieManagerRemover @Inject constructor(private val cookieManagerProvider
     override suspend fun removeCookies(): Boolean {
         suspendCoroutine { continuation ->
             cookieManagerProvider.get()?.removeAllCookies {
-                Timber.v("All cookies removed; restoring DDG cookies")
+                logcat(VERBOSE) { "All cookies removed; restoring DDG cookies" }
                 continuation.resume(Unit)
             }
         }

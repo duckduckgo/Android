@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Aç</string>
     <string name="duck_chat_cannot_open_file_error_message">Dosya açılamıyor. Uyumlu uygulama arayın.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Kameraya erişilemedi</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Bir resim yükle</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Dosya Seç</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fotoğraf Çek</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">DuckDuckGo\'nun bu cihazda kamera erişimi istemesine izin ver</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Siteler kameranızı yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ayarları Aç</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Vazgeç</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Ses kaydediciye erişilemedi</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">DuckDuckGo\'nun bu cihazda ses kaydedici erişimi istemesine izin ver</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Siteler, ses kaydediciyi yalnızca DuckDuckGo\'nun erişim istemesine izin verirseniz kullanabilir.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai, popüler 3. taraf yapay zeka sohbet modelleriyle anonim olarak sohbet etmenizi sağlayan isteğe bağlı bir özelliktir. Sohbetler yapay zekayı eğitmek için kullanılmaz.\n<annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Duck.ai\'ı etkinleştir</string>

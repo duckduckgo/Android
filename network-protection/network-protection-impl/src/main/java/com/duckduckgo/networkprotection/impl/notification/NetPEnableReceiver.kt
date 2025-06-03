@@ -31,7 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
@@ -64,7 +64,7 @@ class NetPEnableReceiver : BroadcastReceiver() {
                 vpn.start()
             }
         } else {
-            logcat(LogPriority.WARN) { "NetPEnableReceiver: unknown action" }
+            logcat(WARN) { "NetPEnableReceiver: unknown action" }
             pendingResult?.finish()
         }
     }

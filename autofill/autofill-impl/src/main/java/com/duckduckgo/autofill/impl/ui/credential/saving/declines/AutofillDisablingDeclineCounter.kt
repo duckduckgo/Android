@@ -27,7 +27,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 /**
  * Repeated prompts to use Autofill (e.g., save login credentials) might annoy a user who doesn't want to use Autofill.
@@ -78,7 +78,7 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     var currentSessionPreviousDeclinedDomain: String? = null
 
     override suspend fun userDeclinedToSaveCredentials(domain: String?) {
-        Timber.v("User declined to save credentials for %s.", domain)
+        logcat { "User declined to save credentials for $domain." }
         if (domain == null) return
 
         withContext(dispatchers.io()) {
@@ -89,7 +89,7 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     }
 
     private fun recordDeclineForDomain(domain: String) {
-        Timber.d("User declined to save credentials for a new domain; recording the decline")
+        logcat { "User declined to save credentials for a new domain; recording the decline" }
         autofillPrefsStore.autofillDeclineCount++
         currentSessionPreviousDeclinedDomain = domain
     }
@@ -124,12 +124,13 @@ class AutofillDisablingDeclineCounter @Inject constructor(
             val promptedToDisablePreviously = promptedToDeclinePreviously()
             val shouldOffer = declineCountHasReachedThreshold() && !promptedToDisablePreviously
 
-            Timber.v(
-                "User declined to save credentials %d times globally from all sessions. Prompted to disable before: %s. Should prompt to disable: %s",
-                autofillPrefsStore.autofillDeclineCount,
-                promptedToDisablePreviously,
-                shouldOffer,
-            )
+            logcat {
+                """
+                    User declined to save credentials ${autofillPrefsStore.autofillDeclineCount} times globally from all sessions. 
+                    Prompted to disable before: $promptedToDisablePreviously. 
+                    Should prompt to disable: $shouldOffer
+                """.trimIndent()
+            }
 
             return@withContext shouldOffer
         }
@@ -138,11 +139,13 @@ class AutofillDisablingDeclineCounter @Inject constructor(
     private fun declineCountHasReachedThreshold() = autofillPrefsStore.autofillDeclineCount == GLOBAL_DECLINE_COUNT_THRESHOLD
 
     private suspend fun determineIfDeclineCounterIsActive(): Boolean {
-        Timber.i(
-            "Autofill: declineCounterIsActive? " +
-                "monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, " +
-                "autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}",
-        )
+        logcat {
+            """
+                Autofill: declineCounterIsActive? 
+                monitorDeclineCounts = ${autofillPrefsStore.monitorDeclineCounts}, 
+                autofillStateSetByUser = ${autofillPrefsStore.autofillStateSetByUser}
+            """.trimIndent()
+        }
         return withContext(dispatchers.io()) {
             autofillPrefsStore.monitorDeclineCounts && !autofillPrefsStore.autofillStateSetByUser
         }

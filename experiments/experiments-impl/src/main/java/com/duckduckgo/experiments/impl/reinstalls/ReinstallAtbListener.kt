@@ -26,7 +26,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesMultibinding(AppScope::class)
@@ -43,7 +44,7 @@ class ReinstallAtbListener @Inject constructor(
 
         if (appBuildConfig.isAppReinstall()) {
             statisticsDataStore.variant = REINSTALL_VARIANT
-            Timber.i("Variant update for returning user")
+            logcat(INFO) { "Variant update for returning user" }
         }
     }
 

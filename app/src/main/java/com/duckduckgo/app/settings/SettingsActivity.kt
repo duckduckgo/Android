@@ -90,6 +90,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
+import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.GeneralPrivacyProFeedbackScreenNoParams
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.Snackbar
@@ -97,7 +98,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 private const val OTHER_PLATFORMS_URL = "https://duckduckgo.com/app"
 
@@ -133,6 +135,12 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var _duckPlayerSettingsPlugin: PluginPoint<DuckPlayerSettingsPlugin>
     private val duckPlayerSettingsPlugin by lazy {
         _duckPlayerSettingsPlugin.getPlugins()
+    }
+
+    @Inject
+    lateinit var _threatProtectionSettingsPlugin: PluginPoint<ThreatProtectionSettingsPlugin>
+    private val threatProtectionSettingsPlugin by lazy {
+        _threatProtectionSettingsPlugin.getPlugins()
     }
 
     private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
@@ -231,12 +239,20 @@ class SettingsActivity : DuckDuckGoActivity() {
                 viewsMain.settingsSectionDuckPlayer.addView(plugin.getView(this))
             }
         }
+
+        if (threatProtectionSettingsPlugin.isEmpty()) {
+            viewsPrivacy.settingsSectionThreatProtection.gone()
+        } else {
+            threatProtectionSettingsPlugin.forEach { plugin ->
+                viewsPrivacy.settingsSectionThreatProtection.addView(plugin.getView(this))
+            }
+        }
     }
 
     private fun configureInternalFeatures() {
         viewsInternal.settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
         internalFeaturePlugins.getPlugins().forEach { feature ->
-            Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
+            logcat(VERBOSE) { "Adding internal feature ${feature.internalFeatureTitle()}" }
             val view = TwoLineListItem(this).apply {
                 setPrimaryText(feature.internalFeatureTitle())
                 setSecondaryText(feature.internalFeatureSubtitle())
@@ -262,6 +278,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
+                    updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                 }
@@ -287,6 +304,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             viewsMain.settingsSectionDuckPlayer.show()
         } else {
             viewsMain.settingsSectionDuckPlayer.gone()
+        }
+    }
+
+    private fun updateThreatProtection(newThreatProtectionSettingsEnabled: Boolean) {
+        if (newThreatProtectionSettingsEnabled) {
+            viewsPrivacy.settingsSectionThreatProtection.show()
+        } else {
+            viewsPrivacy.settingsSectionThreatProtection.gone()
         }
     }
 

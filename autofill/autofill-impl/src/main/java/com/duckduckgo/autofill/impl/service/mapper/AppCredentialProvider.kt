@@ -25,7 +25,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface AppCredentialProvider {
     /**
@@ -45,11 +45,11 @@ class RealAppCredentialProvider @Inject constructor(
     override suspend fun getCredentials(appPackage: String): List<LoginCredentials> = withContext(dispatcherProvider.io()) {
         if (autofillServiceFeature.canMapAppToDomain().isEnabled().not()) return@withContext emptyList()
 
-        Timber.d("Autofill-mapping: Getting credentials for $appPackage")
+        logcat { "Autofill-mapping: Getting credentials for $appPackage" }
         return@withContext appToDomainMapper.getAssociatedDomains(appPackage).map {
             getAllCredentialsFromDomain(it)
         }.flatten().distinct().also {
-            Timber.d("Autofill-mapping: Total credentials for $appPackage : ${it.size}")
+            logcat { "Autofill-mapping: Total credentials for $appPackage : ${it.size}" }
         }
     }
 

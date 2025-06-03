@@ -30,7 +30,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(
     AppScope::class,
@@ -52,7 +53,7 @@ class RemoteMessagingPrivacyConfigObserver @Inject constructor(
             val shouldInvalidate = invalidateConfig && alwaysProcess.not()
 
             if (shouldInvalidate) {
-                Timber.d("RMF: onPrivacyConfigDownloaded, invalidate so next run we process the config")
+                logcat { "RMF: onPrivacyConfigDownloaded, invalidate so next run we process the config" }
                 remoteMessagingConfigRepository.invalidate()
             }
             scheduleDownload()
@@ -63,7 +64,7 @@ class RemoteMessagingPrivacyConfigObserver @Inject constructor(
         if (remoteMessagingFeatureToggles.canScheduleOnPrivacyConfigUpdates().isEnabled()) {
             val refreshInterval = if (remoteMessagingFeatureToggles.scheduleEveryHour().isEnabled()) 1L else 4L
 
-            Timber.v("RMF: Scheduling remote config worker with fresh interval of $refreshInterval hours")
+            logcat(VERBOSE) { "RMF: Scheduling remote config worker with fresh interval of $refreshInterval hours" }
             val workerRequest = PeriodicWorkRequestBuilder<RemoteMessagingConfigDownloadWorker>(refreshInterval, TimeUnit.HOURS)
                 .addTag(REMOTE_MESSAGING_DOWNLOADER_WORKER_TAG)
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)

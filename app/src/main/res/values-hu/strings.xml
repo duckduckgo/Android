@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Figyelmeztetés az adathalászat vagy rosszindulatú programok miatt megjelölt webhelyekre</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">További tudnivalók</annotation></string>
     <string name="maliciousSiteSettingDisabled">Ennek a funkciónak a letiltása veszélyt jelenthet az adataidra.</string>
-
+    <string name="threatProtectionTitle">Fenyegetések elleni védelem</string>
+    <string name="threatProtectionDescription">A DuckDuckGo továbbfejlesztett védelmi megoldásai megállítják a gyakori fenyegetéseket, miközben megőrzik a kapcsolat biztonságát.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Linkek automatikus frissítése HTTPS-re, amikor csak lehetséges.<a href=\"\">További részletek</a>]]></string>
+    <string name="scamBlockerTitle">Csalásblokkoló</string>
+    <string name="scamBlockerDescription">Figyelmeztetés azokra az oldalakra, amelyeket csalás, adathalászat vagy rosszindulatú programok miatt jelöltek meg.</string>
+    <string name="threatProtectionLearnMoreTitle">További részletek</string>
 </resources>

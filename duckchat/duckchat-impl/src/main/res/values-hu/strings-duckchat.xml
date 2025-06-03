@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Megnyitás</string>
     <string name="duck_chat_cannot_open_file_error_message">A fájl nem nyitható meg. Keress kompatibilis alkalmazást.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nem sikerült hozzáférni a kamerához</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Kép feltöltése</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Fájl kiválasztása</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Fénykép készítése</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Engedélyezés, hogy a DuckDuckGo hozzáférést kérjen a kamerához ezen az eszközön</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">A webhelyek csak akkor használhatják a kamerát, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérjen.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Beállítások megnyitása</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Mégsem</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Nem sikerült hozzáférni a hangrögzítőhöz</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Engedélyezd, hogy a DuckDuckGo hozzáférést kérhessen az eszközöd hangrögzítőjéhez</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">A webhelyek csak akkor használhatják a hangrögzítőt, ha engedélyezed, hogy a DuckDuckGo hozzáférést kérhessen.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">A Duck.ai egy opcionális funkció, amely lehetővé teszi a harmadik féltől származó népszerű AI-csevegési modellekkel való névtelen csevegést. A csevegéseidet nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Duck.ai engedélyezése</string>

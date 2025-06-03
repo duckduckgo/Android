@@ -19,7 +19,9 @@ package com.duckduckgo.app.global.file
 import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.File
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface FileDeleter {
 
@@ -53,18 +55,20 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
         parentDirectory: File,
         excludedFiles: List<String>,
     ) {
+        logcat(INFO) { "Deleting contents of directory: $parentDirectory" }
         withContext(dispatchers.io()) {
             runCatching {
                 val files = parentDirectory.listFiles() ?: return@withContext
                 val filesToDelete = files.filterNot { excludedFiles.contains(it.name) }
                 filesToDelete.forEach { it.deleteRecursively() }
             }.onFailure {
-                Timber.e(it, "Failed to delete contents of directory: %s", parentDirectory.absolutePath)
+                logcat(ERROR) { "Failed to delete contents of directory: $parentDirectory" }
             }
         }
     }
 
     override suspend fun deleteDirectory(directoryToDelete: File) {
+        logcat(INFO) { "Deleting directory: $directoryToDelete" }
         withContext(dispatchers.io()) {
             directoryToDelete.deleteRecursively()
         }
@@ -74,6 +78,7 @@ class AndroidFileDeleter(private val dispatchers: DispatcherProvider) : FileDele
         parentDirectory: File,
         files: List<String>,
     ) {
+        logcat(INFO) { "Deleting files from directory: $parentDirectory" }
         withContext(dispatchers.io()) {
             val allFiles = parentDirectory.listFiles() ?: return@withContext
             val filesToDelete = allFiles.filter { files.contains(it.name) }

@@ -70,7 +70,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 /**
  * Introduced by [this Asana task](https://app.asana.com/0/1208671518894266/1207295380941379/f).
@@ -217,7 +219,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment(
                 defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
             ).getOrElse { throwable ->
-                Timber.e(throwable)
+                logcat(ERROR) { throwable.asLog() }
                 return
             }
 
@@ -227,7 +229,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 featureSettings = parsedSettings
                 parsedSettings
             } ?: run {
-                Timber.e("Failed to obtain feature settings.")
+                logcat(ERROR) { "Failed to obtain feature settings." }
                 return
             }
 
@@ -335,7 +337,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 DIALOG -> metrics.getDefaultSetViaDialog()?.fire()
                 MENU -> metrics.getDefaultSetViaMenu()?.fire()
                 UNKNOWN -> {
-                    Timber.e("Trigger for default browser dialog result wasn't provided.")
+                    logcat(ERROR) { "Trigger for default browser dialog result wasn't provided." }
                 }
             }
         }
@@ -355,7 +357,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                     DIALOG -> metrics.getDefaultSetViaDialog()?.fire()
                     MENU -> metrics.getDefaultSetViaMenu()?.fire()
                     UNKNOWN -> {
-                        Timber.e("Trigger for default apps result wasn't provided.")
+                        logcat(ERROR) { "Trigger for default apps result wasn't provided." }
                     }
                 }
             }
@@ -383,7 +385,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             try {
                 featureSettingsJsonAdapter.fromJson(settings)?.toFeatureSettings()
             } catch (e: Exception) {
-                Timber.e(e)
+                logcat(ERROR) { e.asLog() }
                 null
             }
         }

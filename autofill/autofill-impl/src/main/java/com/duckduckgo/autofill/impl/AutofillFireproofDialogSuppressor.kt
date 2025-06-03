@@ -22,7 +22,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillFireproofDialogSuppressor {
     fun isAutofillPreventingFireproofPrompts(): Boolean
@@ -39,17 +40,18 @@ class RealAutofillFireproofDialogSuppressor @Inject constructor(private val time
     override fun isAutofillPreventingFireproofPrompts(): Boolean {
         val timeSinceLastDismissed = timeProvider.currentTimeMillis() - lastTimeUserSawAutofillDialog
         val suppressing = autofillDialogShowing || (timeSinceLastDismissed <= TIME_PERIOD_TO_SUPPRESS_FIREPROOF_PROMPT)
-        Timber.d(
-            "isAutofillPreventingFireproofPrompts: %s (autofillDialogShowing=%s, timeSinceLastDismissed=%sms)",
-            suppressing,
-            autofillDialogShowing,
-            timeSinceLastDismissed,
-        )
+        logcat {
+            """
+            isAutofillPreventingFireproofPrompts: $suppressing 
+            (autofillDialogShowing=$autofillDialogShowing, 
+            timeSinceLastDismissed=${timeSinceLastDismissed}ms)
+            """.trimIndent()
+        }
         return suppressing
     }
 
     override fun autofillSaveOrUpdateDialogVisibilityChanged(visible: Boolean) {
-        Timber.v("Autofill save/update dialog visibility changed to %s", visible)
+        logcat(VERBOSE) { "Autofill save/update dialog visibility changed to $visible" }
         autofillDialogShowing = visible
 
         if (!visible) {

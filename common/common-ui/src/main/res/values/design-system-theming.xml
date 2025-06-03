@@ -138,7 +138,7 @@
         <item name="autocompleteListItemEndPadding">@dimen/keyline_2</item>
         <item name="autocompleteListItemIconMargin">10dp</item>
         <item name="autocompleteListItemWithoutTrailIconEndPadding">@dimen/keyline_4</item>
-        <item name="autocompleteListItemVerticalPadding">14dp</item>
+        <item name="autocompleteListItemVerticalPadding">12dp</item>
 
         <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
         <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
@@ -245,6 +245,7 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue20</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
+        <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorDark</item>
 
     </style>
 
@@ -348,6 +349,7 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
+        <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
     </style>
 

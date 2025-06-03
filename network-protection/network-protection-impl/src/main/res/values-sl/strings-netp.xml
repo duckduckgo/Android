@@ -224,7 +224,7 @@
     <string name="netpCustomDnsSettingText">Strežnik DNS</string>
     <string name="netpPrivateDns">Zasebni DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokiranje tveganih domen)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Preprečevanje prevar)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (priporočeno)</string>
     <string name="netpCustomDnsCustom">Druga</string>
     <string name="netpCustomDnsInputAddressHint">Naslov IPv4</string>
@@ -235,8 +235,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo usmerja poizvedbe DNS prek naših strežnikov DNS, da vaš ponudnik interneta ne more videti, katere spletne strani obiskujete.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blokiranje in filtriranje vsebine</string>
-    <string name="netpDnsBlockMalwarePrimary">Blokiranje tveganih domen</string>
+    <string name="netpDnsBlockMalwareHeader">Blokiranje zlonamerne vsebine</string>
+    <string name="netpDnsBlockMalwarePrimary">Preprečevanje prevar</string>
     <string name="netpDnsBlockMalwareByline">Z blokirnim seznamom na ravni DNS blokirajte več kot 150.000 domen, ki so označene kot gostiteljice zlonamerne programske opreme, napadov z lažnim predstavljanjem in spletnih prevar. <annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Seznami blokad DNS</string>
 

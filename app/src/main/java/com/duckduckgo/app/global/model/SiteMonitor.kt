@@ -40,7 +40,8 @@ import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class SiteMonitor(
     url: String,
@@ -129,7 +130,7 @@ class SiteMonitor(
 
     override fun updatePrivacyData(sitePrivacyData: SitePrivacyData) {
         this.entity = sitePrivacyData.entity
-        Timber.i("fullSiteDetailsAvailable entity ${sitePrivacyData.entity} for $domain")
+        logcat(INFO) { "fullSiteDetailsAvailable entity ${sitePrivacyData.entity} for $domain" }
         fullSiteDetailsAvailable = true
     }
 
@@ -171,18 +172,18 @@ class SiteMonitor(
         if (userAllowList || !isHttps) return UNPROTECTED
 
         if (!fullSiteDetailsAvailable) {
-            Timber.i("Shield: not fullSiteDetailsAvailable for $domain")
-            Timber.i("Shield: entity is ${entity?.name} for $domain")
+            logcat(INFO) { "Shield: not fullSiteDetailsAvailable for $domain" }
+            logcat(INFO) { "Shield: entity is ${entity?.name} for $domain" }
             return UNKNOWN
         }
 
         sslError = isSslCertificateBypassed(url)
         if (sslError) {
-            Timber.i("Shield: site has certificate error")
+            logcat(INFO) { "Shield: site has certificate error" }
             return UNPROTECTED
         }
 
-        Timber.i("Shield: isMajor ${entity?.isMajor} prev ${entity?.prevalence} for $domain")
+        logcat(INFO) { "Shield: isMajor ${entity?.isMajor} prev ${entity?.prevalence} for $domain" }
         return PROTECTED
     }
 

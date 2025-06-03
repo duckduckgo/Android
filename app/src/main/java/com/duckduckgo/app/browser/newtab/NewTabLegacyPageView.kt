@@ -64,7 +64,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class NewTabLegacyPageView @JvmOverloads constructor(
@@ -129,7 +131,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        Timber.d("New Tab: render $viewState")
+        logcat { "New Tab: render $viewState" }
         if (viewState.message == null && viewState.favourites.isEmpty()) {
             homeBackgroundLogo.showLogo()
         } else {
@@ -188,7 +190,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         try {
             context.startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

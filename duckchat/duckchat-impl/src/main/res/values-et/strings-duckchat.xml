@@ -21,6 +21,21 @@
     <string name="duck_chat_download_finished_action_name">Avatud</string>
     <string name="duck_chat_cannot_open_file_error_message">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Juurdepääs kaamerale nurjus</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Laadi pilt üles</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vali fail</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tee pilt</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ava sätted</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Ei saanud juurdepääsu helisalvestile</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme helisalvestile</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Saidid saavad helisalvestit kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai on valikuline funktsioon, mis võimaldab anonüümselt vestelda populaarsete kolmanda poole AI vestlusmudelitega. Teie vestlusi ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Luba Duck.ai</string>

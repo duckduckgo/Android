@@ -28,7 +28,9 @@ import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Companio
 import com.duckduckgo.voice.impl.listeningmode.OnDeviceSpeechRecognizer.Event
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 interface OnDeviceSpeechRecognizer {
     companion object {
@@ -85,7 +87,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
             when (error) {
                 SpeechRecognizer.ERROR_NO_MATCH -> _eventHandler(Event.RecognitionTimedOut(error))
                 else -> {
-                    Timber.e("SpeechRecognizer error: $error")
+                    logcat(ERROR) { "SpeechRecognizer error: $error" }
                     _eventHandler(Event.RecognitionFailed(error))
                 }
             }
@@ -123,7 +125,7 @@ class DefaultOnDeviceSpeechRecognizer @Inject constructor(
             speechRecognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
         }.onFailure {
             _eventHandler(Event.RecognitionFailed(-1))
-            Timber.e(it, "Failed to initialize SpeechRecognizer")
+            logcat(ERROR) { "Failed to initialize SpeechRecognizer: ${it.asLog()}" }
         }.onSuccess {
             speechRecognizer?.setRecognitionListener(recognitionListener)
             speechRecognizer?.startListening(speechRecognizerIntent)

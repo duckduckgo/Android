@@ -30,6 +30,9 @@ interface ScanLogDao {
     @Query("SELECT * FROM pir_broker_scan_log ORDER BY eventTimeInMillis")
     fun getAllBrokerScanEventsFlow(): Flow<List<PirBrokerScanLog>>
 
+    @Query("SELECT * FROM pir_broker_scan_log ORDER BY eventTimeInMillis")
+    fun getAllBrokerScanEvents(): List<PirBrokerScanLog>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertEventLog(pirScanLog: PirEventLog)
 

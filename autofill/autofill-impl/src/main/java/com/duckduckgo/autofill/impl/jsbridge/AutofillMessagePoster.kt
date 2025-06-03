@@ -27,7 +27,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 interface AutofillMessagePoster {
     suspend fun postMessage(
@@ -49,7 +50,7 @@ class AutofillWebViewMessagePoster @Inject constructor(
         webView?.let { wv ->
             withContext(dispatchers.main()) {
                 if (!WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
-                    Timber.e("Unable to post web message")
+                    logcat(ERROR) { "Unable to post web message" }
                     return@withContext
                 }
 

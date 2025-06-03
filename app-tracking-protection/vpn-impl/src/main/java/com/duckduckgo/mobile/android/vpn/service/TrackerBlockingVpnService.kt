@@ -241,7 +241,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                         launch(serviceDispatcher) {
                             // Give Android a moment to complete foreground transition
                             // You might think this is a hack (and it kind of is)
-                            // but it’s a workaround to avoid early establish() binding failures
+                            // but it's a workaround to avoid early establish() binding failures
                             delay(100)
                             async {
                                 startVpn(intent.alwaysOnTriggered())
@@ -831,7 +831,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 //                }
 //            }.onFailure {
 //                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
-//                Timber.w(it, "VPN log: Failed to start trampoline service")
+//                logcat(WARN) { "VPN log: Failed to start trampoline service: ${it.asLog()} }
 //                startVpnService(applicationContext)
 //            }
 //        }

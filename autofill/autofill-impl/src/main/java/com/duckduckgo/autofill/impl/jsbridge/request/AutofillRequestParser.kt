@@ -27,7 +27,9 @@ import com.squareup.moshi.adapters.EnumJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface AutofillRequestParser {
     suspend fun parseAutofillDataRequest(request: String): Result<AutofillDataRequest>
@@ -68,7 +70,7 @@ class AutofillJsonRequestParser @Inject constructor(
             val result = kotlin.runCatching {
                 autofillStoreFormDataRequestParser.fromJson(request)
             }
-                .onFailure { Timber.w(it, "Failed to parse autofill JSON for AutofillStoreFormDataRequest") }
+                .onFailure { logcat(WARN) { "Failed to parse autofill JSON for AutofillStoreFormDataRequest: ${it.asLog()}" } }
                 .getOrNull()
 
             return@withContext if (result == null) {

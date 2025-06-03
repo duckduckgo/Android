@@ -37,7 +37,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class PrivateSearchViewModel @Inject constructor(
@@ -81,7 +82,7 @@ class PrivateSearchViewModel @Inject constructor(
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
+        logcat(INFO) { "User changed autocomplete setting, is now enabled: $enabled" }
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.autoCompleteSuggestionsEnabled = enabled
             if (!enabled) {
@@ -100,7 +101,7 @@ class PrivateSearchViewModel @Inject constructor(
     }
 
     fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
-        Timber.i("User changed autocomplete recently visited sites setting, is now enabled: $enabled")
+        logcat(INFO) { "User changed autocomplete recently visited sites setting, is now enabled: $enabled" }
         viewModelScope.launch(dispatcherProvider.io()) {
             history.setHistoryUserEnabled(enabled)
             if (enabled) {

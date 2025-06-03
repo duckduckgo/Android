@@ -24,7 +24,10 @@ import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Single
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 class AppConfigurationSyncWorkRequestBuilder @Inject constructor() {
 
@@ -53,14 +56,14 @@ class AppConfigurationWorker(
     lateinit var appConfigurationDownloader: ConfigurationDownloader
 
     override fun createWork(): Single<Result> {
-        Timber.i("Running app config sync")
+        logcat(INFO) { "Running app config sync" }
         return appConfigurationDownloader.downloadTask()
             .toSingle {
-                Timber.i("App configuration sync was successful")
+                logcat(INFO) { "App configuration sync was successful" }
                 Result.success()
             }
             .onErrorReturn {
-                Timber.w(it, "App configuration sync work failed")
+                logcat(WARN) { "App configuration sync work failed: ${it.asLog()}" }
                 Result.retry()
             }
     }

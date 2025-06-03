@@ -23,7 +23,8 @@ import com.duckduckgo.remote.messaging.store.RemoteMessagingConfig
 import com.duckduckgo.remote.messaging.store.RemoteMessagingConfigRepository
 import com.duckduckgo.remote.messaging.store.expired
 import com.duckduckgo.remote.messaging.store.invalidated
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface RemoteMessagingConfigProcessor {
     suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig)
@@ -38,7 +39,7 @@ class RealRemoteMessagingConfigProcessor(
 ) : RemoteMessagingConfigProcessor {
 
     override suspend fun process(jsonRemoteMessagingConfig: JsonRemoteMessagingConfig) {
-        Timber.v("RMF: process ${jsonRemoteMessagingConfig.version}")
+        logcat(VERBOSE) { "RMF: process ${jsonRemoteMessagingConfig.version}" }
 
         val shouldProcess = if (remoteMessagingFeatureToggles.alwaysProcessRemoteConfig().isEnabled()) {
             true
@@ -57,7 +58,7 @@ class RealRemoteMessagingConfigProcessor(
             remoteMessagingConfigRepository.insert(RemoteMessagingConfig(version = jsonRemoteMessagingConfig.version))
             remoteMessagingRepository.activeMessage(message)
         } else {
-            Timber.v("RMF: skip")
+            logcat(VERBOSE) { "RMF: skip" }
         }
     }
 }

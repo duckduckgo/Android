@@ -26,7 +26,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface TabManager {
     companion object {
@@ -74,7 +75,7 @@ class DefaultTabManager @Inject constructor(
 
         if (updatedTabIds.isEmpty()) {
             withContext(dispatchers.io()) {
-                Timber.i("Tabs list is null or empty; adding default tab")
+                logcat(INFO) { "Tabs list is null or empty; adding default tab" }
                 tabRepository.addDefaultTab()
             }
         }

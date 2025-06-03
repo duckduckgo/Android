@@ -177,8 +177,13 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         if (w != oldw || h != oldh) {
             // This allows the view to adjust to configuration changes, even if it's currently in the focused state.
             // We need to do this after the layout pass that triggered onSizeChanged because there appears to be a race condition
-            // where layout param changes done directly in the onSizeChanged loop are not applied correctly.
-            doOnLayout {
+            // where layout param changes done directly in the onSizeChanged loop are not applied correctly (only applies to TOP omnibar position).
+            if (omnibarPosition == OmnibarPosition.TOP) {
+                doOnLayout {
+                    unlockContentDimensions()
+                }
+            } else {
+                // For BOTTOM omnibar position, we don't wait to doOnLayout because it breaks the omnibar layout with tab swiping
                 unlockContentDimensions()
             }
         }

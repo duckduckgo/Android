@@ -42,7 +42,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Qualifier
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(
@@ -78,14 +79,14 @@ class RealPrivacyConfigPersister @Inject constructor(
 
         val shouldPersist = newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
 
-        Timber.v(
-            "Should persist privacy config: %s. version=(existing: %s, new: %s), hash=(existing: %s, new: %s)",
-            shouldPersist,
-            previousVersion,
-            newVersion,
-            previousPluginHashCode,
-            currentPluginHashCode,
-        )
+        logcat(VERBOSE) {
+            """
+                Should persist privacy config: $shouldPersist. 
+                version=(existing: $previousVersion, 
+                new: $newVersion), 
+                hash=(existing: $previousPluginHashCode, new: $currentPluginHashCode)
+            """.trimIndent()
+        }
 
         if (shouldPersist) {
             database.runInTransaction {

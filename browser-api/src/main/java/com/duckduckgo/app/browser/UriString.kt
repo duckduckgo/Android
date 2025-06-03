@@ -23,8 +23,9 @@ import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.withScheme
 import java.lang.IllegalArgumentException
+import logcat.LogPriority.INFO
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import timber.log.Timber
 
 class UriString {
 
@@ -121,7 +122,7 @@ class UriString {
                 // e.g., this means "http://raspberrypi" will be considered a webUrl, but "raspberrypi" will not
                 rawUri.hasWebScheme()
             } catch (e: IllegalArgumentException) {
-                Timber.i("Failed to parse %s as a web url; assuming it isn't", inputQuery)
+                logcat(INFO) { "Failed to parse $inputQuery as a web url; assuming it isn't" }
                 false
             }
         }

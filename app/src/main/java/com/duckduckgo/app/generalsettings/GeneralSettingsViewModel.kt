@@ -49,7 +49,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class GeneralSettingsViewModel @Inject constructor(
@@ -104,7 +105,9 @@ class GeneralSettingsViewModel @Inject constructor(
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
                 maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
                 maliciousSiteProtectionFeatureAvailable =
-                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && maliciousSiteProtection.isFeatureEnabled(),
+                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() &&
+                    maliciousSiteProtection.isFeatureEnabled() &&
+                    !androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
             )
         }
 
@@ -112,7 +115,7 @@ class GeneralSettingsViewModel @Inject constructor(
     }
 
     fun onAutocompleteSettingChanged(enabled: Boolean) {
-        Timber.i("User changed autocomplete setting, is now enabled: $enabled")
+        logcat(INFO) { "User changed autocomplete setting, is now enabled: $enabled" }
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.autoCompleteSuggestionsEnabled = enabled
             if (!enabled) {
@@ -131,7 +134,7 @@ class GeneralSettingsViewModel @Inject constructor(
     }
 
     fun onAutocompleteRecentlyVisitedSitesSettingChanged(enabled: Boolean) {
-        Timber.i("User changed autocomplete recently visited sites setting, is now enabled: $enabled")
+        logcat(INFO) { "User changed autocomplete recently visited sites setting, is now enabled: $enabled" }
         viewModelScope.launch(dispatcherProvider.io()) {
             history.setHistoryUserEnabled(enabled)
             if (enabled) {
@@ -162,7 +165,7 @@ class GeneralSettingsViewModel @Inject constructor(
     }
 
     fun onMaliciousSiteProtectionSettingChanged(enabled: Boolean) {
-        Timber.i("User changed malicious site setting, is now enabled: $enabled")
+        logcat(INFO) { "User changed malicious site setting, is now enabled: $enabled" }
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.maliciousSiteProtectionEnabled = enabled
             pixel.fire(

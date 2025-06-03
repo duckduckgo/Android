@@ -27,7 +27,8 @@ import com.wireguard.crypto.Key
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Provider
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
 interface WgProtocol {
@@ -77,7 +78,7 @@ class RealWgProtocol @Inject constructor(
         val level = if (appBuildConfig.isDebug) Log.VERBOSE else Log.ASSERT
         wgTunnel = goBackend.wgTurnOn(INTERFACE_NAME, tunFd, configString, level, appBuildConfig.sdkInt)
         return if (wgTunnel < 0) {
-            logcat(LogPriority.ERROR) { "Wireguard tunnel failed to start: check config / tunFd" }
+            logcat(ERROR) { "Wireguard tunnel failed to start: check config / tunFd" }
             Result.failure(java.lang.IllegalStateException("Wireguard failed to connect to backend"))
         } else {
             logcat { "Protecting V4 and V6 wg-sockets" }

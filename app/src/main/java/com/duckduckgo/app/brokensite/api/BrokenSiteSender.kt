@@ -59,7 +59,10 @@ import java.util.*
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class BrokenSiteSubmitter @Inject constructor(
@@ -173,12 +176,12 @@ class BrokenSiteSubmitter @Inject constructor(
                 }
             }
                 .onSuccess {
-                    Timber.v("Feedback submission succeeded")
+                    logcat(VERBOSE) { "Feedback submission succeeded" }
                     if (!domain.isNullOrEmpty()) {
                         brokenSiteLastSentReport.setLastSentDay(domain)
                     }
                 }
-                .onFailure { Timber.w(it, "Feedback submission failed") }
+                .onFailure { logcat(WARN) { "Feedback submission failed: ${it.asLog()}" } }
 
             pixel.fire(
                 AppPixelName.BROKEN_SITE_REPORTED,

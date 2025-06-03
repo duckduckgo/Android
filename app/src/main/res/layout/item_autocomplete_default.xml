@@ -21,7 +21,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/selectableItemBackground"
-    android:paddingVertical="@dimen/keyline_2"
     android:paddingStart="?attr/autocompleteListItemStartPadding"
     android:paddingEnd="?attr/autocompleteListItemEndPadding">
 
@@ -31,6 +30,7 @@
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_find_search_24"
+        android:paddingVertical="?attr/autocompleteListItemVerticalPadding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

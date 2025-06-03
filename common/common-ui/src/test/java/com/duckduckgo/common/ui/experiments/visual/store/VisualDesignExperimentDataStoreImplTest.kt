@@ -252,6 +252,42 @@ class VisualDesignExperimentDataStoreImplTest {
         Assert.assertTrue(testee.anyConflictingExperimentEnabled.value)
     }
 
+    @Test
+    fun `when Duck AI PoC FF enabled and experiment enabled, Duck AI PoC enabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
+        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatPoCToggle.isEnabled()).thenReturn(true)
+
+        val testee = createTestee()
+
+        Assert.assertTrue(testee.isDuckAIPoCEnabled.value)
+    }
+
+    @Test
+    fun `when Duck AI PoC FF enabled and experiment disabled, Duck AI PoC disabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
+        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(false)
+        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(false)
+        whenever(duckChatPoCToggle.isEnabled()).thenReturn(true)
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isDuckAIPoCEnabled.value)
+    }
+
+    @Test
+    fun `when Duck AI PoC FF disabled but experiment enabled, Duck AI PoC disabled`() = runTest {
+        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
+        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
+        whenever(duckChatPoCToggle.isEnabled()).thenReturn(false)
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isDuckAIPoCEnabled.value)
+    }
+
     private fun createTestee(): VisualDesignExperimentDataStoreImpl {
         return VisualDesignExperimentDataStoreImpl(
             appCoroutineScope = coroutineRule.testScope,

@@ -24,7 +24,11 @@ import android.net.Uri
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface PlayStoreUtils {
 
@@ -42,28 +46,28 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
             val installSource = context.packageManager.getInstallerPackageName(DDG_APP_PACKAGE)
             return matchesPlayStoreInstallSource(installSource)
         } catch (e: IllegalArgumentException) {
-            Timber.w("Can't determine if app was installed from Play Store; assuming it wasn't")
+            logcat(WARN) { "Can't determine if app was installed from Play Store; assuming it wasn't" }
             false
         }
     }
 
     private fun matchesPlayStoreInstallSource(installSource: String?): Boolean {
-        Timber.i("DuckDuckGo app install source detected: $installSource")
+        logcat(INFO) { "DuckDuckGo app install source detected: $installSource" }
         return installSource == PLAY_STORE_PACKAGE
     }
 
     override fun isPlayStoreInstalled(): Boolean {
         return try {
             if (!isPlayStoreActivityResolvable(context)) {
-                Timber.i("Cannot resolve Play Store activity")
+                logcat(INFO) { "Cannot resolve Play Store activity" }
                 return false
             }
 
             val isAppEnabled = isPlayStoreAppEnabled()
-            Timber.i("The Play Store app is installed " + if (isAppEnabled) "and enabled" else "but disabled")
+            logcat(INFO) { "The Play Store app is installed ${if (isAppEnabled) "and enabled" else "but disabled"}" }
             return isAppEnabled
         } catch (e: PackageManager.NameNotFoundException) {
-            Timber.i("Could not find package details for $PLAY_STORE_PACKAGE; Play Store is not installed")
+            logcat(INFO) { "Could not find package details for $PLAY_STORE_PACKAGE; Play Store is not installed" }
             false
         }
     }
@@ -91,7 +95,7 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Timber.e(e, "Could not launch the Play Store")
+            logcat(ERROR) { "Could not launch the Play Store: ${e.asLog()}" }
         }
     }
 
@@ -101,7 +105,7 @@ class PlayStoreAndroidUtils @Inject constructor(val context: Context) : PlayStor
         try {
             context.startActivity(intent)
         } catch (e: ActivityNotFoundException) {
-            Timber.e(e, "Could not launch the Play Store")
+            logcat(ERROR) { "Could not launch the Play Store: ${e.asLog()}" }
         }
     }
 

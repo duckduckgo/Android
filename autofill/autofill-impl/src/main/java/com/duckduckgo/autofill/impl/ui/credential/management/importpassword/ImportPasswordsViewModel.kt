@@ -36,7 +36,9 @@ import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedOut
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(AppScope::class)
 class ImportPasswordsViewModel @Inject constructor(
@@ -64,7 +66,7 @@ class ImportPasswordsViewModel @Inject constructor(
      *     or sync is enabled but not synced with any desktop devices
      */
     fun userLaunchedScreen() {
-        Timber.v("User launched import passwords screen; checking user-journey status")
+        logcat(VERBOSE) { "User launched import passwords screen; checking user-journey status" }
 
         // use appCoroutineScope as the call to get account state might not be quick; we want the call to succeed even if the user leaves the screen
         appCoroutineScope.launch(dispatchers.io()) {
@@ -98,7 +100,7 @@ class ImportPasswordsViewModel @Inject constructor(
     private fun userJourneySuccessCriteriaMet(): Boolean {
         val state = deviceSyncState.getAccountState()
         if (state.isSyncedWithDesktopDevice()) {
-            Timber.i("user-journey completed immediately upon returning to screen")
+            logcat(INFO) { "user-journey completed immediately upon returning to screen" }
             return true
         }
         return false
@@ -121,13 +123,13 @@ class ImportPasswordsViewModel @Inject constructor(
     }
 
     private suspend fun recordUserJourneyStartTime() {
-        Timber.i("Starting user-journey success clock for import passwords screen")
+        logcat(INFO) { "Starting user-journey success clock for import passwords screen" }
         pixel.fire(AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_STARTED)
         importPasswordsDataStore.startUserJourney()
     }
 
     private suspend fun recordUserJourneyRestartTime() {
-        Timber.i("Restarting user-journey success clock for import passwords screen")
+        logcat(INFO) { "Restarting user-journey success clock for import passwords screen" }
         pixel.fire(AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_RESTARTED)
         importPasswordsDataStore.startUserJourney()
     }
@@ -135,7 +137,7 @@ class ImportPasswordsViewModel @Inject constructor(
     private suspend fun aUserJourneyIsOngoing() = importPasswordsDataStore.getUserJourneyStartTime() != null
 
     fun userReturnedFromSyncSettings() {
-        Timber.v("User returned from sync settings. Checking user-journey status")
+        logcat(VERBOSE) { "User returned from sync settings. Checking user-journey status" }
         // use appCoroutineScope as the call to get account state might not be quick; we want the call to succeed even if the user leaves the screen
         appCoroutineScope.launch(dispatchers.io()) {
             if (aUserJourneyIsOngoing() && userJourneySuccessCriteriaMet()) {

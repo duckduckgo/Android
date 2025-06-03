@@ -855,7 +855,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
@@ -870,5 +870,11 @@
     <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
     <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
-
+    <string name="threatProtectionTitle">Threat Protection</string>
+    <string name="threatProtectionDescription">DuckDuckGo\'s enhanced protections stop common threats while keeping your connection secure.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatically upgrades links to HTTPS whenever possible.<br><a href="">Learn More</a>]]></string>
+    <string name="scamBlockerTitle">Scam Blocker</string>
+    <string name="scamBlockerDescription">Warn on sites flagged for scams, phishing and malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Learn more</string>
 </resources>

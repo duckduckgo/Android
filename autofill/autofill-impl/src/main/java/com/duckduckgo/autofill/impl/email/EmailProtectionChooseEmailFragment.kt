@@ -34,7 +34,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailProtectionChooseEmailDialog {
@@ -86,7 +87,7 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
     }
 
     private fun returnResult(resultType: UseEmailResultType) {
-        Timber.v("User action: %s", resultType::class.java.simpleName)
+        logcat(VERBOSE) { "User action: ${resultType::class.java.simpleName}" }
 
         val result = Bundle().also {
             it.putString(EmailProtectionChooseEmailDialog.KEY_URL, getOriginalUrl())
@@ -104,7 +105,7 @@ class EmailProtectionChooseEmailFragment : BottomSheetDialogFragment(), EmailPro
     }
 
     override fun onCancel(dialog: DialogInterface) {
-        Timber.v("onCancel: EmailAutofillTooltipFragment. User declined to use Email Protection")
+        logcat(VERBOSE) { "onCancel: EmailAutofillTooltipFragment. User declined to use Email Protection" }
         returnResult(UseEmailResultType.DoNotUseEmailProtection)
     }
 

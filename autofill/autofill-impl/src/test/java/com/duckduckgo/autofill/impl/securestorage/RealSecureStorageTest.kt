@@ -18,10 +18,10 @@ package com.duckduckgo.autofill.impl.securestorage
 
 import app.cash.turbine.test
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedString
+import com.duckduckgo.autofill.store.SecureStorageRepository
+import com.duckduckgo.autofill.store.SecureStorageRepository.Factory
+import com.duckduckgo.autofill.store.db.WebsiteLoginCredentialsEntity
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.securestorage.store.SecureStorageRepository
-import com.duckduckgo.securestorage.store.SecureStorageRepository.Factory
-import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
