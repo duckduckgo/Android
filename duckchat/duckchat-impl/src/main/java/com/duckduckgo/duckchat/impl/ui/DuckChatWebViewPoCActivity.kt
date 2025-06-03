@@ -43,124 +43,124 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-
-@InjectWith(ActivityScope::class)
-class DuckChatWebViewPoCActivity : DuckChatWebViewActivity() {
-
-    @Inject
-    lateinit var appBrowserNav: BrowserNav
-
-    private val duckChatOmnibar: DuckChatOmnibarLayout by lazy { findViewById(R.id.duckChatOmnibar) }
-
-    override val layoutResId: Int = R.layout.activity_duck_chat_webview_poc
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        configurePoCUI()
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private fun configurePoCUI() {
-        duckChatOmnibar.apply {
-            isVisible = true
-            selectTab(1)
-            onFire = {
-                ActionBottomSheetDialog.Builder(this@DuckChatWebViewPoCActivity)
-                    .setTitle(context.getString(R.string.duck_chat_delete_this_chat))
-                    .setPrimaryItem(context.getString(R.string.duck_chat_delete_chat))
-                    .setSecondaryItem(context.getString(R.string.duck_chat_cancel))
-                    .addEventListener(
-                        object : ActionBottomSheetDialog.EventListener() {
-                            override fun onPrimaryItemClicked() {
-                                contentScopeScripts.sendSubscriptionEvent(
-                                    SubscriptionEventData(
-                                        featureName = DUCK_CHAT_FEATURE_NAME,
-                                        subscriptionName = "submitFireButtonAction",
-                                        params = JSONObject("{}"),
-                                    ),
-                                )
-                            }
-                        },
-                    )
-                    .show()
-            }
-            onNewChat = {
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = DUCK_CHAT_FEATURE_NAME,
-                        subscriptionName = "submitNewChatAction",
-                        params = JSONObject("{}"),
-                    ),
-                )
-            }
-            onSearchSent = { message ->
-                context.startActivity(appBrowserNav.openInNewTab(context, message))
-                finish()
-            }
-            onDuckChatSent = { message ->
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = DUCK_CHAT_FEATURE_NAME,
-                        subscriptionName = "submitAIChatNativePrompt",
-                        params = JSONObject(
-                            """
-                            {
-                              "platform": "android",
-                              "query": {
-                                "prompt": "$message",
-                                "autoSubmit": true
-                              }
-                            }
-                            """,
-                        ),
-                    ),
-                )
-                hideKeyboard(duckChatInput)
-            }
-            onStop = {
-                contentScopeScripts.sendSubscriptionEvent(
-                    SubscriptionEventData(
-                        featureName = DUCK_CHAT_FEATURE_NAME,
-                        subscriptionName = "submitPromptInterruption",
-                        params = JSONObject("{}"),
-                    ),
-                )
-            }
-            onBack = { onBackPressed() }
-            enableFireButton = true
-            enableNewChatButton = true
-        }
-
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                duckChat.chatState.collect { state ->
-                    Log.d("DuckChatWebViewActivity", "ChatState changed to: $state")
-
-                    when (state) {
-                        START_STREAM_NEW_PROMPT -> duckChatOmnibar.hideStopButton()
-                        LOADING -> duckChatOmnibar.showStopButton()
-                        STREAMING -> duckChatOmnibar.showStopButton()
-                        ERROR -> duckChatOmnibar.hideStopButton()
-                        READY -> {
-                            duckChatOmnibar.hideStopButton()
-                            duckChatOmnibar.isVisible = true
-                        }
-                        BLOCKED -> duckChatOmnibar.hideStopButton()
-                        HIDE -> duckChatOmnibar.isVisible = false
-                        SHOW -> duckChatOmnibar.isVisible = true
-                    }
-                }
-            }
-        }
-
-        simpleWebview.apply {
-            setOnTouchListener { v, event ->
-                if (event.action == MotionEvent.ACTION_DOWN) {
-                    hideKeyboard(duckChatOmnibar.duckChatInput)
-                }
-                false
-            }
-            isFocusableInTouchMode = true
-        }
-    }
-}
+// TODO
+// @InjectWith(ActivityScope::class)
+// class DuckChatWebViewPoCActivity : DuckChatWebViewActivity() {
+//
+//     @Inject
+//     lateinit var appBrowserNav: BrowserNav
+//
+//     private val duckChatOmnibar: DuckChatOmnibarLayout by lazy { findViewById(R.id.duckChatOmnibar) }
+//
+//     override val layoutResId: Int = R.layout.activity_duck_chat_webview_poc
+//
+//     override fun onCreate(savedInstanceState: Bundle?) {
+//         super.onCreate(savedInstanceState)
+//         configurePoCUI()
+//     }
+//
+//     @SuppressLint("ClickableViewAccessibility")
+//     private fun configurePoCUI() {
+//         duckChatOmnibar.apply {
+//             isVisible = true
+//             selectTab(1)
+//             onFire = {
+//                 ActionBottomSheetDialog.Builder(this@DuckChatWebViewPoCActivity)
+//                     .setTitle(context.getString(R.string.duck_chat_delete_this_chat))
+//                     .setPrimaryItem(context.getString(R.string.duck_chat_delete_chat))
+//                     .setSecondaryItem(context.getString(R.string.duck_chat_cancel))
+//                     .addEventListener(
+//                         object : ActionBottomSheetDialog.EventListener() {
+//                             override fun onPrimaryItemClicked() {
+//                                 contentScopeScripts.sendSubscriptionEvent(
+//                                     SubscriptionEventData(
+//                                         featureName = DUCK_CHAT_FEATURE_NAME,
+//                                         subscriptionName = "submitFireButtonAction",
+//                                         params = JSONObject("{}"),
+//                                     ),
+//                                 )
+//                             }
+//                         },
+//                     )
+//                     .show()
+//             }
+//             onNewChat = {
+//                 contentScopeScripts.sendSubscriptionEvent(
+//                     SubscriptionEventData(
+//                         featureName = DUCK_CHAT_FEATURE_NAME,
+//                         subscriptionName = "submitNewChatAction",
+//                         params = JSONObject("{}"),
+//                     ),
+//                 )
+//             }
+//             onSearchSent = { message ->
+//                 context.startActivity(appBrowserNav.openInNewTab(context, message))
+//                 finish()
+//             }
+//             onDuckChatSent = { message ->
+//                 contentScopeScripts.sendSubscriptionEvent(
+//                     SubscriptionEventData(
+//                         featureName = DUCK_CHAT_FEATURE_NAME,
+//                         subscriptionName = "submitAIChatNativePrompt",
+//                         params = JSONObject(
+//                             """
+//                             {
+//                               "platform": "android",
+//                               "query": {
+//                                 "prompt": "$message",
+//                                 "autoSubmit": true
+//                               }
+//                             }
+//                             """,
+//                         ),
+//                     ),
+//                 )
+//                 hideKeyboard(duckChatInput)
+//             }
+//             onStop = {
+//                 contentScopeScripts.sendSubscriptionEvent(
+//                     SubscriptionEventData(
+//                         featureName = DUCK_CHAT_FEATURE_NAME,
+//                         subscriptionName = "submitPromptInterruption",
+//                         params = JSONObject("{}"),
+//                     ),
+//                 )
+//             }
+//             onBack = { onBackPressed() }
+//             enableFireButton = true
+//             enableNewChatButton = true
+//         }
+//
+//         lifecycleScope.launch {
+//             repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                 duckChat.chatState.collect { state ->
+//                     Log.d("DuckChatWebViewActivity", "ChatState changed to: $state")
+//
+//                     when (state) {
+//                         START_STREAM_NEW_PROMPT -> duckChatOmnibar.hideStopButton()
+//                         LOADING -> duckChatOmnibar.showStopButton()
+//                         STREAMING -> duckChatOmnibar.showStopButton()
+//                         ERROR -> duckChatOmnibar.hideStopButton()
+//                         READY -> {
+//                             duckChatOmnibar.hideStopButton()
+//                             duckChatOmnibar.isVisible = true
+//                         }
+//                         BLOCKED -> duckChatOmnibar.hideStopButton()
+//                         HIDE -> duckChatOmnibar.isVisible = false
+//                         SHOW -> duckChatOmnibar.isVisible = true
+//                     }
+//                 }
+//             }
+//         }
+//
+//         simpleWebview.apply {
+//             setOnTouchListener { v, event ->
+//                 if (event.action == MotionEvent.ACTION_DOWN) {
+//                     hideKeyboard(duckChatOmnibar.duckChatInput)
+//                 }
+//                 false
+//             }
+//             isFocusableInTouchMode = true
+//         }
+//     }
+// }
