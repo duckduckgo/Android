@@ -75,8 +75,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
     private val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
-    private val shadowTop: View by lazy { findViewById<View>(R.id.shadowViewTop) }
-    private val shadowBottom: View by lazy { findViewById<View>(R.id.shadowViewBottom) }
+    private val shadowTop: View by lazy { findViewById(R.id.shadowViewTop) }
+    private val shadowLineBottom: View by lazy { findViewById(R.id.shadowLineViewBottom) }
+
+    private val shadowGradientBottom: View by lazy { findViewById(R.id.shadowViewBottom) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -363,8 +365,15 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderShadows(showTopShadow: Boolean, showBottomShadow: Boolean) {
+        val isBottomShadowVisible = showBottomShadow && omnibarPosition == OmnibarPosition.TOP
+        if (viewModel.viewState.value.viewMode == ViewMode.NewTab) {
+            shadowLineBottom.gone()
+            shadowGradientBottom.isVisible = isBottomShadowVisible
+        } else {
+            shadowLineBottom.isVisible = isBottomShadowVisible
+            shadowGradientBottom.gone()
+        }
         shadowTop.isVisible = showTopShadow && omnibarPosition == OmnibarPosition.BOTTOM
-        shadowBottom.isVisible = showBottomShadow && omnibarPosition == OmnibarPosition.TOP
     }
 
     companion object {

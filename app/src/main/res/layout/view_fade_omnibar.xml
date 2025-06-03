@@ -35,7 +35,7 @@
             android:id="@+id/shadowViewTop"
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:background="@drawable/background_webview_bottom_shadow" />
+            android:background="@drawable/background_webview_top_shadow" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
@@ -459,10 +459,16 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
-            android:id="@+id/shadowViewBottom"
+            android:id="@+id/shadowLineViewBottom"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="?attr/daxColorLineShadow" />
+
+        <View
+            android:id="@+id/shadowViewBottom"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/background_webview_bottom_shadow" />
 
         <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
             android:id="@+id/omnibarNavigationBar"
