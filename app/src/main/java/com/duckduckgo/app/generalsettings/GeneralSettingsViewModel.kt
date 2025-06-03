@@ -105,7 +105,9 @@ class GeneralSettingsViewModel @Inject constructor(
                 showOnAppLaunchSelectedOption = showOnAppLaunchOptionDataStore.optionFlow.first(),
                 maliciousSiteProtectionEnabled = settingsDataStore.maliciousSiteProtectionEnabled,
                 maliciousSiteProtectionFeatureAvailable =
-                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() && maliciousSiteProtection.isFeatureEnabled(),
+                androidBrowserConfigFeature.enableMaliciousSiteProtection().isEnabled() &&
+                    maliciousSiteProtection.isFeatureEnabled() &&
+                    !androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
             )
         }
 

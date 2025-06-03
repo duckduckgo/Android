@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Sekmelerinizi ve verilerinizi temizlemek, izleyici engelleme geçmişinizi silecek ve bu sayıyı sıfırlayacaktır.\n\nSekmeler görünümünde görmemeyi tercih ediyorsanız bu başlığı gizleyin.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner\'ı Gizle</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Uyarı: Bu site bir güvenlik riski oluşturabilir</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, DuckDuckGo bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Bu web sitesi, şifre veya kredi kartı numarası gibi kişisel bilgilerinizi vermeniz için sizi kandırmak amacıyla meşru bir siteyi taklit ediyor olabilir.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Kimlik avı veya kötü amaçlı yazılım için işaretlenen siteler olduğunda beni uyar</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="maliciousSiteSettingDisabled">Bu özelliği devre dışı bırakmak bilgilerinizi riske atabilir.</string>
-
+    <string name="threatProtectionTitle">Tehdit Koruması</string>
+    <string name="threatProtectionDescription">DuckDuckGo\'nun gelişmiş korumaları, bağlantıyı güvende tutarken yaygın tehditleri durdurur.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Mümkün olduğunda bağlantıları otomatik olarak HTTPS\'ye yükseltir.<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="scamBlockerTitle">Dolandırıcılık Engelleyici</string>
+    <string name="scamBlockerDescription">Dolandırıcılık, kimlik avı ve kötü amaçlı yazılım için işaretlenen siteler olduğunda uyarı göster.</string>
+    <string name="threatProtectionLearnMoreTitle">Daha fazla bilgi</string>
 </resources>

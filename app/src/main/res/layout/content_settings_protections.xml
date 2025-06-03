@@ -50,6 +50,13 @@
         app:leadingIcon="@drawable/ic_shield_color_24"
         app:primaryText="@string/settingsWebTrackingProtectionTitle" />
 
+    <LinearLayout
+        android:id="@+id/settingsSectionThreatProtection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/cookiePopupProtectionSetting"
         android:layout_width="match_parent"

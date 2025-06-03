@@ -856,7 +856,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[See veebisait võib imiteerida seaduslikku veebisaiti, et sinult välja petta isiklikke andmeid, näiteks paroole või krediitkaardi numbreid.\n<a href=\"\">Vaata lähemalt</a>]]></string>
@@ -871,5 +871,11 @@
     <string name="maliciousSiteToggleHint">Hoiata mind andmepüügi või pahavara tõttu märgistatud saitidel</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="maliciousSiteSettingDisabled">Selle funktsiooni keelamine võib teie andmed ohtu seada.</string>
-
+    <string name="threatProtectionTitle">Kaitse ohtude eest</string>
+    <string name="threatProtectionDescription">DuckDuckGo täiustatud kaitsed peatavad levinud ohud, hoides samal ajal su ühenduse turvalisena.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Võimaluse korral uuendab lingid automaatselt HTTPS-ile.<br><a href=\"\">Loe edasi</a>]]></string>
+    <string name="scamBlockerTitle">Pettuste blokeerija</string>
+    <string name="scamBlockerDescription">Hoiata mind pettuste, andmepüügi ja pahavara tõttu märgistatud saitidel.</string>
+    <string name="threatProtectionLearnMoreTitle">Loe edasi</string>
 </resources>

@@ -872,7 +872,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Notīrot savas cilnes un datus, tiks izdzēsta tava izsekotāja bloķēšanas vēsture un šis skaitlis tiks atiestatīts uz nulli.\n\nPaslēp šo reklāmkarogu, ja nevēlies to redzēt cilņu skatā.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslēpt reklāmkarogu</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Iespējams, ka šī vietne uzdodas par likumīgu vietni, lai tevi maldinātu sniegt personisku informāciju, piemēram, paroles vai kredītkartes numurus.\n<a href=\"\">Uzzini vairāk</a>]]></string>
@@ -887,5 +887,11 @@
     <string name="maliciousSiteToggleHint">Brīdiniet mani par vietnēm, kas atzīmētas kā pikšķerēšanas vai ļaunprātīgas programmatūras vietnes</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="maliciousSiteSettingDisabled">Šī līdzekļa atspējošana var apdraudēt tavu informāciju.</string>
-
+    <string name="threatProtectionTitle">Draudu aizsardzība</string>
+    <string name="threatProtectionDescription">DuckDuckGo uzlabotā aizsardzība aptur izplatītākos draudus, vienlaikus nodrošinot drošu savienojumu.</string>
+    <string name="smarterEncryptionTitle">Gudrāka šifrēšana</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automātiski jaunina saites uz HTTPS, kad vien iespējams.<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="scamBlockerTitle">Krāpniecības bloķētājs</string>
+    <string name="scamBlockerDescription">Brīdina par vietnēm, kas atzīmētas kā krāpnieciskas, pikšķerēšanas un ļaunprātīgas programmatūras vietnes.</string>
+    <string name="threatProtectionLearnMoreTitle">Uzzināt vairāk</string>
 </resources>
