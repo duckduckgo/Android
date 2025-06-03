@@ -844,7 +844,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nieuwe AI Chat</string>
+    <string name="duckChatMenuItem">Nieuwe Duck.ai</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laat DuckDuckGo meer beschermen van wat je online doet</string>

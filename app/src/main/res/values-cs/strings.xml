@@ -876,7 +876,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nový AI Chat</string>
+    <string name="duckChatMenuItem">Nový Duck.ai</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Používej DuckDuckGo a získej větší ochranu při prohlížení internetu</string>

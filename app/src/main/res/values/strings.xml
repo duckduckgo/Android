@@ -843,7 +843,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">New AI Chat</string>
+    <string name="duckChatMenuItem">New Duck.ai</string>
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
@@ -878,3 +878,4 @@
     <string name="scamBlockerDescription">Warn on sites flagged for scams, phishing and malware.</string>
     <string name="threatProtectionLearnMoreTitle">Learn more</string>
 </resources>
+

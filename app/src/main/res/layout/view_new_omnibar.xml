@@ -350,7 +350,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:contentDescription="AI Chat"
+                    android:contentDescription="Duck.ai"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_ai_chat_24" />
             </FrameLayout>
