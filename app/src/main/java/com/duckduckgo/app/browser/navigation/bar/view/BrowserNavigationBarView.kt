@@ -33,7 +33,6 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
@@ -66,16 +65,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
-
-    private var showShadows: Boolean = false
-
-    init {
-        context.theme.obtainStyledAttributes(attrs, R.styleable.BrowserNavigationBarView, defStyle, 0)
-            .apply {
-                showShadows = getBoolean(R.styleable.BrowserNavigationBarView_showShadows, true)
-                recycle()
-            }
-    }
 
     override fun setVisibility(visibility: Int) {
         val isVisibilityUpdated = this.visibility != visibility
@@ -126,6 +115,12 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         }
     }
 
+    fun setOmnibarPosition(omnibarPosition: OmnibarPosition) {
+        doOnAttach {
+            viewModel.setOmnibarPosition(omnibarPosition)
+        }
+    }
+
     fun setViewMode(viewMode: ViewMode) {
         doOnAttach {
             viewModel.setViewMode(viewMode)
@@ -135,6 +130,12 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     fun setFireButtonHighlight(highlighted: Boolean) {
         doOnAttach {
             viewModel.setFireButtonHighlight(highlighted)
+        }
+    }
+
+    fun setCanScrollDown(canScrollDown: Boolean) {
+        doOnAttach {
+            viewModel.onCanScrollDownChanged(canScrollDown)
         }
     }
 
@@ -196,7 +197,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        binding.shadowView.isVisible = showShadows
         binding.root.isVisible = viewState.isVisible
 
         binding.newTabButton.isVisible = viewState.newTabButtonVisible
@@ -208,6 +208,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.tabsButton.hasUnread = viewState.hasUnreadTabs
 
         renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
+        binding.shadowView.isVisible = viewState.showShadow
     }
 
     private fun processCommands(command: Command) {
