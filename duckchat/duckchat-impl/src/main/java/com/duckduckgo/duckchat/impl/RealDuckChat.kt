@@ -20,13 +20,11 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -36,7 +34,6 @@ import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
-import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -47,7 +44,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -94,11 +90,6 @@ interface DuckChatInternal : DuckChat {
      * Closes DuckChat.
      */
     fun closeDuckChat()
-
-    /**
-     * Calls onClose when a close event is emitted.
-     */
-    fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
 
     /**
      * Returns whether address bar entry point is enabled or not.
@@ -166,9 +157,9 @@ class RealDuckChat @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
+    private val browserNav: BrowserNav,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
-    private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
@@ -241,6 +232,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChatSettings() {
+        // todo what happens with this interaction? closeDuckChat() would go back to browser activity
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
         intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
@@ -248,18 +240,9 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        appCoroutineScope.launch {
-            closeChatFlow.emit(Unit)
-        }
-    }
-
-    override fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) {
-        lifecycleOwner.lifecycleScope.launch {
-            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                closeChatFlow.collect {
-                    onClose()
-                }
-            }
+        browserNav.closeDuckChat(context).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(this)
         }
     }
 
@@ -325,9 +308,15 @@ class RealDuckChat @Inject constructor(
     }
 
     private fun startDuckChatActivity(url: String) {
-        globalActivityStarter
-            .startIntent(context, DuckChatWebViewActivityWithParams(url))
+        // TODO impl url
+        // globalActivityStarter
+        //     .startIntent(context, DuckChatWebViewActivityWithParams(url))
+        browserNav.openDuckChat(context)
             ?.apply {
+                // TODO fix DuckAi POC
+                // if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
+                //     setClass(context, DuckChatWebViewPoCActivity::class.java)
+                // }
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
             }

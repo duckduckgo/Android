@@ -26,4 +26,6 @@ interface BrowserNav {
     // opens url on a new tab
     fun openInNewTab(context: Context, url: String): Intent
     fun openInCurrentTab(context: Context, url: String): Intent
+    fun openDuckChat(context: Context, query: String? = null, autoPrompt: Boolean = false): Intent
+    fun closeDuckChat(context: Context): Intent
 }

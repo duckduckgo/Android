@@ -100,6 +100,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -195,6 +196,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var browserFeatures: AndroidBrowserConfigFeature
 
     private val lastActiveTabs = TabList()
+
+    private var duckAiFragment: DuckChatWebViewFragment? = null
 
     private var _currentTab: BrowserTabFragment? = null
     private var currentTab: BrowserTabFragment?
@@ -546,7 +549,39 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            duckChat.openDuckChat()
+            duckAiFragment?.let { fragment ->
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.setCustomAnimations(
+                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
+                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
+                )
+                transaction.show(fragment)
+                transaction.commit()
+            } ?: run {
+                val fragment = DuckChatWebViewFragment()
+                duckAiFragment = fragment
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.setCustomAnimations(
+                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
+                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
+                )
+                transaction.replace(binding.duckAiFragmentContainer.id, fragment)
+                transaction.commit()
+            }
+            return
+        }
+
+        if (intent.getBooleanExtra(CLOSE_DUCK_CHAT, false)) {
+            val fragment = duckAiFragment
+            if (fragment?.isVisible == true) {
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.setCustomAnimations(
+                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
+                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
+                )
+                transaction.hide(fragment)
+                transaction.commit()
+            }
             return
         }
 
@@ -760,6 +795,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
+                    val duckAiFragmentRef = duckAiFragment
+                    if (duckAiFragmentRef != null && duckAiFragmentRef.onBackPressed()) {
+                        return
+                    }
                     if (currentTab?.onBackPressed() != true) {
                         // signal user press back button to exit the app so that BrowserApplicationStateInfo
                         // can call the right callback
@@ -817,6 +856,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openExistingTabId: String? = null,
             isLaunchFromClearDataAction: Boolean = false,
             openDuckChat: Boolean = false,
+            closeDuckChat: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -829,6 +869,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_EXISTING_TAB_ID_EXTRA, openExistingTabId)
             intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
+            intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             return intent
         }
 
@@ -846,6 +887,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         const val LAUNCH_FROM_EXTERNAL_EXTRA = "LAUNCH_FROM_EXTERNAL_EXTRA"
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
+        private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
