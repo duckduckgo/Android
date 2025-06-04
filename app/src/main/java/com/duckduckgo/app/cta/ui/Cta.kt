@@ -28,6 +28,7 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBuckDialogBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
@@ -49,6 +50,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
+import com.google.android.material.button.MaterialButton
 
 interface ViewCta {
     fun showCta(
@@ -607,6 +609,66 @@ sealed class DaxBubbleCta(
         view.findViewById<View>(R.id.cardContainer).setOnClickListener { afterAnimation() }
     }
 
+    fun showBuckCta(
+        binding: IncludeOnboardingBubbleBuckDialogBinding,
+        onAnimationEnd: () -> Unit,
+    ) {
+        ctaView = binding.root
+        clearBubbleBuckDialog(binding)
+        val daxTitle = binding.root.context.getString(title)
+        val daxText = binding.root.context.getString(description)
+        val optionsViews: List<MaterialButton> = listOf(
+            binding.daxDialogOption1,
+            binding.daxDialogOption2,
+            binding.daxDialogOption3,
+            binding.daxDialogOption4,
+        )
+
+        primaryCta?.let { primaryCtaRes ->
+            with(binding.primaryCta) {
+                show()
+                text = binding.root.context.getString(primaryCtaRes)
+            }
+        }
+
+        secondaryCta?.let { secondaryCtaRes ->
+            with(binding.secondaryCta) {
+                show()
+                text = binding.root.context.getString(secondaryCtaRes)
+            }
+        }
+
+        placeholder?.let { placeholderImageRes ->
+            with(binding.placeholder) {
+                show()
+                setImageResource(placeholderImageRes)
+            }
+        }
+
+        options?.let { options ->
+            optionsViews.forEachIndexed { index, buttonView ->
+                if (options.size > index) {
+                    options[index].setOptionView(buttonView)
+                    buttonView.show()
+                } else {
+                    buttonView.gone()
+                }
+            }
+        }
+
+        with(binding) {
+            dialogTextCta.text = daxText.html(root.context)
+            daxBubbleDialogTitle.text = daxTitle.html(root.context)
+
+            buckOnboardingDialogView.animateEntrance(
+                onAnimationEnd = {
+                    daxDialogDismissButton.animate().alpha(1f).setDuration(500)
+                    onAnimationEnd()
+                },
+            )
+        }
+    }
+
     private fun clearDialog() {
         ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.alpha = 0f
         ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.gone()
@@ -624,14 +686,27 @@ sealed class DaxBubbleCta(
         ctaView?.findViewById<DaxButton>(R.id.daxDialogOption4)?.gone()
     }
 
+    private fun clearBubbleBuckDialog(binding: IncludeOnboardingBubbleBuckDialogBinding) {
+        binding.apply {
+            this.daxDialogDismissButton.alpha = 0f
+            this.primaryCta.gone()
+            this.secondaryCta.gone()
+            this.placeholder.gone()
+            this.daxDialogOption1.gone()
+            this.daxDialogOption2.gone()
+            this.daxDialogOption3.gone()
+            this.daxDialogOption4.gone()
+        }
+    }
+
     fun setOnPrimaryCtaClicked(onButtonClicked: () -> Unit) {
-        ctaView?.findViewById<DaxButton>(R.id.primaryCta)?.setOnClickListener {
+        ctaView?.findViewById<MaterialButton>(R.id.primaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
         }
     }
 
     fun setOnSecondaryCtaClicked(onButtonClicked: () -> Unit) {
-        ctaView?.findViewById<DaxButton>(R.id.secondaryCta)?.setOnClickListener {
+        ctaView?.findViewById<MaterialButton>(R.id.secondaryCta)?.setOnClickListener {
             onButtonClicked.invoke()
         }
     }
@@ -650,12 +725,19 @@ sealed class DaxBubbleCta(
                 2 -> R.id.daxDialogOption3
                 else -> R.id.daxDialogOption4
             }
-            option.let { ctaView?.findViewById<DaxButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+            option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
         }
     }
 
-    fun hideDaxBubbleCta(binding: FragmentBrowserTabBinding) {
-        binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.daxCtaContainer.gone()
+    fun hideDaxBubbleCta(
+        binding: FragmentBrowserTabBinding,
+        onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    ) {
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble.root.gone()
+        } else {
+            binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.root.gone()
+        }
     }
 
     override val markAsReadOnShow: Boolean = true
@@ -735,7 +817,7 @@ sealed class DaxBubbleCta(
         @DrawableRes val iconRes: Int,
         val link: String,
     ) {
-        fun setOptionView(buttonView: DaxButton) {
+        fun setOptionView(buttonView: MaterialButton) {
             buttonView.apply {
                 text = optionText
                 icon = ContextCompat.getDrawable(this.context, iconRes)
