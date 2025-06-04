@@ -392,8 +392,8 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private suspend fun DefaultBrowserPromptsFeatureToggles.getOrAssignCohort(): AdditionalPromptsCohortName? {
+        defaultBrowserAdditionalPrompts202501().enroll()
         for (cohort in AdditionalPromptsCohortName.entries) {
-            defaultBrowserAdditionalPrompts202501().enroll()
             if (defaultBrowserAdditionalPrompts202501().isEnrolledAndEnabled(cohort)) {
                 return cohort
             }

@@ -351,12 +351,13 @@ class DefaultBrowserPromptsExperimentImplTest {
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         whenever(additionalPromptsToggleMock.getCohort()).thenReturn(null)
-        whenever(additionalPromptsToggleMock.isEnabled()).thenReturn(false)
+        whenever(additionalPromptsToggleMock.isEnrolledAndEnabled(any())).thenReturn(false)
 
         testee.onResume(lifecycleOwnerMock)
 
+        verify(additionalPromptsToggleMock).enroll()
         AdditionalPromptsCohortName.entries.forEach {
-            verify(additionalPromptsToggleMock).isEnabled()
+            verify(additionalPromptsToggleMock).isEnrolledAndEnabled(it)
         }
         verify(dataStoreMock, never()).storeExperimentStage(any())
         assertEquals(ExperimentStage.NOT_ENROLLED, dataStoreMock.experimentStage.first())
@@ -608,7 +609,7 @@ class DefaultBrowserPromptsExperimentImplTest {
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         whenever(additionalPromptsToggleMock.getCohort()).thenReturn(null)
-        whenever(additionalPromptsToggleMock.isEnabled()).thenReturn(false)
+        whenever(additionalPromptsToggleMock.isEnrolledAndEnabled(any())).thenReturn(false)
         mockFeatureSettings(
             activeDaysUntilStage1 = 1,
             activeDaysUntilStage2 = 3,
@@ -1069,7 +1070,8 @@ class DefaultBrowserPromptsExperimentImplTest {
             enrollmentDateET = fakeEnrollmentDateETString,
         )
         whenever(additionalPromptsToggleMock.getCohort()).thenReturn(cohort)
-        whenever(additionalPromptsToggleMock.isEnabled()).thenReturn(true)
+        whenever(additionalPromptsToggleMock.isEnrolledAndEnabled(any())).thenReturn(false)
+        whenever(additionalPromptsToggleMock.isEnrolledAndEnabled(cohortName)).thenReturn(true)
 
         return cohort
     }
