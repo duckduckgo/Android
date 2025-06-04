@@ -166,6 +166,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlus(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

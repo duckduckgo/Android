@@ -36,6 +36,9 @@ interface DuckChatFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlus(): Toggle
+
     /**
      * @return `true` when the remote config has the "duckAiButtonInBrowser" Duck.ai button in browser
      * sub-feature flag enabled
