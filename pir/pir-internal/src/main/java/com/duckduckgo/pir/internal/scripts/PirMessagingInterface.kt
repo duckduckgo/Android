@@ -81,7 +81,7 @@ class PirMessagingInterface @Inject constructor(
                 if (this.secret == secret && context == jsMessage.context) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, secret, jsMessageCallback)
+                    }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -109,7 +109,7 @@ class PirMessagingInterface @Inject constructor(
     inner class BrokerProtectionMessageHandler() : JsMessageHandler {
         override fun process(
             jsMessage: JsMessage,
-            secret: String,
+            jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
             logcat { "PIR-CSS: BrokerProtectionMessageHandler: process $jsMessage" }

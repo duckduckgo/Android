@@ -88,7 +88,7 @@ interface JsMessageHandler {
      * This method processes a [JsMessage] and can return a JsRequestResponse to reply to the message if needed
      * @return `JsRequestResponse` or `null`
      */
-    fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?)
+    fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?)
 
     /**
      * List of domains where we can process the message

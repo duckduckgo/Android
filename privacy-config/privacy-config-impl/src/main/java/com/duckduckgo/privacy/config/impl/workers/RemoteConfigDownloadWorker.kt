@@ -76,7 +76,7 @@ class PrivacyConfigDownloadWorkerScheduler @Inject constructor(
             .addTag(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
             .build()
-        workManager.enqueueUniquePeriodicWork(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG, ExistingPeriodicWorkPolicy.REPLACE, workerRequest)
+        workManager.enqueueUniquePeriodicWork(PRIVACY_CONFIG_DOWNLOADER_WORKER_TAG, ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE, workerRequest)
     }
 
     companion object {

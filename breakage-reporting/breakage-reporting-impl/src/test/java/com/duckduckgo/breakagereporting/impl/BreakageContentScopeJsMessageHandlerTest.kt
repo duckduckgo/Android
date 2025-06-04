@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.Mockito.mock
 
 class BreakageContentScopeJsMessageHandlerTest {
     private val handler = BreakageContentScopeJsMessageHandler().getJsMessageHandler()
@@ -20,7 +21,7 @@ class BreakageContentScopeJsMessageHandlerTest {
             params = JSONObject(),
         )
 
-        handler.process(message, "secret", callback)
+        handler.process(message, mock(), callback)
 
         assertEquals(1, callback.counter)
     }
