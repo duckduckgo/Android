@@ -23,8 +23,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
@@ -52,6 +54,7 @@ import kotlinx.coroutines.launch
 class ProSettingViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
+    private val privacyProFeature: PrivacyProFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -65,6 +68,7 @@ class ProSettingViewModel @Inject constructor(
     data class ViewState(
         val status: SubscriptionStatus = UNKNOWN,
         val region: SubscriptionRegion? = null,
+        val duckAiPlusAvailable: Boolean = false,
         val freeTrialEligible: Boolean = false,
     ) {
         enum class SubscriptionRegion { US, ROW }
@@ -98,10 +102,17 @@ class ProSettingViewModel @Inject constructor(
                     MONTHLY_PLAN_US, YEARLY_PLAN_US -> SubscriptionRegion.US
                     else -> null
                 }
+
+                val duckAiEnabled = privacyProFeature.duckAiPlus().isEnabled()
+                val duckAiAvailable = duckAiEnabled && offer?.features?.any { feature ->
+                    feature == DuckAiPlus.value
+                } ?: false
+
                 _viewState.emit(
                     viewState.value.copy(
                         status = subscriptionStatus,
                         region = region,
+                        duckAiPlusAvailable = duckAiAvailable,
                         freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
                     ),
                 )
