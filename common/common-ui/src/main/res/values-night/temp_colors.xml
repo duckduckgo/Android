@@ -15,6 +15,8 @@
   -->
 
 <resources>
+    <color name="buckColorPrimaryText">@color/white</color>
+
     <color name="buckColorButtonPrimaryContainer">#FFDF80</color>
     <color name="buckColorButtonPrimaryContainerPressed">#CCAA00</color>
     <color name="buckColorButtonPrimaryText">@color/black</color>
@@ -22,4 +24,6 @@
     <color name="buckColorButtonSecondaryBorder">#074C89</color>
     <color name="buckColorButtonSecondaryText">@color/white</color>
     <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
+
+    <color name="buckColorButtonFAB">#042E50</color>
 </resources>
