@@ -168,13 +168,7 @@ class ProSettingView @JvmOverloads constructor(
             else -> {
                 with(binding) {
                     subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
-                    subscriptionBuy.setSecondaryText(
-                        when (viewState.region) {
-                            ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
-                            US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
-                            else -> ""
-                        },
-                    )
+                    subscriptionBuy.setSecondaryText(getSubscriptionSecondaryText(viewState))
                     subscriptionGet.setText(
                         when (viewState.freeTrialEligible) {
                             true -> R.string.subscriptionSettingTryFreeTrial
@@ -188,6 +182,20 @@ class ProSettingView @JvmOverloads constructor(
                     subscriptionSettingContainer.isGone = true
                 }
             }
+        }
+    }
+
+    private fun getSubscriptionSecondaryText(viewState: ViewState) = if (viewState.duckAiPlusAvailable) {
+        when (viewState.region) {
+            ROW -> context.getString(R.string.subscriptionSettingSubscribeWithDuckAiSubtitleRow)
+            US -> context.getString(R.string.subscriptionSettingSubscribeWithDuckAiSubtitle)
+            else -> ""
+        }
+    } else {
+        when (viewState.region) {
+            ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
+            US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
+            else -> ""
         }
     }
 

@@ -35,4 +35,7 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlus(): Toggle
 }
