@@ -14,7 +14,11 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Includes our VPN, Duck.ai Plus, Personal Information Removal, and Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Includes our VPN, Duck.ai Plus and Identity Theft Restoration.</string>
-</resources>
+<com.duckduckgo.common.ui.view.listitem.SettingsListItem xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/duckAiSettings"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:indicatorStatus="on"
+    app:leadingIcon="@drawable/ic_ai_chat_color_24"
+    app:primaryText="@string/duck_ai_paid_settings_title" />

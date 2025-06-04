@@ -33,6 +33,7 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':downloads-api')
     implementation project(':content-scope-scripts-api')
+    implementation project(':subscriptions-api')
     implementation project(':new-tab-page-api')
     implementation project(':voice-search-api')
     implementation project(':browser-api')
