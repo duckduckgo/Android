@@ -44,6 +44,19 @@ class SyncPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugi
             SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR.pixelName to PixelParameter.removeAtb(),
 
             SyncPixelName.SYNC_SETUP_DEEP_LINK_TIMEOUT.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_STARTED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_ABANDONED.pixelName to PixelParameter.removeAtb(),
+
+            SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_BARCODE_CODE_COPIED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_ENDED_ABANDONED.pixelName to PixelParameter.removeAtb(),
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS.pixelName to PixelParameter.removeAtb(),
         )
     }
 }
