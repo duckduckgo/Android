@@ -19,7 +19,6 @@ package com.duckduckgo.pir.internal.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
@@ -92,7 +91,7 @@ interface PirRepository {
     suspend fun saveErrorResult(
         brokerName: String,
         actionType: String,
-        error: PirErrorReponse,
+        message: String,
     )
 
     suspend fun saveExtractProfileResult(
@@ -339,14 +338,14 @@ class RealPirRepository(
     override suspend fun saveErrorResult(
         brokerName: String,
         actionType: String,
-        error: PirErrorReponse,
+        message: String,
     ) {
         withContext(dispatcherProvider.io()) {
             scanResultsDao.insertScanErrorResult(
                 ScanErrorResult(
                     brokerName = brokerName,
                     actionType = actionType,
-                    message = error.message,
+                    message = message,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 ),
             )

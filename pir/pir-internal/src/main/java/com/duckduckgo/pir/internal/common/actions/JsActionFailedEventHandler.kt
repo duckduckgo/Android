@@ -25,12 +25,8 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerS
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
-import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
-import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
-import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.internal.scripts.models.asActionType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -52,19 +48,19 @@ class JsActionFailedEventHandler @Inject constructor(
     ): Next {
         /**
          * This means we have received an error from the JS layer for the last action we pushed.
-         * If the action is GetCaptchaInfo or SolveCaptcha, we proceed to the next action (ignore error)
-         * Else we end the run for the broker
+         * We end the run for the broker.
          */
         val currentBroker = state.brokers[state.currentBrokerIndex]
         val currentAction = currentBroker.actions[state.currentActionIndex]
-        val pirErrorReponse = (event as JsActionFailed).pirErrorReponse
+        val error = (event as JsActionFailed).error
 
         if (state.runType != RunType.OPTOUT) {
             pirRunStateHandler.handleState(
                 BrokerScanActionFailed(
                     brokerName = currentBroker.brokerName,
                     actionType = currentAction.asActionType(),
-                    pirErrorReponse = pirErrorReponse,
+                    actionID = error.actionID,
+                    message = error.message,
                 ),
             )
         } else {
@@ -75,29 +71,17 @@ class JsActionFailedEventHandler @Inject constructor(
                         extractedProfile = it,
                         completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         actionType = currentAction.asActionType(),
-                        result = pirErrorReponse,
+                        actionID = error.actionID,
+                        message = error.message,
                     ),
                 )
             }
         }
 
-        return if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
-            Next(
-                nextState = state.copy(
-                    currentActionIndex = state.currentActionIndex + 1,
-                ),
-                nextEvent = ExecuteNextBrokerAction(
-                    UserProfile(
-                        userProfile = state.profileQuery,
-                    ),
-                ),
-            )
-        } else {
-            // If error happens we skip to next Broker as next steps will not make sense
-            Next(
-                nextState = state,
-                nextEvent = BrokerActionsCompleted(isSuccess = false),
-            )
-        }
+        // If error happens we skip to next Broker as next steps will not make sense
+        return Next(
+            nextState = state,
+            nextEvent = BrokerActionsCompleted(isSuccess = false),
+        )
     }
 }
