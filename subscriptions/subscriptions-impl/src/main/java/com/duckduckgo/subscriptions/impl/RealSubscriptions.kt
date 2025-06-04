@@ -34,7 +34,6 @@ import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -127,6 +126,10 @@ class RealSubscriptions @Inject constructor(
         val path = uri.pathSegments.firstOrNull()
         return eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
     }
+
+    override suspend fun isFreeTrialEligible(): Boolean {
+        return subscriptionsManager.isFreeTrialEligible()
+    }
 }
 
 @ContributesRemoteFeature(
@@ -162,12 +165,7 @@ interface PrivacyProFeature {
     fun featuresApi(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun privacyProFreeTrialJan25(): Toggle
-
-    enum class Cohorts(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        TREATMENT("treatment"),
-    }
+    fun privacyProFreeTrial(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
