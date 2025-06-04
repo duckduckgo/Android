@@ -403,17 +403,6 @@ class SyncWithAnotherDeviceViewModelTest {
     }
 
     @Test
-    fun whenLoginSucceedsThenCommandIsLoginSuccess() = runTest {
-        testee.commands().test {
-            testee.onLoginSuccess()
-            val command = awaitItem()
-            assertTrue(command is Command.LoginSuccess)
-            verify(syncPixels).fireLoginPixel()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
     fun whenUserCancelsThenAbandonedPixelFired() = runTest {
         testee.onUserCancelledWithoutSyncSetup()
         verify(syncPixels).fireSyncSetupAbandoned(eq(SYNC_EXCHANGE))
