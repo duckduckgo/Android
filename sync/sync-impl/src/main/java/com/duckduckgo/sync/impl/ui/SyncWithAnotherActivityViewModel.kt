@@ -41,10 +41,12 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Companion.POLLING_INTERVAL_EXCHANGE_FLOW
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.FinishWithError
@@ -85,10 +87,12 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     // when the timeout expires, an error message will show to the user
     // When finished, user input needed or a suitable error state reached it can be disabled
     private var canTimeout = false
+    private var isDeepLink = false
 
     private val viewState = MutableStateFlow(ViewState())
-    fun viewState(canTimeout: Boolean = false): Flow<ViewState> = viewState.onStart {
-        this@SyncWithAnotherActivityViewModel.canTimeout = canTimeout
+    fun viewState(isDeepLink: Boolean = false): Flow<ViewState> = viewState.onStart {
+        this@SyncWithAnotherActivityViewModel.canTimeout = isDeepLink
+        this@SyncWithAnotherActivityViewModel.isDeepLink = isDeepLink
         startExchangeProcess()
     }
 
@@ -102,7 +106,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                 syncAccountRepository.pollSecondDeviceExchangeAcknowledgement()
                     .onSuccess { success ->
                         if (!success) {
-                            Timber.v("Sync-setup: can timeout = $canTimeout. time since start: ${System.currentTimeMillis() - startTime}")
+                            logcat { "Sync-setup: can timeout = $canTimeout. time since start: ${System.currentTimeMillis() - startTime}" }
                             if (canTimeout && (System.currentTimeMillis() - startTime) > POLLING_TIMEOUT_DURING_DEEP_LINKING) {
                                 polling = false
                                 syncPixels.fireTimeoutOnDeepLinkSetup()
@@ -110,7 +114,9 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                             }
                             return@onSuccess // continue polling
                         }
-                        command.send(Command.LoginSuccess)
+                        syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE)
+                        // Showing Exchange code requires user is logged in, no need to show recovery key
+                        command.send(LoginSuccess(showRecovery = false))
                         polling = false
                     }.onFailure {
                         when (it.code) {
@@ -156,6 +162,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             barcodeContents?.let { contents ->
                 clipboard.copyToClipboard(contents.rawCode)
                 command.send(ShowMessage(string.sync_code_copied_message))
+                syncPixels.fireSyncSetupCodeCopiedToClipboard(SYNC_EXCHANGE)
             } ?: command.send(FinishWithError)
         }
     }
@@ -166,7 +173,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     sealed class Command {
         object ReadTextCode : Command()
-        object LoginSuccess : Command()
+        data class LoginSuccess(val showRecovery: Boolean) : Command()
         object SwitchAccountSuccess : Command()
         data class ShowMessage(val messageId: Int) : Command()
         object FinishWithError : Command()
@@ -185,14 +192,15 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     }
 
     fun onDeepLinkCodeReceived(syncBarcodeUrl: String) {
-        Timber.i("Sync-setup: onDeepLinkCodeReceived $syncBarcodeUrl")
+        logcat { "Sync-setup: onDeepLinkCodeReceived $syncBarcodeUrl" }
+        syncPixels.fireSetupDeepLinkFlowStarted()
         onQRCodeScanned(syncBarcodeUrl)
     }
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
+            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode).also { it.onCodeScanned() }
             when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     logcat(WARN) { "Sync: error processing code ${result.reason}" }
@@ -203,24 +211,36 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                     if (codeType is SyncAuthCode.Exchange) {
                         pollForRecoveryKey(previousPrimaryKey = previousPrimaryKey, qrCode = qrCode)
                     } else {
-                        onLoginSuccess(previousPrimaryKey)
+                        // Show recovery screen if QR scanned is Connect and user was not previously logged in (empty PK)
+                        val showRecovery = codeType is SyncAuthCode.Connect && previousPrimaryKey.isEmpty()
+                        onLoginSuccess(previousPrimaryKey, showRecovery)
                     }
                 }
             }
         }
     }
 
-    private suspend fun onLoginSuccess(previousPrimaryKey: String) {
+    private suspend fun onLoginSuccess(previousPrimaryKey: String, showRecovery: Boolean) {
         val postProcessCodePK = syncAccountRepository.getAccountInfo().primaryKey
-        syncPixels.fireLoginPixel()
+        fireLoginPixels()
         val userSwitchedAccount = previousPrimaryKey.isNotBlank() && previousPrimaryKey != postProcessCodePK
         val commandSuccess = if (userSwitchedAccount) {
             syncPixels.fireUserSwitchedAccount()
             SwitchAccountSuccess
         } else {
-            LoginSuccess
+            LoginSuccess(showRecovery)
         }
         command.send(commandSuccess)
+    }
+
+    private fun fireLoginPixels() {
+        syncPixels.fireLoginPixel()
+
+        if (isDeepLink) {
+            syncPixels.fireSetupDeepLinkFlowSuccess()
+        } else {
+            syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE)
+        }
     }
 
     private fun pollForRecoveryKey(
@@ -243,7 +263,8 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                             is LoggedIn -> {
                                 polling = false
                                 cancelTimeout()
-                                onLoginSuccess(previousPrimaryKey)
+                                // Success when processing recovery or exchange should show recovery key screen
+                                onLoginSuccess(previousPrimaryKey, showRecovery = true)
                             }
                         }
                     }.onFailure {
@@ -276,13 +297,6 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
         }
     }
 
-    fun onLoginSuccess() {
-        viewModelScope.launch {
-            syncPixels.fireLoginPixel()
-            command.send(LoginSuccess)
-        }
-    }
-
     fun onUserAcceptedJoiningNewAccount(encodedStringCode: String) {
         viewModelScope.launch(dispatchers.io()) {
             syncPixels.fireUserAcceptedSwitchingAccount()
@@ -301,7 +315,7 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
                     )
                 }
             } else {
-                syncPixels.fireLoginPixel()
+                fireLoginPixels()
                 syncPixels.fireUserSwitchedAccount()
                 command.send(SwitchAccountSuccess)
             }
@@ -313,11 +327,11 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
             when (result) {
                 EnterCodeContractOutput.Error -> {}
                 EnterCodeContractOutput.LoginSuccess -> {
-                    syncPixels.fireLoginPixel()
-                    command.send(LoginSuccess)
+                    fireLoginPixels()
+                    command.send(LoginSuccess(showRecovery = true))
                 }
                 EnterCodeContractOutput.SwitchAccountSuccess -> {
-                    syncPixels.fireLoginPixel()
+                    fireLoginPixels()
                     command.send(SwitchAccountSuccess)
                 }
             }
@@ -330,6 +344,27 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
 
     fun onUserAskedToSwitchAccount() {
         syncPixels.fireAskUserToSwitchAccount()
+    }
+
+    fun onBarcodeScreenShown() {
+        syncPixels.fireSyncBarcodeScreenShown(SYNC_EXCHANGE)
+    }
+
+    fun onUserCancelledWithoutSyncSetup() {
+        if (isDeepLink) {
+            syncPixels.fireSetupDeepLinkFlowAbandoned()
+        } else {
+            syncPixels.fireSyncSetupAbandoned(SYNC_EXCHANGE)
+        }
+    }
+
+    private fun SyncAuthCode.onCodeScanned() {
+        if (isDeepLink) return
+
+        when (this) {
+            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_EXCHANGE)
+            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_EXCHANGE)
+        }
     }
 
     companion object {

@@ -30,12 +30,4 @@
     <string name="deviceIdSectionHeader">Device Id</string>
     <string name="deviceNameSectionHeader">Device Name</string>
 
-
-    <string name="sync_setup_deep_link_confirmation_dialog_title">Sync new device?</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" will be able to access your synced DuckDuckGo data.</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Sync Now</string>
-    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Cancel</string>
-
-    <string name="deep_link_auth_prompt_title">Set up Sync &amp; Backup</string>
-    <string name="deep_link_auth_prompt_message">Unlock device to set up Sync &amp; Backup</string>
 </resources>

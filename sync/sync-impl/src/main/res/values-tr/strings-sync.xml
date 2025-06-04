@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">QR Kodunu Tara</string>
-    <string name="login_screen_enter_code_cta">Veya Kodu Manuel Olarak Yaz</string>
+    <string name="login_screen_enter_code_cta">Kodu Manuel Olarak Yaz</string>
     <string name="login_screen_barcode_hint">Senkronize etmek için kamerayı QR koduna doğrultun</string>
-    <string name="login_screen_cant_scan">Tarayamıyor musunuz? <font color="#7295F6">Metin Kodunu Paylaşın</font></string>
+    <string name="login_screen_cant_scan_label">Tarama Yapamıyor Musunuz?</string>
+    <string name="login_screen_cant_scan_button_text">Metin Kodunu Kopyala</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">QR Kodunu Tara</string>
-    <string name="connect_screen_scan_qr_hint">Başka bir cihazdaki DuckDuckGo Tarayıcısında <b>Ayarlar &gt; Senkronizasyon ve Yedekleme</b>\'ye gidin ve \"Başka Bir Cihazla Senkronize Et\"i seçin.</string>
-    <string name="connect_screen_enter_code_cta">Veya Kodu Manuel Olarak Yazın</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobilden Mobile mi?</string>
-    <string name="connect_screen_connect_qr_hint_content">Senkronize etmek için bu kodu başka bir cihazla tarayın.</string>
+    <string name="connect_screen_scan_qr_hint">Diğer cihazında DuckDuckGo uygulamasını açın ve <b>Ayarlar &gt; Senkronizasyon ve Yedekleme &gt; Başka Bir Cihazla Senkronize Et</b> bölümüne gidin.</string>
+    <string name="connect_screen_enter_code_cta">Kodu Manuel Olarak Yaz</string>
+    <string name="connect_screen_connect_qr_hint_title">Veya diğer cihazınızda DuckDuckGo ile tarayın</string>
+    <string name="connect_screen_connect_qr_hint_content">Diğer cihazınızda DuckDuckGo\'yu açın ve senkronizasyon için bu kodu tarayın.</string>
     <string name="connect_screen_share_code">Kodu Kopyala</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Senkronizasyonu Değiştir</string>
     <string name="sync_dialog_switch_account_secondary_button">Vazgeç</string>
     <string name="sync_dialog_switch_account_description">Bu cihaz zaten senkronize edilmiş. Farklı bir yedekleme veya cihazla senkronize etmek istediğinden emin misin? Senkronizasyonu değiştirmek, bu cihazla önceden senkronize edilmiş verileri kaldırmayacaktır.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Yeni cihaz senkronize edilsin mi?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">\"%1$s\" senkronize edilmiş DuckDuckGo verilerinize erişebilecek.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Şimdi Senkronize Et</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Vazgeç</string>
+
+    <string name="deep_link_auth_prompt_title">Sync &amp; Backup\'ı ayarlayın</string>
+    <string name="deep_link_auth_prompt_message">Sync &amp; Backup kurulumu için cihazın kilidini açın</string>
 </resources>

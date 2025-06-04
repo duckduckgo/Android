@@ -58,13 +58,17 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/qrcodeContainer"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
                 android:background="?attr/daxColorBackground"
-                app:layout_constraintBottom_toTopOf="@+id/copyCodeDivider"
+                app:layout_constraintTop_toBottomOf="@+id/readerContainer"
                 app:layout_constraintHeight_min="185dp"
                 app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintTop_toBottomOf="@+id/readerContainer"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="20dp"
                 app:layout_constraintVertical_chainStyle="spread">
 
                 <ImageView
@@ -72,8 +76,6 @@
                     android:layout_width="@dimen/qrSizeMedium"
                     android:layout_height="@dimen/qrSizeMedium"
                     android:layout_gravity="center"
-                    android:layout_marginStart="@dimen/keyline_5"
-                    android:layout_marginTop="@dimen/keyline_5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
@@ -82,22 +84,21 @@
                     android:id="@+id/qrCodeHintTitle"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/keyline_4"
-                    android:layout_marginTop="@dimen/keyline_4"
-                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:layout_marginStart="20dp"
+                    app:layout_constraintWidth_max="300dp"
                     android:text="@string/connect_screen_connect_qr_hint_title"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/qrCodeImageView"
-                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/qrCodeImageView"
                     app:typography="h5" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/qrCodeHintContent"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/keyline_4"
+                    android:layout_marginStart="20dp"
                     android:layout_marginTop="@dimen/keyline_2"
-                    android:layout_marginEnd="@dimen/keyline_4"
+                    app:layout_constraintWidth_max="300dp"
                     android:text="@string/connect_screen_connect_qr_hint_content"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/qrCodeImageView"
@@ -107,30 +108,43 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/copyCodeDivider"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@+id/copyCodeButton"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/qrcodeContainer" />
+                app:layout_constraintTop_toBottomOf="@id/qrcodeContainer"
+                app:layout_constraintVertical_bias="1"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toTopOf="@id/cantScanLabel"
+                />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/cantScanLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:layout_marginStart="@dimen/keyline_1"
+                android:text="@string/login_screen_cant_scan_label"
+                app:layout_constraintHorizontal_chainStyle="packed"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/copyCodeButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:textType="secondary" />
+
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonGhost
                 android:id="@+id/copyCodeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/keyline_4"
-                android:drawableEnd="@drawable/ic_arrow_circle_right_12"
-                android:drawablePadding="@dimen/keyline_2"
-                android:text="@string/login_screen_cant_scan"
-                android:gravity="center"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="@string/login_screen_cant_scan_button_text"
+                app:daxButtonSize="large"
+                app:icon="@drawable/ic_copy_24"
+                app:layout_constraintBottom_toBottomOf="@id/cantScanLabel"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/copyCodeDivider"
-                app:textType="secondary" />
+                app:layout_constraintStart_toEndOf="@id/cantScanLabel"
+                app:layout_constraintTop_toTopOf="@id/cantScanLabel" />
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragment_container_view"

@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
@@ -43,7 +44,6 @@ import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.Show
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.Command.SwitchAccountSuccess
 import com.duckduckgo.sync.impl.ui.SyncWithAnotherActivityViewModel.ViewState
 import com.duckduckgo.sync.impl.ui.setup.EnterCodeContract
-import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkConnectedActivity
 import com.duckduckgo.sync.impl.ui.setup.SyncSetupDeepLinkFragment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -67,11 +67,20 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+
         extractDeepLinkCode()?.let {
             configureDeepLinkMode(it)
         }
+
+        onBackPressedDispatcher.addCallback(this) {
+            onUserCancelled()
+        }
+
         observeUiEvents()
         configureListeners()
+        if (savedInstanceState == null && !isDeepLinkSetup()) {
+            viewModel.onBarcodeScreenShown()
+        }
     }
 
     private fun configureDeepLinkMode(deepLink: String) {
@@ -97,9 +106,14 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
         binding.qrCodeReader.pause()
     }
 
+    private fun onUserCancelled() {
+        viewModel.onUserCancelledWithoutSyncSetup()
+        finish()
+    }
+
     private fun observeUiEvents() {
         viewModel
-            .viewState(canTimeout = isDeepLinkSetup())
+            .viewState(isDeepLink = isDeepLinkSetup())
             .flowWithLifecycle(lifecycle, Lifecycle.State.CREATED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
@@ -125,18 +139,19 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             ReadTextCode -> {
                 enterCodeLauncher.launch(RECOVERY_CODE)
             }
-            is LoginSuccess -> {
-                setResult(RESULT_OK)
-                finish()
 
-                if (isDeepLinkSetup()) {
-                    startActivity(SyncSetupDeepLinkConnectedActivity.intent(this))
-                }
+            is LoginSuccess -> {
+                val resultIntent = Intent()
+                resultIntent.putExtra(EXTRA_SHOW_RECOVERY_CODE, it.showRecovery)
+                setResult(RESULT_OK, resultIntent)
+                finish()
             }
+
             FinishWithError -> {
                 setResult(RESULT_CANCELED)
                 finish()
             }
+
             is ShowMessage -> Snackbar.make(binding.root, it.messageId, Snackbar.LENGTH_SHORT).show()
             is ShowError -> showError(it)
             is AskToSwitchAccount -> askUserToSwitchAccount(it)
@@ -204,6 +219,7 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val EXTRA_SHOW_RECOVERY_CODE = "showRecoveryCode"
         const val EXTRA_USER_SWITCHED_ACCOUNT = "userSwitchedAccount"
         private const val EXTRA_DEEP_LINK_CODE = "deepLinkCode"
         private const val FRAGMENT_TAG_DEVICE_CONNECTING = "device-connecting"
@@ -212,7 +228,10 @@ class SyncWithAnotherDeviceActivity : DuckDuckGoActivity() {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java)
         }
 
-        internal fun intentForDeepLink(context: Context, syncBarcodeUrl: String): Intent {
+        internal fun intentForDeepLink(
+            context: Context,
+            syncBarcodeUrl: String,
+        ): Intent {
             return Intent(context, SyncWithAnotherDeviceActivity::class.java).apply {
                 putExtra(EXTRA_DEEP_LINK_CODE, syncBarcodeUrl)
             }
