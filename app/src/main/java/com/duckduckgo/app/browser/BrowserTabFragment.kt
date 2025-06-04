@@ -638,6 +638,9 @@ class BrowserTabFragment :
     private val daxDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble
 
+    private val buckDialogIntroBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble
+
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
@@ -4335,9 +4338,16 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                showCta(daxDialogIntroBubble.daxCtaContainer) {
-                    setOnOptionClicked { userEnteredQuery(it.link) }
+                if(onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                    showBuckCta(buckDialogIntroBubble) {
+                        setOnOptionClicked { userEnteredQuery(it.link) }
+                    }
+                } else {
+                    showCta(daxDialogIntroBubble.daxCtaContainer) {
+                        setOnOptionClicked { userEnteredQuery(it.link) }
+                    }
                 }
+
                 setOnPrimaryCtaClicked {
                     viewModel.onUserClickCtaOkButton(configuration)
                 }
