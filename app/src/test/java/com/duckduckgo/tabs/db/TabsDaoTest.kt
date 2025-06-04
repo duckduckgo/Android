@@ -465,4 +465,36 @@ class TabsDaoTest {
         assertNotNull(testee.tab(tab3.tabId))
         assertEquals(tab3, testee.selectedTab())
     }
+
+    @Test
+    fun whenAddAndSelectWithBlankParentAndUpdateIfBlankParentTrueThenUpdateTabBeforeInserting() {
+        val zero = TabEntity(
+            "TAB_ID0",
+            position = 0,
+            sourceTabId = null,
+            url = "http://example.com",
+        )
+        val first = TabEntity(
+            "TAB_ID1",
+            position = 1,
+            sourceTabId = "TAB_ID0",
+            url = null,
+        )
+        val second = TabEntity(
+            "TAB_ID2",
+            position = 2,
+            sourceTabId = "TAB_ID1",
+            url = "http://example.com",
+        )
+
+        testee.insertTab(zero)
+        testee.insertTab(first)
+        testee.addAndSelectTab(second, updateIfBlankParent = true)
+
+        assertFalse(testee.tabs().contains(first))
+        val storedTab = testee.tab("TAB_ID2")
+        assertEquals("TAB_ID0", storedTab?.sourceTabId)
+        assertEquals(1, storedTab?.position)
+        assertEquals(storedTab, testee.selectedTab())
+    }
 }
