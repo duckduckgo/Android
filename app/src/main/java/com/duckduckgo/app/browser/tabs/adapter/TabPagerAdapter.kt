@@ -24,13 +24,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
-    swipingTabsFeature: SwipingTabsFeatureProvider,
-) : FragmentStateAdapter(activity, swipingTabsFeature) {
+    private val tabManager: TabManager,
+) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
     private var messageForNewFragment: Message? = null
 
@@ -59,6 +59,10 @@ class TabPagerAdapter(
         } else {
             BrowserTabFragment.newInstance(tab.tabId, tab.url, tab.skipHome, isExternal)
         }
+    }
+
+    override fun isAdapterInitialized(): Boolean {
+        return tabManager.getSelectedTabId() != null
     }
 
     fun restore(state: Bundle) {

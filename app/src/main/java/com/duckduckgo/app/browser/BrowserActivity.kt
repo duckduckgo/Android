@@ -221,7 +221,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val tabPagerAdapter by lazy {
         TabPagerAdapter(
             activity = this,
-            swipingTabsFeature = swipingTabsFeature,
+            tabManager = tabManager,
         )
     }
 

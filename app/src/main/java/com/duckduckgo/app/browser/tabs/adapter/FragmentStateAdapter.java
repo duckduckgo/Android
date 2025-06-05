@@ -102,9 +102,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final FragmentManager mFragmentManager;
 
-    @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
-    final SwipingTabsFeatureProvider mSwipingTabsFeature;
-
     // Fragment bookkeeping
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final LongSparseArray<Fragment> mFragments = new LongSparseArray<>();
@@ -131,28 +128,22 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     /**
      * @param fragmentActivity if the {@link ViewPager2} lives directly in a {@link
      *     FragmentActivity} subclass.
-     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
      */
     public FragmentStateAdapter(
-            @NonNull FragmentActivity fragmentActivity,
-            SwipingTabsFeatureProvider swipingTabsFeature) {
+            @NonNull FragmentActivity fragmentActivity) {
         this(fragmentActivity.getSupportFragmentManager(),
-                fragmentActivity.getLifecycle(),
-                swipingTabsFeature);
+                fragmentActivity.getLifecycle());
     }
 
     /**
      * @param fragmentManager of {@link ViewPager2}'s host
      * @param lifecycle of {@link ViewPager2}'s host
-     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
      */
     public FragmentStateAdapter(
             @NonNull FragmentManager fragmentManager,
-            @NonNull Lifecycle lifecycle,
-            SwipingTabsFeatureProvider swipingTabsFeature) {
+            @NonNull Lifecycle lifecycle) {
         mFragmentManager = fragmentManager;
         mLifecycle = lifecycle;
-        mSwipingTabsFeature = swipingTabsFeature;
         super.setHasStableIds(true);
     }
 
@@ -185,6 +176,8 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
      * @see ViewPager2#setOffscreenPageLimit
      */
     public abstract @NonNull Fragment createFragment(int position);
+
+    public abstract @NonNull Boolean isAdapterInitialized();
 
     @NonNull
     @Override
@@ -292,8 +285,10 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @Override
     public final void onViewAttachedToWindow(@NonNull final FragmentViewHolder holder) {
-        placeFragmentInViewHolder(holder);
-        gcFragments();
+        if (isAdapterInitialized()) {
+            placeFragmentInViewHolder(holder);
+            gcFragments();
+        }
     }
 
     /**
