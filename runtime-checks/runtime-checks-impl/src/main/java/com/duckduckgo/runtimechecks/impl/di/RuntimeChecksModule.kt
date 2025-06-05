@@ -16,11 +16,11 @@
 
 package com.duckduckgo.runtimechecks.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.runtimechecks.store.ALL_MIGRATIONS
 import com.duckduckgo.runtimechecks.store.RealRuntimeChecksRepository
@@ -36,14 +36,18 @@ import kotlinx.coroutines.CoroutineScope
 @ContributesTo(AppScope::class)
 object RuntimeChecksModule {
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideRuntimeChecksDatabase(context: Context): RuntimeChecksDatabase {
-        return Room.databaseBuilder(context, RuntimeChecksDatabase::class.java, "runtime_checks.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    @SingleInstanceIn(AppScope::class)
+    fun provideRuntimeChecksDatabase(databaseProvider: DatabaseProvider): RuntimeChecksDatabase {
+        return databaseProvider.buildRoomDatabase(
+            RuntimeChecksDatabase::class.java,
+            "runtime_checks.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)

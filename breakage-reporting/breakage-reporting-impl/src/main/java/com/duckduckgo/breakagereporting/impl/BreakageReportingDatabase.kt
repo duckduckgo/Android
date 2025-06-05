@@ -32,4 +32,4 @@ abstract class BreakageReportingDatabase : RoomDatabase() {
     abstract fun breakageReportingDao(): BreakageReportingDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = listOf<Migration>()

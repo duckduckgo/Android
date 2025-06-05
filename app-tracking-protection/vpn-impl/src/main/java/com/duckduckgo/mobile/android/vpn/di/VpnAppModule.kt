@@ -19,9 +19,10 @@ package com.duckduckgo.mobile.android.vpn.di
 import android.content.Context
 import android.content.res.Resources
 import android.net.ConnectivityManager
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsRepository
@@ -72,15 +73,20 @@ object VpnAppModule {
     @SingleInstanceIn(AppScope::class)
     @Provides
     fun bindVpnDatabase(
-        context: Context,
+        databaseProvider: DatabaseProvider,
         vpnDatabaseCallbackProvider: VpnDatabaseCallbackProvider,
     ): VpnDatabase {
-        return Room.databaseBuilder(context, VpnDatabase::class.java, "vpn.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigrationFrom(*IntRange(1, 17).toList().toIntArray())
-            .addMigrations(*VpnDatabase.ALL_MIGRATIONS.toTypedArray())
-            .addCallback(vpnDatabaseCallbackProvider.provideCallbacks())
-            .build()
+        return databaseProvider.buildRoomDatabase(
+            VpnDatabase::class.java,
+            "vpn.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+                fallbackToDestructiveMigrationFromVersion = IntRange(1, 17).toList(),
+                callbacks = listOf(vpnDatabaseCallbackProvider.provideCallbacks()),
+                migrations = VpnDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides

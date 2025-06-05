@@ -27,6 +27,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
     implementation project(path: ':common-ui')
+    implementation project(path: ':data-store-api')
     implementation project(path: ':sync-settings-api')
     implementation project(path: ':sync-api')
 
