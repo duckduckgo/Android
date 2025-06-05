@@ -44,6 +44,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -62,6 +63,9 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : OmnibarLayout(context, attrs, defStyle) {
+
+    @Inject
+    lateinit var experimentDataStore: VisualDesignExperimentDataStore
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
