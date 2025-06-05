@@ -757,7 +757,7 @@
     <string name="preOnboardingComparisonChartItem1">Søg fortroligt som standard</string>
     <string name="preOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloker sporende annoncer</string>
+    <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
     <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til den \"anden\" side.</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
