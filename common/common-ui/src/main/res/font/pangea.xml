@@ -23,7 +23,7 @@
         app:fontWeight="400" />
 
     <font
-        app:font="@font/pangea_regular"
+        app:font="@font/pangea_medium"
         app:fontStyle="normal"
         app:fontWeight="500" />
 
