@@ -49,7 +49,6 @@ import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.duckduckgo.app.browser.tabs.TabManager;
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -177,7 +176,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
      */
     public abstract @NonNull Fragment createFragment(int position);
 
-    public abstract @NonNull Boolean isAdapterInitialized();
+    public abstract @NonNull Boolean shouldPlaceFragmentInViewHolder(int position);
 
     @NonNull
     @Override
@@ -285,7 +284,7 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @Override
     public final void onViewAttachedToWindow(@NonNull final FragmentViewHolder holder) {
-        if (isAdapterInitialized()) {
+        if (shouldPlaceFragmentInViewHolder(holder.getBindingAdapterPosition())) {
             placeFragmentInViewHolder(holder);
             gcFragments();
         }

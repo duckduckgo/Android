@@ -24,15 +24,24 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
-import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
-    private val tabManager: TabManager,
 ) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
     private var messageForNewFragment: Message? = null
+
+    var currentTabIndex = -1
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            // if the current tab index is -1 and the set value 0, it means the first tab is really selected
+            // and we need to notify the adapter to create the first fragment
+            if (field == -1 && value == 0) {
+                notifyDataSetChanged()
+            }
+            field = value
+        }
 
     override fun getItemCount() = tabs.size
 
@@ -61,8 +70,9 @@ class TabPagerAdapter(
         }
     }
 
-    override fun isAdapterInitialized(): Boolean {
-        return tabManager.getSelectedTabId() != null
+    // This method prevents the creation of a tab fragment for the first tab when we don't know the current tab index yet
+    override fun shouldPlaceFragmentInViewHolder(position: Int): Boolean {
+        return currentTabIndex != -1 || position != 0
     }
 
     fun restore(state: Bundle) {
