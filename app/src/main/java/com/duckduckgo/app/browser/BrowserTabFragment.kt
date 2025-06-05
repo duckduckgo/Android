@@ -125,6 +125,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.ExperimentalHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -577,6 +578,7 @@ class BrowserTabFragment :
 
     private lateinit var popupMenu: BrowserPopupMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
+    private lateinit var experimentalBottomSheet: ExperimentalHomeScreenWidgetBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -4352,6 +4354,36 @@ class BrowserTabFragment :
                 onDismissCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onCtaShown = { viewModel.onCtaShown() },
             )
+        }
+
+        private fun showExperimentalHomeWidget() {
+            hideDaxCta()
+
+            if (!::experimentalBottomSheet.isInitialized) {
+                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(context = requireContext())
+                experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
+                    override fun onShown() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()
+                    }
+
+                    override fun onCanceled() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogCancelled()
+                    }
+
+                    override fun onAddWidgetButtonClicked() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked()
+                    }
+
+                    override fun onNotNowButtonClicked() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked()
+                    }
+                }
+                experimentalBottomSheet.show()
+            } else {
+                if (!experimentalBottomSheet.isShowing) {
+                    experimentalBottomSheet.show()
+                }
+            }
         }
 
         private fun showHomeCta(
