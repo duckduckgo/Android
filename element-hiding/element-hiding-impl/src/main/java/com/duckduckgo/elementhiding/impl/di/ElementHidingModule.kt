@@ -16,11 +16,11 @@
 
 package com.duckduckgo.elementhiding.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.elementhiding.store.ALL_MIGRATIONS
 import com.duckduckgo.elementhiding.store.ElementHidingDatabase
@@ -38,12 +38,16 @@ object ElementHidingModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideElementHidingDatabase(context: Context): ElementHidingDatabase {
-        return Room.databaseBuilder(context, ElementHidingDatabase::class.java, "element_hiding.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideElementHidingDatabase(databaseProvider: DatabaseProvider): ElementHidingDatabase {
+        return databaseProvider.buildRoomDatabase(
+            ElementHidingDatabase::class.java,
+            "element_hiding.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)

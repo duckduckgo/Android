@@ -33,6 +33,7 @@ dependencies {
     implementation project(':di')
     implementation project(':design-system')
     implementation project(':common-utils')
+    implementation project(':data-store-api')
     implementation project(':navigation-api')
     implementation project(':statistics-api')
     implementation project(':internal-features-api')

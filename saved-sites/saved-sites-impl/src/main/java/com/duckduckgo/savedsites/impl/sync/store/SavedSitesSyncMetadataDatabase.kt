@@ -55,4 +55,4 @@ object ChildrenTypeConverter {
     }
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

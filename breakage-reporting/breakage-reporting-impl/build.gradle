@@ -40,6 +40,7 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':content-scope-scripts-api')
     implementation project(path: ':js-messaging-api')
+    implementation project(path: ':data-store-api')
 
     // Room
     implementation AndroidX.room.runtime

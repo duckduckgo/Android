@@ -45,6 +45,12 @@ dependencies {
     // Security crypto
     implementation AndroidX.security.crypto
 
+    // Room
+    implementation AndroidX.room.runtime
+    implementation AndroidX.room.rxJava2
+    implementation AndroidX.room.ktx
+    ksp AndroidX.room.compiler
+
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(':common-test')
     testImplementation Testing.junit4

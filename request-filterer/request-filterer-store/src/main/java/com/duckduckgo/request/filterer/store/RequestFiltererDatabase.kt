@@ -32,4 +32,4 @@ abstract class RequestFiltererDatabase : RoomDatabase() {
     abstract fun requestFiltererDao(): RequestFiltererDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

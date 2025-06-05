@@ -35,6 +35,7 @@ dependencies {
     implementation project(path: ':di')
     implementation project(':browser-api')
     implementation project(path: ':common-utils')
+    implementation project(path: ':data-store-api')
     implementation project(path: ':design-system')
     implementation project(path: ':sync-api')
     implementation project(path: ':sync-store')

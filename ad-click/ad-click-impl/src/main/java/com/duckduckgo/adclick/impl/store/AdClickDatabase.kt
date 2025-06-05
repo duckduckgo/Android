@@ -46,6 +46,6 @@ abstract class AdClickDatabase : RoomDatabase() {
                 }
             }
         }
-        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+        val ALL_MIGRATIONS = listOf(MIGRATION_1_2)
     }
 }

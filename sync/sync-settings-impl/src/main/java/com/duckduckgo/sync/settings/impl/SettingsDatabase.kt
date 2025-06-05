@@ -31,4 +31,4 @@ abstract class SettingsDatabase : RoomDatabase() {
     abstract fun settingsSyncDao(): SettingsSyncMetadataDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

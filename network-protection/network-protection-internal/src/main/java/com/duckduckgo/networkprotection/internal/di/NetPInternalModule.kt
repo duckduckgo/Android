@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.internal.di
 
-import android.content.Context
+import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.remote_config.*
 import com.squareup.anvil.annotations.ContributesTo
@@ -30,8 +30,8 @@ object NetPInternalModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideNetPInternalConfigDatabase(context: Context): NetPInternalConfigDatabase {
-        return NetPInternalConfigDatabase.create(context)
+    fun provideNetPInternalConfigDatabase(databaseProvider: DatabaseProvider): NetPInternalConfigDatabase {
+        return NetPInternalConfigDatabase.create(databaseProvider)
     }
 
     @SingleInstanceIn(AppScope::class)

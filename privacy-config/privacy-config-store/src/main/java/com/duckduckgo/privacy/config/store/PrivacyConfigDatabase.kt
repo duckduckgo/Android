@@ -124,7 +124,7 @@ val MIGRATION_17_18 = object : Migration(17, 18) {
     }
 }
 
-val ALL_MIGRATIONS = arrayOf(
+val ALL_MIGRATIONS = listOf(
     MIGRATION_2_3,
     MIGRATION_3_4,
     MIGRATION_10_11,

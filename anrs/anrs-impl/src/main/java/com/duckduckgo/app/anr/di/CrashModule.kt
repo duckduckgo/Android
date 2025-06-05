@@ -16,10 +16,10 @@
 
 package com.duckduckgo.app.anr.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.anrs.store.CrashDatabase
 import com.duckduckgo.app.anrs.store.UncaughtExceptionDao
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -37,12 +37,16 @@ object CrashModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     @InternalApi
-    fun provideCrashDatabase(context: Context): CrashDatabase {
-        return Room.databaseBuilder(context, CrashDatabase::class.java, "crash_database.db")
-            .addMigrations(*CrashDatabase.ALL_MIGRATIONS.toTypedArray())
-            .fallbackToDestructiveMigration()
-            .enableMultiInstanceInvalidation()
-            .build()
+    fun provideCrashDatabase(databaseProvider: DatabaseProvider): CrashDatabase {
+        return databaseProvider.buildRoomDatabase(
+            CrashDatabase::class.java,
+            "crash_database.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+                migrations = CrashDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides

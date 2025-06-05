@@ -16,8 +16,8 @@
 
 package com.duckduckgo.sync.settings.impl
 
-import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -28,13 +28,17 @@ import dagger.SingleInstanceIn
 @ContributesTo(AppScope::class)
 class StoreModule {
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideSettingsDatabase(context: Context): SettingsDatabase {
-        return Room.databaseBuilder(context, SettingsDatabase::class.java, "settings.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    @SingleInstanceIn(AppScope::class)
+    fun provideSettingsDatabase(databaseProvider: DatabaseProvider): SettingsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            SettingsDatabase::class.java,
+            "settings.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)

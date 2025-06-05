@@ -31,6 +31,6 @@ abstract class DomainTargetAppsDatabase : RoomDatabase() {
     abstract fun domainTargetAppDao(): DomainTargetAppDao
 
     companion object {
-        val ALL_MIGRATIONS = emptyArray<Migration>()
+        val ALL_MIGRATIONS = emptyList<Migration>()
     }
 }

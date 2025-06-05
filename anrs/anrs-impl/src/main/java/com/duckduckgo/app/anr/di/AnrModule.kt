@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.anr.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.anrs.store.AnrsDatabase
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -30,10 +30,14 @@ import dagger.SingleInstanceIn
 object AnrModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAnrDatabase(context: Context): AnrsDatabase {
-        return Room.databaseBuilder(context, AnrsDatabase::class.java, "anr_database.db")
-            .addMigrations(*AnrsDatabase.ALL_MIGRATIONS.toTypedArray())
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideAnrDatabase(databaseProvider: DatabaseProvider): AnrsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AnrsDatabase::class.java,
+            "anr_database.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = AnrsDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 }
