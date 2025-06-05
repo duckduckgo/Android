@@ -17,8 +17,9 @@
 package com.duckduckgo.networkprotection.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.ui.AppBreakageCategory
@@ -48,14 +49,18 @@ object DataModule {
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): NetworkProtectionPrefs = RealNetworkProtectionPrefs(sharedPreferencesProvider)
 
-    @SingleInstanceIn(AppScope::class)
     @Provides
-    fun bindNetPDatabase(context: Context): NetPDatabase {
-        return Room.databaseBuilder(context, NetPDatabase::class.java, "vpn-netp.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*NetPDatabase.ALL_MIGRATIONS.toTypedArray())
-            .build()
+    @SingleInstanceIn(AppScope::class)
+    fun bindNetPDatabase(databaseProvider: DatabaseProvider): NetPDatabase {
+        return databaseProvider.buildRoomDatabase(
+            NetPDatabase::class.java,
+            "vpn-netp.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+                migrations = NetPDatabase.ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides

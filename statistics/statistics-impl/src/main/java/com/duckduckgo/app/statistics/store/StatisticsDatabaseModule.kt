@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.statistics.store
 
-import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -29,15 +29,13 @@ import dagger.SingleInstanceIn
 class StatisticsDatabaseModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideStatisticsDatabase(context: Context): StatisticsDatabase =
-        Room
-            .databaseBuilder(
-                context = context,
-                klass = StatisticsDatabase::class.java,
-                name = "pixels.db",
-            )
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideStatisticsDatabase(databaseProvider: DatabaseProvider): StatisticsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            StatisticsDatabase::class.java,
+            "pixels.db",
+            config = RoomDatabaseConfig(fallbackToDestructiveMigration = true),
+        )
+    }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
