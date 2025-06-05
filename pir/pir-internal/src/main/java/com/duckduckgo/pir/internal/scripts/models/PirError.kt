@@ -16,37 +16,42 @@
 
 package com.duckduckgo.pir.internal.scripts.models
 
+import com.duckduckgo.pir.internal.scripts.models.PirError.JsError
+import com.duckduckgo.pir.internal.scripts.models.PirError.JsError.NoActionFound
+import com.duckduckgo.pir.internal.scripts.models.PirError.JsError.ParsingErrorObjectFailed
+import com.duckduckgo.pir.internal.scripts.models.PirError.JsError.Unknown
+
+data class PirScriptError(
+    val error: String,
+)
+
 sealed class PirError {
-    data object MalformedURL : PirError()
-    data object NoActionFound : PirError()
+    sealed class JsError : PirError() {
+        data object NoActionFound : JsError()
+        data object ParsingErrorObjectFailed : JsError()
+        data class Unknown(
+            val error: String,
+        ) : JsError()
+    }
+
     data class ActionFailed(
         val actionID: String,
         val message: String,
     ) : PirError()
 
-    data object ParsingErrorObjectFailed : PirError()
-    data object UnknownMethodName : PirError()
-    data object UserScriptMessageBrokerNotSet : PirError()
-    data class Unknown(
-        val error: String,
-    ) : PirError()
-
-    data object UnrecoverableError : PirError()
-    data object NoOptOutStep : PirError()
     data class CaptchaServiceError(
         val error: String,
     ) : PirError()
 
     data class EmailError(
-        val error: String?,
+        val error: String,
     ) : PirError()
+}
 
-    data object Cancelled : PirError()
-    data object SolvingCaptchaWithCallbackError : PirError()
-    data object CantCalculatePreferredRunDate : PirError()
-    data class HttpError(
-        val code: Int,
-    ) : PirError()
-
-    data object DataNotInDatabase : PirError()
+fun JsError.asErrorString(): String {
+    return when (this) {
+        is NoActionFound -> "No action found"
+        is ParsingErrorObjectFailed -> "Error in parsing object"
+        is Unknown -> this.error
+    }
 }

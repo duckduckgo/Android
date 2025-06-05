@@ -17,13 +17,12 @@
 package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailFailed
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -32,38 +31,26 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
-    override val event: KClass<out Event> = LoadUrlFailed::class
+class EmailFailedEventHandler @Inject constructor() : EventHandler {
+    override val event: KClass<out Event> = EmailFailed::class
 
     override suspend fun invoke(
         state: State,
         event: Event,
     ): Next {
         /**
-         * This is our attempt to recover since likely the webview and js loaded into it is unusable.
-         * We need to load any url successfully to run the js again.
+         * If we encounter an email related email, it means the broker action depending on it will fail.
          */
-        val actualEvent = event as LoadUrlFailed
-
-        if (state.pendingUrl == null) {
-            return Next(state)
-        }
-
-        if (actualEvent.url == RECOVERY_URL) {
-            return Next(
-                nextState = state.copy(
-                    pendingUrl = null,
-                ),
-                nextEvent = BrokerActionsCompleted(false),
-            )
-        }
+        val currentBroker = state.brokers[state.currentBrokerIndex]
+        val currentAction = currentBroker.actions[state.currentActionIndex]
 
         return Next(
-            nextState = state.copy(
-                pendingUrl = RECOVERY_URL,
-            ),
-            sideEffect = LoadUrl(
-                RECOVERY_URL,
+            nextState = state,
+            nextEvent = JsActionFailed(
+                error = PirError.ActionFailed(
+                    actionID = currentAction.id,
+                    message = (event as EmailFailed).error.error,
+                ),
             ),
         )
     }

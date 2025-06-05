@@ -17,13 +17,12 @@
 package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.CaptchaServiceFailed
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -32,38 +31,24 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
-    override val event: KClass<out Event> = LoadUrlFailed::class
+class CaptchaServiceFailedEventHandler @Inject constructor() : EventHandler {
+    override val event: KClass<out Event> = CaptchaServiceFailed::class
 
     override suspend fun invoke(
         state: State,
         event: Event,
     ): Next {
         /**
-         * This is our attempt to recover since likely the webview and js loaded into it is unusable.
-         * We need to load any url successfully to run the js again.
+         * A captcha related error has occurred. However, we still would like to continue to the next broker action.
          */
-        val actualEvent = event as LoadUrlFailed
-
-        if (state.pendingUrl == null) {
-            return Next(state)
-        }
-
-        if (actualEvent.url == RECOVERY_URL) {
-            return Next(
-                nextState = state.copy(
-                    pendingUrl = null,
-                ),
-                nextEvent = BrokerActionsCompleted(false),
-            )
-        }
-
         return Next(
             nextState = state.copy(
-                pendingUrl = RECOVERY_URL,
+                currentActionIndex = state.currentActionIndex + 1,
             ),
-            sideEffect = LoadUrl(
-                RECOVERY_URL,
+            nextEvent = ExecuteNextBrokerAction(
+                UserProfile(
+                    userProfile = state.profileQuery,
+                ),
             ),
         )
     }

@@ -33,7 +33,6 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerS
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExpectationResponse
@@ -92,7 +91,8 @@ interface PirRunStateHandler {
         data class BrokerScanActionFailed(
             override val brokerName: String,
             val actionType: String,
-            val pirErrorReponse: PirErrorReponse,
+            val actionID: String,
+            val message: String,
         ) : PirRunState(brokerName)
 
         data class BrokerOptOutStarted(
@@ -131,7 +131,8 @@ interface PirRunStateHandler {
             val extractedProfile: ExtractedProfile,
             val completionTimeInMillis: Long,
             val actionType: String,
-            val result: PirErrorReponse,
+            val actionID: String,
+            val message: String,
         ) : PirRunState(brokerName)
     }
 }
@@ -154,9 +155,6 @@ class RealPirRunStateHandler @Inject constructor(
                 .withSubtype(FillFormResponse::class.java, "fillForm"),
         ).add(KotlinJsonAdapterFactory())
             .build().adapter(PirSuccessResponse::class.java)
-    }
-    private val pirErrorAdapter by lazy {
-        Moshi.Builder().build().adapter(PirErrorReponse::class.java)
     }
 
     override suspend fun handleState(pirRunState: PirRunState) = withContext(dispatcherProvider.io()) {
@@ -259,7 +257,7 @@ class RealPirRunStateHandler @Inject constructor(
         repository.saveErrorResult(
             brokerName = state.brokerName,
             actionType = state.actionType,
-            error = state.pirErrorReponse,
+            message = state.message,
         )
     }
 
@@ -315,7 +313,7 @@ class RealPirRunStateHandler @Inject constructor(
             completionTimeInMillis = state.completionTimeInMillis,
             actionType = state.actionType,
             isError = true,
-            result = pirErrorAdapter.toJson(state.result),
+            result = "${state.actionID}: ${state.message}}",
         )
     }
 }
