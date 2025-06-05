@@ -33,4 +33,4 @@ abstract class VoiceSearchDatabase : RoomDatabase() {
     abstract fun voiceSearchDao(): VoiceSearchDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

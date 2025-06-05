@@ -16,8 +16,6 @@
 
 package com.duckduckgo.adclick.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.adclick.impl.AdClickData
 import com.duckduckgo.adclick.impl.DuckDuckGoAdClickData
 import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionFeature
@@ -29,6 +27,8 @@ import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDatabase
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
 import dagger.Module
@@ -42,11 +42,15 @@ class AdClickModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAdClickDatabase(context: Context): AdClickDatabase {
-        return Room.databaseBuilder(context, AdClickDatabase::class.java, "adclick.db")
-            .addMigrations(*ALL_MIGRATIONS)
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideAdClickDatabase(databaseProvider: DatabaseProvider): AdClickDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AdClickDatabase::class.java,
+            "adclick.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @Provides
@@ -62,10 +66,12 @@ class AdClickModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun provideAdClickExemptionsDatabase(context: Context): AdClickExemptionsDatabase {
-        return Room.databaseBuilder(context, AdClickExemptionsDatabase::class.java, "adclick_exemptions.db")
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideAdClickExemptionsDatabase(databaseProvider: DatabaseProvider): AdClickExemptionsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AdClickExemptionsDatabase::class.java,
+            "adclick_exemptions.db",
+            config = RoomDatabaseConfig(fallbackToDestructiveMigration = true),
+        )
     }
 
     @Provides
