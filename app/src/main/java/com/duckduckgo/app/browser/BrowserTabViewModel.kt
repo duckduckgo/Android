@@ -2970,6 +2970,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun openMessageInNewTab(message: Message) {
+        command.value = GenerateWebViewPreviewImage
         command.value = OpenMessageInNewTab(message, tabId)
     }
 
