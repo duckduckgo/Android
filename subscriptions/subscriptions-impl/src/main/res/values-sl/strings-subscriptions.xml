@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Naročeni</string>
     <string name="privacyPolicyAndTermsOfService">Pravilnik o zasebnosti in pogoji storitve</string>
     <string name="subscriptionStatusFreeTrial">Brezplačni preizkus je aktiven</string>
-    <string name="monthly">mesečno</string>
-    <string name="yearly">letno</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Vaša brezplačna preizkusna različica se konča dne %1$s in se na ta dan samodejno spremeni v %2$s plačljivo naročnino.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Vaša brezplačna preizkusna različica se konča dne %1$s in se na ta dan samodejno spremeni v mesečno plačljivo naročnino.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Vaša brezplačna preizkusna različica se konča dne %1$s in se na ta dan samodejno spremeni v letno plačljivo naročnino.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Vaša brezplačna preizkusna različica se konča dne %1$s in se ne bo spremenila v plačljivo naročnino.</string>
 
     <!--Settings Subscriptions-->

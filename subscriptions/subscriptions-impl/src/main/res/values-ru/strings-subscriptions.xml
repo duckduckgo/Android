@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Подписка оформлена</string>
     <string name="privacyPolicyAndTermsOfService">Политика конфиденциальности и условия обслуживания</string>
     <string name="subscriptionStatusFreeTrial">Бесплатный пробный доступ активирован</string>
-    <string name="monthly">ежемесячная</string>
-    <string name="yearly">Годовая</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Ваш бесплатный пробный период завершится %1$s. В тот же день для вас автоматически будет оформлена %2$s платная подписка.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s. В тот же день вы автоматически перейдете на платную ежемесячную подписку.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s. В тот же день вы автоматически перейдете на платную годовую подписку.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s без перехода на платную подписку.</string>
 
     <!--Settings Subscriptions-->

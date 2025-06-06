@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Abonniert</string>
     <string name="privacyPolicyAndTermsOfService">Datenschutzerklärung und Nutzungsbedingungen</string>
     <string name="subscriptionStatusFreeTrial">Kostenlose Testphase aktiv</string>
-    <string name="monthly">monatlich</string>
-    <string name="yearly">Jährlich</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Deine kostenlose Testphase endet am %1$s und wird an diesem Tag automatisch in ein kostenpflichtiges %2$s-Abo umgewandelt.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Deine kostenlose Testphase endet am %1$s und wird an diesem Tag automatisch in ein kostenpflichtiges Monatsabo umgewandelt.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Deine kostenlose Testphase endet am %1$s und wird an diesem Tag automatisch in ein kostenpflichtiges Jahresabo umgewandelt.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Deine kostenlose Testphase endet am %1$s und wird nicht in ein kostenpflichtiges Abonnement umgewandelt.</string>
 
     <!--Settings Subscriptions-->

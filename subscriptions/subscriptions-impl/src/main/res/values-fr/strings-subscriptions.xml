@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Abonné(e)</string>
     <string name="privacyPolicyAndTermsOfService">Politique de confidentialité et conditions d\'utilisation</string>
     <string name="subscriptionStatusFreeTrial">Essai gratuit actif</string>
-    <string name="monthly">mensuel</string>
-    <string name="yearly">Annuel</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Votre essai gratuit se termine le %1$s ; il sera automatiquement converti en abonnement %2$s payant ce jour-là.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Votre essai gratuit se termine le %1$s ; il sera automatiquement converti en abonnement mensuel payant ce jour-là.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Votre essai gratuit se termine le %1$s ; il sera automatiquement converti en abonnement annuel payant ce jour-là.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Votre essai gratuit se termine le %1$s ; il ne sera pas converti en abonnement payant.</string>
 
     <!--Settings Subscriptions-->

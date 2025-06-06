@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Suscrito</string>
     <string name="privacyPolicyAndTermsOfService">Política de privacidad y condiciones del servicio</string>
     <string name="subscriptionStatusFreeTrial">Prueba gratuita activa</string>
-    <string name="monthly">mensual</string>
-    <string name="yearly">Anual</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Tu prueba gratuita finaliza el %1$s y ese día pasará automáticamente a una suscripción %2$s de pago.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tu prueba gratuita finaliza el %1$s y ese día pasará automáticamente a una suscripción mensual de pago.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tu prueba gratuita finaliza el %1$s y ese día pasará automáticamente a una suscripción anual de pago.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tu prueba gratuita finaliza el %1$s y no se convertirá en una suscripción de pago.</string>
 
     <!--Settings Subscriptions-->

@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Abone olundu</string>
     <string name="privacyPolicyAndTermsOfService">Gizlilik Politikası ve Hizmet Koşulları</string>
     <string name="subscriptionStatusFreeTrial">Ücretsiz Deneme Süresi Aktif</string>
-    <string name="monthly">aylık</string>
-    <string name="yearly">yıllık</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Ücretsiz deneme sürümünüz %1$s tarihinde sona erecek ve aynı gün otomatik olarak %2$s ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz denemeniz %1$s tarihinde sona erecek ve aynı gün otomatik olarak aylık ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz denemeniz %1$s tarihinde sona erecek ve aynı gün otomatik olarak yıllık ücretli aboneliğe dönüşecektir.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz deneme sürümünüz %1$s tarihinde sona erecek ve ücretli aboneliğe dönüşmeyecektir.</string>
 
     <!--Settings Subscriptions-->

@@ -183,9 +183,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
                 val subscriptionRenewalDetailsRes = when {
                     viewState.status == AUTO_RENEWABLE && viewState.duration == Monthly ->
-                        getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.monthly))
+                        getString(string.freeTrialMonthlyActiveSubscriptionsData, viewState.date)
                     viewState.status == AUTO_RENEWABLE && viewState.duration == Yearly ->
-                        getString(string.freeTrialActiveSubscriptionsData, viewState.date, getString(string.yearly))
+                        getString(string.freeTrialYearlyActiveSubscriptionsData, viewState.date)
                     else -> getString(string.freeTrialCancelledSubscriptionsData, viewState.date)
                 }
                 binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
