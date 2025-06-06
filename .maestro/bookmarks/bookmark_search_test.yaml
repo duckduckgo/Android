@@ -1,0 +1,70 @@
+appId: com.duckduckgo.mobile.android
+name: "ReleaseTest: Bookmark Search Functionality"
+tags:
+  - releaseTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+          stopApp: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      # Add multiple bookmarks for search testing
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://duckduckgo.com"
+      - pressKey: Enter
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "add bookmark"
+#
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://x.com"
+      - pressKey: Enter
+      - waitForAnimationToEnd
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "add bookmark"
+
+      # Open bookmarks
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - tapOn:
+          text: "bookmarks"
+
+      # Test search functionality
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/searchMenuView"
+      # Search for "duck"
+      - inputText: "duck"
+      - assertVisible: duckduckgo.com
+      - assertNotVisible: x.com
+      # Clear search and verify all bookmarks are visible
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/clearTextButton"
+      - assertVisible: duckduckgo.com
+      - assertVisible: x.com
+
+      - inputText: "x"
+      - assertVisible: x.com
+      - assertNotVisible: duckduckgo.com
+
+      # Test search with no results
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/clearTextButton"
+      - inputText: "nonexistent"
+      - assertVisible: "No results for 'nonexistent'"
+
+      # Test search by URL
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/clearTextButton"
+      - inputText: x.com
+      - assertVisible: x.com
+      - assertNotVisible: duckduckgo.com

@@ -70,7 +70,7 @@ class EditBookmarkFolderDialogFragment : SavedSiteDialogFragment() {
     }?.toSpannable()
 
     private fun getMessageString(bookmarkFolder: BookmarkFolder): String {
-        val totalItems = bookmarkFolder.numBookmarks + bookmarkFolder.numFolders
+        val totalItems = bookmarkFolder.getTotalItems()
         return resources.getQuantityString(
             plurals.bookmarkFolderDeleteMessage,
             totalItems,

@@ -17,7 +17,9 @@
 package com.duckduckgo.savedsites.impl.bookmarks
 
 import android.net.Uri
-import androidx.lifecycle.*
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -67,7 +69,6 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -124,9 +125,7 @@ class BookmarksViewModel @Inject constructor(
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-
-    data class HiddenBookmarksIds(val items: List<String> = emptyList())
+    private val hiddenIdsManager = HiddenIdsManager.getInstance()
 
     init {
         viewState.value = ViewState()
@@ -213,11 +212,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun undoDelete(savedSite: SavedSite) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(
-                hiddenIds.value.copy(
-                    items = hiddenIds.value.items - savedSite.id,
-                ),
-            )
+            hiddenIdsManager.remove(savedSite.id)
         }
     }
 
@@ -252,17 +247,13 @@ class BookmarksViewModel @Inject constructor(
             }
 
             savedSitesRepository.getSavedSites(parentId)
-                .combine(hiddenIds) { savedSites, hiddenIds ->
-                    val filteredBookmarks = savedSites.bookmarks.filter {
-                        when (it) {
-                            is Bookmark -> it.id !in hiddenIds.items
-                            is BookmarkFolder -> it.id !in hiddenIds.items
-                            else -> false
-                        }
-                    }
+                .combine(hiddenIdsManager.getFlow()) { savedSites, hiddenIds ->
+                    val filteredBookmarks = savedSites.bookmarks.filter { !hiddenIds.contains(it.id) }
+                    val filteredFavorites = savedSites.favorites.filter { !hiddenIds.contains(it.id) }
+
                     savedSites.copy(
                         bookmarks = filteredBookmarks,
-                        favorites = savedSites.favorites.filter { it.id !in hiddenIds.items },
+                        favorites = filteredFavorites,
                     )
                 }.collect {
                     onSavedSitesItemsChanged(it.favorites, it.bookmarks)
@@ -272,12 +263,31 @@ class BookmarksViewModel @Inject constructor(
 
     fun fetchAllBookmarksAndFolders() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val favorites = savedSitesRepository.getFavoritesSync()
-            val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
-                .map { it.bookmarkFolder }
-                .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT }
-            val bookmarks = savedSitesRepository.getBookmarksTree()
-            onSavedSitesItemsChanged(favorites, bookmarks + folders)
+            savedSitesRepository.getFavorites()
+                .combine(hiddenIdsManager.getFlow()) { favorites, hiddenIds ->
+                    val folders = savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
+                        .map { it.bookmarkFolder }
+                        .filter { it.id != SavedSitesNames.BOOKMARKS_ROOT && !hiddenIds.contains(it.id) }
+                    val bookmarks = savedSitesRepository.getBookmarksTree().filter { !hiddenIds.contains(it.id) }
+
+                    // Calculate visible child counts for folders in search mode
+                    val allItems = bookmarks + folders
+                    val foldersWithVisibleCounts = folders.map { folder ->
+                        val visibleChildCount = allItems.count { item ->
+                            when (item) {
+                                is Bookmark -> item.parentId == folder.id
+                                is BookmarkFolder -> item.parentId == folder.id
+                                else -> false
+                            }
+                        }
+                        folder to visibleChildCount
+                    }
+
+                    Triple(favorites, bookmarks, foldersWithVisibleCounts)
+                }
+                .collect { (favorites, bookmarks, foldersWithCounts) ->
+                    onSavedSitesItemsChanged(favorites, bookmarks, foldersWithCounts)
+                }
         }
     }
 
@@ -302,7 +312,7 @@ class BookmarksViewModel @Inject constructor(
     }
 
     fun onDeleteBookmarkFolderRequested(bookmarkFolder: BookmarkFolder) {
-        if (bookmarkFolder.numFolders + bookmarkFolder.numBookmarks == 0) {
+        if (bookmarkFolder.isEmpty()) {
             hide(bookmarkFolder)
         } else {
             command.value = DeleteBookmarkFolder(bookmarkFolder)
@@ -315,7 +325,7 @@ class BookmarksViewModel @Inject constructor(
 
     fun undoDelete(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items - bookmarkFolder.id))
+            hiddenIdsManager.remove(bookmarkFolder.id)
         }
     }
 
@@ -331,17 +341,13 @@ class BookmarksViewModel @Inject constructor(
 
     private fun hide(savedSite: SavedSite) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(
-                hiddenIds.value.copy(
-                    items = hiddenIds.value.items + savedSite.id,
-                ),
-            )
+            hiddenIdsManager.add(savedSite.id)
         }
     }
 
     fun hide(bookmarkFolder: BookmarkFolder) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            hiddenIds.emit(hiddenIds.value.copy(items = hiddenIds.value.items + bookmarkFolder.id))
+            hiddenIdsManager.add(bookmarkFolder.id)
         }
         command.postValue(ConfirmDeleteBookmarkFolder(bookmarkFolder))
     }
@@ -360,6 +366,38 @@ class BookmarksViewModel @Inject constructor(
                 is BookmarkFolder -> BookmarkFolderItem(bookmark)
                 else -> null
             }
+        }
+
+        withContext(dispatcherProvider.main()) {
+            val sortingMode = bookmarksDataStore.getSortingMode()
+            viewState.value = viewState.value?.copy(
+                favorites = favorites,
+                bookmarkItems = bookmarkItems,
+                sortedItems = sortElements(bookmarkItems, sortingMode),
+                enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
+                sortingMode = sortingMode,
+            )
+        }
+
+        showSyncPromotionIfEligible()
+    }
+
+    private suspend fun onSavedSitesItemsChanged(
+        favorites: List<Favorite>,
+        bookmarks: List<Bookmark>,
+        foldersWithCounts: List<Pair<BookmarkFolder, Int>>,
+    ) {
+        val bookmarkItems = mutableListOf<BookmarksItemTypes>()
+
+        // Add bookmarks
+        bookmarks.forEach { bookmark ->
+            val isFavorite = favorites.any { favorite -> favorite.id == bookmark.id }
+            bookmarkItems.add(BookmarkItem(bookmark.copy(isFavorite = isFavorite)))
+        }
+
+        // Add folders with visible child counts
+        foldersWithCounts.forEach { (folder, visibleCount) ->
+            bookmarkItems.add(BookmarkFolderItem(folder, visibleCount))
         }
 
         withContext(dispatcherProvider.main()) {

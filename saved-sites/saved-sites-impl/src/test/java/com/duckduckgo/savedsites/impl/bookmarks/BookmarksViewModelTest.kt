@@ -129,6 +129,8 @@ class BookmarksViewModelTest {
     fun after() {
         testee.viewState.removeObserver(viewStateObserver)
         testee.command.removeObserver(commandObserver)
+        val hiddenIdsManager = HiddenIdsManager.getInstance()
+        hiddenIdsManager.getAll().forEach { hiddenIdsManager.remove(it) }
     }
 
     @Test
@@ -269,13 +271,13 @@ class BookmarksViewModelTest {
 
     @Test
     fun whenFetchEverythingThenUpdateStateWithData() = runTest {
-        whenever(savedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite))
+        whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite)))
         whenever(savedSitesRepository.getBookmarksTree()).thenReturn(listOf(bookmark, bookmark, bookmark))
         whenever(savedSitesRepository.getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)).thenReturn(listOf(bookmarkFolderItem, bookmarkFolderItem))
 
         testee.fetchAllBookmarksAndFolders()
 
-        verify(savedSitesRepository).getFavoritesSync()
+        verify(savedSitesRepository).getFavorites()
         verify(savedSitesRepository).getBookmarksTree()
         verify(savedSitesRepository).getFolderTree(SavedSitesNames.BOOKMARKS_ROOT, null)
 
@@ -514,7 +516,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBrowserMenuPressedAndBookmarksEmptyThenCommandSent() {
+    fun whenBrowserMenuPressedAndBookmarksEmptyThenSortByNameButtonDisabled() {
         whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
             flowOf(SavedSites(emptyList(), emptyList())),
         )
@@ -529,7 +531,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBrowserMenuPressedAndBookmarksNotEmptyThenCommandSent() {
+    fun whenBrowserMenuPressedAndBookmarksNotEmptyThenSortByNameButtonEnabled() {
         testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
         testee.onBrowserMenuPressed()
@@ -540,7 +542,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenBrowserMenuPressedAndManualSortingModeThenCommandSent() {
+    fun whenBrowserMenuPressedAndManualSortingModeThenManualSortingButtonEnabled() {
         whenever(bookmarksDataStore.getSortingMode()).thenReturn(MANUAL)
         testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
