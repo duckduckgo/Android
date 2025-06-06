@@ -20,8 +20,11 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoButtonColors.ButtonColors
+import com.duckduckgo.common.ui.compose.theme.DuckDuckGoFabColors.FabColors
 import com.duckduckgo.mobile.android.R
 
 object DuckDuckGoTheme {
@@ -29,6 +32,34 @@ object DuckDuckGoTheme {
     val colors: DuckDuckGoColors
         @Composable
         get() = LocalDuckDuckGoColors.current
+
+    val buttons: DuckDuckGoButtonColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.buttons
+
+    val fabs: DuckDuckGoFabColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.fabs
+
+    val switch: DuckDuckGoSwitchColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.switch
+
+    val slider: DuckDuckGoSliderColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.slider
+
+    val textInput: DuckDuckGoTextInputColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.textInput
+
+    val infoPanel: DuckDuckGoInfoPanelColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.infoPanel
+
+    val tab: DuckDuckGoTabColors
+        @Composable
+        get() = LocalDuckDuckGoColors.current.tab
 
     val shapes
         @Composable
@@ -81,6 +112,81 @@ fun DuckDuckGoTheme(
         ripple = colorResource(R.color.black6),
         logoTitleText = colorResource(R.color.gray85),
         omnibarTextColorHighlight = colorResource(R.color.blue50_20),
+        buttons = DuckDuckGoButtonColors(
+            primary = ButtonColors(
+                containerColor = colorResource(R.color.blue50),
+                contentColor = colorResource(R.color.white),
+                containerPressedColor = colorResource(R.color.blue70),
+                contentPressedColor = colorResource(R.color.white),
+            ),
+            secondary = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.blue50),
+                containerPressedColor = colorResource(R.color.blue50),
+                contentPressedColor = colorResource(R.color.blue70),
+            ),
+            destructive = ButtonColors(
+                containerColor = colorResource(R.color.alertRedOnLightDefault),
+                contentColor = colorResource(R.color.white),
+                containerPressedColor = colorResource(R.color.alertRedOnLightPressed),
+                contentPressedColor = colorResource(R.color.white),
+            ),
+            ghost = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.blue50),
+                containerPressedColor = colorResource(R.color.black6),
+                contentPressedColor = colorResource(R.color.blue50),
+            ),
+            ghostDestructive = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.alertRedOnLightDefault),
+                containerPressedColor = colorResource(R.color.alertRedOnLightDefault),
+                contentPressedColor = colorResource(R.color.alertRedOnLightPressed),
+            ),
+            ghostAlt = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.black60),
+                containerPressedColor = colorResource(R.color.black6),
+                contentPressedColor = colorResource(R.color.black60),
+            ),
+        ),
+        fabs = DuckDuckGoFabColors(
+            primary = FabColors(
+                containerColor = colorResource(R.color.blue50),
+                contentColor = colorResource(R.color.white),
+                containerPressedColor = colorResource(R.color.blue70),
+            ),
+            secondary = FabColors(
+                containerColor = colorResource(R.color.blue0),
+                contentColor = colorResource(R.color.blue70),
+                containerPressedColor = colorResource(R.color.blue20),
+            ),
+        ),
+        switch = DuckDuckGoSwitchColors(
+            thumbOn = colorResource(R.color.white),
+            thumbOff = colorResource(R.color.white),
+            trackOn = colorResource(R.color.blue50),
+            trackOff = colorResource(R.color.gray60_50),
+            thumbDisabledOn = colorResource(R.color.white),
+            thumbDisabledOff = colorResource(R.color.white),
+            trackDisabledOn = colorResource(R.color.gray36),
+            trackDisabledOff = colorResource(R.color.gray36),
+        ),
+        slider = DuckDuckGoSliderColors(
+            activeColor = colorResource(R.color.blue50),
+            inactiveColor = colorResource(R.color.gray60_50),
+        ),
+        textInput = DuckDuckGoTextInputColors(
+            focusedOutline = colorResource(R.color.blue50),
+            enabledOutline = colorResource(R.color.black30),
+        ),
+        infoPanel = DuckDuckGoInfoPanelColors(
+            tooltipBackgroundColor = colorResource(R.color.daxInfoPanelTooltipBackgroundColorLight),
+            alertBackgroundColor = colorResource(R.color.daxInfoPanelAlertBackgroundColorLight),
+        ),
+        tab = DuckDuckGoTabColors(
+            highlight = colorResource(R.color.gray60),
+        ),
     )
 
     val darkColorPalette = DuckDuckGoColors(
@@ -105,6 +211,81 @@ fun DuckDuckGoTheme(
         ripple = colorResource(R.color.white12),
         logoTitleText = colorResource(R.color.white),
         omnibarTextColorHighlight = colorResource(R.color.blue30_20),
+        buttons = DuckDuckGoButtonColors(
+            primary = ButtonColors(
+                containerColor = colorResource(R.color.blue30),
+                contentColor = colorResource(R.color.black84),
+                containerPressedColor = colorResource(R.color.blue50),
+                contentPressedColor = colorResource(R.color.black84),
+            ),
+            secondary = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.blue30),
+                containerPressedColor = colorResource(R.color.blue30),
+                contentPressedColor = colorResource(R.color.blue20),
+            ),
+            destructive = ButtonColors(
+                containerColor = colorResource(R.color.alertRedOnDarkDefault),
+                contentColor = colorResource(R.color.black84),
+                containerPressedColor = colorResource(R.color.alertRedOnDarkPressed),
+                contentPressedColor = colorResource(R.color.black84),
+            ),
+            ghost = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.blue30),
+                containerPressedColor = colorResource(R.color.white12),
+                contentPressedColor = colorResource(R.color.blue30),
+            ),
+            ghostDestructive = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.alertRedOnDarkDefault),
+                containerPressedColor = colorResource(R.color.alertRedOnDarkDefault_18),
+                contentPressedColor = colorResource(R.color.alertRedOnDarkTextPressed),
+            ),
+            ghostAlt = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = colorResource(R.color.white84),
+                containerPressedColor = colorResource(R.color.white12),
+                contentPressedColor = colorResource(R.color.white84),
+            ),
+        ),
+        fabs = DuckDuckGoFabColors(
+            primary = FabColors(
+                containerColor = colorResource(R.color.blue20),
+                contentColor = colorResource(R.color.black),
+                containerPressedColor = colorResource(R.color.blue50),
+            ),
+            secondary = FabColors(
+                containerColor = colorResource(R.color.blue0),
+                contentColor = colorResource(R.color.blue70),
+                containerPressedColor = colorResource(R.color.blue20),
+            ),
+        ),
+        switch = DuckDuckGoSwitchColors(
+            thumbOn = colorResource(R.color.white),
+            thumbOff = colorResource(R.color.white),
+            trackOn = colorResource(R.color.blue30),
+            trackOff = colorResource(R.color.gray60_50),
+            thumbDisabledOn = colorResource(R.color.white48),
+            thumbDisabledOff = colorResource(R.color.white48),
+            trackDisabledOn = colorResource(R.color.gray30),
+            trackDisabledOff = colorResource(R.color.gray30),
+        ),
+        slider = DuckDuckGoSliderColors(
+            activeColor = colorResource(R.color.blue30),
+            inactiveColor = colorResource(R.color.gray40_50),
+        ),
+        textInput = DuckDuckGoTextInputColors(
+            focusedOutline = colorResource(R.color.blue30),
+            enabledOutline = colorResource(R.color.white30),
+        ),
+        infoPanel = DuckDuckGoInfoPanelColors(
+            tooltipBackgroundColor = colorResource(R.color.daxInfoPanelTooltipBackgroundColorDark),
+            alertBackgroundColor = colorResource(R.color.daxInfoPanelAlertBackgroundColorDark),
+        ),
+        tab = DuckDuckGoTabColors(
+            highlight = colorResource(R.color.gray50),
+        ),
     )
 
     val shapes = DuckDuckGoShapes(
