@@ -127,6 +127,7 @@ import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
@@ -556,6 +557,7 @@ class BrowserTabViewModelTest {
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
+    private val tabManager: TabManager = mock()
 
     private val fakeOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles =
         FakeFeatureToggleFactory.create(OnboardingDesignExperimentToggles::class.java)
@@ -763,6 +765,7 @@ class BrowserTabViewModelTest {
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             subscriptionsJSHelper = mockSubscriptionsJSHelper,
             onboardingDesignExperimentToggles = fakeOnboardingDesignExperimentToggles,
+            tabManager = tabManager,
         )
 
         testee.loadData("abc", null, false, false)
