@@ -138,7 +138,7 @@ class BrowserWebViewClient @Inject constructor(
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
     private var currentLoadOperationId: String? = null
-    private var concurrentRequestsOnStart = 0
+    private var parallelRequestsOnStart = 0
 
     init {
         appCoroutineScope.launch {
@@ -153,7 +153,7 @@ class BrowserWebViewClient @Inject constructor(
         val loadId = UUID.randomUUID().toString()
         this.currentLoadOperationId = loadId
 
-        concurrentRequestsOnStart = parallelRequestCounter.incrementAndGet() - 1
+        parallelRequestsOnStart = parallelRequestCounter.incrementAndGet() - 1
         logcat(LogPriority.DEBUG) { "### Request started (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
 
         val job = timeoutScope.launch {
@@ -526,7 +526,7 @@ class BrowserWebViewClient @Inject constructor(
                             start = safeStart,
                             end = currentTimeProvider.elapsedRealtime(),
                             isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
-                            requestsOnStart = concurrentRequestsOnStart,
+                            requestsOnStart = parallelRequestsOnStart,
                             requestsWhenFinished = parallelRequestCounter.get() - 1
                         )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
@@ -783,13 +783,8 @@ class BrowserWebViewClient @Inject constructor(
         private val activeRequestTimeoutJobs = ConcurrentHashMap<String, Job>()
         private const val REQUEST_TIMEOUT_MS = 30000L // 30 seconds
 
-        // Dedicated scope for timeout jobs
+        // dedicated scope for request count timeout jobs
         private val timeoutScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-        /**
-         * Gets the current count of parallel requests being tracked.
-         */
-        fun getParallelRequestCount(): Int = parallelRequestCounter.get()
     }
 }
 
