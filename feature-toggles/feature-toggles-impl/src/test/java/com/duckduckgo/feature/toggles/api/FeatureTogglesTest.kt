@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.api
 
+import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.feature.toggles.api.Cohorts.CONTROL
 import com.duckduckgo.feature.toggles.api.Cohorts.TREATMENT
@@ -35,6 +36,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
+@SuppressLint("DenyListedApi") // getRawStoredState
 class FeatureTogglesTest {
 
     private lateinit var feature: TestFeature

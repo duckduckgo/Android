@@ -143,10 +143,14 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private suspend fun enrollInNewUserExperiment(cohortName: CohortName): Boolean {
+        senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().enroll()
+
         return senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().isEnrolledAndEnabled(cohortName)
     }
 
     private suspend fun enrollInExistingUserExperiment(cohortName: CohortName): Boolean {
+        senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().enroll()
+
         return senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().isEnrolledAndEnabled(cohortName)
     }
 

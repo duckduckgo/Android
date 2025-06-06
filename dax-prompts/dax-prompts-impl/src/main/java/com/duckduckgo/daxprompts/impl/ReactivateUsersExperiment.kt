@@ -30,6 +30,7 @@ import kotlinx.coroutines.withContext
 
 interface ReactivateUsersExperiment {
 
+    suspend fun enrol(): Boolean
     suspend fun isControl(): Boolean
     suspend fun isDuckPlayerPrompt(): Boolean
     suspend fun isBrowserComparisonPrompt(): Boolean
@@ -53,6 +54,10 @@ class ReactivateUsersExperimentImpl @Inject constructor(
     private val reactivateUsersPixelsPlugin: ReactivateUsersPixelsPlugin,
     private val pixel: Pixel,
 ) : ReactivateUsersExperiment {
+
+    override suspend fun enrol(): Boolean {
+        return reactivateUsersToggles.reactivateUsersExperimentMay25().enroll()
+    }
 
     override suspend fun isControl(): Boolean =
         reactivateUsersToggles.reactivateUsersExperimentMay25().isEnrolledAndEnabled(CONTROL)
