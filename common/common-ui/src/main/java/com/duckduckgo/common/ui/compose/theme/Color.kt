@@ -43,6 +43,81 @@ data class DuckDuckGoColors(
     val ripple: Color,
     val logoTitleText: Color,
     val omnibarTextColorHighlight: Color,
+    val buttons: DuckDuckGoButtonColors,
+    val fabs: DuckDuckGoFabColors,
+    val switch: DuckDuckGoSwitchColors,
+    val slider: DuckDuckGoSliderColors,
+    val textInput: DuckDuckGoTextInputColors,
+    val infoPanel: DuckDuckGoInfoPanelColors,
+    val tab: DuckDuckGoTabColors,
+)
+
+@Immutable
+data class DuckDuckGoButtonColors(
+    val primary: ButtonColors,
+    val secondary: ButtonColors,
+    val destructive: ButtonColors,
+    val ghost: ButtonColors,
+    val ghostDestructive: ButtonColors,
+    val ghostAlt: ButtonColors,
+) {
+
+    @Immutable
+    data class ButtonColors(
+        val containerColor: Color,
+        val contentColor: Color,
+        val containerPressedColor: Color,
+        val contentPressedColor: Color,
+    )
+}
+
+@Immutable
+data class DuckDuckGoFabColors(
+    val primary: FabColors,
+    val secondary: FabColors,
+) {
+
+    @Immutable
+    data class FabColors(
+        val containerColor: Color,
+        val contentColor: Color,
+        val containerPressedColor: Color,
+    )
+}
+
+@Immutable
+data class DuckDuckGoSwitchColors(
+    val thumbOn: Color,
+    val thumbOff: Color,
+    val trackOn: Color,
+    val trackOff: Color,
+    val thumbDisabledOn: Color,
+    val thumbDisabledOff: Color,
+    val trackDisabledOn: Color,
+    val trackDisabledOff: Color,
+)
+
+@Immutable
+data class DuckDuckGoSliderColors(
+    val activeColor: Color,
+    val inactiveColor: Color,
+)
+
+@Immutable
+data class DuckDuckGoTextInputColors(
+    val focusedOutline: Color,
+    val enabledOutline: Color,
+)
+
+@Immutable
+data class DuckDuckGoInfoPanelColors(
+    val tooltipBackgroundColor: Color,
+    val alertBackgroundColor: Color,
+)
+
+@Immutable
+data class DuckDuckGoTabColors(
+    val highlight: Color,
 )
 
 val LocalDuckDuckGoColors = staticCompositionLocalOf<DuckDuckGoColors> {
