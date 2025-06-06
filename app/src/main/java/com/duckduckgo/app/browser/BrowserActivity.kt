@@ -223,10 +223,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(
-            activity = this,
-            swipingTabsFeature = swipingTabsFeature,
-        )
+        TabPagerAdapter(activity = this)
     }
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -1012,6 +1009,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun onMoveToTabRequested(index: Int) {
         tabPager.post {
+            tabPagerAdapter.currentTabIndex = index
             tabPager.setCurrentItem(index, false)
         }
     }

@@ -24,6 +24,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
@@ -50,6 +51,7 @@ interface TabManager {
     )
 }
 
+@SingleInstanceIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class DefaultTabManager @Inject constructor(
     private val tabRepository: TabRepository,

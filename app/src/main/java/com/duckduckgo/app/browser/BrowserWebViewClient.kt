@@ -479,7 +479,13 @@ class BrowserWebViewClient @Inject constructor(
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
+                        pageLoadedHandler.onPageLoaded(
+                            url = it,
+                            title = navigationList.currentItem?.title,
+                            start = safeStart,
+                            end = currentTimeProvider.elapsedRealtime(),
+                            isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
+                        )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
                             if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {

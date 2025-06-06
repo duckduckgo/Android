@@ -82,6 +82,8 @@ interface WebViewClientListener {
     fun surrogateDetected(surrogate: SurrogateResponse)
     fun isDesktopSiteEnabled(): Boolean
 
+    fun isTabInForeground(): Boolean
+
     fun loginDetected()
     fun dosAttackDetected()
     fun iconReceived(
