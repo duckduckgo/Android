@@ -38,7 +38,7 @@ class TabPagerAdapter(
             // if the current tab index is -1 and the set value 0, it means the first tab is really selected
             // and we need to notify the adapter to create the first fragment
             if (field == -1 && value == 0) {
-                notifyDataSetChanged()
+                notifyItemChanged(0)
             }
             field = value
         }
