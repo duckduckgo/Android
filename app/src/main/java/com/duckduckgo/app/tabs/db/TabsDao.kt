@@ -26,6 +26,7 @@ import dagger.SingleInstanceIn
 import java.time.LocalDateTime
 import kotlin.math.max
 import kotlinx.coroutines.flow.Flow
+import logcat.logcat
 
 @Dao
 @SingleInstanceIn(AppScope::class)
@@ -160,10 +161,24 @@ abstract class TabsDao {
     abstract fun incrementPositionStartingAt(position: Int)
 
     @Transaction
-    open fun addAndSelectTab(tab: TabEntity) {
-        deleteBlankTabs()
-        insertTab(tab)
-        insertTabSelection(TabSelectionEntity(tabId = tab.tabId))
+    open fun addAndSelectTab(tab: TabEntity, updateIfBlankParent: Boolean = false) {
+        try {
+            val parent = tab.sourceTabId?.let { tab(it) }
+            val newTab = if (updateIfBlankParent && parent != null && parent.url == null) {
+                /*
+                 * If the parent tab is blank, we need to update the parent tab with the previous
+                 * one. Otherwise, foreign key constrains won't be met
+                 */
+                tab.copy(sourceTabId = parent.sourceTabId, position = parent.position)
+            } else {
+                tab
+            }
+            deleteBlankTabs()
+            insertTab(newTab)
+            insertTabSelection(TabSelectionEntity(tabId = newTab.tabId))
+        } catch (e: Exception) {
+            logcat { "Error adding and selecting tab: $e" }
+        }
     }
 
     @Transaction
