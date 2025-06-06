@@ -32,7 +32,15 @@ import kotlinx.coroutines.launch
 import logcat.logcat
 
 interface PageLoadedHandler {
-    fun onPageLoaded(url: String, title: String?, start: Long, end: Long, isTabInForeground: Boolean)
+    fun onPageLoaded(
+        url: String,
+        title: String?,
+        start: Long,
+        end: Long,
+        isTabInForeground: Boolean,
+        requestsOnStart: Int,
+        requestsWhenFinished: Int
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -46,7 +54,15 @@ class RealPageLoadedHandler @Inject constructor(
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : PageLoadedHandler {
 
-    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long, isTabInForeground: Boolean) {
+    override fun onPageLoaded(
+        url: String,
+        title: String?,
+        start: Long,
+        end: Long,
+        isTabInForeground: Boolean,
+        requestsOnStart: Int,
+        requestsWhenFinished: Int,
+    ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(
@@ -59,7 +75,8 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
-            logcat { "$$$: Page load time: ${end - start}, foreground: $isTabInForeground" }
+            logcat { "$$$: Page load time: ${end - start}, foreground: $isTabInForeground, " +
+                "requestsOnStart: $requestsOnStart, requestsWhenFinished: $requestsWhenFinished" }
         }
     }
 }
