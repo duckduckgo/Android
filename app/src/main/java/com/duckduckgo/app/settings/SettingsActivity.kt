@@ -196,6 +196,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
             vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
+            widgetPromptSetting.setOnClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
         }
 
         with(viewsMain) {
@@ -281,6 +282,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
+                    updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                 }
             }.launchIn(lifecycleScope)
 
@@ -325,6 +327,14 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private fun updateVoiceSearchVisibility(isVisible: Boolean) {
         viewsNextSteps.enableVoiceSearchSetting.isVisible = isVisible
+    }
+
+    private fun updateAddWidgetInProtections(isVisible: Boolean, widgetsInstalled: Boolean) {
+        if (isVisible) {
+            viewsPrivacy.widgetPromptSetting.setStatus(isOn = widgetsInstalled)
+        }
+        viewsPrivacy.widgetPromptSetting.isVisible = isVisible
+        viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {

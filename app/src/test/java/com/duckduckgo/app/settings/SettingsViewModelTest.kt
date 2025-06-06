@@ -24,6 +24,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -35,6 +36,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
@@ -87,8 +89,13 @@ class SettingsViewModelTest {
 
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
+    private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+
+    private val mockWidgetCapabilities: WidgetCapabilities = mock()
+
     @Before
     fun before() = runTest {
+        whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
         whenever(appTrackingProtectionMock.isRunning()).thenReturn(true)
         whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
         whenever(subscriptionsMock.isEligible()).thenReturn(true)
@@ -110,6 +117,8 @@ class SettingsViewModelTest {
             settingsPixelDispatcher = settingsPixelDispatcherMock,
             autofillFeature = autofillFeature,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            settingsPageFeature = fakeSettingsPageFeature,
+            widgetCapabilities = mockWidgetCapabilities,
         )
     }
 
@@ -165,5 +174,21 @@ class SettingsViewModelTest {
         fakeAndroidBrowserConfigFeature.newThreatProtectionSettings().setRawStoredState(State(true))
         testee.start()
         assertTrue(testee.viewState().first().isNewThreatProtectionSettingsEnabled)
+    }
+
+    @Test
+    fun whenWidgetAsProtectionFlagEnabledThenAddWidgetIsVisibleInProtectionsSection() = runTest {
+        fakeSettingsPageFeature.self().setRawStoredState(State(true))
+        fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
+        testee.start()
+        assertTrue(testee.viewState().first().isAddWidgetInProtectionsVisible)
+    }
+
+    @Test
+    fun whenWidgetAsProtectionFlagDisabledThenAddWidgetIsNotVisibleInProtectionsSection() = runTest {
+        fakeSettingsPageFeature.self().setRawStoredState(State(true))
+        fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(false))
+        testee.start()
+        assertFalse(testee.viewState().first().isAddWidgetInProtectionsVisible)
     }
 }

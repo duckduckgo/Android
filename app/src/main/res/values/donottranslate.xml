@@ -56,4 +56,7 @@
 
     <!-- Trackers blocked animation-->
     <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
+
+    <!-- Temporary, to be moved to values later-->
+    <string name="settingsAddHomeWidgetTitle">Home Screen Widget</string>
 </resources>
