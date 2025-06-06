@@ -85,10 +85,14 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
+import logcat.LogPriority
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -133,12 +137,48 @@ class BrowserWebViewClient @Inject constructor(
 
     private var shouldOpenDuckPlayerInNewTab: Boolean = true
 
+    private var currentLoadOperationId: String? = null
+    private var concurrentRequestsOnStart = 0
+
     init {
         appCoroutineScope.launch {
             duckPlayer.observeShouldOpenInNewTab().collect {
                 shouldOpenDuckPlayerInNewTab = it is On
             }
         }
+    }
+
+    private fun incrementAndTrackLoad(urlForLog: String) {
+        // a new load operation is starting for this WebView instance.
+        val loadId = UUID.randomUUID().toString()
+        this.currentLoadOperationId = loadId
+
+        concurrentRequestsOnStart = parallelRequestCounter.incrementAndGet() - 1
+        logcat(LogPriority.DEBUG) { "### Request started (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
+
+        val job = timeoutScope.launch {
+            delay(REQUEST_TIMEOUT_MS)
+            // attempt to remove the job - if successful, it means it hasn't been finished/errored/cancelled yet
+            if (activeRequestTimeoutJobs.remove(loadId) != null) {
+                parallelRequestCounter.decrementAndGet()
+                logcat(LogPriority.WARN) { "### Request timed out (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
+            }
+        }
+        activeRequestTimeoutJobs[loadId] = job
+    }
+
+    private fun decrementAndUntrackLoad(reason: String, urlForLog: String?) {
+        this.currentLoadOperationId?.let { loadId ->
+            val job = activeRequestTimeoutJobs.remove(loadId)
+
+            // if we successfully removed the job (it means it hadn't timed out yet)
+            if (job != null) {
+                job.cancel()
+                parallelRequestCounter.decrementAndGet()
+                logcat(LogPriority.DEBUG) { "### Request $reason (ID: $loadId, URL: $urlForLog). Counter: ${parallelRequestCounter.get()}" }
+            }
+        }
+        this.currentLoadOperationId = null
     }
 
     /**
@@ -422,6 +462,7 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != ABOUT_BLANK && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+                incrementAndTrackLoad(it) // increment the request counter
                 requestInterceptor.onPageStarted(url)
             }
             handleMediaPlayback(webView, it)
@@ -485,6 +526,8 @@ class BrowserWebViewClient @Inject constructor(
                             start = safeStart,
                             end = currentTimeProvider.elapsedRealtime(),
                             isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
+                            requestsOnStart = concurrentRequestsOnStart,
+                            requestsWhenFinished = parallelRequestCounter.get() - 1
                         )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -503,6 +546,10 @@ class BrowserWebViewClient @Inject constructor(
                             }
                         }
                         uriLoadedManager.sendUriLoadedPixel()
+
+                        // conclude the tracked load operation
+                        decrementAndUntrackLoad("finished", url)
+
                         start = null
                     }
                 }
@@ -546,6 +593,13 @@ class BrowserWebViewClient @Inject constructor(
         } else {
             pixel.fire(WEB_RENDERER_GONE_KILLED)
         }
+
+        if (this.start != null) {
+            val currentUrl = view?.url
+            decrementAndUntrackLoad("render_process_gone", currentUrl)
+            this.start = null
+        }
+
         webViewClientListener?.recoverFromRenderProcessGone()
         return true
     }
@@ -641,16 +695,19 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest?,
         error: WebResourceError?,
     ) {
-        error?.let {
-            val parsedError = parseErrorResponse(it)
-            if (parsedError != OMITTED && request?.isForMainFrame == true) {
-                start = null
-                webViewClientListener?.onReceivedError(parsedError, request.url.toString())
-            }
+        error?.let { webResourceError ->
+            val parsedError = parseErrorResponse(webResourceError)
             if (request?.isForMainFrame == true) {
+                if (parsedError != OMITTED) {
+                    if (this.start != null) {
+                        decrementAndUntrackLoad("errored", request.url.toString())
+                        this.start = null
+                    }
+                    webViewClientListener?.onReceivedError(parsedError, request.url.toString())
+                }
                 logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
-                    "${it.errorCode.asStringErrorCode()} - ${it.description}",
+                    "${webResourceError.errorCode.asStringErrorCode()} - ${webResourceError.description}",
                     request.url.toString(),
                 )
             }
@@ -719,6 +776,20 @@ class BrowserWebViewClient @Inject constructor(
 
     fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
         requestInterceptor.addExemptedMaliciousSite(url, feed)
+    }
+
+    companion object {
+        val parallelRequestCounter = AtomicInteger(0)
+        private val activeRequestTimeoutJobs = ConcurrentHashMap<String, Job>()
+        private const val REQUEST_TIMEOUT_MS = 30000L // 30 seconds
+
+        // Dedicated scope for timeout jobs
+        private val timeoutScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+        /**
+         * Gets the current count of parallel requests being tracked.
+         */
+        fun getParallelRequestCount(): Int = parallelRequestCounter.get()
     }
 }
 
