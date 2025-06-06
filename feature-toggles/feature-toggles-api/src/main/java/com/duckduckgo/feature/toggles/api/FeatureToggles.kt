@@ -19,11 +19,8 @@ package com.duckduckgo.feature.toggles.api
 import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
-import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort.Companion.AnyCohort.ANY_COHORT
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 import java.time.ZoneId
@@ -167,12 +164,23 @@ interface Toggle {
     fun featureName(): FeatureName
 
     /**
-     * This is the method that SHALL be called to get whether a feature is enabled or not. DO NOT USE [getRawStoredState] for that.
-     * WARNING: Calling this method with a cohort different from [ANY_COHORT] WILL ALWAYS try to enroll the user into an experiment.
-     * This method enrolls users as long as they match the targets, even if the feature is disabled or the min version does not match.
+     * This method
+     * - Enrolls the user if not previously enrolled (ie. no cohort currently assigned) AND [isEnabled].
+     * - Is idempotent, ie. calling the function multiple times has the same effect as calling it once.
+     *
+     * @return `true` when the first enrolment is done, `false` in any other subsequent call
+     */
+    suspend fun enroll(): Boolean
+
+    /**
+     * This method
+     *    - Returns whether the feature flag state is enabled or disabled.
+     *    - It is not affected by experiment cohort assignment. It just checks whether the feature is enabled or not.
+     *    - It considers all other constraints like targets, minSupportedVersion, etc.
+     *
      * @return `true` if the feature should be enabled, `false` otherwise
      */
-    fun isEnabled(cohort: CohortName = ANY_COHORT): Boolean
+    fun isEnabled(): Boolean
 
     /**
      * The usage of this API is only useful for internal/dev settings/features
@@ -200,15 +208,16 @@ interface Toggle {
     fun getSettings(): String?
 
     /**
-     * WARNING: This method does not check if the experiment is still enabled or not.
+     * Convenience method that checks if [getCohort] is not null
+     *  - WARNING: This method does not check if the experiment is still enabled or not.
      * @return `true` if the user is enrolled in the experiment and `false` otherwise
      */
-    fun isEnrolled(): Boolean
+    suspend fun isEnrolled(): Boolean
 
     /**
      * @return `true` if the user is enrolled in the given cohort and the experiment is enabled or `false` otherwise
      */
-    fun isEnrolledAndEnabled(cohort: CohortName): Boolean
+    suspend fun isEnrolledAndEnabled(cohort: CohortName): Boolean
 
     /**
      * @return the list of domain exceptions`exceptions` of the feature or empty list if not present in the remote config
@@ -219,7 +228,7 @@ interface Toggle {
      * WARNING: This method always returns the cohort assigned regardless it the experiment is still enabled or not.
      * @return a [Cohort] if one has been assigned or `null` otherwise.
      */
-    fun getCohort(): Cohort?
+    suspend fun getCohort(): Cohort?
 
     /**
      * This represents the state of a [Toggle]
@@ -263,13 +272,7 @@ interface Toggle {
              * This is nullable because only assigned cohort should have a value here, it's ET timezone
              */
             val enrollmentDateET: String? = null,
-        ) {
-            companion object {
-                enum class AnyCohort(override val cohortName: String) : CohortName {
-                    ANY_COHORT("ANY_COHORT"),
-                }
-            }
-        }
+        )
         interface CohortName {
             val cohortName: String
         }
@@ -379,42 +382,32 @@ internal class ToggleImpl constructor(
         }
     }
 
-    override fun isEnabled(cohort: CohortName): Boolean {
-        if (cohort == ANY_COHORT) {
-            return isRolloutEnabled()
-        }
-
-        // false and not defaultValue because we don't have default values for ALL cohorts
-        val cohortDefaultValue = false
-
-        return store.get(key)?.let { state ->
-            // the feature flag should be "rollout-enabled" before we assign cohorts
-            // this means checking EVERYTHING we check when we call [isEnabled(ANY_COHORT)]
-            val updatedState = if (isRolloutEnabled() == true) {
-                // we assign cohorts if it hasn't been assigned before or if the cohort was removed from the remote config
-                if (state.assignedCohort == null || !state.cohorts.map { it.name }.contains(state.assignedCohort.name)) {
-                    state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets)).also {
-                        it.assignedCohort?.let { cohort ->
-                            callback?.onCohortAssigned(this.featureName().name, cohort.name, cohort.enrollmentDateET!!)
-                        }
-                    }
-                } else {
-                    state
-                }
-            } else {
-                state
-            }
-            store.set(key, updatedState)
-            return (
-                (updatedState.remoteEnableState ?: cohortDefaultValue) &&
-                    updatedState.enable &&
-                    cohort.cohortName.lowercase() == updatedState.assignedCohort?.name?.lowercase() &&
-                    appVersionProvider.invoke() >= (state.minSupportedVersion ?: 0)
-                )
-        } ?: cohortDefaultValue
+    override suspend fun enroll(): Boolean {
+        return enrollInternal()
     }
 
-    private fun isRolloutEnabled(): Boolean {
+    private fun enrollInternal(force: Boolean = false): Boolean {
+        // if the Toggle is not enabled, then we don't enroll
+        if (isEnabled() == false) {
+            return false
+        }
+
+        store.get(key)?.let { state ->
+            if (force || state.assignedCohort == null) {
+                val updatedState = state.copy(assignedCohort = assignCohortRandomly(state.cohorts, state.targets)).also {
+                    it.assignedCohort?.let { cohort ->
+                        callback?.onCohortAssigned(this.featureName().name, cohort.name, cohort.enrollmentDateET!!)
+                    }
+                }
+                store.set(key, updatedState)
+                return updatedState.assignedCohort != null
+            }
+        }
+
+        return false
+    }
+
+    override fun isEnabled(): Boolean {
         // This fun is in there because it should never be called outside this method
         fun Toggle.State.evaluateTargetMatching(isExperiment: Boolean): Boolean {
             val variant = appVariantProvider.invoke()
@@ -568,11 +561,21 @@ internal class ToggleImpl constructor(
         return store.get(key)?.exceptions.orEmpty()
     }
 
-    override fun getCohort(): Cohort? {
+    override suspend fun getCohort(): Cohort? {
+        val state = store.get(key)
+        state?.assignedCohort?.let { assignedCohort ->
+            // cohort is assigned and assignedCohort is no longer in remote config, then re-enroll
+            if (!state.cohorts.map { it.name }.contains(assignedCohort.name)) {
+                enrollInternal(force = true)
+            }
+        }
+
         return store.get(key)?.assignedCohort
     }
 
-    override fun isEnrolled(): Boolean = getCohort() != null
+    override suspend fun isEnrolled(): Boolean = getCohort() != null
 
-    override fun isEnrolledAndEnabled(cohort: CohortName): Boolean = isEnrolled() && isEnabled(cohort)
+    override suspend fun isEnrolledAndEnabled(cohort: CohortName): Boolean {
+        return cohort.cohortName.lowercase() == getCohort()?.name?.lowercase() && isEnabled()
+    }
 }

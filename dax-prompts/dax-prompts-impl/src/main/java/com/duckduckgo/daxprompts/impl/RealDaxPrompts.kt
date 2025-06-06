@@ -53,6 +53,8 @@ class RealDaxPrompts @Inject constructor(
                 return@withContext ActionType.NONE
             }
 
+            reactivateUsersExperiment.enrol()
+
             if (reactivateUsersExperiment.isControl()) {
                 ActionType.SHOW_CONTROL
             } else if (reactivateUsersExperiment.isDuckPlayerPrompt()) {

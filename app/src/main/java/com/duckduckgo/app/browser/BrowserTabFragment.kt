@@ -334,6 +334,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -1292,7 +1293,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
+            anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
                 omnibar.shieldIconExperiment
             } else {
                 omnibar.shieldIcon

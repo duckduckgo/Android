@@ -82,6 +82,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -569,7 +570,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onTrackerAnimationInfoPanelClicked() {
         pixel.fire(
             pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
-            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
         )
         command.value = ShowAnimatedTileDismissalDialog
     }
@@ -595,7 +596,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onTrackerAnimationInfoPanelVisible() {
         pixel.fire(
             pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
-            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
         )
     }
 
