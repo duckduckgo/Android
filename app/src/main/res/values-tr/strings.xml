@@ -842,10 +842,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Yeni Yapay Zeka Sohbeti</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">DuckDuckGo\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tüm site bağlantılarının DuckDuckGo\'da açılması için bizi varsayılan tarayıcınız yapın.</string>

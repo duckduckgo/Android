@@ -874,10 +874,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Novi klepet z umetno inteligenco</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Naj DuckDuckGo zaščiti več vaše dejavnosti na spletu.</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastavite nas kot privzeti brskalnik, da se vse povezave do spletnih mest odprejo v DuckDuckGo.</string>
