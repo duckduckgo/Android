@@ -756,7 +756,7 @@
     <string name="preOnboardingComparisonChartItem1">Search privately by default</string>
     <string name="preOnboardingComparisonChartItem2">Block 3rd-party trackers</string>
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
-    <string name="preOnboardingComparisonChartItem4">Block tracking ads</string>
+    <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
     <string name="preOnboardingDaxDialog3Title">Awesome! Welcome to the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>

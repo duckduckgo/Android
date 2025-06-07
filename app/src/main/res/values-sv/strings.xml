@@ -757,7 +757,7 @@
     <string name="preOnboardingComparisonChartItem1">Sök privat som standard</string>
     <string name="preOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Blockera spårningsannonser</string>
+    <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
     <string name="preOnboardingDaxDialog3Title">Fantastiskt! Välkommen till Duck-sidan.</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>

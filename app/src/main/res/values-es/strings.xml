@@ -757,7 +757,7 @@
     <string name="preOnboardingComparisonChartItem1">Búsqueda privada por defecto</string>
     <string name="preOnboardingComparisonChartItem2">Bloquea rastreadores de terceros</string>
     <string name="preOnboardingComparisonChartItem3">Bloqueo de ventanas emergentes de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloquea anuncios de rastreo</string>
+    <string name="preOnboardingComparisonChartItem4">Bloqueo de anuncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina los datos de navegación con un solo botón</string>
     <string name="preOnboardingDaxDialog3Title">¡Genial! Te damos la bienvenida al lado Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Empezar a navegar</string>
