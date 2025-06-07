@@ -56,4 +56,11 @@
 
     <!-- Trackers blocked animation-->
     <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Try our Home screen widget!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Add our search widget to your Home screen for quick and easy access.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Add Widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Not Now</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Search DuckDuckGo</string>
 </resources>
