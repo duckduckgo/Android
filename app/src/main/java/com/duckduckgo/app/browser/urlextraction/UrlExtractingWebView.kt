@@ -40,7 +40,6 @@ class UrlExtractingWebView(
             javaScriptEnabled = true
             domStorageEnabled = true
             mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-            disableWebSql(this)
             loadsImagesAutomatically = false
         }
         setWebViewClient(webViewClient)
@@ -52,13 +51,6 @@ class UrlExtractingWebView(
         urlExtractor.addUrlExtraction(this) { extractedUrl ->
             urlExtractionListener?.onUrlExtracted(initialUrl, extractedUrl)
         }
-    }
-
-    /**
-     * Explicitly disable database to try protect against Magellan WebSQL/SQLite vulnerability
-     */
-    private fun disableWebSql(settings: WebSettings) {
-        settings.databaseEnabled = false
     }
 
     override fun loadUrl(url: String) {
