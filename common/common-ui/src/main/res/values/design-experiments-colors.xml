@@ -26,6 +26,7 @@
     <color name="background_surface_dark">#333538</color>
     <color name="background_window_dark">#404145</color>
     <color name="background_container_dark">#404145</color>
+    <color name="background_shadow_dark">#202021</color>
 
     <!-- Text -->
     <color name="text_primary_dark">#E6FFFFFF</color>
@@ -39,6 +40,7 @@
 
     <!-- Lines-->
     <color name="lines_dark">#1FF9F9F9</color>
+    <color name="line_shadow_dark">#08F9F9F9</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -52,6 +54,7 @@
     <color name="background_surface_light">#F9F9F9</color>
     <color name="background_window_light">#FFFFFF</color>
     <color name="background_container_light">#FFFFFF</color>
+    <color name="background_shadow_light">#DEDEE0</color>
 
     <!-- Text -->
     <color name="text_primary_light">#1F1F1F</color>
@@ -65,6 +68,7 @@
 
     <!-- Lines-->
     <color name="lines_light">#171F1F1F</color>
+    <color name="line_shadow_light">#00000000</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>

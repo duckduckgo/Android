@@ -62,6 +62,7 @@ class BrowserNavigationBarViewIntegration(
             onDisabled()
         }
         navigationBarView.browserNavigationBarObserver = browserNavigationBarObserver
+        navigationBarView.setOmnibarPosition(omnibar.omnibarPosition)
     }
 
     fun configureCustomTab() {

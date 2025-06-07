@@ -31,6 +31,12 @@
         android:orientation="vertical"
         app:layout_scrollFlags="scroll|enterAlways|snap">
 
+        <View
+            android:id="@+id/shadowViewTop"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/background_webview_top_shadow" />
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
@@ -55,7 +61,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginHorizontal="@dimen/experimentalOmnibarCardMarginHorizontal"
-                    app:cardElevation="1dp"
+                    app:cardElevation="2dp"
                     android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
                     android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
                     app:strokeColor="?daxColorAccentBlue"
@@ -452,11 +458,22 @@
             </FrameLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <View
+            android:id="@+id/shadowLineViewBottom"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/daxColorLineShadow" />
+
+        <View
+            android:id="@+id/shadowViewBottom"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/background_webview_bottom_shadow" />
+
         <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
             android:id="@+id/omnibarNavigationBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:showShadows="false"
             android:layout_gravity="bottom" />
 
     </LinearLayout>

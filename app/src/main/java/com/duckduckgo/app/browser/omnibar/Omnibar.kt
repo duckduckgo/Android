@@ -455,9 +455,8 @@ class Omnibar(
     fun setContentCanScroll(
         canScrollUp: Boolean,
         canScrollDown: Boolean,
-        topOfPage: Boolean,
     ) {
-        newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown, topOfPage))
+        newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown))
     }
 }
 

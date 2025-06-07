@@ -31,6 +31,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyNewTabButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -124,6 +125,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         autofillButtonVisible = true,
                         fireButtonVisible = true,
                         tabsButtonVisible = true,
+                        isNewTab = true,
                     )
                 }
             }
@@ -135,6 +137,7 @@ class BrowserNavigationBarViewModel @Inject constructor(
                         autofillButtonVisible = false,
                         fireButtonVisible = true,
                         tabsButtonVisible = true,
+                        isNewTab = false,
                     )
                 }
             }
@@ -145,6 +148,22 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _viewState.update {
             it.copy(
                 fireButtonHighlighted = highlighted,
+            )
+        }
+    }
+
+    fun setOmnibarPosition(omnibarPosition: OmnibarPosition) {
+        _viewState.update {
+            it.copy(
+                omnibarPosition = omnibarPosition,
+            )
+        }
+    }
+
+    fun onCanScrollDownChanged(canScrollDown: Boolean) {
+        _viewState.update {
+            it.copy(
+                canScrollDown = canScrollDown,
             )
         }
     }
@@ -172,5 +191,11 @@ class BrowserNavigationBarViewModel @Inject constructor(
         val tabsButtonVisible: Boolean = true,
         val tabsCount: Int = 0,
         val hasUnreadTabs: Boolean = false,
-    )
+        val isNewTab: Boolean = false,
+        val canScrollDown: Boolean = false,
+        val omnibarPosition: OmnibarPosition = OmnibarPosition.BOTTOM,
+    ) {
+        val showShadow: Boolean
+            get() = omnibarPosition == OmnibarPosition.TOP && (!isNewTab || canScrollDown)
+    }
 }

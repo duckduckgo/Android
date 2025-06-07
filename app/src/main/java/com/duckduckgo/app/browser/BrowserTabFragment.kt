@@ -2684,18 +2684,26 @@ class BrowserTabFragment :
         )
     }
 
+    private fun checkIfCanScroll() {
+        val canScrollUp = newBrowserTab.newTabContainerScrollView.canScrollVertically(-1)
+        val canScrollDown = newBrowserTab.newTabContainerScrollView.canScrollVertically(1)
+
+        omnibar.setContentCanScroll(canScrollUp, canScrollDown)
+        binding.navigationBar.setCanScrollDown(canScrollDown)
+    }
+
     private fun configureNewTab() {
         newBrowserTab.newTabContainerScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
 
-            // Check if it can scroll up
-            val canScrollUp = v.canScrollVertically(-1)
-            val canScrollDown = v.canScrollVertically(1)
-            val topOfPage = scrollY == 0
+            checkIfCanScroll()
+        }
 
-            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
+        // check if the content can scroll after a delay to allow the view to be fully laid out
+        view?.postDelayed(SCROLLABILITY_CHECK_STARTUP_DELAY) {
+            checkIfCanScroll()
         }
     }
 
@@ -3657,6 +3665,10 @@ class BrowserTabFragment :
         recreatePopupMenu()
         privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
+
+        view?.postDelayed(SCROLLABILITY_CHECK_CONFIG_CHANGE_DELAY) {
+            checkIfCanScroll()
+        }
     }
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
@@ -3952,6 +3964,9 @@ class BrowserTabFragment :
 
         private const val MAX_PROGRESS = 100
         private const val TRACKERS_INI_DELAY = 500L
+
+        private const val SCROLLABILITY_CHECK_STARTUP_DELAY = 1000L
+        private const val SCROLLABILITY_CHECK_CONFIG_CHANGE_DELAY = 500L
         private const val TRACKERS_SECONDARY_DELAY = 200L
 
         private const val DEFAULT_CIRCLE_TARGET_TIMES_1_5 = 96
