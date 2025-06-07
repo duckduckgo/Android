@@ -4360,7 +4360,10 @@ class BrowserTabFragment :
             hideDaxCta()
 
             if (!::experimentalBottomSheet.isInitialized) {
-                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(context = requireContext())
+                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(
+                    context = requireContext(),
+                    isLightModeEnabled = appTheme.isLightModeEnabled(),
+                )
                 experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
                         viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()

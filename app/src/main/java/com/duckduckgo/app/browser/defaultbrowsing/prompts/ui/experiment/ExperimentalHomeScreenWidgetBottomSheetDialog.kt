@@ -29,7 +29,10 @@ import com.google.android.material.shape.CornerFamily
 import com.google.android.material.shape.MaterialShapeDrawable
 
 @SuppressLint("NoBottomSheetDialog")
-class ExperimentalHomeScreenWidgetBottomSheetDialog(private val context: Context) : BottomSheetDialog(context) {
+class ExperimentalHomeScreenWidgetBottomSheetDialog(
+    private val context: Context,
+    isLightModeEnabled: Boolean,
+) : BottomSheetDialog(context) {
 
     private val binding: BottomSheetExperimentHomeScreenWidgetBinding =
         BottomSheetExperimentHomeScreenWidgetBinding.inflate(LayoutInflater.from(context))
@@ -51,6 +54,13 @@ class ExperimentalHomeScreenWidgetBottomSheetDialog(private val context: Context
             eventListener?.onCanceled()
             dismiss()
         }
+        binding.experimentHomeScreenWidgetBottomSheetDialogImage.setImageResource(
+            if (isLightModeEnabled) {
+                com.duckduckgo.app.browser.R.drawable.experiment_widget_promo_light
+            } else {
+                com.duckduckgo.app.browser.R.drawable.experiment_widget_promo_dark
+            },
+        )
         binding.experimentHomeScreenWidgetBottomSheetDialogPrimaryButton.setOnClickListener {
             eventListener?.onAddWidgetButtonClicked()
             dismiss()

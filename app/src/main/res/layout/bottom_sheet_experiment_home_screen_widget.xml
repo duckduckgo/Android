@@ -39,13 +39,16 @@
             android:layout_height="wrap_content">
 
             <ImageView
+                android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogImage"
                 android:layout_width="360dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/experiment_widget_promo"
+                app:srcCompat="@drawable/experiment_widget_promo_light"
                 tools:ignore="ContentDescription" />
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
+            <!-- Using TextView instead of DaxTextView as the text color has to be the same regardless
+             of the Theme. This text is placed on top of an image that is always light colored -->
+            <TextView
                 android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -53,9 +56,10 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:singleLine="true"
-                android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSearchText"
-                app:textType="secondary"
-                app:typography="body2" />
+                android:textColor="@color/black60"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2sp"
+                android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSearchText" />
         </FrameLayout>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
