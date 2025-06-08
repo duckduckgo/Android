@@ -19,8 +19,8 @@
        android:shape="rectangle">
     <solid android:color="?attr/daxColorOnboardingDialogBackground"/>
     <corners
-            android:topLeftRadius="32dp"
-            android:topRightRadius="32dp"
-            android:bottomRightRadius="32dp"
+            android:topLeftRadius="40dp"
+            android:topRightRadius="40dp"
+            android:bottomRightRadius="40dp"
             android:bottomLeftRadius="0dp"/>
 </shape>
