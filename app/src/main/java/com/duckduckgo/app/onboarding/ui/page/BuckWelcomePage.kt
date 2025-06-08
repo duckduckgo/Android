@@ -138,9 +138,9 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
         setBackgroundRes(
             if (appTheme.isLightModeEnabled()) {
-                R.drawable.onboarding_background_bitmap_light
+                R.drawable.buck_onboarding_background_small_light
             } else {
-                R.drawable.onboarding_background_bitmap_dark
+                R.drawable.buck_onboarding_background_small_dark
             },
         )
 
