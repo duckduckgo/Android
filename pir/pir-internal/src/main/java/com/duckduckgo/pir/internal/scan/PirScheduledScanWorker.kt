@@ -40,7 +40,7 @@ class PirScheduledScanRemoteWorker(
 
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
-        val result = pirScan.execute(supportedBrokers, context.applicationContext, SCHEDULED)
+        val result = pirScan.executeAllBrokers(context.applicationContext, SCHEDULED)
 
         return if (result.isSuccess) {
             logcat { "PIR-WORKER ($this}: Successfully completed!" }

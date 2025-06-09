@@ -32,6 +32,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R.id
 import com.duckduckgo.sync.impl.databinding.ActivitySyncSetupAccountBinding
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsParams
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
@@ -54,7 +55,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(ActivityScope::class)
-class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
+class SetupAccountActivity : DuckDuckGoActivity(), SyncSetupNavigationFlowListener, SyncSetupFlowFinishedListener {
     private val binding: ActivitySyncSetupAccountBinding by viewBinding()
     private val viewModel: SetupAccountViewModel by bindViewModel()
 
@@ -188,7 +189,7 @@ class SetupAccountActivity : DuckDuckGoActivity(), SetupFlowListener {
         viewModel.onRecoverAccount()
     }
 
-    private fun launchSyncGetOnOtherPlatforms(source: String) {
+    private fun launchSyncGetOnOtherPlatforms(source: SyncGetOnOtherPlatformsLaunchSource) {
         globalActivityStarter.start(this, SyncGetOnOtherPlatformsParams(source))
     }
 

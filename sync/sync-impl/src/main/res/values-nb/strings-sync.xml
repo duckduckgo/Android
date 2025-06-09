@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skann QR-kode</string>
-    <string name="login_screen_enter_code_cta">Eller skriv inn koden manuelt</string>
+    <string name="login_screen_enter_code_cta">Skriv inn koden manuelt</string>
     <string name="login_screen_barcode_hint">Rett kameraet mot QR-koden for å synkronisere</string>
-    <string name="login_screen_cant_scan">Kan du ikke skanne? <font color="#7295F6">Del tekstkode</font></string>
+    <string name="login_screen_cant_scan_label">Får du ikke skannet?</string>
+    <string name="login_screen_cant_scan_button_text">Kopier tekstkode</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skann QR-kode</string>
-    <string name="connect_screen_scan_qr_hint">Gå til <b>Innstillinger &gt; Synkronisering og sikkerhetskopiering</b> i DuckDuckGo-nettleseren på en annen enhet og velg «Synkroniser med en annen enhet».</string>
-    <string name="connect_screen_enter_code_cta">Eller skriv inn koden manuelt</string>
-    <string name="connect_screen_connect_qr_hint_title">Mobil til mobil?</string>
-    <string name="connect_screen_connect_qr_hint_content">Skann denne koden med en annen enhet for å synkronisere.</string>
+    <string name="connect_screen_scan_qr_hint">Åpne DuckDuckGo-appen på den andre enheten din og gå til <b>Innstillinger &gt; Synkronisering og sikkerhetskopiering &gt; Synkroniser med en annen enhet</b>.</string>
+    <string name="connect_screen_enter_code_cta">Skriv inn koden manuelt</string>
+    <string name="connect_screen_connect_qr_hint_title">Eller skann med DuckDuckGo på en annen enhet</string>
+    <string name="connect_screen_connect_qr_hint_content">Åpne DuckDuckGo på en annen enhet og skann denne koden for å synkronisere.</string>
     <string name="connect_screen_share_code">Kopier koden</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Bytt synkronisering</string>
     <string name="sync_dialog_switch_account_secondary_button">Avbryt</string>
     <string name="sync_dialog_switch_account_description">Denne enheten er allerede synkronisert. Er du sikker på at du vil synkronisere den med en annen sikkerhetskopi eller enhet? Data som allerede er synkronisert med denne enheten, fjernes ikke hvis du bytter.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Vil du synkronisere en ny enhet?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">«%1$s» kan få tilgang til dine synkroniserte DuckDuckGo-data.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Synkroniser nå</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Avbryt</string>
+
+    <string name="deep_link_auth_prompt_title">Konfigurer Sync &amp; Backup</string>
+    <string name="deep_link_auth_prompt_message">Lås opp enheten for å konfigurere Sync &amp; Backup</string>
 </resources>

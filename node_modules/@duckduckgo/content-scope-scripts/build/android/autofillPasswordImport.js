@@ -518,7 +518,16 @@
     android: [...baseFeatures, "webCompat", "breakageReporting", "duckPlayer", "messageBridge"],
     "android-broker-protection": ["brokerProtection"],
     "android-autofill-password-import": ["autofillPasswordImport"],
-    windows: ["cookie", ...baseFeatures, "windowsPermissionUsage", "duckPlayer", "brokerProtection", "breakageReporting", "messageBridge"],
+    windows: [
+      "cookie",
+      ...baseFeatures,
+      "windowsPermissionUsage",
+      "duckPlayer",
+      "brokerProtection",
+      "breakageReporting",
+      "messageBridge",
+      "webCompat"
+    ],
     firefox: ["cookie", ...baseFeatures, "clickToLoad"],
     chrome: ["cookie", ...baseFeatures, "clickToLoad"],
     "chrome-mv3": ["cookie", ...baseFeatures, "clickToLoad"],

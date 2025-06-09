@@ -354,7 +354,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureTextInput() {
         omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                if ((keyEvent == null && actionId == EditorInfo.IME_ACTION_GO) ||
+                    (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER && keyEvent.action == KeyEvent.ACTION_DOWN)
+                ) {
                     viewModel.userSubmittedQuery(omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }

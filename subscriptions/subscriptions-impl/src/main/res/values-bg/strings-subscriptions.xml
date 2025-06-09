@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Вижте отговори на често задавани въпроси или се свържете с поддръжката на Privacy Pro от нашите страници за помощ. Предлаганите функции се различават в различните държави.</string>
     <string name="subscriptionStatusSubscribed">Активен абонамент</string>
     <string name="privacyPolicyAndTermsOfService">Политика за поверителност и Условия на услугата</string>
+    <string name="subscriptionStatusFreeTrial">Безплатна пробна версия е активна</string>
+    <string name="monthly">месечен</string>
+    <string name="yearly">годишен</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Безплатният ви пробен период приключва на %1$s и автоматично се преобразува в %2$s платен абонамент на този ден.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Безплатният ви пробен период приключва на %1$s и няма да се преобразува в платен абонамент.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Настройки на абонамент</string>

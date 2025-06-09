@@ -205,6 +205,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
@@ -465,6 +466,7 @@ class BrowserTabViewModel @Inject constructor(
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val tabManager: TabManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1241,6 +1243,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
+
+    override fun isTabInForeground(): Boolean {
+        return if (swipingTabsFeature.isEnabled) {
+            tabId == tabManager.getSelectedTabId()
+        } else {
+            true
+        }
+    }
 
     override fun closeCurrentTab() {
         viewModelScope.launch {
@@ -2970,6 +2980,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun openMessageInNewTab(message: Message) {
+        command.value = GenerateWebViewPreviewImage
         command.value = OpenMessageInNewTab(message, tabId)
     }
 

@@ -123,8 +123,26 @@ class TabDataRepositoryTest {
         testee.add("http://www.example.com")
 
         val captor = argumentCaptor<TabEntity>()
-        verify(mockDao).addAndSelectTab(captor.capture())
+        verify(mockDao).addAndSelectTab(captor.capture(), any())
         assertTrue(captor.firstValue.viewed)
+    }
+
+    @Test
+    fun whenTabAddAndTabInsertionFixesOnThenAddAndSelectIsCalledWithUpdateIfBlankParent() = runTest {
+        val testee = tabDataRepository()
+        tabManagerFeatureFlags.tabInsertionFixes().setRawStoredState(State(enable = true))
+        testee.add("http://www.example.com")
+
+        verify(mockDao).addAndSelectTab(any(), eq(true))
+    }
+
+    @Test
+    fun whenTabAddAndTabInsertionFixesOffThenAddAndSelectIsCalledWithUpdateIfBlankParentFalse() = runTest {
+        val testee = tabDataRepository()
+        tabManagerFeatureFlags.tabInsertionFixes().setRawStoredState(State(enable = false))
+        testee.add("http://www.example.com")
+
+        verify(mockDao).addAndSelectTab(any(), eq(false))
     }
 
     @Test
@@ -170,7 +188,7 @@ class TabDataRepositoryTest {
     fun whenAddCalledThenTabAddedAndSelectedAndBlankSiteDataCreated() = runTest {
         val testee = tabDataRepository()
         val createdId = testee.add()
-        verify(mockDao).addAndSelectTab(any())
+        verify(mockDao).addAndSelectTab(any(), any())
         assertNotNull(testee.retrieveSiteData(createdId))
     }
 
@@ -179,7 +197,7 @@ class TabDataRepositoryTest {
         val testee = tabDataRepository()
         val url = "http://example.com"
         val createdId = testee.add(url)
-        verify(mockDao).addAndSelectTab(any())
+        verify(mockDao).addAndSelectTab(any(), any())
         assertNotNull(testee.retrieveSiteData(createdId))
         assertEquals(url, testee.retrieveSiteData(createdId).value!!.url)
     }
@@ -229,7 +247,7 @@ class TabDataRepositoryTest {
         testee.add("http://www.example.com")
 
         val captor = argumentCaptor<TabEntity>()
-        verify(mockDao).addAndSelectTab(captor.capture())
+        verify(mockDao).addAndSelectTab(captor.capture(), any())
         assertTrue(captor.firstValue.position == 0)
     }
 
@@ -245,7 +263,7 @@ class TabDataRepositoryTest {
         testee.add("http://www.example.com")
 
         val captor = argumentCaptor<TabEntity>()
-        verify(mockDao).addAndSelectTab(captor.capture())
+        verify(mockDao).addAndSelectTab(captor.capture(), any())
         assertTrue(captor.firstValue.position == 1)
     }
 

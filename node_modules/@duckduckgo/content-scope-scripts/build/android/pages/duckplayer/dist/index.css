@@ -97,9 +97,14 @@ body[data-display=app] {
 
 /* pages/duckplayer/app/components/Button.module.css */
 .Button_button {
+  --button-background: rgba(255, 255, 255, 0.18);
+  --button-color: rgba(255, 255, 255, 1);
+  --button-background-hover: rgba(255, 255, 255, 0.2);
+  align-items: center;
   border: none;
   outline: none;
   display: flex;
+  gap: 8px;
   height: 44px;
   line-height: 44px;
   font-size: 15px;
@@ -107,18 +112,18 @@ body[data-display=app] {
   padding: 0 20px;
   flex-shrink: 0;
   box-shadow: none;
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--button-background);
   border-radius: var(--inner-radius);
-  color: rgba(255, 255, 255, 1);
+  color: var(--button-color);
   text-decoration: none;
 }
 [data-layout=mobile] .Button_button {
-  background-color: rgba(255, 255, 255, 0.12);
+  --button-background: rgba(255, 255, 255, 0.12);
 }
 .Button_button:hover,
 .Button_button:focus-visible {
+  background: var(--button-background-hover);
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.2);
 }
 .Button_fill {
   flex: 1;
@@ -149,8 +154,6 @@ body[data-display=app] {
   left: 50%;
   transform: translateY(-50%) translateX(-50%);
 }
-.Button_icon {
-}
 .Button_icon img {
   display: block;
   width: 100%;
@@ -167,6 +170,16 @@ body[data-display=app] {
   transition: all .3s ease-in-out;
   transition-delay: 2s;
   transform: scale(1.1);
+}
+.Button_button.Button_accent {
+  --button-background: #3969ef;
+  --button-color: #fff;
+  --button-background-hover: #2b55ca;
+}
+.Button_svgIcon {
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
 }
 
 /* pages/duckplayer/app/components/FloatingBar.module.css */
@@ -595,8 +608,11 @@ body[data-display=app] {
 
 /* pages/duckplayer/app/components/YouTubeError.module.css */
 .YouTubeError_error {
+  --youtube-error-background-color: #141414;
+  --youtube-error-text-color: #fff;
+  --youtube-error-text-color-secondary: #ccc;
   align-items: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--youtube-error-background-color);
   display: grid;
   height: 100%;
   justify-items: center;
@@ -668,8 +684,8 @@ body[data-display=app] {
   content: " ";
   display: block;
   background: url('data:image/svg+xml,<svg fill="none" viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg">%0A  <path fill="red" d="M47.5 70.802c1.945 0 3.484-1.588 3.841-3.5C53.076 58.022 61.218 51 71 51h4.96c2.225 0 4.04-1.774 4.04-4 0-.026-.007-9.022-1.338-14.004a8.02 8.02 0 0 0-5.659-5.658C68.014 26 48 26 48 26s-20.015 0-25.004 1.338a8.01 8.01 0 0 0-5.658 5.658C16 37.986 16 48.401 16 48.401s0 10.416 1.338 15.405a8.01 8.01 0 0 0 5.658 5.658c4.99 1.338 24.504 1.338 24.504 1.338"/>%0A  <path fill="%23fff" d="m41.594 58 16.627-9.598-16.627-9.599z"/>%0A  <path fill="%23EB102D" d="M87 71c0 8.837-7.163 16-16 16s-16-7.163-16-16 7.163-16 16-16 16 7.163 16 16"/>%0A  <path fill="%23fff" d="M73 77.8a2 2 0 1 1-4 0 2 2 0 0 1 4 0m-2.039-4.4c-.706 0-1.334-.49-1.412-1.12l-.942-8.75c-.079-.7.55-1.33 1.412-1.33h1.962c.785 0 1.492.63 1.413 1.33l-.942 8.75c-.157.63-.784 1.12-1.49 1.12Z"/>%0A  <path fill="%23CCC" d="M92.501 59c.298 0 .595.12.823.354.454.468.454 1.23 0 1.698l-2.333 2.4a1.145 1.145 0 0 1-1.65 0 1.227 1.227 0 0 1 0-1.698l2.333-2.4c.227-.234.524-.354.822-.354zm-1.166 10.798h3.499c.641 0 1.166.54 1.166 1.2s-.525 1.2-1.166 1.2h-3.499c-.641 0-1.166-.54-1.166-1.2s.525-1.2 1.166-1.2m-1.982 8.754c.227-.234.525-.354.822-.354h.006c.297 0 .595.12.822.354l2.332 2.4c.455.467.455 1.23 0 1.697a1.145 1.145 0 0 1-1.65 0l-2.332-2.4a1.227 1.227 0 0 1 0-1.697"/>%0A</svg>%0A') no-repeat;
-  height: 48px;
-  width: 48px;
+  height: 96px;
+  width: 96px;
 }
 @media screen and (max-width: 320px) {
   .YouTubeError_icon {
@@ -687,14 +703,14 @@ body[data-display=app] {
   }
 }
 .YouTubeError_heading {
-  color: #fff;
+  color: var(--youtube-error-text-color);
   font-size: 20px;
   font-weight: 700;
   line-height: calc(24 / 20);
   margin: 0;
 }
 .YouTubeError_messages {
-  color: #ccc;
+  color: var(--youtube-error-text-color-secondary);
   font-size: 16px;
   line-height: calc(24 / 16);
 }
@@ -712,6 +728,14 @@ p.YouTubeError_messages {
 ul.YouTubeError_messages li {
   list-style: disc;
   margin-left: 24px;
+}
+.YouTubeError_buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.YouTubeError_buttons .YouTubeError_spacer {
+  flex: 0 0 16px;
 }
 
 /* pages/duckplayer/app/components/MobileApp.module.css */
@@ -921,19 +945,15 @@ html[data-focus-mode=on] .MobileApp_embed {
     border-radius: var(--outer-radius);
     padding: 4px;
   }
-  .MobileApp_main[data-youtube-error=true] .MobileApp_switch {
+  .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
     background: #2f2f2f;
-    padding: 8px 8px 0 8px;
-    height: 60px;
-    max-height: 60px;
+    padding: 8px;
     border-top-left-radius: var(--outer-radius);
     border-top-right-radius: var(--outer-radius);
     transition: all 0.3s;
   }
-  .MobileApp_main[data-youtube-error=true] .MobileApp_buttons {
-    background: #2f2f2f;
-    padding: 8px;
-    transition: all 0.3s;
+  .MobileApp_main[data-youtube-error=true] .MobileApp_switch {
+    display: none;
   }
   .MobileApp_main[data-youtube-error=true]:has([data-state=completed]) .MobileApp_buttons {
     border-radius: var(--outer-radius);

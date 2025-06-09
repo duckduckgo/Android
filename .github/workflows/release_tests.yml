@@ -81,6 +81,7 @@ jobs:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
           include-tags: ${{ github.event.inputs.test-tag }}

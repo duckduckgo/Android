@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Skenovanie kódu QR</string>
-    <string name="login_screen_enter_code_cta">Alebo zadajte kód manuálne</string>
+    <string name="login_screen_enter_code_cta">Manuálne zadajte kód</string>
     <string name="login_screen_barcode_hint">Na sychronizovanie nasmerujte kameru na QR kód</string>
-    <string name="login_screen_cant_scan">Nedá sa skenovať? <font color="#7295F6">Zdieľať textový kód</font></string>
+    <string name="login_screen_cant_scan_label">Nemôžeš skenovať?</string>
+    <string name="login_screen_cant_scan_button_text">Kopírovať textový kód</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skenovanie kódu QR</string>
-    <string name="connect_screen_scan_qr_hint">Prejdite do ponuky <b>Nastavenia &gt; Synchronizácia a zálohovanie</b> v prehliadači DuckDuckGo v inom zariadení a vyberte položku „Synchronizovať s iným zariadením“.</string>
-    <string name="connect_screen_enter_code_cta">Alebo zadajte kód manuálne</string>
-    <string name="connect_screen_connect_qr_hint_title">Z mobilného telefónu na mobilný telefón?</string>
-    <string name="connect_screen_connect_qr_hint_content">Naskenujte tento kód pomocou iného zariadenia na synchronizáciu.</string>
+    <string name="connect_screen_scan_qr_hint">Otvor aplikáciu DuckDuckGo vo svojom druhom zariadení a choď na <b>Nastavenia &gt; Synchronizácia a zálohovanie &gt; Synchronizácia s iným zariadením</b>.</string>
+    <string name="connect_screen_enter_code_cta">Manuálne zadajte kód</string>
+    <string name="connect_screen_connect_qr_hint_title">Alebo naskenuj pomocou DuckDuckGo na tvojom inom zariadení</string>
+    <string name="connect_screen_connect_qr_hint_content">Otvor DuckDuckGo na svojom druhom zariadení a naskenuj tento kód na synchronizáciu.</string>
     <string name="connect_screen_share_code">Kopírovať kód</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Prepnutie synchronizácie</string>
     <string name="sync_dialog_switch_account_secondary_button">Zrušiť</string>
     <string name="sync_dialog_switch_account_description">Toto zariadenie je už synchronizované. Naozaj ho že chceš synchronizovať s inou zálohou alebo zariadením? Prepínanie neodstráni žiadne údaje, ktoré už boli synchronizované s týmto zariadením.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Synchronizovať nové zariadenie?</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">„%1$s“ bude mať prístup k tvojim synchronizovaným údajom DuckDuckGo.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Synchronizuj teraz</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Zrušiť</string>
+
+    <string name="deep_link_auth_prompt_title">Nastavenie synchronizácie a zálohovania</string>
+    <string name="deep_link_auth_prompt_message">Ak chcete nastaviť službu Sync &amp; Backup, odomknite zariadenie.</string>
 </resources>

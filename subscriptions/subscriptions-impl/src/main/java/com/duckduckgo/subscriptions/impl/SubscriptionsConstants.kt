@@ -31,6 +31,10 @@ object SubscriptionsConstants {
     // List of offers
     const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-monthly-renews-us"
     const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-yearly-renews-us"
+    const val MONTHLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-monthly-renews-row"
+    const val YEARLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-yearly-renews-row"
+    val LIST_OF_FREE_TRIAL_OFFERS =
+        listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US, MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)
 
     // List of features
     const val LEGACY_FE_NETP = "vpn"

@@ -61,6 +61,11 @@
     <string name="privacyProFaqSecondary">Primește răspunsuri la întrebările frecvente sau contactează asistența Privacy Pro din paginile noastre de ajutor. Disponibilitatea funcțiilor variază în funcție de țară.</string>
     <string name="subscriptionStatusSubscribed">Abonat</string>
     <string name="privacyPolicyAndTermsOfService">Politica de confidențialitate și Condițiile de prestare a serviciului</string>
+    <string name="subscriptionStatusFreeTrial">Perioada de încercare gratuită este activă</string>
+    <string name="monthly">lunar</string>
+    <string name="yearly">anual</string>
+    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Perioada de încercare gratuită se încheie pe %1$s și se transformă automat într-un abonament %2$s cu plată, începând din ziua respectivă.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și nu se va transforma într-un abonament cu plată.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Setări pentru abonament</string>
