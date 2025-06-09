@@ -36,7 +36,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml">
 
             <ImageView
                 android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogImage"
@@ -59,7 +60,8 @@
                 android:textColor="@color/black60"
                 android:textSize="12sp"
                 android:lineSpacingExtra="2sp"
-                android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSearchText" />
+                android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSearchText"
+                tools:ignore="InvalidColorAttribute" />
         </FrameLayout>
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
