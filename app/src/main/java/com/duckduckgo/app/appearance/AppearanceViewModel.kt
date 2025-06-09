@@ -67,6 +67,7 @@ class AppearanceViewModel @Inject constructor(
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
         val isOmnibarPositionFeatureEnabled: Boolean = true,
+        val isFullUrlEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -90,6 +91,7 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
                 )
             }
         }
@@ -167,6 +169,13 @@ class AppearanceViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
             }
             settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
+    }
+
+    fun onFullUrlSettingChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.isFullUrlEnabled = checked
+            viewState.update { currentViewState().copy(isFullUrlEnabled = checked) }
         }
     }
 }

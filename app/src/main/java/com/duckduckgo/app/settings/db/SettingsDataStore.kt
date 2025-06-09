@@ -82,6 +82,7 @@ interface SettingsDataStore {
     var appNotificationsEnabled: Boolean
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
+    var isFullUrlEnabled: Boolean
 
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
@@ -203,6 +204,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = OmnibarPosition.valueOf(preferences.getString(KEY_OMNIBAR_POSITION, OmnibarPosition.TOP.name) ?: OmnibarPosition.TOP.name)
         set(value) = preferences.edit { putString(KEY_OMNIBAR_POSITION, value.name) }
 
+    override var isFullUrlEnabled: Boolean
+        get() = preferences.getBoolean(KEY_IS_FULL_URL_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_IS_FULL_URL_ENABLED, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -278,6 +283,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED = "KEY_NOTIFY_ME_IN_DOWNLOADS_DISMISSED"
         const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
         const val KEY_OMNIBAR_POSITION = "KEY_OMNIBAR_POSITION"
+        const val KEY_IS_FULL_URL_ENABLED = "KEY_IS_FULL_URL_ENABLED"
     }
 
     private class FireAnimationPrefsMapper {
