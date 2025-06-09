@@ -24,4 +24,7 @@ interface SettingsPageFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Toggle.InternalAlwaysEnabled
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun widgetAsProtection(): Toggle
 }
