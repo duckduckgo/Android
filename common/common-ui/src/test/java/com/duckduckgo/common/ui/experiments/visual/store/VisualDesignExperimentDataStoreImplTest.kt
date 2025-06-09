@@ -40,9 +40,6 @@ class VisualDesignExperimentDataStoreImplTest {
     private lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
 
     @Mock
-    private lateinit var experimentalUIThemingFeatureToggle: Toggle
-
-    @Mock
     private lateinit var visualDesignFeatureToggle: Toggle
 
     @Mock
@@ -79,7 +76,6 @@ class VisualDesignExperimentDataStoreImplTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(experimentalUIThemingFeature.self()).thenReturn(experimentalUIThemingFeatureToggle)
         whenever(experimentalUIThemingFeature.visualUpdatesFeature()).thenReturn(visualDesignFeatureToggle)
         whenever(experimentalUIThemingFeature.duckAIPoCFeature()).thenReturn(duckChatPoCToggle)
 
@@ -110,7 +106,6 @@ class VisualDesignExperimentDataStoreImplTest {
     }
 
     private fun whenVisualExperimentEnabled(enabled: Boolean) {
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(enabled)
         whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(enabled)
         whenever(duckChatPoCToggle.isEnabled()).thenReturn(enabled)
     }
@@ -255,7 +250,6 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF enabled and experiment enabled, Duck AI PoC enabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
         whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
         whenever(duckChatPoCToggle.isEnabled()).thenReturn(true)
 
@@ -267,7 +261,6 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF enabled and experiment disabled, Duck AI PoC disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(false)
         whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(false)
         whenever(duckChatPoCToggle.isEnabled()).thenReturn(true)
 
@@ -279,7 +272,6 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF disabled but experiment enabled, Duck AI PoC disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
         whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
         whenever(duckChatPoCToggle.isEnabled()).thenReturn(false)
 

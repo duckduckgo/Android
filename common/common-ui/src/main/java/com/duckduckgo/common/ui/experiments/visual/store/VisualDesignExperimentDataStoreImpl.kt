@@ -65,10 +65,8 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     private val _anyConflictingExperimentEnabled = MutableStateFlow(isAnyConflictingExperimentEnabled())
     override val anyConflictingExperimentEnabled = _anyConflictingExperimentEnabled.asStateFlow()
 
-    private val _experimentFeatureFlagEnabled =
-        MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
-    private val _duckAIFeatureFlagEnabled =
-        MutableStateFlow(_experimentFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
+    private val _experimentFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
+    private val _duckAIFeatureFlagEnabled = MutableStateFlow(experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
 
     override val isExperimentEnabled: StateFlow<Boolean> =
         combine(
@@ -119,10 +117,8 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
 
     private fun updateFeatureState() {
         appCoroutineScope.launch {
-            _experimentFeatureFlagEnabled.value =
-                experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
-            _duckAIFeatureFlagEnabled.value =
-                _experimentFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
+            _experimentFeatureFlagEnabled.value = experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
+            _duckAIFeatureFlagEnabled.value = experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
             _anyConflictingExperimentEnabled.value = isAnyConflictingExperimentEnabled()
         }
     }
