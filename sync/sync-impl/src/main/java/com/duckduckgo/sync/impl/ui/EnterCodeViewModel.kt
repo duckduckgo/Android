@@ -40,6 +40,8 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
+import com.duckduckgo.sync.impl.ui.EnterCodeActivity.Companion.Code
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.AskToSwitchAccount
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.EnterCodeViewModel.Command.ShowError
@@ -67,6 +69,7 @@ class EnterCodeViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     private val viewState = MutableStateFlow(ViewState())
+    private var codeType: Code = Code.RECOVERY_CODE
 
     fun viewState(): Flow<ViewState> = viewState
 
@@ -100,7 +103,7 @@ class EnterCodeViewModel @Inject constructor(
         pastedCode: String,
     ) {
         val previousPrimaryKey = syncAccountRepository.getAccountInfo().primaryKey
-        val codeType = syncAccountRepository.parseSyncAuthCode(pastedCode)
+        val codeType = syncAccountRepository.parseSyncAuthCode(pastedCode).also { it.onCodePasted() }
         when (val result = syncAccountRepository.processCode(codeType)) {
             is Result.Success -> {
                 if (codeType is SyncAuthCode.Exchange) {
@@ -222,5 +225,24 @@ class EnterCodeViewModel @Inject constructor(
 
     fun onUserAskedToSwitchAccount() {
         syncPixels.fireAskUserToSwitchAccount()
+    }
+
+    fun onEnterManualCodeScreenShown(codeType: Code) {
+        this.codeType = codeType
+        syncPixels.fireSyncSetupManualCodeScreenShown(codeType.asScreenType())
+    }
+
+    private fun SyncAuthCode.onCodePasted() {
+        when (this) {
+            is SyncAuthCode.Unknown -> syncPixels.fireSyncSetupCodePastedParseFailure(codeType.asScreenType())
+            else -> syncPixels.fireSyncSetupCodePastedParseSuccess(codeType.asScreenType())
+        }
+    }
+
+    private fun Code.asScreenType(): ScreenType {
+        return when (this) {
+            Code.RECOVERY_CODE -> ScreenType.SYNC_EXCHANGE
+            Code.CONNECT_CODE -> ScreenType.SYNC_CONNECT
+        }
     }
 }

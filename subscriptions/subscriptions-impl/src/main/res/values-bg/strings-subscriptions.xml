@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Активен абонамент</string>
     <string name="privacyPolicyAndTermsOfService">Политика за поверителност и Условия на услугата</string>
     <string name="subscriptionStatusFreeTrial">Безплатна пробна версия е активна</string>
-    <string name="monthly">месечен</string>
-    <string name="yearly">годишен</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Безплатният ви пробен период приключва на %1$s и автоматично се преобразува в %2$s платен абонамент на този ден.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Безплатният ви пробен период приключва на %1$s и автоматично се преобразува в месечен платен абонамент на този ден.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Безплатният ти пробен период приключва на %1$s и автоматично се преобразува в годишен платен абонамент на този ден.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Безплатният ви пробен период приключва на %1$s и няма да се преобразува в платен абонамент.</string>
 
     <!--Settings Subscriptions-->

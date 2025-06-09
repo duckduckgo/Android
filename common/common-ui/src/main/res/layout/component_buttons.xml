@@ -17,6 +17,7 @@
 
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
@@ -262,6 +263,32 @@
             android:layout_gravity="center"
             android:layout_marginTop="16dp"
             app:srcCompat="@drawable/ic_union" />
+
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:primaryText="Onboarding Experiment Buttons" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/buck_button_primary"
+            style="@style/Widget.DuckDuckGo.BuckButton.TextButton.Primary"
+            android:text="Primary buck"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buck_button_secondary"
+            style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
+            android:text="Secondary buck"
+            app:icon="@drawable/ic_find_search_24"
+            app:iconGravity="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml" />
 
     </LinearLayout>
 

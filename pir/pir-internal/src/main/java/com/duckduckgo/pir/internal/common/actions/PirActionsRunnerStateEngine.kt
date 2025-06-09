@@ -20,7 +20,7 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
+import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse.ResponseData
@@ -73,6 +73,10 @@ interface PirActionsRunnerStateEngine {
             val url: String,
         ) : Event()
 
+        data class EmailFailed(
+            val error: PirError.EmailError,
+        ) : Event()
+
         data class EmailReceived(
             val email: String,
         ) : Event()
@@ -91,12 +95,20 @@ interface PirActionsRunnerStateEngine {
 
         data class BrokerActionsCompleted(val isSuccess: Boolean) : Event()
 
+        data class JsErrorReceived(
+            val error: PirError.JsError,
+        ) : Event()
+
         data class JsActionSuccess(
             val pirSuccessResponse: PirSuccessResponse,
         ) : Event()
 
         data class JsActionFailed(
-            val pirErrorReponse: PirErrorReponse,
+            val error: PirError.ActionFailed,
+        ) : Event()
+
+        data class CaptchaServiceFailed(
+            val error: PirError.CaptchaServiceError,
         ) : Event()
 
         data class RetryAwaitCaptchaSolution(

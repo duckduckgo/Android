@@ -18,17 +18,14 @@ package com.duckduckgo.duckchat.impl.helper
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -44,18 +41,11 @@ class RealDuckChatJSHelperTest {
 
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
-    private val mockExperimentDataStore: VisualDesignExperimentDataStore = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         dataStore = mockDataStore,
-        experimentDataStore = mockExperimentDataStore,
     )
-
-    @Before
-    fun setUp() {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
-    }
 
     @Test
     fun whenMethodIsUnknownThenReturnNull() = runTest {
@@ -347,30 +337,6 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
 
         verify(mockDuckChat).updateChatState(ChatState.SHOW)
-    }
-
-    @Test
-    fun whenGetAIChatNativeConfigValuesAndSupportsNativeChatInputThenReturnJsCallbackDataWithSupportsNativeChatInputEnabled() = runTest {
-        val featureName = "aiChat"
-        val method = "getAIChatNativeConfigValues"
-        val id = "123"
-
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
-        whenever(mockExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
-
-        val result = testee.processJsCallbackMessage(featureName, method, id, null)
-
-        val expectedPayload = JSONObject().apply {
-            put("platform", "android")
-            put("isAIChatHandoffEnabled", true)
-            put("supportsClosingAIChat", true)
-            put("supportsOpeningSettings", true)
-            put("supportsNativeChatInput", true)
-            put("supportsImageUpload", false)
-        }
-
-        assertEquals(expectedPayload.toString(), result!!.params.toString())
     }
 
     @Test

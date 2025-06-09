@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Előfizetve</string>
     <string name="privacyPolicyAndTermsOfService">Adatvédelmi szabályzat és szolgáltatási feltételek</string>
     <string name="subscriptionStatusFreeTrial">Az ingyenes próbaidőszak aktív</string>
-    <string name="monthly">havi</string>
-    <string name="yearly">éves</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Az ingyenes próbaidőszakod %1$s dátummal véget ér, és aznap automatikusan %2$s előfizetéssé alakul.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Az ingyenes próbaidőszakod %1$s dátummal véget ér, és aznap automatikusan fizetős havi előfizetéssé alakul.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Az ingyenes próbaidőszakod %1$s dátummal véget ér, és aznap automatikusan fizetős éves előfizetéssé alakul.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Az ingyenes próbaidőszakod %1$s dátummal véget ér, és nem alakul automatikusan előfizetéssé.</string>
 
     <!--Settings Subscriptions-->

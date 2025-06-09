@@ -64,6 +64,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -76,6 +77,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -91,6 +93,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -111,6 +114,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
     private val autofillFeature: AutofillFeature,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val settingsPageFeature: SettingsPageFeature,
+    private val widgetCapabilities: WidgetCapabilities,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -126,6 +131,8 @@ class SettingsViewModel @Inject constructor(
         val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
+        val isAddWidgetInProtectionsVisible: Boolean = false,
+        val widgetsInstalled: Boolean = false,
     )
 
     sealed class Command {
@@ -192,6 +199,12 @@ class SettingsViewModel @Inject constructor(
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
+                    isAddWidgetInProtectionsVisible = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.self().isEnabled() && settingsPageFeature.widgetAsProtection().isEnabled()
+                    },
+                    widgetsInstalled = withContext(dispatcherProvider.io()) {
+                        widgetCapabilities.hasInstalledWidgets
+                    },
                 ),
             )
         }
