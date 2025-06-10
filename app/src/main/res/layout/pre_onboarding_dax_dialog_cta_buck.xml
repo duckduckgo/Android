@@ -81,21 +81,23 @@
                         layout="@layout/pre_onboarding_address_bar_position"
                         android:visibility="gone" />
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                <com.google.android.material.button.MaterialButton
                         android:id="@+id/primaryCta"
+                        style="@style/Widget.DuckDuckGo.BuckButton.TextButton.Primary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_5"
-                        android:text="@string/onboardingLetsDoItButton"
-                        app:daxButtonSize="large" />
+                        android:text="@string/onboardingLetsDoItButton" />
 
-                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                <com.google.android.material.button.MaterialButton
                         android:id="@+id/secondaryCta"
+                        style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
+                        android:textSize="16sp"
+                        android:gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/keyline_0"
-                        android:text="@string/preOnboardingDaxDialog1SecondaryButton"
-                        app:daxButtonSize="large" />
+                        android:layout_marginTop="@dimen/keyline_4"
+                        android:text="@string/preOnboardingDaxDialog1SecondaryButton"/>
 
             </LinearLayout>
         </ScrollView>
