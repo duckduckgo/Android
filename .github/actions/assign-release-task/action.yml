@@ -41,7 +41,7 @@ runs:
         else
           echo "Debug: About to set GITHUB_OUTPUT. Current task_id is '$task_id'."
           echo "Debug: GITHUB_OUTPUT path is '$GITHUB_OUTPUT'." 
-          echo "task_id=$task_id" >> $GITHUB_OUTPUT
+          echo "task_id='$task_id'" >> $GITHUB_OUTPUT
           echo "Debug: Finished writing to GITHUB_OUTPUT."
         fi
       
