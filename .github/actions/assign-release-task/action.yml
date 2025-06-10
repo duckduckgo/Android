@@ -14,7 +14,7 @@ inputs:
     description: 'The Github username to search for'
     required: true
 outputs:
-  task_id_found:
+  task_id:
     description: 'The Asana task ID that was found and assigned'
 runs:
   using: 'composite'
@@ -43,15 +43,8 @@ runs:
           echo "Debug: About to set GITHUB_OUTPUT. Current task_id is '$task_id'."
           echo "Debug: GITHUB_OUTPUT path is '$GITHUB_OUTPUT'."
       
-          # Ensure the GITHUB_OUTPUT file exists and is writable (usually is)
-          touch "$GITHUB_OUTPUT"
-      
           # Write to GITHUB_OUTPUT
-          echo "task_id_found=$task_id" >> "$GITHUB_OUTPUT"
-          echo "Debug: Finished writing to GITHUB_OUTPUT."
-          echo "Debug: Content of GITHUB_OUTPUT after writing:"
-          cat "$GITHUB_OUTPUT" # Display the entire content of the output file
-          echo "--- End of GITHUB_OUTPUT content ---"
+          echo "task_id=HARDCODED_TEST_123" >> $GITHUB_OUTPUT 
         fi
       
 #        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
