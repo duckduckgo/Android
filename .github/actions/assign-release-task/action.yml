@@ -39,10 +39,19 @@ runs:
           echo "No tasks with the exact name '$task_name' found in project GID '$project_gid'."
           exit 1
         else
+          echo "Task ID for the task named '$task_name': $task_id"
           echo "Debug: About to set GITHUB_OUTPUT. Current task_id is '$task_id'."
-          echo "Debug: GITHUB_OUTPUT path is '$GITHUB_OUTPUT'." 
-          echo "task_id='$task_id'" >> $GITHUB_OUTPUT
+          echo "Debug: GITHUB_OUTPUT path is '$GITHUB_OUTPUT'."
+      
+          # Ensure the GITHUB_OUTPUT file exists and is writable (usually is)
+          touch "$GITHUB_OUTPUT"
+      
+          # Write to GITHUB_OUTPUT
+          echo "task_id=$task_id" >> "$GITHUB_OUTPUT"
           echo "Debug: Finished writing to GITHUB_OUTPUT."
+          echo "Debug: Content of GITHUB_OUTPUT after writing:"
+          cat "$GITHUB_OUTPUT" # Display the entire content of the output file
+          echo "--- End of GITHUB_OUTPUT content ---"
         fi
       
 #        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
