@@ -26,3 +26,4 @@ jobs:
           github_token: ${{ secrets.GT_DAXMOBILE }}
           reporter: github-pr-check
           level: warning
+          fail_level: warning
