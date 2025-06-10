@@ -14,14 +14,10 @@ on:
       - '**.md'
       - '.github/**'
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  code_formatting:
-    name: Code Formatting
-    runs-on: ubuntu-24.04
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -29,6 +25,8 @@ jobs:
         with:
           fetch-depth: 0 # required due to setting Spotless ratchetFrom
           submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+          ref: ${{ github.event.inputs.ref }}
 
       - name: Set up JDK version
         uses: actions/setup-java@v4
@@ -38,28 +36,14 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.18.3'
 
       - name: Run Code Formatting Checks
         run: ./gradlew spotlessCheck
-
-  unit_tests:
-    name: Unit tests
-    runs-on: android-large-runner
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
-        with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
 
       - name: JVM tests
         run: ./gradlew jvm_tests
@@ -75,30 +59,6 @@ jobs:
           name: unit-tests-report
           path: unit-tests-report.zip
 
-  lint:
-    name: Lint
-    runs-on: android-large-runner
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
-        with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.18.3'
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
       - name: Lint
         run: ./gradlew lint
 
@@ -113,39 +73,10 @@ jobs:
           name: lint-report
           path: lint-report.zip
 
-  android_tests:
-    runs-on: android-large-runner
-    name: Android CI tests
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
-
-      - name: Setup jq
-        uses: dcarbone/install-jq-action@v1.0.1
-        with:
-          force: true
-
-      - name: Set up JDK version
-        uses: actions/setup-java@v4
-        with:
-          java-version-file: .github/.java-version
-          distribution: 'adopt'
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.18.3'
-
       - name: Decode secret
         env:
           FLANK: ${{ secrets.FLANK }}
         run: echo "$FLANK" > flank.json
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
 
       - name: Build
         run: ./gradlew androidTestsBuild
