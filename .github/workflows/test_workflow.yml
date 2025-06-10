@@ -36,13 +36,18 @@ jobs:
 
       - name: Use the output
         run: |
-          echo "The output from the custom action is: ${{ steps.assign_release_task.outputs.task_id }}"
-          # Add more checks here if needed
-          if [ -z "${{ steps.assign_release_task.outputs.task_id }}" ]; then
-          echo "::error::Output task_id is empty!"
+          echo "Attempting to read output..."
+          ACTUAL_OUTPUT_VALUE="${{ steps.assign_release_task.outputs.task_id }}" # <--- This expression
+          echo "The output from the custom action is: '$ACTUAL_OUTPUT_VALUE'"
+          if [ -z "$ACTUAL_OUTPUT_VALUE" ]; then
+            echo "::error::Output task_id is EMPTY!"
           else
-          echo "Output task_id is NOT empty."
+            echo "Output task_id is NOT empty. Value: $ACTUAL_OUTPUT_VALUE"
           fi
+          
+          echo "--- All available outputs for the step 'assign_release_task' ---"
+          echo '${{ toJson(steps.assign_release_task.outputs) }}'
+          echo "-----------------------------------------------------------------"
 
       - name: Get Asana Task Permalink
         id: get-task-permalink

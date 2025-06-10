@@ -20,7 +20,6 @@ runs:
   using: 'composite'
   steps:
     - name: Find task in Asana and assign it to owner
-      id: find_and_assign_step
       shell: bash
       run: |
         task_name="${{ inputs.task_name }}"
