@@ -90,6 +90,7 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
         const val QUERY = "query"
     }
 }
