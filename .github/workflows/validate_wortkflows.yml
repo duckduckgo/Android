@@ -23,6 +23,6 @@ jobs:
       - name: Download and Setup actionlint
         uses: reviewdog/action-actionlint@v1.65.2
         with:
-          github-token: ${{ secrets.GT_DAXMOBILE }}
+          github_token: ${{ secrets.GT_DAXMOBILE }}
           reporter: github-pr-check
           level: warning
