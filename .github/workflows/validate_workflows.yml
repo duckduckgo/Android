@@ -13,14 +13,14 @@ permissions:
 
 jobs:
   lint-actions:
-    name: Validate Workflow Syntax (actionlint)
+    name: actionlint
     runs-on: android-large-runner
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Download and Setup actionlint
+      - name: Validate Workflow Syntax
         uses: reviewdog/action-actionlint@v1.65.2
         with:
           github_token: ${{ secrets.GT_DAXMOBILE }}
