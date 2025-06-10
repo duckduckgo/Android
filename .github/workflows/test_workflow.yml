@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "The output from the custom action is: ${{ steps.assign_release_task.outputs.task_id }}"
           # Add more checks here if needed
-          if [ -z "${{ steps.assign_release_task.outputs.task_id }}" ]; then
+          if [ -z ${{ steps.assign_release_task.outputs.task_id_found }} ]; then
           echo "::error::Output task_id is empty!"
           else
           echo "Output task_id is NOT empty."
@@ -49,5 +49,5 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: ${{ steps.assign_release_task.outputs.task_id }}
+          asana-task-id: ${{ steps.assign_release_task.outputs.task_id_found }}
           action: 'get-asana-task-permalink'

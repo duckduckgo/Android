@@ -14,12 +14,13 @@ inputs:
     description: 'The Github username to search for'
     required: true
 outputs:
-  task_id:
+  task_id_found:
     description: 'The Asana task ID that was found and assigned'
 runs:
   using: 'composite'
   steps:
     - name: Find task in Asana and assign it to owner
+      id: find_and_assign_step
       shell: bash
       run: |
         task_name="${{ inputs.task_name }}"
@@ -46,7 +47,7 @@ runs:
           touch "$GITHUB_OUTPUT"
       
           # Write to GITHUB_OUTPUT
-          echo "task_id=$task_id" >> "$GITHUB_OUTPUT"
+          echo "task_id_found=$task_id" >> "$GITHUB_OUTPUT"
           echo "Debug: Finished writing to GITHUB_OUTPUT."
           echo "Debug: Content of GITHUB_OUTPUT after writing:"
           cat "$GITHUB_OUTPUT" # Display the entire content of the output file
