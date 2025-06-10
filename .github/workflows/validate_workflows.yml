@@ -14,7 +14,7 @@ permissions:
 jobs:
   lint-actions:
     name: Validate Workflow Syntax (actionlint)
-    runs-on: ubuntu-latest
+    runs-on: android-large-runner
 
     steps:
       - name: Checkout Repository

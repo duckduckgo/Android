@@ -1,55 +1,26 @@
-#name: Test - Workflow for Testing
-#
-#on:
-#  workflow_dispatch:
-#
-#    inputs:
-#      ref:
-#        description: 'This is an example of an input'
-#        required: true
-#
-#env:
-#  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
-#  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
-#
-#jobs:
-#  test-workflow:
-#    runs-on: ubuntu-latest
-#    name: Add here whatever steps you want to test
-#
-#    steps:
-#      - name: Checkout repository
-#        uses: actions/checkout@v4
-#        with:
-#          submodules: recursive
-#          token: ${{ secrets.GT_DAXMOBILE }}
-#          ref: ${{ github.event.inputs.ref }}
-
-name: Lint Workflow Files
+name: Test - Workflow for Testing
 
 on:
-  pull_request:
-    paths:
-      - '.github/workflows/**.yml'
-      - '.github/workflows/**.yaml'
+  workflow_dispatch:
 
-permissions:
-  contents: read # To checkout the code
-  pull-requests: write # To allow reviewdog/action-actionlint to post comments (if desired)
-  checks: write # To allow reviewdog/action-actionlint to post checks
+    inputs:
+      ref:
+        description: 'This is an example of an input'
+        required: true
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
 
 jobs:
-  lint-actions:
-    name: Validate Workflow Syntax (actionlint)
+  test-workflow:
     runs-on: ubuntu-latest
+    name: Add here whatever steps you want to test
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Download and Setup actionlint
-        uses: reviewdog/action-actionlint@v1.65.2
         with:
-          github-token: ${{ secrets.GT_DAXMOBILE }}
-          reporter: github-pr-check
-          level: warning
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+          ref: ${{ github.event.inputs.ref }}
