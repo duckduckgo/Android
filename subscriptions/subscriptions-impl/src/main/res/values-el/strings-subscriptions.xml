@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Έχει γίνει εγγραφή</string>
     <string name="privacyPolicyAndTermsOfService">Πολιτική απορρήτου και Όροι χρήσης υπηρεσιών</string>
     <string name="subscriptionStatusFreeTrial">Η δωρεάν δοκιμή είναι ενεργή</string>
-    <string name="monthly">μηνιαία</string>
-    <string name="yearly">ετήσια</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Η δωρεάν δοκιμή σας λήγει στις %1$s και μετατρέπεται αυτόματα σε %2$s συνδρομή επί πληρωμή την ίδια ημέρα.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Η δωρεάν δοκιμή σας λήγει στις %1$s και μετατρέπεται αυτόματα σε μηνιαία συνδρομή επί πληρωμή την ίδια ημέρα.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Η δωρεάν δοκιμή σας λήγει στις %1$s και μετατρέπεται αυτόματα σε ετήσια συνδρομή επί πληρωμή την ίδια ημέρα.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Η δωρεάν δοκιμή σας λήγει %1$s και δεν θα μετατραπεί σε συνδρομή επί πληρωμή.</string>
 
     <!--Settings Subscriptions-->

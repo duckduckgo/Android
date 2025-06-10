@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Prenumererad</string>
     <string name="privacyPolicyAndTermsOfService">Integritetspolicy och användarvillkor</string>
     <string name="subscriptionStatusFreeTrial">Gratis provperiod aktiv</string>
-    <string name="monthly">månatlig</string>
-    <string name="yearly">årligen</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt %2$s-abonnemang på den dagen.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt månadsabonnemang på den dagen.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt årsabonnemang på den dagen.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och kommer inte att övergå till ett betalt abonnemang.</string>
 
     <!--Settings Subscriptions-->
