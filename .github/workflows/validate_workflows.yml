@@ -24,6 +24,6 @@ jobs:
         uses: reviewdog/action-actionlint@v1.65.2
         with:
           github_token: ${{ secrets.GT_DAXMOBILE }}
-          reporter: github-pr-check
+          reporter: github-pr-review
           level: warning
           fail_level: warning
