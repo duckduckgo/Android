@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -52,6 +53,16 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
         params?.query?.let { query ->
             binding.duckChatOmnibar.duckChatInput.setText(query)
         }
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    binding.duckChatOmnibar.animateOmnibarFocusedState(false)
+                    supportFinishAfterTransition()
+                }
+            },
+        )
 
         binding.duckChatOmnibar.apply {
             selectTab(0)
