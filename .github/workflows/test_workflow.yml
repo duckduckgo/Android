@@ -75,3 +75,13 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-task-id: ${{ steps.read_task_output_step.outputs.task_id }}
           action: 'get-asana-task-permalink'
+
+      - name: Notify Mattermost of Task created
+        id: send-mm-task-created
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
+          mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
+          mattermost-channel-name: 'Thermostat'
+          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.ref }}. Task created successfully ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
+          action: 'send-mattermost-message'
