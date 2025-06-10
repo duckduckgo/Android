@@ -4068,7 +4068,7 @@ class BrowserTabViewModel @Inject constructor(
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
         } else {
-            command.value = SetBrowserBackground(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
         }
     }
 
