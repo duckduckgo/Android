@@ -29,7 +29,7 @@ jobs:
         id: assign-release-task
         uses: ./.github/actions/assign-release-task
         with:
-          task_name: 'Android Release 5.237.0'
+          task_name: 'Android Release 5.238.0 - 5%'
           asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
