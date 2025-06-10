@@ -14,7 +14,7 @@ permissions:
 jobs:
   lint-actions:
     name: actionlint
-    runs-on: android-large-runner
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
