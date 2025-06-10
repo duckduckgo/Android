@@ -36,9 +36,9 @@ jobs:
 
       - name: Use the output
         run: |
-          echo "The output from the custom action is: ${{ steps.assign_release_task.outputs.task_id }}"
+          echo "The output from the custom action is: '${{ steps.assign_release_task.outputs.task_id }}'"
           # Add more checks here if needed
-          if [ -z ${{ steps.assign_release_task.outputs.task_id_found }} ]; then
+          if [ -z '${{ steps.assign_release_task.outputs.task_id_found }}' ]; then
           echo "::error::Output task_id is empty!"
           else
           echo "Output task_id is NOT empty."
