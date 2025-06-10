@@ -162,7 +162,8 @@ class FadeOmnibarLayout @JvmOverloads constructor(
                 omniBarContainer,
                 "omnibar_transition"
             ).toBundle()
-            globalActivityStarter.start(context, SearchInterstitialActivityParams, options)
+            val query = omnibarTextInput.text.toString()
+            globalActivityStarter.start(context, SearchInterstitialActivityParams(query = query), options)
         }
     }
 

@@ -27,9 +27,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.databinding.ActivitySearchInterstitialBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
-object SearchInterstitialActivityParams : GlobalActivityStarter.ActivityParams
+data class SearchInterstitialActivityParams(
+    val query: String
+) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SearchInterstitialActivityParams::class)
@@ -46,6 +49,11 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+
+        val params = intent.getActivityParams(SearchInterstitialActivityParams::class.java)
+        params?.query?.let { query ->
+            binding.duckChatOmnibar.duckChatInput.setText(query)
+        }
 
         binding.duckChatOmnibar.apply {
             selectTab(0)
