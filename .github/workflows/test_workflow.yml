@@ -34,19 +34,38 @@ jobs:
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
 
-      - name: Use the output
+      - name: Read Task ID from file and set as output
+        id: read_task_output_step
         run: |
-          echo "Attempting to read output..."
-          ACTUAL_OUTPUT_VALUE="${{ steps.assign_release_task.outputs.task_id }}" # <--- This expression
-          echo "The output from the custom action is: '$ACTUAL_OUTPUT_VALUE'"
-          if [ -z "$ACTUAL_OUTPUT_VALUE" ]; then
-            echo "::error::Output task_id is EMPTY!"
+          OUTPUT_FILE="${{ github.workspace }}/asana_task_id.txt"
+          echo "Attempting to read Task ID from file: $OUTPUT_FILE"
+          if [ -f "$OUTPUT_FILE" ]; then
+            TASK_ID_VALUE=$(cat "$OUTPUT_FILE")
+            echo "Raw content from file: '$TASK_ID_VALUE'"
+            # Check for error markers
+            if [[ "$TASK_ID_VALUE" == "TASK_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_MAPPING_FILE_NOT_FOUND" || "$TASK_ID_VALUE" == "USER_NOT_IN_MAPPING" ]]; then
+              echo "::error::Error marker found in output file: $TASK_ID_VALUE"
+              echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty on error
+            else
+              echo "Successfully read Task ID: '$TASK_ID_VALUE'"
+              echo "task_id=$TASK_ID_VALUE" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "Output task_id is NOT empty. Value: $ACTUAL_OUTPUT_VALUE"
+            echo "::error::Output file $OUTPUT_FILE not found!"
+            echo "task_id=" >> $GITHUB_OUTPUT # Set actual output to empty if file not found
+          fi
+
+      - name: Use the Task ID read from file
+        run: |
+          echo "Task ID obtained via file method: ${{ steps.read_task_output_step.outputs.task_id }}"
+          if [ -z "${{ steps.read_task_output_step.outputs.task_id }}" ]; then
+            echo "Task ID is still empty after reading from file."
+          else
+            echo "Hooray! Task ID is: ${{ steps.read_task_output_step.outputs.task_id }}"
           fi
           
-          echo "--- All available outputs for the step 'assign_release_task' ---"
-          echo '${{ toJson(steps.assign_release_task.outputs) }}'
+          echo "--- All available outputs for the step 'read_task_output_step' ---"
+          echo '${{ toJson(steps.read_task_output_step.outputs) }}'
           echo "-----------------------------------------------------------------"
 
       - name: Get Asana Task Permalink
@@ -54,5 +73,5 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: ${{ steps.assign_release_task.outputs.task_id }}
+          asana-task-id: ${{ steps.read_task_output_step.outputs.task_id }}
           action: 'get-asana-task-permalink'
