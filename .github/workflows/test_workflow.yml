@@ -26,7 +26,7 @@ jobs:
           ref: ${{ github.event.inputs.ref }}
 
       - name: Assign task to Github Actor
-        id: assign-release-task
+        id: assign_release_task
         uses: ./.github/actions/assign-release-task
         with:
           task_name: 'Android Release 5.238.0 - 5%'
@@ -34,10 +34,20 @@ jobs:
           project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           username: ${{ github.actor }}
 
+      - name: Use the output
+        run: |
+          echo "The output from the custom action is: ${{ steps.assign_release_task.outputs.task_id }}"
+          # Add more checks here if needed
+          if [ -z "${{ steps.assign_step.outputs.task_id }}" ]; then
+          echo "::error::Output task_id is empty!"
+          else
+          echo "Output task_id is NOT empty."
+          fi
+
       - name: Get Asana Task Permalink
         id: get-task-permalink
         uses: duckduckgo/native-github-asana-sync@v1.8
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
+          asana-task-id: ${{ steps.assign_release_task.outputs.task_id }}
           action: 'get-asana-task-permalink'
