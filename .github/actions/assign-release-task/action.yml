@@ -16,7 +16,6 @@ inputs:
 outputs:
   task_id:
     description: 'The Asana task ID that was found and assigned'
-    value: ${{ steps.using.outputs.task_id }}
 runs:
   using: 'composite'
   steps:
