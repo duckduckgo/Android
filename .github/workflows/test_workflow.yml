@@ -24,3 +24,20 @@ jobs:
           submodules: recursive
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
+
+      - name: Assign task to Github Actor
+        id: assign-release-task
+        uses: ./.github/actions/assign-release-task
+        with:
+          task_name: 'Android Release 5.237.0'
+          asana_token: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          project_gid: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
+          username: ${{ github.actor }}
+
+      - name: Get Asana Task Permalink
+        id: get-task-permalink
+        uses: duckduckgo/native-github-asana-sync@v1.8
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: ${{ steps.assign-release-task.outputs.task_id }}
+          action: 'get-asana-task-permalink'
