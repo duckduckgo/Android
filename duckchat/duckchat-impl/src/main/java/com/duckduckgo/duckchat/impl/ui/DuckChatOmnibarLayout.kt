@@ -193,7 +193,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             } else {
                 onDuckChatSent?.invoke(message)
             }
-            duckChatInput.text.clear()
             duckChatInput.clearFocus()
 
             if (duckChatTabLayout.selectedTabPosition == 1) {

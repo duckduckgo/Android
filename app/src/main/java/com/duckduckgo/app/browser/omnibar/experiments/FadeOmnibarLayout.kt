@@ -50,13 +50,11 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import android.app.ActivityOptions
 
 @InjectWith(FragmentScope::class)
 class FadeOmnibarLayout @JvmOverloads constructor(
@@ -76,7 +74,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    private val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
+    val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -120,7 +118,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
     private var focusAnimator: ValueAnimator? = null
-    private var isOmnibarFocused = false
 
     private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
 
@@ -152,18 +149,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             )
 
             omnibarCard.elevation = 0.5f.toDp(context)
-        }
-        omniBarClickCatcher.setOnClickListener {
-            isOmnibarFocused = true
-            animateOmnibarFocusedState(focused = true)
-
-            val options = ActivityOptions.makeSceneTransitionAnimation(
-                context as android.app.Activity,
-                omniBarContainer,
-                "omnibar_transition"
-            ).toBundle()
-            val query = omnibarTextInput.text.toString()
-            globalActivityStarter.start(context, SearchInterstitialActivityParams(query = query), options)
         }
     }
 
@@ -205,7 +190,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
         renderShadows(viewState.showShadows)
 
-        if (viewState.hasFocus || isFindInPageVisible || experimentDataStore.isDuckAIPoCEnabled.value && isOmnibarFocused) {
+        if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
         } else {
             animateOmnibarFocusedState(focused = false)
@@ -380,17 +365,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         // } else {
         //     null
         // }
-    }
-
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        super.onWindowFocusChanged(hasWindowFocus)
-
-        if (experimentDataStore.isDuckAIPoCEnabled.value && hasWindowFocus && isOmnibarFocused) {
-            isOmnibarFocused = false
-            if (!viewModel.viewState.value.hasFocus && !isFindInPageVisible) {
-                animateOmnibarFocusedState(focused = false)
-            }
-        }
     }
 
     companion object {

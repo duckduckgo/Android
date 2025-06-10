@@ -231,8 +231,12 @@ class Omnibar(
         newOmnibar.omnibarTextInput
     }
 
-    private val omniBarContainer: View by lazy {
+    val omniBarContainer: View by lazy {
         newOmnibar.omniBarContainer
+    }
+
+    val omniBarClickCatcher: View? by lazy {
+        (newOmnibar as? FadeOmnibarLayout)?.omniBarClickCatcher
     }
 
     val toolbar: Toolbar by lazy {

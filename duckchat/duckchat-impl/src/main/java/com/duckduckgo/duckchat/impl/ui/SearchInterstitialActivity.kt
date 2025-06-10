@@ -16,10 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.showKeyboard
@@ -31,15 +32,12 @@ import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
 data class SearchInterstitialActivityParams(
-    val query: String
+    val query: String,
 ) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SearchInterstitialActivityParams::class)
 class SearchInterstitialActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var appBrowserNav: BrowserNav
 
     @Inject
     lateinit var duckChat: DuckChat
@@ -60,17 +58,27 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
             enableFireButton = false
             enableNewChatButton = false
             onSearchSent = { query ->
-                startActivity(appBrowserNav.openInCurrentTab(context, query))
-                finish()
+                val data = Intent().putExtra(QUERY, query)
+                setResult(Activity.RESULT_OK, data)
+                supportFinishAfterTransition()
             }
             onDuckChatSent = { query ->
                 duckChat.openDuckChatWithAutoPrompt(query)
                 finish()
             }
-            onBack = { onBackPressed() }
+            onBack = {
+                val query = duckChatInput.text.toString()
+                val data = Intent().putExtra(QUERY, query)
+                setResult(Activity.RESULT_CANCELED, data)
+                onBackPressed()
+            }
         }
         binding.duckChatOmnibar.duckChatInput.post {
             showKeyboard(binding.duckChatOmnibar.duckChatInput)
         }
+    }
+
+    companion object {
+        const val QUERY = "query"
     }
 }
