@@ -74,10 +74,11 @@ class VisualDesignExperimentDataStoreLazyProviderTest {
         whenever(visualDesignExperimentDataStoreImpl.anyConflictingExperimentEnabled).thenReturn(anyConflictingExperimentEnabledFlowMock)
     }
 
-    @Test(expected = AssertionError::class)
-    fun `provider throws an AssertionError if store accessed before initializing`() = runTest {
+    @Test
+    fun `provider creates a store if store accessed before initializing`() = runTest {
         val testee = createTestee()
         testee.isExperimentEnabled
+        verify(visualDesignExperimentDataStoreImplFactory.create(coroutineRule.testScope, experimentalUIThemingFeature, togglesInventory))
     }
 
     @Test
