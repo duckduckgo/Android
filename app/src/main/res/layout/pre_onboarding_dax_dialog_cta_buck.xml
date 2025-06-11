@@ -44,23 +44,24 @@
                     android:orientation="vertical"
                     android:padding="@dimen/keyline_5">
 
-                <com.duckduckgo.common.ui.view.text.DaxTextView
+                <TextView
                         android:id="@+id/dialogTextCta"
-                        style="@style/Typography.DuckDuckGo.H2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:textColor="?attr/daxColorPrimaryText" />
+                        android:fontFamily="@font/pangea"
+                        android:textColor="@color/buckColorPrimaryText"/>
 
-                <com.duckduckgo.common.ui.view.text.DaxTextView
+                <TextView
                         android:id="@+id/descriptionCta"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_4"
-                        app:typography="body1"
+                        android:fontFamily="@font/pangea"
+                        android:textSize="16sp"
+                        android:textColor="@color/buckColorPrimaryText"
+                        android:visibility="gone"
                         tools:text="Remember: you can delete all your tabs, history, and browsing data in two taps with the Fire Button 🔥"
-                        tools:visibility="visible" />
+                        tools:visibility="visible"/>
 
                 <ImageView
                         android:id="@+id/daxDialogContentImage"
