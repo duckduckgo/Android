@@ -91,14 +91,16 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_6"
-            app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+            app:srcCompat="@drawable/ic_cross_red_buck" />
 
         <ImageView
             android:id="@+id/check1"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_check_green_24" />
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
     </LinearLayout>
 
     <!-- Row 2 -->
@@ -137,14 +139,16 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_6"
-            app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+            app:srcCompat="@drawable/ic_cross_red_buck" />
 
         <ImageView
             android:id="@+id/check2"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_check_green_24" />
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
     </LinearLayout>
 
     <!-- Row 3 -->
@@ -184,14 +188,15 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_6"
-            app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+            app:srcCompat="@drawable/ic_cross_red_buck" />
 
         <ImageView
             android:id="@+id/check3"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_check_green_24" />
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
 
     </LinearLayout>
 
@@ -231,14 +236,15 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_6"
-            app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+            app:srcCompat="@drawable/ic_cross_red_buck" />
 
         <ImageView
             android:id="@+id/check4"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_check_green_24" />
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
 
     </LinearLayout>
 
@@ -279,14 +285,15 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_6"
-            app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+            app:srcCompat="@drawable/ic_cross_red_buck" />
 
         <ImageView
             android:id="@+id/check5"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_check_green_24" />
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
 
     </LinearLayout>
 
