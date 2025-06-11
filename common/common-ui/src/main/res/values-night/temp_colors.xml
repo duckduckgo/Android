@@ -26,6 +26,7 @@
     <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
 
     <color name="buckColorButtonFAB">#042E50</color>
+    <color name="buckColorComparisonChartItemBackground">#1AFFFFFF</color>
 
     <color name="bbSurfaceColor">#161615</color>
 
