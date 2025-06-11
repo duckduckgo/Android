@@ -26,6 +26,7 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigData
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import logcat.logcat
 
 @Entity(tableName = "tracker_allowlist")
 data class TrackerAllowlistEntity(
@@ -105,6 +106,7 @@ data class ContentBlockingExceptionEntity(
 )
 
 fun ContentBlockingExceptionEntity.toFeatureException(): FeatureException {
+    logcat { "test" }
     return FeatureException(domain = this.domain, reason = this.reason)
 }
 
