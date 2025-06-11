@@ -91,7 +91,6 @@
             android:id="@+id/daxDialogOnboardingCtaContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:elevation="@dimen/keyline_4">
 
             <include
