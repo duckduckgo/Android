@@ -649,6 +649,12 @@
         <item name="lineHeight">11sp</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem">
+        <item name="fontFamily">@font/pangea_medium</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/buckColorPrimaryText</item>
+    </style>
+
     <style name="Widget.DuckDuckGo.BuckButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="cornerRadius">30dp</item>
         <item name="android:textAppearance">@style/Typography.DuckDuckGo.BuckButton</item>
