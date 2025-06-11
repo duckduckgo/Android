@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:fontFamily="@font/pangea_medium"
+        android:textSize="36sp"
+        android:lineSpacingExtra="-10sp"
+        android:textColor="@color/buckColorPrimaryText"
+        android:text="@string/highlightsPreOnboardingDaxDialog2Title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_marginTop="@dimen/keyline_3"
+        android:adjustViewBounds="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:srcCompat="@drawable/ic_ddg_comparison_chart" />
+
+    <ImageView
+        android:id="@+id/chromeLogo"
+        android:layout_width="wrap_content"
+        android:layout_height="55dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:adjustViewBounds="true"
+        app:layout_constraintEnd_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/ddgLogo"
+        app:srcCompat="@drawable/ic_chrome_comparison_chart" />
+
+    <com.duckduckgo.common.ui.view.divider.VerticalDivider
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/ddgLogo"
+        app:layout_constraintStart_toEndOf="@id/chromeLogo"
+        app:layout_constraintTop_toTopOf="@id/ddgLogo" />
+
+    <ImageView
+        android:id="@+id/check1"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature1"
+        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/feature1"
+        app:srcCompat="@drawable/ic_check_green_24" />
+
+    <ImageView
+        android:id="@+id/cross1"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature1"
+        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
+        app:layout_constraintStart_toStartOf="@id/chromeLogo"
+        app:layout_constraintTop_toTopOf="@id/feature1"
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+
+    <ImageView
+        android:id="@+id/featureIcon1"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature1"
+        app:layout_constraintEnd_toStartOf="@id/feature1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature1"
+        app:srcCompat="@drawable/ic_find_search_color_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/feature1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/keyline_3"
+        android:text="@string/preOnboardingComparisonChartItem1"
+        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintStart_toEndOf="@id/featureIcon1"
+        app:layout_constraintTop_toBottomOf="@+id/chromeLogo"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/feature2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/feature1" />
+
+    <ImageView
+        android:id="@+id/check2"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature2"
+        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/feature2"
+        app:srcCompat="@drawable/ic_check_green_24" />
+
+    <ImageView
+        android:id="@+id/cross2"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature2"
+        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
+        app:layout_constraintStart_toStartOf="@id/chromeLogo"
+        app:layout_constraintTop_toTopOf="@id/feature2"
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+
+    <ImageView
+        android:id="@+id/featureIcon2"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature2"
+        app:layout_constraintEnd_toStartOf="@id/feature2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature2"
+        app:srcCompat="@drawable/ic_shield_color_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/feature2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/keyline_3"
+        android:text="@string/preOnboardingComparisonChartItem2"
+        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintStart_toEndOf="@id/featureIcon2"
+        app:layout_constraintTop_toBottomOf="@+id/feature1"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/feature3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/feature2" />
+
+    <ImageView
+        android:id="@+id/check3"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature3"
+        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/feature3"
+        app:srcCompat="@drawable/ic_check_green_24" />
+
+    <ImageView
+        android:id="@+id/cross3"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature3"
+        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
+        app:layout_constraintStart_toStartOf="@id/chromeLogo"
+        app:layout_constraintTop_toTopOf="@id/feature3"
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+
+    <ImageView
+        android:id="@+id/featureIcon3"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature3"
+        app:layout_constraintEnd_toStartOf="@id/feature3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature3"
+        app:srcCompat="@drawable/ic_cookie_blocked_color_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/feature3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/keyline_3"
+        android:text="@string/preOnboardingComparisonChartItem3"
+        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintStart_toEndOf="@id/featureIcon3"
+        app:layout_constraintTop_toBottomOf="@+id/feature2"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/feature4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/feature3" />
+
+    <ImageView
+        android:id="@+id/check4"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature4"
+        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/feature4"
+        app:srcCompat="@drawable/ic_check_green_24" />
+
+    <ImageView
+        android:id="@+id/cross4"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature4"
+        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
+        app:layout_constraintStart_toStartOf="@id/chromeLogo"
+        app:layout_constraintTop_toTopOf="@id/feature4"
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+
+    <ImageView
+        android:id="@+id/featureIcon4"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature4"
+        app:layout_constraintEnd_toStartOf="@id/feature4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature4"
+        app:srcCompat="@drawable/ic_ads_blocked_color_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/feature4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/keyline_3"
+        android:text="@string/preOnboardingComparisonChartItem4"
+        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintStart_toEndOf="@id/featureIcon4"
+        app:layout_constraintTop_toBottomOf="@+id/feature3"
+        app:typography="body1" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/feature5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/feature4" />
+
+    <ImageView
+        android:id="@+id/check5"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature5"
+        app:layout_constraintEnd_toEndOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/feature5"
+        app:srcCompat="@drawable/ic_check_green_24" />
+
+    <ImageView
+        android:id="@+id/cross5"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="@id/feature5"
+        app:layout_constraintEnd_toEndOf="@id/chromeLogo"
+        app:layout_constraintStart_toStartOf="@id/chromeLogo"
+        app:layout_constraintTop_toTopOf="@id/feature5"
+        app:srcCompat="@drawable/ic_cross_recolorable_gray_24" />
+
+    <ImageView
+        android:id="@+id/featureIcon5"
+        android:layout_width="@dimen/keyline_5"
+        android:layout_height="@dimen/keyline_5"
+        android:layout_marginEnd="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="@id/feature5"
+        app:layout_constraintEnd_toStartOf="@id/feature5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/feature5"
+        app:srcCompat="@drawable/ic_fire_color_24" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/feature5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingVertical="@dimen/keyline_3"
+        android:text="@string/preOnboardingComparisonChartItem5"
+        app:layout_constraintEnd_toStartOf="@id/chromeLogo"
+        app:layout_constraintStart_toEndOf="@id/featureIcon5"
+        app:layout_constraintTop_toBottomOf="@+id/feature4"
+        app:typography="body1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
