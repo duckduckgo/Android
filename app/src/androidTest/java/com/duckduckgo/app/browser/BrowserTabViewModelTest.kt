@@ -510,7 +510,6 @@ class BrowserTabViewModelTest {
 
     private val mockDisabledToggle: Toggle = mock {
         on { it.isEnabled() } doReturn false
-        on { it.isEnabled(any()) } doReturn false
     }
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
