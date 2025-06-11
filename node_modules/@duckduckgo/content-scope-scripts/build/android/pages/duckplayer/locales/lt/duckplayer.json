@@ -32,6 +32,42 @@
     "title" : "<b>KLAIDA:</b> netinkamas vaizdo įrašo ID",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "„Duck Player“ negali įkelti šio vaizdo įrašo",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Šį vaizdo įrašą galima žiūrėti tik „YouTube“ platformoje.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Šį vaizdo įrašą vis dar gali žiūrėti „YouTube“, bet be papildomo „Duck Player“ privatumo.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Atsiprašome, šiam vaizdo įrašui taikomas amžiaus apribojimas",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Norint žiūrėti vaizdo įrašus su amžiaus apribojimais, reikia prisijungti prie „YouTube“ ir patvirtinti savo amžių.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Vis dar gali žiūrėti šį vaizdo įrašą, bet reikės prisijungti ir žiūrėti jį per „YouTube“ be papildomos „Duck Player“ privatumo funkcijos.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Atsiprašome, šį vaizdo įrašą galima žiūrėti tik per „YouTube“.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Šio vaizdo įrašo kūrėjas pasirinko neleisti jo žiūrėti kitose svetainėse.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Vis tiek gali žiūrėti jį „YouTube“, bet be papildomos „Duck Player“ privatumo funkcijos.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "„YouTube“ neleidžia „Duck Player“ įkelti šio vaizdo įrašo",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Šį vaizdo įrašą vis dar gali žiūrėti „YouTube“, bet be papildomo „Duck Player“ privatumo.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Atsiprašome, „YouTube“ mano, kad tu esi robotas.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "„YouTube“ blokuoja šio vaizdo įrašo įkėlimą. Jei naudoji VPN, pabandyk jį išjungti ir iš naujo įkelti šį puslapį.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Jei tai neveikia, vis tiek gali žiūrėti šį vaizdo įrašą „YouTube“, bet be papildomo „Duck Player“ privatumo.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Taip gali nutikti, jei naudoji VPN. Pabandyk išjungti VPN arba pakeisti serverio vietą ir iš naujo įkelti šį puslapį.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Jei tai neveikia, turėsite prisijungti ir žiūrėti šį vaizdo įrašą „YouTube“ be papildomos „Duck Player“ privatumo funkcijos.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {
