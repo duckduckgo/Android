@@ -57,14 +57,18 @@
                 android:orientation="vertical"
                 android:padding="@dimen/keyline_4">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
+            <TextView
                     android:id="@+id/welcomeTitle"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="@dimen/keyline_7"
-                    android:gravity="center"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:gravity="start"
                     android:text="@string/onboardingWelcomeTitle"
-                    app:typography="title"/>
+                    android:fontFamily="@font/pangea_semibold"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/buckColorPrimaryText"
+                    android:textSize="36sp"
+                    android:lineSpacingExtra="-10sp"/>
 
         </com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView>
 
