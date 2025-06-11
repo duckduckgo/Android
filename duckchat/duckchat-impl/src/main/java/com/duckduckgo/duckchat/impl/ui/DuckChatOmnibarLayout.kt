@@ -29,7 +29,6 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.LinearLayout.LayoutParams
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
 import androidx.core.view.isVisible
@@ -193,7 +192,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             } else {
                 onDuckChatSent?.invoke(message)
             }
-            duckChatInput.text.clear()
             duckChatInput.clearFocus()
 
             if (duckChatTabLayout.selectedTabPosition == 1) {
@@ -228,7 +226,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         isStopButtonVisible = false
     }
 
-    private fun animateOmnibarFocusedState(focused: Boolean) {
+    fun animateOmnibarFocusedState(focused: Boolean) {
         focusAnimator?.cancel()
 
         val startTop = omnibarCard.marginTop

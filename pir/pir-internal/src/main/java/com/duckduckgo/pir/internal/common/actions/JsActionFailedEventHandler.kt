@@ -25,8 +25,12 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerS
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
+import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.duckduckgo.pir.internal.scripts.models.asActionType
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -78,10 +82,24 @@ class JsActionFailedEventHandler @Inject constructor(
             }
         }
 
-        // If error happens we skip to next Broker as next steps will not make sense
-        return Next(
-            nextState = state,
-            nextEvent = BrokerActionsCompleted(isSuccess = false),
-        )
+        // If failure is on Any captcha action, we proceed to next action
+        return if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
+            Next(
+                nextState = state.copy(
+                    currentActionIndex = state.currentActionIndex + 1,
+                ),
+                nextEvent = ExecuteNextBrokerAction(
+                    UserProfile(
+                        userProfile = state.profileQuery,
+                    ),
+                ),
+            )
+        } else {
+            // If error happens we skip to next Broker as next steps will not make sense
+            Next(
+                nextState = state,
+                nextEvent = BrokerActionsCompleted(isSuccess = false),
+            )
+        }
     }
 }

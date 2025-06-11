@@ -63,6 +63,7 @@
         app:strokeColor="?attr/daxColorAccentBlue"
         app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth"
         app:cardElevation="0dp"
+        android:transitionName="omnibar_transition"
         app:layout_constraintTop_toBottomOf="@id/duckChatTabLayout"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
