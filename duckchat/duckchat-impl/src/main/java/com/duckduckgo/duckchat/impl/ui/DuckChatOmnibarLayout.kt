@@ -91,6 +91,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var onSearchSent: ((String) -> Unit)? = null
     var onDuckChatSent: ((String) -> Unit)? = null
 
+    private var selectionStart = 0
+    private var selectionEnd = 0
+
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
 
@@ -162,6 +165,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun applyInputBehavior(tabPosition: Int) {
+        selectionStart = duckChatInput.selectionStart
+        selectionEnd = duckChatInput.selectionEnd
+
         val isSearchTab = tabPosition == 0
 
         duckChatInput.apply {
@@ -174,6 +180,12 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
+
+        val length = duckChatInput.text.length
+        duckChatInput.setSelection(
+            selectionStart.coerceIn(0, length),
+            selectionEnd.coerceIn(0, length),
+        )
         applyLeftInputMargin(originalStartMargin)
     }
 

@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -58,8 +59,10 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    binding.duckChatOmnibar.animateOmnibarFocusedState(false)
-                    supportFinishAfterTransition()
+                    val query = binding.duckChatOmnibar.duckChatInput.text.toString()
+                    val data = Intent().putExtra(QUERY, query)
+                    setResult(Activity.RESULT_CANCELED, data)
+                    exitInterstitial()
                 }
             },
         )
@@ -71,22 +74,25 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
             onSearchSent = { query ->
                 val data = Intent().putExtra(QUERY, query)
                 setResult(Activity.RESULT_OK, data)
-                supportFinishAfterTransition()
+                exitInterstitial()
             }
             onDuckChatSent = { query ->
                 duckChat.openDuckChatWithAutoPrompt(query)
                 finish()
             }
             onBack = {
-                val query = duckChatInput.text.toString()
-                val data = Intent().putExtra(QUERY, query)
-                setResult(Activity.RESULT_CANCELED, data)
                 onBackPressed()
             }
         }
         binding.duckChatOmnibar.duckChatInput.post {
             showKeyboard(binding.duckChatOmnibar.duckChatInput)
         }
+    }
+
+    private fun exitInterstitial() {
+        binding.duckChatOmnibar.animateOmnibarFocusedState(false)
+        hideKeyboard(binding.duckChatOmnibar.duckChatInput)
+        supportFinishAfterTransition()
     }
 
     companion object {
