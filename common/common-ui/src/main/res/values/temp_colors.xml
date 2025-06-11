@@ -35,7 +35,7 @@
     <color name="buckYellow">#FFE080</color>
     <color name="buckLightBlue">#4284F4</color>
 
-    <color name="buckColorPrimaryText">@color/black</color>
+    <color name="buckColorPrimaryText">#2C2926</color>
 
     <color name="buckColorButtonPrimaryContainer">#0267C1</color>
     <color name="buckColorButtonPrimaryContainerPressed">#002E5A</color>
