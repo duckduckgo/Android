@@ -1,30 +1,22 @@
 name: 'Pull Request changed -> Sync Asana PR task'
-on:
-  pull_request_review:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - closed
-      - reopened
-      - synchronize
-      - assigned
-      - ready_for_review
+
+on: push
 
 jobs:
-  pr_asana_sync:
-    runs-on: ubuntu-latest
+  pr-asana-sync:
+    name: 'Sync Asana PR task'
+    runs-on: macos-latest
     steps:
       - name: Checkout native actions repo
         uses: actions/checkout@v4
         with:
-          ref: v1.9
+          ref: feature/david/pr-asana-sync
           # Do not change the below path (downstream actions expect it)
           path: native-github-asana-sync
           repository: duckduckgo/native-github-asana-sync
 
       - name: Use PR-Asana Sync Action
-        uses: ./native-github-asana-sync/.github/actions/pr-asana-sync@feature/david/pr-asana-sync
+        uses: ./native-github-asana-sync/.github/actions/pr-asana-sync
         with:
           asana-pat: ${{ secrets.ASANA_PAT }}
           asana-project: ${{ secrets.ASANA_PROJECT }}
