@@ -240,7 +240,7 @@ class SettingsViewModel @Inject constructor(
 
     fun userRequestedToAddHomeScreenWidget() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            postCtaExperienceExperiment.enrol()
+            postCtaExperienceExperiment.enroll()
             val simpleWidgetPrompt = postCtaExperienceExperiment.isSimpleSearchWidgetPrompt()
             command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
             postCtaExperienceExperiment.fireSettingsWidgetDisplay()

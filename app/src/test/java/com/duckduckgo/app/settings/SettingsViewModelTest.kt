@@ -202,7 +202,7 @@ class SettingsViewModelTest {
         whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
         testee.userRequestedToAddHomeScreenWidget()
 
-        verify(mockPostCtaExperienceExperiment).enrol()
+        verify(mockPostCtaExperienceExperiment).enroll()
         verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDisplay()
 
         testee.commands().test {
@@ -215,7 +215,7 @@ class SettingsViewModelTest {
         whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(false)
         testee.userRequestedToAddHomeScreenWidget()
 
-        verify(mockPostCtaExperienceExperiment).enrol()
+        verify(mockPostCtaExperienceExperiment).enroll()
         verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDisplay()
         testee.commands().test {
             assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())

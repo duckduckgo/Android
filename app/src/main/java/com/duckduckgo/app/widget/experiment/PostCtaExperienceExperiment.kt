@@ -29,7 +29,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface PostCtaExperienceExperiment {
-    suspend fun enrol()
+    suspend fun enroll()
     suspend fun isControl(): Boolean
     suspend fun isSimpleSearchWidgetPrompt(): Boolean
 
@@ -55,9 +55,8 @@ class PostCtaExperienceExperimentImpl @Inject constructor(
     private val widgetSearchCountDataStore: WidgetSearchCountDataStore,
 ) : PostCtaExperienceExperiment {
 
-    override suspend fun enrol() {
-        // TODO ANA get the latest changes in develop
-        // postCtaExperienceToggles.postCtaExperienceExperimentJun25().enrol()
+    override suspend fun enroll() {
+        postCtaExperienceToggles.postCtaExperienceExperimentJun25().enroll()
     }
 
     override suspend fun isControl(): Boolean =

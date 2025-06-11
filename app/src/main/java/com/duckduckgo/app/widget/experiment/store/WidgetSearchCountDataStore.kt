@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 interface WidgetSearchCountDataStore {
@@ -52,6 +52,6 @@ class SharedPreferencesWidgetSearchCountDataStore @Inject constructor(
     override suspend fun getWidgetSearchCount(): Int {
         return store.data.map { preferences ->
             preferences[Keys.WIDGET_SEARCH_COUNT] ?: 0
-        }.first()
+        }.firstOrNull() ?: 0
     }
 }
