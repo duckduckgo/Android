@@ -32,6 +32,42 @@
     "title" : "<b>EROARE:</b> ID video incorect",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player nu poate încărca acest videoclip.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Acest videoclip nu poate fi vizionat în afara YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Poți viziona în continuare acest videoclip pe YouTube, dar fără confidențialitatea suplimentară oferită de Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Ne pare rău, acest videoclip impune restricții de vârstă",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Pentru a viziona videoclipuri cu restricții de vârstă, trebuie să te conectezi la YouTube pentru a-ți verifica vârsta.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Poți viziona în continuare acest videoclip, dar va trebui să te conectezi și să-l vizionezi pe YouTube, fără confidențialitatea suplimentară oferită de Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Ne pare rău, acest videoclip poate fi redat doar pe YouTube",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Creatorul acestui videoclip a ales să nu permită vizionarea lui pe alte site-uri.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Îl poți viziona în continuare pe YouTube, dar fără confidențialitatea suplimentară oferită de Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube nu permite Duck Player să încarce acest videoclip",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Poți viziona în continuare acest videoclip pe YouTube, dar fără confidențialitatea suplimentară oferită de Duck Player.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Ne pare rău, YouTube crede că ești un robot.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube blochează încărcarea acestui videoclip. Dacă folosești un VPN, încearcă să-l dezactivezi și să reîncarci această pagină.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Dacă acest lucru nu funcționează, poți viziona în continuare acest videoclip pe YouTube, dar fără confidențialitatea suplimentară oferită de Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Acest lucru se poate întâmpla dacă folosești un VPN. Încearcă să dezactivezi VPN-ul, să schimbi locația serverului sau să reîncarci această pagină.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Dacă acest lucru nu funcționează, va trebui să te conectezi și să vizionezi acest videoclip pe YouTube fără confidențialitatea suplimentară oferită de Duck Player.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

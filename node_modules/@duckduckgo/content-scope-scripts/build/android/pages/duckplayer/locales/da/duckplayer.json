@@ -32,6 +32,42 @@
     "title" : "<b>FEJL:</b> Ugyldigt video-ID",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player kan ikke indlæse denne video",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Denne video kan ikke vises uden for YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Du kan stadig se denne video på YouTube, men uden den ekstra fortrolighed, som Duck Player giver.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Beklager, denne video har aldersbegrænsning",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "For at se aldersbegrænsede videoer skal du logge ind på YouTube for at bekræfte din alder.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Du kan stadig se denne video, men du skal logge ind og se den på YouTube uden den ekstra fortrolighed, som Duck Player giver.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Beklager, denne video kan kun afspilles på YouTube",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Skaberen af denne video har valgt ikke at tillade, at den kan vises på andre hjemmesider.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Du kan stadig se den på YouTube, men uden den ekstra fortrolighed, som Duck Player giver.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube vil ikke lade Duck Player indlæse denne video",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Du kan stadig se denne video på YouTube, men uden den ekstra fortrolighed, som Duck Player giver.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Beklager, YouTube tror, at du er en bot",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube blokerer for, at denne video kan indlæses. Hvis du bruger en VPN, så prøv at slå den fra og genindlæse denne side.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Hvis dette ikke virker, kan du stadig se denne video på YouTube, men uden den ekstra fortrolighed, som Duck Player giver.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Dette kan ske, hvis du bruger en VPN. Prøv at slå VPN fra eller skifte serverplacering og genindlæse denne side.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Hvis det ikke virker, skal du logge ind og se denne video på YouTube uden den ekstra fortrolighed, som Duck Player giver.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

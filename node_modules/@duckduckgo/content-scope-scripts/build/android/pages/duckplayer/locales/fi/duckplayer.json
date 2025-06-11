@@ -32,6 +32,42 @@
     "title" : "<b>VIRHE:</b> virheellinen videotunnus",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player ei voi ladata tätä videota",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Tätä videota ei voi katsoa YouTuben ulkopuolella.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Voit yhä katsoa tämän videon YouTubessa, mutta ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Valitettavasti tämä video on ikärajoitettu.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Jos haluat katsella ikärajoitettuja videoita, sinun täytyy kirjautua sisään YouTubeen vahvistaaksesi ikäsi.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Voit silti katsoa videon, mutta sinun täytyy kirjautua sisään ja katsoa se YouTubessa ilman Duck Playerin tarjoamaa lisätietosuojaa.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Valitettavasti tämän videon voi katsoa vain YouTubessa.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Videon tekijä on päättänyt estää sen katselun muilla sivustoilla.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Voit silti katsoa sen YouTubessa, mutta ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube ei salli Duck Playerin ladata tätä videota.",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Voit yhä katsoa tämän videon YouTubessa, mutta ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Valitettavasti YouTube luulee, että olet botti",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube estää tämän videon latautumisen. Jos käytät VPN:ää, kytke se pois päältä ja lataa tämä sivu uudelleen.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Jos tämä ei toimi, voit silti katsoa tämän videon YouTubessa, mutta ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Näin voi käydä, jos käytät VPN-yhteyttä. Kokeile kytkeä VPN pois päältä tai vaihtaa palvelimen sijaintia ja lataa sivu uudelleen.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Jos tämä ei auta, sinun on kirjauduttava sisään ja katsottava tämä video YouTubessa ilman Duck Playerin tarjoamaa ylimääräistä tietosuojaa.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {
