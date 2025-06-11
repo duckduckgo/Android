@@ -64,6 +64,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -116,6 +117,7 @@ class SettingsViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
+    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -142,7 +144,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAutofillPasswordsManagement : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
-        data object LaunchAddHomeScreenWidget : Command()
+        data class LaunchAddHomeScreenWidget(val simpleWidgetPrompt: Boolean) : Command()
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
@@ -237,7 +239,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToAddHomeScreenWidget() {
-        viewModelScope.launch { command.send(LaunchAddHomeScreenWidget) }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            postCtaExperienceExperiment.enrol()
+            val simpleWidgetPrompt = postCtaExperienceExperiment.isSimpleSearchWidgetPrompt()
+            command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
+            postCtaExperienceExperiment.fireSettingsWidgetDisplay()
+        }
     }
 
     fun onChangeAddressBarPositionClicked() {

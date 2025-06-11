@@ -21,9 +21,11 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillPasswordsManagement
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAutofillSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -93,6 +95,8 @@ class SettingsViewModelTest {
 
     private val mockWidgetCapabilities: WidgetCapabilities = mock()
 
+    private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
+
     @Before
     fun before() = runTest {
         whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
@@ -119,6 +123,7 @@ class SettingsViewModelTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
+            postCtaExperienceExperiment = mockPostCtaExperienceExperiment,
         )
     }
 
@@ -190,5 +195,30 @@ class SettingsViewModelTest {
         fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(false))
         testee.start()
         assertFalse(testee.viewState().first().isAddWidgetInProtectionsVisible)
+    }
+
+    @Test
+    fun whenUserRequestedToAddHomeScreenWidgetAndSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithTrue() = runTest {
+        whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
+        testee.userRequestedToAddHomeScreenWidget()
+
+        verify(mockPostCtaExperienceExperiment).enrol()
+        verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDisplay()
+
+        testee.commands().test {
+            assertEquals(LaunchAddHomeScreenWidget(true), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenUserRequestedToAddHomeScreenWidgetAndNotSimpleWidgetThenLaunchAddHomeScreenWidgetCommandSentWithFalse() = runTest {
+        whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(false)
+        testee.userRequestedToAddHomeScreenWidget()
+
+        verify(mockPostCtaExperienceExperiment).enrol()
+        verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDisplay()
+        testee.commands().test {
+            assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())
+        }
     }
 }
