@@ -49,6 +49,9 @@
     <color name="buckColorButtonFAB">@color/white</color>
     <color name="buckColorComparisonChartItemBackground">#F6EFDF</color>
 
+    <color name="buckColorComparisonChartCheckIcon">#21C000</color>
+    <color name="buckColorComparisonChartCrossIcon">#FE3737</color>
+
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 

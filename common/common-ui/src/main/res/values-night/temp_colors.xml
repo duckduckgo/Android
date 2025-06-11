@@ -27,4 +27,7 @@
 
     <color name="buckColorButtonFAB">#042E50</color>
     <color name="buckColorComparisonChartItemBackground">#1AFFFFFF</color>
+
+    <color name="buckColorComparisonChartCheckIcon">#00DE4E</color>
+    <color name="buckColorComparisonChartCrossIcon">#F2643D</color>
 </resources>
