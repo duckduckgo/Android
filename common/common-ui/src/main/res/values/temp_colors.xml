@@ -47,6 +47,7 @@
     <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
 
     <color name="buckColorButtonFAB">@color/white</color>
+    <color name="buckColorComparisonChartItemBackground">#F6EFDF</color>
 
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
