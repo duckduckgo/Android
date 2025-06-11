@@ -36,27 +36,29 @@
     <ImageView
         android:id="@+id/ddgLogo"
         android:layout_width="48dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="@dimen/keyline_3"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:padding="@dimen/keyline_1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
-        app:srcCompat="@drawable/ic_ddg_comparison_chart" />
+        app:srcCompat="@drawable/ic_dax_icon" />
 
     <ImageView
         android:id="@+id/chromeLogo"
         android:layout_width="48dp"
-        android:layout_height="55dp"
+        android:layout_height="48dp"
         android:layout_marginEnd="@dimen/keyline_2"
-        android:adjustViewBounds="true"
+        android:padding="@dimen/keyline_1"
         app:layout_constraintEnd_toStartOf="@id/ddgLogo"
         app:layout_constraintTop_toTopOf="@id/ddgLogo"
-        app:srcCompat="@drawable/ic_chrome_comparison_chart" />
+        app:srcCompat="@drawable/ic_chrome" />
 
     <!-- Row 1 -->
     <LinearLayout
         android:id="@+id/row1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
         android:minHeight="48dp"
         android:orientation="horizontal"
         android:paddingVertical="@dimen/keyline_2"
