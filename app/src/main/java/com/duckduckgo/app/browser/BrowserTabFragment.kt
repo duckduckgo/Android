@@ -651,6 +651,9 @@ class BrowserTabFragment :
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
+    private val buckDialogInContext
+        get() = binding.includeOnboardingInContextBuckDialog
+
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -2201,7 +2204,11 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
-        daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
+        } else {
+            daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
+        }
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
@@ -3081,7 +3088,11 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
-        onboardingCta.hideOnboardingCta(binding)
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            onboardingCta.hideBuckOnboardingCta(binding)
+        } else {
+            onboardingCta.hideOnboardingCta(binding)
+        }
     }
 
     private fun hideBrokenSitePromptCta(brokenSitePromptDialogCta: BrokenSitePromptDialogCta) {
@@ -3089,7 +3100,7 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
-        daxBubbleCta.hideDaxBubbleCta(binding)
+        daxBubbleCta.hideDaxBubbleCta(binding, onboardingDesignExperimentToggles)
         hideDaxBubbleCta()
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
@@ -3101,8 +3112,15 @@ class BrowserTabFragment :
     }
 
     private fun hideDaxBubbleCta() {
-        newBrowserTab.browserBackground.setImageResource(0)
-        daxDialogIntroBubble.root.gone()
+        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            buckDialogIntroBubble.root.gone()
+            newBrowserTab.newTabLayout.setBackgroundColor(
+                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface)
+            )
+        } else {
+            newBrowserTab.browserBackground.setImageResource(0)
+            daxDialogIntroBubble.root.gone()
+        }
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -4368,7 +4386,7 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                if(onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
                     showBuckCta(buckDialogIntroBubble) {
                         setOnOptionClicked { userEnteredQuery(it.link) }
                     }
@@ -4553,8 +4571,12 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            daxDialogInContext.dialogTextCta.cancelAnimation()
-            daxDialogInContext.daxCtaContainer.gone()
+            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                buckDialogInContext.root.gone()
+            } else {
+                daxDialogInContext.dialogTextCta.cancelAnimation()
+                daxDialogInContext.daxCtaContainer.gone()
+            }
         }
 
         fun renderHomeCta() {
