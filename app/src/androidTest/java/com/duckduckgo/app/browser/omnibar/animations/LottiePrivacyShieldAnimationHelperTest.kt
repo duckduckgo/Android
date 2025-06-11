@@ -295,6 +295,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() = runTest {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
         whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             disabledVisualExperimentStateFlow,
