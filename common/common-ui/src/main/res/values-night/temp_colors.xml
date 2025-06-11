@@ -28,6 +28,9 @@
     <color name="buckColorButtonFAB">#042E50</color>
     <color name="buckColorComparisonChartItemBackground">#1AFFFFFF</color>
 
+    <color name="buckColorComparisonChartCheckIcon">#00DE4E</color>
+    <color name="buckColorComparisonChartCrossIcon">#F2643D</color>
+
     <color name="bbSurfaceColor">#161615</color>
 
     <color name="bbColorPrimaryText">#EDEDEC</color>
