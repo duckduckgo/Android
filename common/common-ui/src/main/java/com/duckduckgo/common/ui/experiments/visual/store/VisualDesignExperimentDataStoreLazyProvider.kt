@@ -82,7 +82,6 @@ class VisualDesignExperimentDataStoreLazyProvider @Inject constructor(
     private val store: VisualDesignExperimentDataStore
         get() {
             val ref = _store
-            assert(ref != null) { "VisualDesignExperimentDataStore is not initialized." }
             return ref ?: runBlocking { initialize() }
         }
 
