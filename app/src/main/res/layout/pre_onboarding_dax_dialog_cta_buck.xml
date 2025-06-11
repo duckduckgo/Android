@@ -42,44 +42,27 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/keyline_5">
+                    android:paddingHorizontal="@dimen/keyline_5"
+                    android:paddingVertical="@dimen/keyline_6">
 
-                <TextView
-                        android:id="@+id/dialogTextCta"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/pangea"
-                        android:textColor="@color/buckColorPrimaryText"/>
+                <include
+                        android:id="@+id/initial"
+                        layout="@layout/pre_onboarding_initial_buck"
+                        android:visibility="gone"/>
 
-                <TextView
-                        android:id="@+id/descriptionCta"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/keyline_4"
-                        android:fontFamily="@font/pangea"
-                        android:textSize="16sp"
-                        android:textColor="@color/buckColorPrimaryText"
-                        android:visibility="gone"
-                        tools:text="Remember: you can delete all your tabs, history, and browsing data in two taps with the Fire Button 🔥"
-                        tools:visibility="visible"/>
-
-                <ImageView
-                        android:id="@+id/daxDialogContentImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="@dimen/keyline_4"
-                        android:adjustViewBounds="true"
-                        android:visibility="gone" />
+                <include
+                        android:id="@+id/skip_onboarding"
+                        layout="@layout/pre_onboarding_skip_onboarding_buck"
+                        android:visibility="gone"/>
 
                 <include
                         android:id="@+id/comparison_chart"
-                        layout="@layout/pre_onboarding_comparison_chart"
+                        layout="@layout/pre_onboarding_comparison_chart_buck"
                         android:visibility="gone" />
 
                 <include
                         android:id="@+id/address_bar_position"
-                        layout="@layout/pre_onboarding_address_bar_position"
+                        layout="@layout/pre_onboarding_address_bar_position_buck"
                         android:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton

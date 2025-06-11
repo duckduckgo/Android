@@ -32,6 +32,7 @@ import androidx.annotation.RawRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -59,8 +60,6 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -188,17 +187,14 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL_REINSTALL_USER -> {
-                    binding.daxDialogCta.root.show()
-                    binding.daxDialogCta.descriptionCta.gone()
-                    binding.daxDialogCta.secondaryCta.show()
+                    binding.daxDialogCta.root.isVisible = true
+                    binding.daxDialogCta.initial.root.isVisible = true
 
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
-                    binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.daxDialogContentImage.gone()
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
                     binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
                     binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
+                    binding.daxDialogCta.secondaryCta.isVisible = true
 
                     binding.daxDialogCta.cardView.animateEntrance()
 
@@ -209,15 +205,12 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 }
 
                 INITIAL -> {
-                    binding.daxDialogCta.root.show()
-                    binding.daxDialogCta.descriptionCta.gone()
-                    binding.daxDialogCta.secondaryCta.gone()
+                    binding.daxDialogCta.root.isVisible = true
+                    binding.daxDialogCta.initial.root.isVisible = true
 
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog1Title)
-                    binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
-                    binding.daxDialogCta.daxDialogContentImage.gone()
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
+                    binding.daxDialogCta.secondaryCta.isVisible = false
 
                     binding.daxDialogCta.cardView.animateEntrance()
 
@@ -230,13 +223,10 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 COMPARISON_CHART -> {
                     playExitAnimation(
                         onAnimationEnd = {
-                            binding.daxDialogCta.descriptionCta.gone()
-                            binding.daxDialogCta.secondaryCta.gone()
+                            resetDialogContentVisibility()
+                            binding.daxDialogCta.secondaryCta.isVisible = false
                             TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                            val ctaText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
-                            binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
-                            binding.daxDialogCta.comparisonChart.root.show()
-                            binding.daxDialogCta.comparisonChart.root.alpha = 1f
+                            binding.daxDialogCta.comparisonChart.root.isVisible = true
 
                             binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                             binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
@@ -250,17 +240,13 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
-                    binding.daxDialogCta.descriptionCta.show()
-                    binding.daxDialogCta.secondaryCta.show()
-                    binding.daxDialogCta.dialogTextCta.text = ""
-
+                    resetDialogContentVisibility()
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                    binding.daxDialogCta.skipOnboarding.root.isVisible = true
 
-                    val ctaDialog3Text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
-                    binding.daxDialogCta.dialogTextCta.text = ctaDialog3Text.html(it)
-                    val ctaDialog3Description = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
-                    binding.daxDialogCta.descriptionCta.text = ctaDialog3Description.html(it)
-                    binding.daxDialogCta.descriptionCta.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+                    binding.daxDialogCta.skipOnboarding.description.text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                        .html(context = it)
+
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
                     binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
                     binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
@@ -270,14 +256,10 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 ADDRESS_BAR_POSITION -> {
                     playExitAnimation(
                         onAnimationEnd = {
-                            binding.daxDialogCta.descriptionCta.gone()
-                            binding.daxDialogCta.secondaryCta.gone()
-                            binding.daxDialogCta.dialogTextCta.text = ""
-                            binding.daxDialogCta.comparisonChart.root.gone()
+                            resetDialogContentVisibility()
+                            binding.daxDialogCta.secondaryCta.isVisible = false
                             TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                            val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
-                            binding.daxDialogCta.dialogTextCta.text = ctaText.html(it)
-                            binding.daxDialogCta.addressBarPosition.root.show()
+                            binding.daxDialogCta.addressBarPosition.root.isVisible = true
 
                             setAddressBarPositionOptions(true)
                             binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
@@ -296,6 +278,12 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 }
             }
         }
+    }
+
+    private fun resetDialogContentVisibility() {
+        binding.daxDialogCta
+            .run { listOf(initial, skipOnboarding, comparisonChart, addressBarPosition) }
+            .forEach { it.root.isVisible = false }
     }
 
     private fun startWelcomeAnimation() {
