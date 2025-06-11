@@ -2941,7 +2941,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        if(!onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (!onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             if (swipingTabsFeature.isEnabled) {
                 binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
             }
@@ -3115,7 +3115,7 @@ class BrowserTabFragment :
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             buckDialogIntroBubble.root.gone()
             newBrowserTab.newTabLayout.setBackgroundColor(
-                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface)
+                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
         } else {
             newBrowserTab.browserBackground.setImageResource(0)
