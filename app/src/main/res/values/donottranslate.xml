@@ -72,4 +72,8 @@
     <string name="settingsDuckAiRebranding">AI Features</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--  Buck Onboarding  -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hi there.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ready for a faster browser that keeps you protected?</string>
+
 </resources>
