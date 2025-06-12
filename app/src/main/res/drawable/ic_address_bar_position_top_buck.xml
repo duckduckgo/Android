@@ -1,0 +1,27 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="24dp" android:viewportHeight="24" android:viewportWidth="24" android:width="24dp">
+
+    <path android:fillColor="#00000000" android:pathData="M9.5,3.32L15.5,3.32A4.375,4.375 0,0 1,19.875 7.695L19.875,17.695A4.375,4.375 0,0 1,15.5 22.07L9.5,22.07A4.375,4.375 0,0 1,5.125 17.695L5.125,7.695A4.375,4.375 0,0 1,9.5 3.32z" android:strokeColor="#FFFFFF" android:strokeWidth="1.25"/>
+
+    <path android:fillColor="#00000000" android:pathData="M19.875,12.07V10.695C19.875,9.285 19.874,8.264 19.809,7.462C19.752,6.766 19.649,6.277 19.477,5.876L19.398,5.709C19.031,4.989 18.473,4.386 17.787,3.966L17.486,3.797C17.054,3.577 16.528,3.452 15.733,3.387C14.931,3.321 13.91,3.32 12.5,3.32C11.09,3.32 10.069,3.321 9.267,3.387C8.571,3.444 8.082,3.546 7.681,3.719L7.514,3.797C6.793,4.164 6.191,4.723 5.771,5.408L5.602,5.709C5.381,6.141 5.256,6.667 5.191,7.462C5.126,8.264 5.125,9.285 5.125,10.695V12.07H19.875Z" android:strokeColor="#FFFFFF" android:strokeWidth="1.25"/>
+
+    <path android:fillColor="#FFFFFF" android:pathData="M8.5,6.695L16.5,6.695A1,1 0,0 1,17.5 7.695L17.5,8.695A1,1 0,0 1,16.5 9.695L8.5,9.695A1,1 0,0 1,7.5 8.695L7.5,7.695A1,1 0,0 1,8.5 6.695z"/>
+
+    <path android:fillColor="#FFFFFF" android:pathData="M9,6.695L16,6.695A0.5,0.5 0,0 1,16.5 7.195L16.5,7.195A0.5,0.5 0,0 1,16 7.695L9,7.695A0.5,0.5 0,0 1,8.5 7.195L8.5,7.195A0.5,0.5 0,0 1,9 6.695z"/>
+
+</vector>
