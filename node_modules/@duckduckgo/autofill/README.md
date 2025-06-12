@@ -41,3 +41,13 @@ We have GitHub Action to facilitate releases. Remember to test on all platforms 
 4. Publish!
 
 This will create the relevant tasks in the [Autofill Project](https://app.asana.com/0/1198964220583541/1200878329826704) in Asana, add the subtasks to relevant projects, and create PRs in all client repos.
+
+### Communicating breaking changes
+If you're introducing a breaking change, make sure to communicate clearly to native engineers. For each platform, if there is already a branch that includes the changes needed to integrate a new version, you can just:
+
+1. Add a comment and close the relevant asana tasks and PRs that were created by the automation. Make sure the future course of action to support those platforms is made clear in these comments.
+2. Remove those Asana tasks from any other projects/boards they may have been added to by the asana automation.
+
+If there are no existing branches, instruct the native engineer on what needs to change on their platform to integrate the new version.
+
+If the breaking change is only for a specific platform, just communicate to the others that their platform can be integrated right away following the usual smoke testing procedures.
