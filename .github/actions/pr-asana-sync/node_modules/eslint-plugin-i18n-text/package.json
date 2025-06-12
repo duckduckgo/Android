@@ -1,0 +1,27 @@
+{
+  "name": "eslint-plugin-i18n-text",
+  "version": "1.0.1",
+  "description": "Disallow English text in string literals",
+  "repository": "dgraham/eslint-plugin-i18n-text",
+  "license": "MIT",
+  "keywords": [
+    "eslint",
+    "eslintplugin",
+    "eslint-plugin"
+  ],
+  "author": "David Graham",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint .",
+    "test": "mocha --reporter dot tests/"
+  },
+  "peerDependencies": {
+    "eslint": ">=5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.4.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "mocha": "^6.2.0",
+    "prettier": "^1.18.2"
+  }
+}
