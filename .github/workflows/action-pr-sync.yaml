@@ -10,6 +10,7 @@ on:
       - synchronize
       - assigned
       - ready_for_review
+      - labeled
 
 concurrency:
   group: ${{ github.ref }}
@@ -17,7 +18,8 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
+    if: |
+      github.event.label.name == 'PR-task' && ${{ github.actor != 'dependabot[bot]' }}  
     steps:
       - uses: actions/checkout@v4
         with:
