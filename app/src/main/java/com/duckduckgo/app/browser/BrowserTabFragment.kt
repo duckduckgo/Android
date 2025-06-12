@@ -2942,11 +2942,12 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
         if (!onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
+            binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+
             if (swipingTabsFeature.isEnabled) {
                 binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
             }
-
-            binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
         }
 
         val webViewLayout = R.layout.include_duckduckgo_browser_webview
