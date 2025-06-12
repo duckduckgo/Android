@@ -40,4 +40,9 @@
     <color name="buckColorPreonboardingOptionBackgroundSelected">#B2FFFFFF</color>
     <color name="buckColorPreonboardingOptionIcon">@color/white18</color>
     <color name="buckColorPreonboardingOptionIconSelected">#252A38</color>
+
+    <color name="buckColorCheckBoxCheckedBackground">#0D7BDE</color>
+    <color name="buckColorCheckBoxCheckedIcon">@color/white</color>
+    <color name="buckColorCheckBoxUncheckedBackground">@color/white3</color>
+    <color name="buckColorCheckBoxUncheckedOutline">@color/white18</color>
 </resources>

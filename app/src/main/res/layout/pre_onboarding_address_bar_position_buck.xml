@@ -80,13 +80,16 @@
             app:layout_constraintStart_toEndOf="@id/option1Image"
             app:layout_constraintTop_toBottomOf="@id/option1Title" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/option1Switch"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_4"
             android:checked="true"
             android:clickable="false"
+            app:buttonIcon="@drawable/ic_checkbox_buck"
+            app:buttonTint="@android:color/transparent"
+            app:useMaterialThemeColors="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -140,12 +143,15 @@
             app:layout_constraintStart_toEndOf="@id/option2Image"
             app:layout_constraintTop_toBottomOf="@id/option2Title" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/option2Switch"
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginEnd="@dimen/keyline_4"
             android:clickable="false"
+            app:buttonIcon="@drawable/ic_checkbox_buck"
+            app:buttonTint="@android:color/transparent"
+            app:useMaterialThemeColors="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
