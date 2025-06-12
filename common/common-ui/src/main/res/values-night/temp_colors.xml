@@ -30,4 +30,9 @@
 
     <color name="buckColorComparisonChartCheckIcon">#00DE4E</color>
     <color name="buckColorComparisonChartCrossIcon">#F2643D</color>
+    <color name="buckColorComparisonChartSearchIcon">#68C5FF</color>
+    <color name="buckColorComparisonChartShieldIcon">#FFFFFF</color>
+    <color name="buckColorComparisonChartCookieIcon">#68C5FF</color>
+    <color name="buckColorComparisonChartBlockIcon">#FFFFFF</color>
+    <color name="buckColorComparisonChartFireIcon">#68C5FF</color>
 </resources>
