@@ -1,7 +1,0 @@
-name: 'Tests: pretest/posttest'
-
-on: [pull_request, push]
-
-jobs:
-  tests:
-    uses: ljharb/actions/.github/workflows/pretest.yml@main

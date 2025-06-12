@@ -5,7 +5,7 @@
   "description": "TypeScript template action",
   "main": "lib/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
     "test": "jest",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
