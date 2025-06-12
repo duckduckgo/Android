@@ -20,7 +20,9 @@ jobs:
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/pr-asana-sync
+        ref: ${{ github.ref }}
+
+      - uses: ./.github/actions/asana/pr-asana-sync
         with:
           GITHUB_TOKEN: ${{ secrets.GT_DAXMOBILE }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
