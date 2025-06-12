@@ -78,6 +78,8 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
             }
             onDuckChatSent = { query ->
                 duckChat.openDuckChatWithAutoPrompt(query)
+                val data = Intent().putExtra(QUERY, query)
+                setResult(Activity.RESULT_CANCELED, data)
                 finish()
             }
             onBack = {
