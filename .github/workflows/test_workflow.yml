@@ -20,7 +20,8 @@ jobs:
     if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: actions/checkout@v4
-        ref: ${{ github.ref }}
+        with:
+          ref: ${{ github.ref }}
 
       - uses: ./.github/actions/asana/pr-asana-sync
         with:
