@@ -257,17 +257,21 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
-                    resetDialogContentVisibility()
-                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
-                    binding.daxDialogCta.skipOnboarding.root.isVisible = true
+                    playExitAnimation(
+                        onAnimationEnd = {
+                            resetDialogContentVisibility()
+                            TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                            binding.daxDialogCta.skipOnboarding.root.isVisible = true
 
-                    binding.daxDialogCta.skipOnboarding.description.text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
-                        .html(context = it)
+                            binding.daxDialogCta.skipOnboarding.description.text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+                                .html(context = it)
 
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
-                    binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
-                    binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                            binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                            binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                            binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                        },
+                    )
                 }
 
                 ADDRESS_BAR_POSITION -> {
@@ -403,6 +407,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private fun playExitAnimation(onAnimationEnd: () -> Unit = {}) {
+        if (binding.onboardingPageAnimation.progress > 0.999f) return
         val animation = (binding.onboardingPageAnimation.tag as? LottieOnboardingAnimationSpec) ?: return
         playAnimation(
             animation = animation,
