@@ -62,6 +62,11 @@
     <color name="buckColorPreonboardingOptionIcon">#252A38</color>
     <color name="buckColorPreonboardingOptionIconSelected">#252A38</color>
 
+    <color name="buckColorCheckBoxCheckedBackground">@color/white</color>
+    <color name="buckColorCheckBoxCheckedIcon">#0856C3</color>
+    <color name="buckColorCheckBoxUncheckedBackground">@color/black3</color>
+    <color name="buckColorCheckBoxUncheckedOutline">@color/black18</color>
+
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 
