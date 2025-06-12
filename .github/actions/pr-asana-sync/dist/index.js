@@ -67540,8 +67540,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-const asana_1 = __nccwpck_require__(2286);
+const asana_1 = __importDefault(__nccwpck_require__(2286));
 const core_1 = __nccwpck_require__(7484);
 const github_1 = __nccwpck_require__(3228);
 const markdown_1 = __nccwpck_require__(3758);
@@ -67551,7 +67554,7 @@ const CUSTOM_FIELD_NAMES = {
     status: 'Github Status'
 };
 const USER_MAP = JSON.parse((0, core_1.getInput)('USER_MAP', { required: false }) || '{}');
-const client = asana_1.Client.create({
+const client = asana_1.default.Client.create({
     defaultHeaders: {
         'asana-enable': 'new_user_task_lists,new_project_templates,new_goal_memberships'
     }
