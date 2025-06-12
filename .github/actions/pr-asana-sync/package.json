@@ -3,9 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "description": "TypeScript template action",
-  "main": "dist/main.js",
+  "main": "lib/main.js",
   "scripts": {
-    "build": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
+    "build": "tsc",
     "test": "jest",
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",

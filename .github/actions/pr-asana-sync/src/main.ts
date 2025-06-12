@@ -1,4 +1,4 @@
-import * as asana from 'asana';
+import asana, {Client} from 'asana'
 import {info, setFailed, getInput, debug, setOutput} from '@actions/core'
 import {context, getOctokit} from '@actions/github'
 import {
@@ -26,7 +26,7 @@ type PRFields = {
   url: asana.resources.CustomField
   status: asana.resources.CustomField
 }
-const client = asana.Client.create({
+const client = Client.create({
   defaultHeaders: {
     'asana-enable':
       'new_user_task_lists,new_project_templates,new_goal_memberships'
