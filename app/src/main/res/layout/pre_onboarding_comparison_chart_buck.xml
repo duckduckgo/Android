@@ -70,10 +70,11 @@
 
         <ImageView
             android:id="@+id/featureIcon1"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_find_search_color_24" />
+            app:srcCompat="@drawable/ic_find_search_buck"
+            app:tint="@color/buckColorComparisonChartSearchIcon"/>
 
         <TextView
             android:id="@+id/feature1"
@@ -118,10 +119,11 @@
 
         <ImageView
             android:id="@+id/featureIcon2"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_shield_color_24" />
+            app:srcCompat="@drawable/ic_shield_buck"
+            app:tint="@color/buckColorComparisonChartShieldIcon" />
 
         <TextView
             android:id="@+id/feature2"
@@ -167,10 +169,11 @@
 
         <ImageView
             android:id="@+id/featureIcon3"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_cookie_blocked_color_24" />
+            app:srcCompat="@drawable/ic_cookie_blocked_buck"
+            app:tint="@color/buckColorComparisonChartCookieIcon" />
 
         <TextView
             android:id="@+id/feature3"
@@ -215,10 +218,11 @@
 
         <ImageView
             android:id="@+id/featureIcon4"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_ads_blocked_color_24" />
+            app:srcCompat="@drawable/ic_ads_blocked_buck"
+            app:tint="@color/buckColorComparisonChartBlockIcon" />
 
         <TextView
             android:id="@+id/feature4"
@@ -264,10 +268,11 @@
 
         <ImageView
             android:id="@+id/featureIcon5"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
-            app:srcCompat="@drawable/ic_fire_color_24" />
+            app:srcCompat="@drawable/ic_fire_buck"
+            app:tint="@color/buckColorComparisonChartFireIcon" />
 
         <TextView
             android:id="@+id/feature5"
