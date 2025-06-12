@@ -1,4 +1,4 @@
-import asana from 'asana'
+import asana, {Client} from 'asana'
 import {info, setFailed, getInput, debug, setOutput} from '@actions/core'
 import {context, getOctokit} from '@actions/github'
 import {
@@ -26,12 +26,12 @@ type PRFields = {
   url: asana.resources.CustomField
   status: asana.resources.CustomField
 }
-const client = asana.Client.create({
+const client = Client.create({
   defaultHeaders: {
     'asana-enable':
       'new_user_task_lists,new_project_templates,new_goal_memberships'
   }
-}).useAccessToken(getInput('ASANA_ACCESS_TOKEN')) // do not mark this as required to avoid PRs created by dependabot to fail
+}).useAccessToken(getInput('ASANA_ACCESS_TOKEN', {required: true}))
 
 const ASANA_WORKSPACE_ID = getInput('ASANA_WORKSPACE_ID', {required: true})
 const PROJECT_ID = getInput('ASANA_PROJECT_ID', {required: true})
