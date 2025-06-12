@@ -25,9 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
@@ -74,8 +72,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var enableNewChatButton = false
 
     val duckChatFireButton: View
-    val duckChatInput: EditText
+    val duckChatInput: SubmitOnEnterEditText
     val duckChatSend: View
+    val duckChatClearText: View
     val duckChatNewChat: View
     val duckChatStop: View
     val duckChatControls: View
@@ -100,6 +99,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatFireButton = findViewById(R.id.duckChatFireButton)
         duckChatInput = findViewById(R.id.duckChatInput)
         duckChatSend = findViewById(R.id.duckChatSend)
+        duckChatClearText = findViewById(R.id.duckChatClearText)
         duckChatNewChat = findViewById(R.id.duckChatNewChat)
         duckChatStop = findViewById(R.id.duckChatStop)
         duckChatControls = findViewById(R.id.duckChatControls)
@@ -113,6 +113,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatFireButton.setOnClickListener { onFire?.invoke() }
         duckChatNewChat.setOnClickListener { onNewChat?.invoke() }
         duckChatSend.setOnClickListener { submitMessage() }
+        duckChatClearText.setOnClickListener { duckChatInput.setText("") }
         duckChatStop.setOnClickListener {
             onStop?.invoke()
             hideStopButton()
@@ -123,6 +124,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatTabLayout.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
+                    duckChatSend.isVisible = tab.position != 0
                     applyInputBehavior(tab.position)
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -144,21 +146,13 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     duckChatSend.isVisible = !s.isNullOrEmpty() && duckChatTabLayout.selectedTabPosition == 1
+                    duckChatClearText.isVisible = !s.isNullOrEmpty()
                     duckChatFireButton.isVisible = false
                     duckChatNewChat.isVisible = false
                 }
                 override fun afterTextChanged(s: Editable?) = Unit
             },
         )
-
-        duckChatInput.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_GO) {
-                submitMessage()
-                true
-            } else {
-                false
-            }
-        }
 
         duckChatFireButton.isVisible = false
         duckChatNewChat.isVisible = false
@@ -171,21 +165,19 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         val isSearchTab = tabPosition == 0
 
         duckChatInput.apply {
-            setSingleLine(isSearchTab)
-            maxLines = if (isSearchTab) 1 else 8
-            imeOptions = if (isSearchTab) {
-                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
-            } else {
-                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_DONE
+            maxLines = MAX_LINES
+
+            submitOnEnterEnabled = isSearchTab
+            onEnter = { submitMessage() }
+
+            text?.length.let { length ->
+                setSelection(
+                    selectionStart.coerceIn(0, length),
+                    selectionEnd.coerceIn(0, length),
+                )
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
-
-        val length = duckChatInput.text.length
-        duckChatInput.setSelection(
-            selectionStart.coerceIn(0, length),
-            selectionEnd.coerceIn(0, length),
-        )
         applyLeftInputMargin(originalStartMargin)
     }
 
@@ -292,5 +284,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
+        private const val MAX_LINES = 8
     }
 }
