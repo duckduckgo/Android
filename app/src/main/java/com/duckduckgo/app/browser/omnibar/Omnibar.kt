@@ -326,9 +326,9 @@ class Omnibar(
         newOmnibar.reduce(StateChange.LoadingStateChange(viewState))
     }
 
-    fun renderOmnibarViewState(viewState: OmnibarViewState) {
+    fun renderOmnibarViewState(viewState: OmnibarViewState, forceRender: Boolean = false) {
         logcat { "Omnibar: renderOmnibarViewState $viewState" }
-        newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
+        newOmnibar.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
     }
 
     fun setPrivacyShield(privacyShield: PrivacyShield) {
