@@ -42,7 +42,7 @@ interface OnboardingDesignExperimentToggles {
      * Toggle for enabling or disabling the "buckOnboarding" design experiment.
      * Default value: false (disabled).
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun buckOnboarding(): Toggle
 
     /**
