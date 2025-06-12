@@ -20,7 +20,9 @@ import android.Manifest
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -95,6 +97,12 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         if (view?.windowVisibility == View.VISIBLE) {
             startDaxDialogAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
         }
+    }
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
