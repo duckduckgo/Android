@@ -1,32 +1,26 @@
-name: 'Pull Request changed -> Sync Asana PR task'
-on:
-  pull_request_review:
-  pull_request:
-    types:
-      - opened
-      - edited
-      - closed
-      - reopened
-      - synchronize
-      - assigned
-      - ready_for_review
+name: Test - Workflow for Testing
 
-concurrency:
-  group: ${{ github.ref }}
+on:
+  workflow_dispatch:
+
+    inputs:
+      ref:
+        description: 'This is an example of an input'
+        required: true
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
 
 jobs:
-  sync:
+  test-workflow:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
+    name: Add here whatever steps you want to test
 
-      - uses: ./.github/actions/asana/pr-asana-sync
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GT_DAXMOBILE }}
-          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          ASANA_WORKSPACE_ID: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
-          ASANA_PROJECT_ID: ${{ vars.GH_ASANA_CODE_REVIEWS_PROJECT_ID }}
-          ASANA_IN_PROGRESS_SECTION_ID: ${{ vars.GH_ASANA_CODE_REVIEWS_IN_PROGRESS_SECTION_ID }}
+          submodules: recursive
+          token: ${{ secrets.GT_DAXMOBILE }}
+          ref: ${{ github.event.inputs.ref }}
