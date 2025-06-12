@@ -51,8 +51,6 @@ interface PirActionsRunnerStateEngine {
         val brokerStepStartTime: Long = -1L,
         val profileQuery: ProfileQuery? = null,
         val transactionID: String = "",
-        val currentExtractedProfileIndex: Int = 0,
-        val extractedProfile: List<ExtractedProfile> = emptyList(),
         val pendingUrl: String? = null,
     )
 
@@ -90,8 +88,6 @@ interface PirActionsRunnerStateEngine {
         data class ExecuteNextBrokerStepAction(
             val actionRequestData: PirScriptRequestData,
         ) : Event()
-
-        data object ExecuteNextProfileForBroker : Event()
 
         data class BrokerStepCompleted(val isSuccess: Boolean) : Event()
 

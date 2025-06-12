@@ -18,7 +18,7 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJob.RunType
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
@@ -64,27 +64,25 @@ class JsActionSuccessEventHandler @Inject constructor(
          * - Else -> we proceed to the next action
          */
         val pirSuccessResponse = (event as JsActionSuccess).pirSuccessResponse
-        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
 
-        if (state.runType != RunType.OPTOUT) {
+        if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
-                BrokerScanActionSucceeded(
-                    currentBroker.brokerName,
-                    pirSuccessResponse,
+                BrokerOptOutActionSucceeded(
+                    brokerName = currentBrokerStep.brokerName,
+                    extractedProfile = currentBrokerStep.profileToOptOut,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    actionType = pirSuccessResponse.actionType,
+                    result = pirSuccessResponse,
                 ),
             )
         } else {
-            state.extractedProfile[state.currentExtractedProfileIndex].let {
-                pirRunStateHandler.handleState(
-                    BrokerOptOutActionSucceeded(
-                        brokerName = currentBroker.brokerName,
-                        extractedProfile = it,
-                        completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        actionType = pirSuccessResponse.actionType,
-                        result = pirSuccessResponse,
-                    ),
-                )
-            }
+            pirRunStateHandler.handleState(
+                BrokerScanActionSucceeded(
+                    currentBrokerStep.brokerName,
+                    pirSuccessResponse,
+                ),
+            )
         }
 
         return when (pirSuccessResponse) {

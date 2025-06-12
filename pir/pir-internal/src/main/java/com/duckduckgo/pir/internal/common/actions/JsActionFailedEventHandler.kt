@@ -18,7 +18,7 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJob.RunType
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
@@ -54,32 +54,30 @@ class JsActionFailedEventHandler @Inject constructor(
          * This means we have received an error from the JS layer for the last action we pushed.
          * We end the run for the broker.
          */
-        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val currentAction = currentBroker.actions[state.currentActionIndex]
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentAction = currentBrokerStep.actions[state.currentActionIndex]
         val error = (event as JsActionFailed).error
 
-        if (state.runType != RunType.OPTOUT) {
+        if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
-                BrokerScanActionFailed(
-                    brokerName = currentBroker.brokerName,
+                BrokerOptOutActionFailed(
+                    brokerName = currentBrokerStep.brokerName,
+                    extractedProfile = currentBrokerStep.profileToOptOut,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = currentAction.asActionType(),
                     actionID = error.actionID,
                     message = error.message,
                 ),
             )
         } else {
-            state.extractedProfile[state.currentExtractedProfileIndex].let {
-                pirRunStateHandler.handleState(
-                    BrokerOptOutActionFailed(
-                        brokerName = currentBroker.brokerName,
-                        extractedProfile = it,
-                        completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        actionType = currentAction.asActionType(),
-                        actionID = error.actionID,
-                        message = error.message,
-                    ),
-                )
-            }
+            pirRunStateHandler.handleState(
+                BrokerScanActionFailed(
+                    brokerName = currentBrokerStep.brokerName,
+                    actionType = currentAction.asActionType(),
+                    actionID = error.actionID,
+                    message = error.message,
+                ),
+            )
         }
 
         // If failure is on Any captcha action, we proceed to next action

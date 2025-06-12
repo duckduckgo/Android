@@ -18,17 +18,16 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanCompleted
-import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutCompleted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextProfileForBroker
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -61,53 +60,34 @@ class BrokerStepCompletedEventHandler @Inject constructor(
          * - If we are at the last extracted profile, We emit the opt out complete pixel for the current broker
          *      and then execute the next broker.
          */
-        if (state.currentExtractedProfileIndex < state.extractedProfile.size - 1) {
-            if (state.runType == RunType.OPTOUT) {
-                // Signal complete for previous run.
-                pirRunStateHandler.handleState(
-                    BrokerRecordOptOutCompleted(
-                        brokerName = state.brokerStepsToExecute[state.currentBrokerStepIndex].brokerName,
-                        extractedProfile = state.extractedProfile[state.currentExtractedProfileIndex],
-                        startTimeInMillis = state.brokerStepStartTime,
-                        endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        isSubmitSuccess = (event as BrokerStepCompleted).isSuccess,
-                    ),
-                )
-            }
 
-            // Broker is not yet completed as another profile can be run
-            return Next(
-                nextState = state,
-                nextEvent = ExecuteNextProfileForBroker,
-            )
-        } else {
-            // Exit point of execution for a Blocker
-            emitBrokerCompletePixel(
-                state = state,
-                totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStepStartTime,
-                isSuccess = (event as BrokerStepCompleted).isSuccess,
-            )
-            return Next(
-                nextState = state.copy(
-                    currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
-                ),
-                nextEvent = ExecuteNextBrokerStep,
-            )
-        }
+        // Now we emit pixels related to the Broker step
+        emitBrokerStepCompletePixel(
+            state = state,
+            totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStepStartTime,
+            isSuccess = (event as BrokerStepCompleted).isSuccess,
+        )
+
+        return Next(
+            nextState = state.copy(
+                currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
+            ),
+            nextEvent = ExecuteNextBrokerStep,
+        )
     }
 
-    private suspend fun emitBrokerCompletePixel(
+    private suspend fun emitBrokerStepCompletePixel(
         state: State,
         totalTimeMillis: Long,
         isSuccess: Boolean,
     ) {
-        val brokerName = state.brokerStepsToExecute[state.currentBrokerStepIndex].brokerName
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val brokerStartTime = state.brokerStepStartTime
         when (state.runType) {
             RunType.MANUAL ->
                 pirRunStateHandler.handleState(
                     BrokerManualScanCompleted(
-                        brokerName = brokerName,
+                        brokerName = currentBrokerStep.brokerName,
                         eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         totalTimeMillis = totalTimeMillis,
                         isSuccess = isSuccess,
@@ -117,7 +97,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
 
             RunType.SCHEDULED -> pirRunStateHandler.handleState(
                 BrokerScheduledScanCompleted(
-                    brokerName = brokerName,
+                    brokerName = currentBrokerStep.brokerName,
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     totalTimeMillis = totalTimeMillis,
                     isSuccess = isSuccess,
@@ -126,20 +106,14 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             )
 
             RunType.OPTOUT -> {
+                val currentOptOutStep = currentBrokerStep as OptOutStep
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutCompleted(
-                        brokerName = brokerName,
-                        startTimeInMillis = brokerStartTime,
+                        brokerName = currentOptOutStep.brokerName,
+                        extractedProfile = currentOptOutStep.profileToOptOut,
+                        startTimeInMillis = state.brokerStepStartTime,
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        extractedProfile = state.extractedProfile[state.currentExtractedProfileIndex],
                         isSubmitSuccess = isSuccess,
-                    ),
-                )
-                pirRunStateHandler.handleState(
-                    BrokerOptOutCompleted(
-                        brokerName = brokerName,
-                        startTimeInMillis = brokerStartTime,
-                        endTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     ),
                 )
             }
