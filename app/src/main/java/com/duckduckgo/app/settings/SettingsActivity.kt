@@ -188,6 +188,11 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshWidgetsInstalledState()
+    }
+
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
             setAsDefaultBrowserSetting.setClickListener { viewModel.onDefaultBrowserSettingClicked() }

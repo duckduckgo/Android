@@ -330,6 +330,15 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun refreshWidgetsInstalledState() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (currentViewState().isAddWidgetInProtectionsVisible) {
+                val widgetsInstalled = widgetCapabilities.hasInstalledWidgets
+                viewState.emit(currentViewState().copy(widgetsInstalled = widgetsInstalled))
+            }
+        }
+    }
+
     private fun currentViewState(): ViewState {
         return viewState.value
     }

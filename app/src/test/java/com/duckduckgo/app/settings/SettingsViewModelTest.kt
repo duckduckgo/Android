@@ -221,4 +221,63 @@ class SettingsViewModelTest {
             assertEquals(LaunchAddHomeScreenWidget(false), awaitItem())
         }
     }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndAddWidgetInProtectionsVisibleAndWidgetsNewlyInstalledThenViewStateUpdatedAndCapabilitiesChecked() =
+        runTest {
+            fakeSettingsPageFeature.self().setRawStoredState(State(true))
+            fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false) // Initial state for start()
+            testee.start()
+            // Ensure initial state is as expected
+            assertEquals(true, testee.viewState().value.isAddWidgetInProtectionsVisible)
+            assertEquals(false, testee.viewState().value.widgetsInstalled)
+
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true) // New state for refresh
+
+            testee.refreshWidgetsInstalledState()
+
+            assertEquals(true, testee.viewState().value.widgetsInstalled)
+            verify(mockWidgetCapabilities, times(2)).hasInstalledWidgets
+        }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndAddWidgetInProtectionsVisibleAndWidgetsNewlyUninstalledThenViewStateUpdatedAndCapabilitiesChecked() =
+        runTest {
+            fakeSettingsPageFeature.self().setRawStoredState(State(true))
+            fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true) // Initial state for start()
+            testee.start()
+            // Ensure initial state is as expected
+            assertEquals(true, testee.viewState().value.isAddWidgetInProtectionsVisible)
+            assertEquals(true, testee.viewState().value.widgetsInstalled)
+
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false) // New state for refresh
+
+            testee.refreshWidgetsInstalledState()
+
+            assertEquals(false, testee.viewState().value.widgetsInstalled)
+            verify(mockWidgetCapabilities, times(2)).hasInstalledWidgets
+        }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndAddWidgetInProtectionsNotVisibleThenViewStateUnchangedAndCapabilitiesNotCheckedByRefresh() =
+        runTest {
+            fakeSettingsPageFeature.self().setRawStoredState(State(true))
+            fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(false))
+            val initialWidgetsInstalledState = true
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(initialWidgetsInstalledState) // Initial state for start()
+            testee.start()
+            // Ensure initial state is as expected
+            assertEquals(false, testee.viewState().value.isAddWidgetInProtectionsVisible)
+            assertEquals(initialWidgetsInstalledState, testee.viewState().value.widgetsInstalled)
+
+            clearInvocations(mockWidgetCapabilities)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(!initialWidgetsInstalledState)
+
+            testee.refreshWidgetsInstalledState()
+
+            assertEquals(initialWidgetsInstalledState, testee.viewState().value.widgetsInstalled)
+            verify(mockWidgetCapabilities, never()).hasInstalledWidgets
+        }
 }
