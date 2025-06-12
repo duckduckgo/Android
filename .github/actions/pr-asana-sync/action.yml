@@ -30,4 +30,4 @@ outputs:
     description: "Will be one of: created, updated"
 runs:
   using: "node20"
-  main: "lib/main.js"
+  main: "dist/index.js"
