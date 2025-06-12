@@ -102,7 +102,7 @@
                 app:primaryTextTruncated="false"
                 app:secondaryText="@string/settingsAddressBarPositionTop" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/showFullUrlSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
