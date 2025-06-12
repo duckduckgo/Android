@@ -23,7 +23,7 @@ jobs:
         with:
           ref: feature/david/06-12-gha_asana_pr_sync
 
-      - uses: ./.github/actions/asana/pr-asana-sync
+      - uses: ./.github/actions/pr-asana-sync
         with:
           GITHUB_TOKEN: ${{ secrets.GT_DAXMOBILE }}
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
