@@ -57,6 +57,11 @@
     <color name="buckColorComparisonChartBlockIcon">#04592E</color>
     <color name="buckColorComparisonChartFireIcon">#F2643D</color>
 
+    <color name="buckColorPreonboardingOptionBackground">#F6EFDF</color>
+    <color name="buckColorPreonboardingOptionBackgroundSelected">#B2FFAB23</color>
+    <color name="buckColorPreonboardingOptionIcon">#252A38</color>
+    <color name="buckColorPreonboardingOptionIconSelected">#252A38</color>
+
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 

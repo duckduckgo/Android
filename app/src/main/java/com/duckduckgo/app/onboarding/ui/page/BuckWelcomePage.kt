@@ -116,16 +116,18 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private fun setAddressBarPositionOptions(defaultOption: Boolean) {
-        if (defaultOption) {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = true
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = false
-        } else {
-            binding.daxDialogCta.addressBarPosition.option1.setBackgroundResource(R.drawable.background_preonboarding_option)
-            binding.daxDialogCta.addressBarPosition.option1Switch.isChecked = false
-            binding.daxDialogCta.addressBarPosition.option2.setBackgroundResource(R.drawable.background_preonboarding_option_selected)
-            binding.daxDialogCta.addressBarPosition.option2Switch.isChecked = true
+        with(binding.daxDialogCta.addressBarPosition) {
+            option1.isSelected = defaultOption
+            option2.isSelected = !defaultOption
+
+            option1Switch.isChecked = defaultOption
+            option2Switch.isChecked = !defaultOption
+
+            option1Image.isSelected = defaultOption
+            option2Image.isSelected = !defaultOption
+
+            option1Body.isSelected = defaultOption
+            option2Body.isSelected = !defaultOption
         }
     }
 
