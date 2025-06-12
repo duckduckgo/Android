@@ -22,7 +22,6 @@ import androidx.core.content.edit
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
-import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -110,7 +109,7 @@ class RealAppBuildConfig @Inject constructor(
         get() = BuildConfig.BUILD_DATE_MILLIS
 
     override val canSkipOnboarding: Boolean
-        get() = BuildConfig.CAN_SKIP_ONBOARDING || isInternalBuild()
+        get() = false
 
     private fun getDownloadsDirectory(): File {
         val downloadDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
