@@ -26,8 +26,8 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerR
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBroker
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextProfileForBroker
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -38,11 +38,11 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class BrokerCompletedEventHandler @Inject constructor(
+class BrokerStepCompletedEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : EventHandler {
-    override val event: KClass<out Event> = BrokerActionsCompleted::class
+    override val event: KClass<out Event> = BrokerStepCompleted::class
 
     override suspend fun invoke(
         state: State,
@@ -66,11 +66,11 @@ class BrokerCompletedEventHandler @Inject constructor(
                 // Signal complete for previous run.
                 pirRunStateHandler.handleState(
                     BrokerRecordOptOutCompleted(
-                        brokerName = state.brokers[state.currentBrokerIndex].brokerName,
+                        brokerName = state.brokerStepsToExecute[state.currentBrokerStepIndex].brokerName,
                         extractedProfile = state.extractedProfile[state.currentExtractedProfileIndex],
-                        startTimeInMillis = state.brokerStartTime,
+                        startTimeInMillis = state.brokerStepStartTime,
                         endTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        isSubmitSuccess = (event as BrokerActionsCompleted).isSuccess,
+                        isSubmitSuccess = (event as BrokerStepCompleted).isSuccess,
                     ),
                 )
             }
@@ -84,14 +84,14 @@ class BrokerCompletedEventHandler @Inject constructor(
             // Exit point of execution for a Blocker
             emitBrokerCompletePixel(
                 state = state,
-                totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStartTime,
-                isSuccess = (event as BrokerActionsCompleted).isSuccess,
+                totalTimeMillis = currentTimeProvider.currentTimeMillis() - state.brokerStepStartTime,
+                isSuccess = (event as BrokerStepCompleted).isSuccess,
             )
             return Next(
                 nextState = state.copy(
-                    currentBrokerIndex = state.currentBrokerIndex + 1,
+                    currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
                 ),
-                nextEvent = ExecuteNextBroker,
+                nextEvent = ExecuteNextBrokerStep,
             )
         }
     }
@@ -101,8 +101,8 @@ class BrokerCompletedEventHandler @Inject constructor(
         totalTimeMillis: Long,
         isSuccess: Boolean,
     ) {
-        val brokerName = state.brokers[state.currentBrokerIndex].brokerName
-        val brokerStartTime = state.brokerStartTime
+        val brokerName = state.brokerStepsToExecute[state.currentBrokerStepIndex].brokerName
+        val brokerStartTime = state.brokerStepStartTime
         when (state.runType) {
             RunType.MANUAL ->
                 pirRunStateHandler.handleState(

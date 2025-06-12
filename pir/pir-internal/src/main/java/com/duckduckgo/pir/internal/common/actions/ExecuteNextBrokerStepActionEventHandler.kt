@@ -19,8 +19,8 @@ package com.duckduckgo.pir.internal.common.actions
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailConfirmation
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
@@ -43,8 +43,8 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
-    override val event: KClass<out Event> = ExecuteNextBrokerAction::class
+class ExecuteNextBrokerStepActionEventHandler @Inject constructor() : EventHandler {
+    override val event: KClass<out Event> = ExecuteNextBrokerStepAction::class
 
     override suspend fun invoke(
         state: State,
@@ -62,13 +62,13 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
          *      we are ready to push the action to js layer
          *  - For any other action, we push it to the js layer via [PushJsAction]
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
-        val requestData = (event as ExecuteNextBrokerAction).actionRequestData
+        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val requestData = (event as ExecuteNextBrokerStepAction).actionRequestData
 
         return if (state.currentActionIndex == currentBroker.actions.size) {
             Next(
                 nextState = state,
-                nextEvent = BrokerActionsCompleted(true),
+                nextEvent = BrokerStepCompleted(true),
             )
         } else {
             val actionToExecute = currentBroker.actions[state.currentActionIndex]

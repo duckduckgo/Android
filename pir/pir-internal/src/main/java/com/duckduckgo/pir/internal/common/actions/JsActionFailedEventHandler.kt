@@ -24,8 +24,8 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerO
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
@@ -54,7 +54,7 @@ class JsActionFailedEventHandler @Inject constructor(
          * This means we have received an error from the JS layer for the last action we pushed.
          * We end the run for the broker.
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
+        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val currentAction = currentBroker.actions[state.currentActionIndex]
         val error = (event as JsActionFailed).error
 
@@ -88,7 +88,7 @@ class JsActionFailedEventHandler @Inject constructor(
                 nextState = state.copy(
                     currentActionIndex = state.currentActionIndex + 1,
                 ),
-                nextEvent = ExecuteNextBrokerAction(
+                nextEvent = ExecuteNextBrokerStepAction(
                     UserProfile(
                         userProfile = state.profileQuery,
                     ),
@@ -98,7 +98,7 @@ class JsActionFailedEventHandler @Inject constructor(
             // If error happens we skip to next Broker as next steps will not make sense
             Next(
                 nextState = state,
-                nextEvent = BrokerActionsCompleted(isSuccess = false),
+                nextEvent = BrokerStepCompleted(isSuccess = false),
             )
         }
     }

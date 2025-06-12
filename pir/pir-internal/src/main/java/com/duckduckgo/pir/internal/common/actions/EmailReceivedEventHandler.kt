@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -56,7 +56,7 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
             nextState = state.copy(
                 extractedProfile = updatedList,
             ),
-            nextEvent = ExecuteNextBrokerAction(
+            nextEvent = ExecuteNextBrokerStepAction(
                 actionRequestData = UserProfile(
                     userProfile = state.profileQuery,
                     extractedProfile = extractedProfileWithEmail.run {

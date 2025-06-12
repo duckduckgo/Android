@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.CaptchaServiceFailed
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -45,7 +45,7 @@ class CaptchaServiceFailedEventHandler @Inject constructor() : EventHandler {
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
             ),
-            nextEvent = ExecuteNextBrokerAction(
+            nextEvent = ExecuteNextBrokerStepAction(
                 UserProfile(
                     userProfile = state.profileQuery,
                 ),

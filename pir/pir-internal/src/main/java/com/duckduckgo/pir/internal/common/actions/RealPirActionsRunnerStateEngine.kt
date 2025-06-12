@@ -38,9 +38,9 @@ class RealPirActionsRunnerStateEngine(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     runType: RunType,
-    brokers: List<BrokerStep>,
+    brokerSteps: List<BrokerStep>,
 ) : PirActionsRunnerStateEngine {
-    private var engineState: State = State(runType, brokers)
+    private var engineState: State = State(runType, brokerSteps)
     private val sideEffectFlow = MutableStateFlow<SideEffect>(None)
     private val eventsFlow = MutableStateFlow<Event>(Idle)
 

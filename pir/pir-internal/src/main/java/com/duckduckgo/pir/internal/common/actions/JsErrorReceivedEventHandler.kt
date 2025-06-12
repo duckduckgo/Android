@@ -43,7 +43,7 @@ class JsErrorReceivedEventHandler @Inject constructor() : EventHandler {
          * This means that we have encountered an error in the js layer while attempting to evaluate a broker action.
          * We fail the current js action if that was the case.
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
+        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val currentAction = currentBroker.actions[state.currentActionIndex]
 
         return Next(

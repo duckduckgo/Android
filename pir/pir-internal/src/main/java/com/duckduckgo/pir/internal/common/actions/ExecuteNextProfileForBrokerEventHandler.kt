@@ -22,7 +22,7 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextProfileForBroker
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -54,7 +54,7 @@ class ExecuteNextProfileForBrokerEventHandler @Inject constructor(
             // Signal start for current run.
             pirRunStateHandler.handleState(
                 BrokerRecordOptOutStarted(
-                    brokerName = newModel.brokers[newModel.currentBrokerIndex].brokerName,
+                    brokerName = newModel.brokerStepsToExecute[newModel.currentBrokerStepIndex].brokerName,
                     extractedProfile = newModel.extractedProfile[newModel.currentExtractedProfileIndex],
                 ),
             )
@@ -62,7 +62,7 @@ class ExecuteNextProfileForBrokerEventHandler @Inject constructor(
         // Restart for broker but with different profile
         return Next(
             nextState = newModel,
-            nextEvent = ExecuteNextBrokerAction(
+            nextEvent = ExecuteNextBrokerStepAction(
                 UserProfile(
                     userProfile = state.profileQuery,
                 ),

@@ -31,8 +31,8 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerR
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBroker
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -44,11 +44,11 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ExecuteNextBrokerEventHandler @Inject constructor(
+class ExecuteNextBrokerStepEventHandler @Inject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirRunStateHandler: PirRunStateHandler,
 ) : EventHandler {
-    override val event: KClass<out Event> = ExecuteNextBroker::class
+    override val event: KClass<out Event> = ExecuteNextBrokerStep::class
 
     override suspend fun invoke(
         state: State,
@@ -62,32 +62,32 @@ class ExecuteNextBrokerEventHandler @Inject constructor(
          *          - we reset action index AND extracted profile index to 0.
          *          - We also update the [State] to reference to the extracted profiles for the next broker.
          */
-        return if (state.currentBrokerIndex >= state.brokers.size) {
+        return if (state.currentBrokerStepIndex >= state.brokerStepsToExecute.size) {
             Next(
                 nextState = state,
                 sideEffect = CompleteExecution,
             )
         } else {
             // Entry point of execution for a Broker
-            state.brokers[state.currentBrokerIndex].let {
+            state.brokerStepsToExecute[state.currentBrokerStepIndex].let {
                 emitBrokerStartPixel(state.runType, it)
 
                 val nextState = if (it is OptOutStep) {
                     state.copy(
                         currentActionIndex = 0,
-                        brokerStartTime = currentTimeProvider.currentTimeMillis(),
+                        brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
                         currentExtractedProfileIndex = 0,
                         extractedProfile = it.profilesToOptOut,
                     )
                 } else {
                     state.copy(
                         currentActionIndex = 0,
-                        brokerStartTime = currentTimeProvider.currentTimeMillis(),
+                        brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
                     )
                 }
                 Next(
                     nextState = nextState,
-                    nextEvent = ExecuteNextBrokerAction(
+                    nextEvent = ExecuteNextBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),
