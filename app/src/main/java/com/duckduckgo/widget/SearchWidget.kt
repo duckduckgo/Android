@@ -25,11 +25,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_WIDGET_ADDED
 import com.duckduckgo.app.pixels.AppPixelName.SEARCH_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class SearchWidgetLight : SearchWidget(R.layout.search_widget_light)
 
@@ -40,6 +43,10 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
 
     @Inject
     lateinit var searchWidgetLifecycleDelegate: SearchWidgetLifecycleDelegate
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
 
     override fun onReceive(
         context: Context,
@@ -56,7 +63,9 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        searchWidgetLifecycleDelegate.handleOnWidgetEnabled(SEARCH_WIDGET_ADDED)
+        appCoroutineScope.launch {
+            searchWidgetLifecycleDelegate.handleOnWidgetEnabled(SEARCH_WIDGET_ADDED)
+        }
     }
 
     override fun onUpdate(
