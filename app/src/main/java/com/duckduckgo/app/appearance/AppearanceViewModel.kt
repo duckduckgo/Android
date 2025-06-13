@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import kotlin.to
 
 @ContributesViewModel(ActivityScope::class)
 class AppearanceViewModel @Inject constructor(
@@ -176,6 +177,9 @@ class AppearanceViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.isFullUrlEnabled = checked
             viewState.update { currentViewState().copy(isFullUrlEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
         }
     }
 }
