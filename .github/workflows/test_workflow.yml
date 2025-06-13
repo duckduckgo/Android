@@ -30,7 +30,7 @@ jobs:
         id: get-asana-user-id
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          github-pat: ${{ secrets.GT_DAXMOBILE }}
           github-username: ${{ github.actor }}
           action: 'get-asana-user-id'
 
