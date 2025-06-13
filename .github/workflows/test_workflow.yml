@@ -27,7 +27,7 @@ jobs:
           ref: ${{ github.event.inputs.ref }}
 
       - name: Move task(s) to "Awaiting review" section
-        uses: duckduckgo/native-github-asana-sync@update_asana_3
+        uses: duckduckgo/native-github-asana-sync@david/feature/update_asana_3
         with:
           action: 'add-task-asana-project'
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
