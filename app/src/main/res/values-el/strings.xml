@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Εμφάνιση</string>
+    <string name="settingsShowFullUrlTitle">Εμφάνιση πλήρους διεύθυνσης ιστότοπου</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
