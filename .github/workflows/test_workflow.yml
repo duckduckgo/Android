@@ -22,18 +22,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Test get asana user id
-        id: get-asana-user-id
+      - name: Get task permalink
+        id: get-task-permalink
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
-          github-pat: ${{ secrets.GT_DAXMOBILE }}
-          github-username: ${{ github.actor }}
-          action: 'get-asana-user-id'
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: '1210542063926870'
+          action: 'get-asana-task-permalink'
 
       - name: Use Asana user id to create a new task
         run:
-          echo ${{ steps.get-asana-user-id.outputs.asanaUserId }} }}
+          echo ${{ steps.get-asana-user-id.outputs.asanaTaskPermalink }} }}
