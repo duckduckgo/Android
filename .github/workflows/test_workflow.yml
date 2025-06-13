@@ -6,6 +6,7 @@ on:
     inputs:
       ref:
         description: 'This is an example of an input'
+        default: 'develop'
         required: true
 
 env:
