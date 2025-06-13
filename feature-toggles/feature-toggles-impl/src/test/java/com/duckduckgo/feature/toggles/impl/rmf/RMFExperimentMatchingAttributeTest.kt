@@ -186,15 +186,16 @@ class RMFExperimentMatchingAttributeTest {
         assertTrue(result!!)
     }
 
-    private fun Toggle.setCohort(isActive: Boolean = true) {
+    private suspend fun Toggle.setCohort(isActive: Boolean = true) {
         val zdt = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         setRawStoredState(
             State(
                 remoteEnableState = isActive,
                 enable = isActive,
-                assignedCohort = State.Cohort(name = "control", weight = 1, enrollmentDateET = zdt),
+                cohorts = listOf(State.Cohort(name = "control", weight = 1, enrollmentDateET = zdt)),
             ),
         )
+        enroll()
     }
 
     abstract class TriggerTestScope private constructor()

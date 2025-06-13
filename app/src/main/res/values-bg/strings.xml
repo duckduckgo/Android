@@ -757,7 +757,7 @@
     <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
     <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
-    <string name="preOnboardingComparisonChartItem4">Блокиране на проследяващи реклами</string>
+    <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
     <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
