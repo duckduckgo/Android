@@ -201,6 +201,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Appearance</string>
+    <string name="settingsShowFullUrlTitle">Show Full Site Address</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
