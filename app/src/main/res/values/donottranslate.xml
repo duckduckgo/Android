@@ -62,4 +62,7 @@
 
     <!-- Appearance Settings -->
     <string name="settingsShowFullUrlTitle">Show Full Site Address</string>
+
+    <!-- Browser tab -->
+    <string name="browserDuckPlayerShortUrl">Duck Player</string>
 </resources>

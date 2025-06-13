@@ -2131,6 +2131,7 @@ class BrowserTabFragment :
             }
 
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
+            is Command.RefreshOmnibar -> renderer.refreshOmnibar()
             else -> {
                 // NO OP
             }
@@ -4094,6 +4095,12 @@ class BrowserTabFragment :
                 lastSeenOmnibarViewState = viewState
 
                 omnibar.renderOmnibarViewState(viewState)
+            }
+        }
+
+        fun refreshOmnibar() {
+            lastSeenOmnibarViewState?.let {
+                omnibar.renderOmnibarViewState(it, true)
             }
         }
 
