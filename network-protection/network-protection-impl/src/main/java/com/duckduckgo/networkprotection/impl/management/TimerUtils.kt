@@ -19,8 +19,16 @@ package com.duckduckgo.networkprotection.impl.management
 import java.util.concurrent.TimeUnit
 
 internal fun Long.toDisplayableTimerText(): String {
-    val hours = TimeUnit.MILLISECONDS.toHours(this) % 60
+    val days = TimeUnit.MILLISECONDS.toDays(this)
+    val hours = TimeUnit.MILLISECONDS.toHours(this) % 24
     val minutes = TimeUnit.MILLISECONDS.toMinutes(this) % 60
     val seconds = TimeUnit.MILLISECONDS.toSeconds(this) % 60
-    return String.format("%02d:%02d:%02d", hours, minutes, seconds)
+
+    val parts = mutableListOf<String>()
+    if (days > 0) parts.add("${days}d")
+    if (hours > 0) parts.add("${hours}h")
+    if (minutes > 0) parts.add("${minutes}m")
+    if (seconds > 0 || parts.isEmpty()) parts.add("${seconds}s")
+
+    return parts.joinToString(" ")
 }

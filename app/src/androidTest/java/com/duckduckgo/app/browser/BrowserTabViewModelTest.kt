@@ -253,6 +253,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.newtabpage.impl.pixels.NewTabPixels
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -509,7 +510,6 @@ class BrowserTabViewModelTest {
 
     private val mockDisabledToggle: Toggle = mock {
         on { it.isEnabled() } doReturn false
-        on { it.isEnabled(any()) } doReturn false
     }
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
@@ -624,6 +624,7 @@ class BrowserTabViewModelTest {
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -842,6 +843,17 @@ class BrowserTabViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = true)
+
+        testee.onViewVisible()
+
+        assertCommandNotIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
 
         testee.onViewVisible()
 
@@ -6359,6 +6371,94 @@ class BrowserTabViewModelTest {
         testee.onViewResumed()
 
         assertCommandIssued<Command.RefreshOmnibar>()
+    }
+
+    @Test
+    fun whenSetBrowserBackgroundWithBuckOnboardingEnabledAndLightModeEnabledThenSetBrowserBackgroundColorCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+
+        testee.setBrowserBackground(lightModeEnabled = true)
+
+        assertCommandIssued<Command.SetBrowserBackgroundColor> {
+            assertEquals(CommonR.color.buckYellow, this.colorRes)
+        }
+    }
+
+    @Test
+    fun whenSetBrowserBackgroundWithBuckOnboardingEnabledAndLightModeDisabledThenSetBrowserBackgroundColorCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+
+        testee.setBrowserBackground(lightModeEnabled = false)
+
+        assertCommandIssued<Command.SetBrowserBackgroundColor> {
+            assertEquals(CommonR.color.buckLightBlue, this.colorRes)
+        }
+    }
+
+    @Test
+    fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+
+        testee.setBrowserBackground(lightModeEnabled = true)
+
+        assertCommandIssued<Command.SetBrowserBackground> {
+            assertEquals(R.drawable.onboarding_background_bitmap_light, this.backgroundRes)
+        }
+    }
+
+    @Test
+    fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+
+        testee.setBrowserBackground(lightModeEnabled = false)
+
+        assertCommandIssued<Command.SetBrowserBackground> {
+            assertEquals(R.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
+        }
+    }
+
+    @Test
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndLightModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+
+        testee.setOnboardingDialogBackground(lightModeEnabled = true)
+
+        assertCommandIssued<Command.SetOnboardingDialogBackgroundColor> {
+            assertEquals(CommonR.color.buckYellow, this.colorRes)
+        }
+    }
+
+    @Test
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndDarkModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+
+        testee.setOnboardingDialogBackground(lightModeEnabled = false)
+
+        assertCommandIssued<Command.SetOnboardingDialogBackgroundColor> {
+            assertEquals(CommonR.color.buckLightBlue, this.colorRes)
+        }
+    }
+
+    @Test
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+
+        testee.setOnboardingDialogBackground(lightModeEnabled = true)
+
+        assertCommandIssued<Command.SetOnboardingDialogBackground> {
+            assertEquals(R.drawable.onboarding_background_bitmap_light, this.backgroundRes)
+        }
+    }
+
+    @Test
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
+        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+
+        testee.setOnboardingDialogBackground(lightModeEnabled = false)
+
+        assertCommandIssued<Command.SetOnboardingDialogBackground> {
+            assertEquals(R.drawable.onboarding_background_bitmap_dark, this.backgroundRes)
+        }
     }
 
     private fun aCredential(): LoginCredentials {

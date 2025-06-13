@@ -32,6 +32,42 @@
     "title" : "<b>ГРЕШКА:</b> невалиден идентификатор на видеоклипа",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player не може да зареди това видео",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Това видео не може да бъде гледано извън YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Все пак можете да гледате това видео в YouTube, но без допълнителната поверителност на Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Съжаляваме, но това видео има възрастово ограничение",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "За да гледате видеа с възрастово ограничение, трябва да влезете в YouTube, за да потвърдите възрастта си.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Все пак можете да гледате това видео, но ще трябва да влезете и да го гледате в YouTube без допълнителната поверителност на Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Съжаляваме, но това видео може да се гледа само в YouTube",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Създателят на това видео е избрал да не позволява то да бъде гледано на други сайтове.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Все пак можете да го гледате в YouTube, но без допълнителната поверителност на Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube няма да позволи на Duck Player да зареди това видео",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Все пак можете да гледате това видео в YouTube, но без допълнителната поверителност на Duck Player.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Съжаляваме, но YouTube мисли, че сте бот",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube блокира зареждането на това видео. Ако използвате VPN, опитайте да го изключите и презаредете тази страница.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Ако това не свърши работа, можете да гледате това видео в YouTube, но без допълнителната поверителност на Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Това може да се случи, ако използвате VPN. Опитайте да изключите VPN или да промените местоположението на сървъра и да презаредите тази страница.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Ако това не проработи, ще трябва да влезете и да гледате това видео в YouTube без допълнителната поверителност на Duck Player.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

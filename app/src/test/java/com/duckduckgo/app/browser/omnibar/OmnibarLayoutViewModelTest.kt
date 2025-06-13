@@ -931,6 +931,8 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenTrackersAnimationStartedAndOmnibarNotFocusedThenCommandAndViewStateCorrect() = runTest {
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
+        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
         testee.onOmnibarFocusChanged(false, SERP_URL)
         val trackers = givenSomeTrackers()
         testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))

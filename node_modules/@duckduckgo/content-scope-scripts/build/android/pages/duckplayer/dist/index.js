@@ -2851,9 +2851,6 @@
   function useYouTubeError() {
     return x2(YouTubeErrorContext).error;
   }
-  function useLocale() {
-    return x2(YouTubeErrorContext).locale;
-  }
   function useShowCustomError() {
     const settings = useSettings();
     const youtubeError = x2(YouTubeErrorContext).error;
@@ -3478,8 +3475,9 @@
   };
 
   // pages/duckplayer/app/components/YouTubeError.jsx
-  function useErrorStrings(youtubeError, locale) {
+  function useErrorStrings(youtubeError) {
     const { t: t3 } = useTypedTranslation();
+    const version = "v2";
     const versions = {
       v1: {
         "sign-in-required": {
@@ -3516,18 +3514,16 @@
         }
       }
     };
-    const version = locale === "en" ? "v2" : "v1";
     return versions[version]?.[youtubeError] || versions[version]?.["unknown"] || versions["v1"]["unknown"];
   }
   function YouTubeError({ layout, embed }) {
     const youtubeError = useYouTubeError();
-    const locale = useLocale();
     if (!youtubeError) {
       return null;
     }
     const { t: t3 } = useTypedTranslation();
     const openOnYoutube = useOpenOnYoutubeHandler();
-    const { heading, messages, variant } = useErrorStrings(youtubeError, locale);
+    const { heading, messages, variant } = useErrorStrings(youtubeError);
     const classes = (0, import_classnames10.default)(YouTubeError_default.error, {
       [YouTubeError_default.desktop]: layout === "desktop",
       [YouTubeError_default.mobile]: layout === "mobile"

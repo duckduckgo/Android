@@ -757,7 +757,7 @@
     <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
     <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
-    <string name="preOnboardingComparisonChartItem4">Nyomon követő hirdetések blokkolása</string>
+    <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
     <string name="preOnboardingDaxDialog3Title">Nagyszerű! Üdvözlünk a kacsa világában!</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
