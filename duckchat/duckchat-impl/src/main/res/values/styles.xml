@@ -15,8 +15,22 @@
   -->
 
 <resources>
-    <style name="TabLayoutTextAppearance.NoAllCaps" parent="TextAppearance.Design.Tab">
-        <item name="textAllCaps">false</item>
+    <style name="Widget.DuckChat.TabLayout.Rounded" parent="Widget.MaterialComponents.TabLayout">
+        <item name="android:background">@drawable/tab_layout_background</item>
+        <item name="tabIndicator">@drawable/tab_indicator</item>
+        <item name="tabIndicatorHeight">40dp</item>
+        <item name="tabIndicatorGravity">center</item>
+        <item name="tabIndicatorColor">?attr/daxColorContainer</item>
+        <item name="tabIndicatorAnimationMode">elastic</item>
+        <item name="tabIndicatorFullWidth">true</item>
+        <item name="tabSelectedTextColor">?attr/daxColorPrimaryText</item>
+        <item name="tabTextColor">?attr/daxColorSecondaryText</item>
+        <item name="tabIconTint">@drawable/tab_icon_tint</item>
+        <item name="tabRippleColor">@null</item>
+        <item name="tabPaddingStart">12dp</item>
+        <item name="tabPaddingEnd">12dp</item>
+        <item name="tabMode">fixed</item>
+        <item name="tabGravity">center</item>
+        <item name="tabInlineLabel">true</item>
     </style>
-
 </resources>
