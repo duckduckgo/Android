@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivitySettingsNewBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
+import com.duckduckgo.app.experiments.ExperimentsScreen
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.generalsettings.GeneralSettingsScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
@@ -221,6 +222,9 @@ class SettingsActivity : DuckDuckGoActivity() {
             shareFeedbackSetting.setOnClickListener { viewModel.onShareFeedbackClicked() }
             ddgOnOtherPlatformsSetting.setTrailingIconSize(Small)
             ddgOnOtherPlatformsSetting.setOnClickListener { viewModel.onDdgOnOtherPlatformsClicked() }
+            experimentsSetting.setOnClickListener {
+                viewModel.onExperimentalFeaturesClicked()
+            }
         }
     }
 
@@ -385,6 +389,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchFeedback -> launchFeedback()
             is LaunchPproUnifiedFeedback -> launchScreen(GeneralPrivacyProFeedbackScreenNoParams)
             is LaunchOtherPlatforms -> launchActivityAndFinish(BrowserActivity.intent(context = this, queryExtra = OTHER_PLATFORMS_URL))
+            Command.LaunchExperimentalFeatures -> launchScreen(ExperimentsScreen.Default)
         }
     }
 

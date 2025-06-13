@@ -49,4 +49,12 @@
         app:trailingIcon="@drawable/ic_open_in_16"
         app:trailingIconTint="?attr/daxColorSecondaryIcon"/>
 
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/experimentsSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_labs_24"
+        app:primaryText="Experiments"
+        app:trailingIconTint="?attr/daxColorSecondaryIcon"/>
+
 </LinearLayout>

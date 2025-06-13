@@ -429,6 +429,11 @@
             android:label="@string/appearanceActivityTitle"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
+            android:name="com.duckduckgo.app.experiments.ExperimentsActivity"
+            android:exported="false"
+            android:label="Experiments"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
             android:name="com.duckduckgo.app.WidgetThemeConfiguration"
             android:exported="false"
             android:label="@string/widgetConfigurationActivityTitle"

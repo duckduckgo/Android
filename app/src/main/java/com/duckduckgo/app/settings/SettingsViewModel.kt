@@ -158,6 +158,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchFeedback : Command()
         data object LaunchPproUnifiedFeedback : Command()
         data object LaunchOtherPlatforms : Command()
+        data object LaunchExperimentalFeatures : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())
@@ -369,6 +370,12 @@ class SettingsViewModel @Inject constructor(
 
     fun onDdgOnOtherPlatformsClicked() {
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
+    }
+
+    fun onExperimentalFeaturesClicked() {
+        viewModelScope.launch {
+            command.send(Command.LaunchExperimentalFeatures)
+        }
     }
 
     companion object {
