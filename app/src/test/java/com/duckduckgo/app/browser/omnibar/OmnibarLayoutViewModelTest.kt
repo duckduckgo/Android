@@ -52,7 +52,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -90,9 +89,9 @@ class OmnibarLayoutViewModelTest {
                 val showsFullUrl = invocation.getArgument<Boolean>(2)
                 val url = invocation.getArgument<String>(1)
                 val query = invocation.getArgument<String>(0)
-                if (url == SERP_URL || url == "")
+                if (url == SERP_URL || url == "") {
                     query
-                else if (showsFullUrl) {
+                } else if (showsFullUrl) {
                     url
                 } else {
                     url.toUri().baseHost ?: invocation.getArgument<String>(1)
