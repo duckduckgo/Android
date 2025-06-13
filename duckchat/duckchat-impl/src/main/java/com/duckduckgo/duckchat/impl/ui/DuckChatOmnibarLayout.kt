@@ -19,13 +19,16 @@ package com.duckduckgo.duckchat.impl.ui
 import android.animation.ValueAnimator
 import android.content.Context
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
@@ -72,7 +75,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var enableNewChatButton = false
 
     val duckChatFireButton: View
-    val duckChatInput: SubmitOnEnterEditText
+    val duckChatInput: EditText
     val duckChatSend: View
     val duckChatClearText: View
     val duckChatNewChat: View
@@ -113,7 +116,11 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatFireButton.setOnClickListener { onFire?.invoke() }
         duckChatNewChat.setOnClickListener { onNewChat?.invoke() }
         duckChatSend.setOnClickListener { submitMessage() }
-        duckChatClearText.setOnClickListener { duckChatInput.setText("") }
+        duckChatClearText.setOnClickListener {
+            duckChatInput.setText("")
+            duckChatInput.setSelection(0)
+            duckChatInput.scrollTo(0, 0)
+        }
         duckChatStop.setOnClickListener {
             onStop?.invoke()
             hideStopButton()
@@ -154,6 +161,15 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             },
         )
 
+        duckChatInput.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_GO) {
+                submitMessage()
+                true
+            } else {
+                false
+            }
+        }
+
         duckChatFireButton.isVisible = false
         duckChatNewChat.isVisible = false
     }
@@ -166,9 +182,14 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
         duckChatInput.apply {
             maxLines = MAX_LINES
+            setHorizontallyScrolling(false)
+            setRawInputType(InputType.TYPE_CLASS_TEXT)
 
-            submitOnEnterEnabled = isSearchTab
-            onEnter = { submitMessage() }
+            imeOptions = if (isSearchTab) {
+                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
+            } else {
+                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
+            }
 
             text?.length.let { length ->
                 setSelection(

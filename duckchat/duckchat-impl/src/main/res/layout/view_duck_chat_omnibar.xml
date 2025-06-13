@@ -89,7 +89,7 @@
                 android:visibility="gone"
                 app:srcCompat="@drawable/ic_fire_24" />
 
-            <com.duckduckgo.duckchat.impl.ui.SubmitOnEnterEditText
+            <EditText
                 android:id="@+id/duckChatInput"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
