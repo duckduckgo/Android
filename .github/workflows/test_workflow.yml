@@ -34,4 +34,4 @@ jobs:
 
       - name: Use Asana user id to create a new task
         run:
-          echo ${{ steps.get-asana-user-id.outputs.asanaTaskPermalink }} }}
+          echo ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }} }}
