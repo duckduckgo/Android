@@ -26,18 +26,12 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Mark task as incomplete
+      - name: Create Asana task when workflow failed
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
-          action: 'mark-asana-task-complete'
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          is-complete: false
-          asana-task-id: '1210542063926870'
-
-      - name: Mark task as complete
-        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
-        with:
-          action: 'mark-asana-task-complete'
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          is-complete: true
-          asana-task-id: '1210542063926870'
+          asana-project: ${{ vars.GH_ASANA_CODE_REVIEWS_PROJECT_ID }}
+          asana-section: ${{ vars.GH_ASANA_CODE_REVIEWS_IN_PROGRESS_SECTION_ID }}
+          asana-task-name: GH Workflow Test
+          asana-task-description: The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          action: 'create-asana-task'
