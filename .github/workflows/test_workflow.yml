@@ -27,8 +27,13 @@ jobs:
           ref: ${{ github.event.inputs.ref }}
 
       - name: Test get asana user id
+        id: get-asana-user-id
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           github-username: ${{ github.actor }}
           action: 'get-asana-user-id'
+
+      - name: Use Asana user id to create a new task
+        run:
+          echo ${{ steps.get-asana-user-id.outputs.asanaUserId }} }}
