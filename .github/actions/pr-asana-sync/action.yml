@@ -1,0 +1,33 @@
+name: "Asana Sync"
+description: "Sync Github PRs to Asana Tasks"
+author: "David Gonzalez based on Quang Nguyen and Sam Macbeth's work"
+inputs:
+  GITHUB_TOKEN:
+    required: true
+    description: "Access token for GitHub API calls"
+  ASANA_ACCESS_TOKEN:
+    required: true
+    description: "Access token for Asana API calls"
+  ASANA_WORKSPACE_ID:
+    required: true
+    description: "ID of your Asana workspace"
+  ASANA_PROJECT_ID:
+    required: true
+    description: "Project ID where issues should be created in Asana"
+  ASANA_IN_PROGRESS_SECTION_ID:
+    required: false
+    description: "If set: move the task to this section once review is in progress"
+  USER_MAP:
+    required: false
+    description: "JSON string mapping Github user IDs to Asana user IDs"
+  RANDOMIZED_REVIEWERS:
+    required: false
+    description: "Comma separated list of GitHub users who can be assigned as randomized reviewers"
+outputs:
+  task_url:
+    description: URL of created/updated PR review task
+  result:
+    description: "Will be one of: created, updated"
+runs:
+  using: "node20"
+  main: "dist/index.js"
