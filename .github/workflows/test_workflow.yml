@@ -40,7 +40,7 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-task-id: 1210542063926870
+          asana-task-id: '1210542063926870'
           asana-task-comment: Hello not Pinned
           asana-task-comment-pinned: false
           action: 'post-comment-asana-task'
