@@ -22,8 +22,6 @@ jobs:
       github.event.label.name == 'PR-task' && github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: feature/david/06-12-gha_asana_pr_sync
 
       - uses: ./.github/actions/pr-asana-sync
         with:
