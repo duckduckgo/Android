@@ -73,7 +73,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="@dimen/keyline_0">
+            android:padding="@dimen/keyline_0"
+            android:animateLayoutChanges="true">
 
             <ImageView
                 android:id="@+id/duckChatFireButton"
@@ -111,6 +112,19 @@
                 android:textSize="16sp"
                 android:textStyle="normal"
                 app:type="multi_line" />
+
+            <ImageView
+                android:id="@+id/duckChatClearText"
+                android:layout_width="@dimen/toolbarIcon"
+                android:layout_height="@dimen/toolbarIcon"
+                android:layout_gravity="bottom"
+                android:background="@drawable/selectable_item_experimental_background"
+                android:gravity="center"
+                android:importantForAccessibility="no"
+                android:padding="@dimen/keyline_1"
+                android:scaleType="centerInside"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
 
             <ImageView
                 android:id="@+id/duckChatSend"

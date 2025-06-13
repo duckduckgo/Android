@@ -50,6 +50,9 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        window.sharedElementEnterTransition?.duration = TRANSITION_DURATION
+        window.sharedElementReturnTransition?.duration = TRANSITION_DURATION
+
         val params = intent.getActivityParams(SearchInterstitialActivityParams::class.java)
         params?.query?.let { query ->
             binding.duckChatOmnibar.duckChatInput.setText(query)
@@ -100,5 +103,6 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
     companion object {
         // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
         const val QUERY = "query"
+        const val TRANSITION_DURATION = 200L
     }
 }
