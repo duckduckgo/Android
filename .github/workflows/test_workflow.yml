@@ -33,15 +33,23 @@ jobs:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
-          asana-task-description: The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          mattermost-message: The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
 
-      - name: Create Asana task when workflow failed
+      - name: Add comment to Asana task not pinned
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Test
-          asana-task-description: The Create Android App Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
-          action: 'create-asana-task'
+          asana-task-id: 1210542063926870
+          asana-task-comment: Hello not Pinned
+          asana-task-comment-pinned: false
+          action: 'post-comment-asana-task'
+
+      - name: Add comment to Asana task pinned
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: 1210542063926870
+          asana-task-comment: Hello Pinned
+          asana-task-comment-pinned: true
+          action: 'post-comment-asana-task'
