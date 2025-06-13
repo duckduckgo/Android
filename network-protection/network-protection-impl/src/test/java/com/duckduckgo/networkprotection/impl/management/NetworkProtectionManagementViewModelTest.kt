@@ -399,27 +399,72 @@ class NetworkProtectionManagementViewModelTest {
 
     @Test
     fun whenTimeDifferenceIs0ThenShowStartingTimeString() {
-        assertEquals("00:00:00", 0L.toDisplayableTimerText())
-    }
-
-    @Test
-    fun whenTimeDifferenceHasHoursOnlyThenSetMinsAndSecondsToDefault() {
-        assertEquals("27:00:00", 97_200_000L.toDisplayableTimerText())
+        assertEquals("0s", 0L.toDisplayableTimerText())
     }
 
     @Test
     fun whenTimeDifferenceHasMinsOnlyThenSetHoursAndSecondsToDefault() {
-        assertEquals("00:38:00", 2_280_000L.toDisplayableTimerText())
+        assertEquals("38m", 2_280_000L.toDisplayableTimerText())
     }
 
     @Test
     fun whenTimeDifferenceHasSecondsOnlyThenSetHoursAndMinutesToDefault() {
-        assertEquals("00:00:32", 32_000L.toDisplayableTimerText())
+        assertEquals("32s", 32_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasHoursOnlyThenShowHoursOnly() {
+        assertEquals("23h", 82_800_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasDaysOnlyThenShowDaysOnly() {
+        assertEquals("75d", 6_480_000_000.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasHoursOnlyThenSetMinsAndSecondsToDefault() {
+        assertEquals("1d 3h", 97_200_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasDaysAndMinutesThenShowDaysAndMinutesOnly() {
+        assertEquals("1d 1m", 86_460_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasDaysAndSecondsThenShowDaysAndSecondsOnly() {
+        assertEquals("1d 35s", 86_435_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasDaysHoursAndSecondsThenShowDaysHoursAndSeconds() {
+        assertEquals("3d 15h 6s", 313_206_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasDaysMinutesAndSecondsThenShowDaysMinutesAndSeconds() {
+        assertEquals("3d 15m 6s", 260_106_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasDaysHoursAndMinutesThenShowDaysHoursAndMinutes() {
+        assertEquals("3d 23h 59m", 345_540_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceHasHoursMinutesAndSecondsThenShowHoursMinutesAndSeconds() {
+        assertEquals("23h 59m 59s", 86_399_000L.toDisplayableTimerText())
+    }
+
+    @Test
+    fun whenTimeDifferenceThenShowAll() {
+        assertEquals("1d 3h 38m 32s", 99_512_000L.toDisplayableTimerText())
     }
 
     @Test
     fun whenTimeDifferenceThenSetHoursAndMinutesToDefault() {
-        assertEquals("27:38:32", 99_512_000L.toDisplayableTimerText())
+        assertEquals("1d 3h 38m 32s", 99_512_000L.toDisplayableTimerText())
     }
 
     @Test
