@@ -26,11 +26,16 @@ jobs:
           token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
 
-      - name: Move task(s) to "Awaiting review" section
+      - name: Mark task as incomplete
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
-          action: 'add-task-asana-project'
-          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
-          asana-project: ${{ vars.GH_ASANA_CODE_REVIEWS_PROJECT_ID }}
-          asana-section: ${{ vars.GH_ASANA_CODE_REVIEWS_IN_PROGRESS_SECTION_ID }}
+          action: 'mark-asana-task-complete'
+          is-complete: true
+          asana-task-id: '1210542063926870'
+
+      - name: Mark task as complete
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
+        with:
+          action: 'mark-asana-task-complete'
+          is-complete: false
           asana-task-id: '1210542063926870'
