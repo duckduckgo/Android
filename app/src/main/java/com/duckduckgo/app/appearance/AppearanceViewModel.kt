@@ -176,7 +176,7 @@ class AppearanceViewModel @Inject constructor(
     fun onFullUrlSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.isFullUrlEnabled = checked
-            viewState.update { currentViewState().copy(isFullUrlEnabled = checked) }
+            viewState.update { it.copy(isFullUrlEnabled = checked) }
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
