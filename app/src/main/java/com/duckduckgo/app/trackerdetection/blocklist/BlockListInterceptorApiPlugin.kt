@@ -58,7 +58,7 @@ class BlockListInterceptorApiPlugin @Inject constructor(
 
         return if (tdsRequired) {
             val activeExperiment = runBlocking {
-                inventory.activeTdsFlag()
+                inventory.activeTdsFlag().also { it?.enroll() }
             }
 
             activeExperiment?.let {
@@ -68,8 +68,8 @@ class BlockListInterceptorApiPlugin @Inject constructor(
                     }.getOrDefault(emptyMap())
                 } ?: emptyMap()
                 val path = when {
-                    activeExperiment.isEnabled(TREATMENT) -> config["treatmentUrl"]
-                    activeExperiment.isEnabled(CONTROL) -> config["controlUrl"]
+                    runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
+                    runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
                     else -> config["nextUrl"]
                 } ?: return chain.proceed(request.build())
                 chain.proceed(request.url("$TDS_BASE_URL$path").build()).also { response ->

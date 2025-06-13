@@ -16,27 +16,30 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.databinding.ActivitySearchInterstitialBinding
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.navigation.api.getActivityParams
 import javax.inject.Inject
 
-object SearchInterstitialActivityParams : GlobalActivityStarter.ActivityParams
+data class SearchInterstitialActivityParams(
+    val query: String,
+) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SearchInterstitialActivityParams::class)
 class SearchInterstitialActivity : DuckDuckGoActivity() {
-
-    @Inject
-    lateinit var appBrowserNav: BrowserNav
 
     @Inject
     lateinit var duckChat: DuckChat
@@ -47,22 +50,59 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        window.sharedElementEnterTransition?.duration = TRANSITION_DURATION
+        window.sharedElementReturnTransition?.duration = TRANSITION_DURATION
+
+        val params = intent.getActivityParams(SearchInterstitialActivityParams::class.java)
+        params?.query?.let { query ->
+            binding.duckChatOmnibar.duckChatInput.setText(query)
+        }
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val query = binding.duckChatOmnibar.duckChatInput.text.toString()
+                    val data = Intent().putExtra(QUERY, query)
+                    setResult(Activity.RESULT_CANCELED, data)
+                    exitInterstitial()
+                }
+            },
+        )
+
         binding.duckChatOmnibar.apply {
             selectTab(0)
             enableFireButton = false
             enableNewChatButton = false
             onSearchSent = { query ->
-                startActivity(appBrowserNav.openInCurrentTab(context, query))
-                finish()
+                val data = Intent().putExtra(QUERY, query)
+                setResult(Activity.RESULT_OK, data)
+                exitInterstitial()
             }
             onDuckChatSent = { query ->
                 duckChat.openDuckChatWithAutoPrompt(query)
+                val data = Intent().putExtra(QUERY, query)
+                setResult(Activity.RESULT_CANCELED, data)
                 finish()
             }
-            onBack = { onBackPressed() }
+            onBack = {
+                onBackPressed()
+            }
         }
         binding.duckChatOmnibar.duckChatInput.post {
             showKeyboard(binding.duckChatOmnibar.duckChatInput)
         }
+    }
+
+    private fun exitInterstitial() {
+        binding.duckChatOmnibar.animateOmnibarFocusedState(false)
+        hideKeyboard(binding.duckChatOmnibar.duckChatInput)
+        supportFinishAfterTransition()
+    }
+
+    companion object {
+        // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
+        const val QUERY = "query"
+        const val TRANSITION_DURATION = 200L
     }
 }

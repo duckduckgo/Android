@@ -14,10 +14,8 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:color="?attr/daxColorPrimaryText"
-        android:state_selected="true" />
-    <item
-        android:color="?attr/daxColorSecondaryText" />
-</selector>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="?attr/daxColorSurface" />
+    <corners android:radius="20dp" />
+</shape>

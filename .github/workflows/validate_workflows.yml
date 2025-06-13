@@ -1,0 +1,29 @@
+name: Lint Workflow Files
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/**.yml'
+      - '.github/workflows/**.yaml'
+
+permissions:
+  contents: read # To checkout the code
+  pull-requests: write # To allow reviewdog/action-actionlint to post comments (if desired)
+  checks: write # To allow reviewdog/action-actionlint to post checks
+
+jobs:
+  lint-actions:
+    name: actionlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Workflow Syntax
+        uses: reviewdog/action-actionlint@v1.65.2
+        with:
+          github_token: ${{ secrets.GT_DAXMOBILE }}
+          reporter: github-pr-review
+          level: warning
+          fail_level: warning
