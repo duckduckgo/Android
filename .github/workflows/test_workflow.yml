@@ -30,12 +30,14 @@ jobs:
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           action: 'mark-asana-task-complete'
-          is-complete: true
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          is-complete: false
           asana-task-id: '1210542063926870'
 
       - name: Mark task as complete
         uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           action: 'mark-asana-task-complete'
-          is-complete: false
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          is-complete: true
           asana-task-id: '1210542063926870'
