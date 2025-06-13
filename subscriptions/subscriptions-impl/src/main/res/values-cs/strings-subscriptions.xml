@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Přihlášeno</string>
     <string name="privacyPolicyAndTermsOfService">Zásady ochrany osobních údajů a podmínky služby</string>
     <string name="subscriptionStatusFreeTrial">Bezplatná zkušební verze je aktivní</string>
-    <string name="monthly">měsíční</string>
-    <string name="yearly">roční</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Tvoje bezplatná zkušební verze končí %1$s a ten samý den se automaticky prodlouží jako %2$s placené předplatné.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezplatné zkušební období ti končí %1$s a ten samý den se automaticky prodlouží jako měsíční placené předplatné.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezplatné zkušební období ti končí %1$s a ten samý den se automaticky prodlouží jako roční placené předplatné.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoje bezplatná zkušební verze končí %1$s a neprodlouží se jako placené předplatné.</string>
 
     <!--Settings Subscriptions-->

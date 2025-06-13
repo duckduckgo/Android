@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Tellitud</string>
     <string name="privacyPolicyAndTermsOfService">Privaatsuspoliitika ja teenusetingimused</string>
     <string name="subscriptionStatusFreeTrial">Tasuta prooviperiood aktiveeritud</string>
-    <string name="monthly">igakuine</string>
-    <string name="yearly">aastane</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt %2$s tasuliseks tellimuseks.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt tasuliseks kuutellimuseks.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt tasuliseks aastatellimuseks.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ega muutu tasuliseks tellimuseks.</string>
 
     <!--Settings Subscriptions-->

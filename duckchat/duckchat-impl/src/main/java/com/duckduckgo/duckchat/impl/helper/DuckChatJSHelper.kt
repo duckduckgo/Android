@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.helper
 
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.ChatState.HIDE
@@ -42,7 +41,6 @@ interface DuckChatJSHelper {
 class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val dataStore: DuckChatDataStore,
-    private val experimentDataStore: VisualDesignExperimentDataStore,
 ) : DuckChatJSHelper {
 
     override suspend fun processJsCallbackMessage(
@@ -103,7 +101,7 @@ class RealDuckChatJSHelper @Inject constructor(
             put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
             put(SUPPORTS_CLOSING_AI_CHAT, true)
             put(SUPPORTS_OPENING_SETTINGS, true)
-            put(SUPPORTS_NATIVE_CHAT_INPUT, experimentDataStore.isExperimentEnabled.value && experimentDataStore.isDuckAIPoCEnabled.value)
+            put(SUPPORTS_NATIVE_CHAT_INPUT, false)
             put(SUPPORTS_IMAGE_UPLOAD, duckChat.isImageUploadEnabled())
         }
         return JsCallbackData(jsonPayload, featureName, method, id)

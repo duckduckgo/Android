@@ -205,6 +205,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
@@ -465,6 +466,7 @@ class BrowserTabViewModel @Inject constructor(
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val tabManager: TabManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1241,6 +1243,14 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun isDesktopSiteEnabled(): Boolean = currentBrowserViewState().isDesktopBrowsingMode
+
+    override fun isTabInForeground(): Boolean {
+        return if (swipingTabsFeature.isEnabled) {
+            tabId == tabManager.getSelectedTabId()
+        } else {
+            true
+        }
+    }
 
     override fun closeCurrentTab() {
         viewModelScope.launch {
@@ -2831,7 +2841,8 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta)
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
+            visualDesignExperimentDataStore.isDuckAIPoCEnabled.value
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
@@ -4058,7 +4069,7 @@ class BrowserTabViewModel @Inject constructor(
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
         } else {
-            command.value = SetBrowserBackground(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
         }
     }
 

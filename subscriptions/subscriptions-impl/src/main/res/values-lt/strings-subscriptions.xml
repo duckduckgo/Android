@@ -62,9 +62,8 @@
     <string name="subscriptionStatusSubscribed">Prenumeruota</string>
     <string name="privacyPolicyAndTermsOfService">Privatumo politika ir paslaugų teikimo sąlygos</string>
     <string name="subscriptionStatusFreeTrial">Nemokama bandomoji versija aktyvi</string>
-    <string name="monthly">mėnesinis</string>
-    <string name="yearly">metinė</string>
-    <string name="freeTrialActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy, second is if trial is monthly or yearly">Jūsų nemokama bandomoji versija baigiasi %1$s ir tą dieną automatiškai taps %2$s mokama prenumerata.</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Nemokama bandomoji versija baigiasi %1$s ir tą dieną automatiškai taps mėnesine mokama prenumerata.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Nemokama bandomoji versija baigiasi %1$s ir tą dieną automatiškai taps metine mokama prenumerata.</string>
     <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Jūsų nemokama bandomoji versija baigiasi %1$s ir nebus pakeista į mokamą prenumeratą.</string>
 
     <!--Settings Subscriptions-->

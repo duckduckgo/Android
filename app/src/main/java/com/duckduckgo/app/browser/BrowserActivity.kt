@@ -35,7 +35,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -103,6 +102,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
+import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -178,6 +179,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var syncUrlIdentifier: SyncUrlIdentifier
+
+    @Inject
     lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
 
     @Inject
@@ -219,10 +223,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private val tabPagerAdapter by lazy {
-        TabPagerAdapter(
-            activity = this,
-            swipingTabsFeature = swipingTabsFeature,
-        )
+        TabPagerAdapter(activity = this)
     }
 
     private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
@@ -521,6 +522,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
             currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
             logcat(VERBOSE) { "Verification link was consumed, so don't allow it to open in a new tab" }
             return
+        }
+
+        intent.intentText?.let {
+            if (syncUrlIdentifier.shouldDelegateToSyncSetup(it)) {
+                globalActivityStarter.start(this, SyncActivityFromSetupUrl(it))
+                logcat { "Sync setup link was consumed, so don't allow it to open in a new tab" }
+                return
+            }
         }
 
         // the BrowserActivity will automatically clear its stack of activities when being brought to the foreground, so this can no longer be true
@@ -1000,6 +1009,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun onMoveToTabRequested(index: Int) {
         tabPager.post {
+            tabPagerAdapter.currentTabIndex = index
             tabPager.setCurrentItem(index, false)
         }
     }
@@ -1020,7 +1030,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabPagerAdapter.onTabsUpdated(updatedTabIds)
     }
 
-    fun launchNewTab(query: String? = null, sourceTabId: String? = null, skipHome: Boolean = false) {
+    fun launchNewTab(
+        query: String? = null,
+        sourceTabId: String? = null,
+        skipHome: Boolean = false,
+    ) {
         lifecycleScope.launch {
             if (swipingTabsFeature.isEnabled) {
                 tabManager.openNewTab(query, sourceTabId, skipHome)

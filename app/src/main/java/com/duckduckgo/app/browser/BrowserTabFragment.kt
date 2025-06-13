@@ -71,6 +71,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
@@ -281,6 +282,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivity.Companion.QUERY
+import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -334,6 +337,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -859,6 +863,16 @@ class BrowserTabFragment :
         )
     }
 
+    private val searchInterstitialLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            val query = result.data?.getStringExtra(QUERY) ?: return@registerForActivityResult
+            if (result.resultCode == RESULT_OK) {
+                submitQuery(query)
+            } else {
+                omnibar.setText(query)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logcat { "onCreate called for tabId=$tabId" }
@@ -1011,6 +1025,22 @@ class BrowserTabFragment :
         configureItemPressedListener()
         configureCustomTab()
         configureEditModeChangeDetection()
+        configureClickCatcher()
+    }
+
+    private fun configureClickCatcher() {
+        omnibar.omniBarClickCatcher?.setOnClickListener {
+            val intent = globalActivityStarter.startIntent(
+                requireContext(),
+                SearchInterstitialActivityParams(query = omnibar.getText()),
+            )
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                requireActivity(),
+                omnibar.omniBarContainer,
+                "omnibar_transition",
+            )
+            searchInterstitialLauncher.launch(intent, options)
+        }
     }
 
     private fun configureNavigationBar() {
@@ -1292,7 +1322,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
+            anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
                 omnibar.shieldIconExperiment
             } else {
                 omnibar.shieldIcon
