@@ -102,6 +102,14 @@
                 app:primaryTextTruncated="false"
                 app:secondaryText="@string/settingsAddressBarPositionTop" />
 
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/showFullUrlSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/settingsShowFullUrlTitle"
+                app:primaryTextTruncated="false"
+                app:showSwitch="true" />
+
         </LinearLayout>
 
     </ScrollView>

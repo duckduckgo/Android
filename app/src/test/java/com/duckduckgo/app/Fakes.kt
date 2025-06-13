@@ -129,6 +129,10 @@ class FakeSettingsDataStore : SettingsDataStore {
         get() = store["experimentalWebsiteDarkMode"] as Boolean? ?: false
         set(value) { store["experimentalWebsiteDarkMode"] = value }
 
+    override var isFullUrlEnabled: Boolean
+        get() = store["isFullUrlEnabled"] as Boolean? ?: false
+        set(value) { store["isFullUrlEnabled"] = value }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption
