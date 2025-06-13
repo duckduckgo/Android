@@ -175,7 +175,7 @@ class AppearanceViewModel @Inject constructor(
     fun onFullUrlSettingChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
             settingsDataStore.isFullUrlEnabled = checked
-            viewState.update { currentViewState().copy(isFullUrlEnabled = checked) }
+            viewState.update { it.copy(isFullUrlEnabled = checked) }
         }
     }
 }
