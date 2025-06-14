@@ -18,6 +18,15 @@ package com.duckduckgo.common.ui.experiments.visual.store
 
 import kotlinx.coroutines.flow.StateFlow
 
+interface VisualDesignExperimentDataStoreInitializer {
+    /**
+     * Initializes the [VisualDesignExperimentDataStore].
+     *
+     * This is a special, idempotent function to be called while the splash screen is visible to pre-warm the store and allow for non-blocking, synchronous access afterwards.
+     */
+    suspend fun initialize(): VisualDesignExperimentDataStore
+}
+
 interface VisualDesignExperimentDataStore {
 
     /**

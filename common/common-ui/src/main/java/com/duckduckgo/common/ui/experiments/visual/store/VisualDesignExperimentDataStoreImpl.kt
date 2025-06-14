@@ -24,8 +24,6 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,13 +35,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = VisualDesignExperimentDataStore::class,
-)
-@ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
-@SingleInstanceIn(scope = AppScope::class)
-class VisualDesignExperimentDataStoreImpl @Inject constructor(
+class VisualDesignExperimentDataStoreImpl(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
@@ -91,10 +83,6 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
             initialValue = _duckAIFeatureFlagEnabled.value && isExperimentEnabled.value,
         )
 
-    /**
-     * This is a blocking call but it only blocks the main thread when the class initializes, so when the splash screen is visible.
-     * All subsequent calls are moved off of the main thread.
-     */
     private fun isAnyConflictingExperimentEnabled(): Boolean = runBlocking {
         val activeExperimentsNames = featureTogglesInventory.getAllActiveExperimentToggles().map { it.featureName().name }
         conflictingExperimentsNames.any { activeExperimentsNames.contains(it) }
@@ -125,5 +113,32 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
                 _experimentFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
             _anyConflictingExperimentEnabled.value = isAnyConflictingExperimentEnabled()
         }
+    }
+}
+
+/**
+ * Factory for integration with [VisualDesignExperimentDataStoreLazyProvider] and testing purposes,
+ * to get an actual instance for your use case just inject [VisualDesignExperimentDataStore].
+ */
+interface VisualDesignExperimentDataStoreImplFactory {
+    fun create(
+        appCoroutineScope: CoroutineScope,
+        experimentalUIThemingFeature: ExperimentalUIThemingFeature,
+        featureTogglesInventory: FeatureTogglesInventory,
+    ): VisualDesignExperimentDataStoreImpl
+}
+
+@ContributesBinding(scope = AppScope::class)
+class VisualDesignExperimentDataStoreImplFactoryImpl @Inject constructor() : VisualDesignExperimentDataStoreImplFactory {
+    override fun create(
+        appCoroutineScope: CoroutineScope,
+        experimentalUIThemingFeature: ExperimentalUIThemingFeature,
+        featureTogglesInventory: FeatureTogglesInventory,
+    ): VisualDesignExperimentDataStoreImpl {
+        return VisualDesignExperimentDataStoreImpl(
+            appCoroutineScope = appCoroutineScope,
+            experimentalUIThemingFeature = experimentalUIThemingFeature,
+            featureTogglesInventory = featureTogglesInventory,
+        )
     }
 }
