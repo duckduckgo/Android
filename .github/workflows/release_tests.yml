@@ -65,11 +65,11 @@ jobs:
 
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
           mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Running Maestro tests for tag ${{ github.event.inputs.test-tag }} https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'send-mattermost-message'
 
@@ -148,12 +148,12 @@ jobs:
         # Condition 1: Our script says success
         # Condition 2: The Maestro action itself also reported overall success
         if: always() && steps.analyze-flow-results.outputs.flow_summary_status == 'success' && steps.release-tests.conclusion == 'success'
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
           mattermost-message: |
             ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: Tests for for tag ${{ github.event.inputs.test-tag }} PASSED successfully.
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
@@ -162,12 +162,12 @@ jobs:
       - name: Notify Mattermost - Maestro Tests FAILURES or ISSUES DETECTED
         # Condition: Our script detected 'failure' OR the Maestro action itself reported failure
         if: always() && (steps.analyze-flow-results.outputs.flow_summary_status == 'failure' || steps.release-tests.conclusion == 'failure')
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
           mattermost-message: |
             ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Tests for tag ${{ github.event.inputs.test-tag }} FAILED or encountered issues.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
@@ -177,12 +177,12 @@ jobs:
         # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
         # AND Maestro action itself didn't mark the whole run as a 'failure'
         if: always() && steps.analyze-flow-results.outputs.flow_summary_status == 'canceled_present' && steps.release-tests.conclusion != 'failure'
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
-          mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
+          mattermost-channel-name: ${{ vars.MM_TEST_NOTIFY_CHANNEL }}
           mattermost-message: |
             :warning: Release ${{ github.event.inputs.app-version }}: Some tests for tag ${{ github.event.inputs.test-tag }} were CANCELED. Please review.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
@@ -191,7 +191,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
