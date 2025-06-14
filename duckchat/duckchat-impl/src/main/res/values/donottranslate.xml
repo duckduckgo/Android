@@ -23,4 +23,6 @@
     <string name="duck_chat_stop_generating">Stop generating</string>
     <string name="duck_chat_search_tab">Search</string>
     <string name="duck_chat_ai_tab">Duck.ai</string>
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
 </resources>
