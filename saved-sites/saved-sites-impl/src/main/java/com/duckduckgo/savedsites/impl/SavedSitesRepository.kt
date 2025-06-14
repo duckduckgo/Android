@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.savedsites.api.models.BookmarkEntry
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.BookmarkFolderItem
 import com.duckduckgo.savedsites.api.models.FolderBranch
@@ -57,9 +58,9 @@ class RealSavedSitesRepository(
         }
     }
 
-    private fun getFolderContent(folderId: String): Flow<List<Any>> {
+    private fun getFolderContent(folderId: String): Flow<List<BookmarkEntry>> {
         return savedSitesEntitiesDao.entitiesInFolder(folderId).map { entities ->
-            val bookmarks = mutableListOf<Any>()
+            val bookmarks = mutableListOf<BookmarkEntry>()
             entities.map { entity ->
                 mapEntity(entity, folderId, bookmarks)
             }
@@ -87,7 +88,7 @@ class RealSavedSitesRepository(
     private fun mapEntity(
         entity: Entity,
         folderId: String,
-        bookmarks: MutableList<Any>,
+        bookmarks: MutableList<BookmarkEntry>,
     ) {
         if (entity.type == FOLDER) {
             val numFolders = savedSitesRelationsDao.countEntitiesInFolder(entity.entityId, FOLDER)
