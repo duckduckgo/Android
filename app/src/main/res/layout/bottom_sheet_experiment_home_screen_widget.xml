@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingTop="12dp">
+
+    <!--We require 32dp top padding but it's split to
+    12dp padding on the scrollview so that the scrollbar goes
+    only up to the rounded corner's start,
+    and the rest is added to the layout below.-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
+        android:orientation="vertical"
+        android:paddingTop="20dp"
+        android:paddingBottom="40dp">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml">
+
+            <ImageView
+                android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogImage"
+                android:layout_width="360dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/experiment_widget_promo_light"
+                tools:ignore="ContentDescription" />
+
+            <!-- Using TextView instead of DaxTextView as the text color has to be the same regardless
+             of the Theme. This text is placed on top of an image that is always light colored -->
+            <TextView
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="6dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:textColor="@color/black60"
+                android:textSize="12sp"
+                android:lineSpacingExtra="2sp"
+                android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSearchText"
+                tools:ignore="InvalidColorAttribute" />
+        </FrameLayout>
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:text="@string/experimentHomeScreenWidgetBottomSheetDialogTitle"
+            app:textType="primary"
+            app:typography="h1" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="40dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/experimentHomeScreenWidgetBottomSheetDialogSubTitle"
+            app:textType="primary"
+            app:typography="body1" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogPrimaryButton"
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="@string/experimentHomeScreenWidgetBottomSheetDialogPrimaryButton"
+            app:daxButtonSize="large" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
+            android:id="@+id/experimentHomeScreenWidgetBottomSheetDialogGhostButton"
+            android:layout_width="327dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:text="@string/experimentHomeScreenWidgetBottomSheetDialogGhostButton"
+            app:daxButtonSize="large" />
+    </LinearLayout>
+</ScrollView>
