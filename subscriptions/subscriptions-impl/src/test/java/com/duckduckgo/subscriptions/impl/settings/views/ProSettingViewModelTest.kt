@@ -37,7 +37,7 @@ class ProSettingViewModelTest {
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(subscriptionsManager, pixelSender, privacyProFeature)
+        viewModel = ProSettingViewModel(subscriptionsManager, pixelSender, privacyProFeature, coroutineTestRule.testDispatcherProvider)
     }
 
     @Test
