@@ -33,6 +33,7 @@ class DuckAiPlusSettingsViewModelTest {
         DuckAiPlusSettingsViewModel(
             subscriptions = subscriptions,
             duckChatFeature = duckChatFeature,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
     }
 
