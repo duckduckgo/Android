@@ -22,6 +22,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
@@ -39,17 +40,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class DuckAiPlusSettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckChatFeature: DuckChatFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -69,11 +69,7 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     }
 
     private val _viewState = MutableStateFlow(ViewState())
-    val viewState = _viewState.asStateFlow().onStart {
-        if (duckChatFeature.duckAiPlus().isEnabled().not()) {
-            _viewState.value = ViewState(settingState = Hidden)
-        }
-    }
+    val viewState = _viewState.asStateFlow()
 
     fun onDuckAiClicked() {
         sendCommand(Command.OpenDuckAiPlusSettings)
@@ -82,11 +78,13 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
 
-        viewModelScope.launch {
-            if (duckChatFeature.duckAiPlus().isEnabled().not()) return@launch
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (duckChatFeature.duckAiPlus().isEnabled().not()) {
+                _viewState.update { it.copy(settingState = Hidden) }
+                return@launch
+            }
 
             subscriptions.getEntitlementStatus().map { entitlements ->
-                logcat { "CRIS: getEntitlementStatus $entitlements" }
                 entitlements.any { product ->
                     product == DuckAiPlus
                 }
@@ -129,11 +127,10 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
     }
 
     private suspend fun isDuckAiProAvailable(): Boolean {
-        return subscriptions.getAvailableProducts().also {
-            logcat { "CRIS: available products: $it" }
-        }.any { availableProduct ->
-            availableProduct == DuckAiPlus
-        }
+        return subscriptions.getAvailableProducts()
+            .any { availableProduct ->
+                availableProduct == DuckAiPlus
+            }
     }
 
     private fun sendCommand(newCommand: Command) {
