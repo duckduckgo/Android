@@ -21,6 +21,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
@@ -53,6 +54,7 @@ class RealContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
+    private val contentScopeExperiments: ContentScopeExperiments,
 ) : CoreContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -177,13 +179,14 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
+        val experiments = contentScopeExperiments.getExperimentsJson()
         val isDesktopMode = site?.isDesktopMode ?: false
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
             "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
         if (userPreferences.isEmpty()) {
-            return "{$defaultParameters}"
+            return "{$experiments,$defaultParameters}"
         }
-        return "{$userPreferences,$defaultParameters}"
+        return "{$userPreferences,$experiments,$defaultParameters}"
     }
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
