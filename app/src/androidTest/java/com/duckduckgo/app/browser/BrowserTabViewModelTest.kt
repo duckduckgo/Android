@@ -119,7 +119,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
@@ -530,7 +529,6 @@ class BrowserTabViewModelTest {
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
@@ -614,7 +612,6 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
@@ -750,7 +747,6 @@ class BrowserTabViewModelTest {
             ),
             duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
-            changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
