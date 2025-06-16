@@ -2,8 +2,10 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
 import android.view.MotionEvent
+import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
@@ -23,6 +25,7 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.model.TestingEntity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -32,6 +35,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -50,6 +54,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -81,6 +86,23 @@ class OmnibarLayoutViewModelTest {
     private val duckChat: DuckChat = mock()
     private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
     private val browserFeatures = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val settingsDataStore: SettingsDataStore = mock()
+    private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
+        mock {
+            on { getDisplayAddress(any(), any(), any()) } doAnswer { invocation ->
+                val showsFullUrl = invocation.getArgument<Boolean>(2)
+                val url = invocation.getArgument<String>(1)
+                val query = invocation.getArgument<String>(0)
+                if (url == SERP_URL || url == "") {
+                    query
+                } else if (showsFullUrl) {
+                    url
+                } else {
+                    url.toUri().baseHost ?: invocation.getArgument<String>(1)
+                }
+            }
+        }
+    }
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -99,6 +121,7 @@ class OmnibarLayoutViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
 
         browserFeatures.duckAiButtonInBrowser().setRawStoredState(Toggle.State(enable = true))
 
@@ -141,6 +164,8 @@ class OmnibarLayoutViewModelTest {
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
             browserFeatures = browserFeatures,
+            addressDisplayFormatter = mockAddressDisplayFormatter,
+            settingsDataStore = settingsDataStore,
         )
     }
 
@@ -1229,6 +1254,82 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenOmnibarLosesFocusAndFullUrlEnabledThenAddressDisplayFormatterCalledWithFullUrlTrue() = runTest {
+        val query = "query"
+        val url = "https://example.com/test.html"
+        val formattedUrl = "https://example.com/test.html"
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        initializeViewModel()
+        testee.onOmnibarFocusChanged(hasFocus = true, query = query) // Initial focus
+        testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
+
+        testee.onOmnibarFocusChanged(hasFocus = false, query = query)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(formattedUrl, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verify(mockAddressDisplayFormatter).getDisplayAddress(query, url, true)
+        }
+    }
+
+    @Test
+    fun whenOmnibarLosesFocusAndFullUrlDisabledThenAddressDisplayFormatterCalledWithFullUrlFalse() = runTest {
+        val query = "query"
+        val url = "https://example.com/test.html"
+        val formattedUrl = "example.com"
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        initializeViewModel()
+        testee.onOmnibarFocusChanged(hasFocus = true, query = query) // Initial focus
+        testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
+
+        testee.onOmnibarFocusChanged(hasFocus = false, query = query)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(formattedUrl, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verify(mockAddressDisplayFormatter).getDisplayAddress(query, url, false)
+        }
+    }
+
+    @Test
+    fun whenExternalOmnibarStateChangedAndFullUrlEnabledThenAddressDisplayFormatterCalledWithFullUrlTrue() = runTest {
+        val omnibarText = "https://example.com/test.html"
+        val formattedUrl = "https://example.com/test.html"
+        val omnibarViewState = OmnibarViewState(omnibarText = omnibarText, isEditing = false)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        initializeViewModel()
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(formattedUrl, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verify(mockAddressDisplayFormatter).getDisplayAddress(omnibarText, omnibarText, true)
+        }
+    }
+
+    @Test
+    fun whenExternalOmnibarStateChangedAndFullUrlDisabledThenAddressDisplayFormatterCalledWithFullUrlFalse() = runTest {
+        val omnibarText = "https://example.com/test.html"
+        val formattedUrl = "example.com"
+        val omnibarViewState = OmnibarViewState(omnibarText = omnibarText, isEditing = false)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        initializeViewModel()
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(formattedUrl, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verify(mockAddressDisplayFormatter).getDisplayAddress(omnibarText, omnibarText, false)
         }
     }
 
