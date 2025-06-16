@@ -1223,6 +1223,15 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledTheButtonIsNotVisible() = runTest {
+        browserFeatures.duckAiButtonInBrowser().setRawStoredState(Toggle.State(enable = false))
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
