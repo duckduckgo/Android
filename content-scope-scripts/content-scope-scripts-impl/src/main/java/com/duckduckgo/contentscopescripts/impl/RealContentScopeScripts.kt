@@ -179,7 +179,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
-        val experiments = contentScopeExperiments.getExperimentsJson()
+        val experiments = getExperimentsKeyValuePair()
         val isDesktopMode = site?.isDesktopMode ?: false
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
             "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
@@ -194,6 +194,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
+    private fun getExperimentsKeyValuePair() = "\"currentCohorts\":${contentScopeExperiments.getExperimentsJson()}"
 
     private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<FeatureException>): String = (
         "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
