@@ -185,6 +185,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    override fun isBottomNavEnabled(): Boolean {
+        return true
+    }
+
     override fun render(viewState: ViewState) {
         super.render(viewState)
 
