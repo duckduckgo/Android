@@ -27,4 +27,6 @@ interface OmnibarBehaviour {
     fun setTranslation(y: Float)
 
     fun isOmnibarScrollingEnabled(): Boolean
+
+    fun isBottomNavEnabled(): Boolean
 }

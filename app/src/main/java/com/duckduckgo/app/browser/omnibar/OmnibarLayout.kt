@@ -999,6 +999,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         return isScrollingEnabled
     }
 
+    override fun isBottomNavEnabled(): Boolean {
+        return false
+    }
+
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {
         return when (omnibarPosition) {
             OmnibarPosition.TOP -> TopAppBarBehavior(context, this)
