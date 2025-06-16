@@ -1507,16 +1507,16 @@ class BrowserTabFragment :
 
     @SuppressLint("WrongConstant")
     private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        binding.browserLayout.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = binding.browserLayout.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
-        view?.postDelayed({ downloadFailedSnackbar.show() }, DOWNLOAD_SNACKBAR_DELAY)
+        val downloadFailedSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+        view?.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = binding.browserLayout.makeSnackbarWithNoBottomInset(
+        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(
             getString(command.messageId, command.fileName),
             Snackbar.LENGTH_LONG,
         )
