@@ -99,9 +99,7 @@ class AppShortcutCreator @Inject constructor(
 
             if (duckChat.showInBrowserMenu.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
-            }
-
-            if (appBuildConfig.isInternalBuild()) {
+            } else if (appBuildConfig.isInternalBuild()) {
                 shortcutList.add(buildAndroidDesignSystemShortcut(context))
             }
 
