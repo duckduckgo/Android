@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -56,7 +55,6 @@ class AppearanceViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -66,7 +64,6 @@ class AppearanceViewModel @Inject constructor(
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
-        val isOmnibarPositionFeatureEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -89,7 +86,6 @@ class AppearanceViewModel @Inject constructor(
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
-                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
                 )
             }
         }
