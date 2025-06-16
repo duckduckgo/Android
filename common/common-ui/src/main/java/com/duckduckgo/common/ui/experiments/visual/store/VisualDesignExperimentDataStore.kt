@@ -30,11 +30,6 @@ interface VisualDesignExperimentDataStore {
      */
     val isDuckAIPoCEnabled: StateFlow<Boolean>
 
-    /**
-     * State flow which returns `true` if there are any conflicting experiments detected.
-     */
-    val anyConflictingExperimentEnabled: StateFlow<Boolean>
-
     fun changeExperimentFlagPreference(enabled: Boolean)
     fun changeDuckAIPoCFlagPreference(enabled: Boolean)
 }
