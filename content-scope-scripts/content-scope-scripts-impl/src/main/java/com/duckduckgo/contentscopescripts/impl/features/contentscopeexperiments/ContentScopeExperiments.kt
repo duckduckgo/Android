@@ -54,7 +54,7 @@ class RealContentScopeExperiments @Inject constructor(
                     null
                 }
             }.let {
-                "\"currentCohorts\":${jsonAdapter.toJson(it)}"
+                jsonAdapter.toJson(it)
             }
         }
     }
