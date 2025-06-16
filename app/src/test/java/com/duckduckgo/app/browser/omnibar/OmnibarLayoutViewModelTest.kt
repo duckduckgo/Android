@@ -23,6 +23,7 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -38,6 +39,8 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -82,6 +85,7 @@ class OmnibarLayoutViewModelTest {
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
     private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
+    private val browserFeatures = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
@@ -118,6 +122,8 @@ class OmnibarLayoutViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+
+        browserFeatures.duckAiButtonInBrowser().setRawStoredState(Toggle.State(enable = true))
 
         initializeViewModel()
     }
@@ -157,6 +163,7 @@ class OmnibarLayoutViewModelTest {
             visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
+            browserFeatures = browserFeatures,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
         )
@@ -1105,10 +1112,10 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenViewModelAttachedThenShowChatMenuFalse() = runTest {
+    fun whenViewModelAttachedThenShowChatMenuTrue() = runTest {
         testee.viewState.test {
             val viewState = awaitItem()
-            assertFalse(viewState.showChatMenu)
+            assertTrue(viewState.showChatMenu)
         }
     }
 
@@ -1155,11 +1162,11 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarNotFocusedThenShowChatMenuFalse() = runTest {
+    fun whenOmnibarNotFocusedThenShowChatMenuTrue() = runTest {
         testee.onOmnibarFocusChanged(false, QUERY)
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertFalse(viewState.showChatMenu)
+            assertTrue(viewState.showChatMenu)
         }
     }
 
@@ -1173,20 +1180,20 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenClearTextButtonPressedThenShowChatMenuFalse() = runTest {
+    fun whenClearTextButtonPressedThenShowChatMenuTrue() = runTest {
         testee.onClearTextButtonPressed()
         testee.viewState.test {
             val viewState = awaitItem()
-            assertFalse(viewState.showChatMenu)
+            assertTrue(viewState.showChatMenu)
         }
     }
 
     @Test
-    fun whenInputStateChangedWithEmptyQueryThenShowChatMenuFalse() = runTest {
+    fun whenInputStateChangedWithEmptyQueryThenShowChatMenuTrue() = runTest {
         testee.onInputStateChanged("", hasFocus = true, clearQuery = true, deleteLastCharacter = false)
         testee.viewState.test {
             val viewState = awaitItem()
-            assertFalse(viewState.showChatMenu)
+            assertTrue(viewState.showChatMenu)
         }
     }
 
@@ -1238,6 +1245,15 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showClickCatcher)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledTheButtonIsNotVisible() = runTest {
+        browserFeatures.duckAiButtonInBrowser().setRawStoredState(Toggle.State(enable = false))
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
         }
     }
 
