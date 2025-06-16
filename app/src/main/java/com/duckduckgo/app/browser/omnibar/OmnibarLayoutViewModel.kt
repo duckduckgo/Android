@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -90,6 +91,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
+    private val browserFeatures: AndroidBrowserConfigFeature,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
@@ -121,8 +123,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
-            showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
-                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || isVisualDesignExperimentEnabled),
+            showChatMenu = showInAddressBar && state.viewMode !is CustomTab && browserFeatures.duckAiButtonInBrowser().isEnabled(),
             showClickCatcher = isDuckAIPoCEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
