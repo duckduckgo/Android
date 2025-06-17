@@ -842,6 +842,7 @@ sealed class DaxBubbleCta(
             dialogTextCta.text = daxText.html(root.context)
             daxBubbleDialogTitle.text = daxTitle.html(root.context)
 
+            binding.root.show()
             buckOnboardingDialogView.animateEntrance(
                 onAnimationEnd = {
                     daxDialogDismissButton.animate().alpha(1f).setDuration(500)
