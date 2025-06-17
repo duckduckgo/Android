@@ -260,7 +260,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Privacy Pro
-            canShowPrivacyProCta() -> {
+            canShowPrivacyProCta() && !onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
                 val descriptionRes: Int = if (freeTrialCopyAvailable()) {
                     R.string.onboardingPrivacyProDaxDialogFreeTrialDescription
