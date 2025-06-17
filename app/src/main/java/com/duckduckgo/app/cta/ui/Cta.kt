@@ -626,7 +626,14 @@ sealed class OnboardingDaxDialogCta(
 
                 onboardingDialogSuggestionsContent.show()
 
-                buckOnboardingDialogView.animateEntrance()
+                buckOnboardingDialogView.animateEntrance(
+                    onAnimationEnd = {
+                        daxDialogDismissButton.animate().apply {
+                            alpha(MAX_ALPHA)
+                            duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                        }.start()
+                    },
+                )
             }
         }
     }
