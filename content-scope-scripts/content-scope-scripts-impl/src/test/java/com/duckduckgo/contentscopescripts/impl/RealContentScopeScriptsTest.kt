@@ -221,6 +221,36 @@ class RealContentScopeScriptsTest {
     }
 
     @Test
+    fun whenGetScriptAndVariablesAreCachedAndCurrentCohortsChangedThenUseNewCurrentCohortsValue() {
+        var js = testee.getScript(null)
+        verifyJsScript(js)
+
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+
+        whenever(mockContentScopeExperiments.getExperimentsJson()).thenReturn(
+            "[{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]",
+        )
+        js = testee.getScript(null)
+
+        verifyJsScript(js, newRegEx)
+        verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
+        verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
+        verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
+    }
+
+    @Test
     fun whenContentScopeScriptsIsEnabledThenReturnTrue() {
         contentScopeScriptsFeature.self().setRawStoredState(State(enable = true))
         assertTrue(testee.isEnabled())
