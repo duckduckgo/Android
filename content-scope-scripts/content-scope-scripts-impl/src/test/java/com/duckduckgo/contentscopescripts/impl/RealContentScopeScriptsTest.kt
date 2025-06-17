@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -36,6 +37,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RealContentScopeScriptsTest {
 
     private val mockPluginPoint: PluginPoint<ContentScopeConfigPlugin> = mock()
@@ -153,7 +155,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"globalPrivacyControlValue\":true,\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"globalPrivacyControlValue\":true,\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -180,7 +183,8 @@ class RealContentScopeScriptsTest {
                 "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -232,7 +236,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"currentCohorts\":\\[\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\\{\"currentCohorts\":\\[\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
