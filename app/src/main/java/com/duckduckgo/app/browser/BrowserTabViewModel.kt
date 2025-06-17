@@ -312,6 +312,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -4115,11 +4116,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-
             if (pixelName != null) {
                 val wasUsedBefore = duckChat.wasOpenedBefore()
-                val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+                val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasUsedBefore.toBinaryString())
                 pixel.fire(pixelName, parameters = params)
             }
 

@@ -33,6 +33,7 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -115,6 +116,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether image upload is enabled or not.
      */
     fun isImageUploadEnabled(): Boolean
+
+    /**
+     * Returns the time a Duck Chat session should be kept alive
+     */
+    fun keepSessionIntervalInMinutes(): Int
 }
 
 enum class ChatState(val value: String) {
@@ -139,6 +145,7 @@ data class DuckChatSettingJson(
     val aiChatBangs: List<String>?,
     val aiChatBangRegex: String?,
     val addressBarEntryPoint: Boolean,
+
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -265,6 +272,9 @@ class RealDuckChat @Inject constructor(
     override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
+    override fun keepSessionIntervalInMinutes(): Int {
+        return 60
+    }
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let { originalQuery ->
@@ -303,6 +313,10 @@ class RealDuckChat @Inject constructor(
         val url = appendParameters(parameters, duckChatLink)
         startDuckChatActivity(url)
         appCoroutineScope.launch {
+            val sessionDelta = duckChatFeatureRepository.sessionDeltaTimestamp()
+            val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
+
             duckChatFeatureRepository.registerOpened()
         }
     }
@@ -359,6 +373,10 @@ class RealDuckChat @Inject constructor(
 
     override suspend fun wasOpenedBefore(): Boolean {
         return duckChatFeatureRepository.wasOpenedBefore()
+    }
+
+    override suspend fun shouldKeepSessionAlive(): Boolean {
+        return duckChatFeatureRepository.lastSessionTimestamp() >= keepSessionIntervalInMinutes() * 60 * 1000
     }
 
     private fun cacheConfig() {
