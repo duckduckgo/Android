@@ -132,7 +132,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
-        data class OpenDuckChat(val url: String, val keepSession: Boolean) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val keepSession: Boolean) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -460,12 +460,12 @@ class BrowserViewModel @Inject constructor(
         command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
 
-    fun openDuckChat() {
+    fun openDuckChat(duckChatUrl: String?) {
         viewModelScope.launch(dispatchers.io()) {
             val keepSession = duckChat.shouldKeepSessionAlive()
             logcat(INFO) { "Duck.ai should keep session alive $keepSession" }
             withContext(dispatchers.main()) {
-                command.value = OpenDuckChat("", keepSession)
+                command.value = OpenDuckChat(duckChatUrl, keepSession)
             }
         }
     }

@@ -16,33 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-import android.annotation.SuppressLint
-import android.os.Bundle
-import android.util.Log
-import android.view.MotionEvent
-import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
-import com.duckduckgo.common.utils.extensions.hideKeyboard
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.impl.ChatState.BLOCKED
-import com.duckduckgo.duckchat.impl.ChatState.ERROR
-import com.duckduckgo.duckchat.impl.ChatState.HIDE
-import com.duckduckgo.duckchat.impl.ChatState.LOADING
-import com.duckduckgo.duckchat.impl.ChatState.READY
-import com.duckduckgo.duckchat.impl.ChatState.SHOW
-import com.duckduckgo.duckchat.impl.ChatState.START_STREAM_NEW_PROMPT
-import com.duckduckgo.duckchat.impl.ChatState.STREAMING
-import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
-import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import javax.inject.Inject
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 // TODO
 // @InjectWith(ActivityScope::class)
 // class DuckChatWebViewPoCActivity : DuckChatWebViewActivity() {

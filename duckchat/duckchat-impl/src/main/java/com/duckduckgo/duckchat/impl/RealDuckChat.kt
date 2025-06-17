@@ -311,7 +311,7 @@ class RealDuckChat @Inject constructor(
 
     private fun openDuckChat(parameters: Map<String, String>) {
         val url = appendParameters(parameters, duckChatLink)
-        startDuckChatActivity(url)
+
         appCoroutineScope.launch {
             val sessionDelta = duckChatFeatureRepository.sessionDeltaTimestamp()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
@@ -319,14 +319,13 @@ class RealDuckChat @Inject constructor(
 
             duckChatFeatureRepository.registerOpened()
         }
+
+        startDuckChatActivity(url)
     }
 
     private fun startDuckChatActivity(url: String) {
-        // TODO impl url
-        // globalActivityStarter
-        //     .startIntent(context, DuckChatWebViewActivityWithParams(url))
-        browserNav.openDuckChat(context)
-            ?.apply {
+        browserNav.openDuckChat(context, duckChatUrl = url)
+            .apply {
                 // TODO fix DuckAi POC
                 // if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
                 //     setClass(context, DuckChatWebViewPoCActivity::class.java)
