@@ -41,7 +41,11 @@ class RealContentScopeExperiments @Inject constructor(
         val moshi = Builder().build()
         val jsonAdapter: JsonAdapter<List<Experiment>> = moshi.adapter(type)
         return runBlocking {
-            val experiments = featureTogglesInventory.getAllTogglesForParent(featureName)
+            val experiments = if (contentScopeExperimentsFeature.self().isEnabled()) {
+                featureTogglesInventory.getAllTogglesForParent(featureName)
+            } else {
+                emptyList()
+            }
             experiments.mapNotNull {
                 it.enroll()
                 if (it.isEnabled()) {
