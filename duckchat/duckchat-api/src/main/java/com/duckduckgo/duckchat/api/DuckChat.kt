@@ -68,7 +68,7 @@ interface DuckChat {
     suspend fun wasOpenedBefore(): Boolean
 
     /**
-     * Returns `true` if Duck Chat should not restart a new Chat Session
+     * Returns `true` if Duck Chat should keep the session alive or start a new one
      */
     suspend fun shouldKeepSessionAlive(): Boolean
 }
