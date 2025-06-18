@@ -89,6 +89,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
+    private var notificationPermissionsRequested = false
 
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
         if (permissionGranted) {
@@ -184,6 +185,9 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
     @SuppressLint("InlinedApi")
     private fun requestNotificationsPermissions() {
+        if (notificationPermissionsRequested) return
+        notificationPermissionsRequested = true
+
         if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
             viewModel.notificationRuntimePermissionRequested()
             requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -306,8 +310,18 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         playAnimation(
             animation = LottieOnboardingAnimationSpec.WALK_WAVE,
             phase = ENTER,
-            onAnimationEnd = { requestNotificationsPermissions() },
+            onAnimationEnd = {
+                binding.longDescriptionContainer.setOnClickListener(null)
+                requestNotificationsPermissions()
+            },
         )
+
+        binding.longDescriptionContainer.run {
+            setOnClickListener {
+                setOnClickListener(null)
+                requestNotificationsPermissions()
+            }
+        }
     }
 
     private fun startDaxDialogAnimation(animationDelay: Long = ANIMATION_DELAY) {
