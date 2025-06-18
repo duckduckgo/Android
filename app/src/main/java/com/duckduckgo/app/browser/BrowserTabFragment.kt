@@ -4398,7 +4398,7 @@ class BrowserTabFragment :
 
         private fun showExperimentalHomeWidget(
             configuration: HomePanelCta,
-            ) {
+        ) {
             hideDaxCta()
 
             if (!::experimentalBottomSheet.isInitialized) {
