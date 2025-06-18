@@ -4396,7 +4396,9 @@ class BrowserTabFragment :
             )
         }
 
-        private fun showExperimentalHomeWidget() {
+        private fun showExperimentalHomeWidget(
+            configuration: HomePanelCta,
+            ) {
             hideDaxCta()
 
             if (!::experimentalBottomSheet.isInitialized) {
@@ -4407,18 +4409,22 @@ class BrowserTabFragment :
                 experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
                         viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()
+                        viewModel.onCtaShown()
                     }
 
                     override fun onCanceled() {
                         viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogCancelled()
+                        viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
 
                     override fun onAddWidgetButtonClicked() {
                         viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked()
+                        viewModel.onUserClickCtaOkButton(configuration)
                     }
 
                     override fun onNotNowButtonClicked() {
                         viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked()
+                        viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }
                 experimentalBottomSheet.show()
