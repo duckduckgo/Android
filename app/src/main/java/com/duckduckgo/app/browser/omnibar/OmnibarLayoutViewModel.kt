@@ -196,11 +196,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onOmnibarFocusChanged(
         hasFocus: Boolean,
-        query: String,
+        inputFieldText: String,
     ) {
         logcat { "Omnibar: onOmnibarFocusChanged" }
-        val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = query.isBlank()
+        val showClearButton = hasFocus && inputFieldText.isNotBlank()
+        val showControls = inputFieldText.isBlank()
 
         if (hasFocus) {
             viewModelScope.launch {
@@ -223,7 +223,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasQueryChanged = false,
                         urlLoaded = _viewState.value.url,
                     ),
-                    omnibarText = addressDisplayFormatter.getDisplayAddress(query, it.url, true),
+                    omnibarText = addressDisplayFormatter.getDisplayAddress(it.query, it.url, true),
                     updateOmnibarText = true,
                 )
             }
@@ -232,7 +232,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText()
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
-                    addressDisplayFormatter.getDisplayAddress(query, it.url, settingsDataStore.isFullUrlEnabled)
+                    addressDisplayFormatter.getDisplayAddress(it.query, it.url, settingsDataStore.isFullUrlEnabled)
                 } else {
                     logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
                     it.omnibarText
