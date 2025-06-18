@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.distinctUntilChanged
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -71,7 +72,7 @@ class TabDataRepository @Inject constructor(
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
-    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs().distinctUntilChanged()
+    override val flowTabs: Flow<List<TabEntity>> = liveTabs.asFlow()
 
     private val childTabClosedSharedFlow = MutableSharedFlow<String>()
 
@@ -85,7 +86,7 @@ class TabDataRepository @Inject constructor(
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
-    override val flowSelectedTab: Flow<TabEntity?> = tabsDao.flowSelectedTab().distinctUntilChanged()
+    override val flowSelectedTab: Flow<TabEntity?> = liveSelectedTab.asFlow().distinctUntilChanged()
 
     override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
