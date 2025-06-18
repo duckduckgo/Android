@@ -121,7 +121,7 @@ class OmnibarLayoutViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(true)
+        whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
 
         initializeViewModel()
     }
@@ -1248,7 +1248,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledTheButtonIsNotVisible() = runTest {
-        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
         testee.viewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.showChatMenu)
@@ -1333,7 +1333,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledAndOtherConditionsAreNotMetThenButtonIsNotVisible() = runTest {
-        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
         initializeViewModel()
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1343,7 +1343,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledButInNewTabThenShowChatMenuIsTrue() = runTest {
-        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
         initializeViewModel()
 
         testee.onViewModeChanged(ViewMode.NewTab)
@@ -1357,7 +1357,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledButHasFocusAndTextThenShowChatMenuIsTrue() = runTest {
-        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
         initializeViewModel()
 
         testee.onInputStateChanged(QUERY, hasFocus = true, clearQuery = false, deleteLastCharacter = false)

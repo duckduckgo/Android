@@ -100,7 +100,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            showChatMenu = duckChat.showInAddressBar.value && duckChat.isDuckAiInBrowserEnabled(),
+            showChatMenu = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser(),
         ),
     )
 
@@ -128,7 +128,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             showBrowserMenuHighlight = highlightOverflowMenu,
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
             showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
-                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isDuckAiInBrowserEnabled()),
+                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
             showClickCatcher = isDuckAIPoCEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)

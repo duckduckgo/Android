@@ -37,7 +37,7 @@ interface DuckChat {
      *
      * @return true if Duck.ai in browser is enabled, false otherwise.
      */
-    fun isDuckAiInBrowserEnabled(): Boolean
+    fun isEnabledInBrowser(): Boolean
 
     /**
      * Checks whether DuckChat should be shown in browser menu based on user settings.

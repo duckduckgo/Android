@@ -229,7 +229,7 @@ class RealDuckChat @Inject constructor(
         return isDuckChatEnabled
     }
 
-    override fun isDuckAiInBrowserEnabled(): Boolean {
+    override fun isEnabledInBrowser(): Boolean {
         return isDuckAiInBrowserEnabled
     }
 

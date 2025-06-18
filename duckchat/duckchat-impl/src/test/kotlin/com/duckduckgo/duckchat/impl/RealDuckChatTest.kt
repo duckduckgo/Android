@@ -565,21 +565,21 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenDuckAiInBrowserFeatureEnabledThenIsDuckAiInBrowserEnabledReturnsTrue() = runTest {
+    fun whenDuckAiInBrowserFeatureEnabledThenIsEnabledInBrowserReturnsTrue() = runTest {
         duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
 
         testee.onPrivacyConfigDownloaded()
 
-        assertTrue(testee.isDuckAiInBrowserEnabled())
+        assertTrue(testee.isEnabledInBrowser())
     }
 
     @Test
-    fun whenDuckAiInBrowserFeatureDisabledThenIsDuckAiInBrowserEnabledReturnsFalse() = runTest {
+    fun whenDuckAiInBrowserFeatureDisabledThenIsEnabledInBrowserReturnsFalse() = runTest {
         duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = false))
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.isDuckAiInBrowserEnabled())
+        assertFalse(testee.isEnabledInBrowser())
     }
 
     companion object {
