@@ -85,7 +85,7 @@ interface PirActionsRunnerStateEngine {
 
         data object ExecuteNextBrokerStep : Event()
 
-        data class ExecuteNextBrokerStepAction(
+        data class ExecuteBrokerStepAction(
             val actionRequestData: PirScriptRequestData,
         ) : Event()
 

@@ -24,7 +24,7 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerO
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
@@ -102,7 +102,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                     nextState = state.copy(
                         currentActionIndex = state.currentActionIndex + 1,
                     ),
-                    nextEvent = ExecuteNextBrokerStepAction(
+                    nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),
@@ -129,7 +129,7 @@ class JsActionSuccessEventHandler @Inject constructor(
                     sideEffect = EvaluateJs(
                         callback = pirSuccessResponse.response!!.callback.eval,
                     ),
-                    nextEvent = ExecuteNextBrokerStepAction(
+                    nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),

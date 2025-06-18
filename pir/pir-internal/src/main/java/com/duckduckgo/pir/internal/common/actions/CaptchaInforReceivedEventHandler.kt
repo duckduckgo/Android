@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.CaptchaInfoReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -48,7 +48,7 @@ class CaptchaInforReceivedEventHandler @Inject constructor() : EventHandler {
                 currentActionIndex = state.currentActionIndex + 1,
                 transactionID = (event as CaptchaInfoReceived).transactionID,
             ),
-            nextEvent = ExecuteNextBrokerStepAction(
+            nextEvent = ExecuteBrokerStepAction(
                 UserProfile(
                     userProfile = state.profileQuery,
                 ),

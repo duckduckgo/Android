@@ -22,7 +22,7 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutSte
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailConfirmation
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
@@ -46,8 +46,8 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ExecuteNextBrokerStepActionEventHandler @Inject constructor() : EventHandler {
-    override val event: KClass<out Event> = ExecuteNextBrokerStepAction::class
+class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
+    override val event: KClass<out Event> = ExecuteBrokerStepAction::class
 
     override suspend fun invoke(
         state: State,
@@ -66,7 +66,7 @@ class ExecuteNextBrokerStepActionEventHandler @Inject constructor() : EventHandl
          *  - For any other action, we push it to the js layer via [PushJsAction]
          */
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
-        val requestData = (event as ExecuteNextBrokerStepAction).actionRequestData
+        val requestData = (event as ExecuteBrokerStepAction).actionRequestData
 
         return if (state.currentActionIndex == currentBrokerStep.actions.size) {
             Next(
