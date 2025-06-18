@@ -46,6 +46,7 @@ class CaptchaInforReceivedEventHandler @Inject constructor() : EventHandler {
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
+                actionRetryCount = 0,
                 transactionID = (event as CaptchaInfoReceived).transactionID,
             ),
             nextEvent = ExecuteBrokerStepAction(

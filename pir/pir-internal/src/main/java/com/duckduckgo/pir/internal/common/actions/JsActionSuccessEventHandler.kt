@@ -65,6 +65,9 @@ class JsActionSuccessEventHandler @Inject constructor(
          */
         val pirSuccessResponse = (event as JsActionSuccess).pirSuccessResponse
         val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val baseSuccessState = state.copy(
+            actionRetryCount = 0,
+        )
 
         if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
@@ -88,7 +91,7 @@ class JsActionSuccessEventHandler @Inject constructor(
         return when (pirSuccessResponse) {
             is NavigateResponse -> {
                 Next(
-                    nextState = state.copy(
+                    nextState = baseSuccessState.copy(
                         pendingUrl = pirSuccessResponse.response.url,
                     ),
                     sideEffect = LoadUrl(
@@ -99,12 +102,12 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse -> {
                 Next(
-                    nextState = state.copy(
-                        currentActionIndex = state.currentActionIndex + 1,
+                    nextState = baseSuccessState.copy(
+                        currentActionIndex = baseSuccessState.currentActionIndex + 1,
                     ),
                     nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
-                            userProfile = state.profileQuery,
+                            userProfile = baseSuccessState.profileQuery,
                         ),
                     ),
                 )
@@ -112,7 +115,7 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is GetCaptchaInfoResponse -> {
                 Next(
-                    nextState = state,
+                    nextState = baseSuccessState,
                     sideEffect = GetCaptchaSolution(
                         actionId = pirSuccessResponse.actionID,
                         responseData = pirSuccessResponse.response,
@@ -123,15 +126,15 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is SolveCaptchaResponse -> {
                 Next(
-                    nextState = state.copy(
-                        currentActionIndex = state.currentActionIndex + 1,
+                    nextState = baseSuccessState.copy(
+                        currentActionIndex = baseSuccessState.currentActionIndex + 1,
                     ),
                     sideEffect = EvaluateJs(
                         callback = pirSuccessResponse.response!!.callback.eval,
                     ),
                     nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
-                            userProfile = state.profileQuery,
+                            userProfile = baseSuccessState.profileQuery,
                         ),
                     ),
                 )

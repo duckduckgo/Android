@@ -44,6 +44,7 @@ class CaptchaServiceFailedEventHandler @Inject constructor() : EventHandler {
         return Next(
             nextState = state.copy(
                 currentActionIndex = state.currentActionIndex + 1,
+                actionRetryCount = 0,
             ),
             nextEvent = ExecuteBrokerStepAction(
                 UserProfile(

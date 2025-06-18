@@ -72,6 +72,7 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 nextState = state.copy(
                     currentActionIndex = 0,
                     brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
+                    actionRetryCount = 0,
                 ),
                 nextEvent = ExecuteBrokerStepAction(
                     UserProfile(

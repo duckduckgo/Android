@@ -486,6 +486,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         when (pirError) {
             is PirError.ActionFailed -> JsActionFailed(
                 error = pirError,
+                allowRetry = true,
             )
 
             is PirError.CaptchaServiceError -> CaptchaServiceFailed(
