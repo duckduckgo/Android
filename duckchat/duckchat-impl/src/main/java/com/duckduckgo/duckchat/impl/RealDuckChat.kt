@@ -154,6 +154,20 @@ enum class ChatState(val value: String) {
     }
 }
 
+enum class ReportMetric(val metric: String) {
+    USER_DID_SUBMIT_PROMPT("userDidSubmitPrompt"),
+    USER_DID_SUBMIT_FIRST_PROMPT("userDidSubmitFirstPrompt"),
+    USER_DID_OPEN_HISTORY("userDidOpenHistory"),
+    USER_DID_SELECT_FIRST_HISTORY_ITEM("userDidSelectFirstHistoryItem"),
+    USER_DID_CREATE_NEW_CHAT("userDidCreateNewChat"),
+    ;
+
+    companion object {
+        fun fromValue(v: String?): ReportMetric? =
+            ReportMetric.entries.firstOrNull { it.metric == v }
+    }
+}
+
 data class DuckChatSettingJson(
     val aiChatURL: String?,
     val aiChatBangs: List<String>?,
