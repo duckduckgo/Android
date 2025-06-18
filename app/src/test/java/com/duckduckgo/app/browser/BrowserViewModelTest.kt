@@ -292,7 +292,7 @@ class BrowserViewModelTest {
         testee.onBookmarksActivityResult(bookmarkUrl)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenInNewTab(bookmarkUrl), commandCaptor.lastValue)
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
     }
 
     @Test
@@ -504,6 +504,17 @@ class BrowserViewModelTest {
         testee.onOmnibarEditModeChanged(isInEditMode)
 
         assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
+    }
+
+    @Test
+    fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = false))
+        val bookmarkUrl = "https://www.example.com"
+
+        testee.onBookmarksActivityResult(bookmarkUrl)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
     }
 
     private fun initTestee() {

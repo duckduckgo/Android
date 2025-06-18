@@ -66,4 +66,7 @@
 
     <!-- Temporary, to be moved to values later-->
     <string name="settingsAddHomeWidgetTitle">Home Screen Widget</string>
+
+    <!-- Browser tab -->
+    <string name="browserDuckPlayerShortUrl">Duck Player</string>
 </resources>

@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.animation.ValueAnimator
 import android.content.Context
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -76,6 +77,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     val duckChatFireButton: View
     val duckChatInput: EditText
     val duckChatSend: View
+    val duckChatClearText: View
     val duckChatNewChat: View
     val duckChatStop: View
     val duckChatControls: View
@@ -91,12 +93,16 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var onSearchSent: ((String) -> Unit)? = null
     var onDuckChatSent: ((String) -> Unit)? = null
 
+    private var selectionStart = 0
+    private var selectionEnd = 0
+
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
 
         duckChatFireButton = findViewById(R.id.duckChatFireButton)
         duckChatInput = findViewById(R.id.duckChatInput)
         duckChatSend = findViewById(R.id.duckChatSend)
+        duckChatClearText = findViewById(R.id.duckChatClearText)
         duckChatNewChat = findViewById(R.id.duckChatNewChat)
         duckChatStop = findViewById(R.id.duckChatStop)
         duckChatControls = findViewById(R.id.duckChatControls)
@@ -110,6 +116,11 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatFireButton.setOnClickListener { onFire?.invoke() }
         duckChatNewChat.setOnClickListener { onNewChat?.invoke() }
         duckChatSend.setOnClickListener { submitMessage() }
+        duckChatClearText.setOnClickListener {
+            duckChatInput.setText("")
+            duckChatInput.setSelection(0)
+            duckChatInput.scrollTo(0, 0)
+        }
         duckChatStop.setOnClickListener {
             onStop?.invoke()
             hideStopButton()
@@ -120,6 +131,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatTabLayout.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
+                    duckChatSend.isVisible = tab.position != 0
                     applyInputBehavior(tab.position)
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -141,6 +153,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     duckChatSend.isVisible = !s.isNullOrEmpty() && duckChatTabLayout.selectedTabPosition == 1
+                    duckChatClearText.isVisible = !s.isNullOrEmpty()
                     duckChatFireButton.isVisible = false
                     duckChatNewChat.isVisible = false
                 }
@@ -162,15 +175,27 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun applyInputBehavior(tabPosition: Int) {
+        selectionStart = duckChatInput.selectionStart
+        selectionEnd = duckChatInput.selectionEnd
+
         val isSearchTab = tabPosition == 0
 
         duckChatInput.apply {
-            setSingleLine(isSearchTab)
-            maxLines = if (isSearchTab) 1 else 8
+            maxLines = MAX_LINES
+            setHorizontallyScrolling(false)
+            setRawInputType(InputType.TYPE_CLASS_TEXT)
+
             imeOptions = if (isSearchTab) {
                 EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
             } else {
-                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_DONE
+                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
+            }
+
+            text?.length.let { length ->
+                setSelection(
+                    selectionStart.coerceIn(0, length),
+                    selectionEnd.coerceIn(0, length),
+                )
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
@@ -280,5 +305,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
+        private const val MAX_LINES = 8
     }
 }

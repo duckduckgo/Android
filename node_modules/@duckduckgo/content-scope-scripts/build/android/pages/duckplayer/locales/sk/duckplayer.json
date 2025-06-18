@@ -32,6 +32,42 @@
     "title" : "<b>CHYBA:</b> Neplatný identifikátor videa",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player nemôže načítať toto video",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Toto video nie je možné pozerať mimo YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Toto video si môžeš pozrieť aj na YouTube, ale bez dodatočného súkromia Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Prepáč, toto video je vekovo obmedzené",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Na sledovanie videí s vekovým obmedzením sa musíš prihlásiť na YouTube a overiť svoj vek.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Stále si môžeš pozrieť toto video, ale budeš sa musieť prihlásiť a pozerať ho na YouTube bez dodatočnej ochrany súkromia Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Prepáč, toto video je možné prehrať iba na YouTube",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Autor tohto videa sa rozhodol nepovoliť jeho sledovanie na iných lokalitách.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Stále si ho môžeš pozrieť na YouTube, ale bez dodatočného súkromia Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube nedovolí Duck Playeru načítať toto video",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Toto video si môžeš pozrieť aj na YouTube, ale bez dodatočného súkromia Duck Player.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Prepáč, YouTube si myslí, že si robot",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube blokuje načítanie tohto videa. Ak používaš sieť VPN, skús ju vypnúť a znova načítať túto stránku.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Ak to nefunguje, môžeš si toto video pozrieť aj na YouTube, ale bez dodatočnej ochrany súkromia, ktorú poskytuje Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Toto sa môže stať, ak používaš VPN. Skús vypnúť sieť VPN alebo prepnúť umiestnenia servera a znova načítať túto stránku.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Ak to nefunguje, budeš sa musieť prihlásiť a pozrieť si toto video na YouTube bez dodatočnej ochrany súkromia, ktorú poskytuje Duck Player.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

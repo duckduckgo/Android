@@ -244,6 +244,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusDescription.setText(R.string.netpManagementDescriptionOn)
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_connected))
         netpToggle.quietlySetChecked(true)
+        netpToggle.jumpDrawablesToCurrentState()
         netpToggle.isEnabled = true
 
         locationDetails.locationHeader.setText(R.string.netpManagementLocationHeaderVpnOn)

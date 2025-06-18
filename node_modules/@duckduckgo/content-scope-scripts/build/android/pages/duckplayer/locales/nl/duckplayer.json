@@ -32,6 +32,42 @@
     "title" : "<b>FOUT:</b> ongeldige video-id",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player kan deze video niet laden.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Deze video kan alleen op YouTube worden bekeken.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Je kunt deze video nog steeds bekijken op YouTube, maar zonder de extra privacy van Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Sorry, deze video heeft een leeftijdsbeperking",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Om video's met leeftijdsbeperkingen te bekijken, moet je je aanmelden bij YouTube om je leeftijd te verifiëren.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Je kunt deze video nog steeds bekijken, maar je moet je aanmelden bij YouTube en hem daar bekijken zonder de extra privacy van Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Sorry, deze video kan alleen op YouTube worden afgespeeld",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "De maker van deze video staat niet toe dat deze video op andere sites wordt bekeken.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Je kunt deze video nog steeds op YouTube bekijken, maar zonder de extra privacy van Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube staat Duck Player niet toe om deze video te laden.",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Je kunt deze video nog steeds bekijken op YouTube, maar zonder de extra privacy van Duck Player.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Sorry, YouTube denkt dat je een bot bent",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube blokkeert het laden van deze video. Als je een VPN gebruikt, probeer deze dan uit te schakelen en deze pagina opnieuw te laden.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Als dit niet werkt, kun je deze video nog steeds op YouTube bekijken, maar dan zonder de extra privacy van Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Dit kan gebeuren als je een VPN gebruikt. Schakel de VPN uit of wijzig de serverlocatie en laad deze pagina opnieuw.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Als dat niet werkt, moet je je aanmelden bij YouTube en deze video daar bekijken zonder de extra privacy van Duck Player.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

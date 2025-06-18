@@ -32,6 +32,42 @@
     "title" : "<b>HIBA:</b> Érvénytelen videoazonosító",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "A Duck Player nem tudja betölteni ezt a videót.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Ezt a videót nem lehet a YouTube-on kívül megtekinteni.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Megnézheted a videót a YouTube-on, de a Duck Player által nyújtott extra adatvédelem nélkül.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Sajnáljuk, ez a videó korhatáros.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "A korhatáros videók megtekintéséhez a YouTube-ra való bejelentkezéssel meg kell erősítened az életkorodat.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Megnézheted a videót, de be kell jelentkezned a YouTube-ra, és ott a Duck Player által nyújtott extra adatvédelem nélkül láthatod.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Sajnáljuk, ez a videó csak a YouTube-on játszható le.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "A videó készítője úgy döntött, hogy nem engedélyezi a más oldalakon való lejátszását.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Megnézheted a YouTube-on, de a Duck Player által nyújtott extra adatvédelem nélkül.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "A YouTube nem engedi, hogy a Duck Player betöltse ezt a videót",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Megnézheted a videót a YouTube-on, de a Duck Player által nyújtott extra adatvédelem nélkül.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Sajnáljuk, a YouTube azt hiszi, hogy bot vagy",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "A YouTube blokkolja ennek a videónak a betöltését. Ha VPN-t használsz, próbáld meg, hogy kikapcsolod, majd újra betöltöd ezt az oldalt.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Ha ez nem működik, akkor is megnézheted ezt a videót a YouTube-on, de a Duck Player által nyújtott extra adatvédelem nélkül.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Ez előfordulhat, ha VPN-t használsz. Próbáld meg kikapcsolni a VPN-t, vagy válts szerverhelyszínt, és töltsd be újra az oldalt.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Ha ez nem működik, be kell jelentkezned a YouTube-ra, és a videót ott a Duck Player által nyújtott extra adatvédelem nélkül láthatod.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

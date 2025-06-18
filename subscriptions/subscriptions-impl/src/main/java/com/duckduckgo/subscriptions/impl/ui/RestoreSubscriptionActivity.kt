@@ -33,6 +33,7 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.WELCOME_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivityRestoreSubscriptionBinding
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
@@ -117,7 +118,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
                         if (isOriginWeb) {
                             setResult(RESULT_OK)
                         } else {
-                            goToSubscriptions()
+                            goToSubscriptionsWelcomePage()
                         }
                         finish()
                     }
@@ -127,11 +128,17 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToSubscriptions() {
+        startSubscriptionsWebViewActivity(url = BUY_URL)
+    }
+
+    private fun goToSubscriptionsWelcomePage() {
+        startSubscriptionsWebViewActivity(url = WELCOME_URL)
+    }
+
+    private fun startSubscriptionsWebViewActivity(url: String) {
         globalActivityStarter.start(
-            this@RestoreSubscriptionActivity,
-            SubscriptionsWebViewActivityWithParams(
-                url = BUY_URL,
-            ),
+            context = this,
+            params = SubscriptionsWebViewActivityWithParams(url),
         )
     }
 
@@ -163,7 +170,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         if (isOriginWeb) {
             setResult(RESULT_OK)
         } else {
-            goToSubscriptions()
+            goToSubscriptionsWelcomePage()
         }
         finish()
     }

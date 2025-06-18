@@ -49,14 +49,6 @@ import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
-import com.duckduckgo.app.autocomplete.api.AutoComplete
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -214,6 +206,14 @@ import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -358,7 +358,7 @@ class BrowserTabViewModelTest {
 
     private val mockCommandObserver: Observer<Command> = mock()
 
-    private val mockSettingsStore: SettingsDataStore = mock()
+    private val ctaViewModelMockSettingsStore: SettingsDataStore = mock()
 
     private val mockSavedSitesRepository: SavedSitesRepository = mock()
 
@@ -510,7 +510,6 @@ class BrowserTabViewModelTest {
 
     private val mockDisabledToggle: Toggle = mock {
         on { it.isEnabled() } doReturn false
-        on { it.isEnabled(any()) } doReturn false
     }
 
     private val mockPrivacyProtectionsPopupManager: PrivacyProtectionsPopupManager = mock()
@@ -565,6 +564,8 @@ class BrowserTabViewModelTest {
 
     private val selectedTab = TabEntity("TAB_ID", "https://example.com", position = 0, sourceTabId = "TAB_ID_SOURCE")
 
+    private var isFullSiteAddressEnabled = true
+
     @Before
     fun before() = runTest {
         MockitoAnnotations.openMocks(this)
@@ -609,6 +610,7 @@ class BrowserTabViewModelTest {
         whenever(mockRemoteMessagingRepository.messageFlow()).thenReturn(remoteMessageFlow.consumeAsFlow())
         whenever(mockSettingsDataStore.automaticFireproofSetting).thenReturn(AutomaticFireproofSetting.ASK_EVERY_TIME)
         whenever(mockSettingsDataStore.omnibarPosition).thenReturn(TOP)
+        whenever(mockSettingsDataStore.isFullUrlEnabled).then { isFullSiteAddressEnabled }
         whenever(mockSSLCertificatesFeature.allowBypass()).thenReturn(mockEnabledToggle)
         whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(false)
@@ -622,6 +624,7 @@ class BrowserTabViewModelTest {
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -631,7 +634,7 @@ class BrowserTabViewModelTest {
             widgetCapabilities = mockWidgetCapabilities,
             dismissedCtaDao = mockDismissedCtaDao,
             userAllowListRepository = mockUserAllowListRepository,
-            settingsDataStore = mockSettingsStore,
+            settingsDataStore = ctaViewModelMockSettingsStore,
             onboardingStore = mockOnboardingStore,
             userStageStore = mockUserStageStore,
             tabRepository = mockTabRepository,
@@ -694,7 +697,7 @@ class BrowserTabViewModelTest {
             userAllowListRepository = mockUserAllowListRepository,
             networkLeaderboardDao = mockNetworkLeaderboardDao,
             autoComplete = mockAutoCompleteApi,
-            appSettingsPreferencesStore = mockSettingsStore,
+            appSettingsPreferencesStore = ctaViewModelMockSettingsStore,
             longPressHandler = mockLongPressHandler,
             webViewSessionStorage = webViewSessionStorage,
             specialUrlDetector = mockSpecialUrlDetector,
@@ -840,6 +843,17 @@ class BrowserTabViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
         testee.browserViewState.value = browserViewState().copy(maliciousSiteBlocked = true)
+
+        testee.onViewVisible()
+
+        assertCommandNotIssued<ShowKeyboard>()
+    }
+
+    @Test
+    fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() = runTest {
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
+        whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
 
         testee.onViewVisible()
 
@@ -1453,14 +1467,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() = runTest {
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(emptyList())
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
     }
 
     @Test
     fun whenTriggeringAutoCompleteButNoQueryChangeThenAutoCompleteSuggestionsNotShown() {
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
@@ -1481,7 +1495,7 @@ class BrowserTabViewModelTest {
                     ),
                 ),
             )
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
         assertTrue(autoCompleteViewState().showFavorites)
@@ -1503,7 +1517,7 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.flowTabs).thenReturn(
                 flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
             )
-            doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+            doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
 
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
@@ -1529,7 +1543,7 @@ class BrowserTabViewModelTest {
                 flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
             whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
-            doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+            doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
             testee.autoCompleteStateFlow.value = "query"
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()
@@ -1553,7 +1567,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringAppLinkQueryAndShouldShowAppLinksPromptThenNavigateInBrowserAndSetPreviousUrlToNull() {
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -1563,7 +1577,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEnteringAppLinkQueryAndShouldNotShowAppLinksPromptThenNavigateInBrowserAndSetUserQueryState() {
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         testee.onUserSubmittedQuery("foo")
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
@@ -3619,7 +3633,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
@@ -3631,7 +3645,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(true)
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.ShowAppLinkPrompt>()
@@ -3643,7 +3657,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.AppLink(uriString = "http://example.com")
         testee.handleAppLink(urlType, isForMainFrame = true)
         whenever(mockAppLinksHandler.isUserQuery()).thenReturn(false)
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         verify(mockAppLinksHandler).handleAppLink(eq(true), eq("http://example.com"), eq(false), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink>()
@@ -3660,7 +3674,7 @@ class BrowserTabViewModelTest {
     fun whenUserSubmittedQueryIsAppLinkAndShouldShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrlToNull() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(true)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(true)
         testee.onUserSubmittedQuery("foo")
         verify(mockAppLinksHandler).updatePreviousUrl(null)
         assertCommandIssued<Navigate>()
@@ -3670,7 +3684,7 @@ class BrowserTabViewModelTest {
     fun whenUserSubmittedQueryIsAppLinkAndShouldNotShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrl() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
-        whenever(mockSettingsStore.showAppLinksPrompt).thenReturn(false)
+        whenever(ctaViewModelMockSettingsStore.showAppLinksPrompt).thenReturn(false)
         testee.onUserSubmittedQuery("foo")
         verify(mockAppLinksHandler).updatePreviousUrl("foo.com")
         assertCommandIssued<Navigate>()
@@ -6344,6 +6358,19 @@ class BrowserTabViewModelTest {
         ) { "someUrl" }
         verify(mockSubscriptionsJSHelper).processJsCallbackMessage(SUBSCRIPTIONS_FEATURE_NAME, "method", "id", null)
         assertCommandNotIssued<Command.SendResponseToJs>()
+    }
+
+    @Test
+    fun whenShowFullSiteAddressSettingChangedThenOmnibarIsRefreshed() = runTest {
+        testee.onViewResumed()
+
+        assertCommandNotIssued<Command.RefreshOmnibar>()
+
+        isFullSiteAddressEnabled = false
+
+        testee.onViewResumed()
+
+        assertCommandIssued<Command.RefreshOmnibar>()
     }
 
     @Test

@@ -24,6 +24,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -49,6 +50,9 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        window.sharedElementEnterTransition?.duration = TRANSITION_DURATION
+        window.sharedElementReturnTransition?.duration = TRANSITION_DURATION
+
         val params = intent.getActivityParams(SearchInterstitialActivityParams::class.java)
         params?.query?.let { query ->
             binding.duckChatOmnibar.duckChatInput.setText(query)
@@ -58,8 +62,10 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
             this,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    binding.duckChatOmnibar.animateOmnibarFocusedState(false)
-                    supportFinishAfterTransition()
+                    val query = binding.duckChatOmnibar.duckChatInput.text.toString()
+                    val data = Intent().putExtra(QUERY, query)
+                    setResult(Activity.RESULT_CANCELED, data)
+                    exitInterstitial()
                 }
             },
         )
@@ -71,16 +77,15 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
             onSearchSent = { query ->
                 val data = Intent().putExtra(QUERY, query)
                 setResult(Activity.RESULT_OK, data)
-                supportFinishAfterTransition()
+                exitInterstitial()
             }
             onDuckChatSent = { query ->
                 duckChat.openDuckChatWithAutoPrompt(query)
+                val data = Intent().putExtra(QUERY, query)
+                setResult(Activity.RESULT_CANCELED, data)
                 finish()
             }
             onBack = {
-                val query = duckChatInput.text.toString()
-                val data = Intent().putExtra(QUERY, query)
-                setResult(Activity.RESULT_CANCELED, data)
                 onBackPressed()
             }
         }
@@ -89,8 +94,15 @@ class SearchInterstitialActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun exitInterstitial() {
+        binding.duckChatOmnibar.animateOmnibarFocusedState(false)
+        hideKeyboard(binding.duckChatOmnibar.duckChatInput)
+        supportFinishAfterTransition()
+    }
+
     companion object {
         // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
         const val QUERY = "query"
+        const val TRANSITION_DURATION = 200L
     }
 }

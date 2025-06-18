@@ -26,6 +26,7 @@ import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.store.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -47,7 +48,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenLightModeAndPrivacyShieldProtectedThenSetLightShieldAnimation() {
+    fun whenLightModeAndPrivacyShieldProtectedThenSetLightShieldAnimation() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
@@ -61,7 +62,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenDarkModeAndPrivacyShieldProtectedThenSetDarkShieldAnimation() {
+    fun whenDarkModeAndPrivacyShieldProtectedThenSetDarkShieldAnimation() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
@@ -75,7 +76,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenLightModeAndPrivacyShieldUnProtectedThenUseLightAnimation() {
+    fun whenLightModeAndPrivacyShieldUnProtectedThenUseLightAnimation() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
@@ -90,7 +91,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenDarkModeAndPrivacyShieldUnProtectedThenUseDarkAnimation() {
+    fun whenDarkModeAndPrivacyShieldUnProtectedThenUseDarkAnimation() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
@@ -105,7 +106,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenLightModeAndPrivacyShieldMaliciousThenUseLightAnimation() {
+    fun whenLightModeAndPrivacyShieldMaliciousThenUseLightAnimation() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
@@ -120,7 +121,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     }
 
     @Test
-    fun whenDarkModeAndPrivacyShieldMaliciousThenUseDarkAnimation() {
+    fun whenDarkModeAndPrivacyShieldMaliciousThenUseDarkAnimation() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
@@ -136,7 +137,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
@@ -152,7 +153,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
@@ -168,7 +169,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
@@ -184,7 +185,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() {
+    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
 
         val holder: LottieAnimationView = mock()
@@ -200,8 +201,9 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewShieldThenUseNonExperimentAssets() {
+    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewShieldThenUseNonExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
 
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
@@ -216,7 +218,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() {
+    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
@@ -235,7 +237,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() {
+    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
@@ -254,7 +256,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() {
+    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
@@ -273,7 +275,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() {
+    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
@@ -292,7 +294,8 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() {
+    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() = runTest {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
         whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             disabledVisualExperimentStateFlow,
