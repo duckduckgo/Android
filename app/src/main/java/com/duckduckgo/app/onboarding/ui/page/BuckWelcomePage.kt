@@ -379,6 +379,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             marginEnd = animation.viewLayoutParamsOverride.marginEnd
             topMargin = animation.viewLayoutParamsOverride.marginTop
             bottomMargin = animation.viewLayoutParamsOverride.marginBottom
+            maxHeight = animation.viewLayoutParamsOverride.maxHeight
         }
 
         addAnimatorListener(
@@ -435,23 +436,22 @@ private enum class LottieOnboardingAnimationSpec(
         enterPhaseMaxProgress = 0.92f,
         viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
             marginStart = (-112).toPx(),
-            marginEnd = (16).toPx(),
-            marginBottom = 16.toPx(),
+            marginEnd = 16.toPx(),
+            marginBottom = 48.toPx(),
         ),
     ),
     POPUP(
         resId = R.raw.ob_2_popup,
         enterPhaseMaxProgress = 0.75f,
         viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
-            marginTop = (-32).toPx(),
-            marginEnd = (-128).toPx(),
+            marginEnd = 16.toPx(),
         ),
     ),
     WING(
         resId = R.raw.ob_3_wing,
         enterPhaseMaxProgress = 0.8f,
         viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
-            marginTop = (-300).toPx(),
+            marginTop = (-250).toPx(),
             marginStart = (-64).toPx(),
             marginEnd = (-64).toPx(),
         ),
@@ -459,8 +459,8 @@ private enum class LottieOnboardingAnimationSpec(
     POPUP_SMALL(
         resId = R.raw.ob_4_popup,
         viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
-            marginTop = (-64).toPx(),
-            marginEnd = (-64).toPx(),
+            marginEnd = 16.toPx(),
+            maxHeight = 250.toPx(),
         ),
     ),
     ;
@@ -470,6 +470,7 @@ private enum class LottieOnboardingAnimationSpec(
         val marginEnd: Int = 0,
         val marginTop: Int = 0,
         val marginBottom: Int = 0,
+        val maxHeight: Int = Integer.MAX_VALUE,
     )
 
     enum class AnimationPhase { ENTER, EXIT }
