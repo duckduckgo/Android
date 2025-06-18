@@ -40,7 +40,6 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -122,8 +121,7 @@ class OmnibarLayoutViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-
-        browserFeatures.duckAiButtonInBrowser().setRawStoredState(Toggle.State(enable = true))
+        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(true)
 
         initializeViewModel()
     }
@@ -1250,7 +1248,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledTheButtonIsNotVisible() = runTest {
-        browserFeatures.duckAiButtonInBrowser().setRawStoredState(Toggle.State(enable = false))
+        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
         testee.viewState.test {
             val viewState = awaitItem()
             assertFalse(viewState.showChatMenu)
@@ -1330,6 +1328,44 @@ class OmnibarLayoutViewModelTest {
             assertEquals(formattedUrl, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
             verify(mockAddressDisplayFormatter).getDisplayAddress(omnibarText, omnibarText, false)
+        }
+    }
+
+    @Test
+    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledAndOtherConditionsAreNotMetThenButtonIsNotVisible() = runTest {
+        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        initializeViewModel()
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledButInNewTabThenShowChatMenuIsTrue() = runTest {
+        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledButHasFocusAndTextThenShowChatMenuIsTrue() = runTest {
+        whenever(duckChat.isDuckAiInBrowserEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        testee.onInputStateChanged(QUERY, hasFocus = true, clearQuery = false, deleteLastCharacter = false)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
