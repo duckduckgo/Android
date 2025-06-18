@@ -101,10 +101,7 @@ interface DuckChatInternal : DuckChat {
     /**
      * Calls onClose when a close event is emitted.
      */
-    fun observeCloseEvent(
-        lifecycleOwner: LifecycleOwner,
-        onClose: () -> Unit,
-    )
+    fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
 
     /**
      * Returns whether address bar entry point is enabled or not.
@@ -370,7 +367,7 @@ class RealDuckChat @Inject constructor(
         val url = appendParameters(parameters, duckChatLink)
 
         appCoroutineScope.launch(dispatchers.io()) {
-            val sessionDelta = duckChatFeatureRepository.sessionDeltaTimestamp()
+            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
 
             val hasSessionActive = when {
