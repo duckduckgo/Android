@@ -937,6 +937,18 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
+    fun whenOmnibarFocusedThenOmnibarTextRemainsDoesNotChangeIfBlank() = runTest {
+        val omnibarViewState = OmnibarViewState(omnibarText = "")
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+        testee.onOmnibarFocusChanged(true, "old input text")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("", viewState.omnibarText)
+        }
+    }
+
+    @Test
     fun whenTrackersAnimationStartedAndOmnibarNotFocusedThenCommandAndViewStateCorrect() = runTest {
         whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
         whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
