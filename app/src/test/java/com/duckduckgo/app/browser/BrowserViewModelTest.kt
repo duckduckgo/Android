@@ -292,7 +292,7 @@ class BrowserViewModelTest {
         testee.onBookmarksActivityResult(bookmarkUrl)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenInNewTab(bookmarkUrl), commandCaptor.lastValue)
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
     }
 
     @Test
