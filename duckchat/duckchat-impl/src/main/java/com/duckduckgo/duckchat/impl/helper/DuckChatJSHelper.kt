@@ -22,6 +22,7 @@ import com.duckduckgo.duckchat.impl.ChatState.HIDE
 import com.duckduckgo.duckchat.impl.ChatState.SHOW
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.ReportMetric
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
@@ -42,6 +43,7 @@ interface DuckChatJSHelper {
 @ContributesBinding(AppScope::class)
 class RealDuckChatJSHelper @Inject constructor(
     private val duckChat: DuckChatInternal,
+    private val duckChatPixels: DuckChatPixels,
     private val dataStore: DuckChatDataStore,
 ) : DuckChatJSHelper {
 
@@ -52,7 +54,6 @@ class RealDuckChatJSHelper @Inject constructor(
         data: JSONObject?,
     ): JsCallbackData? {
         logcat { "Duck.ai jsMessage $featureName $method $data" }
-
         return when (method) {
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
                 getAIChatNativeHandoffData(featureName, method, it)
@@ -99,9 +100,7 @@ class RealDuckChatJSHelper @Inject constructor(
             REPORT_METRIC -> {
                 ReportMetric
                     .fromValue(data?.optString("metricName"))
-                    ?.let {
-                        logcat { "Duck.ai metric ${it.metric}" }
-                    }
+                    ?.let { reportMetric -> duckChatPixels.sendReportMetricPixel(reportMetric) }
                 null
             }
 
