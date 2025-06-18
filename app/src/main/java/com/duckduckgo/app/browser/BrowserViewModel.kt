@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
@@ -66,6 +67,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
@@ -80,6 +82,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
 
@@ -99,6 +102,7 @@ class BrowserViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val duckChat: DuckChat,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -128,6 +132,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val keepSession: Boolean) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -453,6 +458,16 @@ class BrowserViewModel @Inject constructor(
 
     fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
         command.value = ShowUndoDeleteTabsMessage(tabIds)
+    }
+
+    fun openDuckChat(duckChatUrl: String?) {
+        viewModelScope.launch(dispatchers.io()) {
+            val keepSession = duckChat.shouldKeepSessionAlive()
+            logcat(INFO) { "Duck.ai should keep session alive $keepSession" }
+            withContext(dispatchers.main()) {
+                command.value = OpenDuckChat(duckChatUrl, keepSession)
+            }
+        }
     }
 }
 

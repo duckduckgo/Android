@@ -46,8 +46,9 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         context: Context,
         query: String?,
         autoPrompt: Boolean,
+        duckChatUrl: String,
     ): Intent {
-        return BrowserActivity.intent(context = context, openDuckChat = true) // TODO add params
+        return BrowserActivity.intent(context = context, openDuckChat = true, duckChatUrl = duckChatUrl) // TODO add params
     }
 
     override fun closeDuckChat(

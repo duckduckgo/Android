@@ -81,6 +81,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONObject
 
 @InjectWith(FragmentScope::class)
@@ -157,10 +158,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             it.setTitle(R.string.duck_chat_title)
         }
 
-        // TODO
-        // val params = intent.getActivityParams(DuckChatWebViewActivityWithParams::class.java)
-        // val url = params?.url
-        val url = "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+        val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
+
+        logcat { "Duck.ai url $url" }
 
         simpleWebview.let {
             it.webViewClient = webViewClient
@@ -237,6 +237,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                     }
                                 }
                             }
+
                             else -> {}
                         }
                     }
@@ -534,5 +535,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
         private const val REQUEST_CODE_CHOOSE_FILE = 100
+        const val KEY_DUCK_AI_URL: String = "KEY_DUCK_AI_URL"
     }
 }

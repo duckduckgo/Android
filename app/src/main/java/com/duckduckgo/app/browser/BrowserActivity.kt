@@ -101,6 +101,7 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.site.permissions.impl.ui.SitePermissionScreenNoParams
@@ -549,25 +550,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            duckAiFragment?.let { fragment ->
-                val transaction = supportFragmentManager.beginTransaction()
-                transaction.setCustomAnimations(
-                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
-                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
-                )
-                transaction.show(fragment)
-                transaction.commit()
-            } ?: run {
-                val fragment = DuckChatWebViewFragment()
-                duckAiFragment = fragment
-                val transaction = supportFragmentManager.beginTransaction()
-                transaction.setCustomAnimations(
-                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
-                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
-                )
-                transaction.replace(binding.duckAiFragmentContainer.id, fragment)
-                transaction.commit()
-            }
+            viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL))
             return
         }
 
@@ -710,6 +693,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
+            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.keepSession)
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
     }
@@ -790,6 +774,45 @@ open class BrowserActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
+    private fun openDuckChat(url: String?, keepSession: Boolean) {
+        duckAiFragment?.let { fragment ->
+            if (keepSession) {
+                restoreDuckChat(fragment)
+            } else {
+                launchNewDuckChat(url)
+            }
+        } ?: run {
+            launchNewDuckChat(url)
+        }
+    }
+
+    private fun launchNewDuckChat(duckChatUrl: String?) {
+        val fragment = DuckChatWebViewFragment()
+        duckChatUrl?.let {
+            logcat { "Duck.ai url passed $duckChatUrl" }
+            fragment.arguments?.putString(KEY_DUCK_AI_URL, duckChatUrl)
+        }
+
+        duckAiFragment = fragment
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(
+            com.duckduckgo.mobile.android.R.anim.slide_from_right,
+            com.duckduckgo.mobile.android.R.anim.slide_to_right,
+        )
+        transaction.replace(binding.duckAiFragmentContainer.id, fragment)
+        transaction.commit()
+    }
+
+    private fun restoreDuckChat(fragment: DuckChatWebViewFragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(
+            com.duckduckgo.mobile.android.R.anim.slide_from_right,
+            com.duckduckgo.mobile.android.R.anim.slide_to_right,
+        )
+        transaction.show(fragment)
+        transaction.commit()
+    }
+
     private fun configureOnBackPressedListener() {
         onBackPressedDispatcher.addCallback(
             this,
@@ -857,6 +880,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             isLaunchFromClearDataAction: Boolean = false,
             openDuckChat: Boolean = false,
             closeDuckChat: Boolean = false,
+            duckChatUrl: String? = null,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -870,6 +894,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(LAUNCH_FROM_CLEAR_DATA_ACTION, isLaunchFromClearDataAction)
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
+            intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             return intent
         }
 
@@ -888,6 +913,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val LAUNCH_FROM_CLEAR_DATA_ACTION = "LAUNCH_FROM_CLEAR_DATA_ACTION"
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
+        private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
