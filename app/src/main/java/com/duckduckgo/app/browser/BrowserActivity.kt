@@ -1173,8 +1173,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value &&
-                browserFeatures.duckAiButtonInBrowser().isEnabled()
+            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isDuckAiInBrowserEnabled()
         }
     }
 }

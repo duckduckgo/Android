@@ -149,7 +149,4 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun newThreatProtectionSettings(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun duckAiButtonInBrowser(): Toggle
 }
