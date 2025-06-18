@@ -223,7 +223,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasQueryChanged = false,
                         urlLoaded = _viewState.value.url,
                     ),
-                    omnibarText = addressDisplayFormatter.getDisplayAddress(it.query, it.url, true),
+                    omnibarText = addressDisplayFormatter.getDisplayAddress(it.omnibarText, it.url, true),
                     updateOmnibarText = true,
                 )
             }
@@ -232,7 +232,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText()
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
-                    addressDisplayFormatter.getDisplayAddress(it.query, it.url, settingsDataStore.isFullUrlEnabled)
+                    addressDisplayFormatter.getDisplayAddress(it.omnibarText, it.url, settingsDataStore.isFullUrlEnabled)
                 } else {
                     logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
                     it.omnibarText
@@ -546,6 +546,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
                         omnibarText = omnibarText,
+                        url = if (forceRender && omnibarText.isEmpty()) "" else it.url,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
                             hasFocus = omnibarViewState.isEditing,
@@ -553,7 +554,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasQueryChanged = true,
                             urlLoaded = _viewState.value.url,
                         ),
-
                     )
                 }
             }

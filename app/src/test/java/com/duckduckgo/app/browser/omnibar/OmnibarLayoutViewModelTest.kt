@@ -1264,16 +1264,16 @@ class OmnibarLayoutViewModelTest {
         val formattedUrl = "https://example.com/test.html"
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         initializeViewModel()
-        testee.onOmnibarFocusChanged(hasFocus = true, query = query) // Initial focus
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
 
-        testee.onOmnibarFocusChanged(hasFocus = false, query = query)
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = query)
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertEquals(formattedUrl, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
-            verify(mockAddressDisplayFormatter).getDisplayAddress(query, url, true)
+            verify(mockAddressDisplayFormatter).getDisplayAddress(viewState.query, viewState.url, true)
         }
     }
 
@@ -1284,16 +1284,16 @@ class OmnibarLayoutViewModelTest {
         val formattedUrl = "example.com"
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
         initializeViewModel()
-        testee.onOmnibarFocusChanged(hasFocus = true, query = query) // Initial focus
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
 
-        testee.onOmnibarFocusChanged(hasFocus = false, query = query)
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = query)
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertEquals(formattedUrl, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
-            verify(mockAddressDisplayFormatter).getDisplayAddress(query, url, false)
+            verify(mockAddressDisplayFormatter).getDisplayAddress(viewState.query, viewState.url, false)
         }
     }
 
