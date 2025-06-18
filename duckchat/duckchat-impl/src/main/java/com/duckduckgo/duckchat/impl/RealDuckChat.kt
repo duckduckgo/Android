@@ -144,7 +144,7 @@ data class DuckChatSettingJson(
     val aiChatBangs: List<String>?,
     val aiChatBangRegex: String?,
     val addressBarEntryPoint: Boolean,
-
+    val keepSessionAlive: Int,
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -180,6 +180,7 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
+    private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
 
     init {
         if (isMainProcess) {
@@ -271,9 +272,7 @@ class RealDuckChat @Inject constructor(
     override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
-    override fun keepSessionIntervalInMinutes(): Int {
-        return 60
-    }
+    override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
     override fun openDuckChat(query: String?) {
         val parameters = query?.let { originalQuery ->
@@ -393,6 +392,7 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
+            keepSessionAliveInMinutes = settingsJson?.keepSessionAlive ?: DEFAULT_SESSION_ALIVE
             cacheUserSettings()
         }
     }
@@ -418,5 +418,6 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
+        private const val DEFAULT_SESSION_ALIVE = 60
     }
 }
