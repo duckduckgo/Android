@@ -407,8 +407,14 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private fun playExitAnimation(onAnimationEnd: () -> Unit = {}) {
-        if (binding.onboardingPageAnimation.progress > 0.999f) return
-        val animation = (binding.onboardingPageAnimation.tag as? LottieOnboardingAnimationSpec) ?: return
+        val animation = binding.onboardingPageAnimation.tag as? LottieOnboardingAnimationSpec
+
+        if (animation == null || binding.onboardingPageAnimation.progress > 0.999f) {
+            // There is no exit animation or it has already finished
+            onAnimationEnd()
+            return
+        }
+
         playAnimation(
             animation = animation,
             phase = EXIT,
