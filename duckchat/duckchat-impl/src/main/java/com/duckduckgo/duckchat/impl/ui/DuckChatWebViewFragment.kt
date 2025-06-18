@@ -81,7 +81,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import logcat.logcat
 import org.json.JSONObject
 
 @InjectWith(FragmentScope::class)
@@ -159,8 +158,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         }
 
         val url = arguments?.getString(KEY_DUCK_AI_URL) ?: "https://duckduckgo.com/?q=DuckDuckGo+AI+Chat&ia=chat&duckai=5"
-
-        logcat { "Duck.ai url $url" }
 
         simpleWebview.let {
             it.webViewClient = webViewClient
