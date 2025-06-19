@@ -20,6 +20,10 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.core.net.toUri
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -34,6 +38,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -44,11 +49,13 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 interface DuckChatInternal : DuckChat {
     /**
@@ -90,6 +97,11 @@ interface DuckChatInternal : DuckChat {
      * Closes DuckChat.
      */
     fun closeDuckChat()
+
+    /**
+     * Calls onClose when a close event is emitted.
+     */
+    fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
 
     /**
      * Returns whether address bar entry point is enabled or not.
@@ -144,7 +156,6 @@ data class DuckChatSettingJson(
     val aiChatBangs: List<String>?,
     val aiChatBangRegex: String?,
     val addressBarEntryPoint: Boolean,
-    val keepSessionAlive: Int,
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -166,6 +177,7 @@ class RealDuckChat @Inject constructor(
     private val browserNav: BrowserNav,
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
+    private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
@@ -181,6 +193,7 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
+    private var keepSessionAliveEnabled = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
 
     init {
@@ -256,6 +269,19 @@ class RealDuckChat @Inject constructor(
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             context.startActivity(this)
         }
+        appCoroutineScope.launch {
+            closeChatFlow.emit(Unit)
+        }
+    }
+
+    override fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit) {
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                closeChatFlow.collect {
+                    onClose()
+                }
+            }
+        }
     }
 
     override fun isAddressBarEntryPointEnabled(): Boolean {
@@ -323,16 +349,27 @@ class RealDuckChat @Inject constructor(
             duckChatFeatureRepository.registerOpened()
         }
 
-        startDuckChatActivity(url)
+        if (keepSessionAliveEnabled) {
+            logcat { "Duck.ai: restoring Duck.ai session" }
+            openDuckChatSession(url)
+        } else {
+            logcat { "Duck.ai: opening standalone Duck.ai screen" }
+            startDuckChatActivity(url)
+        }
+    }
+
+    private fun openDuckChatSession(url: String) {
+        browserNav.openDuckChat(context, duckChatUrl = url)
+            .apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(this)
+            }
     }
 
     private fun startDuckChatActivity(url: String) {
-        browserNav.openDuckChat(context, duckChatUrl = url)
-            .apply {
-                // TODO fix DuckAi POC
-                // if (experimentDataStore.isDuckAIPoCEnabled.value && experimentDataStore.isExperimentEnabled.value) {
-                //     setClass(context, DuckChatWebViewPoCActivity::class.java)
-                // }
+        globalActivityStarter
+            .startIntent(context, DuckChatWebViewActivityWithParams(url))
+            ?.apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
             }
@@ -386,6 +423,9 @@ class RealDuckChat @Inject constructor(
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
 
+            keepSessionAliveEnabled = duckChatFeature.keepSessionAlive().isEnabled()
+            keepSessionAliveInMinutes = DEFAULT_SESSION_ALIVE
+
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {
                 runCatching { jsonAdapter.fromJson(it) }.getOrNull()
@@ -398,7 +438,7 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
-            keepSessionAliveInMinutes = settingsJson?.keepSessionAlive ?: DEFAULT_SESSION_ALIVE
+
             cacheUserSettings()
         }
     }
