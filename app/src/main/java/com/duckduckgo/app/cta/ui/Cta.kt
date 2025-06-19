@@ -24,11 +24,13 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBuckDialogBinding
+import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextBuckDialogBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
@@ -208,30 +210,28 @@ sealed class OnboardingDaxDialogCta(
                 }
             } ?: primaryCta.gone()
 
-            onboardingDialogSuggestionsContent.gone()
-            onboardingDialogContent.show()
             root.alpha = MAX_ALPHA
 
             primaryCta.setOnClickListener {
-                daxDialogDismissButton.alpha = MIN_ALPHA
-                buckOnboardingDialogView.alpha = MIN_ALPHA
                 onPrimaryCtaClicked.invoke()
             }
 
             daxDialogDismissButton.setOnClickListener {
-                daxDialogDismissButton.alpha = MIN_ALPHA
-                buckOnboardingDialogView.alpha = MIN_ALPHA
                 onDismissCtaClicked.invoke()
             }
 
-            buckOnboardingDialogView.animateEntrance(
-                onAnimationEnd = {
-                    daxDialogDismissButton.animate().apply {
-                        alpha(MAX_ALPHA)
-                        duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                    }.start()
-                },
-            )
+            if (onboardingDaxDialogContainer.isVisible &&
+                (onboardingDialogContent.isVisible || onboardingDialogSuggestionsContent.isVisible)
+            ) {
+                onboardingDialogContent.gone()
+                onboardingDialogSuggestionsContent.gone()
+                TransitionManager.beginDelayedTransition(buckOnboardingDialogView, AutoTransition())
+                onboardingDialogContent.show()
+            } else {
+                onboardingDaxDialogContainer.show()
+                onboardingDialogContent.show()
+                animateBuckOnboardingDialogEntrance()
+            }
         }
     }
 
@@ -603,7 +603,6 @@ sealed class OnboardingDaxDialogCta(
                 val message = description?.let { context.getString(it) }.orEmpty()
                 val parsedDaxText = message.html(context)
 
-                onboardingDialogContent.gone()
                 suggestionsDialogTextCta.text = parsedDaxText
 
                 val optionsViews = listOf(
@@ -618,22 +617,24 @@ sealed class OnboardingDaxDialogCta(
                 optionsViews.forEachIndexed { index, buttonView ->
                     options[index].setOptionView(buttonView)
                     buttonView.setOnClickListener {
-                        daxDialogDismissButton.alpha = MIN_ALPHA
-                        buckOnboardingDialogView.alpha = MIN_ALPHA
+                        onboardingDaxDialogContainer.gone()
+                        onboardingDialogSuggestionsContent.gone()
                         onSuggestedOptionClicked?.invoke(options[index])
                     }
                 }
 
-                onboardingDialogSuggestionsContent.show()
-
-                buckOnboardingDialogView.animateEntrance(
-                    onAnimationEnd = {
-                        daxDialogDismissButton.animate().apply {
-                            alpha(MAX_ALPHA)
-                            duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                        }.start()
-                    },
-                )
+                if (onboardingDaxDialogContainer.isVisible &&
+                    (onboardingDialogContent.isVisible || onboardingDialogSuggestionsContent.isVisible)
+                ) {
+                    onboardingDialogContent.gone()
+                    onboardingDialogSuggestionsContent.gone()
+                    TransitionManager.beginDelayedTransition(buckDialogBinding.buckOnboardingDialogView, AutoTransition())
+                    onboardingDialogSuggestionsContent.show()
+                } else {
+                    onboardingDaxDialogContainer.show()
+                    onboardingDialogSuggestionsContent.show()
+                    animateBuckOnboardingDialogEntrance()
+                }
             }
         }
     }
@@ -685,6 +686,25 @@ sealed class OnboardingDaxDialogCta(
                     onDismissCtaClicked = onDismissCtaClicked,
                 )
             }
+        }
+    }
+
+    internal fun IncludeOnboardingInContextBuckDialogBinding.animateBuckOnboardingDialogEntrance() {
+        daxDialogDismissButton.alpha = MIN_ALPHA
+
+        with(buckOnboardingDialogView) {
+            alpha = MIN_ALPHA
+            animateEntrance(
+                onAnimationEnd = {
+                    with(daxDialogDismissButton) {
+                        show()
+                        animate().apply {
+                            alpha(MAX_ALPHA)
+                            duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                        }.start()
+                    }
+                },
+            )
         }
     }
 
