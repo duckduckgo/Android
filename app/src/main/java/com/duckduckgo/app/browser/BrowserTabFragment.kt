@@ -4411,7 +4411,6 @@ class BrowserTabFragment :
 
             if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
                 if (configuration is DaxBubbleCta.DaxEndCta) {
-                    requireActivity().window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
                     with(newBrowserTab.buckEndAnimation) {
                         isVisible = true
                         playAnimation()

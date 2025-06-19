@@ -2886,13 +2886,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
             duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
-
-    private fun isBuckExperimentEnabledAndDaxEndCta(cta: Cta?): Boolean =
-        onboardingDesignExperimentToggles.buckOnboarding().isEnabled() && cta is DaxBubbleCta.DaxEndCta
 
     fun onUserClickCtaOkButton(cta: Cta) {
         viewModelScope.launch {
