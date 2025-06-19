@@ -211,6 +211,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 val shouldUpdateOmnibarText = !settingsDataStore.isFullUrlEnabled &&
                     !it.omnibarText.isEmpty() &&
                     !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)
+                val omnibarText = if (shouldUpdateOmnibarText) {
+                    it.url
+                } else {
+                    it.omnibarText
+                }
+
                 it.copy(
                     hasFocus = true,
                     expanded = true,
@@ -227,7 +233,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         urlLoaded = _viewState.value.url,
                     ),
                     updateOmnibarText = shouldUpdateOmnibarText,
-                    omnibarText = it.url,
+                    omnibarText = omnibarText,
                 )
             }
         } else {
@@ -250,6 +256,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
                     it.omnibarText
                 }
+
                 it.copy(
                     hasFocus = false,
                     expanded = false,
@@ -543,26 +550,27 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState, forceRender: Boolean) {
         logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState" }
         if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+            val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                if (settingsDataStore.isFullUrlEnabled) {
+                    omnibarViewState.queryOrFullUrl
+                } else {
+                    addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                }
+            } else {
+                omnibarViewState.omnibarText
+            }
+
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
                     it.copy(
                         expanded = true,
                         expandedAnimated = true,
-                        omnibarText = omnibarViewState.omnibarText,
+                        omnibarText = omnibarText,
                         updateOmnibarText = true,
                     )
                 }
             } else {
                 _viewState.update {
-                    val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                        if (settingsDataStore.isFullUrlEnabled) {
-                            omnibarViewState.queryOrFullUrl
-                        } else {
-                            addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
-                        }
-                    } else {
-                        omnibarViewState.omnibarText
-                    }
                     it.copy(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
