@@ -92,6 +92,8 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onDuckChatSent: ((String) -> Unit)? = null
+    var onSearchSelected: (() -> Unit)? = null
+    var onDuckChatSelected: (() -> Unit)? = null
 
     private var selectionStart = 0
     private var selectionEnd = 0
@@ -133,6 +135,10 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     duckChatSend.isVisible = tab.position != 0
                     applyInputBehavior(tab.position)
+                    when (tab.position) {
+                        0 -> onSearchSelected?.invoke()
+                        1 -> onDuckChatSelected?.invoke()
+                    }
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
                 override fun onTabReselected(tab: TabLayout.Tab?) {}
