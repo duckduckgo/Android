@@ -5,6 +5,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
@@ -20,6 +21,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
 @RunWith(AndroidJUnit4::class)
 class RealSubscriptionsJSHelperTest {
@@ -167,5 +169,46 @@ class RealSubscriptionsJSHelperTest {
         assertEquals(expected.method, result.method)
         assertEquals(expected.featureName, result.featureName)
         assertEquals(expected.params.toString(), result.params.toString())
+    }
+
+    @Test
+    fun whenGetAuthAccessTokenRequestWithSuccessfulTokenThenReturnJsCallbackDataWithToken() = runTest {
+        val method = "getAuthAccessToken"
+        val id = "123"
+        val expectedToken = "test-access-token"
+
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Success(expectedToken))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("accessToken", expectedToken)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result?.id)
+        assertEquals(expected.featureName, result?.featureName)
+        assertEquals(expected.method, result?.method)
+        assertEquals(expected.params.toString(), result?.params.toString())
+    }
+
+    @Test
+    fun whenGetAuthAccessTokenRequestWithFailedTokenThenReturnJsCallbackDataWithEmptyObject() = runTest {
+        val method = "getAuthAccessToken"
+        val id = "123"
+
+        whenever(mockSubscriptionsManager.getAccessToken()).thenReturn(AccessTokenResult.Failure("Token not found"))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val jsonPayload = JSONObject()
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result?.id)
+        assertEquals(expected.featureName, result?.featureName)
+        assertEquals(expected.method, result?.method)
+        assertEquals(expected.params.toString(), result?.params.toString())
     }
 }

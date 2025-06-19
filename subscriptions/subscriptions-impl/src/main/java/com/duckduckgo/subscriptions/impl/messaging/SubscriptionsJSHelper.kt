@@ -19,6 +19,7 @@ package com.duckduckgo.subscriptions.impl.messaging
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -52,6 +53,10 @@ class RealSubscriptionsJSHelper @Inject constructor(
             getSubscriptionDetailsData(featureName, method, it)
         }
 
+        METHOD_GET_AUTH_ACCESS_TOKEN -> id?.let {
+            getAuthAccessTokenData(featureName, method, it)
+        }
+
         else -> null
     }
 
@@ -67,6 +72,17 @@ class RealSubscriptionsJSHelper @Inject constructor(
             }
         } ?: JSONObject().apply {
             put(IS_SUBSCRIBED, false)
+        }
+
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private suspend fun getAuthAccessTokenData(featureName: String, method: String, id: String): JsCallbackData {
+        val jsonPayload = when (val result = subscriptionsManager.getAccessToken()) {
+            is AccessTokenResult.Success -> JSONObject().apply {
+                put(ACCESS_TOKEN, result.accessToken)
+            }
+            is AccessTokenResult.Failure -> JSONObject()
         }
 
         return JsCallbackData(jsonPayload, featureName, method, id)
@@ -89,5 +105,6 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val EXPIRES_OR_RENEWS_AT = "expiresOrRenewsAt"
         private const val PAYMENT_PLATFORM = "paymentPlatform"
         private const val STATUS = "status"
+        private const val ACCESS_TOKEN = "accessToken"
     }
 }
