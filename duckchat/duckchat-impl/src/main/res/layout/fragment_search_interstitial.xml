@@ -30,8 +30,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <FrameLayout
-        android:id="@+id/contentContainer"
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -40,21 +40,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageView
-        android:id="@+id/ddgLogo"
-        android:layout_width="@dimen/ntpDaxLogoIconWidth"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-        android:adjustViewBounds="true"
-        android:contentDescription="@string/top_app_bar_label_title"
-        android:maxWidth="180dp"
-        android:maxHeight="180dp"
-        android:visibility="gone"
-        android:paddingTop="@dimen/keyline_3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/duckChatOmnibar"
-        app:srcCompat="@drawable/logo_full" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
