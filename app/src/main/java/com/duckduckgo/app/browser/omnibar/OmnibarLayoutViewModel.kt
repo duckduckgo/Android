@@ -168,7 +168,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showClickCatcher: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
-            return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || !isFullUrlEnabled
+            return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
         }
     }
 
@@ -554,10 +554,19 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }
             } else {
                 _viewState.update {
+                    val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                        if (settingsDataStore.isFullUrlEnabled) {
+                            omnibarViewState.queryOrFullUrl
+                        } else {
+                            addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                        }
+                    } else {
+                        omnibarViewState.omnibarText
+                    }
                     it.copy(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
-                        omnibarText = omnibarViewState.omnibarText,
+                        omnibarText = omnibarText,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
                             hasFocus = omnibarViewState.isEditing,
