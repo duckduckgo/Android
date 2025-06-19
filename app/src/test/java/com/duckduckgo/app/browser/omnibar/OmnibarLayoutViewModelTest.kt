@@ -88,17 +88,9 @@ class OmnibarLayoutViewModelTest {
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
-            on { getDisplayAddress(any(), any(), any()) } doAnswer { invocation ->
-                val showsFullUrl = invocation.getArgument<Boolean>(2)
-                val url = invocation.getArgument<String>(1)
-                val query = invocation.getArgument<String>(0)
-                if (url == SERP_URL || url == "") {
-                    query
-                } else if (showsFullUrl) {
-                    url
-                } else {
-                    url.toUri().baseHost ?: invocation.getArgument<String>(1)
-                }
+            on { getShortUrl(any()) } doAnswer { invocation ->
+                val url = invocation.getArgument<String>(0)
+                url.toUri().baseHost ?: url
             }
         }
     }
@@ -930,7 +922,19 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.leadingIconState == SEARCH)
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
-            assertTrue(viewState.updateOmnibarText)
+            assertFalse(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenOmnibarFocusedThenOmnibarTextRemainsDoesNotChangeIfBlank() = runTest {
+        val omnibarViewState = OmnibarViewState(omnibarText = "")
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+        testee.onOmnibarFocusChanged(true, "old input text")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals("", viewState.omnibarText)
         }
     }
 
@@ -1256,50 +1260,49 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarLosesFocusAndFullUrlEnabledThenAddressDisplayFormatterCalledWithFullUrlTrue() = runTest {
+    fun whenOmnibarLosesFocusAndFullUrlEnabledThenAddressDisplayDisplaysFullUrl() = runTest {
         val query = "query"
         val url = "https://example.com/test.html"
-        val formattedUrl = "https://example.com/test.html"
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         initializeViewModel()
-        testee.onOmnibarFocusChanged(hasFocus = true, query = query) // Initial focus
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
 
-        testee.onOmnibarFocusChanged(hasFocus = false, query = query)
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = query)
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertEquals(formattedUrl, viewState.omnibarText)
+            assertEquals(url, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
-            verify(mockAddressDisplayFormatter).getDisplayAddress(query, url, true)
+            verifyNoInteractions(mockAddressDisplayFormatter)
         }
     }
 
     @Test
-    fun whenOmnibarLosesFocusAndFullUrlDisabledThenAddressDisplayFormatterCalledWithFullUrlFalse() = runTest {
+    fun whenOmnibarLosesFocusAndFullUrlDisabledThenAddressDisplayTheShortUrl() = runTest {
         val query = "query"
         val url = "https://example.com/test.html"
         val formattedUrl = "example.com"
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
         initializeViewModel()
-        testee.onOmnibarFocusChanged(hasFocus = true, query = query) // Initial focus
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = query) // Initial focus
         testee.onExternalStateChange(StateChange.LoadingStateChange(LoadingViewState(url = url))) // Set URL
 
-        testee.onOmnibarFocusChanged(hasFocus = false, query = query)
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = query)
 
         testee.viewState.test {
             val viewState = awaitItem()
             assertEquals(formattedUrl, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
-            verify(mockAddressDisplayFormatter).getDisplayAddress(query, url, false)
+            verify(mockAddressDisplayFormatter).getShortUrl(viewState.url)
         }
     }
 
     @Test
-    fun whenExternalOmnibarStateChangedAndFullUrlEnabledThenAddressDisplayFormatterCalledWithFullUrlTrue() = runTest {
-        val omnibarText = "https://example.com/test.html"
+    fun whenExternalOmnibarStateChangedAndFullUrlEnabledThenAddressDisplayFormatterNotCalled() = runTest {
+        val url = "https://example.com/test.html"
         val formattedUrl = "https://example.com/test.html"
-        val omnibarViewState = OmnibarViewState(omnibarText = omnibarText, isEditing = false)
+        val omnibarViewState = OmnibarViewState(omnibarText = url, queryOrFullUrl = url, isEditing = false)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         initializeViewModel()
 
@@ -1309,25 +1312,112 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertEquals(formattedUrl, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
-            verify(mockAddressDisplayFormatter).getDisplayAddress(omnibarText, omnibarText, true)
+            verifyNoInteractions(mockAddressDisplayFormatter)
         }
     }
 
     @Test
-    fun whenExternalOmnibarStateChangedAndFullUrlDisabledThenAddressDisplayFormatterCalledWithFullUrlFalse() = runTest {
-        val omnibarText = "https://example.com/test.html"
-        val formattedUrl = "example.com"
-        val omnibarViewState = OmnibarViewState(omnibarText = omnibarText, isEditing = false)
+    fun whenOmnibarGainsFocusAndFullUrlDisabledThenOmnibarTextIsFullUrl() = runTest {
+        val url = "https://example.com/test.html"
+        val shortUrl = "example.com"
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
         initializeViewModel()
 
-        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+        // Set initial state: site loaded, omnibar not focused (showing short url)
+        givenSiteLoaded(url)
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = "")
+
+        // omnibar gains focus
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = shortUrl)
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertEquals(formattedUrl, viewState.omnibarText)
+            assertEquals(url, viewState.omnibarText)
             assertTrue(viewState.updateOmnibarText)
-            verify(mockAddressDisplayFormatter).getDisplayAddress(omnibarText, omnibarText, false)
+        }
+    }
+
+    @Test
+    fun whenOmnibarGainsFocusAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
+        val url = "https://example.com/test.html"
+        val shortUrl = "example.com"
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+        initializeViewModel()
+
+        // Set initial state: site loaded, omnibar not focused (showing short url)
+        givenSiteLoaded(url)
+        testee.onOmnibarFocusChanged(hasFocus = false, inputFieldText = "")
+
+        // omnibar gains focus
+        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = shortUrl)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(url, viewState.omnibarText)
+            assertFalse(viewState.updateOmnibarText)
+            verifyNoInteractions(mockAddressDisplayFormatter)
+        }
+    }
+
+    @Test
+    fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEnabledThenOmnibarTextIsFullUrl() = runTest {
+        val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verifyNoInteractions(mockAddressDisplayFormatter)
+        }
+    }
+
+    @Test
+    fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlDisabledThenOmnibarTextIsShortUrl() = runTest {
+        val shortUrl = RANDOM_URL.toUri().baseHost!!
+        val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(shortUrl, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verify(mockAddressDisplayFormatter).getShortUrl(RANDOM_URL)
+        }
+    }
+
+    @Test
+    fun whenExternalOmnibarStateChangedWithForceRenderAndNotDDGUrlAndFullUrlEndabledThenOmnibarTextIsFullUrl() = runTest {
+        val shortUrl = RANDOM_URL.toUri().baseHost!!
+        val omnibarViewState = OmnibarViewState(omnibarText = shortUrl, queryOrFullUrl = RANDOM_URL)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verifyNoInteractions(mockAddressDisplayFormatter)
+        }
+    }
+
+    @Test
+    fun whenExternalOmnibarStateChangedWithoutForceRenderThenOmnibarTextIsFromState() = runTest {
+        val omnibarViewState = OmnibarViewState(omnibarText = RANDOM_URL, queryOrFullUrl = RANDOM_URL)
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = false))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(RANDOM_URL, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+            verifyNoInteractions(mockAddressDisplayFormatter)
         }
     }
 

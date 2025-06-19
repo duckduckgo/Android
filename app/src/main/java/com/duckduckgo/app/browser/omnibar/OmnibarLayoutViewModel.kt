@@ -168,8 +168,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         val showShadows: Boolean = false,
         val showClickCatcher: Boolean = false,
     ) {
-        fun shouldUpdateOmnibarText(): Boolean {
-            return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning
+        fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
+            return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
         }
     }
 
@@ -197,11 +197,11 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     fun onOmnibarFocusChanged(
         hasFocus: Boolean,
-        query: String,
+        inputFieldText: String,
     ) {
         logcat { "Omnibar: onOmnibarFocusChanged" }
-        val showClearButton = hasFocus && query.isNotBlank()
-        val showControls = query.isBlank()
+        val showClearButton = hasFocus && inputFieldText.isNotBlank()
+        val showControls = inputFieldText.isBlank()
 
         if (hasFocus) {
             viewModelScope.launch {
@@ -209,6 +209,15 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
 
             _viewState.update {
+                val shouldUpdateOmnibarText = !settingsDataStore.isFullUrlEnabled &&
+                    !it.omnibarText.isEmpty() &&
+                    !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)
+                val omnibarText = if (shouldUpdateOmnibarText) {
+                    it.url
+                } else {
+                    it.omnibarText
+                }
+
                 it.copy(
                     hasFocus = true,
                     expanded = true,
@@ -224,20 +233,31 @@ class OmnibarLayoutViewModel @Inject constructor(
                         hasQueryChanged = false,
                         urlLoaded = _viewState.value.url,
                     ),
-                    omnibarText = addressDisplayFormatter.getDisplayAddress(query, it.url, true),
-                    updateOmnibarText = true,
+                    updateOmnibarText = shouldUpdateOmnibarText,
+                    omnibarText = omnibarText,
                 )
             }
         } else {
             _viewState.update {
-                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText()
+                val shouldUpdateOmnibarText = it.shouldUpdateOmnibarText(settingsDataStore.isFullUrlEnabled)
                 logcat { "Omnibar: lost focus in Browser or MaliciousSiteWarning mode $shouldUpdateOmnibarText" }
                 val omnibarText = if (shouldUpdateOmnibarText) {
-                    addressDisplayFormatter.getDisplayAddress(query, it.url, settingsDataStore.isFullUrlEnabled)
+                    if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(it.url)) {
+                        logcat { "Omnibar: is DDG url, showing query ${it.query}" }
+                        it.query
+                    } else {
+                        logcat { "Omnibar: is url, showing URL ${it.url}" }
+                        if (settingsDataStore.isFullUrlEnabled) {
+                            it.url
+                        } else {
+                            addressDisplayFormatter.getShortUrl(it.url)
+                        }
+                    }
                 } else {
                     logcat { "Omnibar: not browser or MaliciousSiteWarning mode, not changing omnibar text" }
                     it.omnibarText
                 }
+
                 it.copy(
                     hasFocus = false,
                     expanded = false,
@@ -470,7 +490,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState.update {
             val updatedQuery = if (deleteLastCharacter) {
                 logcat { "Omnibar: deleting last character, old query ${it.query} also deleted" }
-                it.url
+                if (settingsDataStore.isFullUrlEnabled) {
+                    it.url
+                } else {
+                    addressDisplayFormatter.getShortUrl(it.url)
+                }
             } else if (clearQuery) {
                 logcat { "Omnibar: clearing old query ${it.query}, we keep it as reference" }
                 it.query
@@ -527,11 +551,16 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState, forceRender: Boolean) {
         logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState" }
         if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-            val omnibarText = addressDisplayFormatter.getDisplayAddress(
-                omnibarViewState.omnibarText,
-                omnibarViewState.omnibarText,
-                settingsDataStore.isFullUrlEnabled || omnibarViewState.isEditing,
-            )
+            val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                if (settingsDataStore.isFullUrlEnabled) {
+                    omnibarViewState.queryOrFullUrl
+                } else {
+                    addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                }
+            } else {
+                omnibarViewState.omnibarText
+            }
+
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
                     it.copy(
@@ -550,11 +579,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
                             hasFocus = omnibarViewState.isEditing,
-                            query = omnibarText,
+                            query = omnibarViewState.omnibarText,
                             hasQueryChanged = true,
                             urlLoaded = _viewState.value.url,
                         ),
-
                     )
                 }
             }
@@ -599,7 +627,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         )
         _viewState.update {
             it.copy(
-                omnibarText = addressDisplayFormatter.getDisplayAddress(it.query, it.url, settingsDataStore.isFullUrlEnabled),
+                omnibarText = if (settingsDataStore.isFullUrlEnabled) it.url else addressDisplayFormatter.getShortUrl(it.url),
                 updateOmnibarText = true,
             )
         }
