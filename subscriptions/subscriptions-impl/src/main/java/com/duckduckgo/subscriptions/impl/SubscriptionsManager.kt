@@ -347,7 +347,10 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             false
         }
-        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled()
+        val freeTrialProductsAvailableInGooglePlay = getSubscriptionOffer().any {
+            it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
+        }
+        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
