@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -29,6 +30,7 @@ import org.json.JSONObject
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsJSHelper @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
+    private val privacyProFeature: PrivacyProFeature,
 ) : SubscriptionsJSHelper {
 
     override suspend fun processJsCallbackMessage(
@@ -55,6 +57,10 @@ class RealSubscriptionsJSHelper @Inject constructor(
 
         METHOD_GET_AUTH_ACCESS_TOKEN -> id?.let {
             getAuthAccessTokenData(featureName, method, it)
+        }
+
+        METHOD_GET_FEATURE_CONFIG -> id?.let {
+            getFeatureConfigData(featureName, method, it)
         }
 
         else -> null
@@ -88,6 +94,14 @@ class RealSubscriptionsJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    private suspend fun getFeatureConfigData(featureName: String, method: String, id: String): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            put(USE_PAID_DUCK_AI, privacyProFeature.duckAiPlus().isEnabled())
+        }
+
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
     companion object {
         private const val METHOD_HANDSHAKE = "handshake"
         private const val METHOD_SUBSCRIPTION_DETAILS = "subscriptionDetails"
@@ -106,5 +120,6 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val PAYMENT_PLATFORM = "paymentPlatform"
         private const val STATUS = "status"
         private const val ACCESS_TOKEN = "accessToken"
+        private const val USE_PAID_DUCK_AI = "usePaidDuckAi"
     }
 }

@@ -11,11 +11,14 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,10 +33,16 @@ class RealSubscriptionsJSHelperTest {
     var coroutineRule = CoroutineTestRule()
 
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
-    private val testee = RealSubscriptionsJSHelper(mockSubscriptionsManager)
+    private val testee = RealSubscriptionsJSHelper(mockSubscriptionsManager, privacyProFeature)
 
     private val featureName = "subscriptions"
+
+    @Before
+    fun setUp() {
+        // Set up any necessary initializations or mocks
+    }
 
     @Test
     fun whenMethodIsUnknownThenReturnNull() = runTest {
@@ -203,6 +212,50 @@ class RealSubscriptionsJSHelperTest {
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject()
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result?.id)
+        assertEquals(expected.featureName, result?.featureName)
+        assertEquals(expected.method, result?.method)
+        assertEquals(expected.params.toString(), result?.params.toString())
+    }
+
+    @Test
+    fun whenGetFeatureConfigRequestThenReturnJsCallbackDataWithUsePaidDuckAiFlag() = runTest {
+        val method = "getFeatureConfig"
+        val id = "123"
+        val usePaidDuckAi = true
+
+        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("usePaidDuckAi", usePaidDuckAi)
+        }
+
+        val expected = JsCallbackData(jsonPayload, featureName, method, id)
+
+        assertEquals(expected.id, result?.id)
+        assertEquals(expected.featureName, result?.featureName)
+        assertEquals(expected.method, result?.method)
+        assertEquals(expected.params.toString(), result?.params.toString())
+    }
+
+    @Test
+    fun whenGetFeatureConfigRequestWithDisabledFlagThenReturnJsCallbackDataWithUsePaidDuckAiFalse() = runTest {
+        val method = "getFeatureConfig"
+        val id = "123"
+        val usePaidDuckAi = false
+
+        privacyProFeature.duckAiPlus().setRawStoredState(com.duckduckgo.feature.toggles.api.Toggle.State(usePaidDuckAi))
+
+        val result = testee.processJsCallbackMessage(featureName, method, id, null)
+
+        val jsonPayload = JSONObject().apply {
+            put("usePaidDuckAi", usePaidDuckAi)
+        }
 
         val expected = JsCallbackData(jsonPayload, featureName, method, id)
 
