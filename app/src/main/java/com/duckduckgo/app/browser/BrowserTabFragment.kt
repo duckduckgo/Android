@@ -3062,7 +3062,6 @@ class BrowserTabFragment :
             }
         }
         renderer.showNewTab()
-        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
