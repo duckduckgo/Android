@@ -46,8 +46,9 @@ class RatingModule {
         appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,
         promptTypeDecider: PromptTypeDecider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        preventDialogQueuingFeature: PreventFeedbackDialogQueuingFeature,
     ): MainProcessLifecycleObserver {
-        return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider, appCoroutineScope)
+        return AppEnjoymentAppCreationObserver(appEnjoymentPromptEmitter, promptTypeDecider, appCoroutineScope, preventDialogQueuingFeature)
     }
 
     @Provides
