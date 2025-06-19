@@ -55,9 +55,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
     ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
-    // Temporary Pixel
-    ONBOARDING_AUTO_COMPLETE("onboarding_auto_complete"),
-
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
     BROWSER_PULL_TO_REFRESH("m_browser_pull_to_refresh"),
