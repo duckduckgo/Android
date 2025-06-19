@@ -60,7 +60,11 @@ class RealSubscriptionsJSHelperTest {
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
-            put("availableMessages", JSONArray().put("subscriptionDetails"))
+            put("availableMessages", JSONArray().apply {
+                put("subscriptionDetails")
+                put("getAuthAccessToken")
+                put("getFeatureConfig")
+            })
             put("platform", "android")
         }
 

@@ -38,7 +38,11 @@ class RealSubscriptionsJSHelper @Inject constructor(
     ): JsCallbackData? = when (method) {
         METHOD_HANDSHAKE -> id?.let {
             val jsonPayload = JSONObject().apply {
-                put(AVAILABLE_MESSAGES, JSONArray().put(SUBSCRIPTION_DETAILS))
+                put(AVAILABLE_MESSAGES, JSONArray().apply {
+                    put(SUBSCRIPTION_DETAILS)
+                    put(GET_AUTH_ACCESS_TOKEN)
+                    put(GET_FEATURE_CONFIG)
+                })
                 put(PLATFORM, ANDROID)
             }
             return JsCallbackData(jsonPayload, featureName, method, id)
@@ -71,8 +75,12 @@ class RealSubscriptionsJSHelper @Inject constructor(
     companion object {
         private const val METHOD_HANDSHAKE = "handshake"
         private const val METHOD_SUBSCRIPTION_DETAILS = "subscriptionDetails"
+        private const val METHOD_GET_AUTH_ACCESS_TOKEN = "getAuthAccessToken"
+        private const val METHOD_GET_FEATURE_CONFIG = "getFeatureConfig"
         private const val AVAILABLE_MESSAGES = "availableMessages"
         private const val SUBSCRIPTION_DETAILS = "subscriptionDetails"
+        private const val GET_AUTH_ACCESS_TOKEN = "getAuthAccessToken"
+        private const val GET_FEATURE_CONFIG = "getFeatureConfig"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
         private const val IS_SUBSCRIBED = "isSubscribed"
