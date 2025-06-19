@@ -45,6 +45,7 @@ object SubscriptionsConstants {
     const val ITR = "Identity Theft Restoration"
     const val ROW_ITR = "Global Identity Theft Restoration"
     const val PIR = "Data Broker Protection"
+    const val DUCK_AI = "Duck.ai"
 
     // Platform
     const val PLATFORM = "android"
