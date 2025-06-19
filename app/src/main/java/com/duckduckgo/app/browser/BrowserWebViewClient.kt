@@ -70,6 +70,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -124,6 +125,7 @@ class BrowserWebViewClient @Inject constructor(
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
+    private val contentScopeExperiments: ContentScopeExperiments,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -437,7 +439,8 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList))
+        val activeExperiments = contentScopeExperiments.getActiveExperiments()
+        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }

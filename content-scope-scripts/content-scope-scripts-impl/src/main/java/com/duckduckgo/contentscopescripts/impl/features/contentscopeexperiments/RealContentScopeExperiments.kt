@@ -16,18 +16,13 @@
 
 package com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments
 
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi.Builder
-import com.squareup.moshi.Types
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
-
-interface ContentScopeExperiments {
-    fun getExperimentsJson(): String
-}
 
 @ContributesBinding(AppScope::class)
 class RealContentScopeExperiments @Inject constructor(
@@ -35,11 +30,8 @@ class RealContentScopeExperiments @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
 ) : ContentScopeExperiments {
 
-    override fun getExperimentsJson(): String {
+    override fun getActiveExperiments(): List<Toggle> {
         val featureName = contentScopeExperimentsFeature.self().featureName().name
-        val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
-        val moshi = Builder().build()
-        val jsonAdapter: JsonAdapter<List<Experiment>> = moshi.adapter(type)
         return runBlocking {
             val experiments = if (contentScopeExperimentsFeature.self().isEnabled()) {
                 featureTogglesInventory.getAllTogglesForParent(featureName)
@@ -49,23 +41,11 @@ class RealContentScopeExperiments @Inject constructor(
             experiments.mapNotNull {
                 it.enroll()
                 if (it.isEnabled()) {
-                    Experiment(
-                        cohort = it.getCohort()?.name,
-                        feature = featureName,
-                        subfeature = it.featureName().name,
-                    )
+                    it
                 } else {
                     null
                 }
-            }.let {
-                jsonAdapter.toJson(it)
             }
         }
     }
-
-    private data class Experiment(
-        val feature: String,
-        val subfeature: String,
-        val cohort: String?,
-    )
 }
