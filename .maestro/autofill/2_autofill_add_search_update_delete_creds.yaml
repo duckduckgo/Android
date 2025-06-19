@@ -13,7 +13,7 @@ tags:
       - runFlow: steps/access_passwords_screen.yaml
 
       - assertVisible:
-          text: "No passwords saved yet"
+          text: "Deliberate failure"
       - assertNotVisible:
           id: searchLogins
 
