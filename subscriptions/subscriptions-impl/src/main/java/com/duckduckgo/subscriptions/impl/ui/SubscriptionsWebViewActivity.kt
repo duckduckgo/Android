@@ -58,6 +58,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -78,6 +79,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToDuckAI
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
@@ -160,6 +162,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var pixelSender: SubscriptionPixelSender
+
+    @Inject
+    lateinit var duckChat: DuckChat
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
@@ -422,6 +427,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
+            is GoToDuckAI -> goToDuckAI()
             Reload -> binding.webview.reload()
         }
     }
@@ -445,6 +451,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun goToNetP(params: ActivityParams) {
         globalActivityStarter.start(this, params)
+    }
+
+    private fun goToDuckAI() {
+        duckChat.openDuckChat()
     }
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
