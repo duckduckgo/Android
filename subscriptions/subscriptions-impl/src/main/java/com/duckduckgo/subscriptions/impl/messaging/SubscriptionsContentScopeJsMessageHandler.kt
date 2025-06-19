@@ -43,6 +43,9 @@ class SubscriptionsContentScopeJsMessageHandler @Inject constructor() : ContentS
             "subscriptionDetails",
             "getAuthAccessToken",
             "getFeatureConfig",
+            "backToSettings",
+            "openSubscriptionActivation",
+            "openSubscriptionPurchase",
         )
     }
 }

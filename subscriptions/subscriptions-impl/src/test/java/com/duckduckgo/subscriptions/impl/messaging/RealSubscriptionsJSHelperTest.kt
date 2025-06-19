@@ -1,18 +1,19 @@
 package com.duckduckgo.subscriptions.impl.messaging
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.impl.AccessTokenResult
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.repository.Subscription
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,9 +25,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import org.robolectric.RobolectricTestRunner
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class RealSubscriptionsJSHelperTest {
 
     @get:Rule
@@ -35,7 +36,7 @@ class RealSubscriptionsJSHelperTest {
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
-    private val testee = RealSubscriptionsJSHelper(mockSubscriptionsManager, privacyProFeature)
+    private val testee = RealSubscriptionsJSHelper(mockSubscriptionsManager, privacyProFeature, coroutineRule.testDispatcherProvider)
 
     private val featureName = "subscriptions"
 
@@ -71,11 +72,14 @@ class RealSubscriptionsJSHelperTest {
         val result = testee.processJsCallbackMessage(featureName, method, id, null)
 
         val jsonPayload = JSONObject().apply {
-            put("availableMessages", JSONArray().apply {
-                put("subscriptionDetails")
-                put("getAuthAccessToken")
-                put("getFeatureConfig")
-            })
+            put(
+                "availableMessages",
+                JSONArray().apply {
+                    put("subscriptionDetails")
+                    put("getAuthAccessToken")
+                    put("getFeatureConfig")
+                },
+            )
             put("platform", "android")
         }
 
