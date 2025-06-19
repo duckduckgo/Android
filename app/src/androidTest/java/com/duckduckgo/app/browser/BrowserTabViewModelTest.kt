@@ -6747,7 +6747,7 @@ class BrowserTabViewModelTest {
     fun whenMaliciousSiteVisitedThenQueryOrFullUrlUpdates() {
         testee.browserViewState.value = browserViewState().copy(
             browserShowing = false,
-            maliciousSiteBlocked = true
+            maliciousSiteBlocked = true,
         )
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
@@ -6763,7 +6763,7 @@ class BrowserTabViewModelTest {
 
         testee.browserViewState.value = browserViewState().copy(
             browserShowing = false,
-            maliciousSiteBlocked = true
+            maliciousSiteBlocked = true,
         )
         testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
         testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
