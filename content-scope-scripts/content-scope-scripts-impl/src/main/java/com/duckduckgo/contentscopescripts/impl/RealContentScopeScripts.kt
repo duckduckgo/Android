@@ -21,7 +21,6 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
-import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
@@ -34,6 +33,8 @@ import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
+import logcat.logcat
 
 interface CoreContentScopeScripts {
     fun getScript(site: Site?): String
@@ -54,7 +55,6 @@ class RealContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
-    private val contentScopeExperiments: ContentScopeExperiments,
 ) : CoreContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -179,7 +179,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
-        val experiments = getExperimentsKeyValuePair()
+        val experiments = getExperimentsKeyValuePair(site)
         val isDesktopMode = site?.isDesktopMode ?: false
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
             "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
@@ -194,7 +194,21 @@ class RealContentScopeScripts @Inject constructor(
     private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
-    private fun getExperimentsKeyValuePair() = "\"currentCohorts\":${contentScopeExperiments.getExperimentsJson()}"
+    private fun getExperimentsKeyValuePair(site: Site?): String {
+        val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
+        val moshi = Builder().build()
+        val jsonAdapter: JsonAdapter<List<Experiment>> = moshi.adapter(type)
+        (site?.activeContentScopeExperiments ?: listOf()).map {
+            Experiment(
+                cohort = runBlocking { it.getCohort()?.name },
+                feature = it.featureName().parentName ?: "",
+                subfeature = it.featureName().name,
+            )
+        }.let {
+            logcat("Cris") { "Injecting cohorts: $it" }
+            return "\"currentCohorts\":${jsonAdapter.toJson(it)}"
+        }
+    }
 
     private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<FeatureException>): String = (
         "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
@@ -217,4 +231,10 @@ class RealContentScopeScripts @Inject constructor(
 data class PluginParameters(
     val config: String,
     val preferences: String,
+)
+
+data class Experiment(
+    val feature: String,
+    val subfeature: String,
+    val cohort: String?,
 )
