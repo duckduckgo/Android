@@ -265,12 +265,15 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        browserNav.closeDuckChat(context).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(this)
-        }
-        appCoroutineScope.launch {
-            closeChatFlow.emit(Unit)
+        if (keepSessionAliveEnabled) {
+            browserNav.closeDuckChat(context).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                context.startActivity(this)
+            }
+        } else {
+            appCoroutineScope.launch {
+                closeChatFlow.emit(Unit)
+            }
         }
     }
 

@@ -774,7 +774,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
-    private fun openDuckChat(url: String?, keepSession: Boolean) {
+    private fun openDuckChat(
+        url: String?,
+        keepSession: Boolean,
+    ) {
         duckAiFragment?.let { fragment ->
             if (keepSession) {
                 restoreDuckChat(fragment)
@@ -787,10 +790,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNewDuckChat(duckChatUrl: String?) {
-        val fragment = DuckChatWebViewFragment()
-        duckChatUrl?.let {
+        val fragment = DuckChatWebViewFragment().apply {
             logcat { "Duck.ai url passed $duckChatUrl" }
-            fragment.arguments?.putString(KEY_DUCK_AI_URL, duckChatUrl)
+            duckChatUrl?.let {
+                arguments = Bundle().apply {
+                    putString(KEY_DUCK_AI_URL, duckChatUrl)
+                }
+            }
         }
 
         duckAiFragment = fragment
