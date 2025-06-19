@@ -108,6 +108,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @InjectWith(FragmentScope::class)
@@ -144,7 +145,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     sealed class StateChange {
-        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
+        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState, val forceRender: Boolean = false) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
@@ -616,7 +617,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun shouldShowUpdatedPrivacyShield(navigationBarEnabled: Boolean): Boolean {
-        return senseOfProtectionExperiment.shouldShowNewPrivacyShield() || navigationBarEnabled
+        return runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() } || navigationBarEnabled
     }
 
     open fun renderButtons(viewState: ViewState) {
@@ -808,7 +809,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 pulseAnimation.playOn(
                     targetView,
                     isPrivacyShieldAnimation &&
-                        senseOfProtectionExperiment.shouldShowNewPrivacyShield(),
+                        runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() },
                 )
             }
         } else {
@@ -996,6 +997,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun isBottomNavEnabled(): Boolean {
+        return false
     }
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {

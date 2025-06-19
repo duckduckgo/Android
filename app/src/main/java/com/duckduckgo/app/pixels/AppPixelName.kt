@@ -55,9 +55,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
     ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
 
-    // Temporary Pixel
-    ONBOARDING_AUTO_COMPLETE("onboarding_auto_complete"),
-
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
     BROWSER_PULL_TO_REFRESH("m_browser_pull_to_refresh"),
@@ -137,6 +134,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_SYNC_PRESSED("ms_sync_pressed"),
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
+    SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED("m_appearance_settings_is_full_url_option_toggled"),
+    APPEARANCE_SETTINGS_IS_FULL_URL_ENABLED_DAILY("m_appearance_settings_is_full_url_enabled_daily"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),

@@ -1,0 +1,35 @@
+name: 'Pull Request changed -> Sync Asana PR task'
+on:
+  pull_request_review:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - closed
+      - reopened
+      - synchronize
+      - assigned
+      - ready_for_review
+      - labeled
+
+concurrency:
+  group: ${{ github.ref }}
+
+jobs:
+  sync:
+    name: Sync Asana PR task
+    runs-on: ubuntu-latest
+    if: |
+      contains(github.event.pull_request.labels.*.name, 'PR-task') &&
+      github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./.github/actions/pr-asana-sync
+        with:
+          GITHUB_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+          ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          ASANA_WORKSPACE_ID: ${{ secrets.GH_ASANA_WORKSPACE_ID }}
+          ASANA_PROJECT_ID: ${{ vars.GH_ASANA_CODE_REVIEWS_PROJECT_ID }}
+          ASANA_IN_PROGRESS_SECTION_ID: ${{ vars.GH_ASANA_CODE_REVIEWS_IN_PROGRESS_SECTION_ID }}
+          USER_MAP: ${{ vars.GH_ANDROID_USER_MAP }}

@@ -359,7 +359,7 @@ class BrowserViewModel @Inject constructor(
             launch {
                 val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
                 if (existingTab == null) {
-                    command.value = Command.OpenInNewTab(url)
+                    command.value = Command.OpenSavedSite(url)
                 } else {
                     command.value = Command.SwitchToTab(existingTab.tabId)
                 }

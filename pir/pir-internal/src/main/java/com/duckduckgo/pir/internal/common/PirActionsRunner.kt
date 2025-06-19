@@ -47,6 +47,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Ev
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.RetryAwaitCaptchaSolution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.RetryGetCaptchaSolution
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.RetryGetEmailConfirmation
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.Started
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
@@ -389,13 +390,23 @@ class RealPirActionsRunner @AssistedInject constructor(
                 actionId = effect.actionId,
                 brokerName = effect.brokerName,
                 email = effect.extractedProfile.email!!,
-                pollingIntervalSeconds = effect.pollingIntervalSeconds,
             ),
         ).also {
             if (it is Success) {
                 engine?.dispatch(
                     EmailConfirmationLinkReceived(
                         confirmationLink = (it.data as NativeSuccessData.EmailConfirmation).link,
+                    ),
+                )
+            } else if (it is Failure && it.retryNativeAction && effect.attempt != effect.retries) {
+                delay(effect.pollingIntervalSeconds.toLong() * 1_000)
+                engine?.dispatch(
+                    RetryGetEmailConfirmation(
+                        actionId = effect.actionId,
+                        brokerName = effect.brokerName,
+                        extractedProfile = effect.extractedProfile,
+                        pollingIntervalSeconds = effect.pollingIntervalSeconds,
+                        attempt = effect.attempt + 1,
                     ),
                 )
             } else {

@@ -76,6 +76,7 @@ import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -189,6 +190,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
+
+    @Inject
+    lateinit var browserFeatures: AndroidBrowserConfigFeature
 
     private val lastActiveTabs = TabList()
 
@@ -1169,9 +1173,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            if (!duckChat.showInAddressBar.value) {
-                toolbarMockupBinding.aiChatIconMenuMockup.isVisible = false
-            }
+            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
         }
     }
 }

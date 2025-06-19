@@ -48,16 +48,6 @@ import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.autocomplete.api.AutoComplete
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
 import com.duckduckgo.app.browser.SSLErrorType.GENERIC
@@ -285,6 +275,16 @@ import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
@@ -467,6 +467,7 @@ class BrowserTabViewModel @Inject constructor(
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
     private val tabManager: TabManager,
+    private val addressDisplayFormatter: AddressDisplayFormatter,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -477,6 +478,7 @@ class BrowserTabViewModel @Inject constructor(
     private var buildingSiteFactoryJob: Job? = null
     private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
+    private var lastFullSiteUrlEnabled: Boolean = settingsDataStore.isFullUrlEnabled
 
     // Map<String, Map<String, JavaScriptReplyProxy>>() = Map<Origin, Map<location.href, JavaScriptReplyProxy>>()
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
@@ -856,6 +858,11 @@ class BrowserTabViewModel @Inject constructor(
         if (currentGlobalLayoutState() is Invalidated && currentBrowserViewState().browserShowing) {
             showErrorWithAction()
         }
+
+        if (lastFullSiteUrlEnabled != settingsDataStore.isFullUrlEnabled) {
+            lastFullSiteUrlEnabled = settingsDataStore.isFullUrlEnabled
+            command.value = Command.RefreshOmnibar
+        }
     }
 
     fun onViewVisible() {
@@ -1132,7 +1139,8 @@ class BrowserTabViewModel @Inject constructor(
         globalLayoutState.value = Browser(isNewTabState = false)
         findInPageViewState.value = FindInPageViewState(visible = false)
         omnibarViewState.value = currentOmnibarViewState().copy(
-            omnibarText = trimmedInput,
+            omnibarText = if (settingsDataStore.isFullUrlEnabled) trimmedInput else addressDisplayFormatter.getShortUrl(trimmedInput),
+            queryOrFullUrl = trimmedInput,
             forceExpand = true,
         )
         browserViewState.value = currentBrowserViewState().copy(
@@ -1161,7 +1169,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun fireQueryChangedPixel(omnibarText: String) {
-        val oldQuery = currentOmnibarViewState().omnibarText.toUri()
+        val oldQuery = currentOmnibarViewState().queryOrFullUrl.toUri()
         val newQuery = omnibarText.toUri()
 
         if (Patterns.WEB_URL.matcher(oldQuery.toString()).matches()) return
@@ -1304,9 +1312,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onRefreshRequested(triggeredByUser: Boolean) {
-        val omnibarContent = currentOmnibarViewState().omnibarText
+        val omnibarContent = currentOmnibarViewState().queryOrFullUrl
         if (!Patterns.WEB_URL.matcher(omnibarContent).matches()) {
-            fireQueryChangedPixel(currentOmnibarViewState().omnibarText)
+            fireQueryChangedPixel(omnibarContent)
         }
         navigationAwareLoginDetector.onEvent(NavigationEvent.UserAction.Refresh)
         if (currentGlobalLayoutState() is Invalidated) {
@@ -1390,8 +1398,8 @@ class BrowserTabViewModel @Inject constructor(
             }
             return true
         } else if (!skipHome && !isCustomTab) {
-            navigateHome()
             command.value = ShowKeyboard
+            navigateHome()
             return true
         }
 
@@ -1416,6 +1424,7 @@ class BrowserTabViewModel @Inject constructor(
         findInPageViewState.value = FindInPageViewState()
         omnibarViewState.value = currentOmnibarViewState().copy(
             omnibarText = "",
+            queryOrFullUrl = "",
             forceExpand = true,
         )
         loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
@@ -1561,9 +1570,9 @@ class BrowserTabViewModel @Inject constructor(
         setAdClickActiveTabData(url)
 
         val currentOmnibarViewState = currentOmnibarViewState()
-        val omnibarText = omnibarTextForUrl(url)
         omnibarViewState.value = currentOmnibarViewState.copy(
-            omnibarText = omnibarText,
+            queryOrFullUrl = omnibarTextForUrl(url, true),
+            omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
             forceExpand = true,
         )
         val currentBrowserViewState = currentBrowserViewState()
@@ -1755,10 +1764,10 @@ class BrowserTabViewModel @Inject constructor(
         site?.url = url
         onSiteChanged()
         val currentOmnibarViewState = currentOmnibarViewState()
-        val omnibarText = omnibarTextForUrl(url)
         omnibarViewState.postValue(
             currentOmnibarViewState.copy(
-                omnibarText = omnibarText,
+                queryOrFullUrl = omnibarTextForUrl(url, true),
+                omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
                 forceExpand = false,
             ),
         )
@@ -1784,13 +1793,18 @@ class BrowserTabViewModel @Inject constructor(
         return url
     }
 
-    private fun omnibarTextForUrl(url: String?): String {
+    private fun omnibarTextForUrl(url: String?, showFullUrl: Boolean): String {
         if (url == null) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             duckDuckGoUrlDetector.extractQuery(url) ?: url
         } else {
-            stripBasicAuthFromUrl(url)
+            val strippedAuthUrl = stripBasicAuthFromUrl(url)
+            if (showFullUrl) {
+                strippedAuthUrl
+            } else {
+                addressDisplayFormatter.getShortUrl(strippedAuthUrl)
+            }
         }
     }
 
@@ -2037,7 +2051,14 @@ class BrowserTabViewModel @Inject constructor(
                     url = documentUrlString,
                 )
                 omnibarViewState.value = currentOmnibarViewState().copy(
-                    omnibarText = documentUrlString,
+                    omnibarText = if (settingsDataStore.isFullUrlEnabled) {
+                        documentUrlString
+                    } else {
+                        addressDisplayFormatter.getShortUrl(
+                            documentUrlString,
+                        )
+                    },
+                    queryOrFullUrl = documentUrlString,
                     isEditing = false,
                     navigationChange = true,
                 )
@@ -2841,7 +2862,8 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta)
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
+            visualDesignExperimentDataStore.isDuckAIPoCEnabled.value
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
@@ -2999,7 +3021,8 @@ class BrowserTabViewModel @Inject constructor(
     override fun requiresAuthentication(request: BasicAuthenticationRequest) {
         if (request.host != site?.uri?.host) {
             omnibarViewState.value = currentOmnibarViewState().copy(
-                omnibarText = request.site,
+                omnibarText = if (settingsDataStore.isFullUrlEnabled) request.site else addressDisplayFormatter.getShortUrl(request.site),
+                queryOrFullUrl = request.site,
                 forceExpand = true,
             )
             command.value = HideWebContent
@@ -3409,7 +3432,8 @@ class BrowserTabViewModel @Inject constructor(
 
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = siteUrlString,
+                        omnibarText = if (settingsDataStore.isFullUrlEnabled) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
+                        queryOrFullUrl = siteUrlString,
                         isEditing = false,
                     )
 
@@ -3421,7 +3445,8 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(maliciousSiteStatus = maliciousSiteStatus)
                 omnibarViewState.value =
                     currentOmnibarViewState().copy(
-                        omnibarText = siteUrlString,
+                        omnibarText = if (settingsDataStore.isFullUrlEnabled) siteUrlString else addressDisplayFormatter.getShortUrl(siteUrlString),
+                        queryOrFullUrl = siteUrlString,
                         isEditing = false,
                     )
                 loadingViewState.value =
@@ -3785,6 +3810,7 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             omnibarViewState.value = currentOmnibarViewState().copy(
                 omnibarText = "",
+                queryOrFullUrl = "",
                 forceExpand = true,
             )
             loadingViewState.value = currentLoadingViewState().copy(isLoading = false)
@@ -4068,7 +4094,7 @@ class BrowserTabViewModel @Inject constructor(
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
         } else {
-            command.value = SetBrowserBackground(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
         }
     }
 
@@ -4169,7 +4195,7 @@ class BrowserTabViewModel @Inject constructor(
         query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
 
         query == lastSubmittedUserQuery ||
-            (lastSubmittedUserQuery == null && !omnibarViewState.value?.omnibarText.isNullOrBlank())
+            (lastSubmittedUserQuery == null && !omnibarViewState.value?.queryOrFullUrl.isNullOrBlank())
         -> duckChat.openDuckChat(query)
 
         else -> duckChat.openDuckChatWithAutoPrompt(query)
@@ -4177,6 +4203,23 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setLastSubmittedUserQuery(query: String) {
         lastSubmittedUserQuery = query
+    }
+
+    fun onExperimentalHomeScreenWidgetBottomSheetDialogShown() {
+        logcat { "Experimental Home Screen Widget bottom sheet shown" }
+    }
+
+    fun onExperimentalHomeScreenWidgetBottomSheetDialogCancelled() {
+        logcat { "Experimental Home Screen Widget bottom sheet dismissed" }
+    }
+
+    fun onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked() {
+        logcat { "Add Widget clicked on the Experimental Home Screen Widget bottom sheet" }
+        command.value = LaunchAddWidget
+    }
+
+    fun onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked() {
+        logcat { "Not Now clicked on the Experimental Home Screen Widget bottom sheet" }
     }
 
     companion object {

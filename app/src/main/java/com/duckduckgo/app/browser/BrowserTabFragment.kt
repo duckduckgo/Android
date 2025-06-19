@@ -71,6 +71,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.net.toUri
@@ -101,7 +102,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
@@ -125,6 +125,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.ExperimentalHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
@@ -235,6 +236,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.emailprotection.EmailInjector
 import com.duckduckgo.browser.api.WebViewVersionProvider
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
@@ -281,6 +283,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivity.Companion.QUERY
+import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -334,6 +338,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -577,6 +582,7 @@ class BrowserTabFragment :
 
     private lateinit var popupMenu: BrowserPopupMenu
     private lateinit var ctaBottomSheet: PromoBottomSheetDialog
+    private lateinit var experimentalBottomSheet: ExperimentalHomeScreenWidgetBottomSheetDialog
 
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
@@ -859,6 +865,16 @@ class BrowserTabFragment :
         )
     }
 
+    private val searchInterstitialLauncher =
+        registerForActivityResult(StartActivityForResult()) { result ->
+            val query = result.data?.getStringExtra(QUERY) ?: return@registerForActivityResult
+            if (result.resultCode == RESULT_OK) {
+                submitQuery(query)
+            } else {
+                omnibar.setText(query)
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logcat { "onCreate called for tabId=$tabId" }
@@ -1011,6 +1027,22 @@ class BrowserTabFragment :
         configureItemPressedListener()
         configureCustomTab()
         configureEditModeChangeDetection()
+        configureClickCatcher()
+    }
+
+    private fun configureClickCatcher() {
+        omnibar.omniBarClickCatcher?.setOnClickListener {
+            val intent = globalActivityStarter.startIntent(
+                requireContext(),
+                SearchInterstitialActivityParams(query = omnibar.getText()),
+            )
+            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                requireActivity(),
+                omnibar.omniBarContainer,
+                "omnibar_transition",
+            )
+            searchInterstitialLauncher.launch(intent, options)
+        }
     }
 
     private fun configureNavigationBar() {
@@ -1292,7 +1324,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
+            anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
                 omnibar.shieldIconExperiment
             } else {
                 omnibar.shieldIcon
@@ -1486,7 +1518,10 @@ class BrowserTabFragment :
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
+        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(
+            getString(command.messageId, command.fileName),
+            Snackbar.LENGTH_LONG,
+        )
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
                     val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
@@ -2101,6 +2136,7 @@ class BrowserTabFragment :
             }
 
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
+            is Command.RefreshOmnibar -> renderer.refreshOmnibar()
             else -> {
                 // NO OP
             }
@@ -4067,6 +4103,12 @@ class BrowserTabFragment :
             }
         }
 
+        fun refreshOmnibar() {
+            lastSeenOmnibarViewState?.let {
+                omnibar.renderOmnibarViewState(it, true)
+            }
+        }
+
         @SuppressLint("SetTextI18n")
         fun renderLoadingIndicator(viewState: LoadingViewState) {
             renderIfChanged(viewState, lastSeenLoadingViewState) {
@@ -4352,6 +4394,45 @@ class BrowserTabFragment :
                 onDismissCtaClicked = { viewModel.onUserClickCtaSecondaryButton(configuration) },
                 onCtaShown = { viewModel.onCtaShown() },
             )
+        }
+
+        private fun showExperimentalHomeWidget(
+            configuration: HomePanelCta,
+        ) {
+            hideDaxCta()
+
+            if (!::experimentalBottomSheet.isInitialized) {
+                experimentalBottomSheet = ExperimentalHomeScreenWidgetBottomSheetDialog(
+                    context = requireContext(),
+                    isLightModeEnabled = appTheme.isLightModeEnabled(),
+                )
+                experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
+                    override fun onShown() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()
+                        viewModel.onCtaShown()
+                    }
+
+                    override fun onCanceled() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogCancelled()
+                        viewModel.onUserClickCtaSecondaryButton(configuration)
+                    }
+
+                    override fun onAddWidgetButtonClicked() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked()
+                        viewModel.onUserClickCtaOkButton(configuration)
+                    }
+
+                    override fun onNotNowButtonClicked() {
+                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked()
+                        viewModel.onUserClickCtaSecondaryButton(configuration)
+                    }
+                }
+                experimentalBottomSheet.show()
+            } else {
+                if (!experimentalBottomSheet.isShowing) {
+                    experimentalBottomSheet.show()
+                }
+            }
         }
 
         private fun showHomeCta(

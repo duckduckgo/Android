@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
+    <string name="settingsShowFullUrlTitle">Tam Site Adresini Göster</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
     <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
-    <string name="preOnboardingComparisonChartItem4">İzleme reklamlarını engelleyin</string>
+    <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
     <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>

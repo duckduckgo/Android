@@ -26,7 +26,6 @@ import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -42,6 +41,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -276,4 +276,5 @@ sealed class Command {
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
     data object LaunchBookmarksActivity : Command()
     data object StartTrackersExperimentShieldPopAnimation : Command()
+    data object RefreshOmnibar : Command()
 }

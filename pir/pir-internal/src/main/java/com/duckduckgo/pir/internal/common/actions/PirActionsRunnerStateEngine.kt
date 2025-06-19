@@ -126,6 +126,14 @@ interface PirActionsRunnerStateEngine {
             val actionId: String,
             val responseData: ResponseData?,
         ) : Event()
+
+        data class RetryGetEmailConfirmation(
+            val actionId: String,
+            val brokerName: String,
+            val extractedProfile: ExtractedProfile,
+            val pollingIntervalSeconds: Float,
+            val attempt: Int = 0,
+        ) : Event()
     }
 
     /**
@@ -160,6 +168,8 @@ interface PirActionsRunnerStateEngine {
             val brokerName: String,
             val extractedProfile: ExtractedProfile,
             val pollingIntervalSeconds: Float,
+            val retries: Int = 10,
+            val attempt: Int = 0,
         ) : SideEffect(), BrokerActionSideEffect
 
         data class AwaitCaptchaSolution(

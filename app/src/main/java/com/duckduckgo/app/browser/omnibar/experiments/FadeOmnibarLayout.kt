@@ -50,7 +50,6 @@ import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
@@ -75,7 +74,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    private val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
+    val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -151,9 +150,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
             omnibarCard.elevation = 0.5f.toDp(context)
         }
-        omniBarClickCatcher.setOnClickListener {
-            globalActivityStarter.start(context, SearchInterstitialActivityParams)
-        }
     }
 
     override fun onAttachedToWindow() {
@@ -187,6 +183,10 @@ class FadeOmnibarLayout @JvmOverloads constructor(
                 unlockContentDimensions()
             }
         }
+    }
+
+    override fun isBottomNavEnabled(): Boolean {
+        return true
     }
 
     override fun render(viewState: ViewState) {
