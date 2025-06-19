@@ -10,7 +10,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface AddressDisplayFormatter {
-    fun getDisplayAddress(query: String?, url: String?, showsFullUrl: Boolean): String
+    fun getShortUrl(url: String?): String
 }
 
 @SingleInstanceIn(ActivityScope::class)
@@ -18,13 +18,10 @@ interface AddressDisplayFormatter {
 class RealAddressDisplayFormatter @Inject constructor(
     private val context: Context,
     private val duckPlayer: DuckPlayer,
-    private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
 ) : AddressDisplayFormatter {
-    override fun getDisplayAddress(query: String?, url: String?, showsFullUrl: Boolean): String {
+    override fun getShortUrl(url: String?): String {
         return when {
             url == null -> ""
-            duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url) -> query ?: url
-            showsFullUrl -> url
             duckPlayer.isDuckPlayerUri(url) -> context.getString(R.string.browserDuckPlayerShortUrl)
             else -> url.toUri().baseHost ?: url
         }
