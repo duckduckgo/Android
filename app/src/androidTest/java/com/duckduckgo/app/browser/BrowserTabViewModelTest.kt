@@ -6629,6 +6629,150 @@ class BrowserTabViewModelTest {
         }
     }
 
+    @Test
+    fun whenInitializedThenQueryOrFullUrlIsEmptyString() {
+        assertEquals("", omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenLoadingUrlThenQueryOrFullUrlIsUpdated() = runTest {
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo", queryOrFullUrl = "foo")
+        loadUrl("https://example.com")
+
+        assertEquals("https://example.com", omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenPageChangesToNewUrlThenViewStatesAreUpdatedCorrectly() = runTest {
+        // Setup initial state
+        val initialUrl = "https://example.com"
+        val newUrl = "https://example.org"
+        val title = "Example Page"
+
+        // First load initial URL
+        loadUrl(initialUrl)
+
+        // Then navigate to a new URL with title
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = initialUrl, currentUrl = newUrl, title = title))
+
+        // Verify browser view state is updated
+        assertTrue(browserViewState().browserShowing)
+
+        // Verify omnibar state is updated with the new URL
+        assertEquals(newUrl, omnibarViewState().omnibarText)
+        assertEquals(newUrl, omnibarViewState().queryOrFullUrl)
+
+        // Verify loading state reflects the completed navigation
+        assertFalse(loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenPageChangesToNewUrlAndFullUrlDisabledThenViewStatesAreUpdatedCorrectly() = runTest {
+        // Setup initial state
+        val initialUrl = "https://example.org"
+        val title = "Example Page"
+        isFullSiteAddressEnabled = false
+
+        // First load initial URL
+        loadUrl(initialUrl)
+
+        // Then navigate to a new URL with title
+        testee.navigationStateChanged(buildWebNavigation(originalUrl = initialUrl, currentUrl = EXAMPLE_URL, title = title))
+
+        // Verify browser view state is updated
+        assertTrue(browserViewState().browserShowing)
+
+        // Verify omnibar state is updated with the new URL
+        assertEquals(SHORT_EXAMPLE_URL, omnibarViewState().omnibarText)
+        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+
+        // Verify loading state reflects the completed navigation
+        assertFalse(loadingViewState().isLoading)
+    }
+
+    @Test
+    fun whenOpeningDuckChatWithMatchingQueryOrFullUrlValueThenOpenDuckChat() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = query, queryOrFullUrl = query)
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenOpeningDuckChatWithDifferentQueryOrFullUrlValueThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
+        testee.setLastSubmittedUserQuery("test")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat(any())
+    }
+
+    @Test
+    fun whenNavigatingThenQueryOrFullUrlIsPreserved() = runTest {
+        loadUrl(EXAMPLE_URL)
+
+        testee.navigationStateChanged(buildWebNavigation(EXAMPLE_URL))
+
+        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenNavigatingAndFullUrlDisabledThenQueryOrFullUrlIsPreserved() = runTest {
+        isFullSiteAddressEnabled = false
+
+        loadUrl(EXAMPLE_URL)
+
+        testee.navigationStateChanged(buildWebNavigation(EXAMPLE_URL))
+
+        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenRecoveringFromWarningPageThenQueryOrFullUrlIsEmptied() = runTest {
+        loadUrl("https://example.com")
+
+        testee.recoverFromWarningPage(false)
+
+        assertEquals("", omnibarViewState().omnibarText)
+        assertEquals("", omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenMaliciousSiteVisitedThenQueryOrFullUrlUpdates() {
+        testee.browserViewState.value = browserViewState().copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true
+        )
+        testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
+        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
+
+        testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+
+        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenMaliciousSiteVisitedAndFullUrlDisabledThenQueryOrFullUrlUpdates() {
+        isFullSiteAddressEnabled = false
+
+        testee.browserViewState.value = browserViewState().copy(
+            browserShowing = false,
+            maliciousSiteBlocked = true
+        )
+        testee.loadingViewState.value = loadingViewState().copy(isLoading = false)
+        testee.omnibarViewState.value = omnibarViewState().copy(isEditing = true)
+
+        testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
+
+        assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
