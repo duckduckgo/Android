@@ -44,6 +44,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
+import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
@@ -79,6 +80,8 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -140,6 +143,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     private val binding: ActivityDuckChatWebviewBinding by viewBinding()
     private var pendingUploadTask: ValueCallback<Array<Uri>>? = null
+
+    private var hideKeyboardJob: Job? = null
 
     private val root: ViewGroup by lazy { binding.root }
     private val toolbar: Toolbar? by lazy { binding.includeToolbar.toolbar }
@@ -266,8 +271,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }
             pendingUploadTask = null
         }
-
-        activity?.hideKeyboard()
     }
 
     data class FileChooserRequestedParams(
@@ -528,6 +531,14 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         simpleWebview.onResume()
         launchDownloadMessagesJob()
         super.onResume()
+
+        // Cancel any previous job if onResume is called multiple times quickly
+        hideKeyboardJob?.cancel()
+        hideKeyboardJob = viewLifecycleOwner.lifecycleScope.launch { // Use viewLifecycleOwner.lifecycleScope for safety
+            delay(500) // Delay for 500 milliseconds
+            activity?.hideKeyboard()
+            binding.root.hideKeyboard() // Your existing call, ensure hideKeyboard() is robust enough or use this directly
+        }
     }
 
     override fun onPause() {

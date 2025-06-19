@@ -28,7 +28,6 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
-import logcat.logcat
 import org.json.JSONObject
 
 interface DuckChatJSHelper {
@@ -53,7 +52,6 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String?,
         data: JSONObject?,
     ): JsCallbackData? {
-        logcat { "Duck.ai jsMessage $featureName $method $data" }
         return when (method) {
             METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
                 getAIChatNativeHandoffData(featureName, method, it)
