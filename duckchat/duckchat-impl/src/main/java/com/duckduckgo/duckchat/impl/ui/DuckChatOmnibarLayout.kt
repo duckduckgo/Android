@@ -21,6 +21,9 @@ import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.transition.ChangeBounds
+import android.transition.Fade
+import android.transition.TransitionManager
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +32,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import android.widget.LinearLayout
+import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
 import androidx.core.view.isVisible
@@ -70,102 +73,54 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     private val omnibarContent: View by lazy { findViewById(R.id.duckChatControlsContent) }
 
     private var focusAnimator: ValueAnimator? = null
-    private var isStopButtonVisible = false
-    var enableFireButton = false
-    var enableNewChatButton = false
 
-    val duckChatFireButton: View
     val duckChatInput: EditText
     val duckChatSend: View
     val duckChatClearText: View
-    val duckChatNewChat: View
-    val duckChatStop: View
     val duckChatControls: View
     val duckChatBack: View
     val duckChatTabLayout: TabLayout
 
-    private var originalStartMargin: Int = 0
-
-    var onFire: (() -> Unit)? = null
-    var onNewChat: (() -> Unit)? = null
-    var onStop: (() -> Unit)? = null
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
     var onDuckChatSent: ((String) -> Unit)? = null
     var onSearchSelected: (() -> Unit)? = null
     var onDuckChatSelected: (() -> Unit)? = null
 
-    private var selectionStart = 0
-    private var selectionEnd = 0
+    @IdRes
+    private var contentId: Int = View.NO_ID
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
 
-        duckChatFireButton = findViewById(R.id.duckChatFireButton)
         duckChatInput = findViewById(R.id.duckChatInput)
         duckChatSend = findViewById(R.id.duckChatSend)
         duckChatClearText = findViewById(R.id.duckChatClearText)
-        duckChatNewChat = findViewById(R.id.duckChatNewChat)
-        duckChatStop = findViewById(R.id.duckChatStop)
         duckChatControls = findViewById(R.id.duckChatControls)
         duckChatBack = findViewById(R.id.duckChatBack)
         duckChatTabLayout = findViewById(R.id.duckChatTabLayout)
 
-        (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-            originalStartMargin = params.marginStart
-        }
+        configureClickListeners()
+        configureInput()
+        configureTabBehavior()
+        applyInputBehaviour(isSearchTab = true)
+    }
 
-        duckChatFireButton.setOnClickListener { onFire?.invoke() }
-        duckChatNewChat.setOnClickListener { onNewChat?.invoke() }
+    private fun configureClickListeners() {
         duckChatSend.setOnClickListener { submitMessage() }
         duckChatClearText.setOnClickListener {
             duckChatInput.setText("")
             duckChatInput.setSelection(0)
             duckChatInput.scrollTo(0, 0)
-        }
-        duckChatStop.setOnClickListener {
-            onStop?.invoke()
-            hideStopButton()
+            beginTransition()
         }
         duckChatBack.setOnClickListener { onBack?.invoke() }
+    }
 
-        applyInputBehavior(duckChatTabLayout.selectedTabPosition)
-        duckChatTabLayout.addOnTabSelectedListener(
-            object : TabLayout.OnTabSelectedListener {
-                override fun onTabSelected(tab: TabLayout.Tab) {
-                    duckChatSend.isVisible = tab.position != 0
-                    applyInputBehavior(tab.position)
-                    when (tab.position) {
-                        0 -> onSearchSelected?.invoke()
-                        1 -> onDuckChatSelected?.invoke()
-                    }
-                }
-                override fun onTabUnselected(tab: TabLayout.Tab?) {}
-                override fun onTabReselected(tab: TabLayout.Tab?) {}
-            },
-        )
-
+    private fun configureInput() {
         duckChatInput.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                duckChatFireButton.isVisible = false
-                duckChatNewChat.isVisible = false
-            }
-            animateOmnibarFocusedState(hasFocus || isStopButtonVisible)
-            applyLeftInputMargin(originalStartMargin)
+            animateOmnibarFocusedState(hasFocus)
         }
-
-        duckChatInput.addTextChangedListener(
-            object : TextWatcher {
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    duckChatSend.isVisible = !s.isNullOrEmpty() && duckChatTabLayout.selectedTabPosition == 1
-                    duckChatClearText.isVisible = !s.isNullOrEmpty()
-                    duckChatFireButton.isVisible = false
-                    duckChatNewChat.isVisible = false
-                }
-                override fun afterTextChanged(s: Editable?) = Unit
-            },
-        )
 
         duckChatInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -176,42 +131,78 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        duckChatFireButton.isVisible = false
-        duckChatNewChat.isVisible = false
+        duckChatInput.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    val isNullOrEmpty = s.isNullOrEmpty()
+                    val isSearchTab = duckChatTabLayout.selectedTabPosition == 0
+
+                    fade(duckChatSend, !isNullOrEmpty && !isSearchTab)
+                    fade(duckChatClearText, !isNullOrEmpty)
+
+                    if (isNullOrEmpty && duckChatInput.minLines > 1) {
+                        duckChatInput.post {
+                            beginTransition()
+                            duckChatInput.minLines = if (isSearchTab) SEARCH_MIN_LINES else DUCK_CHAT_MIN_LINES
+                        }
+                    }
+                }
+                override fun afterTextChanged(s: Editable?) = Unit
+            },
+        )
     }
 
-    private fun applyInputBehavior(tabPosition: Int) {
-        selectionStart = duckChatInput.selectionStart
-        selectionEnd = duckChatInput.selectionEnd
+    private fun configureTabBehavior() {
+        duckChatTabLayout.addOnTabSelectedListener(
+            object : TabLayout.OnTabSelectedListener {
+                override fun onTabSelected(tab: TabLayout.Tab) {
+                    val isSearchTab = tab.position == 0
+                    fade(duckChatSend, !isSearchTab && duckChatInput.text.isNotEmpty())
+                    applyInputBehaviour(isSearchTab = isSearchTab)
+                    when (tab.position) {
+                        0 -> onSearchSelected?.invoke()
+                        1 -> onDuckChatSelected?.invoke()
+                    }
+                }
+                override fun onTabUnselected(tab: TabLayout.Tab?) {}
+                override fun onTabReselected(tab: TabLayout.Tab?) {}
+            },
+        )
+    }
 
-        val isSearchTab = tabPosition == 0
+    private fun applyInputBehaviour(isSearchTab: Boolean) {
+        beginTransition()
 
         duckChatInput.apply {
             maxLines = MAX_LINES
             setHorizontallyScrolling(false)
             setRawInputType(InputType.TYPE_CLASS_TEXT)
 
-            imeOptions = if (isSearchTab) {
-                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
+            if (isSearchTab) {
+                minLines = SEARCH_MIN_LINES
+                hint = context.getString(R.string.duck_chat_search_or_type_url)
+                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
             } else {
-                EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
-            }
-
-            text?.length.let { length ->
-                setSelection(
-                    selectionStart.coerceIn(0, length),
-                    selectionEnd.coerceIn(0, length),
-                )
+                minLines = DUCK_CHAT_MIN_LINES
+                hint = context.getString(R.string.duck_chat_ask_anything)
+                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
-        applyLeftInputMargin(originalStartMargin)
     }
 
-    private fun applyLeftInputMargin(margin: Int) {
-        (duckChatInput.layoutParams as? LinearLayout.LayoutParams)?.let { params ->
-            params.marginStart = margin
-            duckChatInput.layoutParams = params
+    private fun beginTransition() {
+        (parent as? ViewGroup ?: this).let { root ->
+            val pager = root.findViewById<View>(contentId).apply {
+                isTransitionGroup = true
+            }
+            TransitionManager.beginDelayedTransition(
+                root,
+                ChangeBounds().apply {
+                    excludeChildren(pager, true)
+                },
+            )
         }
     }
 
@@ -224,14 +215,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 onDuckChatSent?.invoke(message)
             }
             duckChatInput.clearFocus()
-
-            if (duckChatTabLayout.selectedTabPosition == 1) {
-                duckChatFireButton.isVisible = enableFireButton
-                duckChatNewChat.isVisible = enableNewChatButton
-                if (enableFireButton) {
-                    applyLeftInputMargin(0)
-                }
-            }
         }
     }
 
@@ -241,20 +224,23 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun showStopButton() {
-        duckChatTabLayout.isVisible = false
-        duckChatBack.isVisible = false
-        duckChatStop.isVisible = true
-        duckChatControls.visibility = View.INVISIBLE
-        isStopButtonVisible = true
+    private fun fade(
+        view: View,
+        visible: Boolean,
+        duration: Long = FADE_DURATION,
+    ) {
+        if (view.isVisible == visible) return
+        (view.parent as? ViewGroup)?.let { root ->
+            TransitionManager.beginDelayedTransition(
+                root,
+                Fade().apply { this.duration = duration },
+            )
+        }
+        view.isVisible = visible
     }
 
-    fun hideStopButton() {
-        duckChatTabLayout.isVisible = true
-        duckChatBack.isVisible = true
-        duckChatStop.isVisible = false
-        duckChatControls.visibility = View.VISIBLE
-        isStopButtonVisible = false
+    fun setContentId(@IdRes id: Int) {
+        contentId = id
     }
 
     fun animateOmnibarFocusedState(focused: Boolean) {
@@ -311,6 +297,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
+        private const val FADE_DURATION = 150L
         private const val MAX_LINES = 8
+        private const val SEARCH_MIN_LINES = 1
+        private const val DUCK_CHAT_MIN_LINES = 3
     }
 }

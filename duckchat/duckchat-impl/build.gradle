@@ -48,6 +48,7 @@ dependencies {
     implementation Google.android.material
     implementation Google.dagger
     implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.viewPager2
 
     implementation "com.squareup.logcat:logcat:_"
 
