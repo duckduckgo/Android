@@ -45,7 +45,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OPEN("aichat_open"),
     DUCK_CHAT_OPEN_BROWSER_MENU("aichat_open_browser_menu"),
     DUCK_CHAT_OPEN_NEW_TAB_MENU("aichat_open_new_tab_menu"),
-    DUCK_CHAT_OPEN_NEW_TAB_FAB("aichat_open_new_tab_fab"),
+    DUCK_CHAT_OPEN_NEW_TAB_FAB("aichat_open_tab_switcher_fab"),
     DUCK_CHAT_USER_ENABLED("aichat_enabled"),
     DUCK_CHAT_USER_DISABLED("aichat_disabled"),
     DUCK_CHAT_MENU_SETTING_OFF("aichat_menu_setting_off"),
