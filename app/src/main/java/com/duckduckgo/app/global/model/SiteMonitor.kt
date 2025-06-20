@@ -223,6 +223,8 @@ class SiteMonitor(
 
     override var activeContentScopeExperiments: List<Toggle>? = null
 
+    override var debugFlags: List<String>? = null
+
     companion object {
         private val specialDomainTypes = setOf(
             TrackerStatus.AD_ALLOWED,
