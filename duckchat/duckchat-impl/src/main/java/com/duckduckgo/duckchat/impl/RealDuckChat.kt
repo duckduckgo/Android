@@ -309,6 +309,7 @@ class RealDuckChat @Inject constructor(
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
     override fun openDuckChat(query: String?) {
+        logcat { "Duck.ai: openDuckChat query $query" }
         val parameters = query?.let { originalQuery ->
             val hasDuckChatBang = isDuckChatBang(originalQuery.toUri())
             val cleanedQuery = if (hasDuckChatBang) {
@@ -334,14 +335,15 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChatWithAutoPrompt(query: String) {
+        logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
         val parameters = mapOf(
             QUERY to query,
             PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
         )
-        openDuckChat(parameters)
+        openDuckChat(parameters, autoPrompt = true)
     }
 
-    private fun openDuckChat(parameters: Map<String, String>) {
+    private fun openDuckChat(parameters: Map<String, String>, autoPrompt: Boolean = false) {
         val url = appendParameters(parameters, duckChatLink)
 
         appCoroutineScope.launch {
@@ -353,16 +355,16 @@ class RealDuckChat @Inject constructor(
         }
 
         if (keepSessionAliveEnabled) {
-            logcat { "Duck.ai: restoring Duck.ai session" }
-            openDuckChatSession(url)
+            logcat { "Duck.ai: restoring Duck.ai session $url" }
+            openDuckChatSession(url, autoPrompt)
         } else {
-            logcat { "Duck.ai: opening standalone Duck.ai screen" }
+            logcat { "Duck.ai: opening standalone Duck.ai screen $url" }
             startDuckChatActivity(url)
         }
     }
 
-    private fun openDuckChatSession(url: String) {
-        browserNav.openDuckChat(context, duckChatUrl = url)
+    private fun openDuckChatSession(url: String, autoPrompt: Boolean) {
+        browserNav.openDuckChat(context, duckChatUrl = url, autoPrompt = autoPrompt)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -382,6 +384,7 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         url: String,
     ): String {
+        logcat { "Duck.ai: parameters Duck.ai $parameters" }
         if (parameters.isEmpty()) return url
         return runCatching {
             val uri = url.toUri()

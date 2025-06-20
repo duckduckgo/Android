@@ -460,9 +460,11 @@ class BrowserViewModel @Inject constructor(
         command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
 
-    fun openDuckChat(duckChatUrl: String?) {
+    fun openDuckChat(duckChatUrl: String?, autoPrompt: Boolean) {
+        logcat(INFO) { "Duck.ai openDuckChat autoPrompt $autoPrompt" }
         viewModelScope.launch(dispatchers.io()) {
-            val keepSession = duckChat.shouldKeepSessionAlive()
+            // Launching a new query will force a new session to start
+            val keepSession = duckChat.shouldKeepSessionAlive() && !autoPrompt
             logcat(INFO) { "Duck.ai should keep session alive $keepSession" }
             withContext(dispatchers.main()) {
                 command.value = OpenDuckChat(duckChatUrl, keepSession)

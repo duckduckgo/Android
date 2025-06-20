@@ -550,7 +550,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL))
+            val autoPrompt = intent.getBooleanExtra(DUCK_CHAT_AUTO_PROMPT, false)
+            viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), autoPrompt)
             return
         }
 
@@ -887,6 +888,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             openDuckChat: Boolean = false,
             closeDuckChat: Boolean = false,
             duckChatUrl: String? = null,
+            autoPrompt: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
@@ -901,6 +903,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(OPEN_DUCK_CHAT, openDuckChat)
             intent.putExtra(CLOSE_DUCK_CHAT, closeDuckChat)
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
+            intent.putExtra(DUCK_CHAT_AUTO_PROMPT, autoPrompt)
             return intent
         }
 
@@ -920,6 +923,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
         private const val CLOSE_DUCK_CHAT = "CLOSE_DUCK_CHAT_EXTRA"
         private const val DUCK_CHAT_URL = "DUCK_CHAT_URL"
+        private const val DUCK_CHAT_AUTO_PROMPT = "DUCK_CHAT_AUTO_PROMPT"
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"

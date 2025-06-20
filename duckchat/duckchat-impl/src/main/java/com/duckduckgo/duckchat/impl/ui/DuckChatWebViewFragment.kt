@@ -82,6 +82,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 import org.json.JSONObject
 
 @InjectWith(FragmentScope::class)
@@ -150,6 +151,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+        logcat { "Duck.ai: onViewCreated Chat Fragment" }
+
         toolbar?.let {
             it.setNavigationIcon(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
             it.setNavigationOnClickListener {
@@ -395,6 +398,7 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             if (simpleWebview.canGoBack()) {
                 simpleWebview.goBack()
             } else {
+                logcat { "Duck.ai: closeDuckChat" }
                 duckChat.closeDuckChat()
             }
             return true
@@ -521,13 +525,15 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
     }
 
     override fun onResume() {
+        simpleWebview.onResume()
         launchDownloadMessagesJob()
         super.onResume()
     }
 
-    override fun onDestroy() {
+    override fun onPause() {
         downloadMessagesJob.cancel()
-        super.onDestroy()
+        simpleWebview.onPause()
+        super.onPause()
     }
 
     companion object {
