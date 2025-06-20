@@ -101,10 +101,7 @@ interface DuckChatInternal : DuckChat {
     /**
      * Calls onClose when a close event is emitted.
      */
-    fun observeCloseEvent(
-        lifecycleOwner: LifecycleOwner,
-        onClose: () -> Unit,
-    )
+    fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
 
     /**
      * Returns whether address bar entry point is enabled or not.
@@ -151,6 +148,20 @@ enum class ChatState(val value: String) {
     companion object {
         fun fromValue(v: String?): ChatState? =
             entries.firstOrNull { it.value == v }
+    }
+}
+
+enum class ReportMetric(val metric: String) {
+    USER_DID_SUBMIT_PROMPT("userDidSubmitPrompt"),
+    USER_DID_SUBMIT_FIRST_PROMPT("userDidSubmitFirstPrompt"),
+    USER_DID_OPEN_HISTORY("userDidOpenHistory"),
+    USER_DID_SELECT_FIRST_HISTORY_ITEM("userDidSelectFirstHistoryItem"),
+    USER_DID_CREATE_NEW_CHAT("userDidCreateNewChat"),
+    ;
+
+    companion object {
+        fun fromValue(v: String?): ReportMetric? =
+            ReportMetric.entries.firstOrNull { it.metric == v }
     }
 }
 
@@ -356,7 +367,7 @@ class RealDuckChat @Inject constructor(
         val url = appendParameters(parameters, duckChatLink)
 
         appCoroutineScope.launch(dispatchers.io()) {
-            val sessionDelta = duckChatFeatureRepository.sessionDeltaTimestamp()
+            val sessionDelta = duckChatFeatureRepository.sessionDeltaInMinutes()
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
 
             val hasSessionActive = when {
