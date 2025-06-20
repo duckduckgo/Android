@@ -95,6 +95,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -166,6 +167,8 @@ class SettingsViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val appTPPollJob = ConflatedJob()
+
+    private var widgetPromptShown = false
 
     init {
         pixel.fire(SETTINGS_OPENED)
@@ -243,6 +246,9 @@ class SettingsViewModel @Inject constructor(
             postCtaExperienceExperiment.enroll()
             val simpleWidgetPrompt = postCtaExperienceExperiment.isSimpleSearchWidgetPrompt()
             command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
+            if (!currentViewState().widgetsInstalled) {
+                widgetPromptShown = true
+            }
             postCtaExperienceExperiment.fireSettingsWidgetDisplay()
         }
     }
@@ -332,9 +338,14 @@ class SettingsViewModel @Inject constructor(
 
     fun refreshWidgetsInstalledState() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (currentViewState().isAddWidgetInProtectionsVisible) {
-                val widgetsInstalled = widgetCapabilities.hasInstalledWidgets
-                viewState.emit(currentViewState().copy(widgetsInstalled = widgetsInstalled))
+            val widgetsInstalled = widgetCapabilities.hasInstalledWidgets
+            viewState.emit(currentViewState().copy(widgetsInstalled = widgetsInstalled))
+            if (widgetPromptShown) {
+                widgetPromptShown = false
+                if (!widgetsInstalled) {
+                    logcat { "Widget bottom sheet was dismissed." }
+                    postCtaExperienceExperiment.fireSettingsWidgetDismiss()
+                }
             }
         }
     }

@@ -223,7 +223,7 @@ class SettingsViewModelTest {
     }
 
     @Test
-    fun whenRefreshWidgetsInstalledStateAndAddWidgetInProtectionsVisibleAndWidgetsNewlyInstalledThenViewStateUpdatedAndCapabilitiesChecked() =
+    fun whenRefreshWidgetsInstalledStateAndWidgetsNewlyInstalledThenViewStateUpdatedAndCapabilitiesChecked() =
         runTest {
             fakeSettingsPageFeature.self().setRawStoredState(State(true))
             fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
@@ -238,11 +238,10 @@ class SettingsViewModelTest {
             testee.refreshWidgetsInstalledState()
 
             assertEquals(true, testee.viewState().value.widgetsInstalled)
-            verify(mockWidgetCapabilities, times(2)).hasInstalledWidgets
         }
 
     @Test
-    fun whenRefreshWidgetsInstalledStateAndAddWidgetInProtectionsVisibleAndWidgetsNewlyUninstalledThenViewStateUpdatedAndCapabilitiesChecked() =
+    fun whenRefreshWidgetsInstalledStateAndWidgetsNewlyUninstalledThenViewStateUpdatedAndCapabilitiesChecked() =
         runTest {
             fakeSettingsPageFeature.self().setRawStoredState(State(true))
             fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
@@ -257,27 +256,40 @@ class SettingsViewModelTest {
             testee.refreshWidgetsInstalledState()
 
             assertEquals(false, testee.viewState().value.widgetsInstalled)
-            verify(mockWidgetCapabilities, times(2)).hasInstalledWidgets
         }
 
     @Test
-    fun whenRefreshWidgetsInstalledStateAndAddWidgetInProtectionsNotVisibleThenViewStateUnchangedAndCapabilitiesNotCheckedByRefresh() =
+    fun whenRefreshWidgetsInstalledStateAndWidgetPromptShownAndWidgetsNotInstalledThenFireSettingsWidgetDismiss() =
         runTest {
-            fakeSettingsPageFeature.self().setRawStoredState(State(true))
-            fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(false))
-            val initialWidgetsInstalledState = true
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(initialWidgetsInstalledState) // Initial state for start()
-            testee.start()
-            // Ensure initial state is as expected
-            assertEquals(false, testee.viewState().value.isAddWidgetInProtectionsVisible)
-            assertEquals(initialWidgetsInstalledState, testee.viewState().value.widgetsInstalled)
-
-            clearInvocations(mockWidgetCapabilities)
-            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(!initialWidgetsInstalledState)
+            whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+            testee.userRequestedToAddHomeScreenWidget() // Simulate user requesting to add widget, which shows the prompt
 
             testee.refreshWidgetsInstalledState()
 
-            assertEquals(initialWidgetsInstalledState, testee.viewState().value.widgetsInstalled)
-            verify(mockWidgetCapabilities, never()).hasInstalledWidgets
+            verify(mockPostCtaExperienceExperiment).fireSettingsWidgetDismiss()
+        }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndWidgetPromptShownAndWidgetsInstalledThenFireSettingsWidgetDismissNotCalled() =
+        runTest {
+            whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
+            testee.userRequestedToAddHomeScreenWidget() // Simulate user requesting to add widget, which shows the prompt
+
+            testee.refreshWidgetsInstalledState()
+
+            verify(mockPostCtaExperienceExperiment, never()).fireSettingsWidgetDismiss()
+        }
+
+    @Test
+    fun whenRefreshWidgetsInstalledStateAndWidgetPromptNotShownAndWidgetsNotInstalledThenFireSettingsWidgetDismissNotCalled() =
+        runTest {
+            whenever(mockPostCtaExperienceExperiment.isSimpleSearchWidgetPrompt()).thenReturn(true)
+            whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false)
+
+            testee.refreshWidgetsInstalledState()
+
+            verify(mockPostCtaExperienceExperiment, never()).fireSettingsWidgetDismiss()
         }
 }

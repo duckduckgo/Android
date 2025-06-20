@@ -36,7 +36,6 @@ interface PostCtaExperienceExperiment {
     suspend fun fireSettingsWidgetDisplay()
     suspend fun fireSettingsWidgetAdd()
 
-    // TODO ANA can we record the dismiss event?
     suspend fun fireSettingsWidgetDismiss()
     suspend fun fireWidgetSearch()
     suspend fun fireWidgetSearchXCount()
