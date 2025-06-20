@@ -146,6 +146,11 @@ jobs:
         run: |
           echo "### Nightly release completed! :rocket:" >> $GITHUB_STEP_SUMMARY
 
+      - name: Install dependencies for create-asana-release task
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r scripts/release/requirements.txt
+
       - name: Create Asana nightly release task
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -154,9 +159,7 @@ jobs:
         run: |
           RELEASE_TASK_URL=$(python ./scripts/release/create-asana-release.py \
           --android-repo-path . \
-          --windows-browser-repo-path ../windows-browser \
           --tag ${{ steps.generate_version_name.outputs.version }} \
-          --version-string ${{ env.VERSION_STRING }}-${{ github.run_number }} \
           --trigger-phrase 'Task/Issue URL:' \
           --asana-project-id ${{ vars.GH_ANDROID_APP_RELEASES_PROJECT_ID }} \
           --asana-section-id ${{ vars.GH_ANDROID_APP_RELEASES_NIGHTLY_SECTION_ID }} \
