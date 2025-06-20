@@ -127,34 +127,13 @@ def create_asana_task(client: asana.ApiClient,
     
     return task['gid']
 
-def get_latest_tag_before_commit(repo_path: str, commitish: str) -> str | None:
+def get_latest_nightly_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
     """
-    Find the most recent semantic version tag (vX.Y.Z) that comes before the given commit.
-    Returns the tag name or None if no tag is found.
+    Return the previous *nightly* tag before `current_tag`, sorted by creation date (not version number).
     """
-    repo = Repo(repo_path)
-    commit = repo.commit(commitish)
-    
-    # Get all tags and filter for semantic version tags
-    version_pattern = re.compile(r'^v?\d+\.\d+\.\d+$')
-    version_tags = [tag for tag in repo.tags if version_pattern.match(tag.name)]
-    
-    # Sort by commit date (newest first)
-    version_tags.sort(key=lambda t: t.commit.committed_date, reverse=True)
-    
-    # Find the first tag that is before our commit
-    for tag in version_tags:
-        if tag.commit.committed_date < commit.committed_date:
-            return tag.name
-    
-    return None
+    nightly_pattern = re.compile(r'^\d+\.\d+\.\d+(?:\.\d+)?-nightly$')
 
-def get_latest_semver_tag(repo_path: str, current_tag: str) -> str | None:
-    """
-    Return the previous tag before `current_tag`, sorted by tag creation date (not version).
-    """
     try:
-        # Get all tags sorted by creation date (oldest first)
         result = subprocess.run(
             ["git", "-C", repo_path, "tag", "--sort=creatordate"],
             capture_output=True,
@@ -163,11 +142,14 @@ def get_latest_semver_tag(repo_path: str, current_tag: str) -> str | None:
         )
         tags = result.stdout.strip().splitlines()
 
-        if current_tag not in tags:
+        # Filter to only nightly tags
+        nightly_tags = [tag for tag in tags if nightly_pattern.match(tag)]
+
+        if current_tag not in nightly_tags:
             return None
 
-        idx = tags.index(current_tag)
-        return tags[idx - 1] if idx > 0 else None
+        idx = nightly_tags.index(current_tag)
+        return nightly_tags[idx - 1] if idx > 0 else None
     except subprocess.CalledProcessError:
         return None
 
@@ -199,7 +181,7 @@ def main():
         
         # Get the start tag (latest tag before the specified tag)
         # start_tag = get_latest_tag_before_commit(args.android_repo_path, args.tag)
-        start_tag = get_latest_semver_tag(args.android_repo_path, args.tag)
+        start_tag = get_latest_nightly_tag_before_commit(args.android_repo_path, args.tag)
         if not start_tag:
             log(f"Error: No previous version tag found before {args.tag}")
             return 1
