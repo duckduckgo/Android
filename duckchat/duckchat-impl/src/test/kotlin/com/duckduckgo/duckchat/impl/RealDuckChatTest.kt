@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
@@ -76,6 +77,7 @@ class RealDuckChatTest {
     private val mockContext: Context = mock()
     private val mockPixel: Pixel = mock()
     private val mockIntent: Intent = mock()
+    private val mockBrowserNav: BrowserNav = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
 
     private lateinit var testee: RealDuckChat
@@ -101,6 +103,7 @@ class RealDuckChatTest {
                 coroutineRule.testScope,
                 mockPixel,
                 imageUploadFeature,
+                mockBrowserNav,
             ),
         )
         coroutineRule.testScope.advanceUntilIdle()

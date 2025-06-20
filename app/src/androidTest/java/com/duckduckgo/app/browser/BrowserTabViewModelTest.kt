@@ -6125,7 +6125,6 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
         verify(mockDuckChat).openDuckChat()
     }

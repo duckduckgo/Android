@@ -4195,11 +4195,9 @@ class BrowserTabViewModel @Inject constructor(
 
         return when {
             query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-
-            query == lastSubmittedUserQuery ||
-                (lastSubmittedUserQuery == null && !omnibarViewState.value?.queryOrFullUrl.isNullOrBlank())
-            -> duckChat.openDuckChat(query)
-
+            lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
+            lastSubmittedUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
+            query == lastSubmittedUserQuery -> duckChat.openDuckChat(query)
             else -> duckChat.openDuckChatWithAutoPrompt(query)
         }
     }
