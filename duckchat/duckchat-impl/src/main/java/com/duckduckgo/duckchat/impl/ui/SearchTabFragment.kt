@@ -91,8 +91,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     }
 
     companion object {
-        const val CONTENT_ANIMATION_DURATION = 500L
-        const val CONTENT_INTERPOLATOR_TENSION = 1F
-        const val CONTENT_SLIDE_DISTANCE = 0.05F
+        private const val CONTENT_ANIMATION_DURATION = 500L
+        private const val CONTENT_INTERPOLATOR_TENSION = 1F
+        private const val CONTENT_SLIDE_DISTANCE = 0.05F
     }
 }
