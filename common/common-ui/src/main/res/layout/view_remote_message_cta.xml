@@ -29,16 +29,36 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/topIllustrationAnimated"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintHeight_max="96dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:lottie_autoPlay="false"
+        app:lottie_loop="false" />
+
     <ImageView
         android:id="@+id/topIllustration"
         android:layout_width="@dimen/messageCtaIllustrationSize"
         android:layout_height="@dimen/messageCtaIllustrationSize"
         android:layout_marginTop="@dimen/keyline_2"
         android:scaleType="center"
-        android:visibility="visible"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/illustrationBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="topIllustration,topIllustrationAnimated" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/messageTitle"
@@ -50,7 +70,7 @@
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/topIllustration"
+        app:layout_constraintTop_toBottomOf="@id/illustrationBarrier"
         app:layout_goneMarginTop="@dimen/keyline_4"
         app:typography="h3"
         tools:text="Placeholder Title" />

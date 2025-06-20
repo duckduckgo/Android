@@ -21,6 +21,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.duckduckgo.autofill.store.feature.AutofillDefaultStateDecider
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.onStart
 import logcat.LogPriority.INFO
 import logcat.logcat
 
@@ -29,6 +33,9 @@ interface AutofillPrefsStore {
     var autofillDeclineCount: Int
     var monitorDeclineCounts: Boolean
     var hasEverBeenPromptedToSaveLogin: Boolean
+    var hasEverImportedPasswords: Boolean
+    fun hasEverImportedPasswordsFlow(): Flow<Boolean>
+    var hasDismissedImportedPasswordsPromo: Boolean
     val autofillStateSetByUser: Boolean
     var timestampUserLastPromptedToDisableAutofill: Long?
     var domainTargetDatasetVersion: Long
@@ -58,6 +65,8 @@ class RealAutofillPrefsStore(
         applicationContext.getSharedPreferences(FILENAME, Context.MODE_PRIVATE)
     }
 
+    private val hasEverImportedPasswordsFlow = MutableSharedFlow<Boolean>(replay = 1)
+
     override var isEnabled: Boolean
         get(): Boolean {
             // if autofill state has been manually set by user, honor that
@@ -83,6 +92,24 @@ class RealAutofillPrefsStore(
         get() = prefs.getBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, false)
         set(value) = prefs.edit { putBoolean(HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN, value) }
 
+    override var hasEverImportedPasswords: Boolean
+        get() = prefs.getBoolean(HAS_EVER_IMPORT_PASSWORDS, false)
+        set(value) {
+            prefs.edit { putBoolean(HAS_EVER_IMPORT_PASSWORDS, value) }
+            hasEverImportedPasswordsFlow.tryEmit(value)
+        }
+
+    override fun hasEverImportedPasswordsFlow(): Flow<Boolean> {
+        return hasEverImportedPasswordsFlow
+            .onStart { emit(hasEverImportedPasswords) }
+            .distinctUntilChanged()
+    }
+
+    override var hasDismissedImportedPasswordsPromo: Boolean
+        get() = prefs.getBoolean(HAS_DISMISSED_IMPORT_PASSWORDS_PROMO, false)
+        set(value) {
+            prefs.edit { putBoolean(HAS_DISMISSED_IMPORT_PASSWORDS_PROMO, value) }
+        }
     override val autofillStateSetByUser: Boolean
         get() = autofillStateSetByUser()
 
@@ -152,6 +179,8 @@ class RealAutofillPrefsStore(
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
+        const val HAS_EVER_IMPORT_PASSWORDS = "autofill_has_ever_import_passwords"
+        const val HAS_DISMISSED_IMPORT_PASSWORDS_PROMO = "autofill_dismissed_import_passwords_promo"
         const val TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL = "timestamp_when_user_last_prompted_to_disable_autofill"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
