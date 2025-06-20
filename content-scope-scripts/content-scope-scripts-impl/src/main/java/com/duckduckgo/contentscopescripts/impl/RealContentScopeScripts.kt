@@ -195,18 +195,22 @@ class RealContentScopeScripts @Inject constructor(
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
     private fun getExperimentsKeyValuePair(site: Site?): String {
-        val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
-        val moshi = Builder().build()
-        val jsonAdapter: JsonAdapter<List<Experiment>> = moshi.adapter(type)
-        (site?.activeContentScopeExperiments ?: listOf()).map {
-            Experiment(
-                cohort = runBlocking { it.getCohort()?.name },
-                feature = it.featureName().parentName ?: "",
-                subfeature = it.featureName().name,
-            )
-        }.let {
-            logcat("Cris") { "Injecting cohorts: $it" }
-            return "\"currentCohorts\":${jsonAdapter.toJson(it)}"
+        return runBlocking {
+            val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
+            val moshi = Builder().build()
+            val jsonAdapter: JsonAdapter<List<Experiment>> = moshi.adapter(type)
+            (site?.activeContentScopeExperiments ?: listOf())
+                .filter { it.getCohort() != null && it.featureName().parentName != null }
+                .map {
+                    Experiment(
+                        cohort = it.getCohort()!!.name,
+                        feature = it.featureName().parentName!!,
+                        subfeature = it.featureName().name,
+                    )
+                }.let {
+                    logcat("Cris") { "Injecting cohorts: $it" }
+                    return@runBlocking "\"currentCohorts\":${jsonAdapter.toJson(it)}"
+                }
         }
     }
 
