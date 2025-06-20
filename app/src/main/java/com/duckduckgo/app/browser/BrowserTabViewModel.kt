@@ -251,6 +251,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECT
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -298,7 +299,6 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider
@@ -4136,8 +4136,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
         viewModelScope.launch {
             if (pixelName != null) {
-                val wasUsedBefore = duckChat.wasOpenedBefore()
-                val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasUsedBefore.toBinaryString())
+                val params = duckChat.createWasUsedBeforePixelParams()
                 pixel.fire(pixelName, parameters = params)
             }
 

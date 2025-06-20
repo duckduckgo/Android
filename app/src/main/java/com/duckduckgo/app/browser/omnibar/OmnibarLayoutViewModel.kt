@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -767,11 +768,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckChatButtonPressed() {
-        val experimentEnabled = viewState.value.isVisualDesignExperimentEnabled
-        if (experimentEnabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+        viewModelScope.launch {
+            val params = duckChat.createWasUsedBeforePixelParams()
+            val experimentEnabled = viewState.value.isVisualDesignExperimentEnabled
+            if (experimentEnabled) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, parameters = params)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, parameters = params)
+            }
         }
     }
 
