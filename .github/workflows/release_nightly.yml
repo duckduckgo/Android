@@ -152,7 +152,7 @@ jobs:
         shell: bash
         working-directory: Android
         run: |
-          RELEASE_TASK_URL=$(python ./scripts/release/finalize-release.py \
+          RELEASE_TASK_URL=$(python ./scripts/release/create-asana-release.py \
           --android-repo-path . \
           --windows-browser-repo-path ../windows-browser \
           --tag ${{ steps.generate_version_name.outputs.version }} \
