@@ -63,6 +63,7 @@ import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import javax.inject.Inject
@@ -549,18 +550,14 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onDuckChatFabClicked() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-
             duckChat.openDuckChat()
         }
     }
 
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-
             val wasUsedBefore = duckChat.wasOpenedBefore()
-            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+            val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasUsedBefore.toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
 
             duckChat.openDuckChat()

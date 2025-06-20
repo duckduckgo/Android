@@ -60,6 +60,11 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED("aichat_search_assist_settings_button_clicked"),
 }
 
+object DuckChatPixelParameters {
+    const val WAS_USED_BEFORE = "was_used_before"
+    const val DELTA_TIMESTAMP_PARAMETERS = "delta-timestamp-minutes"
+}
+
 @ContributesMultibinding(AppScope::class)
 class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

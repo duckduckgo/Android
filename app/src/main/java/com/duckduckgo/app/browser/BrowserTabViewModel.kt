@@ -312,6 +312,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.history.api.NavigationHistory
@@ -4134,11 +4135,9 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-
             if (pixelName != null) {
                 val wasUsedBefore = duckChat.wasOpenedBefore()
-                val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+                val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasUsedBefore.toBinaryString())
                 pixel.fire(pixelName, parameters = params)
             }
 
@@ -4191,14 +4190,16 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) = when {
-        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+    fun openDuckChat(query: String?) {
+        logcat { "Duck.ai: query $query lastSubmittedUserQuery $lastSubmittedUserQuery omnibarQuery ${omnibarViewState.value?.queryOrFullUrl}" }
 
-        query == lastSubmittedUserQuery ||
-            (lastSubmittedUserQuery == null && !omnibarViewState.value?.queryOrFullUrl.isNullOrBlank())
-        -> duckChat.openDuckChat(query)
-
-        else -> duckChat.openDuckChatWithAutoPrompt(query)
+        return when {
+            query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+            lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
+            lastSubmittedUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
+            query == lastSubmittedUserQuery -> duckChat.openDuckChat(query)
+            else -> duckChat.openDuckChatWithAutoPrompt(query)
+        }
     }
 
     fun setLastSubmittedUserQuery(query: String) {
