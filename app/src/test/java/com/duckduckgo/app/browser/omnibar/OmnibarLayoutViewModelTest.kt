@@ -1209,7 +1209,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckChatButtonPressedAndExperimentEnabledThenPixelSent() = runTest {
+    fun `when DuckChat Button pressed, experiment enabled, and it wasn't used before then pixel sent`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
 
@@ -1217,15 +1218,38 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.isVisualDesignExperimentEnabled)
             testee.onDuckChatButtonPressed()
-            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0"))
         }
     }
 
     @Test
-    fun whenDuckChatButtonPressedAndExperimentDisabledThenPixelSent() = runTest {
+    fun `when DuckChat Button pressed, experiment enabled, and it was used before then pixel sent`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isVisualDesignExperimentEnabled)
+            testee.onDuckChatButtonPressed()
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1"))
+        }
+    }
+
+    @Test
+    fun `when DuckChat Button pressed, experiment disabled, and it wasn't used before then pixel sent`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0"))
+    }
+
+    @Test
+    fun `when DuckChat Button pressed, experiment disabled, and it was used before then pixel sent`() = runTest {
+        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
+        testee.onDuckChatButtonPressed()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1"))
     }
 
     @Test

@@ -19,6 +19,7 @@ package com.duckduckgo.app.settings
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_EMAIL_PROTECTION_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_SYNC_PRESSED
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.extensions.toBinaryString
@@ -68,12 +69,10 @@ class SettingsPixelDispatcherImpl @Inject constructor(
 
     override fun fireDuckChatPressed() {
         appCoroutineScope.launch {
-            val wasUsedBefore = duckChat.wasOpenedBefore()
+            val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(
                 pixel = DUCK_CHAT_SETTINGS_PRESSED,
-                parameters = mapOf(
-                    PARAM_DUCK_CHAT_USED_BEFORE to wasUsedBefore.toBinaryString(),
-                ),
+                parameters = params,
             )
         }
     }
@@ -92,7 +91,6 @@ class SettingsPixelDispatcherImpl @Inject constructor(
 
     private companion object {
         const val PARAM_SYNC_IS_ENABLED = "is_enabled"
-        const val PARAM_DUCK_CHAT_USED_BEFORE = "was_used_before"
         const val PARAM_EMAIL_IS_SIGNED_IN = "is_signed_in"
     }
 }
