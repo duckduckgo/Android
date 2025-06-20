@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhled</string>
+    <string name="settingsShowFullUrlTitle">Zobrazovat celou adresu webu</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Soukromé vyhledávání ve výchozím nastavení</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj trackery třetích stran</string>
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Blokuj reklamy, které tě sledují</string>
+    <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
     <string name="preOnboardingDaxDialog3Title">Bezva! Vítej v Kačerově.</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>

@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Εμφάνιση</string>
+    <string name="settingsShowFullUrlTitle">Εμφάνιση πλήρους διεύθυνσης ιστότοπου</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Ιδιωτική αναζήτηση βάσει προεπιλογής</string>
     <string name="preOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός διαφημίσεων παρακολούθησης</string>
+    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
     <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
     <string name="preOnboardingDaxDialog3Title">Φανταστικά! Το Παπί σε καλωσορίζει!</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>

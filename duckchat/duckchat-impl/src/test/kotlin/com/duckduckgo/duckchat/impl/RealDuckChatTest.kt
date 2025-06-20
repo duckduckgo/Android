@@ -564,6 +564,24 @@ class RealDuckChatTest {
         assertFalse(testee.isImageUploadEnabled())
     }
 
+    @Test
+    fun whenDuckAiInBrowserFeatureEnabledThenIsEnabledInBrowserReturnsTrue() = runTest {
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.isEnabledInBrowser())
+    }
+
+    @Test
+    fun whenDuckAiInBrowserFeatureDisabledThenIsEnabledInBrowserReturnsFalse() = runTest {
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isEnabledInBrowser())
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {

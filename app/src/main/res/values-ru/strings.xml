@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Внешний вид</string>
+    <string name="settingsShowFullUrlTitle">Показывать полный адрес сайта</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Сохранить</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Конфиденциальный поиск по умолчанию</string>
     <string name="preOnboardingComparisonChartItem2">Блокировка сторонних трекеров</string>
     <string name="preOnboardingComparisonChartItem3">Блокировка всплывающих окон куки</string>
-    <string name="preOnboardingComparisonChartItem4">Блокирует рекламу с отслеживанием</string>
+    <string name="preOnboardingComparisonChartItem4">Блокировка целевой рекламы</string>
     <string name="preOnboardingComparisonChartItem5">Стирает данные браузера одним нажатием</string>
     <string name="preOnboardingDaxDialog3Title">Супер! Добро пожаловать в утиную команду!</string>
     <string name="preOnboardingDaxDialog3Button">Начать просмотр</string>

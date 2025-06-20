@@ -178,6 +178,7 @@ class RealDuckChat @Inject constructor(
     }
 
     private var isDuckChatEnabled = false
+    private var isDuckAiInBrowserEnabled = false
     private var isDuckChatUserEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
@@ -226,6 +227,10 @@ class RealDuckChat @Inject constructor(
 
     override fun isEnabled(): Boolean {
         return isDuckChatEnabled
+    }
+
+    override fun isEnabledInBrowser(): Boolean {
+        return isDuckAiInBrowserEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
@@ -375,6 +380,7 @@ class RealDuckChat @Inject constructor(
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
+            isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {

@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aparência</string>
+    <string name="settingsShowFullUrlTitle">Mostrar endereço completo do site</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Pesquisa em privado por predefinição</string>
     <string name="preOnboardingComparisonChartItem2">Bloqueia rastreadores de terceiros</string>
     <string name="preOnboardingComparisonChartItem3">Bloquear pop-ups de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloqueia anúncios que rastreiam</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquear anúncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina dados de navegação com um botão</string>
     <string name="preOnboardingDaxDialog3Title">Fantástico! Damos-te as boas-vindas ao Duck Side.</string>
     <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>

@@ -145,7 +145,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     sealed class StateChange {
-        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
+        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState, val forceRender: Boolean = false) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
@@ -997,6 +997,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun isBottomNavEnabled(): Boolean {
+        return false
     }
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {

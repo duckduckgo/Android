@@ -203,6 +203,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izskats</string>
+    <string name="settingsShowFullUrlTitle">Rādīt pilnu vietnes adresi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -771,7 +772,7 @@
     <string name="preOnboardingComparisonChartItem1">Meklē privāti pēc noklusējuma</string>
     <string name="preOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
-    <string name="preOnboardingComparisonChartItem4">Bloķēt izsekojošas reklāmas</string>
+    <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
     <string name="preOnboardingDaxDialog3Title">Lieliski! Apsveicam ar pievienošanos pīļu komandai.</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>

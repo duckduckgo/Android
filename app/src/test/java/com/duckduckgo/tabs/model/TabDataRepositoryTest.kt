@@ -50,6 +50,7 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -648,6 +649,81 @@ class TabDataRepositoryTest {
         }
     }
 
+    @Test
+    fun whenFlowTabsCollectedThenEmitsTabs() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val tab1 = TabEntity(tabId = "tab1", url = "http://example1.com", position = 0)
+        val tab2 = TabEntity(tabId = "tab2", url = "http://example2.com", position = 1)
+        dao.insertTab(tab1)
+        dao.insertTab(tab2)
+        val testee = tabDataRepository(dao)
+
+        val tabs = testee.flowTabs.first()
+
+        assertEquals(2, tabs.size)
+        assertEquals(tab1.tabId, tabs[0].tabId)
+        assertEquals(tab2.tabId, tabs[1].tabId)
+        db.close()
+    }
+
+    @Test
+    fun whenFlowSelectedTabCollectedThenEmitsSelectedTab() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val tab1 = TabEntity(tabId = "tab1", url = "http://example1.com", position = 0)
+        val tab2 = TabEntity(tabId = "tab2", url = "http://example2.com", position = 1)
+        dao.addAndSelectTab(tab1)
+        dao.addAndSelectTab(tab2)
+        val testee = tabDataRepository(dao)
+
+        val selectedTab = testee.flowSelectedTab.first()
+
+        assertNotNull(selectedTab)
+        assertEquals(tab2.tabId, selectedTab?.tabId)
+        db.close()
+    }
+
+    @Test
+    fun whenFlowSelectedTabCollectedWithNoSelectionThenEmitsNull() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val testee = tabDataRepository(dao)
+
+        val selectedTab = testee.flowSelectedTab.first()
+
+        assertNull(selectedTab)
+        db.close()
+    }
+
+    @Test
+    fun whenTabsChangeFlowTabsEmitsUpdatedList() = runTest {
+        val db = createDatabase()
+        val dao = db.tabsDao()
+        val testee = tabDataRepository(dao)
+
+        // Initial state: empty
+        val initialTabs = testee.flowTabs.first()
+        assertEquals(0, initialTabs.size)
+
+        // Add first tab
+        val tab1 = TabEntity(tabId = "tab1", url = "http://example1.com", position = 0)
+        dao.insertTab(tab1)
+        val tabsAfterFirst = testee.flowTabs.first()
+        assertEquals(1, tabsAfterFirst.size)
+        assertEquals(tab1.tabId, tabsAfterFirst[0].tabId)
+
+        // Add second tab
+        val tab2 = TabEntity(tabId = "tab2", url = "http://example2.com", position = 1)
+        dao.insertTab(tab2)
+        val tabsAfterSecond = testee.flowTabs.first()
+        assertEquals(2, tabsAfterSecond.size)
+        assertEquals(tab1.tabId, tabsAfterSecond[0].tabId)
+        assertEquals(tab2.tabId, tabsAfterSecond[1].tabId)
+
+        db.close()
+    }
+
     private fun tabDataRepository(
         dao: TabsDao = mockDatabase(),
         entityLookup: EntityLookup = mock(),
@@ -694,6 +770,8 @@ class TabDataRepositoryTest {
         whenever(mockDao.flowDeletableTabs())
             .thenReturn(daoDeletableTabs.consumeAsFlow())
         whenever(mockDao.liveTabs())
+            .thenReturn(MutableLiveData())
+        whenever(mockDao.liveSelectedTab())
             .thenReturn(MutableLiveData())
 
         return mockDao

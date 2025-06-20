@@ -55,7 +55,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Custom Tabs Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
