@@ -29,7 +29,10 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.privacy.config.api.AmpLinkInfo
@@ -621,6 +624,28 @@ class BrokenSiteSubmitterTest {
         assertFalse(params.containsKey("protectionsState"))
     }
 
+    @Test
+    fun whenSubmitReportAndActiveContentScopeExperimentsThenIncludeParam() = runTest {
+        val brokenSite = getBrokenSite()
+        val contentScopeExperiments = listOf(
+            mock<Toggle>().apply {
+                whenever(featureName()).thenReturn(FeatureName("test", "experiment1"))
+                whenever(getCohort()).thenReturn(Cohort("control", 1, "2023-01-01T00:00:00Z"))
+            },
+            mock<Toggle>().apply {
+                whenever(featureName()).thenReturn(FeatureName("test", "experiment2"))
+                whenever(getCohort()).thenReturn(Cohort("treatment", 1, "2023-01-01T00:00:00Z"))
+            },
+        )
+
+        testee.submitBrokenSiteFeedback(brokenSite.copy(contentScopeExperiments = contentScopeExperiments), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+        val params = paramsCaptor.lastValue
+        assertEquals("experiment1:control,experiment2:treatment", params["contentScopeExperiments"])
+    }
+
     private fun assignToExperiment() {
         val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
@@ -654,6 +679,7 @@ class BrokenSiteSubmitterTest {
             userRefreshCount = 0,
             openerContext = null,
             jsPerformance = null,
+            contentScopeExperiments = null,
         )
     }
 
