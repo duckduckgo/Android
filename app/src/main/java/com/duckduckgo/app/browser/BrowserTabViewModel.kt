@@ -2465,7 +2465,7 @@ class BrowserTabViewModel @Inject constructor(
         logcat("Cris") {
             runBlocking {
                 "Report broken site: ${site?.activeContentScopeExperiments?.map { "${it.featureName().name}, ${it.getCohort()}" }}"
-            } 
+            }
         }
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = MENU))
     }
