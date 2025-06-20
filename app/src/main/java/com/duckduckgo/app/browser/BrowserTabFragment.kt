@@ -127,6 +127,8 @@ import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.easteregglogos.EasterEggLogoHandler
+import com.duckduckgo.app.browser.easteregglogos.EnlargedEasterEggLogoActivity
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -563,6 +565,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+
+    @Inject
+    lateinit var easterEggLogoHandler: EasterEggLogoHandler
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1026,6 +1031,17 @@ class BrowserTabFragment :
         configureCustomTab()
         configureEditModeChangeDetection()
         configureClickCatcher()
+        configureLogoClickListener()
+    }
+
+    private fun configureLogoClickListener() {
+        omnibar.configureLogoClickListener(
+            object : Omnibar.LogoClickListener {
+                override fun onClick(url: String) {
+                    viewModel.onDynamicLogoClicked(url)
+                }
+            },
+        )
     }
 
     private fun configureClickCatcher() {
@@ -2129,9 +2145,16 @@ class BrowserTabFragment :
             is Command.LaunchBookmarksActivity -> {
                 browserActivity?.launchBookmarks()
             }
-
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
-            else -> {
+            is Command.ExtractDDGLogo -> {
+                webView?.let {
+                    easterEggLogoHandler.handle(it) { logo ->
+                        viewModel.onLogoReceived(logo.logo, logo.type)
+                    }
+                }
+            }
+            is Command.ShowEnlargedLogo -> launchEnlargedEasterEggLogoActivity(it.url)
+            null -> {
                 // NO OP
             }
         }
@@ -4571,6 +4594,16 @@ class BrowserTabFragment :
 
     fun launchTabSwitcherAfterTabsUndeleted() {
         viewModel.onLaunchTabSwitcherAfterTabsUndeletedRequest()
+    }
+
+    private fun launchEnlargedEasterEggLogoActivity(logoUrl: String) {
+        val intent = EnlargedEasterEggLogoActivity.intent(requireContext(), logoUrl, logoUrl)
+        val activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            requireActivity(),
+            omnibar.daxIcon,
+            logoUrl,
+        )
+        startActivity(intent, activityOptions.toBundle())
     }
 }
 

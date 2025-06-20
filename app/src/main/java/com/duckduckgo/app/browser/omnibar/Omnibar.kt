@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -162,6 +163,10 @@ class Omnibar(
         fun onTrackersCountFinished()
     }
 
+    interface LogoClickListener {
+        fun onClick(url: String)
+    }
+
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
@@ -251,6 +256,10 @@ class Omnibar(
         newOmnibar.shieldIconExperiment
     }
 
+    val daxIcon: ImageView by lazy {
+        newOmnibar.daxIcon
+    }
+
     val textInputRootView: View by lazy {
         newOmnibar.omnibarTextInput.rootView
     }
@@ -295,6 +304,10 @@ class Omnibar(
 
     fun configureItemPressedListeners(listener: ItemPressedListener) {
         newOmnibar.setOmnibarItemPressedListener(listener)
+    }
+
+    fun configureLogoClickListener(logoClickListener: LogoClickListener) {
+        newOmnibar.setLogoClickListener(logoClickListener)
     }
 
     fun configureFadeOmnibarItemPressedListeners(listener: FadeOmnibarItemPressedListener) {

@@ -98,6 +98,7 @@ import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
+import com.duckduckgo.app.browser.commands.Command.ExtractDDGLogo
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -191,6 +192,7 @@ import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler.Ev
 import com.duckduckgo.app.browser.logindetection.LoginDetected
 import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
 import com.duckduckgo.app.browser.logindetection.NavigationEvent
+import com.duckduckgo.app.browser.easteregglogos.EasterEggLogosToggles
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
@@ -467,6 +469,7 @@ class BrowserTabViewModel @Inject constructor(
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
     private val tabManager: TabManager,
+    private val easterEggLogosToggles: EasterEggLogosToggles,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1855,6 +1858,12 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
+
+            if(easterEggLogosToggles.feature().isEnabled()) {
+                if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+                    command.value = ExtractDDGLogo
+                }
+            }
         }
     }
 
@@ -4178,6 +4187,23 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setLastSubmittedUserQuery(query: String) {
         lastSubmittedUserQuery = query
+    }
+
+    fun onLogoReceived(logoPath: String, logoType: String) {
+        val themedLogoUrl = if (logoType == "themed") {
+            "https://${AppUrl.Url.HOST}$logoPath"
+        } else {
+            null
+        }
+
+        logcat { "BrowserTabFragment: Received logo: $themedLogoUrl" }
+        omnibarViewState.postValue(currentOmnibarViewState().copy(
+            themedLogoUrl = themedLogoUrl,
+        ))
+    }
+
+    fun onDynamicLogoClicked(url: String) {
+        command.value = Command.ShowEnlargedLogo(url)
     }
 
     companion object {

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent"
+    tools:ignore="InvalidColorAttribute">
+
+    <ImageView
+        android:id="@+id/close_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="@dimen/keyline_2"
+        android:background="@drawable/selectable_circular_ripple_light"
+        android:contentDescription="@string/cd_close_logo_screen"
+        android:padding="8dp"
+        app:layout_constraintBottom_toTopOf="@id/enlarged_logo_image"
+        app:layout_constraintEnd_toEndOf="@id/enlarged_logo_image"
+        app:layout_constraintStart_toEndOf="@id/enlarged_logo_image"
+        app:srcCompat="@drawable/ic_close_24_solid_color"
+        app:tint="@color/white"
+        tools:ignore="InvalidColorAttribute" />
+
+    <ImageView
+        android:id="@+id/enlarged_logo_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:contentDescription="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout> 

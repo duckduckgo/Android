@@ -21,4 +21,5 @@ data class OmnibarViewState(
     val isEditing: Boolean = false,
     val navigationChange: Boolean = false,
     val forceExpand: Boolean = true,
+    val themedLogoUrl: String? = null,
 )

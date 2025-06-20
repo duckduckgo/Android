@@ -404,4 +404,10 @@
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
 
+    <style name="Theme.DuckDuckGo.DynamicLogo" parent="Theme.AppCompat.Transparent.NoActionBar">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="enableEdgeToEdge">true</item>
+    </style>
+
 </resources>

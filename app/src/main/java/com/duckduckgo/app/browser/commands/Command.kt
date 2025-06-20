@@ -276,4 +276,7 @@ sealed class Command {
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
     data object LaunchBookmarksActivity : Command()
     data object StartTrackersExperimentShieldPopAnimation : Command()
+
+    object ExtractDDGLogo : Command()
+    data class ShowEnlargedLogo(val url: String) : Command()
 }
