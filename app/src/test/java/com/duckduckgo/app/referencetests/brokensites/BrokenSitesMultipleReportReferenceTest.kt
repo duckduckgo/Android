@@ -216,6 +216,7 @@ class BrokenSitesMultipleReportReferenceTest(private val testCase: MultipleRepor
                 openerContext = null,
                 jsPerformance = null,
                 contentScopeExperiments = null,
+                debugFlags = null,
             )
 
             testee.submitBrokenSiteFeedback(brokenSite, toggle = false)

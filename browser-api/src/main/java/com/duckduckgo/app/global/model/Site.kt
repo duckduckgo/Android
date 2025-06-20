@@ -87,6 +87,8 @@ interface Site {
     var previousNumberOfBlockedTrackers: Int?
 
     var activeContentScopeExperiments: List<Toggle>?
+
+    var debugFlags: List<String>?
 }
 
 enum class MaliciousSiteStatus {

@@ -646,6 +646,18 @@ class BrokenSiteSubmitterTest {
         assertEquals("experiment1:control,experiment2:treatment", params["contentScopeExperiments"])
     }
 
+    @Test
+    fun whenSubmitReportAndADebugFlagsThenIncludeParam() = runTest {
+        val brokenSite = getBrokenSite()
+
+        testee.submitBrokenSiteFeedback(brokenSite.copy(debugFlags = listOf("flag1,flag2")), toggle = false)
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))
+        val params = paramsCaptor.lastValue
+        assertEquals("flag1,flag2", params["debugFlags"])
+    }
+
     private fun assignToExperiment() {
         val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
         testBlockListFeature.tdsNextExperimentTest().setRawStoredState(
@@ -680,6 +692,7 @@ class BrokenSiteSubmitterTest {
             openerContext = null,
             jsPerformance = null,
             contentScopeExperiments = null,
+            debugFlags = null,
         )
     }
 

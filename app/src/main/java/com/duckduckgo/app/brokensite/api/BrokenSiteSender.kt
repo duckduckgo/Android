@@ -161,6 +161,10 @@ class BrokenSiteSubmitter @Inject constructor(
                     }
                 }
 
+            brokenSite.debugFlags?.takeIf { it.isNotEmpty() }?.sorted()?.let { debugFlags ->
+                params[DEBUG_FLAGS] = debugFlags.joinToString(",")
+            }
+
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
             if (lastSentDay != null) {
                 params[LAST_SENT_DAY] = lastSentDay
@@ -241,6 +245,7 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val JS_PERFORMANCE = "jsPerformance"
         private const val BLOCKLIST_EXPERIMENT = "blockListExperiment"
         private const val CONTENT_SCOPE_EXPERIMENTS = "contentScopeExperiments"
+        private const val DEBUG_FLAGS = "debugFlags"
     }
 }
 
