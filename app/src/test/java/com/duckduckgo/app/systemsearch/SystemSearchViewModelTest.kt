@@ -33,6 +33,7 @@ import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.ShowRemoveS
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.QuickAccessItems
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Suggestions.SystemSearchResultsViewState
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -73,6 +74,7 @@ class SystemSearchViewModelTest {
     private val mockPixel: Pixel = mock()
     private val mockSettingsStore: SettingsDataStore = mock()
     private val mockHistory: NavigationHistory = mock()
+    private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -97,6 +99,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            mockPostCtaExperienceExperiment,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -234,44 +237,54 @@ class SystemSearchViewModelTest {
     }
 
     @Test
-    fun whenUserSubmitsQueryThenBrowserLaunchedWithQueryAndPixelSent() {
+    fun whenUserSubmitsQueryThenBrowserLaunchedWithQueryAndPixelSent() = runTest {
         testee.userSubmittedQuery(QUERY)
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
-    fun whenUserSubmitsQueryWithSpaceThenBrowserLaunchedWithTrimmedQueryAndPixelSent() {
+    fun whenUserSubmitsQueryWithSpaceThenBrowserLaunchedWithTrimmedQueryAndPixelSent() = runTest {
         testee.userSubmittedQuery("$QUERY ")
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(QUERY), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
-    fun whenUserSubmitsBlankQueryThenIgnored() {
+    fun whenUserSubmitsBlankQueryThenIgnored() = runTest {
         testee.userSubmittedQuery(BLANK_QUERY)
         assertFalse(commandCaptor.allValues.any { it is Command.LaunchBrowser })
         verify(mockPixel, never()).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        verify(mockPostCtaExperienceExperiment, never()).fireWidgetSearch()
+        verify(mockPostCtaExperienceExperiment, never()).fireWidgetSearchXCount()
     }
 
     @Test
     fun whenUserSubmitsQueryThenOnboardingCompleted() = runTest {
         testee.userSubmittedQuery(QUERY)
         verify(mockUserStageStore).stageCompleted(AppStage.NEW)
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
-    fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() {
+    fun whenUserSubmitsAutocompleteResultThenBrowserLaunchedAndPixelSent() = runTest {
         testee.userSubmittedAutocompleteResult(AutoCompleteSearchSuggestion(phrase = AUTOCOMPLETE_RESULT, isUrl = false, isAllowedInTopHits = false))
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowser(AUTOCOMPLETE_RESULT), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
-    fun whenUserSubmitsAutocompleteResultToOpenInTabThenBrowserLaunchedAndPixelSent() {
+    fun whenUserSubmitsAutocompleteResultToOpenInTabThenBrowserLaunchedAndPixelSent() = runTest {
         val phrase = "phrase"
         val tabId = "tabId"
 
@@ -280,6 +293,8 @@ class SystemSearchViewModelTest {
         verify(commandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         assertEquals(Command.LaunchBrowserAndSwitchToTab(phrase, tabId), commandCaptor.lastValue)
         verify(mockPixel).fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearch()
+        verify(mockPostCtaExperienceExperiment).fireWidgetSearchXCount()
     }
 
     @Test
@@ -397,6 +412,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            mockPostCtaExperienceExperiment,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -422,6 +438,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            mockPostCtaExperienceExperiment,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -474,6 +491,7 @@ class SystemSearchViewModelTest {
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
+            mockPostCtaExperienceExperiment,
         )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems
