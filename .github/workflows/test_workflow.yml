@@ -6,6 +6,7 @@ on:
     inputs:
       ref:
         description: 'This is an example of an input'
+        default: 'develop'
         required: true
 
 env:
@@ -21,6 +22,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive
-          token: ${{ secrets.GT_DAXMOBILE }}
           ref: ${{ github.event.inputs.ref }}
+
+      - name: Get task permalink
+        id: get-task-permalink
+        uses: duckduckgo/native-github-asana-sync@feature/david/update_asana_3
+        with:
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
+          asana-task-id: '1210542063926870'
+          action: 'get-asana-task-permalink'
+
+      - name: Use Asana user id to create a new task
+        run:
+          echo ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }} }}
