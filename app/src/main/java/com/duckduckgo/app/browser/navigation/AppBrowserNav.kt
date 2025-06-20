@@ -44,7 +44,6 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
 
     override fun openDuckChat(
         context: Context,
-        query: String?,
         hasSessionActive: Boolean,
         duckChatUrl: String,
     ): Intent {
