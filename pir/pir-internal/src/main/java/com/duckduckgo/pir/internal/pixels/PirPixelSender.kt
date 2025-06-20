@@ -23,8 +23,6 @@ import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROK
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_BROKER_COMPLETED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_BROKER_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_RECORD_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED
@@ -110,26 +108,6 @@ interface PirPixelSender {
         brokerName: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
-    )
-
-    /**
-     * Tells us when the opt-out process is started for a broker
-     *
-     * @param brokerName for which the opt-out is started for
-     */
-    fun reportBrokerOptOutStarted(
-        brokerName: String,
-    )
-
-    /**
-     * Tells us when the opt-out process is completed for a broker. This means that all records for the broker has been completed.
-     *
-     * @param brokerName for which the opt-out is started for
-     * @param totalTimeInMillis How long it took to complete the optout for the broker.
-     */
-    fun reportBrokerOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
     )
 
     /**
@@ -269,24 +247,6 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_SUCCESS to isSuccess.toString(),
         )
         fire(PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED, params)
-    }
-
-    override fun reportBrokerOptOutStarted(brokerName: String) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-        )
-        fire(PIR_INTERNAL_OPT_OUT_BROKER_STARTED, params)
-    }
-
-    override fun reportBrokerOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-    ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-        )
-        fire(PIR_INTERNAL_OPT_OUT_BROKER_COMPLETED, params)
     }
 
     override fun sendCPUUsageAlert(averageCpuUsagePercent: Int) {

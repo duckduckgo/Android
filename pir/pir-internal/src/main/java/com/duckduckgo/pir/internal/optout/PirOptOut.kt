@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
-import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
@@ -151,11 +150,12 @@ class RealPirOptOut @Inject constructor(
                 brokerStepsParser.parseStep(broker, this)
             }
         }.filter {
-            (it as OptOutStep).profilesToOptOut.isNotEmpty()
-        }.also { list ->
-            runners[0].startOn(webView, profileQuery, list)
-            runners[0].stop()
-        }
+            it.isNotEmpty()
+        }.flatten()
+            .also { list ->
+                runners[0].startOn(webView, profileQuery, list)
+                runners[0].stop()
+            }
 
         logcat { "PIR-OPT-OUT: Optout completed for all runners" }
         emitCompletedPixel()
@@ -179,11 +179,20 @@ class RealPirOptOut @Inject constructor(
 
         val script = pirCssScriptLoader.getScript()
 
-        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
-            brokers.size
+        val brokerSteps = brokers.mapNotNull { broker ->
+            repository.getBrokerOptOutSteps(broker)?.run {
+                brokerStepsParser.parseStep(broker, this)
+            }
+        }.filter {
+            it.isNotEmpty()
+        }.flatten()
+
+        maxWebViewCount = if (brokerSteps.size <= MAX_DETACHED_WEBVIEW_COUNT) {
+            brokerSteps.size
         } else {
             MAX_DETACHED_WEBVIEW_COUNT
         }
+
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
@@ -200,13 +209,7 @@ class RealPirOptOut @Inject constructor(
         }
 
         // Start each runner on a subset of the broker steps
-        brokers.mapNotNull { broker ->
-            repository.getBrokerOptOutSteps(broker)?.run {
-                brokerStepsParser.parseStep(broker, this)
-            }
-        }.filter {
-            (it as OptOutStep).profilesToOptOut.isNotEmpty()
-        }.splitIntoParts(maxWebViewCount)
+        brokerSteps.splitIntoParts(maxWebViewCount)
             .mapIndexed { index, part ->
                 async {
                     runners[index].start(profileQuery, part)
