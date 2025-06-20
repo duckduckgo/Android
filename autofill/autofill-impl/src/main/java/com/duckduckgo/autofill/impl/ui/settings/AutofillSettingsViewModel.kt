@@ -43,12 +43,14 @@ import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Comman
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigatePasswordList
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigateToHowToSyncWithDesktop
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -106,10 +108,16 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun sendLaunchPixel(autofillScreenLaunchSource: AutofillScreenLaunchSource) {
-        pixel.fire(
-            AUTOFILL_SETTINGS_OPENED,
-            parameters = mapOf("source" to autofillScreenLaunchSource.asString()),
-        )
+        viewModelScope.launch {
+            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
+            pixel.fire(
+                AUTOFILL_SETTINGS_OPENED,
+                parameters = mapOf(
+                    "source" to autofillScreenLaunchSource.asString(),
+                    "has_credentials_saved" to hasCredentialsSaved.toBinaryString(),
+                ),
+            )
+        }
     }
 
     private fun onViewStateFlowStart() {
