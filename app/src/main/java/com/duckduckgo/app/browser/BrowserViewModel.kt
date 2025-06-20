@@ -132,7 +132,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
-        data class OpenDuckChat(val duckChatUrl: String?, val keepSession: Boolean) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -460,14 +460,11 @@ class BrowserViewModel @Inject constructor(
         command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
 
-    fun openDuckChat(duckChatUrl: String?, autoPrompt: Boolean) {
-        logcat(INFO) { "Duck.ai openDuckChat autoPrompt $autoPrompt" }
+    fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean) {
+        logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
         viewModelScope.launch(dispatchers.io()) {
-            // Launching a new query will force a new session to start
-            val keepSession = duckChat.shouldKeepSessionAlive() && !autoPrompt
-            logcat(INFO) { "Duck.ai should keep session alive $keepSession" }
             withContext(dispatchers.main()) {
-                command.value = OpenDuckChat(duckChatUrl, keepSession)
+                command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive)
             }
         }
     }
