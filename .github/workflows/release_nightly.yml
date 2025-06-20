@@ -155,7 +155,6 @@ jobs:
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         shell: bash
-        working-directory: Android
         run: |
           RELEASE_TASK_URL=$(python ./scripts/release/create-asana-release.py \
           --android-repo-path . \
