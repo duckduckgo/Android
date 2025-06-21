@@ -7,6 +7,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
+import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 
 @SuppressLint("DenyListedApi")
@@ -21,14 +23,14 @@ class RealContentScopeExperimentsTest {
     )
 
     @Test
-    fun whenContentScopeExperimentsFeatureIsDisabledThenGetExperimentsJsonReturnsEmptyList() {
+    fun whenContentScopeExperimentsFeatureIsDisabledThenGetExperimentsReturnsEmptyList() {
         fakeContentScopeExperimentsFeature.self().setRawStoredState(Toggle.State(false))
-        val experimentsJson = testee.getExperimentsJson()
-        assert(experimentsJson == "[]")
+        val experiments = testee.getActiveExperiments()
+        assertEquals(listOf<Toggle>(), experiments)
     }
 
     @Test
-    fun whenContentScopeExperimentsFeatureIsEnabledThenGetExperimentsJsonReturnsEnabledExperiments() {
+    fun whenContentScopeExperimentsFeatureIsEnabledThenGetExperimentsReturnsEnabledExperiments() = runTest {
         fakeContentScopeExperimentsFeature.self().setRawStoredState(Toggle.State(true))
         fakeContentScopeExperimentsFeature.test().setRawStoredState(
             Toggle.State(
@@ -45,11 +47,57 @@ class RealContentScopeExperimentsTest {
             ),
         )
 
-        val experimentsJson = testee.getExperimentsJson()
-        assert(
-            experimentsJson == "[{\"cohort\":\"treatment\",\"feature\":\"fakeFeature\",\"subfeature\":\"test\"}," +
-                "{\"cohort\":\"control\",\"feature\":\"fakeFeature\",\"subfeature\":\"bloops\"}]",
+        val experimentsJson = testee.getActiveExperiments()
+        assertEquals(TREATMENT.cohortName, experimentsJson[0].getCohort()?.name)
+        assertEquals(CONTROL.cohortName, experimentsJson[1].getCohort()?.name)
+        assertEquals("test", experimentsJson[0].featureName().name)
+        assertEquals("bloops", experimentsJson[1].featureName().name)
+    }
+
+    @Test
+    fun whenContentScopeExperimentsFeatureIsEnabledButExperimentsAreDisabledThenGetExperimentsReturnsEmptyList() = runTest {
+        fakeContentScopeExperimentsFeature.self().setRawStoredState(Toggle.State(true))
+        fakeContentScopeExperimentsFeature.test().setRawStoredState(
+            Toggle.State(
+                remoteEnableState = false,
+                cohorts = listOf(Cohort(name = TREATMENT.cohortName, weight = 1)),
+                assignedCohort = Cohort(name = TREATMENT.cohortName, weight = 1),
+            ),
         )
+        fakeContentScopeExperimentsFeature.bloops().setRawStoredState(
+            Toggle.State(
+                remoteEnableState = false,
+                cohorts = listOf(Cohort(name = CONTROL.cohortName, weight = 1)),
+                assignedCohort = Cohort(name = CONTROL.cohortName, weight = 1),
+            ),
+        )
+
+        val experiments = testee.getActiveExperiments()
+        assertEquals(listOf<Toggle>(), experiments)
+    }
+
+    @Test
+    fun whenContentScopeExperimentsFeatureIsEnabledAndMixedExperimentStatesThenGetExperimentsReturnsOnlyEnabledExperiments() = runTest {
+        fakeContentScopeExperimentsFeature.self().setRawStoredState(Toggle.State(true))
+        fakeContentScopeExperimentsFeature.test().setRawStoredState(
+            Toggle.State(
+                remoteEnableState = true,
+                cohorts = listOf(Cohort(name = TREATMENT.cohortName, weight = 1)),
+                assignedCohort = Cohort(name = TREATMENT.cohortName, weight = 1),
+            ),
+        )
+        fakeContentScopeExperimentsFeature.bloops().setRawStoredState(
+            Toggle.State(
+                remoteEnableState = false,
+                cohorts = listOf(Cohort(name = CONTROL.cohortName, weight = 1)),
+                assignedCohort = Cohort(name = CONTROL.cohortName, weight = 1),
+            ),
+        )
+
+        val experiments = testee.getActiveExperiments()
+        assertEquals(1, experiments.size)
+        assertEquals(TREATMENT.cohortName, experiments[0].getCohort()?.name)
+        assertEquals("test", experiments[0].featureName().name)
     }
 }
 

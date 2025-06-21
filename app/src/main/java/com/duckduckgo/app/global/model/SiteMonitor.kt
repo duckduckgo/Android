@@ -36,6 +36,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.ContentBlocking
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.CoroutineScope
@@ -219,6 +220,8 @@ class SiteMonitor(
     override var maliciousSiteStatus: MaliciousSiteStatus? = null
 
     override var previousNumberOfBlockedTrackers: Int? = null
+
+    override var activeContentScopeExperiments: List<Toggle>? = null
 
     companion object {
         private val specialDomainTypes = setOf(
