@@ -3617,6 +3617,10 @@ class BrowserTabViewModel @Inject constructor(
                 breakageReportResult(data)
             }
 
+            "addDebugFlag" -> {
+                site?.debugFlags = site?.debugFlags?.toMutableList()?.plus(featureName)?.toList()
+            }
+
             else -> {
                 // NOOP
             }
