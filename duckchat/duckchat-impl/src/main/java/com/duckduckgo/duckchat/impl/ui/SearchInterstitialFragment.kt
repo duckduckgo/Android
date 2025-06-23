@@ -34,6 +34,12 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchInterstitialBinding
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import com.duckduckgo.voice.api.VoiceSearchLauncher
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSuccess
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
+import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -41,6 +47,12 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var voiceSearchLauncher: VoiceSearchLauncher
+
+    @Inject
+    lateinit var voiceSearchAvailability: VoiceSearchAvailability
 
     private val binding: FragmentSearchInterstitialBinding by viewBinding()
 
@@ -55,7 +67,9 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupViewPager()
+        configureViewPager()
+        configureOmnibar()
+        configureVoice()
 
         val params = requireActivity().intent.getActivityParams(SearchInterstitialActivityParams::class.java)
         params?.query?.let { query ->
@@ -74,52 +88,67 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             },
         )
 
-        setupOmnibarCallbacks()
-
-        binding.duckChatOmnibar.duckChatInput.post {
-            showKeyboard(binding.duckChatOmnibar.duckChatInput)
-        }
-        binding.duckChatOmnibar.setContentId(R.id.viewPager)
         binding.actionSend.setOnClickListener {
             binding.duckChatOmnibar.submitMessage()
         }
+        binding.duckChatOmnibar.duckChatInput.post {
+            showKeyboard(binding.duckChatOmnibar.duckChatInput)
+        }
     }
 
-    private fun setupViewPager() {
+    private fun configureViewPager() {
         pagerAdapter = InputScreenPagerAdapter(this)
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun setupOmnibarCallbacks() {
-        binding.duckChatOmnibar.apply {
-            selectTab(0)
-            onSearchSent = { query ->
-                val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
-                requireActivity().setResult(Activity.RESULT_OK, data)
-                exitInterstitial()
-            }
-            onDuckChatSent = { query ->
-                val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
-                requireActivity().setResult(Activity.RESULT_CANCELED, data)
-                requireActivity().finish()
-                duckChat.openDuckChatWithAutoPrompt(query)
-            }
-            onBack = {
-                requireActivity().onBackPressed()
-            }
-            onSearchSelected = {
-                binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
-                binding.viewPager.setCurrentItem(0, true)
-            }
-            onDuckChatSelected = {
-                binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
-                binding.viewPager.setCurrentItem(1, true)
-            }
-            onSendMessageAvailable = { isAvailable ->
-                binding.actionSend.isVisible = isAvailable
+    private fun configureOmnibar() = with(binding.duckChatOmnibar) {
+        setContentId(R.id.viewPager)
+        selectTab(0)
+
+        onSearchSent = { query ->
+            val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
+            requireActivity().setResult(Activity.RESULT_OK, data)
+            exitInterstitial()
+        }
+        onDuckChatSent = { query ->
+            val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
+            requireActivity().setResult(Activity.RESULT_CANCELED, data)
+            requireActivity().finish()
+            duckChat.openDuckChatWithAutoPrompt(query)
+        }
+        onBack = {
+            requireActivity().onBackPressed()
+        }
+        onSearchSelected = {
+            binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
+            binding.viewPager.setCurrentItem(0, true)
+        }
+        onDuckChatSelected = {
+            binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
+            binding.viewPager.setCurrentItem(1, true)
+        }
+        onSendMessageAvailable = { isAvailable ->
+            binding.actionSend.isVisible = isAvailable
+        }
+    }
+
+    private fun configureVoice() {
+        binding.actionVoice.setOnClickListener {
+            voiceSearchLauncher.launch(requireActivity())
+        }
+        voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
+            when (it) {
+                is VoiceRecognitionSuccess -> {
+                    binding.duckChatOmnibar.submitMessage(it.result)
+                }
+                is SearchCancelled -> {}
+                is VoiceSearchDisabled -> {
+                    binding.actionVoice.isVisible = false
+                }
             }
         }
+        binding.actionVoice.isVisible = voiceSearchAvailability.isVoiceSearchAvailable
     }
 
     private fun exitInterstitial() {
@@ -131,5 +160,10 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
     override fun onDestroyView() {
         binding.viewPager.unregisterOnPageChangeCallback(pageChangeCallback)
         super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.actionVoice.isVisible = voiceSearchAvailability.isVoiceSearchAvailable
     }
 }
