@@ -18,7 +18,8 @@ package com.duckduckgo.app.pixels.duckchat
 
 import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 
 suspend fun DuckChat.createWasUsedBeforePixelParams(): Map<String, String> {
-    return mapOf("was_used_before" to wasOpenedBefore().toBinaryString())
+    return mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasOpenedBefore().toBinaryString())
 }
