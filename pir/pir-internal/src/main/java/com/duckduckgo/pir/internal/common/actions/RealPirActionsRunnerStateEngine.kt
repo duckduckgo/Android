@@ -22,14 +22,13 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.Idle
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.None
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -41,8 +40,14 @@ class RealPirActionsRunnerStateEngine(
     brokerSteps: List<BrokerStep>,
 ) : PirActionsRunnerStateEngine {
     private var engineState: State = State(runType, brokerSteps)
-    private val sideEffectFlow = MutableStateFlow<SideEffect>(None)
-    private val eventsFlow = MutableStateFlow<Event>(Idle)
+    private val sideEffectFlow = MutableSharedFlow<SideEffect>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    private val eventsFlow = MutableSharedFlow<Event>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -52,7 +57,7 @@ class RealPirActionsRunnerStateEngine(
         }
     }
 
-    override val sideEffect: Flow<SideEffect> = sideEffectFlow.asStateFlow()
+    override val sideEffect: Flow<SideEffect> = sideEffectFlow.asSharedFlow()
 
     override fun dispatch(event: Event) {
         coroutineScope.launch {
