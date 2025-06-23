@@ -47,4 +47,11 @@
     <color name="buckColorCheckBoxUncheckedOutline">@color/white18</color>
 
     <color name="bbSurfaceColor">#161615</color>
+
+    <color name="bbColorButtonSecondaryText">#EDEDEC</color>
+    <color name="bbColorButtonOptionPressed">@color/white12</color>
+
+    <color name="bbColorButtonOptionContainer">#232320</color>
+    <color name="bbColorButtonOptionText">#EDEDEC</color>
+
 </resources>

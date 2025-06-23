@@ -697,4 +697,61 @@
         <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
+    <style name="Typography.DuckDuckGo.BBButton">
+        <item name="fontFamily">@font/pangea_medium</item>
+        <item name="android:textSize">18sp</item>
+        <item name="lineHeight">18sp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BBButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="cornerRadius">100dp</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.BBButton</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingRight">24dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BBButton.TextButton.Primary">
+        <item name="android:textColor">@color/bbColorButtonPrimaryText</item>
+        <item name="backgroundTint">@color/bbColorButtonPrimaryContainer</item>
+        <item name="rippleColor">@color/bbColorButtonPrimaryContainerPressed</item>
+        <item name="iconTint">@color/bbColorButtonPrimaryText</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BBButton.TextButton.Secondary">
+        <item name="cornerRadius">100dp</item>
+        <item name="android:textColor">@color/bbColorButtonSecondaryText</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="iconTint">@color/bbColorButtonSecondaryText</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="rippleColor">@color/bbColorButtonOptionPressed</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.BBButton.Option" parent="">
+        <item name="fontFamily">@font/pangea_regular</item>
+        <item name="android:textSize">18sp</item>
+        <item name="lineHeight">25sp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BBButton.Option" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+        <item name="cornerRadius">10dp</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.BBButton.Option</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:textColor">@color/bbColorButtonOptionText</item>
+        <item name="backgroundTint">@color/bbColorButtonOptionContainer</item>
+        <item name="iconTint">@color/bbColorButtonOptionText</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="iconSize">24dp</item>
+        <item name="iconPadding">8dp</item>
+        <item name="rippleColor">@color/bbColorButtonOptionPressed</item>
+    </style>
+
 </resources>
