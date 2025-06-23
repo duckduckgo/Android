@@ -25,7 +25,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 
 @RunWith(AndroidJUnit4::class)
-class BrowserApplicationStateInfoTest {
+class BrowserApplicationUserPreferenceFeatureStateInfoTest {
 
     private lateinit var browserApplicationStateInfo: BrowserApplicationStateInfo
     private val observer: BrowserLifecycleObserver = mock()

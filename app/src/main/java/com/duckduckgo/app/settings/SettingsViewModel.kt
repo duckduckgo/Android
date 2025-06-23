@@ -72,7 +72,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckAiVisibilityRepository
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
@@ -90,6 +90,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -108,7 +110,7 @@ class SettingsViewModel @Inject constructor(
     private val autoconsent: Autoconsent,
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
-    private val duckChat: DuckChat,
+    private val duckAiVisibilityRepository: DuckAiVisibilityRepository,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
@@ -167,6 +169,16 @@ class SettingsViewModel @Inject constructor(
 
     init {
         pixel.fire(SETTINGS_OPENED)
+
+        duckAiVisibilityRepository.showSettings
+            .onEach { showDuckAiSettings ->
+                viewState.emit(
+                    currentViewState().copy(
+                        isDuckChatEnabled = showDuckAiSettings,
+                    )
+                )
+            }
+            .launchIn(viewModelScope)
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -197,7 +209,6 @@ class SettingsViewModel @Inject constructor(
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
                     isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
-                    isDuckChatEnabled = duckChat.isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
                     isAddWidgetInProtectionsVisible = withContext(dispatcherProvider.io()) {
                         settingsPageFeature.self().isEnabled() && settingsPageFeature.widgetAsProtection().isEnabled()

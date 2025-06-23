@@ -309,6 +309,7 @@ import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckAiVisibilityRepository
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -448,6 +449,7 @@ class BrowserTabViewModel @Inject constructor(
     private val httpErrorPixels: Lazy<HttpErrorPixels>,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckAiVisibilityRepository: DuckAiVisibilityRepository,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
@@ -721,6 +723,14 @@ class BrowserTabViewModel @Inject constructor(
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
             }
             .launchIn(viewModelScope)
+
+        duckAiVisibilityRepository.showPopupMenuShortcuts
+            .onEach { showPopupMenuShortcuts ->
+                browserViewState.value = currentBrowserViewState().copy(
+                    showDuckChatOption = showPopupMenuShortcuts,
+                )
+            }
+            .launchIn(viewModelScope)
     }
 
     fun loadData(
@@ -887,10 +897,6 @@ class BrowserTabViewModel @Inject constructor(
         } else {
             command.value = HideKeyboard
         }
-
-        browserViewState.value = currentBrowserViewState().copy(
-            showDuckChatOption = duckChat.showInBrowserMenu.value,
-        )
 
         viewModelScope.launch {
             refreshOnViewVisible.emit(true)
@@ -2673,13 +2679,11 @@ class BrowserTabViewModel @Inject constructor(
         withContext(dispatchers.io()) {
             val addToHomeSupported = addToHomeCapabilityDetector.isAddToHomeSupported()
             val showAutofill = autofillCapabilityChecker.canAccessCredentialManagementScreen()
-            val showDuckChat = duckChat.showInBrowserMenu.value
 
             withContext(dispatchers.main()) {
                 browserViewState.value = currentBrowserViewState().copy(
                     addToHomeVisible = addToHomeSupported,
                     showAutofill = showAutofill,
-                    showDuckChatOption = showDuckChat,
                 )
             }
         }

@@ -20,7 +20,7 @@ import android.webkit.WebBackForwardList
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class WebViewNavigationStateTest {
+class WebViewNavigationUserPreferenceFeatureStateTest {
 
     private val stack: TestBackForwardList = TestBackForwardList()
 

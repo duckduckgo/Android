@@ -60,6 +60,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiVisibilityRepository
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -94,6 +95,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
+    private val duckAiVisibilityRepository: DuckAiVisibilityRepository,
     private val browserFeatures: AndroidBrowserConfigFeature,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
@@ -114,13 +116,31 @@ class OmnibarLayoutViewModel @Inject constructor(
             isExperimentEnabled to isDuckAIPoCEnabled
         }
 
+    private val showDuckAiButton = combine(
+        _viewState,
+        duckAiVisibilityRepository.showOmnibarShortcutOnNtpAndOnFocus,
+        duckAiVisibilityRepository.showOmnibarShortcutInAllStates,
+    ) { viewState, showOnNtpAndOnFocus, showInAllStates ->
+        when {
+            viewState.viewMode is CustomTab -> {
+                false
+            }
+
+            showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank()) -> {
+                true
+            }
+
+            else -> showInAllStates
+        }
+    }
+
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         visualDesignExperimentFlags,
-        duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, visualDesignExperimentFlags, showInAddressBar ->
+        showDuckAiButton
+    ) { state, tabs, highlightOverflowMenu, visualDesignExperimentFlags, showDuckAiButton ->
         val (isVisualDesignExperimentEnabled, isDuckAIPoCEnabled) = visualDesignExperimentFlags
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
@@ -128,8 +148,7 @@ class OmnibarLayoutViewModel @Inject constructor(
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
-            showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
-                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
+            showChatMenu = showDuckAiButton,
             showClickCatcher = isDuckAIPoCEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
