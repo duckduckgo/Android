@@ -148,10 +148,10 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
-import com.duckduckgo.app.browser.omnibar.getOmnibarType
+import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -565,6 +565,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
+    @Inject
+    lateinit var omnibarTypeResolver: OmnibarTypeResolver
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -948,7 +951,7 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, visualDesignExperimentDataStore.getOmnibarType(), binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarTypeResolver.getOmnibarType(), binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1369,7 +1372,7 @@ class BrowserTabFragment :
         }
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        val hasOmnibarTypeChanged = omnibar.omnibarType != visualDesignExperimentDataStore.getOmnibarType()
+        val hasOmnibarTypeChanged = omnibar.omnibarType != omnibarTypeResolver.getOmnibarType()
         if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
@@ -2806,8 +2809,8 @@ class BrowserTabFragment :
                 }
             },
         )
-        omnibar.configureFadeOmnibarItemPressedListeners(
-            object : FadeOmnibarItemPressedListener {
+        omnibar.configureOmnibarItemPressedListeners(
+            object : OmnibarItemPressedListener {
                 override fun onBackButtonPressed() {
                     hideKeyboard()
                 }

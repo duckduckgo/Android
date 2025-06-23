@@ -1031,3 +1031,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         omnibarTextListener?.onTrackersCountFinished()
     }
 }
+
+interface OmnibarItemPressedListener {
+    fun onBackButtonPressed()
+}
