@@ -1794,7 +1794,10 @@ class BrowserTabViewModel @Inject constructor(
         return url
     }
 
-    private fun omnibarTextForUrl(url: String?, showFullUrl: Boolean): String {
+    private fun omnibarTextForUrl(
+        url: String?,
+        showFullUrl: Boolean,
+    ): String {
         if (url == null) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -2045,9 +2048,9 @@ class BrowserTabViewModel @Inject constructor(
                 loadingViewState.value = currentLoadingViewState().copy(
                     isLoading = true,
                     trackersAnimationEnabled = true,
-                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                        * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                        * showing in case the URL was blocked locally and therefore never started to show*/
+                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                    * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                    * showing in case the URL was blocked locally and therefore never started to show*/
                     progress = 20,
                     url = documentUrlString,
                 )
@@ -3472,7 +3475,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateTabTitle(tabId: String, newTitle: String) {
+    suspend fun updateTabTitle(
+        tabId: String,
+        newTitle: String,
+    ) {
         getSite()?.let { site ->
             site.title = newTitle
             tabRepository.update(tabId, site)
@@ -4142,7 +4148,10 @@ class BrowserTabViewModel @Inject constructor(
         } ?: openDuckChat()
     }
 
-    private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
+    private fun openDuckChat(
+        pixelName: Pixel.PixelName? = null,
+        query: String? = null,
+    ) {
         viewModelScope.launch {
             if (pixelName != null) {
                 val params = duckChat.createWasUsedBeforePixelParams()
@@ -4198,17 +4207,13 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) {
-        logcat { "Duck.ai: query $query lastSubmittedUserQuery $lastSubmittedChatUserQuery omnibarQuery ${omnibarViewState.value?.queryOrFullUrl} url $url" }
+    fun openDuckChat(query: String?) = when {
+        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+        lastSubmittedChatUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
+        lastSubmittedChatUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
+        query == lastSubmittedChatUserQuery -> duckChat.openDuckChat(query)
 
-        return when {
-            query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-            lastSubmittedChatUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
-            lastSubmittedChatUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
-            query == lastSubmittedChatUserQuery -> duckChat.openDuckChat(query)
-
-            else -> duckChat.openDuckChatWithAutoPrompt(query)
-        }
+        else -> duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     fun setLastSubmittedChatUserQuery(query: String) {
