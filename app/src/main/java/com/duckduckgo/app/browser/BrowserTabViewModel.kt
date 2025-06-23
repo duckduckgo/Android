@@ -94,6 +94,7 @@ import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
 import com.duckduckgo.app.browser.commands.Command.HandleNonHttpAppLink
 import com.duckduckgo.app.browser.commands.Command.HideBrokenSitePromptCta
 import com.duckduckgo.app.browser.commands.Command.HideKeyboard
+import com.duckduckgo.app.browser.commands.Command.HideKeyboardForChat
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxBubbleCta
 import com.duckduckgo.app.browser.commands.Command.HideOnboardingDaxDialog
 import com.duckduckgo.app.browser.commands.Command.HideSSLError
@@ -4126,10 +4127,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onDuckChatMenuClicked() {
+        viewModelScope.launch {
+            command.value = HideKeyboardForChat
+        }
         openDuckChat(pixelName = DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU)
     }
 
     fun onDuckChatOmnibarButtonClicked(query: String?) {
+        viewModelScope.launch {
+            command.value = HideKeyboardForChat
+        }
         openDuckChat(query = query)
     }
 
