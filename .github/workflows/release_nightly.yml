@@ -152,6 +152,7 @@ jobs:
           pip install -r scripts/release/requirements.txt
 
       - name: Create Asana nightly release task
+        if: steps.check_for_changes.outputs.has_changes == 'true'
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
         shell: bash
