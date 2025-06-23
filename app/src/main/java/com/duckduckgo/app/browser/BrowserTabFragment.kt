@@ -2718,7 +2718,8 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = visualDesignExperimentDataStore.isNewDesignEnabled.value,
+                addExtraDividerPadding = visualDesignExperimentDataStore.isNewDesignEnabled.value ||
+                    visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value,
             ),
         )
     }
