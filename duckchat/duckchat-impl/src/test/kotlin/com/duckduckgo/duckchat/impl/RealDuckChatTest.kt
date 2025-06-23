@@ -87,7 +87,7 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInBrowserMenu()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
-        whenever(mockDuckChatFeatureRepository.sessionDeltaTimestamp()).thenReturn(10L)
+        whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
         duckChatFeature.self().setRawStoredState(State(enable = true))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
