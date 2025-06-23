@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -68,8 +69,12 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         _viewState.value = ViewState(viewMode = ViewMode.ImportError)
     }
 
-    fun onImportFlowCancelledByUser(stage: String) {
+    fun onImportFlowCancelledByUser(stage: String, canShowPreImportDialog: Boolean) {
         importPasswordsPixelSender.onUserCancelledImportWebFlow(stage)
+
+        if (!canShowPreImportDialog) {
+            _viewState.value = ViewState(viewMode = ViewMode.FlowTerminated)
+        }
     }
 
     private fun fireImportSuccessPixel(savedCredentials: Int, numberSkipped: Int) {
@@ -80,15 +85,22 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
         importPasswordsPixelSender.onImportFailed(reason)
     }
 
+    fun shouldShowInitialInstructionalPrompt() {
+        importPasswordsPixelSender.onImportPasswordsDialogDisplayed()
+        _viewState.value = viewState.value.copy(viewMode = PreImport)
+    }
+
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState
 
-    data class ViewState(val viewMode: ViewMode = PreImport)
+    data class ViewState(val viewMode: ViewMode = DeterminingFirstView)
 
     sealed interface ViewMode {
+        data object DeterminingFirstView : ViewMode
         data object PreImport : ViewMode
         data object Importing : ViewMode
         data class ImportSuccess(val importResult: ImportResult.Finished) : ViewMode
         data object ImportError : ViewMode
+        data object FlowTerminated : ViewMode
     }
 }

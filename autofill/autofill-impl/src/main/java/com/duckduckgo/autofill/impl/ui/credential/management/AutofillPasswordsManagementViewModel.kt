@@ -87,7 +87,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportGooglePasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
@@ -454,7 +454,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             autofillEffectDispatcher.effects.collect { effect ->
                 when {
-                    effect is LaunchImportPasswords -> addCommand(LaunchImportPasswordsFromGooglePasswordManager)
+                    effect is LaunchImportPasswords -> addCommand(LaunchImportGooglePasswords(showImportInstructions = false))
                 }
             }
         }
@@ -740,7 +740,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
     fun onImportPasswordsFromGooglePasswordManager() {
         viewModelScope.launch(dispatchers.io()) {
-            addCommand(LaunchImportPasswordsFromGooglePasswordManager)
+            addCommand(LaunchImportGooglePasswords(showImportInstructions = true))
         }
     }
 
@@ -904,7 +904,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
-        data object LaunchImportPasswordsFromGooglePasswordManager : ListModeCommand()
+        data class LaunchImportGooglePasswords(val showImportInstructions: Boolean) : ListModeCommand()
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
         data object ReevalutePromotions : ListModeCommand()
