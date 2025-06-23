@@ -209,7 +209,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun seesNewVisualDesign(): Boolean {
-        val seesNewVisualDesing = visualDesignExperimentDataStore.isExperimentEnabled.value
+        val seesNewVisualDesing = visualDesignExperimentDataStore.isNewDesignEnabled.value
         logcat { "VisualDesign: seesNewVisualDesign $seesNewVisualDesing" }
         return seesNewVisualDesing
     }

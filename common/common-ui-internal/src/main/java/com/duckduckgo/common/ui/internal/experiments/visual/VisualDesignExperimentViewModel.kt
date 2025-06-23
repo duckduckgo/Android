@@ -60,7 +60,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
 
     init {
         combine(
-            visualDesignExperimentDataStore.isExperimentEnabled,
+            visualDesignExperimentDataStore.isNewDesignEnabled,
             visualDesignExperimentDataStore.isDuckAIPoCEnabled,
             visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
         ) { isExperimentEnabled, isDuckAIPoC, anyConflictingExperimentEnabled ->

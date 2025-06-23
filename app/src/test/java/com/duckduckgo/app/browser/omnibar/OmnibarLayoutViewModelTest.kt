@@ -109,7 +109,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
@@ -1210,7 +1210,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckChatButtonPressedAndExperimentEnabledThenPixelSent() = runTest {
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
 
         testee.viewState.test {

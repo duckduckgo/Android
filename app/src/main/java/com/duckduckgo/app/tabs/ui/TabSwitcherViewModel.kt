@@ -129,7 +129,7 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-        visualDesignExperimentDataStore.isExperimentEnabled,
+        visualDesignExperimentDataStore.isNewDesignEnabled,
         duckChat.showInBrowserMenu,
     ) { viewState, tabSwitcherItems, tabSwitcherData, isVisualDesignExperimentEnabled, showInBrowserMenu ->
         viewState.copy(

@@ -45,7 +45,8 @@ class ThemingSharedPreferences @Inject constructor(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
             context.isInNightMode(),
-            visualDesignExperimentDataStore.isExperimentEnabled.value,
+            visualDesignExperimentDataStore.isNewDesignEnabled.value ||
+                visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value,
         )
     }
 
@@ -70,23 +71,23 @@ class ThemingSharedPreferences @Inject constructor(
             value: String?,
             defValue: DuckDuckGoTheme,
             isInNightMode: Boolean,
-            isExperimentEnabled: Boolean,
+            isNewDesignEnabled: Boolean,
         ) =
             when (value) {
-                THEME_LIGHT -> if (isExperimentEnabled) {
+                THEME_LIGHT -> if (isNewDesignEnabled) {
                     DuckDuckGoTheme.EXPERIMENT_LIGHT
                 } else {
                     DuckDuckGoTheme.LIGHT
                 }
 
-                THEME_DARK -> if (isExperimentEnabled) {
+                THEME_DARK -> if (isNewDesignEnabled) {
                     DuckDuckGoTheme.EXPERIMENT_DARK
                 } else {
                     DuckDuckGoTheme.DARK
                 }
 
                 else ->
-                    if (isExperimentEnabled) {
+                    if (isNewDesignEnabled) {
                         if (isInNightMode) {
                             DuckDuckGoTheme.EXPERIMENT_DARK
                         } else {

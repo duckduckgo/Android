@@ -32,13 +32,13 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
 class TabItemDecorator(context: Context, experimentStore: VisualDesignExperimentDataStore) : RecyclerView.ItemDecoration() {
-    private val borderPadding = if (experimentStore.isExperimentEnabled.value) BORDER_PADDING_NEW else BORDER_PADDING
-    private val activeTabBorderColor = if (experimentStore.isExperimentEnabled.value) {
+    private val borderPadding = if (experimentStore.isNewDesignEnabled.value) BORDER_PADDING_NEW else BORDER_PADDING
+    private val activeTabBorderColor = if (experimentStore.isNewDesignEnabled.value) {
         CommonR.attr.daxColorTabHighlight
     } else {
         CommonR.attr.daxColorBackgroundInverted
     }
-    private val selectionBorderWidth = if (experimentStore.isExperimentEnabled.value) {
+    private val selectionBorderWidth = if (experimentStore.isNewDesignEnabled.value) {
         ACTIVE_TAB_BORDER_WIDTH
     } else {
         SELECTION_BORDER_WIDTH

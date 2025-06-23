@@ -45,24 +45,35 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
 
-    private val _experimentFeatureFlagEnabled =
+    private val _newDesignFeatureFlagEnabled =
         MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
     private val _duckAIFeatureFlagEnabled =
-        MutableStateFlow(_experimentFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
+        MutableStateFlow(_newDesignFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
+    private val _newDesignWithoutBottomBarFeatureFlagEnabled =
+        MutableStateFlow(experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().isEnabled())
 
-    override val isExperimentEnabled: StateFlow<Boolean> = _experimentFeatureFlagEnabled.stateIn(
+    override val isNewDesignEnabled: StateFlow<Boolean> = _newDesignFeatureFlagEnabled.stateIn(
         scope = appCoroutineScope,
         started = SharingStarted.Eagerly,
-        initialValue = _experimentFeatureFlagEnabled.value,
+        initialValue = _newDesignFeatureFlagEnabled.value,
+    )
+
+    override val isNewDesignWithoutBottomBarEnabled: StateFlow<Boolean> = combine(isNewDesignEnabled, _newDesignWithoutBottomBarFeatureFlagEnabled) {
+        withBottomBar, withoutBottomBar ->
+        !withBottomBar && withoutBottomBar
+    }.stateIn(
+        scope = appCoroutineScope,
+        started = SharingStarted.Eagerly,
+        initialValue = !isNewDesignEnabled.value && _newDesignWithoutBottomBarFeatureFlagEnabled.value,
     )
 
     override val isDuckAIPoCEnabled: StateFlow<Boolean> =
-        combine(_duckAIFeatureFlagEnabled, isExperimentEnabled) { duckAIFeatureFlagEnabled, experimentEnabled ->
+        combine(_duckAIFeatureFlagEnabled, isNewDesignEnabled) { duckAIFeatureFlagEnabled, experimentEnabled ->
             duckAIFeatureFlagEnabled && experimentEnabled
         }.stateIn(
             scope = appCoroutineScope,
             started = SharingStarted.Eagerly,
-            initialValue = _duckAIFeatureFlagEnabled.value && isExperimentEnabled.value,
+            initialValue = _duckAIFeatureFlagEnabled.value && isNewDesignEnabled.value,
         )
 
     override fun onPrivacyConfigDownloaded() {
@@ -84,10 +95,10 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
 
     private fun updateFeatureState() {
         appCoroutineScope.launch {
-            _experimentFeatureFlagEnabled.value =
+            _newDesignFeatureFlagEnabled.value =
                 experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
             _duckAIFeatureFlagEnabled.value =
-                _experimentFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
+                _newDesignFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
         }
     }
 }

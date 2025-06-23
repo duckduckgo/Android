@@ -699,7 +699,7 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
         )
 

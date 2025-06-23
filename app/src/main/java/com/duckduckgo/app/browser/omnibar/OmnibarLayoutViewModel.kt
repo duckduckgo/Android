@@ -107,7 +107,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     // We need to do this since the max overloads for combine is 5
     private val visualDesignExperimentFlags =
         combine(
-            visualDesignExperimentDataStore.isExperimentEnabled,
+            visualDesignExperimentDataStore.isNewDesignEnabled,
             visualDesignExperimentDataStore.isDuckAIPoCEnabled,
         ) { isExperimentEnabled, isDuckAIPoCEnabled ->
             isExperimentEnabled to isDuckAIPoCEnabled

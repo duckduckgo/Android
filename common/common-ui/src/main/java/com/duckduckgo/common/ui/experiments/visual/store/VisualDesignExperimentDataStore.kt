@@ -23,7 +23,13 @@ interface VisualDesignExperimentDataStore {
     /**
      * State flow which returns `true` if the feature flag for the experiment is enabled and there are no conflicting experiments detected.
      */
-    val isExperimentEnabled: StateFlow<Boolean>
+    val isNewDesignEnabled: StateFlow<Boolean>
+
+    /**
+     * State flow which returns `true` if the feature flag for the new design without the bottom navigation bar is enabled
+     * and there are no conflicting experiments detected (the full new design with the bottom bar).
+     */
+    val isNewDesignWithoutBottomBarEnabled: StateFlow<Boolean>
 
     /**
      * State flow which returns `true` if the feature flag for the Duck AI PoC is enabled and there are no conflicting experiments detected.

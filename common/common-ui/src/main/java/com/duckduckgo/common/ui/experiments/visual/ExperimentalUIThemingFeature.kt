@@ -34,4 +34,7 @@ interface ExperimentalUIThemingFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun visualUpdatesFeature(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun visualUpdatesWithoutBottomBarFeature(): Toggle
 }

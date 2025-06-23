@@ -42,7 +42,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Before
     fun setup() {
-        whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             disabledVisualExperimentStateFlow,
         )
     }
@@ -220,7 +220,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
 
@@ -239,7 +239,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
 
@@ -258,7 +258,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
 
@@ -277,7 +277,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
 
@@ -297,7 +297,7 @@ class LottiePrivacyShieldAnimationHelperTest {
     fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
-        whenever(visualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             disabledVisualExperimentStateFlow,
         )
 

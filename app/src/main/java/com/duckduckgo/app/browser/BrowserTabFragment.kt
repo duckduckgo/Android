@@ -1094,7 +1094,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isExperimentEnabled = visualDesignExperimentDataStore.isExperimentEnabled.value,
+            isExperimentEnabled = visualDesignExperimentDataStore.isNewDesignEnabled.value,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -1183,7 +1183,7 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.isExperimentEnabled.value) {
+        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.isNewDesignEnabled.value) {
             // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
@@ -2718,7 +2718,7 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = visualDesignExperimentDataStore.isExperimentEnabled.value,
+                addExtraDividerPadding = visualDesignExperimentDataStore.isNewDesignEnabled.value,
             ),
         )
     }

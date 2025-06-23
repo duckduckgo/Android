@@ -19,18 +19,16 @@ package com.duckduckgo.app.browser.omnibar.model
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import javax.inject.Inject
 
 class OmnibarTypeResolver @Inject constructor(
     private val experimentsDataStore: VisualDesignExperimentDataStore,
-    private val browserFeatures: AndroidBrowserConfigFeature
 ) {
     fun getOmnibarType(): OmnibarType {
-        return if (experimentsDataStore.isExperimentEnabled.value) {
+        return if (experimentsDataStore.isNewDesignEnabled.value) {
             FADE
-        } else if (browserFeatures.newUIWithoutNavBar().isEnabled()) {
+        } else if (experimentsDataStore.isNewDesignWithoutBottomBarEnabled.value) {
             SINGLE
         } else {
             SCROLLING
