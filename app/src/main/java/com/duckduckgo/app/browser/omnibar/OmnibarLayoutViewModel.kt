@@ -48,6 +48,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -131,7 +132,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
             showClickCatcher = isDuckAIPoCEnabled,
         )
-    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -767,11 +768,31 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckChatButtonPressed() {
-        val experimentEnabled = viewState.value.isVisualDesignExperimentEnabled
-        if (experimentEnabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+        viewModelScope.launch {
+            val launchSource = when {
+                viewState.value.hasFocus -> "focused"
+                viewState.value.viewMode is NewTab -> "ntp"
+                viewState.value.viewMode is Browser -> when {
+                    duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(viewState.value.url) -> "serp"
+                    else -> "website"
+                }
+                else -> "unknown"
+            }
+            val launchSourceParams = mapOf("source" to launchSource)
+            val wasUsedBeforeParams = duckChat.createWasUsedBeforePixelParams()
+
+            val params = mutableMapOf<String, String>().apply {
+                putAll(wasUsedBeforeParams)
+                putAll(launchSourceParams)
+            }
+
+            val pixelName = if (viewState.value.isVisualDesignExperimentEnabled) {
+                DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN
+            } else {
+                DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
+            }
+
+            pixel.fire(pixelName, parameters = params)
         }
     }
 

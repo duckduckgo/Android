@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_MENU_SETTI
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON
@@ -44,6 +45,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_OPEN("aichat_open"),
     DUCK_CHAT_OPEN_BROWSER_MENU("aichat_open_browser_menu"),
     DUCK_CHAT_OPEN_NEW_TAB_MENU("aichat_open_new_tab_menu"),
+    DUCK_CHAT_OPEN_TAB_SWITCHER_FAB("aichat_open_tab_switcher_fab"),
     DUCK_CHAT_USER_ENABLED("aichat_enabled"),
     DUCK_CHAT_USER_DISABLED("aichat_disabled"),
     DUCK_CHAT_MENU_SETTING_OFF("aichat_menu_setting_off"),
@@ -72,6 +74,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_OPEN.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_BROWSER_MENU.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_OPEN_NEW_TAB_MENU.pixelName to PixelParameter.removeAtb(),
+            DUCK_CHAT_OPEN_TAB_SWITCHER_FAB.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_USER_ENABLED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_USER_DISABLED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_MENU_SETTING_OFF.pixelName to PixelParameter.removeAtb(),
