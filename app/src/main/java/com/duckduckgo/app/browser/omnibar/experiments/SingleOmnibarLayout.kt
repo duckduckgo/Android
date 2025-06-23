@@ -83,9 +83,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val toolbarContainerPaddingTopWhenAtBottom by lazy {
         resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingTopWhenAtBottom)
     }
-    private val toolbarContainerPaddingHorizontalWhenAtBottom by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingHorizontalWhenAtBottom)
-    }
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
@@ -107,8 +104,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             // When omnibar is at the bottom, we're adding an additional space at the top
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
-                right = toolbarContainerPaddingHorizontalWhenAtBottom,
-                left = toolbarContainerPaddingHorizontalWhenAtBottom,
             )
 
             omnibarCard.elevation = 0.5f.toDp(context)
