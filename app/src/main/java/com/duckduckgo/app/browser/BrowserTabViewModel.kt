@@ -564,7 +564,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
-    private var lastSubmittedUserQuery: String? = null
+    private var lastSubmittedChatUserQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -4136,7 +4136,10 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             command.value = HideKeyboardForChat
         }
-        openDuckChat(query = query)
+        query?.let {
+            openDuckChat(query = query)
+            setLastSubmittedChatUserQuery(query)
+        } ?: openDuckChat()
     }
 
     private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
@@ -4196,19 +4199,20 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun openDuckChat(query: String?) {
-        logcat { "Duck.ai: query $query lastSubmittedUserQuery $lastSubmittedUserQuery omnibarQuery ${omnibarViewState.value?.queryOrFullUrl}" }
+        logcat { "Duck.ai: query $query lastSubmittedUserQuery $lastSubmittedChatUserQuery omnibarQuery ${omnibarViewState.value?.queryOrFullUrl} url $url" }
 
         return when {
             query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-            lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
-            lastSubmittedUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
-            query == lastSubmittedUserQuery -> duckChat.openDuckChat(query)
+            lastSubmittedChatUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
+            lastSubmittedChatUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
+            query == lastSubmittedChatUserQuery -> duckChat.openDuckChat(query)
+
             else -> duckChat.openDuckChatWithAutoPrompt(query)
         }
     }
 
-    fun setLastSubmittedUserQuery(query: String) {
-        lastSubmittedUserQuery = query
+    fun setLastSubmittedChatUserQuery(query: String) {
+        lastSubmittedChatUserQuery = query
     }
 
     fun onExperimentalHomeScreenWidgetBottomSheetDialogShown() {
