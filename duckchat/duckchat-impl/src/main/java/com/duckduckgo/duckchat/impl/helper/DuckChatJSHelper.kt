@@ -51,59 +51,57 @@ class RealDuckChatJSHelper @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-    ): JsCallbackData? {
-        return when (method) {
-            METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
-                getAIChatNativeHandoffData(featureName, method, it)
-            }
-
-            METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES -> id?.let {
-                getAIChatNativeConfigValues(featureName, method, it)
-            }
-
-            METHOD_OPEN_AI_CHAT -> {
-                val payload = extractPayload(data)
-                dataStore.updateUserPreferences(payload)
-                duckChat.openDuckChat()
-                null
-            }
-
-            METHOD_CLOSE_AI_CHAT -> {
-                duckChat.closeDuckChat()
-                null
-            }
-
-            METHOD_OPEN_AI_CHAT_SETTINGS -> {
-                duckChat.openDuckChatSettings()
-                null
-            }
-
-            METHOD_RESPONSE_STATE -> {
-                ChatState
-                    .fromValue(data?.optString("status"))
-                    ?.let { status -> duckChat.updateChatState(status) }
-                null
-            }
-
-            METHOD_HIDE_CHAT_INPUT -> {
-                duckChat.updateChatState(HIDE)
-                null
-            }
-
-            METHOD_SHOW_CHAT_INPUT -> {
-                duckChat.updateChatState(SHOW)
-                null
-            }
-
-            REPORT_METRIC -> {
-                ReportMetric
-                    .fromValue(data?.optString("metricName"))
-                    ?.let { reportMetric -> duckChatPixels.sendReportMetricPixel(reportMetric) }
-                null
-            }
-
-            else -> null
+    ): JsCallbackData? = when (method) {
+        METHOD_GET_AI_CHAT_NATIVE_HANDOFF_DATA -> id?.let {
+            getAIChatNativeHandoffData(featureName, method, it)
         }
+
+        METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES -> id?.let {
+            getAIChatNativeConfigValues(featureName, method, it)
+        }
+
+        METHOD_OPEN_AI_CHAT -> {
+            val payload = extractPayload(data)
+            dataStore.updateUserPreferences(payload)
+            duckChat.openDuckChat()
+            null
+        }
+
+        METHOD_CLOSE_AI_CHAT -> {
+            duckChat.closeDuckChat()
+            null
+        }
+
+        METHOD_OPEN_AI_CHAT_SETTINGS -> {
+            duckChat.openDuckChatSettings()
+            null
+        }
+
+        METHOD_RESPONSE_STATE -> {
+            ChatState
+                .fromValue(data?.optString("status"))
+                ?.let { status -> duckChat.updateChatState(status) }
+            null
+        }
+
+        METHOD_HIDE_CHAT_INPUT -> {
+            duckChat.updateChatState(HIDE)
+            null
+        }
+
+        METHOD_SHOW_CHAT_INPUT -> {
+            duckChat.updateChatState(SHOW)
+            null
+        }
+
+        REPORT_METRIC -> {
+            ReportMetric
+                .fromValue(data?.optString("metricName"))
+                ?.let { reportMetric -> duckChatPixels.sendReportMetricPixel(reportMetric) }
+            null
+        }
+
+        else -> null
     }
 
     private fun getAIChatNativeHandoffData(

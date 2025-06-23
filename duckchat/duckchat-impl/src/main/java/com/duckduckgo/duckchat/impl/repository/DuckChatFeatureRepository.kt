@@ -96,6 +96,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun sessionDeltaInMinutes(): Long {
-        return duckChatDataStore.sessionDeltaTimestamp() / 60000
+        return duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+    }
+
+    companion object {
+        private const val MS_TO_MINUTES = 60000
     }
 }
