@@ -1300,6 +1300,7 @@ class BrowserTabFragment :
     }
 
     private fun launchCustomTabUrlInDdg(url: String) {
+        startActivity(BrowserActivity.intent(requireActivity(), closeDuckChat = true))
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = Uri.parse(url)
         }
