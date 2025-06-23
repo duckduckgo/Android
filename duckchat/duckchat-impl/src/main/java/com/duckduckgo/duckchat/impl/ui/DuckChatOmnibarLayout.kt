@@ -222,7 +222,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     fun submitMessage(message: String? = null) {
         val text = message?.also(duckChatInput::setText) ?: duckChatInput.text.toString().trim()
-        if (text.isNotEmpty()) {
+        if (text.isNotBlank()) {
             if (duckChatTabLayout.selectedTabPosition == 0) {
                 onSearchSent?.invoke(text)
             } else {
