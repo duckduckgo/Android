@@ -45,4 +45,6 @@
     <color name="buckColorCheckBoxCheckedIcon">@color/white</color>
     <color name="buckColorCheckBoxUncheckedBackground">@color/white3</color>
     <color name="buckColorCheckBoxUncheckedOutline">@color/white18</color>
+
+    <color name="bbSurfaceColor">#161615</color>
 </resources>

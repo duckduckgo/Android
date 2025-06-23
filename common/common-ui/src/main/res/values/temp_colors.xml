@@ -70,6 +70,8 @@
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 
+    <color name="bbSurfaceColor">#FBFBFA</color>
+
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
     <color name="daxColorBackdropLight">#E0E0E0</color>
