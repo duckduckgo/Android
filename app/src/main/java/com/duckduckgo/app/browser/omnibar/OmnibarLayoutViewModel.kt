@@ -167,6 +167,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
         val showClickCatcher: Boolean = false,
+        val showFindInPage: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -193,6 +194,18 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
+    }
+
+    fun onFindInPageRequested() {
+        _viewState.update {
+            it.copy(showFindInPage = true)
+        }
+    }
+
+    fun onFindInPageDismissed() {
+        _viewState.update {
+            it.copy(showFindInPage = false)
+        }
     }
 
     fun onOmnibarFocusChanged(

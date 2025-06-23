@@ -200,6 +200,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             browserMenu.gone()
         }
         animateOmnibarFocusedState(focused = true)
+        viewModel.onFindInPageRequested()
     }
 
     private fun onFindInPageHidden() {
@@ -212,6 +213,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         if (!viewModel.viewState.value.hasFocus) {
             animateOmnibarFocusedState(focused = false)
         }
+        viewModel.onFindInPageDismissed()
     }
 
     fun setSingleOmnibarItemPressedListener(itemPressedListener: OmnibarItemPressedListener) {

@@ -624,12 +624,12 @@ open class OmnibarLayout @JvmOverloads constructor(
         val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,
-            showTabsMenu = viewState.showTabsMenu,
-            showFireIcon = viewState.showFireIcon,
-            showBrowserMenu = viewState.showBrowserMenu,
+            showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
+            showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
+            showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
             showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
             showChatMenu = viewState.showChatMenu,
-            showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
+            showSpacer = viewState.showClearButton || viewState.showVoiceSearch || viewState.showFindInPage,
         )
 
         if (omnibarAnimationManager.isFeatureEnabled() &&
