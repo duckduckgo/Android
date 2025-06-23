@@ -48,7 +48,6 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -266,8 +265,6 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }
             pendingUploadTask = null
         }
-
-        activity?.hideKeyboard()
     }
 
     data class FileChooserRequestedParams(

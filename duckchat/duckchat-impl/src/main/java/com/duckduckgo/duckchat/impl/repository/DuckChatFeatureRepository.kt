@@ -39,7 +39,7 @@ interface DuckChatFeatureRepository {
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
     suspend fun lastSessionTimestamp(): Long
-    suspend fun sessionDeltaTimestamp(): Long
+    suspend fun sessionDeltaInMinutes(): Long
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -95,7 +95,11 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.lastSessionTimestamp()
     }
 
-    override suspend fun sessionDeltaTimestamp(): Long {
-        return duckChatDataStore.sessionDeltaTimestamp()
+    override suspend fun sessionDeltaInMinutes(): Long {
+        return duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+    }
+
+    companion object {
+        private const val MS_TO_MINUTES = 60000
     }
 }
