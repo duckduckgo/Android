@@ -532,12 +532,11 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
         launchDownloadMessagesJob()
         super.onResume()
 
-        // Cancel any previous job if onResume is called multiple times quickly
         hideKeyboardJob?.cancel()
-        hideKeyboardJob = viewLifecycleOwner.lifecycleScope.launch { // Use viewLifecycleOwner.lifecycleScope for safety
-            delay(500) // Delay for 500 milliseconds
+        hideKeyboardJob = viewLifecycleOwner.lifecycleScope.launch {
+            delay(750)
             activity?.hideKeyboard()
-            binding.root.hideKeyboard() // Your existing call, ensure hideKeyboard() is robust enough or use this directly
+            binding.root.hideKeyboard()
         }
     }
 
