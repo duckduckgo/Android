@@ -21,6 +21,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isVisible
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -78,6 +80,9 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             showKeyboard(binding.duckChatOmnibar.duckChatInput)
         }
         binding.duckChatOmnibar.setContentId(R.id.viewPager)
+        binding.actionSend.setOnClickListener {
+            binding.duckChatOmnibar.submitMessage()
+        }
     }
 
     private fun setupViewPager() {
@@ -104,10 +109,15 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
                 requireActivity().onBackPressed()
             }
             onSearchSelected = {
+                binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
                 binding.viewPager.setCurrentItem(0, true)
             }
             onDuckChatSelected = {
+                binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
                 binding.viewPager.setCurrentItem(1, true)
+            }
+            onSendMessageAvailable = { isAvailable ->
+                binding.actionSend.isVisible = isAvailable
             }
         }
     }
