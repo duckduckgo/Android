@@ -172,6 +172,10 @@ data class DuckChatSettingJson(
     val addressBarEntryPoint: Boolean,
 )
 
+data class DuckChatSessionSettingJson(
+    val sessionTimeoutMinutes: Long,
+)
+
 @SingleInstanceIn(AppScope::class)
 
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
@@ -196,8 +200,12 @@ class RealDuckChat @Inject constructor(
     private val _showInAddressBar = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
 
-    private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
+    private val settingsJsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
+    }
+
+    private val sessionJsonAdapter: JsonAdapter<DuckChatSessionSettingJson> by lazy {
+        moshi.adapter(DuckChatSessionSettingJson::class.java)
     }
 
     private var isDuckChatEnabled = false
@@ -473,12 +481,9 @@ class RealDuckChat @Inject constructor(
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
 
-            keepSessionAliveEnabled = duckChatFeature.keepSessionAlive().isEnabled()
-            keepSessionAliveInMinutes = DEFAULT_SESSION_ALIVE
-
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {
-                runCatching { jsonAdapter.fromJson(it) }.getOrNull()
+                runCatching { settingsJsonAdapter.fromJson(it) }.getOrNull()
             }
             duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
             settingsJson?.aiChatBangs?.takeIf { it.isNotEmpty() }
@@ -488,6 +493,14 @@ class RealDuckChat @Inject constructor(
                 }
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
+
+            val sessionSettings = duckChatFeature.keepSession().getSettings()
+            val sessionSettingsJson = sessionSettings?.let {
+                runCatching { sessionJsonAdapter.fromJson(it) }.getOrNull()
+            }
+
+            keepSessionAliveEnabled = duckChatFeature.keepSession().isEnabled()
+            keepSessionAliveInMinutes = sessionSettingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
             cacheUserSettings()
         }
