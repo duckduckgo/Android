@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -30,9 +31,9 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -374,7 +375,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
 
-        verify(mockDuckChatPixels).sendReportMetricPixel(any())
+        verifyNoInteractions(mockDuckChatPixels)
     }
 
     @Test
@@ -382,10 +383,10 @@ class RealDuckChatJSHelperTest {
         val featureName = "aiChat"
         val method = "reportMetric"
         val id = "123"
-        val data = JSONObject(mapOf("metricName" to "test"))
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
-        verify(mockDuckChatPixels).sendReportMetricPixel(any())
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
     }
 }
