@@ -911,4 +911,14 @@
     <string name="scamBlockerTitle">Preprečevanje prevar</string>
     <string name="scamBlockerDescription">Prikaži opozorilo na spletnih mestih, označenih zaradi prevar, lažnega predstavljanja in zlonamerne programske opreme.</string>
     <string name="threatProtectionLearnMoreTitle">Več</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Preizkusite naš pripomoček za domači zaslon!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodajte naš gradnik za iskanje na domači zaslon za hiter in preprost dostop.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj gradnik</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne zdaj</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Poišči DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Pripomoček na domačem zaslonu</string>
 </resources>
