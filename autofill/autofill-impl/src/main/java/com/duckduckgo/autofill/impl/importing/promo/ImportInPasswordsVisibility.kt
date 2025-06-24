@@ -76,14 +76,14 @@ class RealImportInPasswordsVisibility @Inject constructor(
     }
 
     override fun onPromoDismissed() {
-        internalAutofillStore.hasDismissedImportedPasswordsPromo = true
+        internalAutofillStore.hasDeclinedPasswordManagementImportPromo = true
         canShowImportPasswords = false
     }
 
     private suspend fun evaluateIfUserCanShowImportPromo(): Boolean {
         if (autofillFeature.canPromoteImportPasswordsInPasswordManagement().isEnabled().not()) return false
 
-        if (internalAutofillStore.hasEverImportedPasswords || internalAutofillStore.hasDismissedImportedPasswordsPromo) return false
+        if (internalAutofillStore.hasEverImportedPasswords || internalAutofillStore.hasDeclinedPasswordManagementImportPromo) return false
 
         val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
         val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)

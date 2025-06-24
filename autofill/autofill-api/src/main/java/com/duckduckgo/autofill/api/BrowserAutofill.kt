@@ -81,6 +81,11 @@ interface BrowserAutofill {
      * Informs the JS layer that the in-context Email Protection flow has finished
      */
     fun inContextEmailProtectionFlowFinished()
+
+    /**
+     * Informs the JS layer that new autofill data is available, and the JS flow to ask for credentials can start again.
+     */
+    fun onNewAutofillDataAvailable(url: String?)
 }
 
 /**
@@ -153,4 +158,10 @@ interface Callback {
      * Called when credentials have been saved, and we want to show the user some visual confirmation.
      */
     fun onCredentialsSaved(savedCredentials: LoginCredentials)
+
+    suspend fun promptUserTo(event: AutofillPrompt)
+}
+
+sealed interface AutofillPrompt {
+    data class ImportPasswords(val currentUrl: String) : AutofillPrompt
 }

@@ -36,6 +36,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillPrompt
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -324,6 +325,10 @@ class ImportGooglePasswordsWebFlowFragment :
         }
     }
 
+    override suspend fun promptUserTo(event: AutofillPrompt) {
+        // no-op, we don't prompt the user for anything in this flow
+    }
+
     override suspend fun onCsvAvailable(csv: String) {
         viewModel.onCsvAvailable(csv)
     }
@@ -349,6 +354,10 @@ class ImportGooglePasswordsWebFlowFragment :
             return
         }
         browserAutofill.injectCredentials(null)
+    }
+
+    override fun onNewPasswordsImported() {
+        // no-op
     }
 
     companion object {

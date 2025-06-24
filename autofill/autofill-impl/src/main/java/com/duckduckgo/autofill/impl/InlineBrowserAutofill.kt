@@ -79,4 +79,8 @@ class InlineBrowserAutofill @Inject constructor(
     override fun inContextEmailProtectionFlowFinished() {
         autofillInterface.inContextEmailProtectionFlowFinished()
     }
+
+    override fun onNewAutofillDataAvailable(url: String?) {
+        autofillInterface.onNewAutofillDataAvailable(url)
+    }
 }

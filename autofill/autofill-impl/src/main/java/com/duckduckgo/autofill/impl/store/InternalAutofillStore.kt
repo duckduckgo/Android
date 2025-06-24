@@ -42,9 +42,12 @@ interface InternalAutofillStore : AutofillStore {
 
     var hasEverImportedPasswords: Boolean
 
+    var hasDeclinedInBrowserPasswordImportPromo: Boolean
+    var hasDeclinedPasswordManagementImportPromo: Boolean
+
     fun hasEverImportedPasswordsFlow(): Flow<Boolean>
 
-    var hasDismissedImportedPasswordsPromo: Boolean
+    var inBrowserImportPromoShownCount: Int
 
     /**
      * Find saved credential for the given id
