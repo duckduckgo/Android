@@ -344,16 +344,6 @@
 
             </androidx.appcompat.widget.Toolbar>
 
-            <Space
-                android:id="@+id/spacer1X"
-                android:layout_width="10dp"
-                android:layout_height="match_parent"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/toolbar"
-                app:layout_constraintTop_toTopOf="parent" />
-
             <FrameLayout
                 android:id="@+id/shieldIconPulseAnimationContainer"
                 android:layout_width="74dp"
@@ -469,6 +459,13 @@
                         android:scaleType="center"
                         android:src="@drawable/ic_fire_24" />
                 </FrameLayout>
+
+                <Space
+                    android:layout_width="10dp"
+                    android:layout_height="match_parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

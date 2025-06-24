@@ -175,9 +175,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
             val animatedCardStrokeWidth = (startCardStrokeWidth + (endCardStrokeWidth - startCardStrokeWidth) * fraction).toInt()
 
-            val params = omnibarCard.layoutParams as MarginLayoutParams
-            omnibarCard.setLayoutParams(params)
-
             omnibarCard.strokeWidth = animatedCardStrokeWidth
         }
 
