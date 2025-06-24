@@ -131,7 +131,7 @@ interface DuckChatInternal : DuckChat {
     /**
      * Returns the time a Duck Chat session should be kept alive
      */
-    fun keepSessionIntervalInMinutes(): Long
+    fun keepSessionIntervalInMinutes(): Int
 }
 
 enum class ChatState(val value: String) {
@@ -170,10 +170,7 @@ data class DuckChatSettingJson(
     val aiChatBangs: List<String>?,
     val aiChatBangRegex: String?,
     val addressBarEntryPoint: Boolean,
-)
-
-data class DuckChatSessionSettingJson(
-    val sessionTimeoutMinutes: Long,
+    val sessionTimeoutMinutes: Int,
 )
 
 @SingleInstanceIn(AppScope::class)
@@ -200,12 +197,8 @@ class RealDuckChat @Inject constructor(
     private val _showInAddressBar = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
 
-    private val settingsJsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
+    private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
-    }
-
-    private val sessionJsonAdapter: JsonAdapter<DuckChatSessionSettingJson> by lazy {
-        moshi.adapter(DuckChatSessionSettingJson::class.java)
     }
 
     private var isDuckChatEnabled = false
@@ -216,7 +209,7 @@ class RealDuckChat @Inject constructor(
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
     private var keepSessionAliveEnabled = false
-    private var keepSessionAliveInMinutes: Long = DEFAULT_SESSION_ALIVE
+    private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
 
     init {
         if (isMainProcess) {
@@ -483,8 +476,9 @@ class RealDuckChat @Inject constructor(
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {
-                runCatching { settingsJsonAdapter.fromJson(it) }.getOrNull()
+                runCatching { jsonAdapter.fromJson(it) }.getOrNull()
             }
+
             duckChatLink = settingsJson?.aiChatURL ?: DUCK_CHAT_WEB_LINK
             settingsJson?.aiChatBangs?.takeIf { it.isNotEmpty() }
                 ?.let { bangs ->
@@ -494,13 +488,8 @@ class RealDuckChat @Inject constructor(
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
 
-            val sessionSettings = duckChatFeature.keepSession().getSettings()
-            val sessionSettingsJson = sessionSettings?.let {
-                runCatching { sessionJsonAdapter.fromJson(it) }.getOrNull()
-            }
-
             keepSessionAliveEnabled = duckChatFeature.keepSession().isEnabled()
-            keepSessionAliveInMinutes = sessionSettingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
+            keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
             cacheUserSettings()
         }
@@ -527,6 +516,6 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
-        private const val DEFAULT_SESSION_ALIVE = 60L
+        private const val DEFAULT_SESSION_ALIVE = 60
     }
 }
