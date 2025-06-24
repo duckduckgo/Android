@@ -43,7 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
             android:breakStrategy="balanced"
-            android:text="@string/duckChatTitle"
+            android:text="@string/duck_chat_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/newPill"
             app:layout_constraintHorizontal_bias="0"

@@ -71,6 +71,5 @@
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
 
     <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Duck.ai</string>
+    <string name="duckChatMenuItem">@string/duck_chat_title</string>
 </resources>
