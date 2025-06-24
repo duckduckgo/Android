@@ -1459,6 +1459,31 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun whenFindInPageDismissedThenShowFindInPageIsFalse() = runTest {
+        // First set showFindInPage to true
+        testee.onFindInPageRequested()
+
+        // Then dismiss it
+        testee.onFindInPageDismissed()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showFindInPage)
+        }
+    }
+
+    @Test
+    fun whenFindInPageRequestedThenShowFindInPageIsTrue() = runTest {
+        // First set showFindInPage to true
+        testee.onFindInPageRequested()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showFindInPage)
+        }
+    }
+
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
