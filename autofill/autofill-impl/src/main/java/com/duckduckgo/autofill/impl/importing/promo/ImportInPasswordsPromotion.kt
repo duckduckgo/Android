@@ -126,6 +126,7 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
                     subtitle = context.getString(R.string.passwords_import_promo_subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
                     messageType = REMOTE_MESSAGE,
+                    actionIcon = com.duckduckgo.mobile.android.R.drawable.ic_open_in_24,
                 ),
             )
             onTopAnimationConfigured { view ->
