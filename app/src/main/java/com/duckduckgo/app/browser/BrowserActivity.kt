@@ -99,6 +99,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiVisibilityRepository
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
@@ -112,6 +113,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -179,7 +184,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var tabManager: TabManager
 
     @Inject
-    lateinit var duckChat: DuckChat
+    lateinit var duckAiVisibilityRepository: DuckAiVisibilityRepository
 
     @Inject
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
@@ -1226,18 +1231,28 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar.value) {
-                    experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = false
-                }
+                combine(
+                    duckAiVisibilityRepository.showOmnibarShortcutOnNtpAndOnFocus,
+                    duckAiVisibilityRepository.showOmnibarShortcutInAllStates,
+                ) { showOnNtpAndOnFocus, showInAllStates ->
+                    showOnNtpAndOnFocus || showInAllStates
+                }.distinctUntilChanged().onEach {
+                    experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = it
+                }.launchIn(lifecycleScope)
             } else {
                 experimentalToolbarMockupBottomBinding = binding.bottomMockupExperimentalToolbar
                 binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar.value) {
-                    experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
-                }
+                combine(
+                    duckAiVisibilityRepository.showOmnibarShortcutOnNtpAndOnFocus,
+                    duckAiVisibilityRepository.showOmnibarShortcutInAllStates,
+                ) { showOnNtpAndOnFocus, showInAllStates ->
+                    showOnNtpAndOnFocus || showInAllStates
+                }.distinctUntilChanged().onEach {
+                    experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = it
+                }.launchIn(lifecycleScope)
             }
         } else {
             toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
@@ -1256,7 +1271,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
+            duckAiVisibilityRepository.showOmnibarShortcutInAllStates.onEach {
+                toolbarMockupBinding.aiChatIconMenuMockup.isVisible = it
+            }.launchIn(lifecycleScope)
         }
     }
 }
