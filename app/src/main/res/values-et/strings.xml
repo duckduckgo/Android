@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Välimus</string>
+    <string name="settingsShowFullUrlTitle">Näita kogu saidi aadressi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Otsi vaikimisi privaatselt</string>
     <string name="preOnboardingComparisonChartItem2">Blokeeri kolmanda poole jälgurid</string>
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
-    <string name="preOnboardingComparisonChartItem4">Blokeeri jälgivad reklaamid</string>
+    <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
     <string name="preOnboardingDaxDialog3Title">Suurepärane! Tere tulemast pardi poolele.</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>

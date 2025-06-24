@@ -35,15 +35,19 @@ import com.duckduckgo.pir.internal.common.NativeBrokerActionHandler.NativeAction
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.CaptchaInfoReceived
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.CaptchaServiceFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailConfirmationLinkReceived
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsErrorReceived
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlComplete
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.RetryAwaitCaptchaSolution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.RetryGetCaptchaSolution
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.RetryGetEmailConfirmation
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.Started
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
@@ -58,7 +62,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Si
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngineFactory
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
+import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
@@ -273,7 +277,7 @@ class RealPirActionsRunner @AssistedInject constructor(
             // IF this timer completes, then timeout was reached
             kotlin.runCatching {
                 onError(
-                    PirErrorReponse(
+                    PirError.ActionFailed(
                         actionID = effect.actionId,
                         message = "Local timeout",
                     ),
@@ -294,9 +298,8 @@ class RealPirActionsRunner @AssistedInject constructor(
     private suspend fun handleAwaitCaptchaSolution(effect: AwaitCaptchaSolution) = withContext(dispatcherProvider.io()) {
         if (effect.transactionID.isEmpty()) {
             onError(
-                PirErrorReponse(
-                    actionID = effect.actionId,
-                    message = "Unable to solve captcha",
+                PirError.CaptchaServiceError(
+                    "Unable to solve captcha",
                 ),
             )
         } else {
@@ -309,7 +312,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 if (this is Success) {
                     when (val status = (this.data as CaptchaSolutionStatus).status) {
                         is Ready -> engine?.dispatch(
-                            ExecuteNextBrokerAction(
+                            ExecuteNextBrokerStepAction(
                                 actionRequestData = PirScriptRequestData.SolveCaptcha(
                                     token = status.token,
                                 ),
@@ -319,9 +322,8 @@ class RealPirActionsRunner @AssistedInject constructor(
                         else -> {
                             if (effect.attempt == effect.retries) {
                                 onError(
-                                    PirErrorReponse(
-                                        actionID = effect.actionId,
-                                        message = "Unable to solve captcha",
+                                    PirError.CaptchaServiceError(
+                                        "Unable to solve captcha",
                                     ),
                                 )
                             } else {
@@ -339,9 +341,8 @@ class RealPirActionsRunner @AssistedInject constructor(
                     }
                 } else {
                     onError(
-                        PirErrorReponse(
-                            actionID = effect.actionId,
-                            message = "Unable to solve captcha",
+                        PirError.CaptchaServiceError(
+                            "Unable to solve captcha",
                         ),
                     )
                 }
@@ -375,9 +376,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             } else {
                 val result = it as Failure
                 onError(
-                    PirErrorReponse(
-                        actionID = it.actionId,
-                        message = result.message,
+                    PirError.CaptchaServiceError(
+                        error = result.message,
                     ),
                 )
             }
@@ -390,7 +390,6 @@ class RealPirActionsRunner @AssistedInject constructor(
                 actionId = effect.actionId,
                 brokerName = effect.brokerName,
                 email = effect.extractedProfile.email!!,
-                pollingIntervalSeconds = effect.pollingIntervalSeconds,
             ),
         ).also {
             if (it is Success) {
@@ -399,12 +398,22 @@ class RealPirActionsRunner @AssistedInject constructor(
                         confirmationLink = (it.data as NativeSuccessData.EmailConfirmation).link,
                     ),
                 )
+            } else if (it is Failure && it.retryNativeAction && effect.attempt != effect.retries) {
+                delay(effect.pollingIntervalSeconds.toLong() * 1_000)
+                engine?.dispatch(
+                    RetryGetEmailConfirmation(
+                        actionId = effect.actionId,
+                        brokerName = effect.brokerName,
+                        extractedProfile = effect.extractedProfile,
+                        pollingIntervalSeconds = effect.pollingIntervalSeconds,
+                        attempt = effect.attempt + 1,
+                    ),
+                )
             } else {
                 val result = it as Failure
                 onError(
-                    PirErrorReponse(
-                        actionID = result.actionId,
-                        message = result.message,
+                    PirError.EmailError(
+                        error = result.message,
                     ),
                 )
             }
@@ -427,9 +436,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             } else {
                 val result = it as Failure
                 onError(
-                    PirErrorReponse(
-                        actionID = result.actionId,
-                        message = result.message,
+                    PirError.EmailError(
+                        error = result.message,
                     ),
                 )
             }
@@ -470,15 +478,31 @@ class RealPirActionsRunner @AssistedInject constructor(
         )
     }
 
-    override fun onError(pirErrorReponse: PirErrorReponse) {
+    override fun onError(pirError: PirError) {
         if (timerJob.isActive) {
             timerJob.cancel()
         }
 
-        engine?.dispatch(
-            JsActionFailed(
-                pirErrorReponse = pirErrorReponse,
-            ),
-        )
+        when (pirError) {
+            is PirError.ActionFailed -> JsActionFailed(
+                error = pirError,
+            )
+
+            is PirError.CaptchaServiceError -> CaptchaServiceFailed(
+                error = pirError,
+            )
+
+            is PirError.EmailError -> EmailFailed(
+                error = pirError,
+            )
+
+            is PirError.JsError -> JsErrorReceived(
+                error = pirError,
+            )
+
+            else -> null
+        }?.also {
+            engine?.dispatch(it)
+        }
     }
 }

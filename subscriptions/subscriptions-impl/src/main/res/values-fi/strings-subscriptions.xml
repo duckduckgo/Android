@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä Privacy Pron tukeen ohjesivuiltamme. Ominaisuuden saatavuus vaihtelee maittain.</string>
     <string name="subscriptionStatusSubscribed">Tilattu</string>
     <string name="privacyPolicyAndTermsOfService">Tietosuojakäytäntö ja palveluehdot</string>
+    <string name="subscriptionStatusFreeTrial">Ilmainen kokeilujakso on aktiivinen</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ilmainen kokeilujaksosi päättyy %1$s. Se muuttuu automaattisesti maksulliseksi kuukausitilaukseksi kyseisenä päivänä.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ilmainen kokeilujaksosi päättyy %1$s. Se muuttuu automaattisesti maksulliseksi vuositilaukseksi kyseisenä päivänä.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ilmainen kokeilujaksosi päättyy %1$s. Sitä ei muunneta maksulliseksi tilaukseksi.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tilauksen asetukset</string>

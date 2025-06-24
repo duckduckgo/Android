@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.update
 @ContributesViewModel(ViewScope::class)
 class VisualDesignExperimentViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val visualUpdatesDesignExperimentConflictChecker: VisualUpdatesDesignExperimentConflictChecker,
     private val themingDataStore: ThemingDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -61,7 +62,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
         combine(
             visualDesignExperimentDataStore.isExperimentEnabled,
             visualDesignExperimentDataStore.isDuckAIPoCEnabled,
-            visualDesignExperimentDataStore.anyConflictingExperimentEnabled,
+            visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
         ) { isExperimentEnabled, isDuckAIPoC, anyConflictingExperimentEnabled ->
             _viewState.update {
                 it.copy(

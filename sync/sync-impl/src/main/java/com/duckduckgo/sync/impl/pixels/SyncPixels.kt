@@ -27,6 +27,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_DAILY_SUCCESS_RATE_PIXEL
 import com.duckduckgo.sync.impl.pixels.SyncPixelName.SYNC_OBJECT_LIMIT_EXCEEDED_DAILY
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE
+import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.squareup.anvil.annotations.ContributesBinding
@@ -88,6 +90,24 @@ interface SyncPixels {
     fun fireUserSwitchedAccount()
     fun fireUserSwitchedLogoutError()
     fun fireUserSwitchedLoginError()
+    fun fireTimeoutOnDeepLinkSetup()
+    fun fireSyncBarcodeScreenShown(screenType: ScreenType)
+    fun fireSyncSetupFinishedSuccessfully(screenType: ScreenType)
+    fun fireSyncSetupAbandoned(screenType: ScreenType)
+    fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)
+    fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType)
+    fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType)
+    fun fireSyncSetupCodeCopiedToClipboard(screenType: ScreenType)
+    fun fireBarcodeScannerParseError(screenType: ScreenType)
+    fun fireBarcodeScannerParseSuccess(screenType: ScreenType)
+
+    enum class ScreenType(val value: String) {
+        SYNC_CONNECT("connect"),
+        SYNC_EXCHANGE("exchange"),
+    }
+    fun fireSetupDeepLinkFlowStarted()
+    fun fireSetupDeepLinkFlowSuccess()
+    fun fireSetupDeepLinkFlowAbandoned()
 }
 
 @ContributesBinding(AppScope::class)
@@ -282,8 +302,69 @@ class RealSyncPixels @Inject constructor(
         pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGIN_ERROR)
     }
 
+    override fun fireTimeoutOnDeepLinkSetup() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_DEEP_LINK_TIMEOUT)
+    }
+
     override fun fireUserSwitchedLogoutError() {
         pixel.fire(SyncPixelName.SYNC_USER_SWITCHED_LOGOUT_ERROR)
+    }
+
+    override fun fireSetupDeepLinkFlowStarted() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_STARTED)
+    }
+
+    override fun fireSetupDeepLinkFlowSuccess() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_SUCCESS)
+    }
+
+    override fun fireSetupDeepLinkFlowAbandoned() {
+        pixel.fire(SyncPixelName.SYNC_SETUP_DEEP_LINK_FLOW_ABANDONED)
+    }
+
+    override fun fireSyncBarcodeScreenShown(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCREEN_SHOWN, parameters = params)
+    }
+
+    override fun fireSyncSetupAbandoned(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_ABANDONED, parameters = params)
+    }
+
+    override fun fireSyncSetupFinishedSuccessfully(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_ENDED_SUCCESS, parameters = params)
+    }
+
+    override fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN, parameters = params)
+    }
+
+    override fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS, parameters = params)
+    }
+
+    override fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED, parameters = params)
+    }
+
+    override fun fireSyncSetupCodeCopiedToClipboard(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_CODE_COPIED, parameters = params)
+    }
+
+    override fun fireBarcodeScannerParseSuccess(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_SUCCESS, parameters = params)
+    }
+
+    override fun fireBarcodeScannerParseError(screenType: ScreenType) {
+        val params = mapOf(SYNC_SETUP_SCREEN_TYPE to screenType.value)
+        pixel.fire(SyncPixelName.SYNC_SETUP_BARCODE_SCANNER_FAILED, parameters = params)
     }
 
     companion object {
@@ -339,6 +420,20 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_USER_SWITCHED_ACCOUNT("sync_user_switched_account"),
     SYNC_USER_SWITCHED_LOGOUT_ERROR("sync_user_switched_logout_error"),
     SYNC_USER_SWITCHED_LOGIN_ERROR("sync_user_switched_login_error"),
+    SYNC_SETUP_DEEP_LINK_TIMEOUT("sync_setup_deep_link_timeout"),
+    SYNC_SETUP_DEEP_LINK_FLOW_STARTED("sync_setup_deep_link_flow_started"),
+    SYNC_SETUP_DEEP_LINK_FLOW_SUCCESS("sync_setup_deep_link_flow_success"),
+    SYNC_SETUP_DEEP_LINK_FLOW_ABANDONED("sync_setup_deep_link_flow_abandoned"),
+
+    SYNC_SETUP_BARCODE_SCREEN_SHOWN("sync_setup_barcode_screen_shown"),
+    SYNC_SETUP_BARCODE_SCANNER_SUCCESS("sync_setup_barcode_scanner_success"),
+    SYNC_SETUP_BARCODE_SCANNER_FAILED("sync_setup_barcode_scanner_failed"),
+    SYNC_SETUP_BARCODE_CODE_COPIED("sync_setup_barcode_code_copied"),
+    SYNC_SETUP_MANUAL_CODE_ENTRY_SCREEN_SHOWN("sync_setup_manual_code_entry_screen_shown"),
+    SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS("sync_setup_manual_code_entered_success"),
+    SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED("sync_setup_manual_code_entered_failed"),
+    SYNC_SETUP_ENDED_ABANDONED("sync_setup_ended_abandoned"),
+    SYNC_SETUP_ENDED_SUCCESS("sync_setup_ended_success"),
 }
 
 object SyncPixelParameters {
@@ -359,4 +454,5 @@ object SyncPixelParameters {
     const val ERROR = "error"
     const val SYNC_FEATURE_PROMOTION_SOURCE = "source"
     const val GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE = "source"
+    const val SYNC_SETUP_SCREEN_TYPE = "source"
 }

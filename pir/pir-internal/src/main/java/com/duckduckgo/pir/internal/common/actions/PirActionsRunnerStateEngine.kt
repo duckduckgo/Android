@@ -20,7 +20,7 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
+import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse.ResponseData
@@ -45,14 +45,12 @@ interface PirActionsRunnerStateEngine {
      */
     data class State(
         val runType: RunType,
-        val brokers: List<BrokerStep>,
-        val currentBrokerIndex: Int = 0,
+        val brokerStepsToExecute: List<BrokerStep>,
+        val currentBrokerStepIndex: Int = 0,
         val currentActionIndex: Int = 0,
-        val brokerStartTime: Long = -1L,
+        val brokerStepStartTime: Long = -1L,
         val profileQuery: ProfileQuery? = null,
         val transactionID: String = "",
-        val currentExtractedProfileIndex: Int = 0,
-        val extractedProfile: List<ExtractedProfile> = emptyList(),
         val pendingUrl: String? = null,
     )
 
@@ -73,6 +71,10 @@ interface PirActionsRunnerStateEngine {
             val url: String,
         ) : Event()
 
+        data class EmailFailed(
+            val error: PirError.EmailError,
+        ) : Event()
+
         data class EmailReceived(
             val email: String,
         ) : Event()
@@ -81,22 +83,28 @@ interface PirActionsRunnerStateEngine {
             val confirmationLink: String,
         ) : Event()
 
-        data object ExecuteNextBroker : Event()
+        data object ExecuteNextBrokerStep : Event()
 
-        data class ExecuteNextBrokerAction(
+        data class ExecuteNextBrokerStepAction(
             val actionRequestData: PirScriptRequestData,
         ) : Event()
 
-        data object ExecuteNextProfileForBroker : Event()
+        data class BrokerStepCompleted(val isSuccess: Boolean) : Event()
 
-        data class BrokerActionsCompleted(val isSuccess: Boolean) : Event()
+        data class JsErrorReceived(
+            val error: PirError.JsError,
+        ) : Event()
 
         data class JsActionSuccess(
             val pirSuccessResponse: PirSuccessResponse,
         ) : Event()
 
         data class JsActionFailed(
-            val pirErrorReponse: PirErrorReponse,
+            val error: PirError.ActionFailed,
+        ) : Event()
+
+        data class CaptchaServiceFailed(
+            val error: PirError.CaptchaServiceError,
         ) : Event()
 
         data class RetryAwaitCaptchaSolution(
@@ -113,6 +121,14 @@ interface PirActionsRunnerStateEngine {
         data class RetryGetCaptchaSolution(
             val actionId: String,
             val responseData: ResponseData?,
+        ) : Event()
+
+        data class RetryGetEmailConfirmation(
+            val actionId: String,
+            val brokerName: String,
+            val extractedProfile: ExtractedProfile,
+            val pollingIntervalSeconds: Float,
+            val attempt: Int = 0,
         ) : Event()
     }
 
@@ -148,6 +164,8 @@ interface PirActionsRunnerStateEngine {
             val brokerName: String,
             val extractedProfile: ExtractedProfile,
             val pollingIntervalSeconds: Float,
+            val retries: Int = 10,
+            val attempt: Int = 0,
         ) : SideEffect(), BrokerActionSideEffect
 
         data class AwaitCaptchaSolution(

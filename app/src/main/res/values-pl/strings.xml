@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Wygląd</string>
+    <string name="settingsShowFullUrlTitle">Pokaż pełny adres witryny internetowej</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Domyślnie szukaj prywatnie</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj mechanizmy śledzące innych firm</string>
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blokowanie śledzących reklam</string>
+    <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
     <string name="preOnboardingDaxDialog3Title">Fantastycznie! Witaj po Kaczej Stronie Mocy!</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>

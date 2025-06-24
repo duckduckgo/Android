@@ -203,6 +203,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspect</string>
+    <string name="settingsShowFullUrlTitle">Afișați adresa completă a site-ului</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
@@ -771,7 +772,7 @@
     <string name="preOnboardingComparisonChartItem1">Caută implicit în mod privat</string>
     <string name="preOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire terțe</string>
     <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blochează reclamele cu scop de urmărire</string>
+    <string name="preOnboardingComparisonChartItem4">Blochează reclamele direcționate</string>
     <string name="preOnboardingComparisonChartItem5">Șterge datele de navigare cu un singur buton</string>
     <string name="preOnboardingDaxDialog3Title">Super! Bine ai venit de cealaltă parte!</string>
     <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>

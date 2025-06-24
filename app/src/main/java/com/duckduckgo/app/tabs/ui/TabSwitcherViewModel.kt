@@ -28,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICK
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -59,7 +60,6 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -82,6 +82,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -548,7 +549,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onDuckChatFabClicked() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
             duckChat.openDuckChat()
         }
@@ -556,10 +558,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-
-            val wasUsedBefore = duckChat.wasOpenedBefore()
-            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+            val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
 
             duckChat.openDuckChat()
@@ -569,7 +568,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onTrackerAnimationInfoPanelClicked() {
         pixel.fire(
             pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
-            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
         )
         command.value = ShowAnimatedTileDismissalDialog
     }
@@ -595,7 +594,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onTrackerAnimationInfoPanelVisible() {
         pixel.fire(
             pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
-            parameters = senseOfProtectionExperiment.getTabManagerPixelParams(),
+            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
         )
     }
 

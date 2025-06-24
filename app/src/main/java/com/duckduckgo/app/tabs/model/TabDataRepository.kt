@@ -19,6 +19,7 @@ package com.duckduckgo.app.tabs.model
 import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.distinctUntilChanged
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -71,7 +72,7 @@ class TabDataRepository @Inject constructor(
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
 
-    override val flowTabs: Flow<List<TabEntity>> = tabsDao.flowTabs().distinctUntilChanged()
+    override val flowTabs: Flow<List<TabEntity>> = liveTabs.asFlow()
 
     private val childTabClosedSharedFlow = MutableSharedFlow<String>()
 
@@ -85,7 +86,7 @@ class TabDataRepository @Inject constructor(
 
     override val liveSelectedTab: LiveData<TabEntity> = tabsDao.liveSelectedTab()
 
-    override val flowSelectedTab: Flow<TabEntity?> = tabsDao.flowSelectedTab().distinctUntilChanged()
+    override val flowSelectedTab: Flow<TabEntity?> = liveSelectedTab.asFlow().distinctUntilChanged()
 
     override val tabSwitcherData: Flow<TabSwitcherData> = tabSwitcherDataStore.data
 
@@ -93,12 +94,21 @@ class TabDataRepository @Inject constructor(
 
     private var purgeDeletableTabsJob = ConflatedJob()
 
+    private var tabInsertionFixesFlag: Boolean? = null
+
     override suspend fun add(
         url: String?,
         skipHome: Boolean,
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
-        add(tabId, buildSiteData(url, tabId), skipHome = skipHome, isDefaultTab = false)
+        val flag = getAndCacheTabInsertionFixesFlag()
+        val siteData = if (flag) {
+            buildSiteData(url, tabId)
+        } else {
+            buildSiteDataSync(url, tabId)
+        }
+        add(tabId, siteData, skipHome = skipHome, isDefaultTab = false, updateIfBlankParent = flag)
+
         return@withContext tabId
     }
 
@@ -108,13 +118,19 @@ class TabDataRepository @Inject constructor(
         sourceTabId: String,
     ): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
-
+        val flag = getAndCacheTabInsertionFixesFlag()
+        val siteData = if (flag) {
+            buildSiteData(url, tabId)
+        } else {
+            buildSiteDataSync(url, tabId)
+        }
         add(
             tabId = tabId,
-            data = buildSiteData(url, tabId),
+            data = siteData,
             skipHome = skipHome,
             isDefaultTab = false,
             sourceTabId = sourceTabId,
+            updateIfBlankParent = flag,
         )
 
         return@withContext tabId
@@ -122,24 +138,46 @@ class TabDataRepository @Inject constructor(
 
     override suspend fun addDefaultTab(): String = withContext(dispatchers.io()) {
         val tabId = generateTabId()
-
+        val flag = getAndCacheTabInsertionFixesFlag()
+        val siteData = if (flag) {
+            buildSiteData(url = null, tabId = tabId)
+        } else {
+            buildSiteDataSync(url = null, tabId)
+        }
         add(
             tabId = tabId,
-            data = buildSiteData(url = null, tabId = tabId),
+            data = siteData,
             skipHome = false,
             isDefaultTab = true,
+            updateIfBlankParent = flag,
         )
 
         return@withContext tabId
     }
 
+    private suspend fun getAndCacheTabInsertionFixesFlag(): Boolean {
+        return tabInsertionFixesFlag ?: withContext(dispatchers.io()) {
+            tabManagerFeatureFlags.tabInsertionFixes().isEnabled()
+        }.also { tabInsertionFixesFlag = it }
+    }
+
     private fun generateTabId() = UUID.randomUUID().toString()
 
-    private fun buildSiteData(url: String?, tabId: String): MutableLiveData<Site> {
+    private fun buildSiteDataSync(url: String?, tabId: String): MutableLiveData<Site> {
         val data = MutableLiveData<Site>()
         url?.let {
             val siteMonitor = siteFactory.buildSite(url = it, tabId = tabId)
             data.postValue(siteMonitor)
+        }
+        return data
+    }
+
+    private suspend fun buildSiteData(url: String?, tabId: String): MutableLiveData<Site> {
+        val data = MutableLiveData<Site>()
+        url ?: return data
+        val siteMonitor = siteFactory.buildSite(url = url, tabId = tabId)
+        withContext(dispatchers.main()) {
+            data.value = siteMonitor
         }
         return data
     }
@@ -150,6 +188,7 @@ class TabDataRepository @Inject constructor(
         skipHome: Boolean,
         isDefaultTab: Boolean,
         sourceTabId: String? = null,
+        updateIfBlankParent: Boolean = false,
     ) {
         siteData[tabId] = data
         databaseExecutor().scheduleDirect {
@@ -178,6 +217,7 @@ class TabDataRepository @Inject constructor(
                     position = position,
                     sourceTabId = sourceTabId,
                 ),
+                updateIfBlankParent = updateIfBlankParent,
             )
         }
     }

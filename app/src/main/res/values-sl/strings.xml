@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>
+    <string name="settingsShowFullUrlTitle">Prikaži polni naslov spletnega mesta</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
     <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
     <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
-    <string name="preOnboardingComparisonChartItem4">Blokiraj oglase, ki sledijo</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o brskanju z enim gumbom</string>
     <string name="preOnboardingDaxDialog3Title">Odlično! Veseli nas, da ste se nam pridružili.</string>
     <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>

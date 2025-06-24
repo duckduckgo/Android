@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspetto</string>
+    <string name="settingsShowFullUrlTitle">Mostra l\'indirizzo completo del sito</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salva</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Cerca privatamente per impostazione predefinita</string>
     <string name="preOnboardingComparisonChartItem2">Blocca i sistemi di tracciamento di terze parti</string>
     <string name="preOnboardingComparisonChartItem3">Blocca i popup dei cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blocca gli annunci di tracciamento</string>
+    <string name="preOnboardingComparisonChartItem4">Blocca gli annunci mirati</string>
     <string name="preOnboardingComparisonChartItem5">Cancella i dati di navigazione con un solo pulsante</string>
     <string name="preOnboardingDaxDialog3Title">Fantastico! Duck ti dà il benvenuto!</string>
     <string name="preOnboardingDaxDialog3Button">Inizia a navigare</string>

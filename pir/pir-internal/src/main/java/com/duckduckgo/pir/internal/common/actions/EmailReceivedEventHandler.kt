@@ -17,10 +17,11 @@
 package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -44,25 +45,29 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
          * We now re-do the last Broker action passing the updated extracted profile into the [State] and also the
          * [UserProfile] for the action.
          */
-        val extractedProfileWithEmail =
-            state.extractedProfile[state.currentExtractedProfileIndex].copy(
-                email = (event as EmailReceived).email,
-            )
-        val updatedList = state.extractedProfile.toMutableList()
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex] as OptOutStep
 
-        updatedList[state.currentExtractedProfileIndex] = extractedProfileWithEmail
+        val updatedProfileWithEmail = currentBrokerStep.profileToOptOut.copy(
+            email = (event as EmailReceived).email,
+        )
+
+        val updatedBrokerSteps = state.brokerStepsToExecute.toMutableList().apply {
+            this[state.currentBrokerStepIndex] = currentBrokerStep.copy(
+                profileToOptOut = updatedProfileWithEmail,
+            )
+        }
 
         return Next(
             nextState = state.copy(
-                extractedProfile = updatedList,
+                brokerStepsToExecute = updatedBrokerSteps,
             ),
-            nextEvent = ExecuteNextBrokerAction(
+            nextEvent = ExecuteNextBrokerStepAction(
                 actionRequestData = UserProfile(
                     userProfile = state.profileQuery,
-                    extractedProfile = extractedProfileWithEmail.run {
+                    extractedProfile = updatedProfileWithEmail.run {
                         ExtractedProfileParams(
                             name = this.name,
-                            profileUrl = this.profileUrl?.profileUrl,
+                            profileUrl = this.profileUrl,
                             fullName = state.profileQuery?.fullName,
                             email = this.email,
                         )

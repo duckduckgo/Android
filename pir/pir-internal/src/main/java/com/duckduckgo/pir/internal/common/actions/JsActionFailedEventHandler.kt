@@ -18,14 +18,14 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJob.RunType
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
@@ -52,41 +52,41 @@ class JsActionFailedEventHandler @Inject constructor(
     ): Next {
         /**
          * This means we have received an error from the JS layer for the last action we pushed.
-         * If the action is GetCaptchaInfo or SolveCaptcha, we proceed to the next action (ignore error)
-         * Else we end the run for the broker
+         * We end the run for the broker.
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
-        val currentAction = currentBroker.actions[state.currentActionIndex]
-        val pirErrorReponse = (event as JsActionFailed).pirErrorReponse
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val currentAction = currentBrokerStep.actions[state.currentActionIndex]
+        val error = (event as JsActionFailed).error
 
-        if (state.runType != RunType.OPTOUT) {
+        if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
-                BrokerScanActionFailed(
-                    brokerName = currentBroker.brokerName,
+                BrokerOptOutActionFailed(
+                    brokerName = currentBrokerStep.brokerName,
+                    extractedProfile = currentBrokerStep.profileToOptOut,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     actionType = currentAction.asActionType(),
-                    pirErrorReponse = pirErrorReponse,
+                    actionID = error.actionID,
+                    message = error.message,
                 ),
             )
         } else {
-            state.extractedProfile[state.currentExtractedProfileIndex].let {
-                pirRunStateHandler.handleState(
-                    BrokerOptOutActionFailed(
-                        brokerName = currentBroker.brokerName,
-                        extractedProfile = it,
-                        completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        actionType = currentAction.asActionType(),
-                        result = pirErrorReponse,
-                    ),
-                )
-            }
+            pirRunStateHandler.handleState(
+                BrokerScanActionFailed(
+                    brokerName = currentBrokerStep.brokerName,
+                    actionType = currentAction.asActionType(),
+                    actionID = error.actionID,
+                    message = error.message,
+                ),
+            )
         }
 
+        // If failure is on Any captcha action, we proceed to next action
         return if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
             Next(
                 nextState = state.copy(
                     currentActionIndex = state.currentActionIndex + 1,
                 ),
-                nextEvent = ExecuteNextBrokerAction(
+                nextEvent = ExecuteNextBrokerStepAction(
                     UserProfile(
                         userProfile = state.profileQuery,
                     ),
@@ -96,7 +96,7 @@ class JsActionFailedEventHandler @Inject constructor(
             // If error happens we skip to next Broker as next steps will not make sense
             Next(
                 nextState = state,
-                nextEvent = BrokerActionsCompleted(isSuccess = false),
+                nextEvent = BrokerStepCompleted(isSuccess = false),
             )
         }
     }

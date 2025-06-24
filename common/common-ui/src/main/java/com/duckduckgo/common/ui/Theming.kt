@@ -42,10 +42,8 @@ enum class DuckDuckGoTheme {
     fun getOptionIndex(): Int {
         return when (this) {
             SYSTEM_DEFAULT -> 1
-            DARK -> 2
-            LIGHT -> 3
-            EXPERIMENT_DARK -> 4
-            EXPERIMENT_LIGHT -> 5
+            LIGHT, EXPERIMENT_LIGHT -> 2
+            DARK, EXPERIMENT_DARK -> 3
         }
     }
 }

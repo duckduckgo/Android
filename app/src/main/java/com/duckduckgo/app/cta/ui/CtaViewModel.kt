@@ -209,21 +209,11 @@ class CtaViewModel @Inject constructor(
         detectedRefreshPatterns: Set<RefreshPattern>,
     ): Cta? {
         return withContext(dispatcher) {
-            markOnboardingAsCompletedIfRequiredCtasShown()
             if (isBrowserShowing) {
                 getBrowserCta(site, detectedRefreshPatterns)
             } else {
                 getHomeCta()
             }
-        }
-    }
-
-    // Temporary function to complete onboarding if all CTAs were shown
-    private suspend fun markOnboardingAsCompletedIfRequiredCtasShown() {
-        if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            logcat { "Auto completing DAX ONBOARDING" }
-            userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-            pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETE)
         }
     }
 

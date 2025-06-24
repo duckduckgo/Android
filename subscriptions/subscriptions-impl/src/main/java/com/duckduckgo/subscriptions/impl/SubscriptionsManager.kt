@@ -222,11 +222,9 @@ interface SubscriptionsManager {
     suspend fun canSupportEncryption(): Boolean
 
     /**
-     * Checks whether the user has previously used a trial.
-     *
-     * @return [Boolean] indicating if the user has had a trial before.
+     * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
-    suspend fun hadTrial(): Boolean
+    suspend fun isFreeTrialEligible(): Boolean
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -343,12 +341,16 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun canSupportEncryption(): Boolean = authRepository.canSupportEncryption()
 
-    override suspend fun hadTrial(): Boolean {
-        return try {
-            return subscriptionsService.offerStatus().hadTrial
+    override suspend fun isFreeTrialEligible(): Boolean {
+        val userHadFreeTrial = try {
+            subscriptionsService.offerStatus().hadTrial
         } catch (e: Exception) {
             false
         }
+        val freeTrialProductsAvailableInGooglePlay = getSubscriptionOffer().any {
+            it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
+        }
+        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
@@ -468,12 +470,6 @@ class RealSubscriptionsManager @Inject constructor(
             }
 
             if (subscription.isActive()) {
-                // Free Trial experiment metrics
-                if (confirmationResponse.subscription.productId.contains("monthly-renews-us")) {
-                    pixelSender.reportFreeTrialOnSubscriptionStartedMonthly()
-                } else if (confirmationResponse.subscription.productId.contains("yearly-renews-us")) {
-                    pixelSender.reportFreeTrialOnSubscriptionStartedYearly()
-                }
                 pixelSender.reportPurchaseSuccess()
                 pixelSender.reportSubscriptionActivated()
                 emitEntitlementsValues()

@@ -231,8 +231,12 @@ class Omnibar(
         newOmnibar.omnibarTextInput
     }
 
-    private val omniBarContainer: View by lazy {
+    val omniBarContainer: View by lazy {
         newOmnibar.omniBarContainer
+    }
+
+    val omniBarClickCatcher: View? by lazy {
+        (newOmnibar as? FadeOmnibarLayout)?.omniBarClickCatcher
     }
 
     val toolbar: Toolbar by lazy {
@@ -326,9 +330,9 @@ class Omnibar(
         newOmnibar.reduce(StateChange.LoadingStateChange(viewState))
     }
 
-    fun renderOmnibarViewState(viewState: OmnibarViewState) {
+    fun renderOmnibarViewState(viewState: OmnibarViewState, forceRender: Boolean = false) {
         logcat { "Omnibar: renderOmnibarViewState $viewState" }
-        newOmnibar.reduce(StateChange.OmnibarStateChange(viewState))
+        newOmnibar.reduce(StateChange.OmnibarStateChange(viewState, forceRender))
     }
 
     fun setPrivacyShield(privacyShield: PrivacyShield) {

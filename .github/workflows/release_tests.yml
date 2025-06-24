@@ -20,7 +20,7 @@ env:
 
 jobs:
   run-release-tests:
-    name: Create and Push git tag for version
+    name: Create release APK and run E2E Maestro tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -81,6 +81,7 @@ jobs:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
           include-tags: ${{ github.event.inputs.test-tag }}

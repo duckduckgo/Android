@@ -154,7 +154,9 @@ class RealPirScan @Inject constructor(
             repository.getBrokerScanSteps(broker)?.run {
                 brokerStepsParser.parseStep(broker, this)
             }
-        }.splitIntoParts(maxWebViewCount)
+        }.filter {
+            it.isNotEmpty()
+        }.flatten().splitIntoParts(maxWebViewCount)
             .mapIndexed { index, part ->
                 // We want to run the runners in parallel but wait for everything complete before we proceed
                 async {
