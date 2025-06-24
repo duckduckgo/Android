@@ -879,4 +879,14 @@
     <string name="scamBlockerTitle">Blokering af svindel</string>
     <string name="scamBlockerDescription">Advar på websteder, der er registreret for svindel, phishing og malware.</string>
     <string name="threatProtectionLearnMoreTitle">Mere info</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prøv vores widget til startskærmen!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Tilføj widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søg på DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startskærmswidget</string>
 </resources>
