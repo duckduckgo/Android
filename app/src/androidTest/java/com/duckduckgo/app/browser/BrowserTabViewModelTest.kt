@@ -6455,7 +6455,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
         val query = "example"
-        testee.setLastSubmittedUserQuery(query)
+        testee.setLastSubmittedChatUserQuery(query)
 
         testee.openDuckChat(query)
 
@@ -6488,7 +6488,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
         val query = "example"
-        testee.setLastSubmittedUserQuery("foo")
+        testee.setLastSubmittedChatUserQuery("foo")
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
 
         testee.openDuckChat(query)
@@ -6714,7 +6714,7 @@ class BrowserTabViewModelTest {
     fun whenOpeningDuckChatWithDifferentQueryOrFullUrlValueThenOpenDuckChatWithAutoPrompt() = runTest {
         val query = "example"
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
-        testee.setLastSubmittedUserQuery("test")
+        testee.setLastSubmittedChatUserQuery("test")
 
         testee.openDuckChat(query)
 

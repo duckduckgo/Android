@@ -564,7 +564,7 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
-    private var lastSubmittedUserQuery: String? = null
+    private var lastSubmittedChatUserQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -1794,7 +1794,10 @@ class BrowserTabViewModel @Inject constructor(
         return url
     }
 
-    private fun omnibarTextForUrl(url: String?, showFullUrl: Boolean): String {
+    private fun omnibarTextForUrl(
+        url: String?,
+        showFullUrl: Boolean,
+    ): String {
         if (url == null) return ""
 
         return if (duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
@@ -2045,9 +2048,9 @@ class BrowserTabViewModel @Inject constructor(
                 loadingViewState.value = currentLoadingViewState().copy(
                     isLoading = true,
                     trackersAnimationEnabled = true,
-                        /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
-                        * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
-                        * showing in case the URL was blocked locally and therefore never started to show*/
+                    /*We set the progress to 20 so the omnibar starts animating and the user knows we are loading the page.
+                    * We don't show the browser until the page actually starts loading, to prevent previous sites from briefly
+                    * showing in case the URL was blocked locally and therefore never started to show*/
                     progress = 20,
                     url = documentUrlString,
                 )
@@ -2864,7 +2867,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
-            visualDesignExperimentDataStore.isDuckAIPoCEnabled.value
+            visualDesignExperimentDataStore.isDuckAIPoCEnabled.value || duckChat.isKeepSessionEnabled()
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 
@@ -3472,7 +3475,10 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun updateTabTitle(tabId: String, newTitle: String) {
+    suspend fun updateTabTitle(
+        tabId: String,
+        newTitle: String,
+    ) {
         getSite()?.let { site ->
             site.title = newTitle
             tabRepository.update(tabId, site)
@@ -4136,10 +4142,16 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             command.value = HideKeyboardForChat
         }
-        openDuckChat(query = query)
+        query?.let {
+            openDuckChat(query = query)
+            setLastSubmittedChatUserQuery(query)
+        } ?: openDuckChat()
     }
 
-    private fun openDuckChat(pixelName: Pixel.PixelName? = null, query: String? = null) {
+    private fun openDuckChat(
+        pixelName: Pixel.PixelName? = null,
+        query: String? = null,
+    ) {
         viewModelScope.launch {
             if (pixelName != null) {
                 val params = duckChat.createWasUsedBeforePixelParams()
@@ -4195,20 +4207,17 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) {
-        logcat { "Duck.ai: query $query lastSubmittedUserQuery $lastSubmittedUserQuery omnibarQuery ${omnibarViewState.value?.queryOrFullUrl}" }
+    fun openDuckChat(query: String?) = when {
+        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+        lastSubmittedChatUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
+        lastSubmittedChatUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
+        query == lastSubmittedChatUserQuery -> duckChat.openDuckChat(query)
 
-        return when {
-            query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-            lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
-            lastSubmittedUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
-            query == lastSubmittedUserQuery -> duckChat.openDuckChat(query)
-            else -> duckChat.openDuckChatWithAutoPrompt(query)
-        }
+        else -> duckChat.openDuckChatWithAutoPrompt(query)
     }
 
-    fun setLastSubmittedUserQuery(query: String) {
-        lastSubmittedUserQuery = query
+    fun setLastSubmittedChatUserQuery(query: String) {
+        lastSubmittedChatUserQuery = query
     }
 
     fun onExperimentalHomeScreenWidgetBottomSheetDialogShown() {

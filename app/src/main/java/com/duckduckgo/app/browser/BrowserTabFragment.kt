@@ -2902,7 +2902,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedUserQuery(query)
+        viewModel.setLastSubmittedChatUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -3070,6 +3070,7 @@ class BrowserTabFragment :
             }
         }
         renderer.showNewTab()
+        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
