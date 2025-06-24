@@ -59,7 +59,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     )
 
     override val isNewDesignWithoutBottomBarEnabled: StateFlow<Boolean> = combine(isNewDesignEnabled, _newDesignWithoutBottomBarFeatureFlagEnabled) {
-        withBottomBar, withoutBottomBar ->
+            withBottomBar, withoutBottomBar ->
         !withBottomBar && withoutBottomBar
     }.stateIn(
         scope = appCoroutineScope,

@@ -81,4 +81,3 @@ class OmnibarTypeResolverTest {
         assertEquals(SCROLLING, omnibarType)
     }
 }
-

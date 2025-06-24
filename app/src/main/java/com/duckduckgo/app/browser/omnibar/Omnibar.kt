@@ -104,7 +104,7 @@ class Omnibar(
                         binding.rootView.removeView(binding.singleOmnibarBottom)
                     }
 
-                    SINGLE ->  {
+                    SINGLE -> {
                         // remove bottom variant
                         binding.rootView.removeView(binding.singleOmnibarBottom)
 
@@ -349,8 +349,7 @@ class Omnibar(
         val omnibar = newOmnibar
         if (omnibar is FadeOmnibarLayout) {
             omnibar.setFadeOmnibarItemPressedListener(listener)
-        }
-        else if (omnibar is SingleOmnibarLayout) {
+        } else if (omnibar is SingleOmnibarLayout) {
             omnibar.setSingleOmnibarItemPressedListener(listener)
         }
     }

@@ -629,7 +629,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
             showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
             showChatMenu = viewState.showChatMenu,
-            showSpacer = viewState.showClearButton || viewState.showVoiceSearch || viewState.showFindInPage,
+            showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
         )
 
         if (omnibarAnimationManager.isFeatureEnabled() &&
