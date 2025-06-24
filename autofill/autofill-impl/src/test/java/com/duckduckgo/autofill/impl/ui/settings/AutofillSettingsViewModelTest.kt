@@ -8,10 +8,9 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
-import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN

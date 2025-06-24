@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl
 import android.webkit.WebView
 import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.autofill.api.AutofillPrompt
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
 import com.duckduckgo.autofill.api.EmailProtectionUserPromptListener
@@ -70,6 +71,9 @@ class InlineBrowserAutofillTest {
         }
 
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
+        }
+
+        override suspend fun promptUserTo(event: AutofillPrompt) {
         }
     }
 
@@ -134,6 +138,9 @@ class InlineBrowserAutofillTest {
         }
 
         override fun closeEmailProtectionTab(data: String) {
+        }
+
+        override fun onNewAutofillDataAvailable(url: String?) {
         }
 
         override fun getIncontextSignupDismissedAt(data: String) {

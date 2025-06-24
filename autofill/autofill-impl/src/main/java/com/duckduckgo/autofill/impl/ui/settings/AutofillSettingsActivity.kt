@@ -27,13 +27,13 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode

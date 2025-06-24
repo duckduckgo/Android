@@ -249,6 +249,11 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to sign up for Email Protection
      */
     fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
+
+    /**
+     * Creates a dialog which prompts the user to import passwords from Google Passwords
+     */
+    fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment
 }
 
 private fun prefix(
@@ -256,4 +261,14 @@ private fun prefix(
     tag: String,
 ): String {
     return "$tabId/$tag"
+}
+
+@Parcelize
+enum class AutofillImportLaunchSource(val value: String) : Parcelable {
+    PasswordManagementPromo("password_management_promo"),
+    PasswordManagementEmptyState("password_management_empty_state"),
+    PasswordManagementOverflow("password_management_overflow"),
+    AutofillSettings("autofill_settings_button"),
+    InBrowserPromo("in_browser_promo"),
+    Unknown("unknown"),
 }

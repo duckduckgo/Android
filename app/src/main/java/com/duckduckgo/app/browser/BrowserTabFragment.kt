@@ -210,6 +210,9 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
+import com.duckduckgo.autofill.api.AutofillPrompt
+import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
@@ -759,6 +762,24 @@ class BrowserTabFragment :
 
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
             viewModel.onShowUserCredentialsSaved(savedCredentials)
+        }
+
+        override suspend fun promptUserTo(event: AutofillPrompt) {
+            withContext(dispatchers.main()) {
+                when (event) {
+                    is ImportPasswords -> {
+                        showDialogHidingPrevious(
+                            credentialAutofillDialogFactory.autofillImportPasswordsPromoDialog(
+                                importSource = InBrowserPromo,
+                                tabId = tabId,
+                                url = event.currentUrl,
+                            ),
+                            AUTOFILL_DIALOG_TAB,
+                            event.currentUrl,
+                        )
+                    }
+                }
+            }
         }
 
         override suspend fun onCredentialsAvailableToSave(
@@ -1768,6 +1789,12 @@ class BrowserTabFragment :
 
     override fun onAutofillStateChange() {
         viewModel.onRefreshRequested(triggeredByUser = false)
+    }
+
+    override fun onNewPasswordsImported() {
+        webView?.let {
+            browserAutofill.onNewAutofillDataAvailable(it.url)
+        }
     }
 
     override fun onRejectGeneratedPassword(originalUrl: String) {
@@ -3986,6 +4013,7 @@ class BrowserTabFragment :
     }
 
     companion object {
+        private const val AUTOFILL_DIALOG_TAB = "AUTOFILL_DIALOG_TAB"
         private const val CUSTOM_TAB_TOOLBAR_COLOR_ARG = "CUSTOM_TAB_TOOLBAR_COLOR_ARG"
         private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"
