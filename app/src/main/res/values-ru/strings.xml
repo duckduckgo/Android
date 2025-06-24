@@ -911,4 +911,14 @@
     <string name="scamBlockerTitle">Блокировщик мошенничества</string>
     <string name="scamBlockerDescription">Предупреждать о мошеннических, фишинговых и вредоносных сайтах.</string>
     <string name="threatProtectionLearnMoreTitle">Подробнее</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Попробуйте виджет для главного экрана!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Добавьте наш поисковый виджет на домашний экран для быстрого и удобного доступа.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Добавить виджет</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Не сейчас</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Поиск в DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Виджет для главного экрана</string>
 </resources>
