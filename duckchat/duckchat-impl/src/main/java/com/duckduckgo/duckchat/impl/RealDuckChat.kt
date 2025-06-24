@@ -258,6 +258,10 @@ class RealDuckChat @Inject constructor(
         return isDuckAiInBrowserEnabled
     }
 
+    override fun isKeepSessionEnabled(): Boolean {
+        return keepSessionAliveEnabled
+    }
+
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
         return duckChatFeatureRepository.observeDuckChatUserEnabled()
     }
