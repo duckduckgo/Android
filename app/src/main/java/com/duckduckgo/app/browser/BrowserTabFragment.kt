@@ -4385,7 +4385,7 @@ class BrowserTabFragment :
             hideNewTab()
             configuration.apply {
                 if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                    showBuckCta(buckDialogIntroBubble) {
+                    showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
                         setOnOptionClicked { userEnteredQuery(it.link) }
                     }
                 } else {

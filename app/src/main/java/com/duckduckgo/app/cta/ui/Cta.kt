@@ -19,12 +19,15 @@ package com.duckduckgo.app.cta.ui
 import android.content.Context
 import android.net.Uri
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
@@ -51,6 +54,7 @@ import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
@@ -820,6 +824,7 @@ sealed class DaxBubbleCta(
 
     fun showBuckCta(
         binding: IncludeOnboardingBubbleBuckDialogBinding,
+        configuration: DaxBubbleCta,
         onAnimationEnd: () -> Unit,
     ) {
         ctaView = binding.root
@@ -862,6 +867,13 @@ sealed class DaxBubbleCta(
                 } else {
                     buttonView.gone()
                 }
+            }
+        }
+
+        if (configuration is DaxEndCta) {
+            binding.root.updatePadding(bottom = 8.toPx())
+            binding.buckOnboardingDialogView.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = 0.toPx()
             }
         }
 
