@@ -62,7 +62,7 @@ class OmnibarTypeResolverTest {
     }
 
     @Test
-    fun whenBothNewDesignFlagsAreEnabledThenOmnibarWithNabBarTakesPrecedent() {
+    fun whenBothNewDesignFlagsAreEnabledThenOmnibarWithNabBarTakesPrecedence() {
         whenever(mockIsNewDesignEnabled.value).thenReturn(true)
         whenever(mockIsNewDesignWithoutBottomBarEnabled.value).thenReturn(true)
 
