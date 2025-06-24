@@ -120,26 +120,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         duckChatBack.setOnClickListener { onBack?.invoke() }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (minHeight == 0) {
-            val currentMinLines = duckChatInput.minLines
-            val currentMaxLines = duckChatInput.maxLines
-
-            duckChatInput.minLines = DUCK_CHAT_MIN_LINES
-            duckChatInput.maxLines = DUCK_CHAT_MIN_LINES
-            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
-            minHeight = measuredHeight
-
-            duckChatInput.minLines = currentMinLines
-            duckChatInput.maxLines = currentMaxLines
-        }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        if (measuredHeight < minHeight) {
-            setMeasuredDimension(measuredWidth, minHeight)
-        }
-    }
-
     private fun configureInputBehavior() = with(duckChatInput) {
         maxLines = MAX_LINES
         setHorizontallyScrolling(false)

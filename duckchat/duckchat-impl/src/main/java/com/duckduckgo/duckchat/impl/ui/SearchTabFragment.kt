@@ -21,14 +21,28 @@ import android.transition.Transition
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
+import com.duckduckgo.duckchat.impl.ui.inputscreen.InputScreenViewModel
+import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.AutoCompleteViewState
+import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.OmnibarPosition.TOP
+import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.SuggestionItemDecoration
+import com.duckduckgo.duckchat.impl.ui.inputscreen.renderIfChanged
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -39,7 +53,24 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     @Inject
     lateinit var newTabPagePlugins: ActivePluginPoint<NewTabPagePlugin>
 
+    @Inject lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject lateinit var globalActivityStarter: GlobalActivityStarter
+
+    private val viewModel: InputScreenViewModel by lazy {
+        ViewModelProvider(requireParentFragment(), viewModelFactory)[InputScreenViewModel::class.java]
+    }
+
+    private lateinit var renderer: SearchInterstitialFragmentRenderer
+
+    private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
+
     private val binding: FragmentSearchTabBinding by viewBinding()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        renderer = SearchInterstitialFragmentRenderer()
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -56,6 +87,9 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 override fun onTransitionResume(transition: Transition) {}
             },
         )
+
+        configureObservers()
+        configureAutoComplete()
     }
 
     private fun setupNewTabPage() {
@@ -87,6 +121,74 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                     .setDuration(CONTENT_ANIMATION_DURATION)
                     .start()
             }
+        }
+    }
+
+    private fun configureAutoComplete() {
+        val context = context ?: return
+        binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
+        autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+            immediateSearchClickListener = {
+                viewModel.userSelectedAutocomplete(it)
+            },
+            editableSearchClickListener = {
+                viewModel.onUserSelectedToEditQuery(it.phrase)
+            },
+            autoCompleteInAppMessageDismissedListener = {
+                viewModel.onUserDismissedAutoCompleteInAppMessage()
+            },
+            autoCompleteOpenSettingsClickListener = {
+                // TODO: expose this screen param
+                viewModel.onUserDismissedAutoCompleteInAppMessage()
+                // globalActivityStarter.start(context, PrivateSearchScreenNoParams)
+            },
+            autoCompleteLongPressClickListener = {
+                viewModel.userLongPressedAutocomplete(it)
+            },
+            omnibarPosition = TOP,
+        )
+        binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.autoCompleteSuggestionsList.addItemDecoration(
+            SuggestionItemDecoration(
+                divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
+                addExtraDividerPadding = true,
+            ),
+        )
+    }
+
+    inner class SearchInterstitialFragmentRenderer {
+
+        private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
+
+        fun renderAutocomplete(viewState: AutoCompleteViewState) {
+            renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
+                lastSeenAutoCompleteViewState = viewState
+
+                if (viewState.showSuggestions || viewState.showFavorites) {
+                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
+                        if (binding.autoCompleteSuggestionsList.isVisible) {
+                            viewModel.autoCompleteSuggestionsGone()
+                        }
+                        binding.autoCompleteSuggestionsList.gone()
+                    } else {
+                        binding.autoCompleteSuggestionsList.show()
+                        autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
+                    }
+                } else {
+                    if (binding.autoCompleteSuggestionsList.isVisible) {
+                        viewModel.autoCompleteSuggestionsGone()
+                    }
+                    binding.autoCompleteSuggestionsList.gone()
+                }
+            }
+        }
+    }
+
+    private fun configureObservers() {
+        viewModel.autoCompleteViewState.observe(
+            viewLifecycleOwner,
+        ) {
+            it?.let { renderer.renderAutocomplete(it) }
         }
     }
 

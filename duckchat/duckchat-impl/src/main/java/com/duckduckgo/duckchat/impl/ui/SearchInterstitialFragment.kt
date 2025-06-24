@@ -23,16 +23,21 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchInterstitialBinding
+import com.duckduckgo.duckchat.impl.ui.inputscreen.Command
+import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.UserSubmittedQuery
+import com.duckduckgo.duckchat.impl.ui.inputscreen.InputScreenViewModel
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -54,6 +59,13 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
     @Inject
     lateinit var voiceSearchAvailability: VoiceSearchAvailability
 
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel: InputScreenViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[InputScreenViewModel::class.java]
+    }
+
     private val binding: FragmentSearchInterstitialBinding by viewBinding()
 
     private val pageChangeCallback = object : OnPageChangeCallback() {
@@ -70,6 +82,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         configureViewPager()
         configureOmnibar()
         configureVoice()
+        configureObservers()
 
         val params = requireActivity().intent.getActivityParams(SearchInterstitialActivityParams::class.java)
         params?.query?.let { query ->
@@ -96,6 +109,20 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         }
         binding.actionNewLine.setOnClickListener {
             binding.duckChatOmnibar.printNewLine()
+        }
+    }
+
+    private fun configureObservers() {
+        viewModel.command.observe(
+            viewLifecycleOwner,
+        ) {
+            processCommand(it)
+        }
+    }
+
+    private fun processCommand(command: Command) {
+        if (command is UserSubmittedQuery) {
+            binding.duckChatOmnibar.submitMessage(command.query)
         }
     }
 
@@ -133,6 +160,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         }
         onSendMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
+            viewModel.triggerAutocomplete(binding.duckChatOmnibar.duckChatInput.text.toString(), true, true)
         }
     }
 
