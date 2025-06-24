@@ -13,7 +13,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -119,17 +118,17 @@ class CredentialImporterImplTest {
     }
 
     @Test
-    fun whenImportingNoCredentialsThenHasEverImportedPasswordsIsNotSet() = runTest {
+    fun whenImportingNoCredentialsThenHasEverImportedPasswordsIsStillSet() = runTest {
         listOf<LoginCredentials>().import()
-        verify(autofillStore, never()).hasEverImportedPasswords = true
+        verify(autofillStore).hasEverImportedPasswords = true
     }
 
     @Test
-    fun whenImportingOnlyDuplicatesThenHasEverImportedPasswordsIsNotSet() = runTest {
+    fun whenImportingOnlyDuplicatesThenHasEverImportedPasswordsIsStillSet() = runTest {
         val duplicatedLogin = creds(username = "username")
         duplicatedLogin.treatAsDuplicate()
         listOf(duplicatedLogin).import()
-        verify(autofillStore, never()).hasEverImportedPasswords = true
+        verify(autofillStore).hasEverImportedPasswords = true
     }
 
     private suspend fun List<LoginCredentials>.import(originalListSize: Int = this.size) {
