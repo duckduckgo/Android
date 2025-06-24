@@ -50,6 +50,7 @@ interface Pixel {
         const val LAST_USED_DAY = "duck_address_last_used"
         const val WEBVIEW_VERSION = "webview_version"
         const val WEBVIEW_FULL_VERSION = "webview_full_version"
+        const val IS_DUCKDUCKGO_PACKAGE = "is_duckduckgo_app_package"
         const val DEFAULT_BROWSER = "default_browser"
         const val EMAIL = "email"
         const val MESSAGE_SHOWN = "message"

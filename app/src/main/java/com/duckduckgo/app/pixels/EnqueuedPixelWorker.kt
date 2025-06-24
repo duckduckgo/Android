@@ -27,8 +27,10 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -60,6 +62,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall,
+    private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
@@ -85,6 +88,7 @@ class EnqueuedPixelWorker @Inject constructor(
         val paramsMap = mutableMapOf<String, String>().apply {
             put(WEBVIEW_VERSION, webViewVersionProvider.getMajorVersion())
             put(DEFAULT_BROWSER, defaultBrowserDetector.isDefaultBrowser().toString())
+            put(IS_DUCKDUCKGO_PACKAGE, isDuckDuckGoAppPackage(appBuildConfig.applicationId))
             if (collectWebViewFullVersion) {
                 put(WEBVIEW_FULL_VERSION, webViewVersionProvider.getFullVersion())
             }
@@ -104,6 +108,10 @@ class EnqueuedPixelWorker @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun isDuckDuckGoAppPackage(applicationId: String): String {
+        return (applicationId == "com.duckduckgo.mobile.android" || applicationId == "com.duckduckgo.mobile.android.debug").toString()
     }
 
     private fun isLaunchByFireAction(): Boolean {
