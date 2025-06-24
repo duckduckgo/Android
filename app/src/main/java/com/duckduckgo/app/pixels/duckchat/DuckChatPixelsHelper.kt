@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.app.pixels.duckchat
 
-import android.content.Context
-import android.content.Intent
+import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 
-/**
- * Public interface to provide navigation Intents related to browser screen
- */
-interface BrowserNav {
-    // opens url on a new tab
-    fun openInNewTab(context: Context, url: String): Intent
-    fun openInCurrentTab(context: Context, url: String): Intent
-    fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
-    fun closeDuckChat(context: Context): Intent
+suspend fun DuckChat.createWasUsedBeforePixelParams(): Map<String, String> {
+    return mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasOpenedBefore().toBinaryString())
 }

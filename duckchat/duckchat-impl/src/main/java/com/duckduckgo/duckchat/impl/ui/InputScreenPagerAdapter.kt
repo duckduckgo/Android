@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.duckchat.impl.ui
 
-import android.content.Context
-import android.content.Intent
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
-/**
- * Public interface to provide navigation Intents related to browser screen
- */
-interface BrowserNav {
-    // opens url on a new tab
-    fun openInNewTab(context: Context, url: String): Intent
-    fun openInCurrentTab(context: Context, url: String): Intent
-    fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
-    fun closeDuckChat(context: Context): Intent
+class InputScreenPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    override fun getItemCount(): Int = 2
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> SearchTabFragment()
+            1 -> DuckChatTabFragment()
+            else -> throw IllegalArgumentException("Invalid position: $position")
+        }
+    }
 }

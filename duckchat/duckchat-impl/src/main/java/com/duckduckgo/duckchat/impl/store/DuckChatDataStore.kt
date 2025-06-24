@@ -20,13 +20,16 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.di.DuckChat
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_LAST_SESSION_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_OPENED
+import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SESSION_DELTA_TIMESTAMP
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_ADDRESS_BAR
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_SHOW_IN_MENU
 import com.duckduckgo.duckchat.impl.store.SharedPreferencesDuckChatDataStore.Keys.DUCK_CHAT_USER_ENABLED
@@ -59,8 +62,11 @@ interface DuckChatDataStore {
 
     suspend fun fetchAndClearUserPreferences(): String?
     suspend fun updateUserPreferences(userPreferences: String?)
+
     suspend fun registerOpened()
     suspend fun wasOpenedBefore(): Boolean
+    suspend fun lastSessionTimestamp(): Long
+    suspend fun sessionDeltaTimestamp(): Long
 }
 
 @ContributesBinding(AppScope::class)
@@ -78,6 +84,8 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
         val DUCK_CHAT_SHOW_IN_ADDRESS_BAR = booleanPreferencesKey(name = "DUCK_CHAT_SHOW_IN_ADDRESS_BAR")
         val DUCK_CHAT_OPENED = booleanPreferencesKey(name = "DUCK_CHAT_OPENED")
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
+        val DUCK_CHAT_LAST_SESSION_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_LAST_SESSION_TIMESTAMP")
+        val DUCK_CHAT_SESSION_DELTA_TIMESTAMP = longPreferencesKey(name = "DUCK_CHAT_SESSION_DELTA_TIMESTAMP")
     }
 
     private fun Preferences.defaultShowInAddressBar(): Boolean {
@@ -163,10 +171,24 @@ class SharedPreferencesDuckChatDataStore @Inject constructor(
     }
 
     override suspend fun registerOpened() {
+        val now = System.currentTimeMillis()
+        val lastOpened = lastSessionTimestamp()
+        val delta = now - lastOpened
+
         store.edit { it[DUCK_CHAT_OPENED] = true }
+        store.edit { it[DUCK_CHAT_LAST_SESSION_TIMESTAMP] = now }
+        store.edit { it[DUCK_CHAT_SESSION_DELTA_TIMESTAMP] = delta }
     }
 
     override suspend fun wasOpenedBefore(): Boolean {
         return store.data.map { it[DUCK_CHAT_OPENED] }.firstOrNull() ?: false
+    }
+
+    override suspend fun lastSessionTimestamp(): Long {
+        return store.data.firstOrNull()?.let { it[DUCK_CHAT_LAST_SESSION_TIMESTAMP] } ?: 0L
+    }
+
+    override suspend fun sessionDeltaTimestamp(): Long {
+        return store.data.firstOrNull()?.let { it[DUCK_CHAT_SESSION_DELTA_TIMESTAMP] } ?: 0L
     }
 }

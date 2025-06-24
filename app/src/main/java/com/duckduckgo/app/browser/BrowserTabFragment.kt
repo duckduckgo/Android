@@ -1220,6 +1220,10 @@ class BrowserTabFragment :
                 viewModel.onNewTabMenuItemClicked()
             }
             onMenuItemClicked(duckChatMenuItem) {
+                activity?.currentFocus?.let {
+                    it.hideKeyboard()
+                    it.clearFocus()
+                }
                 viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
@@ -1944,6 +1948,10 @@ class BrowserTabFragment :
 
             is Command.HideKeyboard -> {
                 hideKeyboard()
+            }
+
+            is Command.HideKeyboardForChat -> {
+                hideKeyboardForChat()
             }
 
             is Command.BrokenSiteFeedback -> {
@@ -2898,7 +2906,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedUserQuery(query)
+        viewModel.setLastSubmittedChatUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -3611,6 +3619,16 @@ class BrowserTabFragment :
             hideKeyboard(omnibar.omnibarTextInput)
             binding.focusDummy.requestFocus()
             omnibar.showOutline(false)
+        }
+    }
+
+    private fun hideKeyboardForChat() {
+        if (!isHidden) {
+            logcat(VERBOSE) { "Keyboard for chat now hiding" }
+            activity?.currentFocus?.let {
+                it.hideKeyboard()
+                it.clearFocus()
+            }
         }
     }
 

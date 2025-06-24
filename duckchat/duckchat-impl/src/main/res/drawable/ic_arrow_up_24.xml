@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +14,12 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <!-- Duck.ai PoC strings -->
-    <string name="duck_chat_delete_this_chat">Delete this chat?</string>
-    <string name="duck_chat_delete_chat">Delete Chat</string>
-    <string name="duck_chat_cancel">Cancel</string>
-    <string name="duck_chat_ask_anything">Ask anything…</string>
-    <string name="duck_chat_search_or_type_url">Search or type URL</string>
-    <string name="duck_chat_stop_generating">Stop generating</string>
-    <string name="duck_chat_search_tab">Search</string>
-    <string name="duck_chat_ai_tab">Duck.ai</string>
-</resources>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:pathData="M4.707,12.207a1,1 0,0 1,-1.414 -1.414l8,-8a1,1 0,0 1,1.414 0l8,8a1,1 0,0 1,-1.414 1.414L13,5.914V20.5a1,1 0,1 1,-2 0V5.914z" />
+</vector>

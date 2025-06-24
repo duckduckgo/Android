@@ -38,9 +38,9 @@ class RealPirActionsRunnerStateEngine(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     runType: RunType,
-    brokers: List<BrokerStep>,
+    brokerSteps: List<BrokerStep>,
 ) : PirActionsRunnerStateEngine {
-    private var engineState: State = State(runType, brokers)
+    private var engineState: State = State(runType, brokerSteps)
     private val sideEffectFlow = MutableStateFlow<SideEffect>(None)
     private val eventsFlow = MutableStateFlow<Event>(Idle)
 
@@ -63,26 +63,26 @@ class RealPirActionsRunnerStateEngine(
     private suspend fun handleEvent(newEvent: Event) {
         val eventHandler = eventHandlers.getPlugins().firstOrNull { it.event.isInstance(newEvent) }
         if (eventHandler == null) {
-            logcat { "PIR-ENGINE: Unable to handle event $newEvent" }
+            logcat { "PIR-ENGINE($this): Unable to handle event $newEvent" }
             return
         }
 
-        logcat { "PIR-ENGINE: $newEvent dispatched to $eventHandler" }
+        logcat { "PIR-ENGINE($this): $newEvent dispatched to $eventHandler" }
 
         val next = eventHandler.invoke(engineState, newEvent)
 
-        logcat { "PIR-ENGINE: Event resulted to state: ${next.nextState}" }
-        logcat { "PIR-ENGINE: Event resulted to event: ${next.nextEvent}" }
-        logcat { "PIR-ENGINE: Event resulted to sideeffect: ${next.sideEffect}" }
+        logcat { "PIR-ENGINE($this): Event resulted to state: ${next.nextState}" }
+        logcat { "PIR-ENGINE($this): Event resulted to event: ${next.nextEvent}" }
+        logcat { "PIR-ENGINE($this): Event resulted to sideeffect: ${next.sideEffect}" }
         engineState = next.nextState
 
         next.sideEffect?.let {
-            logcat { "PIR-ENGINE: Emitting side effect: $it" }
+            logcat { "PIR-ENGINE($this): Emitting side effect: $it" }
             sideEffectFlow.emit(it)
         }
 
         next.nextEvent?.let {
-            logcat { "PIR-ENGINE: Dispatching event: $it" }
+            logcat { "PIR-ENGINE($this): Dispatching event: $it" }
             eventsFlow.emit(next.nextEvent)
         }
     }

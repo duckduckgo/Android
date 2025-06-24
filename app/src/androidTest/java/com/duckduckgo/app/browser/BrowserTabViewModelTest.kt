@@ -6125,7 +6125,6 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
         verify(mockDuckChat).openDuckChat()
     }
@@ -6136,7 +6135,6 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "1"))
         verify(mockDuckChat).openDuckChat()
     }
@@ -6457,7 +6455,7 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
         val query = "example"
-        testee.setLastSubmittedUserQuery(query)
+        testee.setLastSubmittedChatUserQuery(query)
 
         testee.openDuckChat(query)
 
@@ -6466,20 +6464,31 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasTextThenOpenDuckChatWithQuery() = runTest {
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasSameTextThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasNewTextThenOpenDuckChatWithAutoPrompt() = runTest {
         val query = "example"
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo", queryOrFullUrl = "foo")
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat(any())
     }
 
     @Test
     fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
         val query = "example"
-        testee.setLastSubmittedUserQuery("foo")
+        testee.setLastSubmittedChatUserQuery("foo")
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
 
         testee.openDuckChat(query)
@@ -6705,7 +6714,7 @@ class BrowserTabViewModelTest {
     fun whenOpeningDuckChatWithDifferentQueryOrFullUrlValueThenOpenDuckChatWithAutoPrompt() = runTest {
         val query = "example"
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
-        testee.setLastSubmittedUserQuery("test")
+        testee.setLastSubmittedChatUserQuery("test")
 
         testee.openDuckChat(query)
 

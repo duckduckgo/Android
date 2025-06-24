@@ -841,7 +841,6 @@ class TabSwitcherViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "0"))
         verify(duckChatMock).openDuckChat()
     }
@@ -852,8 +851,27 @@ class TabSwitcherViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "1"))
+        verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when Duck Chat fab clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+
+        testee.onDuckChatFabClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "0"))
+        verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when Duck Chat fab clicked and it was used before then open Duck Chat and send a pixel`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
+
+        testee.onDuckChatFabClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
         verify(duckChatMock).openDuckChat()
     }
 

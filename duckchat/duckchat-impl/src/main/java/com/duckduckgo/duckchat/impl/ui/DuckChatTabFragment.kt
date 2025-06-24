@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.tabs
+package com.duckduckgo.duckchat.impl.ui
 
-import android.content.Context
-import android.content.Intent
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.R
 
-/**
- * Public interface to provide navigation Intents related to browser screen
- */
-interface BrowserNav {
-    // opens url on a new tab
-    fun openInNewTab(context: Context, url: String): Intent
-    fun openInCurrentTab(context: Context, url: String): Intent
-    fun openDuckChat(context: Context, hasSessionActive: Boolean = false, duckChatUrl: String): Intent
-    fun closeDuckChat(context: Context): Intent
-}
+@InjectWith(FragmentScope::class)
+class DuckChatTabFragment : DuckDuckGoFragment(R.layout.fragment_duck_chat_tab)

@@ -41,7 +41,7 @@ class EmailFailedEventHandler @Inject constructor() : EventHandler {
         /**
          * If we encounter an email related email, it means the broker action depending on it will fail.
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
+        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val currentAction = currentBroker.actions[state.currentActionIndex]
 
         return Next(
