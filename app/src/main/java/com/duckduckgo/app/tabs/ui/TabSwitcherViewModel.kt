@@ -61,6 +61,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiVisibilityRepository
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -93,6 +94,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
+    private val duckAiVisibilityRepository: DuckAiVisibilityRepository,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
@@ -130,13 +132,13 @@ class TabSwitcherViewModel @Inject constructor(
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
         visualDesignExperimentDataStore.isExperimentEnabled,
-        duckChat.showInBrowserMenu,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, isVisualDesignExperimentEnabled, showInBrowserMenu ->
+        duckAiVisibilityRepository.showPopupMenuShortcuts,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, isVisualDesignExperimentEnabled, showDuckAiMenuItem ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
             isNewVisualDesignEnabled = isVisualDesignExperimentEnabled,
-            isDuckChatEnabled = duckChat.isEnabled() && showInBrowserMenu,
+            isDuckChatEnabled = showDuckAiMenuItem,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
