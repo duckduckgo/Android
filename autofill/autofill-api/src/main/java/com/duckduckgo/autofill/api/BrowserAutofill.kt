@@ -153,4 +153,9 @@ interface Callback {
      * Called when credentials have been saved, and we want to show the user some visual confirmation.
      */
     fun onCredentialsSaved(savedCredentials: LoginCredentials)
+
+    /**
+     * Called when the user should be prompted to import passwords from Google.
+     */
+    suspend fun promptUserToImportPassword(originalUrl: String)
 }

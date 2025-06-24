@@ -45,7 +45,7 @@
     <string name="autofillDevSettingsImportPasswordsImportPasswordsCsvTitle">Import CSV</string>
     <string name="autofillDevSettingsImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords we were able to import">%1$d passwords imported from Google</string>
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagTitle">Previous Google Imports</string>
-    <string name="autofillDevSettingsResetGooglePasswordsImportFlagInstruction">Tap to forget previous imports</string>
+    <string name="autofillDevSettingsResetGooglePasswordsImportFlagInstruction">Tap to forget previous imports, and import prompt choices</string>
     <string name="autofillDevSettingsResetGooglePasswordsImportFlagConfirmation">Eligible to see Google Import promos again</string>
 
     <string name="autofillDevSettingsOverrideMaxInstallDialogTitle">Maximum number of days since install</string>

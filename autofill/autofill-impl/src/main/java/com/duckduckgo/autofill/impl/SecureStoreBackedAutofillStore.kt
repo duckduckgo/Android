@@ -94,11 +94,24 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return autofillPrefsStore.hasEverImportedPasswordsFlow()
     }
 
-    override var hasDismissedImportedPasswordsPromo: Boolean
-        get() = autofillPrefsStore.hasDismissedImportedPasswordsPromo
+    override var hasDeclinedPasswordManagementImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedPasswordManagementImportPromo
         set(value) {
-            autofillPrefsStore.hasDismissedImportedPasswordsPromo = value
+            autofillPrefsStore.hasDeclinedPasswordManagementImportPromo = value
         }
+
+    override var hasDeclinedInBrowserPasswordImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo = value
+        }
+
+    override var inBrowserImportPromoShownCount: Int
+        get() = autofillPrefsStore.inBrowserImportPromoShownCount
+        set(value) {
+            autofillPrefsStore.inBrowserImportPromoShownCount = value
+        }
+
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {

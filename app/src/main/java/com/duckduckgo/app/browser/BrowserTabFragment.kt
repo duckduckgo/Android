@@ -210,6 +210,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
@@ -759,6 +760,20 @@ class BrowserTabFragment :
 
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
             viewModel.onShowUserCredentialsSaved(savedCredentials)
+        }
+
+        override suspend fun promptUserToImportPassword(originalUrl: String) {
+            withContext(dispatchers.main()) {
+                showDialogHidingPrevious(
+                    credentialAutofillDialogFactory.autofillImportPasswordsPromoDialog(
+                        importSource = InBrowserPromo,
+                        tabId = tabId,
+                        url = originalUrl,
+                    ),
+                    tabId,
+                    requiredUrl = originalUrl,
+                )
+            }
         }
 
         override suspend fun onCredentialsAvailableToSave(
@@ -3178,13 +3193,16 @@ class BrowserTabFragment :
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
                 context?.let {
-                    plugin.processResult(
-                        result = result,
-                        context = it,
-                        tabId = tabId,
-                        fragment = this@BrowserTabFragment,
-                        autofillCallback = this@BrowserTabFragment,
-                    )
+                    lifecycleScope.launch {
+                        plugin.processResult(
+                            result = result,
+                            context = it,
+                            tabId = tabId,
+                            fragment = this@BrowserTabFragment,
+                            autofillCallback = this@BrowserTabFragment,
+                            webView = webView,
+                        )
+                    }
                 }
             }
         }

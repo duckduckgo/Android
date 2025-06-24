@@ -719,15 +719,15 @@ class SecureStoreBackedAutofillStoreTest {
     @Test
     fun whenUserHasNeverDismissedImportPasswordPromoThenCallsThroughToStoreCorrectly() = runTest {
         setupTesteeWithAutofillAvailable()
-        testee.hasDismissedImportedPasswordsPromo
-        verify(autofillPrefsStore).hasDismissedImportedPasswordsPromo
+        testee.hasDeclinedPasswordManagementImportPromo
+        verify(autofillPrefsStore).hasDeclinedPasswordManagementImportPromo
     }
 
     @Test
     fun whenUserHasDismissedImportPasswordPromoThenCallsThroughToStoreCorrectly() = runTest {
         setupTesteeWithAutofillAvailable()
-        testee.hasDismissedImportedPasswordsPromo = true
-        verify(autofillPrefsStore).hasDismissedImportedPasswordsPromo = true
+        testee.hasDeclinedPasswordManagementImportPromo = true
+        verify(autofillPrefsStore).hasDeclinedPasswordManagementImportPromo = true
     }
 
     private fun enableDeepDomainCheckFeatureFlag() {

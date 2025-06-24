@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementPromo
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
