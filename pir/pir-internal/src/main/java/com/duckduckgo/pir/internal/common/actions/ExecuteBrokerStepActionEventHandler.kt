@@ -19,6 +19,7 @@ package com.duckduckgo.pir.internal.common.actions
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
@@ -91,6 +92,11 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
                     pushDelay = 10_000
+                }
+
+                // Adding a temporary delay to potentially workaround captcha for optouts
+                if (state.runType == PirJob.RunType.OPTOUT && actionToExecute is BrokerAction.FillForm) {
+                    pushDelay = 5_000
                 }
 
                 if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
