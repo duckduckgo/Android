@@ -213,15 +213,17 @@ class OmnibarLayoutViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        tabRepository.flowTabs.onEach { tabs ->
-            _viewState.update { state ->
-                state.copy(
-                    shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
-                    tabCount = tabs.size,
-                    hasUnreadTabs = tabs.any { !it.viewed },
-                )
-            }
-        }.launchIn(viewModelScope)
+        combine(_viewState, tabRepository.flowTabs) { viewState, tabs ->
+            viewState to tabs
+        }.onEach { (_, tabs) ->
+             _viewState.update { viewState ->
+                 viewState.copy(
+                     shouldUpdateTabsCount = tabs.size != viewState.tabCount && tabs.isNotEmpty(),
+                     tabCount = tabs.size,
+                     hasUnreadTabs = tabs.any { !it.viewed },
+                 )
+             }
+         }.launchIn(viewModelScope)
     }
 
     fun onOmnibarFocusChanged(
