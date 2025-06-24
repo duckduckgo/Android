@@ -879,4 +879,14 @@
     <string name="scamBlockerTitle">Bedrägeriblockerare</string>
     <string name="scamBlockerDescription">Varna på webbplatser som har flaggats för bedrägerier, nätfiske och skadlig programvara.</string>
     <string name="threatProtectionLearnMoreTitle">Läs mer</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prova vår widget för startsidan!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lägg till vår sök-widget på din startsida för snabb och enkel åtkomst.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lägg till widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Inte nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Sök DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget på startsidan</string>
 </resources>
