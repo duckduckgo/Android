@@ -634,8 +634,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
         if (omnibarAnimationManager.isFeatureEnabled() &&
             previousTransitionState != null &&
-            newTransitionState != previousTransitionState &&
-            !viewState.isLoading
+            newTransitionState != previousTransitionState
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
