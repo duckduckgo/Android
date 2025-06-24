@@ -31,6 +31,7 @@ class ProductionTabSwitcherButton @JvmOverloads constructor(
 
     override var count = 0
         set(value) {
+            if (field == value) return
             field = value
             val text = if (count < 100) "$count" else "~"
             binding.tabCount.text = text

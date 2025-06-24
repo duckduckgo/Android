@@ -557,10 +557,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderTabIcon(viewState: ViewState) {
-        if (viewState.shouldUpdateTabsCount) {
-            tabsMenu.count = viewState.tabCount
-            tabsMenu.hasUnread = viewState.hasUnreadTabs
-        }
+        tabsMenu.count = viewState.tabCount
+        tabsMenu.hasUnread = viewState.hasUnreadTabs
     }
 
     private fun renderLeadingIconState(viewState: ViewState) {
