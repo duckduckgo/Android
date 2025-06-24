@@ -301,7 +301,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         private const val DEFAULT_ANIMATION_DURATION = 300L
         private const val FADE_DURATION = 150L
         private const val MAX_LINES = 8
-        private const val SEARCH_MIN_LINES = 1
-        private const val DUCK_CHAT_MIN_LINES = 3
+        private const val SEARCH_MIN_LINES = 2
+        private const val DUCK_CHAT_MIN_LINES = 2
     }
 }
