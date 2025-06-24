@@ -40,6 +40,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
@@ -97,15 +98,11 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
 
-        if (omnibarPosition == OmnibarPosition.TOP) {
-            omnibarCard.elevation = 1f.toDp(context)
-        } else {
+        if (omnibarPosition == OmnibarPosition.BOTTOM) {
             // When omnibar is at the bottom, we're adding an additional space at the top
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
             )
-
-            omnibarCard.elevation = 0.5f.toDp(context)
         }
     }
 

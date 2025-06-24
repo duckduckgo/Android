@@ -59,7 +59,7 @@
                     android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
                     android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
                     android:transitionName="omnibar_transition"
-                    app:cardElevation="1dp"
+                    app:cardElevation="2dp"
                     app:strokeColor="?daxColorAccentBlue"
                     app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
 
