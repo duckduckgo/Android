@@ -118,8 +118,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     override fun render(viewState: ViewState) {
         super.render(viewState)
 
-        renderShadows(viewState.showShadows)
-
         if (viewState.hasFocus || isFindInPageVisible) {
             animateOmnibarFocusedState(focused = true)
         } else {
@@ -207,14 +205,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             viewModel.onBackButtonPressed()
             singleOmnibarItemPressedListener?.onBackButtonPressed()
         }
-    }
-
-    private fun renderShadows(showShadows: Boolean) {
-        // outlineProvider = if (showShadows) {
-        //     ViewOutlineProvider.BACKGROUND
-        // } else {
-        //     null
-        // }
     }
 
     companion object {
