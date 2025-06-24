@@ -73,8 +73,12 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -90,31 +94,24 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
-    private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
     private val duckAiVisibilityRepository: DuckAiVisibilityRepository,
-    private val browserFeatures: AndroidBrowserConfigFeature,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
-    private val _viewState = MutableStateFlow(
-        ViewState(
-            showChatMenu = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser(),
-        ),
-    )
+    private val _viewState = MutableStateFlow(ViewState())
+    val viewState = _viewState.asStateFlow()
 
-    // We need to do this since the max overloads for combine is 5
-    private val visualDesignExperimentFlags =
-        combine(
-            visualDesignExperimentDataStore.isExperimentEnabled,
-            visualDesignExperimentDataStore.isDuckAIPoCEnabled,
-        ) { isExperimentEnabled, isDuckAIPoCEnabled ->
-            isExperimentEnabled to isDuckAIPoCEnabled
-        }
+    private val visualDesignExperimentFlags = combine(
+        visualDesignExperimentDataStore.isExperimentEnabled,
+        visualDesignExperimentDataStore.isDuckAIPoCEnabled,
+    ) { isExperimentEnabled, isDuckAIPoCEnabled ->
+        isExperimentEnabled to isDuckAIPoCEnabled
+    }.distinctUntilChanged()
 
     private val showDuckAiButton = combine(
         _viewState,
@@ -126,32 +123,13 @@ class OmnibarLayoutViewModel @Inject constructor(
                 false
             }
 
-            showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank()) -> {
+            showInAllStates -> {
                 true
             }
 
-            else -> showInAllStates
+            else -> showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank())
         }
-    }
-
-    val viewState = combine(
-        _viewState,
-        tabRepository.flowTabs,
-        defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentFlags,
-        showDuckAiButton
-    ) { state, tabs, highlightOverflowMenu, visualDesignExperimentFlags, showDuckAiButton ->
-        val (isVisualDesignExperimentEnabled, isDuckAIPoCEnabled) = visualDesignExperimentFlags
-        state.copy(
-            shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
-            tabCount = tabs.size,
-            hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
-            showBrowserMenuHighlight = highlightOverflowMenu,
-            isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
-            showChatMenu = showDuckAiButton,
-            showClickCatcher = isDuckAIPoCEnabled,
-        )
-    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+    }.distinctUntilChanged()
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -213,6 +191,37 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
+
+        showDuckAiButton.onEach { showDuckAiButton ->
+            _viewState.update {
+                it.copy(showChatMenu = showDuckAiButton)
+            }
+        }.launchIn(viewModelScope)
+
+        defaultBrowserPromptsExperiment.highlightPopupMenu.onEach { highlightOverflowMenu ->
+            _viewState.update {
+                it.copy(showBrowserMenuHighlight = highlightOverflowMenu)
+            }
+        }.launchIn(viewModelScope)
+
+        visualDesignExperimentFlags.onEach { (isVisualDesignExperimentEnabled, isDuckAIPoCEnabled) ->
+            _viewState.update {
+                it.copy(
+                    isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
+                    showClickCatcher = isDuckAIPoCEnabled,
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        tabRepository.flowTabs.onEach { tabs ->
+            _viewState.update { state ->
+                state.copy(
+                    shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
+                    tabCount = tabs.size,
+                    hasUnreadTabs = tabs.any { !it.viewed },
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onOmnibarFocusChanged(

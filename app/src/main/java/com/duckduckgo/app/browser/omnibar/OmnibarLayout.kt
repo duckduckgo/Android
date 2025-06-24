@@ -494,6 +494,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     open fun render(viewState: ViewState) {
+        logcat { "lp_test: render" }
         when (viewState.viewMode) {
             is CustomTab -> {
                 renderCustomTabMode(viewState, viewState.viewMode)
