@@ -40,7 +40,8 @@ class RealRuntimeConfigurationWriterTest {
                 "password": false,
                 "username": false
               },
-              "email": true
+              "email": true,
+              "credentialsImport": true
             }
         """,
         )
@@ -48,6 +49,7 @@ class RealRuntimeConfigurationWriterTest {
         val actualInputTypes = testee.generateResponseGetAvailableInputTypes(
             credentialsAvailable = AvailableInputTypeCredentials(username = false, password = false),
             emailAvailable = true,
+            credentialsImport = true,
         )
 
         assertAvailableInputTypesJsonCorrect(expectedAvailableInputTypes, actualInputTypes)

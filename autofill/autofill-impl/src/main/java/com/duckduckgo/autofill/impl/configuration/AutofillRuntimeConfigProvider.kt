@@ -21,6 +21,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -49,6 +50,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val siteSpecificFixesStore: AutofillSiteSpecificFixesStore,
+    private val inBrowserPromo: InBrowserImportPromo,
 ) : AutofillRuntimeConfigProvider {
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
@@ -90,8 +92,9 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     private suspend fun generateAvailableInputTypes(url: String?): String {
         val credentialsAvailable = determineIfCredentialsAvailable(url)
         val emailAvailable = determineIfEmailAvailable()
+        val canPromoImport = inBrowserPromo.canShowPromo()
 
-        val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable).also {
+        val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(credentialsAvailable, emailAvailable, canPromoImport).also {
             logcat(VERBOSE) { "autofill-config: availableInputTypes for $url: \n$it" }
         }
         return "availableInputTypes = $json"

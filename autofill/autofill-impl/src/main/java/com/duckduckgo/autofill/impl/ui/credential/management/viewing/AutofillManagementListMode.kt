@@ -29,6 +29,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
@@ -37,8 +39,6 @@ import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListMo
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.AutofillToggleState
