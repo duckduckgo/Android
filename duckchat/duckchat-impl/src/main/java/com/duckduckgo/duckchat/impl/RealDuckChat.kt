@@ -111,6 +111,8 @@ interface DuckChatInternal : DuckChat {
      */
     fun closeDuckChat()
 
+    fun openNewDuckChatSession()
+
     /**
      * Calls onClose when a close event is emitted.
      */
@@ -405,6 +407,10 @@ class RealDuckChat @Inject constructor(
             PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
         )
         openDuckChat(parameters, autoPrompt = true)
+    }
+
+    override fun openNewDuckChatSession() {
+        openDuckChat(emptyMap(), autoPrompt = true)
     }
 
     private fun openDuckChat(

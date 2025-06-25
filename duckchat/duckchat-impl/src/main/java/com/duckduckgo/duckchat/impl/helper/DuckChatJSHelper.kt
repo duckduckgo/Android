@@ -63,7 +63,7 @@ class RealDuckChatJSHelper @Inject constructor(
         METHOD_OPEN_AI_CHAT -> {
             val payload = extractPayload(data)
             dataStore.updateUserPreferences(payload)
-            duckChat.openDuckChat()
+            duckChat.openNewDuckChatSession()
             null
         }
 
