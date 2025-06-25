@@ -92,6 +92,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -339,7 +340,7 @@ class SettingsViewModel @Inject constructor(
     fun refreshWidgetsInstalledState() {
         viewModelScope.launch(dispatcherProvider.io()) {
             val widgetsInstalled = widgetCapabilities.hasInstalledWidgets
-            viewState.emit(currentViewState().copy(widgetsInstalled = widgetsInstalled))
+            viewState.update { it.copy(widgetsInstalled = widgetsInstalled) }
             if (widgetPromptShown) {
                 widgetPromptShown = false
                 if (!widgetsInstalled) {
