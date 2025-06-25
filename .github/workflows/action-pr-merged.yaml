@@ -8,7 +8,7 @@ jobs:
   add-pr-merged-comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: duckduckgo/native-github-asana-sync@${{ vars.GHA_ASANA_SYNC_VERSION }}
+      - uses: duckduckgo/native-github-asana-sync@v2.0
         if: github.event.pull_request.merged
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
