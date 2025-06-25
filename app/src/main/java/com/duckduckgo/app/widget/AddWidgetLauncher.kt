@@ -73,19 +73,29 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
         simpleWidgetPrompt: Boolean,
     ) {
         activity?.let {
+            val widgetLabel: String
             val provider = when {
-                simpleWidgetPrompt && appTheme.isLightModeEnabled() -> ComponentName(it, SearchWidgetLight::class.java)
-                simpleWidgetPrompt -> ComponentName(it, SearchWidget::class.java)
-                else -> ComponentName(it, SearchAndFavoritesWidget::class.java)
+                simpleWidgetPrompt && appTheme.isLightModeEnabled() -> {
+                    widgetLabel = it.getString(R.string.searchWidgetLabel)
+                    ComponentName(it, SearchWidgetLight::class.java)
+                }
+                simpleWidgetPrompt -> {
+                    widgetLabel = it.getString(R.string.searchWidgetLabel)
+                    ComponentName(it, SearchWidget::class.java)
+                }
+                else -> {
+                    widgetLabel = it.getString(R.string.favoritesWidgetLabel)
+                    ComponentName(it, SearchAndFavoritesWidget::class.java)
+                }
             }
-            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it))
+            AppWidgetManager.getInstance(it).requestPinAppWidget(provider, null, buildPendingIntent(it, widgetLabel))
         }
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
-    private fun buildPendingIntent(context: Context): PendingIntent? {
+    private fun buildPendingIntent(context: Context, widgetLabel: String): PendingIntent? {
         val intent = Intent(ACTION_ADD_WIDGET).run {
-            putExtra(EXTRA_WIDGET_ADDED_LABEL, context.getString(R.string.favoritesWidgetLabel))
+            putExtra(EXTRA_WIDGET_ADDED_LABEL, widgetLabel)
         }
         return PendingIntent.getBroadcast(
             context,
