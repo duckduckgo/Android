@@ -194,6 +194,7 @@ sealed class OnboardingDaxDialogCta(
         val binding = binding.includeOnboardingInContextBuckDialog
 
         with(binding) {
+            wingAnimation.gone()
             root.show()
             primaryCta.setOnClickListener(null)
 
@@ -632,13 +633,23 @@ sealed class OnboardingDaxDialogCta(
                 ) {
                     onboardingDialogContent.gone()
                     onboardingDialogSuggestionsContent.gone()
-                    TransitionManager.beginDelayedTransition(buckDialogBinding.buckOnboardingDialogView, AutoTransition())
+                    TransitionManager.beginDelayedTransition(buckOnboardingDialogView, AutoTransition())
                     onboardingDialogSuggestionsContent.show()
+                    showAndPlayWingAnimation()
                 } else {
                     onboardingDaxDialogContainer.show()
                     onboardingDialogSuggestionsContent.show()
                     animateBuckOnboardingDialogEntrance()
+                    showAndPlayWingAnimation()
                 }
+            }
+        }
+
+        private fun IncludeOnboardingInContextBuckDialogBinding.showAndPlayWingAnimation() {
+            with(wingAnimation) {
+                setMaxProgress(0.8f)
+                show()
+                playAnimation()
             }
         }
     }
