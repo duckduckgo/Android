@@ -380,7 +380,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -2462,11 +2461,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onBrokenSiteSelected() {
-        logcat("Cris") {
-            runBlocking {
-                "Report broken site: ${site?.activeContentScopeExperiments?.map { "${it.featureName().name}, ${it.getCohort()}" }}"
-            }
-        }
         command.value = BrokenSiteFeedback(BrokenSiteData.fromSite(site, reportFlow = MENU))
     }
 
@@ -3637,7 +3631,6 @@ class BrowserTabViewModel @Inject constructor(
         isActiveCustomTab: Boolean = false,
         getWebViewUrl: () -> String?,
     ) {
-        logcat("Cris") { "received CSS callback: $method" }
         when (method) {
             "webShare" -> if (id != null && data != null) {
                 webShare(featureName, method, id, data)
