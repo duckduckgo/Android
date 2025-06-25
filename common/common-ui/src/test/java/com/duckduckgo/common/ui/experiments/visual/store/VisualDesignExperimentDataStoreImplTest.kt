@@ -18,8 +18,11 @@ package com.duckduckgo.common.ui.experiments.visual.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -28,23 +31,17 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import kotlin.jvm.java
 
 class VisualDesignExperimentDataStoreImplTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
-
-    @Mock
-    private lateinit var experimentalUIThemingFeatureToggle: Toggle
-
-    @Mock
-    private lateinit var visualDesignFeatureToggle: Toggle
-
-    @Mock
-    private lateinit var duckChatPoCToggle: Toggle
+    private val experimentalUIThemingFeature = FakeFeatureToggleFactory.create(
+        toggles = ExperimentalUIThemingFeature::class.java,
+        store = FakeToggleStore()
+    )
 
     @Mock
     private lateinit var togglesInventory: FeatureTogglesInventory
@@ -53,24 +50,15 @@ class VisualDesignExperimentDataStoreImplTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(experimentalUIThemingFeature.self()).thenReturn(experimentalUIThemingFeatureToggle)
-        whenever(experimentalUIThemingFeature.visualUpdatesFeature()).thenReturn(visualDesignFeatureToggle)
-        whenever(experimentalUIThemingFeature.duckAIPoCFeature()).thenReturn(duckChatPoCToggle)
-    }
-
-    private fun whenVisualExperimentEnabled(enabled: Boolean) {
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(enabled)
-        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(enabled)
-        whenever(duckChatPoCToggle.isEnabled()).thenReturn(enabled)
+        experimentalUIThemingFeature.self().setRawStoredState(State(enable = true))
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = true))
+        experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().setRawStoredState(State(enable = true))
+        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = true))
     }
 
     @Test
     fun `when Duck AI PoC FF enabled and experiment enabled, Duck AI PoC enabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(duckChatPoCToggle.isEnabled()).thenReturn(true)
-
         val testee = createTestee()
 
         Assert.assertTrue(testee.isDuckAIPoCEnabled.value)
@@ -79,9 +67,8 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF enabled and experiment disabled, Duck AI PoC disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(false)
-        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(false)
-        whenever(duckChatPoCToggle.isEnabled()).thenReturn(true)
+        experimentalUIThemingFeature.self().setRawStoredState(State(enable = false))
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
@@ -91,9 +78,7 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF disabled but experiment enabled, Duck AI PoC disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(duckChatPoCToggle.isEnabled()).thenReturn(false)
+        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
