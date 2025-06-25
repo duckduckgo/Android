@@ -879,4 +879,14 @@
     <string name="scamBlockerTitle">Πρόγραμμα αποκλεισμού απάτης</string>
     <string name="scamBlockerDescription">Προειδοποίηση για ιστότοπους που έχουν επισημανθεί για απάτες, ηλεκτρονικό ψάρεμα και κακόβουλο λογισμικό.</string>
     <string name="threatProtectionLearnMoreTitle">Μάθετε περισσότερα</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Δοκιμάστε τη μικροεφαρμογή μας για την Αρχική οθόνη!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Προσθέστε το γραφικό στοιχείο μας αναζήτησης στην αρχική οθόνη σας για γρήγορη και εύκολη πρόσβαση.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Προσθήκη γραφικού στοιχείου</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Όχι τώρα</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Αναζήτηση DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Μικροεφαρμογή αρχικής οθόνης</string>
 </resources>
