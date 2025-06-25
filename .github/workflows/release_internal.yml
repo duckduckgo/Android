@@ -1,4 +1,4 @@
-name: Release - Nightly Release to Internal and Firebase
+name: Release - Release to Internal and Firebase
 
 on:
   schedule:
@@ -12,7 +12,7 @@ env:
 
 jobs:
   create-tag:
-    name: Generate and upload nightly bundle to Play Store Internal track
+    name: Generate and upload bundle to Play Store Internal track
     runs-on: ubuntu-latest
 
     steps:
@@ -58,8 +58,8 @@ jobs:
       - name: Notify if no changes
         if: steps.check_for_changes.outputs.has_changes == 'false'
         run: |
-          echo "No new commits since the last tag. Skipping nightly release."
-          echo "No new commits since the last tag. Skipping nightly release." >> $GITHUB_STEP_SUMMARY
+          echo "No new commits since the last tag. Skipping internal release."
+          echo "No new commits since the last tag. Skipping internal release." >> $GITHUB_STEP_SUMMARY
           exit 0   
 
       - name: Decode upload keys
@@ -104,13 +104,13 @@ jobs:
           NETP_DEBUG_SERVER_TOKEN: ${{ secrets.NETP_DEBUG_SERVER_TOKEN }}
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
         if: steps.check_for_changes.outputs.has_changes == 'true'
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
 
       - name: Generate nightly version name
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: generate_version_name
         run: |
-          output=$(./gradlew --no-configuration-cache getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
+          output=$(./gradlew --no-configuration-cache getBuildVersionName -PversionNameSuffix=-internal -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Capture App Bundle Path
@@ -126,12 +126,12 @@ jobs:
         run: |
           bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
 
-      - name: Tag Nightly release
+      - name: Tag Internal Release
         if: steps.check_for_changes.outputs.has_changes == 'true'
-        id: tag_nightly_release
+        id: tag_internal_release
         run: |
           git checkout develop
-          git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for nightly release."
+          git tag -a ${{ steps.generate_version_name.outputs.version }} -m "Create tag ${{ steps.generate_version_name.outputs.version }} for internal release."
           git push origin ${{ steps.generate_version_name.outputs.version }}
 
       - name: Upload APK as artifact
@@ -144,14 +144,14 @@ jobs:
       - name: Set successful summary
         if: steps.check_for_changes.outputs.has_changes == 'true'
         run: |
-          echo "### Nightly release completed! :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "### Internal release completed! :rocket:" >> $GITHUB_STEP_SUMMARY
 
       - name: Install dependencies for create-asana-release task
         run: |
           python -m pip install --upgrade pip
           pip install -r scripts/release/requirements.txt
 
-      - name: Create Asana nightly release task
+      - name: Create Asana internal release task
         if: steps.check_for_changes.outputs.has_changes == 'true'
         env:
           ASANA_ACCESS_TOKEN: ${{ secrets.ASANA_ACCESS_TOKEN }}
@@ -175,5 +175,5 @@ jobs:
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Nightly Release
-          asana-task-description: The Nightly Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: The Internal Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
