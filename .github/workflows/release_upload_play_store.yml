@@ -1,4 +1,4 @@
-name: Release - Production Release to Play Store and Github
+name: Production Release to Play Store and Github
 
 on:
   workflow_call:
