@@ -875,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Ďakujeme! Vaše hlásenie pomáha zlepšovať DuckDuckGo pre všetkých!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nový AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Nechaj DuckDuckGo chrániť viac toho, čo robíš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás ako svoj predvolený prehliadač, aby sa všetky odkazy na stránky otvárali v DuckDuckGo.</string>

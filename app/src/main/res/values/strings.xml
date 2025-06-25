@@ -842,10 +842,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">New AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>

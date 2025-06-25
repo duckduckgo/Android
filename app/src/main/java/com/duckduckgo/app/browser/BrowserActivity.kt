@@ -556,16 +556,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(CLOSE_DUCK_CHAT, false)) {
-            val fragment = duckAiFragment
-            if (fragment?.isVisible == true) {
-                val transaction = supportFragmentManager.beginTransaction()
-                transaction.setCustomAnimations(
-                    com.duckduckgo.mobile.android.R.anim.slide_from_right,
-                    com.duckduckgo.mobile.android.R.anim.slide_to_right,
-                )
-                transaction.hide(fragment)
-                transaction.commit()
-            }
+            closeDuckChat()
             return
         }
 
@@ -577,6 +568,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val sharedText = intent.intentText
         if (sharedText != null) {
+            closeDuckChat()
             if (intent.getBooleanExtra(ShortcutBuilder.SHORTCUT_EXTRA_ARG, false)) {
                 logcat { "Shortcut opened with url $sharedText" }
                 lifecycleScope.launch { viewModel.onOpenShortcut(sharedText) }
@@ -773,6 +765,19 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     fun launchDownloads() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
+    }
+
+    private fun closeDuckChat() {
+        val fragment = duckAiFragment
+        if (fragment?.isVisible == true) {
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.setCustomAnimations(
+                com.duckduckgo.mobile.android.R.anim.slide_from_right,
+                com.duckduckgo.mobile.android.R.anim.slide_to_right,
+            )
+            transaction.hide(fragment)
+            transaction.commit()
+        }
     }
 
     private fun openDuckChat(

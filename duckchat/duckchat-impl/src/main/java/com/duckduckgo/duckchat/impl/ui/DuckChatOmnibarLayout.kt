@@ -220,13 +220,13 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun submitMessage() {
-        val message = duckChatInput.text.toString().trim()
-        if (message.isNotEmpty()) {
+    fun submitMessage(message: String? = null) {
+        val text = message?.also(duckChatInput::setText) ?: duckChatInput.text.toString().trim()
+        if (text.isNotBlank()) {
             if (duckChatTabLayout.selectedTabPosition == 0) {
-                onSearchSent?.invoke(message)
+                onSearchSent?.invoke(text)
             } else {
-                onDuckChatSent?.invoke(message)
+                onDuckChatSent?.invoke(text)
             }
             duckChatInput.clearFocus()
         }

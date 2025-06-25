@@ -859,10 +859,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Mulțumim! Sesizarea ta ajută la îmbunătățirea DuckDuckGo pentru toată lumea!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Chat AI nou</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lasă DuckDuckGo să protejeze mai mult din ceea ce faci online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Transformă-ne în browserul tău implicit, astfel încât toate linkurile de pe site să se deschidă în DuckDuckGo.</string>

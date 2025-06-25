@@ -523,8 +523,8 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     override fun onResume() {
         simpleWebview.onResume()
-        launchDownloadMessagesJob()
         super.onResume()
+        launchDownloadMessagesJob()
     }
 
     override fun onPause() {

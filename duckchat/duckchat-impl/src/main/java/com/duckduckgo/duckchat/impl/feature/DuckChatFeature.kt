@@ -50,5 +50,5 @@ interface DuckChatFeature {
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun keepSessionAlive(): Toggle
+    fun keepSession(): Toggle
 }
