@@ -1270,7 +1270,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed with experiment enabled and was used before then correct pixel sent`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onViewModeChanged(ViewMode.NewTab)
         testee.onOmnibarFocusChanged(false, "")
