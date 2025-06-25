@@ -505,7 +505,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (viewState.leadingIconState == PRIVACY_SHIELD) {
-            renderPrivacyShield(viewState.privacyShield, viewState.viewMode, viewState.isVisualDesignExperimentEnabled)
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode, viewState.isExperimentalThemingEnabled)
         } else {
             lastSeenPrivacyShield = null
         }
@@ -574,7 +574,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                if (shouldShowUpdatedPrivacyShield(viewState.isVisualDesignExperimentEnabled)) {
+                if (shouldShowUpdatedPrivacyShield(viewState.isExperimentalThemingEnabled)) {
                     shieldIcon.gone()
                     shieldIconExperiment.show()
                 } else {
@@ -696,7 +696,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderHint(viewState: ViewState) {
-        if (!viewState.isVisualDesignExperimentEnabled && viewState.viewMode is NewTab && duckChat.showInAddressBar.value) {
+        if (!viewState.isExperimentalThemingEnabled && viewState.viewMode is NewTab && duckChat.showInAddressBar.value) {
             omnibarTextInput.hint = context.getString(R.string.search)
         } else {
             omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
