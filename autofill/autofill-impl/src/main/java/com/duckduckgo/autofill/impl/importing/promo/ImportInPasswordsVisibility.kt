@@ -28,6 +28,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -48,9 +49,10 @@ class RealImportInPasswordsVisibility @Inject constructor(
 ) : ImportInPasswordsVisibility {
 
     private var canShowImportPasswords = false
+    private var importedPasswordsCollector: Job? = null
 
     init {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        importedPasswordsCollector = appCoroutineScope.launch(dispatcherProvider.io()) {
             logcat { "Autofill: Evaluating if user can show import promo" }
             canShowImportPasswords = evaluateIfUserCanShowImportPromo()
             logcat { "Autofill: Evaluation result, can show import promo? $canShowImportPasswords" }
@@ -63,6 +65,7 @@ class RealImportInPasswordsVisibility @Inject constructor(
                 if (hasImported) {
                     canShowImportPasswords = false
                     logcat { "Autofill: User has imported passwords, hiding promo" }
+                    importedPasswordsCollector?.cancel()
                 }
             }
         }
