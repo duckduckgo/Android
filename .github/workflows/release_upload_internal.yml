@@ -1,4 +1,4 @@
-name: Release - Release to Internal and Firebase
+name: Release to Internal and Firebase
 
 on:
   schedule:
