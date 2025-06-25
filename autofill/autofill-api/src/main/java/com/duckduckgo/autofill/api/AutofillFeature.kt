@@ -153,5 +153,5 @@ interface AutofillFeature {
     fun createAsyncPreferences(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
-    fun canPromoteImportPasswords(): Toggle
+    fun canPromoteImportPasswordsInPasswordManagement(): Toggle
 }
