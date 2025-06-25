@@ -3,6 +3,7 @@ name: Release - Release to Internal and Firebase
 on:
   schedule:
     - cron: '0 2 * * *' # run at 3 AM UTC
+  workflow_call:
   workflow_dispatch:
 
 env:
