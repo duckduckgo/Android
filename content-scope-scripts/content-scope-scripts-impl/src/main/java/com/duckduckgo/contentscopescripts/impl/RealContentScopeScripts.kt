@@ -34,7 +34,6 @@ import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
-import logcat.logcat
 
 interface CoreContentScopeScripts {
     fun getScript(site: Site?): String
@@ -208,7 +207,6 @@ class RealContentScopeScripts @Inject constructor(
                         subfeature = it.featureName().name,
                     )
                 }.let {
-                    logcat("Cris") { "Injecting cohorts: $it" }
                     return@runBlocking "\"currentCohorts\":${jsonAdapter.toJson(it)}"
                 }
         }
