@@ -875,4 +875,14 @@
     <string name="scamBlockerTitle">Pettuste blokeerija</string>
     <string name="scamBlockerDescription">Hoiata mind pettuste, andmepüügi ja pahavara tõttu märgistatud saitidel.</string>
     <string name="threatProtectionLearnMoreTitle">Loe edasi</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Proovige meie avakuva vidinat!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisage vidin</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo otsing</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>
 </resources>
