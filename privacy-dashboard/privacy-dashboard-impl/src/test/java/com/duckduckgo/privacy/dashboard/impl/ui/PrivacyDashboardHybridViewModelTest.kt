@@ -272,6 +272,7 @@ class PrivacyDashboardHybridViewModelTest {
             openerContext = null,
             jsPerformance = jsPerformance.toList(),
             contentScopeExperiments = null,
+            debugFlags = null,
         )
 
         val isToggleReport = false
@@ -334,6 +335,7 @@ class PrivacyDashboardHybridViewModelTest {
             openerContext = null,
             jsPerformance = jsPerformance.toList(),
             contentScopeExperiments = listOf(mockToggle),
+            debugFlags = null,
         )
 
         val isToggleReport = false
