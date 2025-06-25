@@ -45,6 +45,9 @@ class LottiePrivacyShieldAnimationHelperTest {
         whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             disabledVisualExperimentStateFlow,
         )
+        whenever(visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled).thenReturn(
+            disabledVisualExperimentStateFlow,
+        )
     }
 
     @Test
