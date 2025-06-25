@@ -647,10 +647,10 @@ class BrokenSiteSubmitterTest {
     }
 
     @Test
-    fun whenSubmitReportAndADebugFlagsThenIncludeParam() = runTest {
+    fun whenSubmitReportAndADebugFlagsThenIncludeParamSortedRemovingDuplicates() = runTest {
         val brokenSite = getBrokenSite()
 
-        testee.submitBrokenSiteFeedback(brokenSite.copy(debugFlags = listOf("flag1,flag2")), toggle = false)
+        testee.submitBrokenSiteFeedback(brokenSite.copy(debugFlags = listOf("flag2", "flag1", "flag2")), toggle = false)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixel).fire(eq(BROKEN_SITE_REPORT.pixelName), parameters = paramsCaptor.capture(), any(), eq(Count))

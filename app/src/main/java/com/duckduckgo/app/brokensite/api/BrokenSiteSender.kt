@@ -161,7 +161,7 @@ class BrokenSiteSubmitter @Inject constructor(
                     }
                 }
 
-            brokenSite.debugFlags?.takeIf { it.isNotEmpty() }?.sorted()?.let { debugFlags ->
+            brokenSite.debugFlags?.takeIf { it.isNotEmpty() }?.toSortedSet()?.let { debugFlags ->
                 params[DEBUG_FLAGS] = debugFlags.joinToString(",")
             }
 
