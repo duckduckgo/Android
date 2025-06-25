@@ -1,0 +1,28 @@
+name: Release - Production Release to Play Store and Github
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Ref to build APK from (branch, tag, commit)'
+        required: true
+
+env:
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
+  GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
+  GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
+  emoji_info: ":information_source:" # ℹ️
+  emoji_end: ":flight_arrival:" # 🛫
+
+jobs:
+  release-play-store:
+    name: Publish Release to Play Store
+    uses: ./.github/workflows/release_upload_play_store.yml
+    with:
+      ref: ${{ github.event.inputs.ref }}
+
+  release-internal:
+    name: Publish Internal Release to Play Store and Firebase
+    needs: release-play-store
+    if: needs.release-play-store.result == 'success'
+    uses: ./.github/workflows/release_upload_internal.yml

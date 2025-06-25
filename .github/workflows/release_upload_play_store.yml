@@ -1,6 +1,13 @@
 name: Release - Production Release to Play Store and Github
 
 on:
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Ref to build APK from (branch, tag, commit)'
+        type: string
+        required: true
+
   workflow_dispatch:
     inputs:
       ref:
