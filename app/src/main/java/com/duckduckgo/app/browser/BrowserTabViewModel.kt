@@ -4207,13 +4207,16 @@ class BrowserTabViewModel @Inject constructor(
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
     }
 
-    fun openDuckChat(query: String?) = when {
-        query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-        lastSubmittedChatUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
-        lastSubmittedChatUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
-        query == lastSubmittedChatUserQuery -> duckChat.openDuckChat(query)
+    fun openDuckChat(query: String?) {
+        logcat { "Duck.ai: query $query lastSubmittedChatUserQuery $lastSubmittedChatUserQuery omnibar ${omnibarViewState.value?.queryOrFullUrl}" }
+        when {
+            query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
+            lastSubmittedChatUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
+            lastSubmittedChatUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChat(query)
+            query == lastSubmittedChatUserQuery -> duckChat.openDuckChat(query)
 
-        else -> duckChat.openDuckChatWithAutoPrompt(query)
+            else -> duckChat.openDuckChatWithAutoPrompt(query)
+        }
     }
 
     fun setLastSubmittedChatUserQuery(query: String) {

@@ -2902,7 +2902,6 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedChatUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
