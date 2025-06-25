@@ -21,7 +21,7 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutSte
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -61,7 +61,7 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
             nextState = state.copy(
                 brokerStepsToExecute = updatedBrokerSteps,
             ),
-            nextEvent = ExecuteNextBrokerStepAction(
+            nextEvent = ExecuteBrokerStepAction(
                 actionRequestData = UserProfile(
                     userProfile = state.profileQuery,
                     extractedProfile = updatedProfileWithEmail.run {

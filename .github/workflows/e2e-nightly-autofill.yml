@@ -70,7 +70,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

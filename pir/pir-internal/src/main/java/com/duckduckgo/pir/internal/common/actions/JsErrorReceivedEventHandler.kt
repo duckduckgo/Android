@@ -41,7 +41,7 @@ class JsErrorReceivedEventHandler @Inject constructor() : EventHandler {
     ): Next {
         /**
          * This means that we have encountered an error in the js layer while attempting to evaluate a broker action.
-         * We fail the current js action if that was the case.
+         * We fail the current js action if that was the case. We donn't retry the action as this is an unrecoverable error.
          */
         val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val currentAction = currentBroker.actions[state.currentActionIndex]
@@ -53,6 +53,7 @@ class JsErrorReceivedEventHandler @Inject constructor() : EventHandler {
                     actionID = currentAction.id,
                     message = (event as JsErrorReceived).error.asErrorString(),
                 ),
+                allowRetry = false,
             ),
         )
     }

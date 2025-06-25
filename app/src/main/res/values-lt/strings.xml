@@ -875,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>

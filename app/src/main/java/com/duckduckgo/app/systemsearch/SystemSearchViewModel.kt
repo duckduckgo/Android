@@ -31,6 +31,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -87,6 +88,7 @@ class SystemSearchViewModel @Inject constructor(
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
@@ -302,6 +304,8 @@ class SystemSearchViewModel @Inject constructor(
             userStageStore.stageCompleted(AppStage.NEW)
             command.value = Command.LaunchBrowser(query.trim())
             pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+            postCtaExperienceExperiment.fireWidgetSearch()
+            postCtaExperienceExperiment.fireWidgetSearchXCount()
         }
     }
 
@@ -315,6 +319,10 @@ class SystemSearchViewModel @Inject constructor(
             }
         }
         pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        viewModelScope.launch {
+            postCtaExperienceExperiment.fireWidgetSearch()
+            postCtaExperienceExperiment.fireWidgetSearchXCount()
+        }
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {

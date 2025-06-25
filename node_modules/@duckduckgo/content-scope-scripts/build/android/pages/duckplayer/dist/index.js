@@ -996,7 +996,7 @@
      * @param {ImportMeta['injectName']} [params.injectName] - application platform
      * @param {boolean} [params.willThrow] - whether the application will simulate an error
      * @param {boolean} [params.debugState] - whether to show debugging UI
-     * @param {string} [params.locale] - for applications strings
+     * @param {keyof typeof import('./utils').translationsLocales} [params.locale] - for applications strings and numbers formatting
      * @param {number} [params.textLength] - what ratio of text should be used. Set a number higher than 1 to have longer strings for testing
      */
     constructor({
@@ -1632,12 +1632,21 @@
       "windows"
     ),
     willThrow: false,
+    /** @type {keyof typeof import('../utils').translationsLocales} */
+    locale: "en",
     /** @type {import('../environment').Environment['env']} */
     env: "production"
   });
   var THEME_QUERY = "(prefers-color-scheme: dark)";
   var REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
-  function EnvironmentProvider({ children, debugState, env = "production", willThrow = false, injectName = "windows" }) {
+  function EnvironmentProvider({
+    children,
+    debugState,
+    env = "production",
+    willThrow = false,
+    injectName = "windows",
+    locale = "en"
+  }) {
     const [theme, setTheme] = d2(window.matchMedia(THEME_QUERY).matches ? "dark" : "light");
     const [isReducedMotion, setReducedMotion] = d2(window.matchMedia(REDUCED_MOTION_QUERY).matches);
     y2(() => {
@@ -1669,7 +1678,8 @@
           isDarkMode: theme === "dark",
           injectName,
           willThrow,
-          env
+          env,
+          locale
         }
       },
       children

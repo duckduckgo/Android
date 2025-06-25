@@ -13,9 +13,9 @@
     "rollup-plugin-terser": "^7.0.2"
   },
   "dependencies": {
-    "@duckduckgo/autoconsent": "^14.2.0",
+    "@duckduckgo/autoconsent": "^14.3.0",
     "@duckduckgo/autofill": "github:duckduckgo/duckduckgo-autofill#18.0.0",
-    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#9.11.0",
+    "@duckduckgo/content-scope-scripts": "github:duckduckgo/content-scope-scripts#10.1.0",
     "@duckduckgo/privacy-dashboard": "github:duckduckgo/privacy-dashboard#9.0.0",
     "@duckduckgo/privacy-reference-tests": "github:duckduckgo/privacy-reference-tests#1747996876"
   }
