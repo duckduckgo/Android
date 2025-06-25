@@ -54,7 +54,9 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/keyline_4"
             android:layout_marginTop="@dimen/keyline_4"
-            android:layout_marginBottom="54dp"
+            android:layout_marginBottom="0dp"
+            app:layout_goneMarginBottom="36dp"
+            app:layout_constraintBottom_toTopOf="@id/wingAnimation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -189,5 +191,20 @@
 
             </LinearLayout>
         </com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView>
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/wingAnimation"
+            android:layout_width="wrap_content"
+            android:layout_height="112dp"
+            android:layout_marginTop="8dp"
+            android:adjustViewBounds="true"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/buckOnboardingDialogView"
+            app:lottie_rawRes="@raw/ob_3_wing" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>
