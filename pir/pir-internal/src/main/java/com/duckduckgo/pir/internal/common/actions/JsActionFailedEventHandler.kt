@@ -19,15 +19,18 @@ package com.duckduckgo.pir.internal.common.actions
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction
+import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.GetCaptchaInfo
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -81,12 +84,25 @@ class JsActionFailedEventHandler @Inject constructor(
         }
 
         // If failure is on Any captcha action, we proceed to next action
-        return if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
+        return if (shouldRetryFailedAction(state, event, currentAction)) {
+            Next(
+                nextState = state.copy(
+                    currentActionIndex = state.currentActionIndex,
+                    actionRetryCount = state.actionRetryCount + 1,
+                ),
+                nextEvent = ExecuteBrokerStepAction(
+                    UserProfile(
+                        userProfile = state.profileQuery,
+                    ),
+                ),
+            )
+        } else if (currentAction is GetCaptchaInfo || currentAction is SolveCaptcha) {
             Next(
                 nextState = state.copy(
                     currentActionIndex = state.currentActionIndex + 1,
+                    actionRetryCount = 0,
                 ),
-                nextEvent = ExecuteNextBrokerStepAction(
+                nextEvent = ExecuteBrokerStepAction(
                     UserProfile(
                         userProfile = state.profileQuery,
                     ),
@@ -99,5 +115,28 @@ class JsActionFailedEventHandler @Inject constructor(
                 nextEvent = BrokerStepCompleted(isSuccess = false),
             )
         }
+    }
+
+    private fun shouldRetryFailedAction(
+        state: State,
+        event: JsActionFailed,
+        currentAction: BrokerAction,
+    ): Boolean {
+        if (!event.allowRetry) {
+            return false
+        }
+
+        if (state.runType == RunType.OPTOUT) {
+            // for optout, for ANY action we retry at most 3 times
+            return state.actionRetryCount < MAX_RETRY_COUNT_OPTOUT
+        } else {
+            // For scans, we ONLY retry once if the action is expectation
+            return (currentAction is Expectation && state.actionRetryCount < MAX_RETRY_COUNT_SCAN)
+        }
+    }
+
+    companion object {
+        const val MAX_RETRY_COUNT_OPTOUT = 3
+        const val MAX_RETRY_COUNT_SCAN = 1
     }
 }

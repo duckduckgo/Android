@@ -843,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Új AI-csevegés</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>

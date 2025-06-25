@@ -22,8 +22,8 @@ import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlComplete
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -86,9 +86,10 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 Next(
                     nextState = state.copy(
                         currentActionIndex = state.currentActionIndex + 1,
+                        actionRetryCount = 0,
                         pendingUrl = null,
                     ),
-                    nextEvent = ExecuteNextBrokerStepAction(
+                    nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),

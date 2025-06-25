@@ -46,22 +46,10 @@
             android:layout_marginStart="@dimen/keyline_2"
             android:text="@string/duckChatMenuItem"
             app:layout_constraintStart_toEndOf="@id/icon"
-            app:layout_constraintEnd_toStartOf="@id/newPill"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:typography="body1"/>
 
-        <ImageView
-            android:id="@+id/newPill"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_1"
-            android:src="@drawable/ic_new_pill"
-            android:importantForAccessibility="no"
-            app:layout_constraintStart_toEndOf="@id/label"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

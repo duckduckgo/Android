@@ -69,4 +69,7 @@
 
     <!-- Browser tab -->
     <string name="browserDuckPlayerShortUrl">Duck Player</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatMenuItem">@string/duck_chat_title</string>
 </resources>

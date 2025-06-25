@@ -19,9 +19,7 @@ jobs:
   sync:
     name: Sync Asana PR task
     runs-on: ubuntu-latest
-    if: |
-      contains(github.event.pull_request.labels.*.name, 'PR-task') &&
-      github.actor != 'dependabot[bot]'
+    if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v4
 

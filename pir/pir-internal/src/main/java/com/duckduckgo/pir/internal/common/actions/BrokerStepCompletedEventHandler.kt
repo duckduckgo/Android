@@ -71,6 +71,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
         return Next(
             nextState = state.copy(
                 currentBrokerStepIndex = state.currentBrokerStepIndex + 1,
+                actionRetryCount = 0,
             ),
             nextEvent = ExecuteNextBrokerStep,
         )
