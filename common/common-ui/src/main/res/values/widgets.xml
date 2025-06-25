@@ -644,13 +644,12 @@
     </style>
 
     <style name="Typography.DuckDuckGo.BuckButton">
-        <item name="fontFamily">@font/pangea_bold</item>
+        <item name="fontFamily">@font/pangea_medium</item>
         <item name="android:textSize">16sp</item>
-        <item name="lineHeight">11sp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.BuckButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="cornerRadius">30dp</item>
+        <item name="cornerRadius">32dp</item>
         <item name="android:textAppearance">@style/Typography.DuckDuckGo.BuckButton</item>
         <item name="android:includeFontPadding">false</item>
         <item name="android:paddingLeft">0dp</item>
@@ -671,7 +670,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.BuckButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="cornerRadius">30dp</item>
+        <item name="cornerRadius">32dp</item>
         <item name="android:textAppearance">@style/Typography.DuckDuckGo.BuckButton</item>
         <item name="android:textColor">@color/buckColorButtonSecondaryText</item>
         <item name="android:includeFontPadding">false</item>
@@ -681,7 +680,7 @@
         <item name="android:paddingRight">20dp</item>
         <item name="iconGravity">end</item>
         <item name="iconSize">24dp</item>
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">14sp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="rippleColor">@color/buckColorButtonSecondaryContainerPressed</item>
