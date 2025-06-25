@@ -42,7 +42,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
-        val isBrowserThemingFeatureAvailable: Boolean = true,
+        val isBrowserThemingFeatureAvailable: Boolean = false,
         val isBrowserThemingFeatureChangeable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
         val isDuckAIPoCFeatureAvailable: Boolean = false,
@@ -66,7 +66,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
         ) { isExperimentEnabled, isDuckAIPoC, anyConflictingExperimentEnabled ->
             _viewState.update {
                 it.copy(
-                    isBrowserThemingFeatureAvailable = true,
+                    isBrowserThemingFeatureAvailable = false,
                     isBrowserThemingFeatureEnabled = isExperimentEnabled,
                     isDuckAIPoCFeatureAvailable = isExperimentEnabled,
                     isDuckAIPoCFeatureEnabled = isDuckAIPoC,
