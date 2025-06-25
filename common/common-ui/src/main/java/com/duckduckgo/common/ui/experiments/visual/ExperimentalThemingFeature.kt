@@ -35,6 +35,6 @@ interface ExperimentalThemingFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun splitOmnibarFeature(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun singleOmnibarFeature(): Toggle
 }
