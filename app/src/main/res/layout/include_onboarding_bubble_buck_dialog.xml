@@ -20,9 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipChildren="false"
-    android:clipToPadding="false"
-    android:paddingTop="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_4">
+    android:clipToPadding="false">
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/daxDialogDismissButton"
@@ -46,7 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"
-        android:layout_marginVertical="@dimen/keyline_6"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
