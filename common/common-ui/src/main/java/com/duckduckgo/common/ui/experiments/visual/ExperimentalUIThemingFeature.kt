@@ -30,8 +30,5 @@ interface ExperimentalUIThemingFeature {
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun duckAIPoCFeature(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun visualUpdatesFeature(): Toggle
 }
