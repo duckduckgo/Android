@@ -109,15 +109,11 @@
 
     <style name="Typography.Buck.H1">
         <item name="android:textSize">24sp</item>
-        <item name="android:lineSpacingExtra">-4sp</item>
-        <item name="android:lineHeight">26sp</item>
         <item name="fontFamily">@font/pangea_semibold</item>
     </style>
 
     <style name="Typography.Buck.Body1">
-        <item name="android:textSize">16sp</item>
-        <item name="android:lineSpacingExtra">4sp</item>
-        <item name="android:lineHeight">24sp</item>
+        <item name="android:textSize">18sp</item>
         <item name="fontFamily">@font/pangea_regular</item>
     </style>
 
