@@ -1,6 +1,6 @@
 appId: com.duckduckgo.mobile.android
 tags:
-  - privacyTest
+  - privacyTestInternal
 ---
 - retry:
     maxRetries: 3
