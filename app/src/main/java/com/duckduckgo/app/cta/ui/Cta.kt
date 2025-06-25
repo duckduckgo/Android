@@ -613,10 +613,10 @@ sealed class OnboardingDaxDialogCta(
                     daxDialogOption1,
                     daxDialogOption2,
                     daxDialogOption3,
-                    daxDialogOption4,
                 )
 
-                val options = onboardingStore.getSitesOptions()
+                // Buck dialog has a maximum of 3 options
+                val options = onboardingStore.getSitesOptions().takeLast(optionsViews.size)
 
                 optionsViews.forEachIndexed { index, buttonView ->
                     options[index].setOptionView(buttonView)
