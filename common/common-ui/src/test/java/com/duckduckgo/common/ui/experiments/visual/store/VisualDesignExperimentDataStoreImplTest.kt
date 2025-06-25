@@ -17,7 +17,7 @@
 package com.duckduckgo.common.ui.experiments.visual.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
+import com.duckduckgo.common.ui.experiments.visual.NewDesignFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -38,8 +38,8 @@ class VisualDesignExperimentDataStoreImplTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    private val experimentalUIThemingFeature = FakeFeatureToggleFactory.create(
-        toggles = ExperimentalUIThemingFeature::class.java,
+    private val newDesignFeature = FakeFeatureToggleFactory.create(
+        toggles = NewDesignFeature::class.java,
         store = FakeToggleStore(),
     )
 
@@ -50,10 +50,10 @@ class VisualDesignExperimentDataStoreImplTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        experimentalUIThemingFeature.self().setRawStoredState(State(enable = true))
-        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = true))
-        experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().setRawStoredState(State(enable = true))
-        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = true))
+        newDesignFeature.self().setRawStoredState(State(enable = true))
+        // newDesignFeature.splitOmnibarFeature().setRawStoredState(State(enable = true))
+        newDesignFeature.newDesignFeature().setRawStoredState(State(enable = true))
+        newDesignFeature.duckAIPoCFeature().setRawStoredState(State(enable = true))
     }
 
     @Test
@@ -67,8 +67,8 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF enabled and experiment disabled, Duck AI PoC disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        experimentalUIThemingFeature.self().setRawStoredState(State(enable = false))
-        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
+        newDesignFeature.self().setRawStoredState(State(enable = false))
+        // newDesignFeature.splitOmnibarFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
@@ -78,17 +78,17 @@ class VisualDesignExperimentDataStoreImplTest {
     @Test
     fun `when Duck AI PoC FF disabled but experiment enabled, Duck AI PoC disabled`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = false))
+        newDesignFeature.duckAIPoCFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
         Assert.assertFalse(testee.isDuckAIPoCEnabled.value)
     }
 
-    private fun createTestee(): VisualDesignExperimentDataStoreImpl {
-        return VisualDesignExperimentDataStoreImpl(
+    private fun createTestee(): NewDesignDataStoreImpl {
+        return NewDesignDataStoreImpl(
             appCoroutineScope = coroutineRule.testScope,
-            experimentalUIThemingFeature = experimentalUIThemingFeature,
+            newDesignFeature = newDesignFeature,
         )
     }
 }

@@ -89,7 +89,7 @@ import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -186,7 +186,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
 
     @Inject
-    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+    lateinit var newDesignDataStore: NewDesignDataStore
 
     @Inject
     lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
@@ -1225,7 +1225,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun bindMockupToolbars() {
         when {
-            visualDesignExperimentDataStore.isNewDesignEnabled.value -> {
+            newDesignDataStore.isSplitOmnibarEnabled.value -> {
                 when (settingsDataStore.omnibarPosition) {
                     TOP -> {
                         experimentalToolbarMockupBinding = binding.topMockupExperimentalToolbar
@@ -1246,7 +1246,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
             }
-            visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value -> {
+            newDesignDataStore.isNewDesignEnabled.value -> {
                 singleToolBarMockupBinding = when (settingsDataStore.omnibarPosition) {
                     TOP -> {
                         binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()

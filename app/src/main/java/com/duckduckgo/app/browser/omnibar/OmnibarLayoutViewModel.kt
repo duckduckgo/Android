@@ -56,7 +56,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
@@ -90,7 +90,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val newDesignDataStore: NewDesignDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -106,8 +106,8 @@ class OmnibarLayoutViewModel @Inject constructor(
     // We need to do this since the max overloads for combine is 5
     private val visualDesignExperimentFlags =
         combine(
-            visualDesignExperimentDataStore.isNewDesignEnabled,
-            visualDesignExperimentDataStore.isDuckAIPoCEnabled,
+            newDesignDataStore.isSplitOmnibarEnabled,
+            newDesignDataStore.isDuckAIPoCEnabled,
         ) { isExperimentEnabled, isDuckAIPoCEnabled ->
             isExperimentEnabled to isDuckAIPoCEnabled
         }

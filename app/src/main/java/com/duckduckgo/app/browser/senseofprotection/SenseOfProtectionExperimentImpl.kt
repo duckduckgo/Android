@@ -22,7 +22,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
@@ -59,7 +59,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
     private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val newDesignDataStore: NewDesignDataStore,
     private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
 
@@ -209,8 +209,8 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun seesNewVisualDesign(): Boolean {
-        val seesNewVisualDesing = visualDesignExperimentDataStore.isNewDesignEnabled.value ||
-            visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value
+        val seesNewVisualDesing = newDesignDataStore.isSplitOmnibarEnabled.value ||
+            newDesignDataStore.isNewDesignEnabled.value
         logcat { "VisualDesign: seesNewVisualDesign $seesNewVisualDesing" }
         return seesNewVisualDesing
     }

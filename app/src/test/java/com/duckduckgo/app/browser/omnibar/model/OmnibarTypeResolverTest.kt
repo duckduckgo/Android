@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.omnibar.model
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -30,14 +30,14 @@ import org.mockito.kotlin.whenever
 class OmnibarTypeResolverTest {
 
     private lateinit var testee: OmnibarTypeResolver
-    private val mockExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockExperimentDataStore: NewDesignDataStore = mock()
     private val mockIsNewDesignEnabled = mock<MutableStateFlow<Boolean>>()
     private val mockIsNewDesignWithoutBottomBarEnabled = mock<MutableStateFlow<Boolean>>()
 
     @Before
     fun setup() {
-        whenever(mockExperimentDataStore.isNewDesignEnabled).thenReturn(mockIsNewDesignEnabled)
-        whenever(mockExperimentDataStore.isNewDesignWithoutBottomBarEnabled).thenReturn(mockIsNewDesignWithoutBottomBarEnabled)
+        whenever(mockExperimentDataStore.isSplitOmnibarEnabled).thenReturn(mockIsNewDesignEnabled)
+        whenever(mockExperimentDataStore.isNewDesignEnabled).thenReturn(mockIsNewDesignWithoutBottomBarEnabled)
         testee = OmnibarTypeResolver(mockExperimentDataStore)
     }
 

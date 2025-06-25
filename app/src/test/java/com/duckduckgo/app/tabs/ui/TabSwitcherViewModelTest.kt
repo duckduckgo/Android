@@ -62,7 +62,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -164,7 +164,7 @@ class TabSwitcherViewModelTest {
         State.Cohort(name = VARIANT_2.cohortName, weight = 1),
     )
 
-    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockNewDesignDataStore: NewDesignDataStore = mock()
     private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private lateinit var testee: TabSwitcherViewModel
@@ -195,7 +195,7 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
+        whenever(mockNewDesignDataStore.isSplitOmnibarEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
         )
         whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
@@ -211,7 +211,7 @@ class TabSwitcherViewModelTest {
             userBrowserProperties = FakeUserBrowserProperties(),
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            newDesignDataStore = mockNewDesignDataStore,
             pixel = FakePixel(),
         )
 
@@ -238,7 +238,7 @@ class TabSwitcherViewModelTest {
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
-            mockVisualDesignExperimentDataStore,
+            mockNewDesignDataStore,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)

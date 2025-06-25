@@ -21,7 +21,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.update
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class VisualDesignExperimentViewModel @Inject constructor(
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val newDesignDataStore: NewDesignDataStore,
     private val visualUpdatesDesignExperimentConflictChecker: VisualUpdatesDesignExperimentConflictChecker,
     private val themingDataStore: ThemingDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
@@ -60,8 +60,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
 
     init {
         combine(
-            visualDesignExperimentDataStore.isNewDesignEnabled,
-            visualDesignExperimentDataStore.isDuckAIPoCEnabled,
+            newDesignDataStore.isSplitOmnibarEnabled,
+            newDesignDataStore.isDuckAIPoCEnabled,
             visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
         ) { isExperimentEnabled, isDuckAIPoC, anyConflictingExperimentEnabled ->
             _viewState.update {
@@ -78,10 +78,10 @@ class VisualDesignExperimentViewModel @Inject constructor(
     }
 
     fun onExperimentalUIModeChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.changeExperimentFlagPreference(checked)
+        newDesignDataStore.changeExperimentFlagPreference(checked)
     }
 
     fun onDuckAIPoCChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.changeDuckAIPoCFlagPreference(checked)
+        newDesignDataStore.changeDuckAIPoCFlagPreference(checked)
     }
 }

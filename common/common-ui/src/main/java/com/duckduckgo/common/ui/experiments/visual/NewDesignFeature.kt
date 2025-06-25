@@ -23,18 +23,18 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "experimentalUITheming",
+    featureName = "newDesign",
 )
-interface ExperimentalUIThemingFeature {
+interface NewDesignFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun duckAIPoCFeature(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun visualUpdatesFeature(): Toggle
+    // @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    // fun splitOmnibarFeature(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun visualUpdatesWithoutBottomBarFeature(): Toggle
+    fun newDesignFeature(): Toggle
 }

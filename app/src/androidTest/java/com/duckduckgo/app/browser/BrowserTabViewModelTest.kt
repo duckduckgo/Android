@@ -217,7 +217,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -549,7 +549,7 @@ class BrowserTabViewModelTest {
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
     val mockStack: WebBackForwardList = mock()
 
-    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockNewDesignDataStore: NewDesignDataStore = mock()
     private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
@@ -641,7 +641,7 @@ class BrowserTabViewModelTest {
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockNewDesignDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -699,7 +699,7 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
-        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
+        whenever(mockNewDesignDataStore.isSplitOmnibarEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
         )
 
@@ -779,7 +779,7 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            newDesignDataStore = mockNewDesignDataStore,
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
@@ -871,7 +871,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() = runTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockNewDesignDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
 
         testee.onViewVisible()
 
