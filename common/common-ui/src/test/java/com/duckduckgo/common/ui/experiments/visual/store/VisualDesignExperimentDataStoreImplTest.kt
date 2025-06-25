@@ -22,6 +22,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlin.jvm.java
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -30,8 +31,8 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
-import kotlin.jvm.java
 
+@Suppress("DenyListedApi")
 class VisualDesignExperimentDataStoreImplTest {
 
     @get:Rule
@@ -39,7 +40,7 @@ class VisualDesignExperimentDataStoreImplTest {
 
     private val experimentalUIThemingFeature = FakeFeatureToggleFactory.create(
         toggles = ExperimentalUIThemingFeature::class.java,
-        store = FakeToggleStore()
+        store = FakeToggleStore(),
     )
 
     @Mock
