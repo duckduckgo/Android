@@ -74,6 +74,7 @@ class VisualDesignExperimentDataStoreImplTest {
         return VisualDesignExperimentDataStoreImpl(
             appCoroutineScope = coroutineRule.testScope,
             experimentalUIThemingFeature = experimentalUIThemingFeature,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
     }
 }

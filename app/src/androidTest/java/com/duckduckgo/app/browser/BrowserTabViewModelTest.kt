@@ -641,7 +641,7 @@ class BrowserTabViewModelTest {
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -871,7 +871,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() = runTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(true))
 
         testee.onViewVisible()
 
