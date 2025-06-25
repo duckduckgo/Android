@@ -187,19 +187,6 @@
                     app:icon="@drawable/ic_globe_16"
                     tools:ignore="DeprecatedWidgetInXml" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/keyline_2" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/daxDialogOption4"
-                    style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/onboardingSitesDaxDialogOption4"
-                    app:icon="@drawable/ic_wand_16"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
             </LinearLayout>
         </com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView>
     </androidx.constraintlayout.widget.ConstraintLayout>
