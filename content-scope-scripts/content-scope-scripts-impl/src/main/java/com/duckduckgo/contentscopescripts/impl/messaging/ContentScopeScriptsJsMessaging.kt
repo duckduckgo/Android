@@ -72,7 +72,6 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
                     if (jsMessage.method == "addDebugFlag") {
                         // If method is addDebugFlag, we want to handle it for all features
-                        logcat("Cris") { "Debug flag: ${jsMessage.featureName}" }
                         jsMessageCallback.process(
                             featureName = jsMessage.featureName,
                             method = jsMessage.method,
