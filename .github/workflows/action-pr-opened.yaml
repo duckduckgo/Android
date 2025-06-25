@@ -12,7 +12,7 @@ jobs:
       issues: write
     steps:
       - name: Add comment in Asana task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@${{ vars.GHA_ASANA_SYNC_VERSION }}
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"

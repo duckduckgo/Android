@@ -73,7 +73,7 @@ jobs:
         run: echo "current_date=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
       - name: Sync Output to Asana
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@${{ vars.GHA_ASANA_SYNC_VERSION }}
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
