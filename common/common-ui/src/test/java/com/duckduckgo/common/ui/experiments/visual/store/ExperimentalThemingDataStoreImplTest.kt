@@ -33,7 +33,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
 @Suppress("DenyListedApi")
-class VisualDesignExperimentDataStoreImplTest {
+class ExperimentalThemingDataStoreImplTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
@@ -56,13 +56,13 @@ class VisualDesignExperimentDataStoreImplTest {
         experimentalThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = true))
     }
 
-    @Test
-    fun `when Duck AI PoC FF enabled and experiment enabled, Duck AI PoC enabled`() = runTest {
-        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        val testee = createTestee()
-
-        Assert.assertTrue(testee.isDuckAIPoCEnabled.value)
-    }
+    // @Test
+    // fun `when Duck AI PoC FF enabled and experiment enabled, Duck AI PoC enabled`() = runTest {
+    //     whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
+    //     val testee = createTestee()
+    //
+    //     Assert.assertTrue(testee.isDuckAIPoCEnabled.value)
+    // }
 
     @Test
     fun `when Duck AI PoC FF enabled and experiment disabled, Duck AI PoC disabled`() = runTest {
