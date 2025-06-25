@@ -77,7 +77,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -162,7 +162,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
-    lateinit var newDesignDataStore: NewDesignDataStore
+    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
 
     @Inject
     lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
@@ -174,8 +174,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val tabsAdapter: TabSwitcherAdapter by lazy {
         TabSwitcherAdapter(
-            isVisualExperimentEnabled = newDesignDataStore.isSplitOmnibarEnabled.value ||
-                newDesignDataStore.isNewDesignEnabled.value,
+            isVisualExperimentEnabled = experimentalThemingDataStore.isSplitOmnibarEnabled.value ||
+                experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             itemClickListener = this,
             webViewPreviewPersister = webViewPreviewPersister,
             lifecycleOwner = this,
@@ -286,7 +286,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, newDesignDataStore)
+        tabItemDecorator = TabItemDecorator(this, experimentalThemingDataStore)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)

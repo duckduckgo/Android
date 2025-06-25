@@ -18,7 +18,7 @@ package com.duckduckgo.common.ui.experiments.visual.store
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface NewDesignDataStore {
+interface ExperimentalThemingDataStore {
 
     /**
      * State flow which returns `true` if the feature flag for the experiment is enabled and there are no conflicting experiments detected.
@@ -29,7 +29,7 @@ interface NewDesignDataStore {
      * State flow which returns `true` if the feature flag for the new design without the bottom navigation bar is enabled
      * and there are no conflicting experiments detected (the full new design with the bottom bar).
      */
-    val isNewDesignEnabled: StateFlow<Boolean>
+    val isSingleOmnibarEnabled: StateFlow<Boolean>
 
     /**
      * State flow which returns `true` if the feature flag for the Duck AI PoC is enabled and there are no conflicting experiments detected.

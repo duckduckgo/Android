@@ -18,7 +18,7 @@ package com.duckduckgo.common.ui.experiments.visual.store
 
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.ui.experiments.visual.NewDesignFeature
+import com.duckduckgo.common.ui.experiments.visual.ExperimentalThemingFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -37,24 +37,24 @@ import kotlinx.coroutines.launch
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = NewDesignDataStore::class,
+    boundType = ExperimentalThemingDataStore::class,
 )
 @ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 @SingleInstanceIn(scope = AppScope::class)
-class NewDesignDataStoreImpl @Inject constructor(
+class ExperimentalThemingDataStoreImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val newDesignFeature: NewDesignFeature,
-) : NewDesignDataStore, PrivacyConfigCallbackPlugin {
+    private val experimentalThemingFeature: ExperimentalThemingFeature,
+) : ExperimentalThemingDataStore, PrivacyConfigCallbackPlugin {
 
     // Should be false until we revive the feature
     private val _splitOmnibarFlagEnabled = MutableStateFlow(false).asStateFlow()
     // private val _splitOmnibarFlagEnabled =
-    //     MutableStateFlow(newDesignFeature.self().isEnabled() && newDesignFeature.splitOmnibarFeature().isEnabled())
+    //     MutableStateFlow(experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled())
 
     private val _duckAIFeatureFlagEnabled =
-        MutableStateFlow(_splitOmnibarFlagEnabled.value && newDesignFeature.duckAIPoCFeature().isEnabled())
+        MutableStateFlow(_splitOmnibarFlagEnabled.value && experimentalThemingFeature.duckAIPoCFeature().isEnabled())
     private val _newDesignFeatureFlagEnabled =
-        MutableStateFlow(newDesignFeature.newDesignFeature().isEnabled())
+        MutableStateFlow(experimentalThemingFeature.singleOmnibarFeature().isEnabled())
 
     override val isSplitOmnibarEnabled: StateFlow<Boolean> = _splitOmnibarFlagEnabled.stateIn(
         scope = appCoroutineScope,
@@ -62,7 +62,7 @@ class NewDesignDataStoreImpl @Inject constructor(
         initialValue = _splitOmnibarFlagEnabled.value,
     )
 
-    override val isNewDesignEnabled: StateFlow<Boolean> = combine(isSplitOmnibarEnabled, _newDesignFeatureFlagEnabled) {
+    override val isSingleOmnibarEnabled: StateFlow<Boolean> = combine(isSplitOmnibarEnabled, _newDesignFeatureFlagEnabled) {
             withBottomBar, withoutBottomBar ->
         !withBottomBar && withoutBottomBar
     }.stateIn(
@@ -86,24 +86,24 @@ class NewDesignDataStoreImpl @Inject constructor(
 
     @SuppressLint("DenyListedApi")
     override fun changeExperimentFlagPreference(enabled: Boolean) {
-        newDesignFeature.self().setRawStoredState(Toggle.State(remoteEnableState = enabled))
-        // newDesignFeature.splitOmnibarFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+        experimentalThemingFeature.self().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+        // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
         updateFeatureState()
     }
 
     @SuppressLint("DenyListedApi")
     override fun changeDuckAIPoCFlagPreference(enabled: Boolean) {
-        newDesignFeature.duckAIPoCFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+        experimentalThemingFeature.duckAIPoCFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
         updateFeatureState()
     }
 
     private fun updateFeatureState() {
         appCoroutineScope.launch {
             // _splitOmnibarFlagEnabled.value =
-            //     newDesignFeature.self().isEnabled() && newDesignFeature.splitOmnibarFeature().isEnabled()
+            //     experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled()
 
             _duckAIFeatureFlagEnabled.value =
-                _splitOmnibarFlagEnabled.value && newDesignFeature.duckAIPoCFeature().isEnabled()
+                _splitOmnibarFlagEnabled.value && experimentalThemingFeature.duckAIPoCFeature().isEnabled()
         }
     }
 }

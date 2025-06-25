@@ -19,16 +19,16 @@ package com.duckduckgo.app.browser.omnibar.model
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
-import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import javax.inject.Inject
 
 class OmnibarTypeResolver @Inject constructor(
-    private val experimentsDataStore: NewDesignDataStore,
+    private val experimentsDataStore: ExperimentalThemingDataStore,
 ) {
     fun getOmnibarType(): OmnibarType {
         return if (experimentsDataStore.isSplitOmnibarEnabled.value) {
             FADE
-        } else if (experimentsDataStore.isNewDesignEnabled.value) {
+        } else if (experimentsDataStore.isSingleOmnibarEnabled.value) {
             SINGLE
         } else {
             SCROLLING

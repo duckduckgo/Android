@@ -290,7 +290,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
-import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -460,7 +460,7 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val newDesignDataStore: NewDesignDataStore,
+    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
@@ -2796,7 +2796,7 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && newDesignDataStore.isSplitOmnibarEnabled.value)
+        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && experimentalThemingDataStore.isSplitOmnibarEnabled.value)
     }
 
     fun onPopupMenuLaunched() {
@@ -2867,7 +2867,7 @@ class BrowserTabViewModel @Inject constructor(
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
-            newDesignDataStore.isDuckAIPoCEnabled.value || duckChat.isKeepSessionEnabled()
+            experimentalThemingDataStore.isDuckAIPoCEnabled.value || duckChat.isKeepSessionEnabled()
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
 

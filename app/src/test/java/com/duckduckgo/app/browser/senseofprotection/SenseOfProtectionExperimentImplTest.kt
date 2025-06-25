@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -51,7 +51,7 @@ class SenseOfProtectionExperimentImplTest {
     private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
 
     @Mock
-    private lateinit var mockExperimentDataStore: NewDesignDataStore
+    private lateinit var mockExperimentDataStore: ExperimentalThemingDataStore
 
     private lateinit var testee: SenseOfProtectionExperimentImpl
     private lateinit var fakeUserBrowserProperties: FakeUserBrowserProperties
@@ -77,7 +77,7 @@ class SenseOfProtectionExperimentImplTest {
             userBrowserProperties = fakeUserBrowserProperties,
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            newDesignDataStore = mockExperimentDataStore,
+            experimentalThemingDataStore = mockExperimentDataStore,
             pixel = FakePixel(),
         )
     }

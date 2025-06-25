@@ -242,7 +242,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -554,7 +554,7 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var newDesignDataStore: NewDesignDataStore
+    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
 
     @Inject
     lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
@@ -1094,7 +1094,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isExperimentEnabled = newDesignDataStore.isSplitOmnibarEnabled.value,
+            isExperimentEnabled = experimentalThemingDataStore.isSplitOmnibarEnabled.value,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -1183,7 +1183,7 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && newDesignDataStore.isSplitOmnibarEnabled.value) {
+        val popupMenuResourceType = if (!isActiveCustomTab() && experimentalThemingDataStore.isSplitOmnibarEnabled.value) {
             // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
             BrowserPopupMenu.ResourceType.BOTTOM
         } else {
@@ -2726,8 +2726,8 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = newDesignDataStore.isSplitOmnibarEnabled.value ||
-                    newDesignDataStore.isNewDesignEnabled.value,
+                addExtraDividerPadding = experimentalThemingDataStore.isSplitOmnibarEnabled.value ||
+                    experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             ),
         )
     }

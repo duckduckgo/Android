@@ -34,7 +34,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.NewDesignDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -73,7 +73,7 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
-    private val mockNewDesignDataStore: NewDesignDataStore = mock()
+    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
     private val duckAIPoCStateFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
@@ -109,8 +109,8 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockNewDesignDataStore.isSplitOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
-        whenever(mockNewDesignDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
+        whenever(mockExperimentalThemingDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
@@ -150,7 +150,7 @@ class OmnibarLayoutViewModelTest {
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
-            newDesignDataStore = mockNewDesignDataStore,
+            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
             addressDisplayFormatter = mockAddressDisplayFormatter,
@@ -1218,7 +1218,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed and omnibar has focus with experiment enabled then source is focused`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        whenever(mockNewDesignDataStore.isSplitOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "query")
 
@@ -1270,7 +1270,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed with experiment enabled and was used before then correct pixel sent`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        whenever(mockNewDesignDataStore.isSplitOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onViewModeChanged(ViewMode.NewTab)
         testee.onOmnibarFocusChanged(false, "")
