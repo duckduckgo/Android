@@ -21,7 +21,6 @@ import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
