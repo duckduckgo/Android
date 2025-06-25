@@ -28,8 +28,8 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerR
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.CompleteExecution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -72,8 +72,9 @@ class ExecuteNextBrokerStepEventHandler @Inject constructor(
                 nextState = state.copy(
                     currentActionIndex = 0,
                     brokerStepStartTime = currentTimeProvider.currentTimeMillis(),
+                    actionRetryCount = 0,
                 ),
-                nextEvent = ExecuteNextBrokerStepAction(
+                nextEvent = ExecuteBrokerStepAction(
                     UserProfile(
                         userProfile = state.profileQuery,
                     ),

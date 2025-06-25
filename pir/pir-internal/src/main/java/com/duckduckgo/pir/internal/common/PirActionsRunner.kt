@@ -39,7 +39,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Ev
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailConfirmationLinkReceived
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsErrorReceived
@@ -312,7 +312,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 if (this is Success) {
                     when (val status = (this.data as CaptchaSolutionStatus).status) {
                         is Ready -> engine?.dispatch(
-                            ExecuteNextBrokerStepAction(
+                            ExecuteBrokerStepAction(
                                 actionRequestData = PirScriptRequestData.SolveCaptcha(
                                     token = status.token,
                                 ),
@@ -486,6 +486,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         when (pirError) {
             is PirError.ActionFailed -> JsActionFailed(
                 error = pirError,
+                allowRetry = true,
             )
 
             is PirError.CaptchaServiceError -> CaptchaServiceFailed(

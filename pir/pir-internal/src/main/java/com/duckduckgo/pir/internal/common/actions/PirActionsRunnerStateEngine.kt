@@ -52,6 +52,7 @@ interface PirActionsRunnerStateEngine {
         val profileQuery: ProfileQuery? = null,
         val transactionID: String = "",
         val pendingUrl: String? = null,
+        val actionRetryCount: Int = 0,
     )
 
     /**
@@ -85,7 +86,7 @@ interface PirActionsRunnerStateEngine {
 
         data object ExecuteNextBrokerStep : Event()
 
-        data class ExecuteNextBrokerStepAction(
+        data class ExecuteBrokerStepAction(
             val actionRequestData: PirScriptRequestData,
         ) : Event()
 
@@ -101,6 +102,7 @@ interface PirActionsRunnerStateEngine {
 
         data class JsActionFailed(
             val error: PirError.ActionFailed,
+            val allowRetry: Boolean,
         ) : Event()
 
         data class CaptchaServiceFailed(
