@@ -650,7 +650,7 @@
 
     <style name="Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem">
         <item name="fontFamily">@font/pangea_medium</item>
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/buckColorPrimaryText</item>
     </style>
 

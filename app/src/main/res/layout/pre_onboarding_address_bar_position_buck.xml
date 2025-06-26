@@ -28,8 +28,7 @@
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/pangea_medium"
-            android:textSize="24sp"
+            android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
             android:text="@string/highlightsPreOnboardingAddressBarTitle"/>
 
@@ -71,7 +70,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_regular"
+            android:fontFamily="@font/pangea_medium"
             android:includeFontPadding="false"
             android:textSize="12sp"
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
@@ -134,7 +133,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_regular"
+            android:fontFamily="@font/pangea_medium"
             android:includeFontPadding="false"
             android:textSize="12sp"
             android:textColor="@color/preonboarding_address_bar_position_text_buck"

@@ -25,8 +25,7 @@
     <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/pangea_medium"
-            android:textSize="32sp"
+            android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
             android:text="@string/highlightsPreOnboardingDaxDialog1TitleBuck"/>
 
@@ -34,8 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
-            android:fontFamily="@font/pangea"
-            android:textSize="16sp"
+            android:textAppearance="@style/Typography.Buck.Body1"
             android:textColor="@color/buckColorPrimaryText"
             android:text="@string/highlightsPreOnboardingDaxDialog1DescriptionBuck"/>
 

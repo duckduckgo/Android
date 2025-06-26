@@ -242,6 +242,8 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                             TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                             binding.daxDialogCta.comparisonChart.root.isVisible = true
 
+                            val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2TitleBuck).html(context = it)
+                            binding.daxDialogCta.comparisonChart.title.text = titleText
                             binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                             binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
 
