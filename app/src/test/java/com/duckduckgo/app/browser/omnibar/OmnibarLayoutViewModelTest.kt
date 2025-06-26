@@ -107,7 +107,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
-        whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
+        whenever(duckChat.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
         whenever(duckChat.showInputScreen).thenReturn(duckChatShowInputScreenFlow)

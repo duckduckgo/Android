@@ -32,6 +32,7 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
@@ -199,6 +200,7 @@ data class DuckChatSettingJson(
 @SingleInstanceIn(AppScope::class)
 
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
+@ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
@@ -214,7 +216,7 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
-) : DuckChatInternal, PrivacyConfigCallbackPlugin {
+) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
     private val _showInputScreen = MutableStateFlow(false)
@@ -368,9 +370,9 @@ class RealDuckChat @Inject constructor(
 
     override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
 
-    override val showInBrowserMenu: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
+    override val showPopupMenuShortcut: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
 
-    override val showInAddressBar: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
+    override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 

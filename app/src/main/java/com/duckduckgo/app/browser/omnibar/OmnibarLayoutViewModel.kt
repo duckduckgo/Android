@@ -101,7 +101,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            showChatMenu = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser(),
+            showChatMenu = duckChat.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser(),
         ),
     )
 
@@ -110,7 +110,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         visualDesignExperimentDataStore.isExperimentEnabled,
-        duckChat.showInAddressBar,
+        duckChat.showOmnibarShortcutOnNtpAndOnFocus,
     ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),

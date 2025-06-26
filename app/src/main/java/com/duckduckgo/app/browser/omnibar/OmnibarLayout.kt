@@ -697,7 +697,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderHint(viewState: ViewState) {
-        if (!viewState.isVisualDesignExperimentEnabled && viewState.viewMode is NewTab && duckChat.showInAddressBar.value) {
+        if (!viewState.isVisualDesignExperimentEnabled && viewState.viewMode is NewTab && duckChat.showOmnibarShortcutOnNtpAndOnFocus.value) {
             omnibarTextInput.hint = context.getString(R.string.search)
         } else {
             omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
