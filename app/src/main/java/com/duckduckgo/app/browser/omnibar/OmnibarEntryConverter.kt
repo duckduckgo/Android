@@ -27,5 +27,6 @@ interface OmnibarEntryConverter {
 
 sealed class QueryOrigin {
     object FromUser : QueryOrigin()
+    object FromBookmark : QueryOrigin()
     data class FromAutocomplete(val isNav: Boolean?) : QueryOrigin()
 }
