@@ -29,7 +29,7 @@
     <color name="buckColorComparisonChartItemBackground">#1AFFFFFF</color>
 
     <color name="buckColorComparisonChartCheckIcon">#00DE4E</color>
-    <color name="buckColorComparisonChartCrossIcon">#F2643D</color>
+    <color name="buckColorComparisonChartCrossIcon">#888888</color>
     <color name="buckColorComparisonChartSearchIcon">#68C5FF</color>
     <color name="buckColorComparisonChartShieldIcon">#FFFFFF</color>
     <color name="buckColorComparisonChartCookieIcon">#68C5FF</color>
