@@ -720,6 +720,24 @@ class RealDuckChatTest {
         assertTrue(testee.keepSession.value)
     }
 
+    @Test
+    fun `when global feature flag disabled then don't show settings`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showSettings.value)
+    }
+
+    @Test
+    fun `when global feature flag enabled then show settings`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showSettings.value)
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {

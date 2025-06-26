@@ -220,6 +220,7 @@ class RealDuckChat @Inject constructor(
 ) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
+    private val _showSettings = MutableStateFlow(false)
     private val _showInputScreen = MutableStateFlow(false)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
@@ -363,6 +364,8 @@ class RealDuckChat @Inject constructor(
     override fun updateChatState(state: ChatState) {
         _chatState.value = state
     }
+
+    override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
 
     override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
 
@@ -536,7 +539,9 @@ class RealDuckChat @Inject constructor(
 
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isDuckChatEnabled = duckChatFeature.self().isEnabled()
+            val featureEnabled = duckChatFeature.self().isEnabled()
+            isDuckChatEnabled = featureEnabled
+            _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
 
