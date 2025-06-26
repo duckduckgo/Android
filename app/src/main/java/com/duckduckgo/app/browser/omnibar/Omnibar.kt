@@ -53,7 +53,6 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
-import com.duckduckgo.common.ui.experiments.visual.ExperimentalThemingFeature
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
