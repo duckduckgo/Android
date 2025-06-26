@@ -17,6 +17,7 @@
 package com.duckduckgo.vpn.internal.feature.logs
 
 import logcat.AndroidLogcatLogger
+import logcat.LogPriority
 import logcat.LogcatLogger
 import logcat.logcat
 
@@ -35,7 +36,7 @@ class LoggingExtensions {
 
         @JvmStatic
         fun enableLogging() {
-            LogcatLogger.install(AndroidLogcatLogger())
+            LogcatLogger.install(AndroidLogcatLogger(LogPriority.VERBOSE))
             logcat { "Logging Started" }
         }
     }

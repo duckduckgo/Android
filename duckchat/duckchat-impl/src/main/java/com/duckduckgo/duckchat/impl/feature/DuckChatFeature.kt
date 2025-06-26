@@ -39,7 +39,7 @@ interface DuckChatFeature {
     /**
      * @return `true` when the remote config has the "duckAiButtonInBrowser" Duck.ai button in browser
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `internal`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiButtonInBrowser(): Toggle
@@ -47,8 +47,16 @@ interface DuckChatFeature {
     /**
      * @return `true` when the remote config has the "keepSessionAlive"
      * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
+     * If the remote feature is not present defaults to `internal`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun keepSession(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "duckAiInputScreen"
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `internal`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiInputScreen(): Toggle
 }

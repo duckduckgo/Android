@@ -23,7 +23,6 @@ import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
 import com.duckduckgo.app.global.model.PrivacyShield.UNPROTECTED
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -39,7 +38,6 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -75,7 +73,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val duckAIPoCStateFlow = MutableStateFlow(false)
+    private val duckChatShowInputScreenFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -84,7 +82,6 @@ class OmnibarLayoutViewModelTest {
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
     private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
-    private val browserFeatures = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
@@ -111,10 +108,10 @@ class OmnibarLayoutViewModelTest {
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
-        whenever(mockExperimentalThemingDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
+        whenever(duckChat.showInputScreen).thenReturn(duckChatShowInputScreenFlow)
 
         initializeViewModel()
     }
@@ -1306,7 +1303,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAIPoCEnabledThenShowClickCatcherTrue() = runTest {
-        duckAIPoCStateFlow.value = true
+        duckChatShowInputScreenFlow.value = true
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
@@ -1317,7 +1314,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAIPoCDisabledThenShowClickCatcherFalse() = runTest {
-        duckAIPoCStateFlow.value = false
+        duckChatShowInputScreenFlow.value = false
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()

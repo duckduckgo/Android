@@ -73,6 +73,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -109,9 +111,8 @@ class OmnibarLayoutViewModel @Inject constructor(
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         experimentalThemingDataStore.isSplitOmnibarEnabled,
         experimentalThemingDataStore.isSingleOmnibarEnabled,
-        experimentalThemingDataStore.isDuckAIPoCEnabled,
         duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, isSplitOmnibarEnabled, isSingleOmnibarEnabled, isDuckAIPoCEnabled, showInAddressBar ->
+    ) { state, tabs, highlightOverflowMenu, isSplitOmnibarEnabled, isSingleOmnibarEnabled, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
@@ -120,7 +121,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             isExperimentalThemingEnabled = isSplitOmnibarEnabled || isSingleOmnibarEnabled,
             showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
                 (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
-            showClickCatcher = isDuckAIPoCEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
@@ -185,6 +185,13 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
+        duckChat.showInputScreen.onEach { inputScreenEnabled ->
+            _viewState.update {
+                it.copy(
+                    showClickCatcher = inputScreenEnabled,
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onFindInPageRequested() {

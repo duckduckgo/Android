@@ -28,6 +28,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -53,6 +54,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -62,6 +65,11 @@ interface DuckChatInternal : DuckChat {
      * Set user setting to determine whether DuckChat should be enabled or disabled.
      */
     suspend fun setEnableDuckChatUserSetting(enabled: Boolean)
+
+    /**
+     * Set user setting to determine whether dedicated Duck.ai input screen with a mode switch should be used.
+     */
+    suspend fun setInputScreenUserSetting(enabled: Boolean)
 
     /**
      * Set user setting to determine whether DuckChat should be shown in browser menu.
@@ -77,6 +85,11 @@ interface DuckChatInternal : DuckChat {
      * Observes whether DuckChat is user enabled or disabled.
      */
     fun observeEnableDuckChatUserSetting(): Flow<Boolean>
+
+    /**
+     * Observes whether Duck.ai input screen with a mode switch is enabled or disabled.
+     */
+    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
 
     /**
      * Observes whether DuckChat should be shown in browser menu based on user settings only.
@@ -132,6 +145,11 @@ interface DuckChatInternal : DuckChat {
      * Returns the time a Duck Chat session should be kept alive
      */
     fun keepSessionIntervalInMinutes(): Int
+
+    /**
+     * Returns whether dedicated Duck.ai input screen feature is available (its feature flag is enabled).
+     */
+    fun isInputScreenFeatureAvailable(): Boolean
 }
 
 enum class ChatState(val value: String) {
@@ -181,6 +199,7 @@ data class DuckChatSettingJson(
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckChatFeature: DuckChatFeature,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
@@ -193,6 +212,7 @@ class RealDuckChat @Inject constructor(
 ) : DuckChatInternal, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
+    private val _showInputScreen = MutableStateFlow(false)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
@@ -203,6 +223,7 @@ class RealDuckChat @Inject constructor(
 
     private var isDuckChatEnabled = false
     private var isDuckAiInBrowserEnabled = false
+    private var duckAiInputScreen = false
     private var isDuckChatUserEnabled = false
     private var duckChatLink = DUCK_CHAT_WEB_LINK
     private var bangRegex: Regex? = null
@@ -214,6 +235,12 @@ class RealDuckChat @Inject constructor(
     init {
         if (isMainProcess) {
             cacheConfig()
+            visualDesignExperimentDataStore.isNewDesignEnabled.onEach { isExperimentEnabled ->
+                if (!isExperimentEnabled) {
+                    // the new input screen feature is only available when the visual design experiment is enabled
+                    setInputScreenUserSetting(false)
+                }
+            }.launchIn(appCoroutineScope)
         }
     }
 
@@ -228,6 +255,11 @@ class RealDuckChat @Inject constructor(
             pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
         }
         duckChatFeatureRepository.setDuckChatUserEnabled(enabled)
+        cacheUserSettings()
+    }
+
+    override suspend fun setInputScreenUserSetting(enabled: Boolean) {
+        duckChatFeatureRepository.setInputScreenUserSetting(enabled)
         cacheUserSettings()
     }
 
@@ -255,6 +287,10 @@ class RealDuckChat @Inject constructor(
         return isDuckChatEnabled
     }
 
+    override fun isInputScreenFeatureAvailable(): Boolean {
+        return duckAiInputScreen
+    }
+
     override fun isEnabledInBrowser(): Boolean {
         return isDuckAiInBrowserEnabled
     }
@@ -265,6 +301,10 @@ class RealDuckChat @Inject constructor(
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
         return duckChatFeatureRepository.observeDuckChatUserEnabled()
+    }
+
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
+        return duckChatFeatureRepository.observeInputScreenUserSettingEnabled()
     }
 
     override fun observeShowInBrowserMenuUserSetting(): Flow<Boolean> {
@@ -321,11 +361,13 @@ class RealDuckChat @Inject constructor(
         _chatState.value = state
     }
 
-    override val showInBrowserMenu: StateFlow<Boolean> get() = _showInBrowserMenu.asStateFlow()
+    override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
 
-    override val showInAddressBar: StateFlow<Boolean> get() = _showInAddressBar.asStateFlow()
+    override val showInBrowserMenu: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
 
-    override val chatState: StateFlow<ChatState> get() = _chatState.asStateFlow()
+    override val showInAddressBar: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
+
+    override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
@@ -473,6 +515,7 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             isDuckChatEnabled = duckChatFeature.self().isEnabled()
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
+            duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
 
             val settingsString = duckChatFeature.self().getSettings()
             val settingsJson = settingsString?.let {
@@ -497,6 +540,10 @@ class RealDuckChat @Inject constructor(
 
     private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
+
+        val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatEnabled && isDuckChatUserEnabled &&
+            visualDesignExperimentDataStore.isNewDesignEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+        _showInputScreen.emit(showInputScreen)
 
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
             isDuckChatEnabled && isDuckChatUserEnabled
