@@ -74,7 +74,6 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -83,7 +82,8 @@ class OmnibarLayoutViewModelTest {
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
     private val duckAiFeatureState: DuckAiFeatureState = mock()
-    private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
+    private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
+    private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
@@ -109,7 +109,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
-        whenever(duckChat.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckChatShowInAddressBarFlow)
+        whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
@@ -1129,7 +1129,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModeIsNewTabAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
-        duckChatShowInAddressBarFlow.value = false
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
         testee.onViewModeChanged(ViewMode.NewTab)
 
         testee.viewState.test {
@@ -1150,7 +1150,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenNavigationBarExperimentEnabledAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
-        duckChatShowInAddressBarFlow.value = false
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
         disabledVisualExperimentNavBarStateFlow.value = true
 
         testee.viewState.test {

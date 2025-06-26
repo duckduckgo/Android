@@ -103,7 +103,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            showChatMenu = duckChat.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser(),
+            showChatMenu = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser(),
         ),
     )
 
@@ -112,15 +112,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         visualDesignExperimentDataStore.isExperimentEnabled,
-        duckChat.showOmnibarShortcutOnNtpAndOnFocus,
-    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
+        duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
+    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showOmnibarShortcutOnNtpAndOnFocus ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
-            showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
+            showChatMenu = showOmnibarShortcutOnNtpAndOnFocus && state.viewMode !is CustomTab &&
                 (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
