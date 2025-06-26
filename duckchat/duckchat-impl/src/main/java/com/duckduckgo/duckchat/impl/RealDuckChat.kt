@@ -235,7 +235,7 @@ class RealDuckChat @Inject constructor(
     init {
         if (isMainProcess) {
             cacheConfig()
-            visualDesignExperimentDataStore.isExperimentEnabled.onEach { isExperimentEnabled ->
+            visualDesignExperimentDataStore.isNewDesignEnabled.onEach { isExperimentEnabled ->
                 if (!isExperimentEnabled) {
                     // the new input screen feature is only available when the visual design experiment is enabled
                     setInputScreenUserSetting(false)
@@ -542,7 +542,7 @@ class RealDuckChat @Inject constructor(
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
         val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatEnabled && isDuckChatUserEnabled &&
-            visualDesignExperimentDataStore.isExperimentEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+            visualDesignExperimentDataStore.isNewDesignEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
         _showInputScreen.emit(showInputScreen)
 
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
