@@ -24,5 +24,5 @@ interface DuckAiFeatureState {
     val showPopupMenuShortcut: StateFlow<Boolean>
     val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean>
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
-    // val keepSession: StateFlow<Boolean>
+    val keepSession: StateFlow<Boolean>
 }

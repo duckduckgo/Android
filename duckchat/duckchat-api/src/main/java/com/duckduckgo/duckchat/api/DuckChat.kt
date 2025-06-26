@@ -32,14 +32,6 @@ interface DuckChat {
     fun isEnabled(): Boolean
 
     /**
-     * Checks whether Duck.ai should keep the session alive or not
-     * Uses a cached value - does not perform disk I/O.
-     *
-     * @return true if Duck.ai keep session alive is enabled, false otherwise.
-     */
-    fun isKeepSessionEnabled(): Boolean
-
-    /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
     fun openDuckChat()

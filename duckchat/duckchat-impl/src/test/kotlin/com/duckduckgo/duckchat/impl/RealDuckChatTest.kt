@@ -702,6 +702,24 @@ class RealDuckChatTest {
         assertTrue(testee.isInputScreenFeatureAvailable())
     }
 
+    @Test
+    fun `when keep session feature flag disabled then session is not kept alive`() = runTest {
+        duckChatFeature.keepSession().setRawStoredState(State(false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.keepSession.value)
+    }
+
+    @Test
+    fun `when keep session feature flag enabled then session is kept alive`() = runTest {
+        duckChatFeature.keepSession().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.keepSession.value)
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {
