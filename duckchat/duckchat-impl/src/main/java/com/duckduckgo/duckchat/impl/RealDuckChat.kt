@@ -225,6 +225,7 @@ class RealDuckChat @Inject constructor(
     private val _showInAddressBar = MutableStateFlow(false)
     private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _keepSession = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -238,7 +239,6 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
-    private var keepSessionAliveEnabled = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
 
     init {
@@ -292,16 +292,14 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
+    override val keepSession: StateFlow<Boolean> = _keepSession.asStateFlow()
+
     override fun isEnabled(): Boolean {
         return isDuckChatEnabled
     }
 
     override fun isInputScreenFeatureAvailable(): Boolean {
         return duckAiInputScreen
-    }
-
-    override fun isKeepSessionEnabled(): Boolean {
-        return keepSessionAliveEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
@@ -329,7 +327,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        if (keepSessionAliveEnabled) {
+        if (keepSession.value) {
             browserNav.closeDuckChat(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -442,7 +440,7 @@ class RealDuckChat @Inject constructor(
 
             val hasSessionActive = when {
                 forceNewSession -> false
-                keepSessionAliveEnabled -> hasActiveSession()
+                keepSession.value -> hasActiveSession()
                 else -> false
             }
 
@@ -450,7 +448,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                if (keepSessionAliveEnabled) {
+                if (keepSession.value) {
                     logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                     openDuckChatSession(url, hasSessionActive)
                 } else {
@@ -556,7 +554,7 @@ class RealDuckChat @Inject constructor(
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
 
-            keepSessionAliveEnabled = duckChatFeature.keepSession().isEnabled()
+            _keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
             cacheUserSettings()
