@@ -309,6 +309,14 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    fun printNewLine() {
+        val currentText = duckChatInput.text.toString()
+        val currentSelection = duckChatInput.selectionStart
+        val newText = currentText.substring(0, currentSelection) + "\n" + currentText.substring(currentSelection)
+        duckChatInput.setText(newText)
+        duckChatInput.setSelection(currentSelection + 1)
+    }
+
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
         private const val FADE_DURATION = 150L
