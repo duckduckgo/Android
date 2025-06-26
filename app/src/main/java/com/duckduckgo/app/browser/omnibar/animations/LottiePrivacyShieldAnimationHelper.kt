@@ -54,11 +54,14 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment
             unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
-        } else if (visualDesignExperimentDataStore.isNewDesignEnabled.value ||
-            visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value
-        ) {
+        } else if (visualDesignExperimentDataStore.isNewDesignEnabled.value) {
             protectedShield = R.raw.protected_shield_visual_updates
             protectedShieldDark = R.raw.dark_protected_shield_visual_updates
+            unprotectedShield = R.raw.unprotected_shield_visual_updates
+            unprotectedShieldDark = R.raw.dark_unprotected_shield_visual_updates
+        } else if (visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value) {
+            protectedShield = R.raw.protected_shield_new_design
+            protectedShieldDark = R.raw.dark_protected_shield_new_design
             unprotectedShield = R.raw.unprotected_shield_visual_updates
             unprotectedShieldDark = R.raw.dark_unprotected_shield_visual_updates
         } else {
