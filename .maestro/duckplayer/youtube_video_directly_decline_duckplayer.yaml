@@ -1,0 +1,42 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Close prompt using close button"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 0
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      
+      # Navigate to a YouTube video
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      - pressKey: Enter
+      
+      # Wait for the page to load and DuckPlayer prompt to appear
+      - extendedWaitUntil:
+          visible:
+              text: "Turn on Duck Player to watch without targeted ads"
+          timeout: 15000
+      
+      # Close the DuckPlayer prompt using "No Thanks" button
+      - tapOn:
+          text: "No Thanks"
+      
+      # Wait for prompt to disappear
+      - extendedWaitUntil:
+          notVisible:
+              text: "Turn on Duck Player to watch without targeted ads"
+          timeout: 5000
+      
+      # Core assertion: Verify we're still on regular YouTube (not Duck Player)
+      - assertNotVisible:
+          text: "duck://player/"
+      
+      # Verify we're still on YouTube mobile URL
+      - assertVisible:
+          text: ".*youtube.*" 
