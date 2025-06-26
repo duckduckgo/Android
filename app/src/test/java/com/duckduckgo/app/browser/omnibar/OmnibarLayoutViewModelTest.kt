@@ -110,6 +110,7 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(mockExperimentalThemingDataStore.isDuckAIPoCEnabled).thenReturn(duckAIPoCStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
@@ -181,6 +182,18 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSingleOmnibarEnabledThenExperimentalThemingViewStateSet() = runTest {
+        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+
+        initializeViewModel()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.isExperimentalThemingEnabled)
         }
     }
 
