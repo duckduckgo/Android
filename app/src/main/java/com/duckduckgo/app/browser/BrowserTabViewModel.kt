@@ -2879,7 +2879,9 @@ class BrowserTabViewModel @Inject constructor(
             ctaViewModel.onUserClickCtaOkButton(cta)
         }
         val onboardingCommand = when (cta) {
-            is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetInstructions -> LaunchAddWidget
+            is HomePanelCta.AddWidgetAuto, is HomePanelCta.AddWidgetAutoOnboardingExperiment, is HomePanelCta.AddWidgetInstructions -> {
+                LaunchAddWidget
+            }
             is OnboardingDaxDialogCta -> onOnboardingCtaOkButtonClicked(cta)
             is DaxBubbleCta -> onDaxBubbleCtaOkButtonClicked(cta)
             is BrokenSitePromptDialogCta -> onBrokenSiteCtaOkButtonClicked(cta)
@@ -4218,23 +4220,6 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setLastSubmittedChatUserQuery(query: String) {
         lastSubmittedChatUserQuery = query
-    }
-
-    fun onExperimentalHomeScreenWidgetBottomSheetDialogShown() {
-        logcat { "Experimental Home Screen Widget bottom sheet shown" }
-    }
-
-    fun onExperimentalHomeScreenWidgetBottomSheetDialogCancelled() {
-        logcat { "Experimental Home Screen Widget bottom sheet dismissed" }
-    }
-
-    fun onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked() {
-        logcat { "Add Widget clicked on the Experimental Home Screen Widget bottom sheet" }
-        command.value = LaunchAddWidget
-    }
-
-    fun onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked() {
-        logcat { "Not Now clicked on the Experimental Home Screen Widget bottom sheet" }
     }
 
     companion object {

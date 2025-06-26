@@ -185,6 +185,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -4336,7 +4337,7 @@ class BrowserTabFragment :
 
         private fun showCta(configuration: Cta) {
             when (configuration) {
-                is HomePanelCta -> showHomeCta(configuration)
+                is HomePanelCta -> showBottomSheetCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -4414,6 +4415,14 @@ class BrowserTabFragment :
             )
         }
 
+        private fun showBottomSheetCta(configuration: HomePanelCta) {
+            if (configuration is AddWidgetAutoOnboardingExperiment) {
+                showExperimentalHomeWidget(configuration)
+            } else {
+                showHomeCta(configuration)
+            }
+        }
+
         private fun showExperimentalHomeWidget(
             configuration: HomePanelCta,
         ) {
@@ -4426,22 +4435,18 @@ class BrowserTabFragment :
                 )
                 experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()
                         viewModel.onCtaShown()
                     }
 
                     override fun onCanceled() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogCancelled()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
 
                     override fun onAddWidgetButtonClicked() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked()
                         viewModel.onUserClickCtaOkButton(configuration)
                     }
 
                     override fun onNotNowButtonClicked() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }
