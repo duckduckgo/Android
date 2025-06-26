@@ -50,7 +50,7 @@
     <color name="buckColorComparisonChartItemBackground">#F6EFDF</color>
 
     <color name="buckColorComparisonChartCheckIcon">#21C000</color>
-    <color name="buckColorComparisonChartCrossIcon">#FE3737</color>
+    <color name="buckColorComparisonChartCrossIcon">#888888</color>
     <color name="buckColorComparisonChartSearchIcon">#0856C3</color>
     <color name="buckColorComparisonChartShieldIcon">#7349F3</color>
     <color name="buckColorComparisonChartCookieIcon">#671807</color>
