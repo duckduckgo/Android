@@ -53,6 +53,8 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.trackerdetection.model.Entity
+import com.duckduckgo.common.ui.experiments.visual.ExperimentalThemingFeature
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.view.KeyboardAwareEditText
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -64,13 +66,17 @@ import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import logcat.logcat
 
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
     val omnibarType: OmnibarType,
+    val themingDataStore: ExperimentalThemingDataStore,
+    val coroutineScope: CoroutineScope,
     private val binding: FragmentBrowserTabBinding,
 ) {
 
@@ -91,20 +97,21 @@ class Omnibar(
                         binding.rootView.removeView(binding.singleOmnibarBottom)
                     }
 
-                    FADE -> {
-                        // remove bottom variant
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    // TODO: Revisit this when the split omnibar feature is revived
+                    // FADE -> {
+                    //     // remove bottom variant
+                    //     binding.rootView.removeView(binding.fadeOmnibarBottom)
+                    //
+                    //     // remove all scrolling omnibars
+                    //     binding.rootView.removeView(binding.newOmnibar)
+                    //     binding.rootView.removeView(binding.newOmnibarBottom)
+                    //
+                    //     // remove all single omnibars
+                    //     binding.rootView.removeView(binding.singleOmnibar)
+                    //     binding.rootView.removeView(binding.singleOmnibarBottom)
+                    // }
 
-                        // remove all scrolling omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove all single omnibars
-                        binding.rootView.removeView(binding.singleOmnibar)
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-                    }
-
-                    SINGLE -> {
+                    else -> {
                         // remove bottom variant
                         binding.rootView.removeView(binding.singleOmnibarBottom)
 
@@ -115,6 +122,10 @@ class Omnibar(
                         // remove all fade omnibars
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
+
+                        coroutineScope.launch {
+                            themingDataStore.countSingleOmnibarUser()
+                        }
                     }
                 }
             }
@@ -134,20 +145,21 @@ class Omnibar(
                         binding.rootView.removeView(binding.singleOmnibarBottom)
                     }
 
-                    FADE -> {
-                        // remove top variant
-                        binding.rootView.removeView(binding.fadeOmnibar)
+                    // TODO: Revisit this when the split omnibar feature is revived
+                    // FADE -> {
+                    //     // remove top variant
+                    //     binding.rootView.removeView(binding.fadeOmnibar)
+                    //
+                    //     // remove all scrolling omnibars
+                    //     binding.rootView.removeView(binding.newOmnibar)
+                    //     binding.rootView.removeView(binding.newOmnibarBottom)
+                    //
+                    //     // remove all single omnibars
+                    //     binding.rootView.removeView(binding.singleOmnibar)
+                    //     binding.rootView.removeView(binding.singleOmnibarBottom)
+                    // }
 
-                        // remove all scrolling omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove all single omnibars
-                        binding.rootView.removeView(binding.singleOmnibar)
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-                    }
-
-                    SINGLE -> {
+                    else -> {
                         // remove top variant
                         binding.rootView.removeView(binding.singleOmnibar)
 
@@ -158,6 +170,10 @@ class Omnibar(
                         // remove all fade omnibars
                         binding.rootView.removeView(binding.fadeOmnibar)
                         binding.rootView.removeView(binding.fadeOmnibarBottom)
+
+                        coroutineScope.launch {
+                            themingDataStore.countSingleOmnibarUser()
+                        }
                     }
                 }
 

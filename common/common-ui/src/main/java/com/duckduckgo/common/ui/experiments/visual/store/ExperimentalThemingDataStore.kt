@@ -38,4 +38,6 @@ interface ExperimentalThemingDataStore {
 
     fun changeExperimentFlagPreference(enabled: Boolean)
     fun changeDuckAIPoCFlagPreference(enabled: Boolean)
+
+    suspend fun countSingleOmnibarUser()
 }

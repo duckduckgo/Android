@@ -101,6 +101,10 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
         updateFeatureState()
     }
 
+    override suspend fun countSingleOmnibarUser() {
+        experimentalThemingFeature.singleOmnibarFeature().enroll()
+    }
+
     private fun updateFeatureState() {
         appCoroutineScope.launch {
             // TODO: Revisit this when the split omnibar feature is revived
