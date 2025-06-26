@@ -25,10 +25,6 @@
     <string name="experimentalUIIconsTitle">Use colorful icons</string>
     <string name="experimentalUIIconsMessage">When enabled, colorful icons will be shown in the toolbar.</string>
 
-    <!-- Duck.ai updates - O-A -->
-    <string name="duckAIUpdateTitle">Duck.ai PoC</string>
-    <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
-
     <!--    Bottom Navigation Bar Experiment-->
     <string name="navigationBarExperimentEnableTitle">Enable navigation bar</string>
     <string name="navigationBarExperimentEnableMessage">Enables the bottom navigation bar and adjusts relevant functionality in the address bar and browser menu.</string>

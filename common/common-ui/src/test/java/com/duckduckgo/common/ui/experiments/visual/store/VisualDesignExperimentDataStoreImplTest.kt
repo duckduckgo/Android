@@ -20,7 +20,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlin.jvm.java
 import kotlinx.coroutines.test.runTest
@@ -28,9 +27,7 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
 
 @Suppress("DenyListedApi")
 class VisualDesignExperimentDataStoreImplTest {
@@ -43,9 +40,6 @@ class VisualDesignExperimentDataStoreImplTest {
         store = FakeToggleStore(),
     )
 
-    @Mock
-    private lateinit var togglesInventory: FeatureTogglesInventory
-
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
@@ -53,42 +47,29 @@ class VisualDesignExperimentDataStoreImplTest {
         experimentalUIThemingFeature.self().setRawStoredState(State(enable = true))
         experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = true))
         experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().setRawStoredState(State(enable = true))
-        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = true))
     }
 
     @Test
-    fun `when Duck AI PoC FF enabled and experiment enabled, Duck AI PoC enabled`() = runTest {
-        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
+    fun `when experiment feature flag enabled, then experiment enabled`() = runTest {
         val testee = createTestee()
 
-        Assert.assertTrue(testee.isDuckAIPoCEnabled.value)
+        Assert.assertTrue(testee.isExperimentEnabled.value)
     }
 
     @Test
-    fun `when Duck AI PoC FF enabled and experiment disabled, Duck AI PoC disabled`() = runTest {
-        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        experimentalUIThemingFeature.self().setRawStoredState(State(enable = false))
+    fun `when experiment feature flag disabled, then experiment disabled`() = runTest {
         experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
-        Assert.assertFalse(testee.isDuckAIPoCEnabled.value)
-    }
-
-    @Test
-    fun `when Duck AI PoC FF disabled but experiment enabled, Duck AI PoC disabled`() = runTest {
-        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
-        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = false))
-
-        val testee = createTestee()
-
-        Assert.assertFalse(testee.isDuckAIPoCEnabled.value)
+        Assert.assertFalse(testee.isExperimentEnabled.value)
     }
 
     private fun createTestee(): VisualDesignExperimentDataStoreImpl {
         return VisualDesignExperimentDataStoreImpl(
             appCoroutineScope = coroutineRule.testScope,
             experimentalUIThemingFeature = experimentalUIThemingFeature,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
         )
     }
 }

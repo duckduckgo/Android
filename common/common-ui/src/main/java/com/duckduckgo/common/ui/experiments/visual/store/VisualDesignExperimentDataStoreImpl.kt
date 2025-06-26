@@ -19,6 +19,7 @@ package com.duckduckgo.common.ui.experiments.visual.store
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
@@ -33,6 +34,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(
     scope = AppScope::class,
@@ -42,13 +44,12 @@ import kotlinx.coroutines.launch
 @SingleInstanceIn(scope = AppScope::class)
 class VisualDesignExperimentDataStoreImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
     private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
 
     private val _newDesignFeatureFlagEnabled =
         MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
-    private val _duckAIFeatureFlagEnabled =
-        MutableStateFlow(_newDesignFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled())
     private val _newDesignWithoutBottomBarFeatureFlagEnabled =
         MutableStateFlow(experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().isEnabled())
 
@@ -67,38 +68,21 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
         initialValue = !isNewDesignEnabled.value && _newDesignWithoutBottomBarFeatureFlagEnabled.value,
     )
 
-    override val isDuckAIPoCEnabled: StateFlow<Boolean> =
-        combine(_duckAIFeatureFlagEnabled, isNewDesignEnabled) { duckAIFeatureFlagEnabled, experimentEnabled ->
-            duckAIFeatureFlagEnabled && experimentEnabled
-        }.stateIn(
-            scope = appCoroutineScope,
-            started = SharingStarted.Eagerly,
-            initialValue = _duckAIFeatureFlagEnabled.value && isNewDesignEnabled.value,
-        )
-
     override fun onPrivacyConfigDownloaded() {
-        updateFeatureState()
+        appCoroutineScope.launch {
+            updateFeatureState()
+        }
     }
 
     @SuppressLint("DenyListedApi")
-    override fun changeExperimentFlagPreference(enabled: Boolean) {
+    override suspend fun changeExperimentFlagPreference(enabled: Boolean) = withContext(dispatcherProvider.io()) {
         experimentalUIThemingFeature.self().setRawStoredState(Toggle.State(remoteEnableState = enabled))
         experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
         updateFeatureState()
     }
 
-    @SuppressLint("DenyListedApi")
-    override fun changeDuckAIPoCFlagPreference(enabled: Boolean) {
-        experimentalUIThemingFeature.duckAIPoCFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
-        updateFeatureState()
-    }
-
-    private fun updateFeatureState() {
-        appCoroutineScope.launch {
-            _newDesignFeatureFlagEnabled.value =
-                experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
-            _duckAIFeatureFlagEnabled.value =
-                _newDesignFeatureFlagEnabled.value && experimentalUIThemingFeature.duckAIPoCFeature().isEnabled()
-        }
+    private suspend fun updateFeatureState() = withContext(dispatcherProvider.io()) {
+        _newDesignFeatureFlagEnabled.value =
+            experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
     }
 }

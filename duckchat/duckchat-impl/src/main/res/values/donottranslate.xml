@@ -24,4 +24,7 @@
     <string name="duck_chat_stop_generating">Stop generating</string>
     <string name="duck_chat_search_tab">Search</string>
     <string name="duck_chat_ai_tab">Duck.ai</string>
+    <string name="duck_ai_setting_input_screen_title">Search Input</string>
+    <string name="duck_ai_setting_input_screen_description">Search the web or ask Duck.ai directly from the Address Bar</string>
+    <string name="duck_ai_setting_input_screen_description_when_disabled">Search the web or ask Duck.ai directly from the Address Bar\n(INTERNAL NOTE: When enabled, also activates new visual design if not already.)</string>
 </resources>
