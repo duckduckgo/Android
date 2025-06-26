@@ -384,17 +384,17 @@ class RealDuckChat @Inject constructor(
 
     override fun openDuckChatWithAutoPrompt(query: String) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
-        val parameters = addChatParameters(query, autoPrompt = true, prefill = false)
+        val parameters = addChatParameters(query, autoPrompt = true)
         openDuckChat(parameters, forceNewSession = true)
     }
 
     override fun openDuckChatWithPrefill(query: String) {
         logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
-        val parameters = addChatParameters(query, autoPrompt = false, prefill = true)
+        val parameters = addChatParameters(query, autoPrompt = false)
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    private fun addChatParameters(query: String, autoPrompt: Boolean, prefill: Boolean): Map<String, String> {
+    private fun addChatParameters(query: String, autoPrompt: Boolean): Map<String, String> {
         val hasDuckChatBang = isDuckChatBang(query.toUri())
         val cleanedQuery = if (hasDuckChatBang) {
             stripBang(query)
@@ -407,12 +407,9 @@ class RealDuckChat @Inject constructor(
                 if (hasDuckChatBang) {
                     put(BANG_QUERY_NAME, BANG_QUERY_VALUE)
                 }
-            }
-            if (autoPrompt) {
-                put(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE)
-            }
-            if (prefill) {
-                put(QUERY, query)
+                if (autoPrompt) {
+                    put(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE)
+                }
             }
         }
     }

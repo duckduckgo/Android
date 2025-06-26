@@ -296,6 +296,7 @@ class RealDuckChatTest {
     @Test
     fun whenOpenDuckChatCalledWithBangQueryThenActivityStartedWithBangQuery() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
+        duckChatFeature.keepSession().setRawStoredState(State(enable = false))
         testee.onPrivacyConfigDownloaded()
 
         testee.openDuckChatWithPrefill(query = "example !ai")
