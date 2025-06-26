@@ -51,7 +51,7 @@ class ExperimentalThemingDataStoreImplTest {
         MockitoAnnotations.openMocks(this)
 
         experimentalThemingFeature.self().setRawStoredState(State(enable = true))
-        experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(State(enable = true))
+        // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(State(enable = true))
         experimentalThemingFeature.singleOmnibarFeature().setRawStoredState(State(enable = true))
         experimentalThemingFeature.duckAIPoCFeature().setRawStoredState(State(enable = true))
     }

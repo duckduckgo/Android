@@ -46,8 +46,9 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
     private val experimentalThemingFeature: ExperimentalThemingFeature,
 ) : ExperimentalThemingDataStore, PrivacyConfigCallbackPlugin {
 
-    // Should be false until we revive the feature
     private val _splitOmnibarFlagEnabled = MutableStateFlow(false).asStateFlow()
+
+    // TODO: Revisit this when the split omnibar feature is revived
     // private val _splitOmnibarFlagEnabled =
     //     MutableStateFlow(experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled())
 
@@ -87,7 +88,10 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
     @SuppressLint("DenyListedApi")
     override fun changeExperimentFlagPreference(enabled: Boolean) {
         experimentalThemingFeature.self().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+
+        // TODO: Revisit this when the split omnibar feature is revived
         // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+
         updateFeatureState()
     }
 
@@ -99,6 +103,7 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
 
     private fun updateFeatureState() {
         appCoroutineScope.launch {
+            // TODO: Revisit this when the split omnibar feature is revived
             // _splitOmnibarFlagEnabled.value =
             //     experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled()
 
