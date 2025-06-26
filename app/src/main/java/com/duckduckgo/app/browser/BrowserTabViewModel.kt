@@ -2871,7 +2871,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     private fun showOrHideKeyboard(cta: Cta?) {
-        logcat { "Duck.ai: showOrHideKeyboard" }
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
         val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
             duckChat.showInputScreen.value

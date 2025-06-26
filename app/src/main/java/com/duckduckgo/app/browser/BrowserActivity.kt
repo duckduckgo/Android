@@ -551,7 +551,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
-            logcat { "Duck.ai: isDuckChatVisible = true" }
             isDuckChatVisible = true
             val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
             viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive)
@@ -771,7 +770,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun closeDuckChat() {
-        logcat { "Duck.ai: isDuckChatVisible = false" }
         isDuckChatVisible = false
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {

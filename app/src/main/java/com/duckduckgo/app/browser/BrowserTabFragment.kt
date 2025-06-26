@@ -3691,7 +3691,6 @@ class BrowserTabFragment :
         if (!isAdded) return
         webView?.onResume()
         launchDownloadMessagesJob()
-        logcat { "Duck.ai: onTabVisible" }
         viewModel.onViewVisible()
     }
 
