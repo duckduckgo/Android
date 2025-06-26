@@ -35,6 +35,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -73,7 +74,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val duckChatShowInputScreenFlow = MutableStateFlow(false)
+    private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -81,6 +82,7 @@ class OmnibarLayoutViewModelTest {
 
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
+    private val duckAiFeatureState: DuckAiFeatureState = mock()
     private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
@@ -110,7 +112,7 @@ class OmnibarLayoutViewModelTest {
         whenever(duckChat.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
-        whenever(duckChat.showInputScreen).thenReturn(duckChatShowInputScreenFlow)
+        whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
 
         initializeViewModel()
     }
@@ -1290,7 +1292,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAIPoCEnabledThenShowClickCatcherTrue() = runTest {
-        duckChatShowInputScreenFlow.value = true
+        duckAiShowInputScreenFlow.value = true
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
@@ -1301,7 +1303,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAIPoCDisabledThenShowClickCatcherFalse() = runTest {
-        duckChatShowInputScreenFlow.value = false
+        duckAiShowInputScreenFlow.value = false
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
