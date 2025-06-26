@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.api
 
 import android.net.Uri
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
