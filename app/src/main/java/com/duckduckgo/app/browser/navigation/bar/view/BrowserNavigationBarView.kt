@@ -229,7 +229,11 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         if (enabled) {
             if (!pulseAnimation.isActive) {
                 doOnLayout {
-                    pulseAnimation.playOn(binding.fireIconImageView, isExperimentAndShieldView = false)
+                    pulseAnimation.playOn(
+                        targetView = binding.fireIconImageView,
+                        isSenseOfProtectionExperimentAndShieldView = false,
+                        isBuckOnboardingExperiment = false
+                    )
                 }
             }
         } else {
