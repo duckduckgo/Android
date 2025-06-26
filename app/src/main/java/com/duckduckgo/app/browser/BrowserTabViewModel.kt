@@ -4213,7 +4213,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun openDuckChat(query: String?) {
-        logcat { "Duck.ai: query $query lastSubmittedUserQuery $lastSubmittedUserQuery omnibar ${omnibarViewState.value?.queryOrFullUrl} lastSubmittedChatQuery $lastSubmittedChatQuery" }
         when {
             query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
             lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
