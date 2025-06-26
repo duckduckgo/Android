@@ -40,7 +40,7 @@ import kotlinx.coroutines.withContext
  */
 
 interface ApiManipulationRepository {
-    suspend fun insertJsonData(jsonData: String)
+    suspend fun insertJsonData(jsonData: String): Boolean
     suspend fun getJsonData(): String?
 }
 
@@ -50,8 +50,8 @@ class RealApiManipulationRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : ApiManipulationRepository {
 
-    override suspend fun insertJsonData(jsonData: String) {
-        withContext(dispatcherProvider.io()) { apiManipulationStore.insertJsonData(jsonData) }
+    override suspend fun insertJsonData(jsonData: String): Boolean {
+        return withContext(dispatcherProvider.io()) { apiManipulationStore.insertJsonData(jsonData) }
     }
 
     override suspend fun getJsonData(): String? {

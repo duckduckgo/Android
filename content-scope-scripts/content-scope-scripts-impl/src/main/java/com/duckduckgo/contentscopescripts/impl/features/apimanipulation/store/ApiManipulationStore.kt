@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl.features.apimanipulation.store
 
+import android.annotation.SuppressLint
 import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -23,7 +24,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface ApiManipulationStore {
-    suspend fun insertJsonData(jsonData: String)
+    suspend fun insertJsonData(jsonData: String): Boolean
     suspend fun getJsonData(): String?
 }
 
@@ -42,9 +43,8 @@ class RealApiManipulationStore @Inject constructor(
         return preferences.getString(KEY_JSON_DATA, null)
     }
 
-    override suspend fun insertJsonData(jsonData: String) {
-        preferences.edit {
-            putString(KEY_JSON_DATA, jsonData)
-        }
+    @SuppressLint("UseKtx")
+    override suspend fun insertJsonData(jsonData: String): Boolean {
+        return preferences.edit().putString(KEY_JSON_DATA, jsonData).commit()
     }
 }

@@ -16,26 +16,22 @@
 
 package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 @ContributesMultibinding(AppScope::class)
 class ApiManipulationFeaturePlugin @Inject constructor(
     private val apiManipulationRepository: ApiManipulationRepository,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PrivacyFeaturePlugin {
 
     override fun store(featureName: String, jsonString: String): Boolean {
         return if (featureName == this.featureName) {
-            appCoroutineScope.launch {
+            return runBlocking {
                 apiManipulationRepository.insertJsonData(jsonString)
             }
-            true
         } else {
             false
         }
