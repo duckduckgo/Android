@@ -73,6 +73,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -103,7 +104,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            showChatMenu = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser(),
+            showChatMenu = duckAiFeatureState.showOmnibarShortcutInAllStates.value,
         ),
     )
 
@@ -112,18 +113,33 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         visualDesignExperimentDataStore.isExperimentEnabled,
-        duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
-    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showOmnibarShortcutOnNtpAndOnFocus ->
+    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
-            showChatMenu = showOmnibarShortcutOnNtpAndOnFocus && state.viewMode !is CustomTab &&
-                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+
+    private val showDuckAiButton = combine(
+        _viewState,
+        duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
+        duckAiFeatureState.showOmnibarShortcutInAllStates,
+    ) { viewState, showOnNtpAndOnFocus, showInAllStates ->
+        when {
+            viewState.viewMode is CustomTab -> {
+                false
+            }
+
+            showInAllStates -> {
+                true
+            }
+
+            else -> showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank())
+        }
+    }.distinctUntilChanged()
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -190,6 +206,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     showClickCatcher = inputScreenEnabled,
                 )
+            }
+        }.launchIn(viewModelScope)
+
+        showDuckAiButton.onEach { showDuckAiButton ->
+            _viewState.update {
+                it.copy(showChatMenu = showDuckAiButton)
             }
         }.launchIn(viewModelScope)
     }

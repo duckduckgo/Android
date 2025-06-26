@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -222,6 +223,7 @@ class RealDuckChat @Inject constructor(
     private val _showInputScreen = MutableStateFlow(false)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
+    private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
@@ -298,10 +300,6 @@ class RealDuckChat @Inject constructor(
         return duckAiInputScreen
     }
 
-    override fun isEnabledInBrowser(): Boolean {
-        return isDuckAiInBrowserEnabled
-    }
-
     override fun isKeepSessionEnabled(): Boolean {
         return keepSessionAliveEnabled
     }
@@ -373,6 +371,8 @@ class RealDuckChat @Inject constructor(
     override val showPopupMenuShortcut: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
 
     override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
+
+    override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -577,6 +577,9 @@ class RealDuckChat @Inject constructor(
         val showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() &&
             isDuckChatEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
         _showInAddressBar.emit(showInAddressBar)
+
+        val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
+        _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
     }
 
     companion object {
