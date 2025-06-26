@@ -93,36 +93,23 @@
             app:barrierDirection="bottom"
             app:constraint_referenced_ids="welcomeContent,daxDialogCta" />
 
-
-
     <FrameLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/bottomContentBarrier"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/onboardingPageAnimation"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:adjustViewBounds="true"
-                    android:layout_gravity="bottom"
                     android:importantForAccessibility="no"
                     android:scaleType="fitCenter"
                     app:lottie_imageAssetsFolder="images"
                     app:lottie_loop="false"/>
-
-<!--        <ImageView-->
-<!--                android:id="@+id/testImage"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:adjustViewBounds="true"-->
-<!--                android:layout_gravity="bottom"-->
-<!--                android:src="@drawable/test_pattern"-->
-<!--                android:scaleType="fitCenter"/>-->
 
     </FrameLayout>
 

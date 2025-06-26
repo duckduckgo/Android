@@ -25,9 +25,10 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
 import androidx.core.view.ViewCompat
@@ -388,12 +389,12 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         }
         setMinAndMaxProgress(minProgress, maxProgress)
 
-        updateLayoutParams<ViewGroup.MarginLayoutParams> {
+        updateLayoutParams<FrameLayout.LayoutParams> {
             marginStart = animation.viewLayoutParamsOverride.marginStart
             marginEnd = animation.viewLayoutParamsOverride.marginEnd
             topMargin = animation.viewLayoutParamsOverride.marginTop
             bottomMargin = animation.viewLayoutParamsOverride.marginBottom
-            maxHeight = animation.viewLayoutParamsOverride.maxHeight
+            gravity = animation.viewLayoutParamsOverride.gravity
         }
 
         addAnimatorListener(
@@ -465,16 +466,13 @@ private enum class LottieOnboardingAnimationSpec(
         resId = R.raw.ob_3_wing,
         enterPhaseMaxProgress = 0.8f,
         viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
-            marginTop = (-250).toPx(),
-            marginStart = (-64).toPx(),
-            marginEnd = (-64).toPx(),
+            gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
         ),
     ),
     POPUP_SMALL(
         resId = R.raw.ob_4_popup,
         viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
             marginEnd = 16.toPx(),
-            maxHeight = 250.toPx(),
         ),
     ),
     ;
@@ -484,7 +482,7 @@ private enum class LottieOnboardingAnimationSpec(
         val marginEnd: Int = 0,
         val marginTop: Int = 0,
         val marginBottom: Int = 0,
-        val maxHeight: Int = Integer.MAX_VALUE,
+        val gravity: Int = Gravity.BOTTOM or Gravity.START,
     )
 
     enum class AnimationPhase { ENTER, EXIT }
