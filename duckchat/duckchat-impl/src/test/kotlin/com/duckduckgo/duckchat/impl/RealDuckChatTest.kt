@@ -282,7 +282,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatCalledWithQueryThenActivityStartedWithQuery() = runTest {
-        testee.openDuckChat(query = "example")
+        testee.openDuckChatWithPrefill(query = "example")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             DuckChatWebViewActivityWithParams(
@@ -298,7 +298,7 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChat(query = "example !ai")
+        testee.openDuckChatWithPrefill(query = "example !ai")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             DuckChatWebViewActivityWithParams(
@@ -314,7 +314,7 @@ class RealDuckChatTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
 
-        testee.openDuckChat(query = "!ai !image")
+        testee.openDuckChatWithPrefill(query = "!ai !image")
         verify(mockGlobalActivityStarter).startIntent(
             mockContext,
             DuckChatWebViewActivityWithParams(
