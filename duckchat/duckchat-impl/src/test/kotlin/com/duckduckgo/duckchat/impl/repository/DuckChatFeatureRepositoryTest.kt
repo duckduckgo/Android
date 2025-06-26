@@ -55,6 +55,13 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when setInputScreenUserSetting then set in data store`() = runTest {
+        testee.setInputScreenUserSetting(false)
+
+        verify(mockDataStore).setInputScreenUserSetting(false)
+    }
+
+    @Test
     fun whenObserveDuckChatUserEnabledThenObserveDataStore() = runTest {
         whenever(mockDataStore.observeDuckChatUserEnabled()).thenReturn(flowOf(true, false))
 
@@ -82,6 +89,15 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
+    fun `when observeInputScreenUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false, true))
+
+        val results = testee.observeInputScreenUserSettingEnabled().take(2).toList()
+        assertFalse(results[0])
+        assertTrue(results[1])
+    }
+
+    @Test
     fun whenIsDuckChatUserEnabledThenGetFromDataStore() = runTest {
         whenever(mockDataStore.isDuckChatUserEnabled()).thenReturn(false)
         assertFalse(testee.isDuckChatUserEnabled())
@@ -98,6 +114,12 @@ class DuckChatFeatureRepositoryTest {
     fun whenShouldShowInAddressBarThenGetFromDataStore() = runTest {
         whenever(mockDataStore.getShowInAddressBar()).thenReturn(true)
         assertTrue(testee.shouldShowInAddressBar())
+    }
+
+    @Test
+    fun `when isInputScreenUserSettingEnabled called, then get from data store`() = runTest {
+        whenever(mockDataStore.isInputScreenUserSettingEnabled()).thenReturn(true)
+        assertTrue(testee.isInputScreenUserSettingEnabled())
     }
 
     @Test

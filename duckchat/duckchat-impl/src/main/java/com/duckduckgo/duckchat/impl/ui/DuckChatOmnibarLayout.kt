@@ -196,11 +196,11 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             if (isSearchTab) {
                 minLines = SEARCH_MIN_LINES
                 hint = context.getString(R.string.duck_chat_search_or_type_url)
-                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_GO
+                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
             } else {
                 minLines = DUCK_CHAT_MIN_LINES
                 hint = context.getString(R.string.duck_chat_ask_anything)
-                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_ACTION_NONE
+                imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
