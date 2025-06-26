@@ -19,10 +19,34 @@ package com.duckduckgo.duckchat.api
 import kotlinx.coroutines.flow.StateFlow
 
 interface DuckAiFeatureState {
+
+    /**
+     * Indicates whether the Duck AI settings should be available from the main settings screen.
+     */
     val showSettings: StateFlow<Boolean>
+
+    /**
+     * Indicates whether focusing the omnibar should navigate to a new Duck.ai input screen with a Search/AI mode switcher.
+     */
     val showInputScreen: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck AI shortcut should be shown in the popup menus in the main browser tabs as well as on the tab switcher screen.
+     */
     val showPopupMenuShortcut: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck AI omnibar shortcut should be shown on the New Tab Page (NTP) and when the omnibar is focused.
+     */
     val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck AI omnibar shortcut should be shown in all states, including when the omnibar is not focused.
+     */
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
+
+    /**
+     * Indicates whether the Duck AI state should be kept when closed, so that it can be resumed later without starting a new session.
+     */
     val keepSession: StateFlow<Boolean>
 }
