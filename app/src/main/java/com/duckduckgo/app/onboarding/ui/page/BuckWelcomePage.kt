@@ -27,6 +27,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
@@ -34,6 +35,7 @@ import androidx.annotation.RawRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
@@ -145,6 +147,13 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, insets ->
+            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val margin = v.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
+            v.updateLayoutParams<MarginLayoutParams> { topMargin = statusBarHeight + margin }
+            insets
+        }
 
         setBackgroundRes(
             if (appTheme.isLightModeEnabled()) {
