@@ -25,11 +25,5 @@ interface VisualDesignExperimentDataStore {
      */
     val isExperimentEnabled: StateFlow<Boolean>
 
-    /**
-     * State flow which returns `true` if the feature flag for the Duck AI PoC is enabled and there are no conflicting experiments detected.
-     */
-    val isDuckAIPoCEnabled: StateFlow<Boolean>
-
-    fun changeExperimentFlagPreference(enabled: Boolean)
-    fun changeDuckAIPoCFlagPreference(enabled: Boolean)
+    suspend fun changeExperimentFlagPreference(enabled: Boolean)
 }

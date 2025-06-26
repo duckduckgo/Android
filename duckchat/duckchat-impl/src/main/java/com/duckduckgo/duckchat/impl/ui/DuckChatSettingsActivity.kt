@@ -55,6 +55,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.onDuckChatUserEnabledToggled(isChecked)
         }
 
+    private val inputScreenToggleListener =
+        CompoundButton.OnCheckedChangeListener { _, isChecked ->
+            viewModel.onDuckAiInputScreenToggled(isChecked)
+        }
+
     private val menuToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onShowDuckChatInMenuToggled(isChecked)
@@ -111,6 +116,17 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
+
+        binding.duckAiInputScreenEnabledToggle.apply {
+            isVisible = viewState.shouldShowInputScreenToggle
+            quietlySetIsChecked(viewState.isInputScreenEnabled, inputScreenToggleListener)
+            val description = if (viewState.isInputScreenEnabled) {
+                getString(R.string.duck_ai_setting_input_screen_description)
+            } else {
+                getString(R.string.duck_ai_setting_input_screen_description_when_disabled)
+            }
+            setSecondaryText(description)
+        }
 
         binding.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
 

@@ -25,14 +25,17 @@ import kotlinx.coroutines.flow.Flow
 
 interface DuckChatFeatureRepository {
     suspend fun setDuckChatUserEnabled(enabled: Boolean)
+    suspend fun setInputScreenUserSetting(enabled: Boolean)
     suspend fun setShowInBrowserMenu(showDuckChat: Boolean)
     suspend fun setShowInAddressBar(showDuckChat: Boolean)
 
     fun observeDuckChatUserEnabled(): Flow<Boolean>
+    fun observeInputScreenUserSettingEnabled(): Flow<Boolean>
     fun observeShowInBrowserMenu(): Flow<Boolean>
     fun observeShowInAddressBar(): Flow<Boolean>
 
     suspend fun isDuckChatUserEnabled(): Boolean
+    suspend fun isInputScreenUserSettingEnabled(): Boolean
     suspend fun shouldShowInBrowserMenu(): Boolean
     suspend fun shouldShowInAddressBar(): Boolean
 
@@ -51,6 +54,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         duckChatDataStore.setDuckChatUserEnabled(enabled)
     }
 
+    override suspend fun setInputScreenUserSetting(enabled: Boolean) {
+        duckChatDataStore.setInputScreenUserSetting(enabled)
+    }
+
     override suspend fun setShowInBrowserMenu(showDuckChat: Boolean) {
         duckChatDataStore.setShowInBrowserMenu(showDuckChat)
     }
@@ -63,6 +70,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
         return duckChatDataStore.observeDuckChatUserEnabled()
     }
 
+    override fun observeInputScreenUserSettingEnabled(): Flow<Boolean> {
+        return duckChatDataStore.observeInputScreenUserSettingEnabled()
+    }
+
     override fun observeShowInBrowserMenu(): Flow<Boolean> {
         return duckChatDataStore.observeShowInBrowserMenu()
     }
@@ -73,6 +84,10 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun isDuckChatUserEnabled(): Boolean {
         return duckChatDataStore.isDuckChatUserEnabled()
+    }
+
+    override suspend fun isInputScreenUserSettingEnabled(): Boolean {
+        return duckChatDataStore.isInputScreenUserSettingEnabled()
     }
 
     override suspend fun shouldShowInBrowserMenu(): Boolean {
