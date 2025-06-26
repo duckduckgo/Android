@@ -50,19 +50,38 @@ class VisualDesignExperimentDataStoreImplTest {
     }
 
     @Test
-    fun `when experiment feature flag enabled, then experiment enabled`() = runTest {
-        val testee = createTestee()
-
-        Assert.assertTrue(testee.isExperimentEnabled.value)
-    }
-
-    @Test
-    fun `when experiment feature flag disabled, then experiment disabled`() = runTest {
+    fun `when split omnibar feature flag enabled, then experiment enabled`() = runTest {
         experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
-        Assert.assertFalse(testee.isExperimentEnabled.value)
+        Assert.assertTrue(testee.isNewDesignWithoutBottomBarEnabled.value)
+    }
+
+    @Test
+    fun `when split omnibar feature flag disabled, then experiment disabled`() = runTest {
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
+        experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().setRawStoredState(State(enable = false))
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isNewDesignWithoutBottomBarEnabled.value)
+    }
+
+    @Test
+    fun `when new design feature flag enabled, then experiment enabled`() = runTest {
+        val testee = createTestee()
+
+        Assert.assertTrue(testee.isNewDesignEnabled.value)
+    }
+
+    @Test
+    fun `when new design feature flag disabled, then experiment disabled`() = runTest {
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isNewDesignEnabled.value)
     }
 
     private fun createTestee(): VisualDesignExperimentDataStoreImpl {
