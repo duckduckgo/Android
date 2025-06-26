@@ -94,6 +94,9 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         binding.duckChatOmnibar.duckChatInput.post {
             showKeyboard(binding.duckChatOmnibar.duckChatInput)
         }
+        binding.actionNewLine.setOnClickListener {
+            binding.duckChatOmnibar.printNewLine()
+        }
     }
 
     private fun configureViewPager() {
