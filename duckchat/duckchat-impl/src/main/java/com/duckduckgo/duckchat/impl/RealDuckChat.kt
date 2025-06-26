@@ -483,7 +483,6 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         url: String,
     ): String {
-        logcat { "Duck.ai: parameters Duck.ai $parameters" }
         if (parameters.isEmpty()) return url
         return runCatching {
             val uri = url.toUri()

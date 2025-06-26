@@ -1388,8 +1388,9 @@ class BrowserTabFragment :
 
         viewModel.onViewResumed()
 
-        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
-        if (fragmentIsVisible()) {
+        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible and Duck.ai is not
+        if (fragmentIsVisible() && (requireActivity() as? BrowserActivity)?.isDuckChatVisible == false) {
+            logcat { "Duck.ai BTF onResume onViewVisible()" }
             viewModel.onViewVisible()
         }
 
@@ -3690,6 +3691,7 @@ class BrowserTabFragment :
         if (!isAdded) return
         webView?.onResume()
         launchDownloadMessagesJob()
+        logcat { "Duck.ai: onTabVisible" }
         viewModel.onViewVisible()
     }
 
