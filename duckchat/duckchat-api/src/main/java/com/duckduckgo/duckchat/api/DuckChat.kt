@@ -48,13 +48,6 @@ interface DuckChat {
     fun isKeepSessionEnabled(): Boolean
 
     /**
-     * Checks whether dedicated Duck.ai input screen with the input mode switch should be used when focusing on the omnibar.
-     *
-     * @return true if the input mode switch should be used, false otherwise.
-     */
-    val showInputScreen: StateFlow<Boolean>
-
-    /**
      * Checks whether DuckChat should be shown in address bar based on user settings.
      *
      * @return true if DuckChat should be shown, false otherwise.
