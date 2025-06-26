@@ -44,9 +44,4 @@ interface DuckAiFeatureState {
      * Indicates whether the Duck AI omnibar shortcut should be shown in all states, including when the omnibar is not focused.
      */
     val showOmnibarShortcutInAllStates: StateFlow<Boolean>
-
-    /**
-     * Indicates whether the Duck AI state should be kept when closed, so that it can be resumed later without starting a new session.
-     */
-    val keepSession: StateFlow<Boolean>
 }

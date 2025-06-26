@@ -292,8 +292,6 @@ class RealDuckChat @Inject constructor(
         cacheUserSettings()
     }
 
-    override val keepSession: StateFlow<Boolean> = _keepSession.asStateFlow()
-
     override fun isEnabled(): Boolean {
         return isDuckChatEnabled
     }
@@ -327,7 +325,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        if (keepSession.value) {
+        if (_keepSession.value) {
             browserNav.closeDuckChat(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -442,7 +440,7 @@ class RealDuckChat @Inject constructor(
 
             val hasSessionActive = when {
                 forceNewSession -> false
-                keepSession.value -> hasActiveSession()
+                _keepSession.value -> hasActiveSession()
                 else -> false
             }
 
@@ -450,7 +448,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                if (keepSession.value) {
+                if (_keepSession.value) {
                     logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                     openDuckChatSession(url, hasSessionActive)
                 } else {
