@@ -1192,7 +1192,12 @@ class BrowserWebViewClientTest {
         var countFinished = 0
         var countStarted = 0
 
-        override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+        override fun onPageStarted(
+            webView: WebView,
+            url: String?,
+            isDesktopMode: Boolean?,
+            activeExperiments: List<Toggle>,
+        ) {
             countStarted++
         }
 

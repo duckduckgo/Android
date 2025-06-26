@@ -513,6 +513,8 @@ class BrowserTabViewModel @Inject constructor(
     private var ctaChangedTicker = MutableStateFlow("")
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
+    private var activeExperiments: List<Toggle>? = null
+
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
         val bookmarks: List<String> = emptyList(),
@@ -800,6 +802,7 @@ class BrowserTabViewModel @Inject constructor(
         if (updateMaliciousSiteStatus) {
             site?.maliciousSiteStatus = maliciousSiteStatus
         }
+        site?.activeContentScopeExperiments = activeExperiments
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1898,7 +1901,8 @@ class BrowserTabViewModel @Inject constructor(
         webViewNavigationState: WebViewNavigationState,
         activeExperiments: List<Toggle>,
     ) {
-        site?.activeContentScopeExperiments = activeExperiments
+        this.activeExperiments = activeExperiments
+
         browserViewState.value =
             currentBrowserViewState().copy(
                 browserShowing = true,

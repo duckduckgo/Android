@@ -1,7 +1,6 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
-import com.duckduckgo.app.global.model.Site
 import java.util.*
 import org.junit.Assert.*
 import org.junit.Before
@@ -28,28 +27,27 @@ class ContentScopeScriptsJsInjectorPluginTest {
     @Test
     fun whenEnabledAndInjectContentScopeScriptsThenPopulateMessagingParameters() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript(null)).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
+        whenever(mockCoreContentScopeScripts.getScript(null, listOf())).thenReturn("")
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
 
-        verify(mockCoreContentScopeScripts).getScript(null)
+        verify(mockCoreContentScopeScripts).getScript(null, listOf())
         verify(mockWebView).evaluateJavascript(any(), anyOrNull())
     }
 
     @Test
     fun whenDisabledAndInjectContentScopeScriptsThenDoNothing() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(false)
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null, listOf())
 
         verifyNoInteractions(mockWebView)
     }
 
     @Test
-    fun whenEnabledAndInjectContentScopeScriptsThenUseSite() {
-        val site: Site = mock()
+    fun whenEnabledAndInjectContentScopeScriptsThenUseParams() {
         whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.getScript(site)).thenReturn("")
-        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, site)
+        whenever(mockCoreContentScopeScripts.getScript(true, listOf())).thenReturn("")
+        contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, true, listOf())
 
-        verify(mockCoreContentScopeScripts).getScript(site)
+        verify(mockCoreContentScopeScripts).getScript(true, listOf())
     }
 }
