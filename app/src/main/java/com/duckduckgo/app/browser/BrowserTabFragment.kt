@@ -1390,7 +1390,6 @@ class BrowserTabFragment :
 
         // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible and Duck.ai is not
         if (fragmentIsVisible() && (requireActivity() as? BrowserActivity)?.isDuckChatVisible == false) {
-            logcat { "Duck.ai BTF onResume onViewVisible()" }
             viewModel.onViewVisible()
         }
 
