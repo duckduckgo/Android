@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.api
 import kotlinx.coroutines.flow.StateFlow
 
 interface DuckAiFeatureState {
-    // val showSettings: StateFlow<Boolean>
+    val showSettings: StateFlow<Boolean>
     val showInputScreen: StateFlow<Boolean>
     val showPopupMenuShortcut: StateFlow<Boolean>
     val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean>

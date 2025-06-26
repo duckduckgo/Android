@@ -138,7 +138,7 @@ class TabSwitcherViewModel @Inject constructor(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
             isNewVisualDesignEnabled = isVisualDesignExperimentEnabled,
-            isDuckChatEnabled = duckChat.isEnabled() && showInBrowserMenu,
+            isDuckChatEnabled = showInBrowserMenu,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 

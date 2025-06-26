@@ -1511,7 +1511,6 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckChatMock.isEnabled()).thenReturn(true)
 
         initializeViewModel()
 
@@ -1524,7 +1523,6 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
 
         initializeViewModel()
