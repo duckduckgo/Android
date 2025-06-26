@@ -190,6 +190,7 @@ sealed class OnboardingDaxDialogCta(
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
         onDismissCtaClicked: () -> Unit,
+        onAnimationEnd: () -> Unit = {},
     ) {
         val binding = binding.includeOnboardingInContextBuckDialog
 
@@ -232,10 +233,11 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDialogSuggestionsContent.gone()
                 TransitionManager.beginDelayedTransition(buckOnboardingDialogView, AutoTransition())
                 onboardingDialogContent.show()
+                onAnimationEnd()
             } else {
                 onboardingDaxDialogContainer.show()
                 onboardingDialogContent.show()
-                animateBuckOnboardingDialogEntrance()
+                animateBuckOnboardingDialogEntrance(onAnimationEnd = onAnimationEnd)
             }
         }
     }
@@ -310,7 +312,7 @@ sealed class OnboardingDaxDialogCta(
             binding: FragmentBrowserTabBinding,
             onPrimaryCtaClicked: () -> Unit,
             onSecondaryCtaClicked: () -> Unit,
-            onTypingAnimationFinished: () -> Unit,
+            onTypingAnimationFinished: () -> Unit,  // TODO should be renamed to onAnimationEnd if buck wins
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
         ) {
@@ -321,6 +323,7 @@ sealed class OnboardingDaxDialogCta(
                     message = getTrackersDescription(context, trackers),
                     primaryCtaText = buttonText?.let { context.getString(it) },
                     binding = binding,
+                    onAnimationEnd = onTypingAnimationFinished,
                     onPrimaryCtaClicked = onPrimaryCtaClicked,
                     onDismissCtaClicked = onDismissCtaClicked,
                 )
@@ -704,7 +707,7 @@ sealed class OnboardingDaxDialogCta(
         }
     }
 
-    internal fun IncludeOnboardingInContextBuckDialogBinding.animateBuckOnboardingDialogEntrance() {
+    internal fun IncludeOnboardingInContextBuckDialogBinding.animateBuckOnboardingDialogEntrance(onAnimationEnd: () -> Unit = {}) {
         daxDialogDismissButton.alpha = MIN_ALPHA
 
         with(buckOnboardingDialogView) {
@@ -718,6 +721,7 @@ sealed class OnboardingDaxDialogCta(
                             duration = DAX_DIALOG_APPEARANCE_ANIMATION
                         }.start()
                     }
+                    onAnimationEnd()
                 },
             )
         }
