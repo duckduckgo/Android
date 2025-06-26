@@ -17,19 +17,21 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
-import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperiments
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.FeatureName
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -49,7 +51,6 @@ class RealContentScopeScriptsTest {
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
     private val contentScopeScriptsFeature = FakeFeatureToggleFactory.create(ContentScopeScriptsFeature::class.java)
-    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
 
     lateinit var testee: CoreContentScopeScripts
 
@@ -63,7 +64,6 @@ class RealContentScopeScriptsTest {
             mockUnprotectedTemporary,
             mockFingerprintProtectionManager,
             contentScopeScriptsFeature,
-            mockContentScopeExperiments,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -74,15 +74,14 @@ class RealContentScopeScriptsTest {
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
             .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
         whenever(mockFingerprintProtectionManager.getSeed()).thenReturn(sessionKey)
-        whenever(mockContentScopeExperiments.getExperimentsJson()).thenReturn("[]")
     }
 
     @Test
     fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
@@ -92,7 +91,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndAllowListChangedThenUseNewAllowListValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -109,7 +108,7 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -119,7 +118,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndGpcChangedThenUseNewGpcValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -136,7 +135,7 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockPlugin2.preferences()).thenReturn("\"globalPrivacyControlValue\":false")
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -146,7 +145,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndConfigChangedThenUseNewConfigValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -164,7 +163,7 @@ class RealContentScopeScriptsTest {
         )
         whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -174,7 +173,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -191,7 +190,7 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
@@ -201,7 +200,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndDesktopModeChangedThenUseNewDesktopModeValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -217,16 +216,15 @@ class RealContentScopeScriptsTest {
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
-        val site: Site = mock()
-        whenever(site.isDesktopMode).thenReturn(true)
-        js = testee.getScript(site)
+
+        js = testee.getScript(true, listOf())
 
         verifyJsScript(js, newRegEx)
     }
 
     @Test
-    fun whenGetScriptAndVariablesAreCachedAndCurrentCohortsChangedThenUseNewCurrentCohortsValue() {
-        var js = testee.getScript(null)
+    fun whenGetScriptAndVariablesAreCachedAndCurrentCohortsChangedThenUseNewCurrentCohortsValue() = runTest {
+        var js = testee.getScript(false, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -244,15 +242,79 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
 
-        whenever(mockContentScopeExperiments.getExperimentsJson()).thenReturn(
-            "[{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]",
-        )
-        js = testee.getScript(null)
+        val mockToggle = mock<Toggle>()
+        whenever(mockToggle.getCohort()).thenReturn(Cohort("control", weight = 1))
+        whenever(mockToggle.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        val activeExperiments = listOf(mockToggle)
+
+        js = testee.getScript(false, activeExperiments)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
         verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
         verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
+    }
+
+    @Test
+    fun whenGetScriptWithMultipleActiveExperimentsThenFormatsCorrectly() = runTest {
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[" +
+                "\\{\"cohort\":\"treatment\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}," +
+                "\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"bloops\"}\\]," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+
+        val mockToggle1 = mock<Toggle>()
+        whenever(mockToggle1.getCohort()).thenReturn(Cohort("treatment", weight = 1))
+        whenever(mockToggle1.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        val mockToggle2 = mock<Toggle>()
+        whenever(mockToggle2.getCohort()).thenReturn(Cohort("control", weight = 1))
+        whenever(mockToggle2.featureName()).thenReturn(FeatureName("contentScopeExperiments", "bloops"))
+
+        val activeExperiments = listOf(mockToggle1, mockToggle2)
+
+        val js = testee.getScript(false, activeExperiments)
+
+        verifyJsScript(js, newRegEx)
+    }
+
+    @Test
+    fun whenGetScriptWithExperimentWithoutCohortThenFormatsCorrectly() = runTest {
+        val mockToggle = mock<Toggle>()
+        whenever(mockToggle.getCohort()).thenReturn(null)
+        whenever(mockToggle.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        val activeExperiments = listOf(mockToggle)
+
+        val js = testee.getScript(false, activeExperiments)
+
+        verifyJsScript(js)
+    }
+
+    @Test
+    fun whenGetScriptWithNoActiveExperimentsThenFormatsCorrectly() = runTest {
+        val js = testee.getScript(null, listOf())
+
+        verifyJsScript(js)
+    }
+
+    @Test
+    fun whenGetScriptWithNullSiteThenFormatsCorrectly() = runTest {
+        val js = testee.getScript(null, listOf())
+
+        verifyJsScript(js)
     }
 
     @Test
@@ -269,9 +331,57 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptThenPopulateMessagingParameters() {
-        val js = testee.getScript(null)
+        val js = testee.getScript(null, listOf())
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
+    }
+
+    @Test
+    fun whenGetScriptWithMixedValidAndNullCohortExperimentsThenFiltersOutNullCohorts() = runTest {
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[" +
+                "\\{\"cohort\":\"treatment\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}\\]," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+
+        val validExperiment = mock<Toggle>()
+        whenever(validExperiment.getCohort()).thenReturn(Cohort("treatment", weight = 1))
+        whenever(validExperiment.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
+
+        val nullCohortExperiment = mock<Toggle>()
+        whenever(nullCohortExperiment.getCohort()).thenReturn(null)
+        whenever(nullCohortExperiment.featureName()).thenReturn(FeatureName("contentScopeExperiments", "bloops"))
+
+        val activeExperiments = listOf(validExperiment, nullCohortExperiment)
+
+        val js = testee.getScript(null, activeExperiments)
+
+        verifyJsScript(js, newRegEx)
+    }
+
+    @Test
+    fun whenGetScriptWithExperimentWithoutParentNameThenFiltersOut() = runTest {
+        val expectedRegEx = contentScopeRegex
+
+        val mockToggle = mock<Toggle>()
+        whenever(mockToggle.getCohort()).thenReturn(Cohort("treatment", weight = 1))
+        whenever(mockToggle.featureName()).thenReturn(FeatureName(null, "test"))
+
+        val activeExperiments = listOf(mockToggle)
+
+        val js = testee.getScript(null, activeExperiments)
+
+        verifyJsScript(js, expectedRegEx)
     }
 
     private fun verifyJsScript(js: String, regex: Regex = contentScopeRegex) {
