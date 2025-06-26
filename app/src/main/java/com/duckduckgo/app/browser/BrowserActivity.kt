@@ -1228,7 +1228,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar.value) {
+                if (!duckChat.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
             } else {
@@ -1237,7 +1237,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showInAddressBar.value) {
+                if (!duckChat.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
             }
@@ -1258,7 +1258,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
+            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser()
         }
     }
 }

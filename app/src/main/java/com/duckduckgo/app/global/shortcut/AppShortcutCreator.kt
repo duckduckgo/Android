@@ -35,6 +35,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.squareup.anvil.annotations.ContributesTo
@@ -79,11 +80,12 @@ class AppShortcutCreator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
     private val dispatchers: DispatcherProvider,
 ) {
 
     init {
-        duckChat.showInBrowserMenu
+        duckAiFeatureState.showPopupMenuShortcut
             .onEach { refreshAppShortcuts() }
             .flowOn(dispatchers.io())
             .launchIn(appCoroutineScope)
@@ -97,7 +99,7 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
 
-            if (duckChat.showInBrowserMenu.value) {
+            if (duckAiFeatureState.showPopupMenuShortcut.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
             } else if (appBuildConfig.isInternalBuild()) {
                 shortcutList.add(buildAndroidDesignSystemShortcut(context))

@@ -231,6 +231,7 @@ import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -443,6 +444,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckChat: DuckChat = mock()
 
+    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
@@ -643,7 +646,7 @@ class BrowserTabViewModelTest {
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
-        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
         whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
@@ -764,6 +767,7 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
+            duckAiFeatureState = mockDuckAiFeatureState,
             duckPlayerJSHelper = DuckPlayerJSHelper(
                 mockDuckPlayer,
                 mockAppBuildConfig,
@@ -921,7 +925,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
-        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertFalse(browserViewState().showDuckChatOption)
@@ -929,7 +933,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
-        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertTrue(browserViewState().showDuckChatOption)

@@ -55,18 +55,11 @@ interface DuckChat {
     val showInputScreen: StateFlow<Boolean>
 
     /**
-     * Checks whether DuckChat should be shown in browser menu based on user settings.
-     *
-     * @return true if DuckChat should be shown, false otherwise.
-     */
-    val showInBrowserMenu: StateFlow<Boolean>
-
-    /**
      * Checks whether DuckChat should be shown in address bar based on user settings.
      *
      * @return true if DuckChat should be shown, false otherwise.
      */
-    val showInAddressBar: StateFlow<Boolean>
+    val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean>
 
     /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.

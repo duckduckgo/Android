@@ -192,7 +192,7 @@ class RealDuckChatTest {
 
     @Test
     fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
-        assertTrue(testee.showInBrowserMenu.value)
+        assertTrue(testee.showPopupMenuShortcut.value)
     }
 
     @Test
@@ -201,7 +201,7 @@ class RealDuckChatTest {
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInBrowserMenu.value)
+        assertFalse(testee.showPopupMenuShortcut.value)
     }
 
     @Test
@@ -242,11 +242,11 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.setShowInAddressBarUserSetting(true)
-        assertTrue(testee.showInAddressBar.value)
+        assertTrue(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
 
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         testee.setShowInAddressBarUserSetting(false)
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -475,8 +475,8 @@ class RealDuckChatTest {
         testee.setEnableDuckChatUserSetting(false)
 
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(false)
-        assertFalse(testee.showInBrowserMenu.value)
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showPopupMenuShortcut.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -494,8 +494,8 @@ class RealDuckChatTest {
         testee.setEnableDuckChatUserSetting(true)
 
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(true)
-        assertTrue(testee.showInBrowserMenu.value)
-        assertTrue(testee.showInAddressBar.value)
+        assertTrue(testee.showPopupMenuShortcut.value)
+        assertTrue(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -511,8 +511,8 @@ class RealDuckChatTest {
         )
         testee.setEnableDuckChatUserSetting(true)
 
-        assertFalse(testee.showInBrowserMenu.value)
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showPopupMenuShortcut.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -527,7 +527,7 @@ class RealDuckChatTest {
         )
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -542,7 +542,7 @@ class RealDuckChatTest {
         )
         testee.onPrivacyConfigDownloaded()
 
-        assertTrue(testee.showInAddressBar.value)
+        assertTrue(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
