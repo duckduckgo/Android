@@ -99,6 +99,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
@@ -180,6 +181,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
@@ -1228,7 +1232,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     experimentalToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
             } else {
@@ -1237,7 +1241,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
 
-                if (!duckChat.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
                     experimentalToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
             }
@@ -1258,7 +1262,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
             }
 
-            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser()
+            toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value && duckChat.isEnabledInBrowser()
         }
     }
 }

@@ -48,13 +48,6 @@ interface DuckChat {
     fun isKeepSessionEnabled(): Boolean
 
     /**
-     * Checks whether DuckChat should be shown in address bar based on user settings.
-     *
-     * @return true if DuckChat should be shown, false otherwise.
-     */
-    val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean>
-
-    /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
     fun openDuckChat()
