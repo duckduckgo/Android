@@ -22,6 +22,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.duckduckgo.app.widget.experiment.di.WidgetSearchCount
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -29,8 +30,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 interface WidgetSearchCountDataStore {
-    suspend fun incrementWidgetSearchCount()
-    suspend fun getWidgetSearchCount(): Int
+    suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int
+    suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int
 }
 
 @ContributesBinding(AppScope::class)
@@ -38,20 +39,20 @@ interface WidgetSearchCountDataStore {
 class SharedPreferencesWidgetSearchCountDataStore @Inject constructor(
     @WidgetSearchCount private val store: DataStore<Preferences>,
 ) : WidgetSearchCountDataStore {
-    private object Keys {
-        val WIDGET_SEARCH_COUNT = intPreferencesKey(name = "WIDGET_SEARCH_COUNT")
-    }
 
-    override suspend fun incrementWidgetSearchCount() {
+    override suspend fun increaseMetricForPixelDefinition(definition: PixelDefinition): Int {
+        val tag = "$definition"
+        val currentCount = getMetricForPixelDefinition(definition)
         store.edit { preferences ->
-            val currentCount = preferences[Keys.WIDGET_SEARCH_COUNT] ?: 0
-            preferences[Keys.WIDGET_SEARCH_COUNT] = currentCount + 1
+            preferences[intPreferencesKey(tag)] = currentCount + 1
         }
+        return currentCount + 1
     }
 
-    override suspend fun getWidgetSearchCount(): Int {
+    override suspend fun getMetricForPixelDefinition(definition: PixelDefinition): Int {
+        val tag = "$definition"
         return store.data.map { preferences ->
-            preferences[Keys.WIDGET_SEARCH_COUNT] ?: 0
+            preferences[intPreferencesKey(tag)] ?: 0
         }.firstOrNull() ?: 0
     }
 }
