@@ -394,13 +394,18 @@ class RealDuckChat @Inject constructor(
         openDuckChat(parameters, forceNewSession = true)
     }
 
-    private fun addChatParameters(query: String, autoPrompt: Boolean): Map<String, String> {
+    private fun addChatParameters(
+        query: String,
+        autoPrompt: Boolean,
+    ): Map<String, String> {
         val hasDuckChatBang = isDuckChatBang(query.toUri())
+        logcat { "Duck.ai: hasDuckChatBang $hasDuckChatBang" }
         val cleanedQuery = if (hasDuckChatBang) {
             stripBang(query)
         } else {
             query
         }
+        logcat { "Duck.ai: cleaned query $query" }
         return mutableMapOf<String, String>().apply {
             if (cleanedQuery.isNotEmpty()) {
                 put(QUERY, cleanedQuery)
@@ -492,7 +497,10 @@ class RealDuckChat @Inject constructor(
                     .filterNot { it in parameters.keys }
                     .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
             }.build().toString()
-        }.getOrElse { url }
+        }.getOrElse {
+            logcat { "Duck.ai: parameters $url" }
+            url
+        }
     }
 
     override fun isDuckChatUrl(uri: Uri): Boolean {
