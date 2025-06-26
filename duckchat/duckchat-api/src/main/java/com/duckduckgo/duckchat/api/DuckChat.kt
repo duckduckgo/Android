@@ -71,12 +71,17 @@ interface DuckChat {
     /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
-    fun openDuckChat(query: String? = null)
+    fun openDuckChat()
 
     /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
      */
     fun openDuckChatWithAutoPrompt(query: String)
+
+    /**
+     * Opens Duck Chat with a prefilled [String] query.
+     */
+    fun openDuckChatWithPrefill(query: String)
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.

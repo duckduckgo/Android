@@ -204,7 +204,12 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
-                        duckChat.openDuckChat(url.getQueryParameter(QUERY))
+                        val query = url.getQueryParameter(QUERY)
+                        if (query != null) {
+                            duckChat.openDuckChatWithPrefill(query)
+                        } else {
+                            duckChat.openDuckChat()
+                        }
                     }.isSuccess
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {

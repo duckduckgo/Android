@@ -425,7 +425,8 @@ class BrowserWebViewClientTest {
         whenever(specialUrlDetector.determineType(initiatingUrl = any(), uri = any())).thenReturn(urlType)
         whenever(webResourceRequest.url).thenReturn("https://duckduckgo.com/?q=example&ia=chat&duckai=5".toUri())
         assertTrue(testee.shouldOverrideUrlLoading(webView, webResourceRequest))
-        verify(mockDuckChat).openDuckChat("example")
+
+        verify(mockDuckChat).openDuckChatWithPrefill("example")
     }
 
     @UiThreadTest
