@@ -4408,9 +4408,12 @@ class BrowserTabFragment :
 
             if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
                 if (configuration is DaxBubbleCta.DaxEndCta) {
-                    with(newBrowserTab.buckEndAnimation) {
-                        isVisible = true
-                        playAnimation()
+                    lifecycleScope.launch {
+                        with(newBrowserTab.buckEndAnimation) {
+                            delay(500)
+                            isVisible = true
+                            playAnimation()
+                        }
                     }
                 }
             }
