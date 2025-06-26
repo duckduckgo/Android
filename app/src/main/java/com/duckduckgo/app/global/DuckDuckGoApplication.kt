@@ -38,6 +38,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.*
 import logcat.AndroidLogcatLogger
 import logcat.LogPriority.DEBUG
+import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.LogcatLogger
 import logcat.asLog
@@ -137,7 +138,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     private fun configureLogging() {
         if (BuildConfig.DEBUG) {
-            LogcatLogger.install(AndroidLogcatLogger(DEBUG))
+            LogcatLogger.install(AndroidLogcatLogger(VERBOSE))
         }
     }
 
