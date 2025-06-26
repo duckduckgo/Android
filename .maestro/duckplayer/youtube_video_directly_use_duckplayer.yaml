@@ -1,0 +1,54 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Accept prompt and verify Duck Player loads"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 0
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - assertVisible:
+          text: "Search"
+      
+      # Navigate to a YouTube video
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+      - pressKey: Enter
+      
+      # Wait for the page to load and DuckPlayer prompt to appear
+      - extendedWaitUntil:
+          visible:
+              text: "Turn on Duck Player to watch without targeted ads"
+          timeout: 15000
+      
+      # Assert the DuckPlayer prompt has expected content
+      - assertVisible:
+          text: "Turn On Duck Player"
+      - assertVisible:
+          text: "No Thanks"
+      
+      # Accept the DuckPlayer prompt
+      - tapOn:
+          text: "Turn On Duck Player"
+      
+      # Wait for Duck Player to load
+      - extendedWaitUntil:
+          visible:
+              text: "duck://player/.*"
+          timeout: 15000
+      
+      # Core assertion: Duck Player is now active (confirmed by extendedWaitUntil above)
+      
+      # Verify the prompt has disappeared
+      - assertNotVisible:
+          text: "Turn on Duck Player to watch without targeted ads"
+      - assertNotVisible:
+          text: "Turn On Duck Player"
+      - assertNotVisible:
+          text: "No Thanks"
+ 
