@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -39,7 +39,7 @@ import kotlinx.coroutines.launch
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -87,7 +87,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             if (checked) {
                 // the new input screen feature is only available when the visual design experiment is enabled
-                visualDesignExperimentDataStore.changeExperimentFlagPreference(enabled = true)
+                experimentalThemingDataStore.changeExperimentFlagPreference(enabled = true)
             }
             duckChat.setInputScreenUserSetting(checked)
         }
