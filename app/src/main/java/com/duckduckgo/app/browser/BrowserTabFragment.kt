@@ -1388,8 +1388,8 @@ class BrowserTabFragment :
 
         viewModel.onViewResumed()
 
-        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
-        if (fragmentIsVisible()) {
+        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible and Duck.ai is not
+        if (fragmentIsVisible() && (requireActivity() as? BrowserActivity)?.isDuckChatVisible == false) {
             viewModel.onViewVisible()
         }
 
@@ -2902,7 +2902,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedChatUserQuery(query)
+        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 

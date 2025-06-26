@@ -6077,7 +6077,7 @@ class BrowserTabViewModelTest {
             "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         testee.onUserSubmittedQuery("https://duckduckgo.com/?q=example&ia=chat&duckai=5")
-        mockDuckChat.openDuckChat("example")
+        mockDuckChat.openDuckChatWithPrefill("example")
     }
 
     @Test
@@ -6455,11 +6455,12 @@ class BrowserTabViewModelTest {
     @Test
     fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
         val query = "example"
-        testee.setLastSubmittedChatUserQuery(query)
+        testee.setLastSubmittedUserQuery(query)
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChat()
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
     }
 
@@ -6470,7 +6471,7 @@ class BrowserTabViewModelTest {
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
     }
 
@@ -6482,19 +6483,21 @@ class BrowserTabViewModelTest {
         testee.openDuckChat(query)
 
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChat(any())
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test
     fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
         val query = "example"
-        testee.setLastSubmittedChatUserQuery("foo")
+        testee.setLastSubmittedUserQuery("foo")
+        testee.setLastSubmittedUserChatQuery("foo")
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
 
         testee.openDuckChat(query)
 
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
         verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(query)
     }
 
     @Test
@@ -6706,7 +6709,8 @@ class BrowserTabViewModelTest {
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChat()
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
     }
 
@@ -6714,12 +6718,67 @@ class BrowserTabViewModelTest {
     fun whenOpeningDuckChatWithDifferentQueryOrFullUrlValueThenOpenDuckChatWithAutoPrompt() = runTest {
         val query = "example"
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
-        testee.setLastSubmittedChatUserQuery("test")
+        testee.setLastSubmittedUserQuery("test")
+        testee.setLastSubmittedUserChatQuery("test")
 
         testee.openDuckChat(query)
 
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChat(any())
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatWithoutSubmittingAPreviousSearchThenOpenDuckChatWithPrefill() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatChangingOmnibarThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatAfterSubmittingASearchThenOpenDuckChatWithPrefill() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.setLastSubmittedUserQuery("test")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatAfterSubmittingASearchAndChatThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.setLastSubmittedUserQuery("test")
+        testee.setLastSubmittedUserChatQuery("test")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test

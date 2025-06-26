@@ -276,6 +276,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     var destroyedByBackPress: Boolean = false
 
     var isDataClearingInProgress: Boolean = false
+    var isDuckChatVisible: Boolean = false
 
     private val startBookmarksActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -550,6 +551,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
+            isDuckChatVisible = true
             val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
             viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive)
             return
@@ -768,6 +770,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun closeDuckChat() {
+        isDuckChatVisible = false
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {
             val transaction = supportFragmentManager.beginTransaction()
@@ -797,7 +800,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchNewDuckChat(duckChatUrl: String?) {
         val fragment = DuckChatWebViewFragment().apply {
-            logcat { "Duck.ai url passed $duckChatUrl" }
             duckChatUrl?.let {
                 arguments = Bundle().apply {
                     putString(KEY_DUCK_AI_URL, duckChatUrl)

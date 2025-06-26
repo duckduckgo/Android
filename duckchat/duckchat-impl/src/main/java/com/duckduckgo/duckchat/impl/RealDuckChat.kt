@@ -111,10 +111,15 @@ interface DuckChatInternal : DuckChat {
      */
     fun closeDuckChat()
 
+    fun openNewDuckChatSession()
+
     /**
      * Calls onClose when a close event is emitted.
      */
-    fun observeCloseEvent(lifecycleOwner: LifecycleOwner, onClose: () -> Unit)
+    fun observeCloseEvent(
+        lifecycleOwner: LifecycleOwner,
+        onClose: () -> Unit,
+    )
 
     /**
      * Returns whether address bar entry point is enabled or not.
@@ -372,25 +377,46 @@ class RealDuckChat @Inject constructor(
     override fun isImageUploadEnabled(): Boolean = isImageUploadEnabled
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
-    override fun openDuckChat(query: String?) {
-        logcat { "Duck.ai: openDuckChat query $query" }
-        val parameters = query?.let { originalQuery ->
-            val hasDuckChatBang = isDuckChatBang(originalQuery.toUri())
-            val cleanedQuery = if (hasDuckChatBang) {
-                stripBang(originalQuery)
-            } else {
-                originalQuery
-            }
-            mutableMapOf<String, String>().apply {
-                if (cleanedQuery.isNotEmpty()) {
-                    put(QUERY, cleanedQuery)
-                    if (hasDuckChatBang) {
-                        put(BANG_QUERY_NAME, BANG_QUERY_VALUE)
-                    }
+    override fun openDuckChat() {
+        logcat { "Duck.ai: openDuckChat" }
+        openDuckChat(emptyMap())
+    }
+
+    override fun openDuckChatWithAutoPrompt(query: String) {
+        logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
+        val parameters = addChatParameters(query, autoPrompt = true)
+        openDuckChat(parameters, forceNewSession = true)
+    }
+
+    override fun openDuckChatWithPrefill(query: String) {
+        logcat { "Duck.ai: openDuckChatWithPrefill query $query" }
+        val parameters = addChatParameters(query, autoPrompt = false)
+        openDuckChat(parameters, forceNewSession = true)
+    }
+
+    private fun addChatParameters(
+        query: String,
+        autoPrompt: Boolean,
+    ): Map<String, String> {
+        val hasDuckChatBang = isDuckChatBang(query.toUri())
+        logcat { "Duck.ai: hasDuckChatBang $hasDuckChatBang" }
+        val cleanedQuery = if (hasDuckChatBang) {
+            stripBang(query)
+        } else {
+            query
+        }
+        logcat { "Duck.ai: cleaned query $query" }
+        return mutableMapOf<String, String>().apply {
+            if (cleanedQuery.isNotEmpty()) {
+                put(QUERY, cleanedQuery)
+                if (hasDuckChatBang) {
+                    put(BANG_QUERY_NAME, BANG_QUERY_VALUE)
+                }
+                if (autoPrompt) {
+                    put(PROMPT_QUERY_NAME, PROMPT_QUERY_VALUE)
                 }
             }
-        } ?: emptyMap()
-        openDuckChat(parameters)
+        }
     }
 
     private fun stripBang(query: String): String {
@@ -398,18 +424,13 @@ class RealDuckChat @Inject constructor(
         return query.replace(bangPattern, "").trim()
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String) {
-        logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
-        val parameters = mapOf(
-            QUERY to query,
-            PROMPT_QUERY_NAME to PROMPT_QUERY_VALUE,
-        )
-        openDuckChat(parameters, autoPrompt = true)
+    override fun openNewDuckChatSession() {
+        openDuckChat(emptyMap(), forceNewSession = true)
     }
 
     private fun openDuckChat(
         parameters: Map<String, String>,
-        autoPrompt: Boolean = false,
+        forceNewSession: Boolean = false,
     ) {
         val url = appendParameters(parameters, duckChatLink)
 
@@ -418,7 +439,7 @@ class RealDuckChat @Inject constructor(
             val params = mapOf(DuckChatPixelParameters.DELTA_TIMESTAMP_PARAMETERS to sessionDelta.toString())
 
             val hasSessionActive = when {
-                autoPrompt -> false
+                forceNewSession -> false
                 keepSessionAliveEnabled -> hasActiveSession()
                 else -> false
             }
@@ -464,7 +485,6 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         url: String,
     ): String {
-        logcat { "Duck.ai: parameters Duck.ai $parameters" }
         if (parameters.isEmpty()) return url
         return runCatching {
             val uri = url.toUri()
@@ -477,7 +497,10 @@ class RealDuckChat @Inject constructor(
                     .filterNot { it in parameters.keys }
                     .forEach { appendQueryParameter(it, uri.getQueryParameter(it)) }
             }.build().toString()
-        }.getOrElse { url }
+        }.getOrElse {
+            logcat { "Duck.ai: parameters $url" }
+            url
+        }
     }
 
     override fun isDuckChatUrl(uri: Uri): Boolean {
