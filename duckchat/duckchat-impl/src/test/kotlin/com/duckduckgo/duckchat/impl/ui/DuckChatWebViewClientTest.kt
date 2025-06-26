@@ -38,6 +38,6 @@ class DuckChatWebViewClientTest {
 
         duckChatWebViewClient.onPageStarted(webView, url, null)
 
-        verify(mockPlugin).onPageStarted(webView, url, null)
+        verify(mockPlugin).onPageStarted(webView, url, null, listOf())
     }
 }

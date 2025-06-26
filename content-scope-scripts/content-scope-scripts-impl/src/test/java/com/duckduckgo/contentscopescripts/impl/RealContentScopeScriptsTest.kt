@@ -17,7 +17,6 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -79,10 +78,10 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
@@ -92,7 +91,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndAllowListChangedThenUseNewAllowListValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -109,7 +108,7 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl2))
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -119,7 +118,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndGpcChangedThenUseNewGpcValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -136,7 +135,7 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockPlugin2.preferences()).thenReturn("\"globalPrivacyControlValue\":false")
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -146,7 +145,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndConfigChangedThenUseNewConfigValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -164,7 +163,7 @@ class RealContentScopeScriptsTest {
         )
         whenever(mockPlugin1.preferences()).thenReturn("\"globalPrivacyControlValue\":true")
         whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockPlugin1))
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -174,7 +173,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -191,7 +190,7 @@ class RealContentScopeScriptsTest {
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions).thenReturn(listOf(unprotectedTemporaryException))
-        js = testee.getScript(null)
+        js = testee.getScript(null, listOf())
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(4)).unprotectedTemporaryExceptions
@@ -201,7 +200,7 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndDesktopModeChangedThenUseNewDesktopModeValue() {
-        var js = testee.getScript(null)
+        var js = testee.getScript(null, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -217,17 +216,15 @@ class RealContentScopeScriptsTest {
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
                 "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
         )
-        val site: Site = mock()
-        whenever(site.isDesktopMode).thenReturn(true)
-        js = testee.getScript(site)
+
+        js = testee.getScript(true, listOf())
 
         verifyJsScript(js, newRegEx)
     }
 
     @Test
     fun whenGetScriptAndVariablesAreCachedAndCurrentCohortsChangedThenUseNewCurrentCohortsValue() = runTest {
-        val site: Site = mock()
-        var js = testee.getScript(site)
+        var js = testee.getScript(false, listOf())
         verifyJsScript(js)
 
         val newRegEx = Regex(
@@ -251,8 +248,7 @@ class RealContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle)
 
-        whenever(site.activeContentScopeExperiments).thenReturn(activeExperiments)
-        js = testee.getScript(site)
+        js = testee.getScript(false, activeExperiments)
 
         verifyJsScript(js, newRegEx)
         verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
@@ -262,8 +258,6 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptWithMultipleActiveExperimentsThenFormatsCorrectly() = runTest {
-        val site: Site = mock()
-
         val newRegEx = Regex(
             "^processConfig\\(\\{\"features\":\\{" +
                 "\"config1\":\\{\"state\":\"enabled\"\\}," +
@@ -291,41 +285,34 @@ class RealContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle1, mockToggle2)
 
-        whenever(site.activeContentScopeExperiments).thenReturn(activeExperiments)
-        val js = testee.getScript(site)
+        val js = testee.getScript(false, activeExperiments)
 
         verifyJsScript(js, newRegEx)
     }
 
     @Test
     fun whenGetScriptWithExperimentWithoutCohortThenFormatsCorrectly() = runTest {
-        val site: Site = mock()
-
         val mockToggle = mock<Toggle>()
         whenever(mockToggle.getCohort()).thenReturn(null)
         whenever(mockToggle.featureName()).thenReturn(FeatureName("contentScopeExperiments", "test"))
 
         val activeExperiments = listOf(mockToggle)
 
-        whenever(site.activeContentScopeExperiments).thenReturn(activeExperiments)
-        val js = testee.getScript(site)
+        val js = testee.getScript(false, activeExperiments)
 
         verifyJsScript(js)
     }
 
     @Test
     fun whenGetScriptWithNoActiveExperimentsThenFormatsCorrectly() = runTest {
-        val site: Site = mock()
-
-        whenever(site.activeContentScopeExperiments).thenReturn(emptyList())
-        val js = testee.getScript(site)
+        val js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
     }
 
     @Test
     fun whenGetScriptWithNullSiteThenFormatsCorrectly() = runTest {
-        val js = testee.getScript(null)
+        val js = testee.getScript(null, listOf())
 
         verifyJsScript(js)
     }
@@ -344,15 +331,13 @@ class RealContentScopeScriptsTest {
 
     @Test
     fun whenGetScriptThenPopulateMessagingParameters() {
-        val js = testee.getScript(null)
+        val js = testee.getScript(null, listOf())
         verifyJsScript(js)
         verify(mockContentScopeJsReader).getContentScopeJS()
     }
 
     @Test
     fun whenGetScriptWithMixedValidAndNullCohortExperimentsThenFiltersOutNullCohorts() = runTest {
-        val site: Site = mock()
-
         val newRegEx = Regex(
             "^processConfig\\(\\{\"features\":\\{" +
                 "\"config1\":\\{\"state\":\"enabled\"\\}," +
@@ -379,16 +364,13 @@ class RealContentScopeScriptsTest {
 
         val activeExperiments = listOf(validExperiment, nullCohortExperiment)
 
-        whenever(site.activeContentScopeExperiments).thenReturn(activeExperiments)
-        val js = testee.getScript(site)
+        val js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js, newRegEx)
     }
 
     @Test
     fun whenGetScriptWithExperimentWithoutParentNameThenFiltersOut() = runTest {
-        val site: Site = mock()
-
         val expectedRegEx = contentScopeRegex
 
         val mockToggle = mock<Toggle>()
@@ -397,8 +379,7 @@ class RealContentScopeScriptsTest {
 
         val activeExperiments = listOf(mockToggle)
 
-        whenever(site.activeContentScopeExperiments).thenReturn(activeExperiments)
-        val js = testee.getScript(site)
+        val js = testee.getScript(null, activeExperiments)
 
         verifyJsScript(js, expectedRegEx)
     }
