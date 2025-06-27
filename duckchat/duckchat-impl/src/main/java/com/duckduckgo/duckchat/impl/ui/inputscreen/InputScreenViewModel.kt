@@ -70,6 +70,7 @@ class InputScreenViewModel @Inject constructor(
     private val history: NavigationHistory,
     savedSitesRepository: SavedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val inputScreenDataStore: InputScreenDataStore,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
@@ -105,6 +106,17 @@ class InputScreenViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            inputScreenDataStore.getLastUsedMode().let { mode ->
+                command.value = when (mode) {
+                    null,
+                    InputScreenMode.SEARCH,
+                    -> Command.SwitchModeToSearch
+                    InputScreenMode.CHAT -> Command.SwitchModeToChat
+                }
+            }
+        }
     }
 
     @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -273,6 +285,18 @@ class InputScreenViewModel @Inject constructor(
             hasUserSeenHistoryIAM = false
             lastAutoCompleteState = null
             autoCompleteJob.cancel()
+        }
+    }
+
+    fun onSearchSelected() {
+        viewModelScope.launch {
+            inputScreenDataStore.setLastUsedMode(InputScreenMode.SEARCH)
+        }
+    }
+
+    fun onChatSelected() {
+        viewModelScope.launch {
+            inputScreenDataStore.setLastUsedMode(InputScreenMode.CHAT)
         }
     }
 }
