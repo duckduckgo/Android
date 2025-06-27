@@ -36,6 +36,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchInterstitialBinding
 import com.duckduckgo.duckchat.impl.ui.inputscreen.Command
+import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchModeToChat
+import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchModeToSearch
 import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.UserSubmittedQuery
 import com.duckduckgo.duckchat.impl.ui.inputscreen.InputScreenViewModel
 import com.duckduckgo.navigation.api.getActivityParams
@@ -121,8 +123,19 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
     }
 
     private fun processCommand(command: Command) {
-        if (command is UserSubmittedQuery) {
-            binding.duckChatOmnibar.submitMessage(command.query)
+        when (command) {
+            is UserSubmittedQuery -> binding.duckChatOmnibar.submitMessage(command.query)
+            SwitchModeToSearch -> {
+                binding.viewPager.setCurrentItem(0, false)
+            }
+
+            SwitchModeToChat -> {
+                binding.viewPager.setCurrentItem(1, false)
+            }
+
+            else -> {
+                // TODO handle other commands
+            }
         }
     }
 
@@ -134,7 +147,6 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
     private fun configureOmnibar() = with(binding.duckChatOmnibar) {
         setContentId(R.id.viewPager)
-        selectTab(0)
 
         onSearchSent = { query ->
             val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
@@ -153,10 +165,12 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         onSearchSelected = {
             binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
             binding.viewPager.setCurrentItem(0, true)
+            viewModel.onSearchSelected()
         }
         onDuckChatSelected = {
             binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
             binding.viewPager.setCurrentItem(1, true)
+            viewModel.onChatSelected()
         }
         onSendMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable

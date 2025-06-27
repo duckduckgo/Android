@@ -106,8 +106,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         configureInputBehavior()
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
-
-        onSearchSelected?.invoke()
     }
 
     private fun configureClickListeners() {
