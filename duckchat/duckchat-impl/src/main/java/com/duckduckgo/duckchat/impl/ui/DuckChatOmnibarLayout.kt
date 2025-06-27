@@ -149,7 +149,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
             if (isNullOrEmpty && duckChatInput.minLines > 1) {
                 duckChatInput.post {
-                    beginChangeBoundsTransition()
                     duckChatInput.minLines = if (duckChatTabLayout.selectedTabPosition == 0) SEARCH_MIN_LINES else DUCK_CHAT_MIN_LINES
                 }
             }
@@ -174,8 +173,6 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun applyModeSpecificInputBehaviour(isSearchTab: Boolean) {
-        beginChangeBoundsTransition()
-
         duckChatInput.apply {
             if (isSearchTab) {
                 minLines = SEARCH_MIN_LINES
