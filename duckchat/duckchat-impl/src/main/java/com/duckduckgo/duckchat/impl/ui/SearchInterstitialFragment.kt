@@ -95,9 +95,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val query = binding.duckChatOmnibar.duckChatInput.text.toString()
-                    val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
-                    requireActivity().setResult(Activity.RESULT_CANCELED, data)
+                    requireActivity().setResult(Activity.RESULT_CANCELED)
                     exitInterstitial()
                 }
             },
@@ -154,8 +152,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             exitInterstitial()
         }
         onDuckChatSent = { query ->
-            val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
-            requireActivity().setResult(Activity.RESULT_CANCELED, data)
+            requireActivity().setResult(Activity.RESULT_CANCELED)
             requireActivity().finish()
             duckChat.openDuckChatWithAutoPrompt(query)
         }
