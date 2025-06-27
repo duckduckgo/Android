@@ -103,6 +103,20 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun whenQueryOriginIsFromBookmarkAndIsQueryThenSearchQueryBuilt() {
+        val input = "foo"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromBookmark)
+        assertDuckDuckGoSearchQuery("foo", result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromBookmarkAndIsUrlThenUrlReturned() {
+        val input = "http://example.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromBookmark)
+        assertEquals(input, result)
+    }
+
+    @Test
     fun whenQueryOriginIsFromAutocompleteAndIsNavIsFalseThenSearchQueryBuilt() {
         val input = "example.com"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = false))
