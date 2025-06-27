@@ -151,6 +151,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -951,13 +952,15 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(
-            omnibarPosition = settingsDataStore.omnibarPosition,
-            omnibarType = omnibarTypeResolver.getOmnibarType(),
-            themingDataStore = experimentalThemingDataStore,
-            coroutineScope = lifecycleScope,
-            binding = binding,
-        )
+
+        val omnibarType = omnibarTypeResolver.getOmnibarType()
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarType, binding)
+
+        if (omnibarType == OmnibarType.SINGLE) {
+            lifecycleScope.launch {
+                experimentalThemingDataStore.countSingleOmnibarUser()
+            }
+        }
 
         webViewContainer = binding.webViewContainer
         configureObservers()
