@@ -30,13 +30,6 @@
         layout="@layout/include_omnibar_toolbar_mockup" />
 
     <include
-        android:id="@+id/topMockupExperimentalToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/experimentalToolbarSize"
-        android:layout_alignParentTop="true"
-        layout="@layout/include_experimental_omnibar_toolbar_mockup" />
-
-    <include
         android:id="@+id/topMockupSingleToolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/experimentalToolbarSize"
@@ -72,13 +65,6 @@
         android:layout_height="?attr/actionBarSize"
         android:layout_alignParentBottom="true"
         layout="@layout/include_omnibar_toolbar_mockup" />
-
-    <include
-        android:id="@+id/bottomMockupExperimentalToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        layout="@layout/include_experimental_omnibar_toolbar_mockup_bottom" />
 
     <include
         android:id="@+id/bottomMockupSingleToolbar"

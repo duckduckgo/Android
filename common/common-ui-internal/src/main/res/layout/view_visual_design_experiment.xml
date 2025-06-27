@@ -26,6 +26,7 @@
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:primaryText="@string/experimentalUISettings" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -34,6 +35,7 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/experimentalUITitle"
         app:primaryTextTruncated="false"
+        android:visibility="gone"
         app:secondaryText="@string/experimentalUIMessage"
         app:showSwitch="true" />
 
