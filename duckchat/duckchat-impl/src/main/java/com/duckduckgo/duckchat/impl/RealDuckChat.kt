@@ -32,6 +32,7 @@ import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentD
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
@@ -199,6 +200,7 @@ data class DuckChatSettingJson(
 @SingleInstanceIn(AppScope::class)
 
 @ContributesBinding(AppScope::class, boundType = DuckChat::class)
+@ContributesBinding(AppScope::class, boundType = DuckAiFeatureState::class)
 @ContributesBinding(AppScope::class, boundType = DuckChatInternal::class)
 @ContributesMultibinding(AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 class RealDuckChat @Inject constructor(
@@ -214,13 +216,16 @@ class RealDuckChat @Inject constructor(
     private val pixel: Pixel,
     private val imageUploadFeature: AIChatImageUploadFeature,
     private val browserNav: BrowserNav,
-) : DuckChatInternal, PrivacyConfigCallbackPlugin {
+) : DuckChatInternal, DuckAiFeatureState, PrivacyConfigCallbackPlugin {
 
     private val closeChatFlow = MutableSharedFlow<Unit>(replay = 0)
+    private val _showSettings = MutableStateFlow(false)
     private val _showInputScreen = MutableStateFlow(false)
     private val _showInBrowserMenu = MutableStateFlow(false)
     private val _showInAddressBar = MutableStateFlow(false)
+    private val _showOmnibarShortcutInAllStates = MutableStateFlow(false)
     private val _chatState = MutableStateFlow(ChatState.HIDE)
+    private val _keepSession = MutableStateFlow(false)
 
     private val jsonAdapter: JsonAdapter<DuckChatSettingJson> by lazy {
         moshi.adapter(DuckChatSettingJson::class.java)
@@ -234,7 +239,6 @@ class RealDuckChat @Inject constructor(
     private var bangRegex: Regex? = null
     private var isAddressBarEntryPointEnabled: Boolean = false
     private var isImageUploadEnabled: Boolean = false
-    private var keepSessionAliveEnabled = false
     private var keepSessionAliveInMinutes: Int = DEFAULT_SESSION_ALIVE
 
     init {
@@ -296,14 +300,6 @@ class RealDuckChat @Inject constructor(
         return duckAiInputScreen
     }
 
-    override fun isEnabledInBrowser(): Boolean {
-        return isDuckAiInBrowserEnabled
-    }
-
-    override fun isKeepSessionEnabled(): Boolean {
-        return keepSessionAliveEnabled
-    }
-
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
         return duckChatFeatureRepository.observeDuckChatUserEnabled()
     }
@@ -329,7 +325,7 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun closeDuckChat() {
-        if (keepSessionAliveEnabled) {
+        if (_keepSession.value) {
             browserNav.closeDuckChat(context).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -366,11 +362,15 @@ class RealDuckChat @Inject constructor(
         _chatState.value = state
     }
 
+    override val showSettings: StateFlow<Boolean> = _showSettings.asStateFlow()
+
     override val showInputScreen: StateFlow<Boolean> = _showInputScreen.asStateFlow()
 
-    override val showInBrowserMenu: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
+    override val showPopupMenuShortcut: StateFlow<Boolean> = _showInBrowserMenu.asStateFlow()
 
-    override val showInAddressBar: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
+    override val showOmnibarShortcutOnNtpAndOnFocus: StateFlow<Boolean> = _showInAddressBar.asStateFlow()
+
+    override val showOmnibarShortcutInAllStates: StateFlow<Boolean> = _showOmnibarShortcutInAllStates.asStateFlow()
 
     override val chatState: StateFlow<ChatState> = _chatState.asStateFlow()
 
@@ -440,7 +440,7 @@ class RealDuckChat @Inject constructor(
 
             val hasSessionActive = when {
                 forceNewSession -> false
-                keepSessionAliveEnabled -> hasActiveSession()
+                _keepSession.value -> hasActiveSession()
                 else -> false
             }
 
@@ -448,7 +448,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN, parameters = params)
-                if (keepSessionAliveEnabled) {
+                if (_keepSession.value) {
                     logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
                     openDuckChatSession(url, hasSessionActive)
                 } else {
@@ -536,7 +536,9 @@ class RealDuckChat @Inject constructor(
 
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
-            isDuckChatEnabled = duckChatFeature.self().isEnabled()
+            val featureEnabled = duckChatFeature.self().isEnabled()
+            isDuckChatEnabled = featureEnabled
+            _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
 
@@ -554,7 +556,7 @@ class RealDuckChat @Inject constructor(
             isAddressBarEntryPointEnabled = settingsJson?.addressBarEntryPoint ?: false
             isImageUploadEnabled = imageUploadFeature.self().isEnabled()
 
-            keepSessionAliveEnabled = duckChatFeature.keepSession().isEnabled()
+            _keepSession.value = duckChatFeature.keepSession().isEnabled()
             keepSessionAliveInMinutes = settingsJson?.sessionTimeoutMinutes ?: DEFAULT_SESSION_ALIVE
 
             cacheUserSettings()
@@ -575,6 +577,9 @@ class RealDuckChat @Inject constructor(
         val showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() &&
             isDuckChatEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
         _showInAddressBar.emit(showInAddressBar)
+
+        val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled
+        _showOmnibarShortcutInAllStates.emit(showOmnibarShortcutInAllStates)
     }
 
     companion object {

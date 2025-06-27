@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -43,6 +44,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
@@ -97,12 +99,16 @@ class SettingsViewModelTest {
 
     private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
 
+    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiShowSettingsFlow = MutableStateFlow(false)
+
     @Before
     fun before() = runTest {
         whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
         whenever(appTrackingProtectionMock.isRunning()).thenReturn(true)
         whenever(autofillCapabilityCheckerMock.canAccessCredentialManagementScreen()).thenReturn(true)
         whenever(subscriptionsMock.isEligible()).thenReturn(true)
+        whenever(mockDuckAiFeatureState.showSettings).thenReturn(duckAiShowSettingsFlow)
 
         testee = SettingsViewModel(
             defaultWebBrowserCapability = defaultWebBrowserCapabilityMock,
@@ -116,6 +122,7 @@ class SettingsViewModelTest {
             subscriptions = subscriptionsMock,
             duckPlayer = duckPlayerMock,
             duckChat = duckChatMock,
+            duckAiFeatureState = mockDuckAiFeatureState,
             voiceSearchAvailability = voiceSearchAvailabilityMock,
             privacyProUnifiedFeedback = privacyProUnifiedFeedbackMock,
             settingsPixelDispatcher = settingsPixelDispatcherMock,
@@ -292,4 +299,22 @@ class SettingsViewModelTest {
 
             verify(mockPostCtaExperienceExperiment, never()).fireSettingsWidgetDismiss()
         }
+
+    @Test
+    fun `when duck AI settings disabled then state updated`() = runTest {
+        duckAiShowSettingsFlow.value = false
+
+        testee.viewState().test {
+            assertFalse(awaitItem().isDuckChatEnabled)
+        }
+    }
+
+    @Test
+    fun `when duck AI settings enabled then state updated`() = runTest {
+        duckAiShowSettingsFlow.value = true
+
+        testee.viewState().test {
+            assertTrue(awaitItem().isDuckChatEnabled)
+        }
+    }
 }

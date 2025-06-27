@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.api
 
 import android.net.Uri
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
@@ -30,43 +29,6 @@ interface DuckChat {
      * @return true if DuckChat is enabled, false otherwise.
      */
     fun isEnabled(): Boolean
-
-    /**
-     * Checks whether Duck.ai in browser is enabled based on remote config flag.
-     * Uses a cached value - does not perform disk I/O.
-     *
-     * @return true if Duck.ai in browser is enabled, false otherwise.
-     */
-    fun isEnabledInBrowser(): Boolean
-
-    /**
-     * Checks whether Duck.ai should keep the session alive or not
-     * Uses a cached value - does not perform disk I/O.
-     *
-     * @return true if Duck.ai keep session alive is enabled, false otherwise.
-     */
-    fun isKeepSessionEnabled(): Boolean
-
-    /**
-     * Checks whether dedicated Duck.ai input screen with the input mode switch should be used when focusing on the omnibar.
-     *
-     * @return true if the input mode switch should be used, false otherwise.
-     */
-    val showInputScreen: StateFlow<Boolean>
-
-    /**
-     * Checks whether DuckChat should be shown in browser menu based on user settings.
-     *
-     * @return true if DuckChat should be shown, false otherwise.
-     */
-    val showInBrowserMenu: StateFlow<Boolean>
-
-    /**
-     * Checks whether DuckChat should be shown in address bar based on user settings.
-     *
-     * @return true if DuckChat should be shown, false otherwise.
-     */
-    val showInAddressBar: StateFlow<Boolean>
 
     /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
