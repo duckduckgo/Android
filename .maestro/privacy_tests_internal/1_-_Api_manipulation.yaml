@@ -1,0 +1,54 @@
+appId: com.duckduckgo.mobile.android
+tags:
+  - privacyTestInternal
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/browserMenu"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
+      - scrollUntilVisible:
+          element:
+            text: "Developer Settings"
+          direction: DOWN
+          timeout: 50000
+          speed: 40
+          visibilityPercentage: 100
+          centerElement: false
+      - tapOn: "Developer Settings"
+      - scrollUntilVisible:
+          element:
+            id: "com.duckduckgo.mobile.android:id/overridePrivacyRemoteConfigUrl"
+          direction: DOWN
+          timeout: 50000
+          speed: 40
+          visibilityPercentage: 100
+          centerElement: true
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/overridePrivacyRemoteConfigUrl"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/trailingSwitch"
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/internal_edit_text"
+      - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json"
+      - hideKeyboard
+      - tapOn:
+          id: "com.duckduckgo.mobile.android:id/load"
+      - tapOn: "OK"
+      - pressKey: Back
+      - pressKey: Back
+      - pressKey: Back
+      - assertVisible:
+          id: "com.duckduckgo.mobile.android:id/omnibarTextInput"
+      - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/pages/conditional-matching-experiments.html?automation=1"
+      - pressKey: Enter
+      - tapOn:
+          id: "run-tests"
+      - assertVisible:
+          id: "test-status"
+          text: "pass"

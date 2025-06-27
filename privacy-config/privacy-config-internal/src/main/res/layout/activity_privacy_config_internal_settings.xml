@@ -111,6 +111,7 @@
                 android:layout_marginRight="@dimen/keyline_3"
                 android:layout_marginLeft="@dimen/keyline_3"
                 android:hint="Add your custom URL here"
+                app:type="url"
                 app:editable="true" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
