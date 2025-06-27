@@ -111,7 +111,7 @@ jobs:
           name: internalPrivacyTest_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           app-file: apk/internal.apk
-          android-api-level: 30
+          android-api-level: 34
           workspace: .maestro
           include-tags: privacyTestInternal
 
