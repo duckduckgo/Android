@@ -1239,8 +1239,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
-                binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
 
                 toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
@@ -1256,9 +1254,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         binding.bottomMockupSingleToolbar
                     }
                 }
-                binding.bottomMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
-                binding.topMockupExperimentalToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
 
                 singleToolBarMockupBinding.aiChatIconMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()

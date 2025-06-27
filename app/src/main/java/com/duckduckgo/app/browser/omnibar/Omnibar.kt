@@ -28,7 +28,6 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
-import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
@@ -43,7 +42,6 @@ import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -82,10 +80,6 @@ class Omnibar(
                         // remove bottom variant
                         binding.rootView.removeView(binding.newOmnibarBottom)
 
-                        // remove all fade omnibars
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
-
                         // remove all single omnibars
                         binding.rootView.removeView(binding.singleOmnibar)
                         binding.rootView.removeView(binding.singleOmnibarBottom)
@@ -97,10 +91,6 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove all fade omnibars
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
                 }
             }
@@ -110,10 +100,6 @@ class Omnibar(
                     SCROLLING -> {
                         // remove top variant
                         binding.rootView.removeView(binding.newOmnibar)
-
-                        // remove all fade omnibars
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
 
                         // remove all single omnibars
                         binding.rootView.removeView(binding.singleOmnibar)
@@ -126,10 +112,6 @@ class Omnibar(
                         // remove all scrolling omnibars
                         binding.rootView.removeView(binding.newOmnibar)
                         binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove all fade omnibars
-                        binding.rootView.removeView(binding.fadeOmnibar)
-                        binding.rootView.removeView(binding.fadeOmnibarBottom)
                     }
                 }
 
@@ -200,7 +182,6 @@ class Omnibar(
             OmnibarPosition.TOP -> {
                 when (omnibarType) {
                     SCROLLING -> binding.newOmnibar
-                    FADE -> binding.fadeOmnibar
                     SINGLE -> binding.singleOmnibar
                 }
             }
@@ -208,7 +189,6 @@ class Omnibar(
             OmnibarPosition.BOTTOM -> {
                 when (omnibarType) {
                     SCROLLING -> binding.newOmnibarBottom
-                    FADE -> binding.fadeOmnibarBottom
                     SINGLE -> binding.singleOmnibarBottom
                 }
             }
@@ -253,7 +233,6 @@ class Omnibar(
 
     val omniBarClickCatcher: View? by lazy {
         when (omnibarType) {
-            FADE -> (newOmnibar as? FadeOmnibarLayout)?.omniBarClickCatcher
             SINGLE -> (newOmnibar as? SingleOmnibarLayout)?.omniBarClickCatcher
             else -> null
         }
@@ -467,15 +446,6 @@ class Omnibar(
 
     fun voiceSearchDisabled(url: String?) {
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
-    }
-
-    fun getNavigationBar(): BrowserNavigationBarView? {
-        val omnibar = newOmnibar
-        return if (omnibar is FadeOmnibarLayout) {
-            omnibar.navigationBar
-        } else {
-            null
-        }
     }
 
     fun setContentCanScroll(
