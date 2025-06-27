@@ -54,7 +54,7 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
     //     MutableStateFlow(experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled())
     private val _splitOmnibarFlagEnabled = MutableStateFlow(false).asStateFlow()
 
-  private val _newDesignFeatureFlagEnabled =
+    private val _singleOmnibarFeatureFlagEnabled =
         MutableStateFlow(experimentalThemingFeature.singleOmnibarFeature().isEnabled())
 
     override val isSplitOmnibarEnabled: StateFlow<Boolean> = _splitOmnibarFlagEnabled.stateIn(
@@ -63,13 +63,13 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
         initialValue = _splitOmnibarFlagEnabled.value,
     )
 
-    override val isSingleOmnibarEnabled: StateFlow<Boolean> = combine(isSplitOmnibarEnabled, _newDesignFeatureFlagEnabled) {
+    override val isSingleOmnibarEnabled: StateFlow<Boolean> = combine(isSplitOmnibarEnabled, _singleOmnibarFeatureFlagEnabled) {
             withBottomBar, withoutBottomBar ->
         !withBottomBar && withoutBottomBar
     }.stateIn(
         scope = appCoroutineScope,
         started = SharingStarted.Eagerly,
-        initialValue = !isSplitOmnibarEnabled.value && _newDesignFeatureFlagEnabled.value,
+        initialValue = !isSplitOmnibarEnabled.value && _singleOmnibarFeatureFlagEnabled.value,
     )
 
     override fun onPrivacyConfigDownloaded() {
