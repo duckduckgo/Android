@@ -2796,7 +2796,7 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = false)
+        command.value = LaunchPopupMenu
     }
 
     fun onPopupMenuLaunched() {

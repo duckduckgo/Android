@@ -845,8 +845,6 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
-
     private fun showTrackersExperimentShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
@@ -1099,14 +1097,6 @@ class BrowserTabFragment :
                 viewModel.onNavigationBarBookmarksButtonClicked()
             }
         }
-
-        browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
-            lifecycleScope = lifecycleScope,
-            browserTabFragmentBinding = binding,
-            isExperimentEnabled = false,
-            omnibar = omnibar,
-            browserNavigationBarObserver = observer,
-        )
     }
 
     private fun configureEditModeChangeDetection() {
@@ -1182,7 +1172,6 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
-            browserNavigationBarIntegration.configureCustomTab()
         }
     }
 
@@ -1313,16 +1302,11 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu(anchorToNavigationBar: Boolean) {
+    private fun launchPopupMenu() {
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
-                if (anchorToNavigationBar) {
-                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
-                    popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
-                } else {
-                    popupMenu.show(binding.rootView, omnibar.toolbar)
-                }
+                popupMenu.show(binding.rootView, omnibar.toolbar)
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
@@ -1419,7 +1403,6 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
-        browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
 
@@ -1581,7 +1564,6 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.setViewMode(ViewMode.NewTab)
-        browserNavigationBarIntegration.configureNewTabViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1600,7 +1582,6 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
-        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showError(
@@ -1613,7 +1594,6 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Error)
-        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1639,7 +1619,6 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
-        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         webView?.stopLoading()
@@ -1729,7 +1708,6 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibar.setViewMode(ViewMode.SSLWarning)
-        browserNavigationBarIntegration.configureBrowserViewMode()
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         maliciousWarningView.gone()
@@ -2143,7 +2121,7 @@ class BrowserTabFragment :
 
             is Command.LaunchPopupMenu -> {
                 hideKeyboard()
-                launchPopupMenu(it.anchorToNavigationBar)
+                launchPopupMenu()
             }
 
             is Command.LaunchBookmarksActivity -> {
@@ -4253,7 +4231,6 @@ class BrowserTabFragment :
                 }
 
                 omnibar.renderBrowserViewState(viewState)
-                browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
@@ -4518,7 +4495,6 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
-            browserNavigationBarIntegration.configureNewTabViewMode()
 
             viewModel.onNewTabShown()
         }
