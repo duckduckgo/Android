@@ -316,6 +316,17 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             }
             importCsvLauncher.launch(intent)
         }
+
+        binding.importPasswordsResetImportedFlagButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasEverImportedPasswords = false
+            }
+            Toast.makeText(
+                this@AutofillInternalSettingsActivity,
+                getString(R.string.autofillDevSettingsResetGooglePasswordsImportFlagConfirmation),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
     }
 
     private fun configureEngagementEventHandlers() {
