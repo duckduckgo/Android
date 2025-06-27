@@ -85,7 +85,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     var onSendMessageAvailable: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
-            value?.invoke(!duckChatInput.text.isNullOrEmpty())
+            value?.invoke(duckChatInput.text.getTextToSubmit() != null)
         }
 
     @IdRes
@@ -139,9 +139,9 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
 
         doOnTextChanged { text, _, _, _ ->
+            onSendMessageAvailable?.invoke(duckChatInput.text.getTextToSubmit() != null)
             val isNullOrEmpty = text.isNullOrEmpty()
             fade(duckChatClearText, !isNullOrEmpty)
-            onSendMessageAvailable?.invoke(!isNullOrEmpty)
 
             if (isNullOrEmpty && duckChatInput.minLines > 1) {
                 duckChatInput.post {
@@ -201,12 +201,13 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     fun submitMessage(message: String? = null) {
-        val text = message?.also(duckChatInput::setText) ?: duckChatInput.text.toString().trim()
-        if (text.isNotBlank()) {
+        val text = message?.also(duckChatInput::setText) ?: duckChatInput.text
+        val textToSubmit = text.getTextToSubmit()?.toString()
+        if (textToSubmit != null) {
             if (duckChatTabLayout.selectedTabPosition == 0) {
-                onSearchSent?.invoke(text)
+                onSearchSent?.invoke(textToSubmit)
             } else {
-                onDuckChatSent?.invoke(text)
+                onDuckChatSent?.invoke(textToSubmit)
             }
             duckChatInput.clearFocus()
         }
@@ -291,10 +292,16 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     fun printNewLine() {
         val currentText = duckChatInput.text.toString()
-        val currentSelection = duckChatInput.selectionStart
-        val newText = currentText.substring(0, currentSelection) + "\n" + currentText.substring(currentSelection)
+        val selectionStart = duckChatInput.selectionStart
+        val selectionEnd = duckChatInput.selectionEnd
+        val newText = currentText.substring(0, selectionStart) + "\n" + currentText.substring(selectionEnd)
         duckChatInput.setText(newText)
-        duckChatInput.setSelection(currentSelection + 1)
+        duckChatInput.setSelection(selectionStart + 1)
+    }
+
+    private fun CharSequence.getTextToSubmit(): CharSequence? {
+        val text = this.trim()
+        return text.ifBlank { null }
     }
 
     companion object {
