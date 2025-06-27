@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.cta.db.DismissedCtaDao
@@ -84,6 +85,7 @@ class OnboardingDaxDialogTests {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockSubscriptions: Subscriptions = mock()
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
+    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -112,6 +114,7 @@ class OnboardingDaxDialogTests {
             mockBrokenSitePrompt,
             mockUserBrowserProperties,
             mockSenseOfProtectionExperiment,
+            mockOnboardingHomeScreenWidgetExperiment,
         )
     }
 

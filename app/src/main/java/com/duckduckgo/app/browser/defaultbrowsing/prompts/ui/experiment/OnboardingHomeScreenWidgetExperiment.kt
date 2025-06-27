@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.widget.experiment
+package com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment
 
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetToggles.Cohorts.CONTROL
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetToggles.Cohorts.VARIANT_ONBOARDING_HOME_SCREEN_WIDGET_PROMPT
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceToggles.Cohorts.CONTROL
-import com.duckduckgo.app.widget.experiment.PostCtaExperienceToggles.Cohorts.VARIANT_SIMPLE_SEARCH_WIDGET_PROMPT
 import com.duckduckgo.app.widget.experiment.store.WidgetSearchCountDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -33,69 +33,70 @@ import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-interface PostCtaExperienceExperiment {
+interface OnboardingHomeScreenWidgetExperiment {
     suspend fun enroll()
     suspend fun isControl(): Boolean
-    suspend fun isSimpleSearchWidgetPrompt(): Boolean
+    suspend fun isOnboardingHomeScreenWidgetExperiment(): Boolean
 
-    suspend fun fireSettingsWidgetDisplay()
-    suspend fun fireSettingsWidgetAdd()
-
-    suspend fun fireSettingsWidgetDismiss()
+    suspend fun fireOnboardingWidgetDisplay()
+    suspend fun fireOnboardingWidgetAdd()
+    suspend fun fireOnboardingWidgetDismiss()
     suspend fun fireWidgetSearch()
     suspend fun fireWidgetSearchXCount()
 }
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PostCtaExperienceExperiment::class,
+    boundType = OnboardingHomeScreenWidgetExperiment::class,
 )
 @SingleInstanceIn(AppScope::class)
-class PostCtaExperienceExperimentImpl @Inject constructor(
+class OnboardingHomeScreenWidgetExperimentImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val postCtaExperienceToggles: PostCtaExperienceToggles,
-    private val postCtaExperiencePixelsPlugin: PostCtaExperiencePixelsPlugin,
+    private val onboardingHomeScreenWidgetToggles: OnboardingHomeScreenWidgetToggles,
+    private val onboardingHomeScreenWidgetPixelsPlugin: OnboardingHomeScreenWidgetPixelsPlugin,
     private val pixel: Pixel,
     private val widgetSearchCountDataStore: WidgetSearchCountDataStore,
-) : PostCtaExperienceExperiment {
+) : OnboardingHomeScreenWidgetExperiment {
 
     override suspend fun enroll() {
-        postCtaExperienceToggles.postCtaExperienceExperimentJun25().enroll()
+        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetExperimentJun25().enroll()
     }
 
     override suspend fun isControl(): Boolean =
-        postCtaExperienceToggles.postCtaExperienceExperimentJun25().isEnrolledAndEnabled(CONTROL)
+        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetExperimentJun25().isEnrolledAndEnabled(CONTROL)
 
-    override suspend fun isSimpleSearchWidgetPrompt(): Boolean =
-        postCtaExperienceToggles.postCtaExperienceExperimentJun25().isEnrolledAndEnabled(VARIANT_SIMPLE_SEARCH_WIDGET_PROMPT)
+    override suspend fun isOnboardingHomeScreenWidgetExperiment(): Boolean =
+        onboardingHomeScreenWidgetToggles.onboardingHomeScreenWidgetExperimentJun25().isEnrolledAndEnabled(
+            VARIANT_ONBOARDING_HOME_SCREEN_WIDGET_PROMPT,
+        )
 
-    override suspend fun fireSettingsWidgetDisplay() {
+    override suspend fun fireOnboardingWidgetDisplay() {
         withContext(dispatcherProvider.io()) {
-            postCtaExperiencePixelsPlugin.getSettingsWidgetDisplayMetric()?.fire()
+            onboardingHomeScreenWidgetPixelsPlugin.getOnboardingWidgetDisplayMetric()?.fire()
         }
     }
 
-    override suspend fun fireSettingsWidgetAdd() {
+    override suspend fun fireOnboardingWidgetAdd() {
         withContext(dispatcherProvider.io()) {
-            postCtaExperiencePixelsPlugin.getSettingsWidgetAddMetric()?.fire()
+            onboardingHomeScreenWidgetPixelsPlugin.getOnboardingWidgetAddMetric()?.fire()
         }
     }
 
-    override suspend fun fireSettingsWidgetDismiss() {
+    override suspend fun fireOnboardingWidgetDismiss() {
         withContext(dispatcherProvider.io()) {
-            postCtaExperiencePixelsPlugin.getSettingsWidgetDismissMetric()?.fire()
+            onboardingHomeScreenWidgetPixelsPlugin.getOnboardingWidgetDismissMetric()?.fire()
         }
     }
 
     override suspend fun fireWidgetSearch() {
         withContext(dispatcherProvider.io()) {
-            postCtaExperiencePixelsPlugin.getWidgetSearchMetric()?.fire()
+            onboardingHomeScreenWidgetPixelsPlugin.getWidgetSearchMetric()?.fire()
         }
     }
 
     override suspend fun fireWidgetSearchXCount() {
         withContext(dispatcherProvider.io()) {
-            postCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()?.getPixelDefinitions()?.forEach { definition ->
+            onboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch3xMetric()?.getPixelDefinitions()?.forEach { definition ->
                 if (isInConversionWindow(definition)) {
                     widgetSearchCountDataStore.getMetricForPixelDefinition(definition).takeIf { it < 3 }?.let {
                         widgetSearchCountDataStore.increaseMetricForPixelDefinition(definition).takeIf { it == 3 }?.apply {
@@ -105,7 +106,7 @@ class PostCtaExperienceExperimentImpl @Inject constructor(
                 }
             }
 
-            postCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()?.getPixelDefinitions()?.forEach { definition ->
+            onboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch5xMetric()?.getPixelDefinitions()?.forEach { definition ->
                 if (isInConversionWindow(definition)) {
                     widgetSearchCountDataStore.getMetricForPixelDefinition(definition).takeIf { it < 5 }?.let {
                         widgetSearchCountDataStore.increaseMetricForPixelDefinition(definition).takeIf { it == 5 }?.apply {
