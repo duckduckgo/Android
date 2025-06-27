@@ -99,14 +99,12 @@ class DuckChatSettingsViewModelTest {
     fun `when onDuckAiInputScreen enabled then set user setting`() = runTest {
         testee.onDuckAiInputScreenToggled(true)
         verify(duckChat).setInputScreenUserSetting(true)
-        verify(mockExperimentalThemingDataStore).changeExperimentFlagPreference(enabled = true)
     }
 
     @Test
     fun `when onDuckAiInputScreen disabled then set user setting`() = runTest {
         testee.onDuckAiInputScreenToggled(false)
         verify(duckChat).setInputScreenUserSetting(false)
-        verify(mockExperimentalThemingDataStore, never()).changeExperimentFlagPreference(any())
     }
 
     @Test
