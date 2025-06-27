@@ -891,4 +891,14 @@
     <string name="scamBlockerTitle">Krāpniecības bloķētājs</string>
     <string name="scamBlockerDescription">Brīdina par vietnēm, kas atzīmētas kā krāpnieciskas, pikšķerēšanas un ļaunprātīgas programmatūras vietnes.</string>
     <string name="threatProtectionLearnMoreTitle">Uzzināt vairāk</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Pamēģini mūsu sākuma ekrāna logrīku!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pievieno mūsu meklēšanas logrīku savam sākuma ekrānam ātrai un vienkāršai piekļuvei.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pievienot logrīku</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne tagad</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Meklēt DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>
 </resources>

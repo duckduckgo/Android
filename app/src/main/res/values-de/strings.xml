@@ -875,4 +875,14 @@
     <string name="scamBlockerTitle">Betrugsblocker</string>
     <string name="scamBlockerDescription">Warnt vor Websites, die als betrügerische, Phishing- und Malware-Websites gekennzeichnet sind.</string>
     <string name="threatProtectionLearnMoreTitle">Mehr erfahren</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probiere unser Startbildschirm-Widget aus!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget hinzufügen</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Jetzt nicht</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Mit DuckDuckGo suchen</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget für Startbildschirm</string>
 </resources>
