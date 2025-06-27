@@ -35,7 +35,7 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         activeExperiments: List<Toggle>,
     ) {
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments, webView)}", null)
         }
     }
 
