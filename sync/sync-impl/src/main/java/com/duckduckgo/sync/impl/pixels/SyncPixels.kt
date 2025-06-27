@@ -433,7 +433,7 @@ enum class SyncPixelName(override val pixelName: String) : Pixel.PixelName {
     SYNC_SETUP_MANUAL_CODE_ENTERED_SUCCESS("sync_setup_manual_code_entered_success"),
     SYNC_SETUP_MANUAL_CODE_ENTERED_FAILED("sync_setup_manual_code_entered_failed"),
     SYNC_SETUP_ENDED_ABANDONED("sync_setup_ended_abandoned"),
-    SYNC_SETUP_ENDED_SUCCESS("sync_setup_ended_success"),
+    SYNC_SETUP_ENDED_SUCCESS("sync_setup_ended_successful"),
 }
 
 object SyncPixelParameters {
