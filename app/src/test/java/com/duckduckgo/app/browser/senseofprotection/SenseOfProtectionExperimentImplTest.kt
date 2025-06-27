@@ -84,7 +84,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and and visual design updates not enabled then user can be enrolled`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isNewDesignEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -102,7 +102,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and and visual design updates not enabled then user can't be enrolled`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockExperimentDataStore.isNewDesignEnabled).thenReturn(MutableStateFlow(true))
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -120,7 +120,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and experiment is enabled but for different cohort then isEnabled returns false`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isNewDesignEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -136,7 +136,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and experiment is disabled then isEnabled returns false`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isNewDesignEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(10)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(

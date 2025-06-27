@@ -18,56 +18,70 @@ package com.duckduckgo.common.ui.experiments.visual.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalUIThemingFeature
-import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import kotlin.jvm.java
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
 
+@Suppress("DenyListedApi")
 class VisualDesignExperimentDataStoreImplTest {
 
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var experimentalUIThemingFeature: ExperimentalUIThemingFeature
-
-    @Mock
-    private lateinit var experimentalUIThemingFeatureToggle: Toggle
-
-    @Mock
-    private lateinit var visualDesignFeatureToggle: Toggle
+    private val experimentalUIThemingFeature = FakeFeatureToggleFactory.create(
+        toggles = ExperimentalUIThemingFeature::class.java,
+        store = FakeToggleStore(),
+    )
 
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(experimentalUIThemingFeature.self()).thenReturn(experimentalUIThemingFeatureToggle)
-        whenever(experimentalUIThemingFeature.visualUpdatesFeature()).thenReturn(visualDesignFeatureToggle)
+        experimentalUIThemingFeature.self().setRawStoredState(State(enable = true))
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = true))
+        experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().setRawStoredState(State(enable = true))
     }
 
     @Test
-    fun `when experiment feature flag enabled, then experiment enabled`() = runTest {
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(true)
+    fun `when split omnibar feature flag enabled, then experiment enabled`() = runTest {
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
-        Assert.assertTrue(testee.isExperimentEnabled.value)
+        Assert.assertTrue(testee.isNewDesignWithoutBottomBarEnabled.value)
     }
 
     @Test
-    fun `when experiment feature flag disabled, then experiment disabled`() = runTest {
-        whenever(experimentalUIThemingFeatureToggle.isEnabled()).thenReturn(true)
-        whenever(visualDesignFeatureToggle.isEnabled()).thenReturn(false)
+    fun `when split omnibar feature flag disabled, then experiment disabled`() = runTest {
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
+        experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()
 
-        Assert.assertFalse(testee.isExperimentEnabled.value)
+        Assert.assertFalse(testee.isNewDesignWithoutBottomBarEnabled.value)
+    }
+
+    @Test
+    fun `when new design feature flag enabled, then experiment enabled`() = runTest {
+        val testee = createTestee()
+
+        Assert.assertTrue(testee.isNewDesignEnabled.value)
+    }
+
+    @Test
+    fun `when new design feature flag disabled, then experiment disabled`() = runTest {
+        experimentalUIThemingFeature.visualUpdatesFeature().setRawStoredState(State(enable = false))
+
+        val testee = createTestee()
+
+        Assert.assertFalse(testee.isNewDesignEnabled.value)
     }
 
     private fun createTestee(): VisualDesignExperimentDataStoreImpl {

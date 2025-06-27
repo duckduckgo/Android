@@ -59,7 +59,7 @@ class VisualDesignExperimentViewModel @Inject constructor(
 
     init {
         combine(
-            visualDesignExperimentDataStore.isExperimentEnabled,
+            visualDesignExperimentDataStore.isNewDesignEnabled,
             visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
         ) { isExperimentEnabled, anyConflictingExperimentEnabled ->
             _viewState.update {

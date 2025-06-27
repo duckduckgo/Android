@@ -31,6 +31,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,13 +48,24 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     private val experimentalUIThemingFeature: ExperimentalUIThemingFeature,
 ) : VisualDesignExperimentDataStore, PrivacyConfigCallbackPlugin {
 
-    private val _experimentFeatureFlagEnabled =
+    private val _newDesignFeatureFlagEnabled =
         MutableStateFlow(experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled())
+    private val _newDesignWithoutBottomBarFeatureFlagEnabled =
+        MutableStateFlow(experimentalUIThemingFeature.visualUpdatesWithoutBottomBarFeature().isEnabled())
 
-    override val isExperimentEnabled: StateFlow<Boolean> = _experimentFeatureFlagEnabled.stateIn(
+    override val isNewDesignEnabled: StateFlow<Boolean> = _newDesignFeatureFlagEnabled.stateIn(
         scope = appCoroutineScope,
         started = SharingStarted.Eagerly,
-        initialValue = _experimentFeatureFlagEnabled.value,
+        initialValue = _newDesignFeatureFlagEnabled.value,
+    )
+
+    override val isNewDesignWithoutBottomBarEnabled: StateFlow<Boolean> = combine(isNewDesignEnabled, _newDesignWithoutBottomBarFeatureFlagEnabled) {
+            withBottomBar, withoutBottomBar ->
+        !withBottomBar && withoutBottomBar
+    }.stateIn(
+        scope = appCoroutineScope,
+        started = SharingStarted.Eagerly,
+        initialValue = !isNewDesignEnabled.value && _newDesignWithoutBottomBarFeatureFlagEnabled.value,
     )
 
     override fun onPrivacyConfigDownloaded() {
@@ -70,7 +82,7 @@ class VisualDesignExperimentDataStoreImpl @Inject constructor(
     }
 
     private suspend fun updateFeatureState() = withContext(dispatcherProvider.io()) {
-        _experimentFeatureFlagEnabled.value =
+        _newDesignFeatureFlagEnabled.value =
             experimentalUIThemingFeature.self().isEnabled() && experimentalUIThemingFeature.visualUpdatesFeature().isEnabled()
     }
 }

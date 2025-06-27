@@ -195,7 +195,7 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
         )
         whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))

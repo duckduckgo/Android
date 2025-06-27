@@ -624,9 +624,9 @@ open class OmnibarLayout @JvmOverloads constructor(
         val newTransitionState = TransitionState(
             showClearButton = viewState.showClearButton,
             showVoiceSearch = viewState.showVoiceSearch,
-            showTabsMenu = viewState.showTabsMenu,
-            showFireIcon = viewState.showFireIcon,
-            showBrowserMenu = viewState.showBrowserMenu,
+            showTabsMenu = viewState.showTabsMenu && !viewState.showFindInPage,
+            showFireIcon = viewState.showFireIcon && !viewState.showFindInPage,
+            showBrowserMenu = viewState.showBrowserMenu && !viewState.showFindInPage,
             showBrowserMenuHighlight = viewState.showBrowserMenuHighlight,
             showChatMenu = viewState.showChatMenu,
             showSpacer = viewState.showClearButton || viewState.showVoiceSearch,
@@ -634,8 +634,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
         if (omnibarAnimationManager.isFeatureEnabled() &&
             previousTransitionState != null &&
-            newTransitionState != previousTransitionState &&
-            !viewState.isLoading
+            newTransitionState != previousTransitionState
         ) {
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
@@ -1030,4 +1029,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     override fun onAnimationFinished() {
         omnibarTextListener?.onTrackersCountFinished()
     }
+}
+
+interface OmnibarItemPressedListener {
+    fun onBackButtonPressed()
 }

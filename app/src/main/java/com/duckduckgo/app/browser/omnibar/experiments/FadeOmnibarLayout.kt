@@ -41,6 +41,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.FindInPage
 import com.duckduckgo.app.browser.omnibar.FindInPageImpl
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -119,7 +120,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
+    private var fadeOmnibarItemPressedListener: OmnibarItemPressedListener? = null
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
@@ -355,7 +356,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
+    fun setFadeOmnibarItemPressedListener(itemPressedListener: OmnibarItemPressedListener) {
         fadeOmnibarItemPressedListener = itemPressedListener
         backIcon.setOnClickListener {
             viewModel.onBackButtonPressed()
@@ -374,8 +375,4 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
     }
-}
-
-interface FadeOmnibarItemPressedListener {
-    fun onBackButtonPressed()
 }

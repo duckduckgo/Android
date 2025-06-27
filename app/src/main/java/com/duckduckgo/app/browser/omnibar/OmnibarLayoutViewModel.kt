@@ -109,7 +109,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentDataStore.isExperimentEnabled,
+        visualDesignExperimentDataStore.isNewDesignEnabled,
         duckChat.showInAddressBar,
     ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
         state.copy(
@@ -157,6 +157,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
         val showClickCatcher: Boolean = false,
+        val showFindInPage: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
             return this.viewMode is Browser || this.viewMode is MaliciousSiteWarning || (!isFullUrlEnabled && omnibarText.isNotEmpty())
@@ -190,6 +191,18 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun onFindInPageRequested() {
+        _viewState.update {
+            it.copy(showFindInPage = true)
+        }
+    }
+
+    fun onFindInPageDismissed() {
+        _viewState.update {
+            it.copy(showFindInPage = false)
+        }
     }
 
     fun onOmnibarFocusChanged(

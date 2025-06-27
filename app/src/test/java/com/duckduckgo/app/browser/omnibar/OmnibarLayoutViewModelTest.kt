@@ -106,7 +106,7 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
@@ -1215,7 +1215,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed and omnibar has focus with experiment enabled then source is focused`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "query")
 
@@ -1267,7 +1267,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed with experiment enabled and was used before then correct pixel sent`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onViewModeChanged(ViewMode.NewTab)
         testee.onOmnibarFocusChanged(false, "")
@@ -1517,6 +1517,31 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.showChatMenu)
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenFindInPageDismissedThenShowFindInPageIsFalse() = runTest {
+        // First set showFindInPage to true
+        testee.onFindInPageRequested()
+
+        // Then dismiss it
+        testee.onFindInPageDismissed()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showFindInPage)
+        }
+    }
+
+    @Test
+    fun whenFindInPageRequestedThenShowFindInPageIsTrue() = runTest {
+        // First set showFindInPage to true
+        testee.onFindInPageRequested()
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.showFindInPage)
         }
     }
 
