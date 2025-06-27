@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchInterstitialBinding
 import com.duckduckgo.duckchat.impl.ui.inputscreen.Command
+import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchModeToChat
 import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchModeToSearch
 import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.UserSubmittedQuery
@@ -88,14 +89,14 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
         val params = requireActivity().intent.getActivityParams(SearchInterstitialActivityParams::class.java)
         params?.query?.let { query ->
-            binding.duckChatOmnibar.duckChatInput.setText(query)
+            binding.duckChatOmnibar.text = query
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val query = binding.duckChatOmnibar.duckChatInput.text.toString()
+                    val query = binding.duckChatOmnibar.text
                     val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
                     requireActivity().setResult(Activity.RESULT_CANCELED, data)
                     exitInterstitial()
@@ -125,6 +126,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
     private fun processCommand(command: Command) {
         when (command) {
             is UserSubmittedQuery -> binding.duckChatOmnibar.submitMessage(command.query)
+            is EditWithSelectedQuery -> binding.duckChatOmnibar.text = command.query
             SwitchModeToSearch -> {
                 binding.viewPager.setCurrentItem(0, false)
             }
@@ -174,7 +176,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         }
         onSendMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
-            viewModel.triggerAutocomplete(binding.duckChatOmnibar.duckChatInput.text.toString(), true, true)
+            viewModel.triggerAutocomplete(binding.duckChatOmnibar.text, true, true)
         }
     }
 

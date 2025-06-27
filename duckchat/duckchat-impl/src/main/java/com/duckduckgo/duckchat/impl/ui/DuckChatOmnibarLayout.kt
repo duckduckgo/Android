@@ -88,10 +88,13 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             value?.invoke(duckChatInput.text.getTextToSubmit() != null)
         }
 
+    var text: String
+        get() = duckChatInput.text.toString()
+        set(value) { duckChatInput.setText(value) }
+
     @IdRes
     private var contentId: Int = View.NO_ID
     private var focusAnimator: ValueAnimator? = null
-    private var minHeight = 0
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)

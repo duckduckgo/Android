@@ -188,7 +188,6 @@ class InputScreenViewModel @Inject constructor(
     }
 
     fun onUserSelectedToEditQuery(query: String) {
-        // TODO: handle edit query
         command.value = EditWithSelectedQuery(query)
     }
 
