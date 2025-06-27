@@ -28,10 +28,6 @@
             android:label="@string/duck_chat_title"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"/>
         <activity
-            android:name="com.duckduckgo.duckchat.impl.ui.DuckChatWebViewPoCActivity"
-            android:exported="false"
-            android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"/>
-        <activity
             android:name="com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivity"
             android:exported="false" />
     </application>

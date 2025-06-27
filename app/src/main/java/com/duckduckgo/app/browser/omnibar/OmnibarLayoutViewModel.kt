@@ -48,7 +48,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
@@ -73,6 +73,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -93,7 +95,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
-    private val browserFeatures: AndroidBrowserConfigFeature,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
@@ -104,23 +105,13 @@ class OmnibarLayoutViewModel @Inject constructor(
         ),
     )
 
-    // We need to do this since the max overloads for combine is 5
-    private val visualDesignExperimentFlags =
-        combine(
-            visualDesignExperimentDataStore.isExperimentEnabled,
-            visualDesignExperimentDataStore.isDuckAIPoCEnabled,
-        ) { isExperimentEnabled, isDuckAIPoCEnabled ->
-            isExperimentEnabled to isDuckAIPoCEnabled
-        }
-
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        visualDesignExperimentFlags,
+        visualDesignExperimentDataStore.isExperimentEnabled,
         duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, visualDesignExperimentFlags, showInAddressBar ->
-        val (isVisualDesignExperimentEnabled, isDuckAIPoCEnabled) = visualDesignExperimentFlags
+    ) { state, tabs, highlightOverflowMenu, isVisualDesignExperimentEnabled, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
@@ -129,9 +120,8 @@ class OmnibarLayoutViewModel @Inject constructor(
             isVisualDesignExperimentEnabled = isVisualDesignExperimentEnabled,
             showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
                 (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
-            showClickCatcher = isDuckAIPoCEnabled,
         )
-    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000L), _viewState.value)
+    }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -193,6 +183,13 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
+        duckChat.showInputScreen.onEach { inputScreenEnabled ->
+            _viewState.update {
+                it.copy(
+                    showClickCatcher = inputScreenEnabled,
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onOmnibarFocusChanged(
@@ -767,11 +764,31 @@ class OmnibarLayoutViewModel @Inject constructor(
     }
 
     fun onDuckChatButtonPressed() {
-        val experimentEnabled = viewState.value.isVisualDesignExperimentEnabled
-        if (experimentEnabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN)
+        viewModelScope.launch {
+            val launchSource = when {
+                viewState.value.hasFocus -> "focused"
+                viewState.value.viewMode is NewTab -> "ntp"
+                viewState.value.viewMode is Browser -> when {
+                    duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(viewState.value.url) -> "serp"
+                    else -> "website"
+                }
+                else -> "unknown"
+            }
+            val launchSourceParams = mapOf("source" to launchSource)
+            val wasUsedBeforeParams = duckChat.createWasUsedBeforePixelParams()
+
+            val params = mutableMapOf<String, String>().apply {
+                putAll(wasUsedBeforeParams)
+                putAll(launchSourceParams)
+            }
+
+            val pixelName = if (viewState.value.isVisualDesignExperimentEnabled) {
+                DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN
+            } else {
+                DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
+            }
+
+            pixel.fire(pixelName, parameters = params)
         }
     }
 

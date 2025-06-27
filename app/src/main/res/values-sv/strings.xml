@@ -843,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Tack! Din rapport hjälper till att göra DuckDuckGo bättre för alla!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Ny AI-chatt</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
@@ -879,4 +875,14 @@
     <string name="scamBlockerTitle">Bedrägeriblockerare</string>
     <string name="scamBlockerDescription">Varna på webbplatser som har flaggats för bedrägerier, nätfiske och skadlig programvara.</string>
     <string name="threatProtectionLearnMoreTitle">Läs mer</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prova vår widget för startsidan!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lägg till vår sök-widget på din startsida för snabb och enkel åtkomst.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lägg till widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Inte nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Sök DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget på startsidan</string>
 </resources>

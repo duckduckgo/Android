@@ -20,6 +20,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import kotlinx.coroutines.test.runTest
@@ -31,6 +33,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -41,10 +44,12 @@ class RealDuckChatJSHelperTest {
 
     private val mockDuckChat: DuckChatInternal = mock()
     private val mockDataStore: DuckChatDataStore = mock()
+    private val mockDuckChatPixels: DuckChatPixels = mock()
 
     private val testee = RealDuckChatJSHelper(
         duckChat = mockDuckChat,
         dataStore = mockDataStore,
+        duckChatPixels = mockDuckChatPixels,
     )
 
     @Test
@@ -219,7 +224,7 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockDataStore).updateUserPreferences(payloadString)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -230,7 +235,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -242,7 +247,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -360,5 +365,28 @@ class RealDuckChatJSHelperTest {
         }
 
         assertEquals(expectedPayload.toString(), result!!.params.toString())
+    }
+
+    @Test
+    fun whenReportMetricWithoutDataThenPixelNotSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
+
+        verifyNoInteractions(mockDuckChatPixels)
+    }
+
+    @Test
+    fun whenReportMetricWithDataThenPixelSent() = runTest {
+        val featureName = "aiChat"
+        val method = "reportMetric"
+        val id = "123"
+        val data = JSONObject(mapOf("metricName" to "userDidSubmitPrompt"))
+
+        assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
+
+        verify(mockDuckChatPixels).sendReportMetricPixel(USER_DID_SUBMIT_PROMPT)
     }
 }

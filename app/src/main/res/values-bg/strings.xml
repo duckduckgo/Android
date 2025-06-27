@@ -843,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Благодарим ви! Вашето докладване ни помага да направим DuckDuckGo по-добър за всички!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
@@ -879,4 +875,14 @@
     <string name="scamBlockerTitle">Блокиране на измами</string>
     <string name="scamBlockerDescription">Предупреждения в сайтове, за които има сигнали за измами, фишинг и злонамерен софтуер.</string>
     <string name="threatProtectionLearnMoreTitle">Научете повече</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Опитайте нашия уиджет на началния екран!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Добави приспособлението</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Не сега</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Търсене с DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Уиджет на началния екран</string>
 </resources>

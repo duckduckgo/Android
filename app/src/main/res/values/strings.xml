@@ -842,10 +842,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">New AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
@@ -878,4 +874,14 @@
     <string name="scamBlockerTitle">Scam Blocker</string>
     <string name="scamBlockerDescription">Warn on sites flagged for scams, phishing and malware.</string>
     <string name="threatProtectionLearnMoreTitle">Learn more</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Try our Home screen widget!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Add our search widget to your Home screen for quick and easy access.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Add Widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Not Now</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Search DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Home Screen Widget</string>
 </resources>

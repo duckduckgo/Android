@@ -17,10 +17,13 @@
 package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitCaptchaSolution
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.AwaitEmailConfirmation
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
@@ -35,6 +38,7 @@ import com.duckduckgo.pir.internal.scripts.models.DataSource.EXTRACTED_PROFILE
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
+import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -43,8 +47,8 @@ import kotlin.reflect.KClass
     scope = AppScope::class,
     boundType = EventHandler::class,
 )
-class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
-    override val event: KClass<out Event> = ExecuteNextBrokerAction::class
+class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
+    override val event: KClass<out Event> = ExecuteBrokerStepAction::class
 
     override suspend fun invoke(
         state: State,
@@ -62,24 +66,24 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
          *      we are ready to push the action to js layer
          *  - For any other action, we push it to the js layer via [PushJsAction]
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
-        val requestData = (event as ExecuteNextBrokerAction).actionRequestData
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val requestData = (event as ExecuteBrokerStepAction).actionRequestData
 
-        return if (state.currentActionIndex == currentBroker.actions.size) {
+        return if (state.currentActionIndex == currentBrokerStep.actions.size) {
             Next(
                 nextState = state,
-                nextEvent = BrokerActionsCompleted(true),
+                nextEvent = BrokerStepCompleted(true),
             )
         } else {
-            val actionToExecute = currentBroker.actions[state.currentActionIndex]
+            val actionToExecute = currentBrokerStep.actions[state.currentActionIndex]
 
-            if (actionToExecute.needsEmail && !hasEmail(state)) {
+            if (currentBrokerStep is OptOutStep && actionToExecute.needsEmail && !hasEmail(currentBrokerStep)) {
                 Next(
                     nextState = state,
                     sideEffect = GetEmailForProfile(
                         actionId = actionToExecute.id,
-                        brokerName = currentBroker.brokerName,
-                        extractedProfile = state.extractedProfile[state.currentExtractedProfileIndex],
+                        brokerName = currentBrokerStep.brokerName,
+                        extractedProfile = currentBrokerStep.profileToOptOut,
                         profileQuery = state.profileQuery,
                     ),
                 )
@@ -90,13 +94,18 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
                     pushDelay = 10_000
                 }
 
-                if (actionToExecute is EmailConfirmation) {
+                // Adding a temporary delay to potentially workaround captcha for optouts
+                if (state.runType == PirJob.RunType.OPTOUT && actionToExecute is BrokerAction.FillForm) {
+                    pushDelay = 5_000
+                }
+
+                if (currentBrokerStep is OptOutStep && actionToExecute is EmailConfirmation) {
                     Next(
                         nextState = state,
                         sideEffect = AwaitEmailConfirmation(
                             actionId = actionToExecute.id,
-                            brokerName = currentBroker.brokerName,
-                            extractedProfile = state.extractedProfile[state.currentExtractedProfileIndex],
+                            brokerName = currentBrokerStep.brokerName,
+                            extractedProfile = currentBrokerStep.profileToOptOut,
                             pollingIntervalSeconds = actionToExecute.pollingTime.toFloat(),
                         ),
                     )
@@ -105,7 +114,7 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
                         nextState = state,
                         sideEffect = AwaitCaptchaSolution(
                             actionId = actionToExecute.id,
-                            brokerName = currentBroker.brokerName,
+                            brokerName = currentBrokerStep.brokerName,
                             transactionID = state.transactionID,
                             attempt = 0,
                         ),
@@ -117,7 +126,7 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
                             actionToExecute.id,
                             actionToExecute,
                             pushDelay,
-                            completeRequestData(state, actionToExecute, requestData),
+                            completeRequestData(currentBrokerStep, actionToExecute, state.profileQuery, requestData),
                         ),
                     )
                 }
@@ -125,30 +134,29 @@ class ExecuteNextBrokerActionEventHandler @Inject constructor() : EventHandler {
         }
     }
 
-    private fun hasEmail(state: State): Boolean {
-        return state.extractedProfile[state.currentExtractedProfileIndex].email != null
+    private fun hasEmail(optOutStep: OptOutStep): Boolean {
+        return optOutStep.profileToOptOut.email != null
     }
 
     private fun completeRequestData(
-        state: State,
+        brokerStep: BrokerStep,
         actionToExecute: BrokerAction,
+        profileQuery: ProfileQuery?,
         requestData: PirScriptRequestData,
     ): PirScriptRequestData {
-        return if (actionToExecute.dataSource == EXTRACTED_PROFILE &&
+        return if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
             (requestData as UserProfile).extractedProfile == null
         ) {
-            val extractedProfile = state.extractedProfile[state.currentExtractedProfileIndex]
+            val extractedProfile = brokerStep.profileToOptOut
 
             UserProfile(
                 userProfile = requestData.userProfile,
-                extractedProfile = extractedProfile.run {
-                    ExtractedProfileParams(
-                        name = this.name,
-                        profileUrl = this.profileUrl,
-                        fullName = state.profileQuery?.fullName,
-                        email = this.email,
-                    )
-                },
+                extractedProfile = ExtractedProfileParams(
+                    name = extractedProfile.name,
+                    profileUrl = extractedProfile.profileUrl,
+                    fullName = profileQuery?.fullName,
+                    email = extractedProfile.email,
+                ),
             )
         } else {
             requestData

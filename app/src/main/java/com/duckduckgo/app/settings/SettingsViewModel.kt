@@ -64,6 +64,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
@@ -91,9 +92,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -116,6 +119,7 @@ class SettingsViewModel @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
+    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -142,7 +146,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAutofillPasswordsManagement : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
-        data object LaunchAddHomeScreenWidget : Command()
+        data class LaunchAddHomeScreenWidget(val simpleWidgetPrompt: Boolean) : Command()
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
@@ -164,6 +168,8 @@ class SettingsViewModel @Inject constructor(
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val appTPPollJob = ConflatedJob()
+
+    private var widgetPromptShown = false
 
     init {
         pixel.fire(SETTINGS_OPENED)
@@ -237,7 +243,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToAddHomeScreenWidget() {
-        viewModelScope.launch { command.send(LaunchAddHomeScreenWidget) }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            postCtaExperienceExperiment.enroll()
+            val simpleWidgetPrompt = postCtaExperienceExperiment.isSimpleSearchWidgetPrompt()
+            command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
+            if (!currentViewState().widgetsInstalled) {
+                widgetPromptShown = true
+            }
+            postCtaExperienceExperiment.fireSettingsWidgetDisplay()
+        }
     }
 
     fun onChangeAddressBarPositionClicked() {
@@ -320,6 +334,20 @@ class SettingsViewModel @Inject constructor(
                 command.send(LaunchAppTPOnboarding)
             }
             pixel.fire(SETTINGS_APPTP_PRESSED)
+        }
+    }
+
+    fun refreshWidgetsInstalledState() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val widgetsInstalled = widgetCapabilities.hasInstalledWidgets
+            viewState.update { it.copy(widgetsInstalled = widgetsInstalled) }
+            if (widgetPromptShown) {
+                widgetPromptShown = false
+                if (!widgetsInstalled) {
+                    logcat { "Widget bottom sheet was dismissed." }
+                    postCtaExperienceExperiment.fireSettingsWidgetDismiss()
+                }
+            }
         }
     }
 

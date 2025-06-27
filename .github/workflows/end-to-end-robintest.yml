@@ -55,7 +55,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Onboarding flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -68,7 +68,7 @@ jobs:
           include-tags: onboardingTest
 
       - name: Ad click detection flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -82,7 +82,7 @@ jobs:
 
       - name: Privacy Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -96,7 +96,7 @@ jobs:
 
       - name: Security Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -110,7 +110,7 @@ jobs:
 
       - name: Release Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -124,7 +124,7 @@ jobs:
 
       - name: Notifications permissions Android 13+
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}

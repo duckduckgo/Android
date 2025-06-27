@@ -27,7 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 interface PirActionsRunnerStateEngineFactory {
     fun create(
         runType: PirJob.RunType,
-        brokers: List<BrokerStep>,
+        brokerSteps: List<BrokerStep>,
     ): PirActionsRunnerStateEngine
 }
 
@@ -38,14 +38,14 @@ class RealPirActionsRunnerStateEngineFactory @Inject constructor(
 ) : PirActionsRunnerStateEngineFactory {
     override fun create(
         runType: PirJob.RunType,
-        brokers: List<BrokerStep>,
+        brokerSteps: List<BrokerStep>,
     ): PirActionsRunnerStateEngine {
         return RealPirActionsRunnerStateEngine(
             eventHandlers = eventHandlers,
             dispatcherProvider = dispatcherProvider,
             coroutineScope = coroutineScope,
             runType = runType,
-            brokers = brokers,
+            brokerSteps = brokerSteps,
         )
     }
 }

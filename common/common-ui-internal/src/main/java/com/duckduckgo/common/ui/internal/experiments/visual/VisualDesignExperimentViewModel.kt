@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -45,8 +46,6 @@ class VisualDesignExperimentViewModel @Inject constructor(
         val isBrowserThemingFeatureAvailable: Boolean = true,
         val isBrowserThemingFeatureChangeable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
-        val isDuckAIPoCFeatureAvailable: Boolean = false,
-        val isDuckAIPoCFeatureEnabled: Boolean = false,
         val experimentConflictAlertVisible: Boolean = false,
         val selectedTheme: String = "",
     )
@@ -61,15 +60,12 @@ class VisualDesignExperimentViewModel @Inject constructor(
     init {
         combine(
             visualDesignExperimentDataStore.isExperimentEnabled,
-            visualDesignExperimentDataStore.isDuckAIPoCEnabled,
             visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
-        ) { isExperimentEnabled, isDuckAIPoC, anyConflictingExperimentEnabled ->
+        ) { isExperimentEnabled, anyConflictingExperimentEnabled ->
             _viewState.update {
                 it.copy(
                     isBrowserThemingFeatureAvailable = true,
                     isBrowserThemingFeatureEnabled = isExperimentEnabled,
-                    isDuckAIPoCFeatureAvailable = isExperimentEnabled,
-                    isDuckAIPoCFeatureEnabled = isDuckAIPoC,
                     isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
                     experimentConflictAlertVisible = anyConflictingExperimentEnabled,
                 )
@@ -78,10 +74,8 @@ class VisualDesignExperimentViewModel @Inject constructor(
     }
 
     fun onExperimentalUIModeChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.changeExperimentFlagPreference(checked)
-    }
-
-    fun onDuckAIPoCChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.changeDuckAIPoCFlagPreference(checked)
+        viewModelScope.launch {
+            visualDesignExperimentDataStore.changeExperimentFlagPreference(checked)
+        }
     }
 }

@@ -40,6 +40,21 @@ interface DuckChat {
     fun isEnabledInBrowser(): Boolean
 
     /**
+     * Checks whether Duck.ai should keep the session alive or not
+     * Uses a cached value - does not perform disk I/O.
+     *
+     * @return true if Duck.ai keep session alive is enabled, false otherwise.
+     */
+    fun isKeepSessionEnabled(): Boolean
+
+    /**
+     * Checks whether dedicated Duck.ai input screen with the input mode switch should be used when focusing on the omnibar.
+     *
+     * @return true if the input mode switch should be used, false otherwise.
+     */
+    val showInputScreen: StateFlow<Boolean>
+
+    /**
      * Checks whether DuckChat should be shown in browser menu based on user settings.
      *
      * @return true if DuckChat should be shown, false otherwise.
@@ -56,12 +71,17 @@ interface DuckChat {
     /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
-    fun openDuckChat(query: String? = null)
+    fun openDuckChat()
 
     /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
      */
     fun openDuckChatWithAutoPrompt(query: String)
+
+    /**
+     * Opens Duck Chat with a prefilled [String] query.
+     */
+    fun openDuckChatWithPrefill(query: String)
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.

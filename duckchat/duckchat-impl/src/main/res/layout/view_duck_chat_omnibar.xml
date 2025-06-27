@@ -73,21 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="@dimen/keyline_0"
-            android:animateLayoutChanges="true">
-
-            <ImageView
-                android:id="@+id/duckChatFireButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:gravity="center"
-                android:importantForAccessibility="no"
-                android:padding="@dimen/keyline_2"
-                android:scaleType="center"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_fire_24" />
+            android:padding="@dimen/keyline_0">
 
             <EditText
                 android:id="@+id/duckChatInput"
@@ -98,8 +84,8 @@
                 android:layout_weight="1"
                 android:background="@null"
                 android:fontFamily="sans-serif"
-                android:gravity="start|center"
-                android:hint="@string/duck_chat_ask_anything"
+                android:gravity="start|top"
+                android:hint="@string/duck_chat_search_or_type_url"
                 android:inputType="textUri|textNoSuggestions|textMultiLine"
                 android:lineSpacingMultiplier="1.2"
                 android:minHeight="@dimen/toolbarIcon"
@@ -117,7 +103,7 @@
                 android:id="@+id/duckChatClearText"
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
-                android:layout_gravity="bottom"
+                android:layout_gravity="top"
                 android:background="@drawable/selectable_item_experimental_background"
                 android:gravity="center"
                 android:importantForAccessibility="no"
@@ -126,50 +112,7 @@
                 android:visibility="gone"
                 app:srcCompat="@drawable/ic_close_circle_small_secondary_24" />
 
-            <ImageView
-                android:id="@+id/duckChatSend"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:layout_gravity="bottom"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:gravity="center"
-                android:importantForAccessibility="no"
-                android:padding="@dimen/keyline_1"
-                android:scaleType="centerInside"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_send" />
-
-            <ImageView
-                android:id="@+id/duckChatNewChat"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:layout_gravity="center"
-                android:background="@drawable/selectable_item_experimental_background"
-                android:gravity="center"
-                android:importantForAccessibility="no"
-                android:padding="@dimen/keyline_2"
-                android:scaleType="center"
-                android:visibility="gone"
-                app:srcCompat="@drawable/ic_chat_new" />
-
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
-
-    <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-        android:id="@+id/duckChatStop"
-        android:text="@string/duck_chat_stop_generating"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        app:daxButtonSize="small"
-        android:gravity="center"
-        android:importantForAccessibility="no"
-        android:visibility="gone"
-        android:layout_marginHorizontal="@dimen/keyline_4"
-        android:layout_marginVertical="@dimen/keyline_3"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
 </merge>

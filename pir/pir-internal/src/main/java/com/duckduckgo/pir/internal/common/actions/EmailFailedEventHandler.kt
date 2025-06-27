@@ -39,9 +39,10 @@ class EmailFailedEventHandler @Inject constructor() : EventHandler {
         event: Event,
     ): Next {
         /**
-         * If we encounter an email related email, it means the broker action depending on it will fail.
+         * If we encounter an error related to email, it means the broker action depending on it will fail.
+         * We don't need to retry the action, as it is not a recoverable error.
          */
-        val currentBroker = state.brokers[state.currentBrokerIndex]
+        val currentBroker = state.brokerStepsToExecute[state.currentBrokerStepIndex]
         val currentAction = currentBroker.actions[state.currentActionIndex]
 
         return Next(
@@ -51,6 +52,7 @@ class EmailFailedEventHandler @Inject constructor() : EventHandler {
                     actionID = currentAction.id,
                     message = (event as EmailFailed).error.error,
                 ),
+                allowRetry = false,
             ),
         )
     }

@@ -843,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Obrigado! O teu relatório ajuda a melhorar o DuckDuckGo para todos!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Novo AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Deixa o DuckDuckGo proteger melhor o que fazes online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Torna-nos o teu navegador predefinido para que todos os links dos sites sejam abertos no DuckDuckGo.</string>
@@ -879,4 +875,14 @@
     <string name="scamBlockerTitle">Bloqueador de fraude</string>
     <string name="scamBlockerDescription">Avisar sobre sites sinalizados por fraudes, phishing e malware.</string>
     <string name="threatProtectionLearnMoreTitle">Saiba mais</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Experimenta o nosso widget do ecrã inicial!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adicione o nosso widget de pesquisa ao seu ecrã inicial para obter acesso rápido e fácil.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adicionar widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Agora não</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Pesquisar no DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget da página principal</string>
 </resources>

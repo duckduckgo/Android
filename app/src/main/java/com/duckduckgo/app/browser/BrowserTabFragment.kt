@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.getOmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
@@ -185,6 +186,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -1217,6 +1219,10 @@ class BrowserTabFragment :
                 viewModel.onNewTabMenuItemClicked()
             }
             onMenuItemClicked(duckChatMenuItem) {
+                activity?.currentFocus?.let {
+                    it.hideKeyboard()
+                    it.clearFocus()
+                }
                 viewModel.onDuckChatMenuClicked()
             }
             onMenuItemClicked(bookmarksMenuItem) {
@@ -1384,8 +1390,8 @@ class BrowserTabFragment :
 
         viewModel.onViewResumed()
 
-        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
-        if (fragmentIsVisible()) {
+        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible and Duck.ai is not
+        if (fragmentIsVisible() && (requireActivity() as? BrowserActivity)?.isDuckChatVisible == false) {
             viewModel.onViewVisible()
         }
 
@@ -1742,6 +1748,10 @@ class BrowserTabFragment :
         }
     }
 
+    fun openSavedSite(url: String) {
+        viewModel.onUserSubmittedQuery(url, QueryOrigin.FromBookmark)
+    }
+
     fun submitQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
     }
@@ -1941,6 +1951,10 @@ class BrowserTabFragment :
 
             is Command.HideKeyboard -> {
                 hideKeyboard()
+            }
+
+            is Command.HideKeyboardForChat -> {
+                hideKeyboardForChat()
             }
 
             is Command.BrokenSiteFeedback -> {
@@ -3610,6 +3624,16 @@ class BrowserTabFragment :
         }
     }
 
+    private fun hideKeyboardForChat() {
+        if (!isHidden) {
+            logcat(VERBOSE) { "Keyboard for chat now hiding" }
+            activity?.currentFocus?.let {
+                it.hideKeyboard()
+                it.clearFocus()
+            }
+        }
+    }
+
     private fun hideKeyboardRetainFocus() {
         if (!isHidden) {
             logcat(VERBOSE) { "Keyboard now hiding" }
@@ -4318,7 +4342,7 @@ class BrowserTabFragment :
 
         private fun showCta(configuration: Cta) {
             when (configuration) {
-                is HomePanelCta -> showHomeCta(configuration)
+                is HomePanelCta -> showBottomSheetCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -4396,6 +4420,14 @@ class BrowserTabFragment :
             )
         }
 
+        private fun showBottomSheetCta(configuration: HomePanelCta) {
+            if (configuration is AddWidgetAutoOnboardingExperiment) {
+                showExperimentalHomeWidget(configuration)
+            } else {
+                showHomeCta(configuration)
+            }
+        }
+
         private fun showExperimentalHomeWidget(
             configuration: HomePanelCta,
         ) {
@@ -4408,22 +4440,18 @@ class BrowserTabFragment :
                 )
                 experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()
                         viewModel.onCtaShown()
                     }
 
                     override fun onCanceled() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogCancelled()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
 
                     override fun onAddWidgetButtonClicked() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked()
                         viewModel.onUserClickCtaOkButton(configuration)
                     }
 
                     override fun onNotNowButtonClicked() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }

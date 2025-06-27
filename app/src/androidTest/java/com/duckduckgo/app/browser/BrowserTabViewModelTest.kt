@@ -91,6 +91,7 @@ import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -113,6 +114,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -558,6 +560,7 @@ class BrowserTabViewModelTest {
     private val mockSiteHttpErrorHandler: HttpCodeSiteErrorHandler = mock()
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
+    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
     private val tabManager: TabManager = mock()
 
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
@@ -641,7 +644,7 @@ class BrowserTabViewModelTest {
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -663,6 +666,7 @@ class BrowserTabViewModelTest {
             brokenSitePrompt = mockBrokenSitePrompt,
             userBrowserProperties = mockUserBrowserProperties,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
+            onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -871,7 +875,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() = runTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        whenever(mockVisualDesignExperimentDataStore.isDuckAIPoCEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(true))
 
         testee.onViewVisible()
 
@@ -5567,6 +5571,24 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun givenRequestSubmittedFromBookmarkThenCorrectQueryOriginSetInBrowserViewState() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null, FromBookmark)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo", queryOrigin = FromBookmark)
+
+        assertEquals(testee.browserViewState.value?.lastQueryOrigin, FromBookmark)
+    }
+
+    @Test
+    fun givenRequestSubmittedFromUserThenCorrectQueryOriginSetInBrowserViewState() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(testee.browserViewState.value?.lastQueryOrigin, FromUser)
+    }
+
+    @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = DaxBubbleCta.DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
@@ -6077,7 +6099,7 @@ class BrowserTabViewModelTest {
             "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
         )
         testee.onUserSubmittedQuery("https://duckduckgo.com/?q=example&ia=chat&duckai=5")
-        mockDuckChat.openDuckChat("example")
+        mockDuckChat.openDuckChatWithPrefill("example")
     }
 
     @Test
@@ -6125,7 +6147,6 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "0"))
         verify(mockDuckChat).openDuckChat()
     }
@@ -6136,7 +6157,6 @@ class BrowserTabViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, mapOf("was_used_before" to "1"))
         verify(mockDuckChat).openDuckChat()
     }
@@ -6461,31 +6481,45 @@ class BrowserTabViewModelTest {
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChat()
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
     }
 
     @Test
-    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasTextThenOpenDuckChatWithQuery() = runTest {
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasSameTextThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+    }
+
+    @Test
+    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasNewTextThenOpenDuckChatWithAutoPrompt() = runTest {
         val query = "example"
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo", queryOrFullUrl = "foo")
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test
     fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
         val query = "example"
         testee.setLastSubmittedUserQuery("foo")
+        testee.setLastSubmittedUserChatQuery("foo")
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
 
         testee.openDuckChat(query)
 
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
         verify(mockDuckChat, never()).openDuckChat()
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(query)
     }
 
     @Test
@@ -6697,7 +6731,8 @@ class BrowserTabViewModelTest {
 
         testee.openDuckChat(query)
 
-        verify(mockDuckChat).openDuckChat(query)
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChat()
         verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
     }
 
@@ -6706,11 +6741,66 @@ class BrowserTabViewModelTest {
         val query = "example"
         testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
         testee.setLastSubmittedUserQuery("test")
+        testee.setLastSubmittedUserChatQuery("test")
 
         testee.openDuckChat(query)
 
         verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChat(any())
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatWithoutSubmittingAPreviousSearchThenOpenDuckChatWithPrefill() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatChangingOmnibarThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatAfterSubmittingASearchThenOpenDuckChatWithPrefill() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.setLastSubmittedUserQuery("test")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithPrefill(query)
+        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
+        verify(mockDuckChat, never()).openDuckChat()
+    }
+
+    @Test
+    fun whenOpeningDuckChatAfterSubmittingASearchAndChatThenOpenDuckChatWithAutoPrompt() = runTest {
+        val query = "example"
+        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
+
+        testee.setLastSubmittedUserQuery("test")
+        testee.setLastSubmittedUserChatQuery("test")
+
+        testee.openDuckChat(query)
+
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
+        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
+        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test

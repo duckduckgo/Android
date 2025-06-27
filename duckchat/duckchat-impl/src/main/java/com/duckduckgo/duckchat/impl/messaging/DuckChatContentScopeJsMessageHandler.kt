@@ -46,6 +46,7 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor() : ContentScopeJ
             "responseState",
             "hideChatInput",
             "showChatInput",
+            "reportMetric",
         )
     }
 }
