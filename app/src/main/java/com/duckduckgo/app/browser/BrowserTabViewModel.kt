@@ -2796,7 +2796,7 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && experimentalThemingDataStore.isSplitOmnibarEnabled.value)
+        command.value = LaunchPopupMenu(anchorToNavigationBar = false)
     }
 
     fun onPopupMenuLaunched() {

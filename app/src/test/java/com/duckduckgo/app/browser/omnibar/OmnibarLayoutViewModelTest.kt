@@ -106,7 +106,6 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
@@ -1228,7 +1227,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed and omnibar has focus with experiment enabled then source is focused`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "query")
 
@@ -1280,7 +1279,7 @@ class OmnibarLayoutViewModelTest {
     @Test
     fun `when DuckChat Button pressed with experiment enabled and was used before then correct pixel sent`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onViewModeChanged(ViewMode.NewTab)
         testee.onOmnibarFocusChanged(false, "")

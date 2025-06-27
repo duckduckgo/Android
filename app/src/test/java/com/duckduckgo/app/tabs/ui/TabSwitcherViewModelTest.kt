@@ -195,9 +195,6 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            defaultVisualExperimentStateFlow,
-        )
         whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(

@@ -58,7 +58,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.extensions.combine
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -72,6 +71,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -109,16 +109,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
-        experimentalThemingDataStore.isSplitOmnibarEnabled,
         experimentalThemingDataStore.isSingleOmnibarEnabled,
         duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, isSplitOmnibarEnabled, isSingleOmnibarEnabled, showInAddressBar ->
+    ) { state, tabs, highlightOverflowMenu, isSingleOmnibarEnabled, showInAddressBar ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            isExperimentalThemingEnabled = isSplitOmnibarEnabled || isSingleOmnibarEnabled,
+            isExperimentalThemingEnabled = isSingleOmnibarEnabled,
             showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
                 (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
         )

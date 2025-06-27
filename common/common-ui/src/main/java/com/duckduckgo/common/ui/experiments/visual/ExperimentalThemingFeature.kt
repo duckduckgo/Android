@@ -30,13 +30,6 @@ interface ExperimentalThemingFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun duckAIPoCFeature(): Toggle
-
-    // TODO: Revisit this when the split omnibar feature is revived
-//    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-//    fun splitOmnibarFeature(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun singleOmnibarFeature(): Toggle
 

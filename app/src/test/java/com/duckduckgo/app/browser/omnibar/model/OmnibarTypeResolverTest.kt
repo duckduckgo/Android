@@ -31,29 +31,16 @@ class OmnibarTypeResolverTest {
 
     private lateinit var testee: OmnibarTypeResolver
     private val mockExperimentDataStore: ExperimentalThemingDataStore = mock()
-    private val mockIsNewDesignEnabled = mock<MutableStateFlow<Boolean>>()
     private val mockIsNewDesignWithoutBottomBarEnabled = mock<MutableStateFlow<Boolean>>()
 
     @Before
     fun setup() {
-        whenever(mockExperimentDataStore.isSplitOmnibarEnabled).thenReturn(mockIsNewDesignEnabled)
         whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(mockIsNewDesignWithoutBottomBarEnabled)
         testee = OmnibarTypeResolver(mockExperimentDataStore)
     }
 
     @Test
-    fun whenNewDesignIsEnabledThenOmnibarTypeIsFade() {
-        whenever(mockIsNewDesignEnabled.value).thenReturn(true)
-        whenever(mockIsNewDesignWithoutBottomBarEnabled.value).thenReturn(false)
-
-        val omnibarType = testee.getOmnibarType()
-
-        assertEquals(FADE, omnibarType)
-    }
-
-    @Test
-    fun whenNewDesignWithoutBottomBarIsEnabledThenOmnibarTypeIsSingle() {
-        whenever(mockIsNewDesignEnabled.value).thenReturn(false)
+    fun whenSingleOmnibarIsEnabledThenOmnibarTypeIsSingle() {
         whenever(mockIsNewDesignWithoutBottomBarEnabled.value).thenReturn(true)
 
         val omnibarType = testee.getOmnibarType()
@@ -61,19 +48,9 @@ class OmnibarTypeResolverTest {
         assertEquals(SINGLE, omnibarType)
     }
 
-    @Test
-    fun whenBothNewDesignFlagsAreEnabledThenOmnibarWithNabBarTakesPrecedence() {
-        whenever(mockIsNewDesignEnabled.value).thenReturn(true)
-        whenever(mockIsNewDesignWithoutBottomBarEnabled.value).thenReturn(true)
-
-        val omnibarType = testee.getOmnibarType()
-
-        assertEquals(FADE, omnibarType)
-    }
 
     @Test
     fun whenNoExperimentIsEnabledThenOmnibarTypeIsScrolling() {
-        whenever(mockIsNewDesignEnabled.value).thenReturn(false)
         whenever(mockIsNewDesignWithoutBottomBarEnabled.value).thenReturn(false)
 
         val omnibarType = testee.getOmnibarType()

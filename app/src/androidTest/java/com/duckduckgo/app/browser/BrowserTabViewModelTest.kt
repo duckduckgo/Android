@@ -699,9 +699,6 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
-        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            defaultVisualExperimentStateFlow,
-        )
 
         whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
 

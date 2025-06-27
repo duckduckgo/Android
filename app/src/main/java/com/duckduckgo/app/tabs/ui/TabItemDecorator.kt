@@ -32,7 +32,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
 class TabItemDecorator(context: Context, experimentStore: ExperimentalThemingDataStore) : RecyclerView.ItemDecoration() {
-    private val isNewDesignEnabled = experimentStore.isSplitOmnibarEnabled.value || experimentStore.isSingleOmnibarEnabled.value
+    private val isNewDesignEnabled = experimentStore.isSingleOmnibarEnabled.value
     private val borderPadding = if (isNewDesignEnabled) BORDER_PADDING_NEW else BORDER_PADDING
     private val activeTabBorderColor = if (isNewDesignEnabled) {
         CommonR.attr.daxColorTabHighlight

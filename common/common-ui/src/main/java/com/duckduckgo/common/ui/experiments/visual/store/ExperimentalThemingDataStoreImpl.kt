@@ -49,50 +49,14 @@ class ExperimentalThemingDataStoreImpl @Inject constructor(
     private val experimentalThemingFeature: ExperimentalThemingFeature,
 ) : ExperimentalThemingDataStore, PrivacyConfigCallbackPlugin {
 
-    // TODO: Revisit this when the split omnibar feature is revived
-    // private val _splitOmnibarFlagEnabled =
-    //     MutableStateFlow(experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled())
-    private val _splitOmnibarFlagEnabled = MutableStateFlow(false).asStateFlow()
-
     private val _singleOmnibarFeatureFlagEnabled =
         MutableStateFlow(experimentalThemingFeature.singleOmnibarFeature().isEnabled())
 
-    override val isSplitOmnibarEnabled: StateFlow<Boolean> = _splitOmnibarFlagEnabled.stateIn(
+    override val isSingleOmnibarEnabled: StateFlow<Boolean> = _singleOmnibarFeatureFlagEnabled.stateIn(
         scope = appCoroutineScope,
         started = SharingStarted.Eagerly,
-        initialValue = _splitOmnibarFlagEnabled.value,
+        initialValue = _singleOmnibarFeatureFlagEnabled.value,
     )
-
-    override val isSingleOmnibarEnabled: StateFlow<Boolean> = combine(isSplitOmnibarEnabled, _singleOmnibarFeatureFlagEnabled) {
-            withBottomBar, withoutBottomBar ->
-        !withBottomBar && withoutBottomBar
-    }.stateIn(
-        scope = appCoroutineScope,
-        started = SharingStarted.Eagerly,
-        initialValue = !isSplitOmnibarEnabled.value && _singleOmnibarFeatureFlagEnabled.value,
-    )
-
-    override fun onPrivacyConfigDownloaded() {
-        appCoroutineScope.launch {
-            updateFeatureState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    override suspend fun changeExperimentFlagPreference(enabled: Boolean) = withContext(dispatcherProvider.io()) {
-        experimentalThemingFeature.self().setRawStoredState(Toggle.State(remoteEnableState = enabled))
-
-        // TODO: Revisit this when the split omnibar feature is revived
-        // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(Toggle.State(remoteEnableState = enabled))
-
-        updateFeatureState()
-    }
-
-    private suspend fun updateFeatureState() = withContext(dispatcherProvider.io()) {
-        // TODO: Revisit this when the split omnibar feature is revived
-        // _splitOmnibarFlagEnabled.value =
-        //     experimentalThemingFeature.self().isEnabled() && experimentalThemingFeature.splitOmnibarFeature().isEnabled()
-    }
 
     override suspend fun countSingleOmnibarUser() {
         withContext(dispatcherProvider.io()) {

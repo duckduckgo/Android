@@ -174,8 +174,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val tabsAdapter: TabSwitcherAdapter by lazy {
         TabSwitcherAdapter(
-            isVisualExperimentEnabled = experimentalThemingDataStore.isSplitOmnibarEnabled.value ||
-                experimentalThemingDataStore.isSingleOmnibarEnabled.value,
+            isVisualExperimentEnabled = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             itemClickListener = this,
             webViewPreviewPersister = webViewPreviewPersister,
             lifecycleOwner = this,

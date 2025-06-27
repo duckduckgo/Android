@@ -45,8 +45,7 @@ class ThemingSharedPreferences @Inject constructor(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
             context.isInNightMode(),
-            experimentalThemingDataStore.isSplitOmnibarEnabled.value ||
-                experimentalThemingDataStore.isSingleOmnibarEnabled.value,
+            experimentalThemingDataStore.isSingleOmnibarEnabled.value,
         )
     }
 

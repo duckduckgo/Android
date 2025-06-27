@@ -1103,7 +1103,7 @@ class BrowserTabFragment :
         browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
             lifecycleScope = lifecycleScope,
             browserTabFragmentBinding = binding,
-            isExperimentEnabled = experimentalThemingDataStore.isSplitOmnibarEnabled.value,
+            isExperimentEnabled = false,
             omnibar = omnibar,
             browserNavigationBarObserver = observer,
         )
@@ -1192,14 +1192,9 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && experimentalThemingDataStore.isSplitOmnibarEnabled.value) {
-            // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
-            BrowserPopupMenu.ResourceType.BOTTOM
-        } else {
-            when (settingsDataStore.omnibarPosition) {
-                TOP -> BrowserPopupMenu.ResourceType.TOP
-                BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
-            }
+        val popupMenuResourceType = when (settingsDataStore.omnibarPosition) {
+            TOP -> BrowserPopupMenu.ResourceType.TOP
+            BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
         }
 
         popupMenu = BrowserPopupMenu(
@@ -2735,8 +2730,7 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = experimentalThemingDataStore.isSplitOmnibarEnabled.value ||
-                    experimentalThemingDataStore.isSingleOmnibarEnabled.value,
+                addExtraDividerPadding = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             ),
         )
     }

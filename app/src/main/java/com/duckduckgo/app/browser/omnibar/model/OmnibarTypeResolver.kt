@@ -26,9 +26,7 @@ class OmnibarTypeResolver @Inject constructor(
     private val experimentsDataStore: ExperimentalThemingDataStore,
 ) {
     fun getOmnibarType(): OmnibarType {
-        return if (experimentsDataStore.isSplitOmnibarEnabled.value) {
-            FADE
-        } else if (experimentsDataStore.isSingleOmnibarEnabled.value) {
+        return if (experimentsDataStore.isSingleOmnibarEnabled.value) {
             SINGLE
         } else {
             SCROLLING

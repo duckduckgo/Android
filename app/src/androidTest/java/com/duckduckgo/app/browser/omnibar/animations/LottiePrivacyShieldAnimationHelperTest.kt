@@ -42,9 +42,6 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Before
     fun setup() {
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            disabledVisualExperimentStateFlow,
-        )
         whenever(experimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(
             disabledVisualExperimentStateFlow,
         )
@@ -219,89 +216,11 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).setAnimation(R.raw.protected_shield)
     }
 
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            enabledVisualExperimentStateFlow,
-        )
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, experimentalThemingDataStore)
-
-        testee.setAnimationView(holder, PROTECTED)
-
-        verify(holder).setAnimation(R.raw.protected_shield_visual_updates)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            enabledVisualExperimentStateFlow,
-        )
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, experimentalThemingDataStore)
-
-        testee.setAnimationView(holder, UNPROTECTED)
-
-        verify(holder).setAnimation(R.raw.unprotected_shield_visual_updates)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            enabledVisualExperimentStateFlow,
-        )
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, experimentalThemingDataStore)
-
-        testee.setAnimationView(holder, PROTECTED)
-
-        verify(holder).setAnimation(R.raw.dark_protected_shield_visual_updates)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewVisualDesignShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            enabledVisualExperimentStateFlow,
-        )
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, experimentalThemingDataStore)
-
-        testee.setAnimationView(holder, UNPROTECTED)
-
-        verify(holder).setAnimation(R.raw.dark_unprotected_shield_visual_updates)
-    }
 
     @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndProtectedAndNewSignleOmnibarDesignEnabledShowCheckmarkAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            disabledVisualExperimentStateFlow,
-        )
         whenever(experimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
@@ -321,9 +240,6 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenLightModeAndUnprotectedAndNewSignleOmnibarDesignEnabledThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            disabledVisualExperimentStateFlow,
-        )
         whenever(experimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
@@ -343,9 +259,6 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenDarkModeAndProtectedAndNewSignleOmnibarDesignEnabledShowCheckmarkAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            disabledVisualExperimentStateFlow,
-        )
         whenever(experimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
@@ -365,9 +278,6 @@ class LottiePrivacyShieldAnimationHelperTest {
     @Test
     fun whenDarkModeAndUnprotectedAndNewSignleOmnibarDesignEnabledThenUseExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            disabledVisualExperimentStateFlow,
-        )
         whenever(experimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(
             enabledVisualExperimentStateFlow,
         )
@@ -381,25 +291,5 @@ class LottiePrivacyShieldAnimationHelperTest {
         testee.setAnimationView(holder, UNPROTECTED)
 
         verify(holder).setAnimation(R.raw.dark_unprotected_shield_visual_updates)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
-        whenever(experimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(
-            disabledVisualExperimentStateFlow,
-        )
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, experimentalThemingDataStore)
-
-        testee.setAnimationView(holder, PROTECTED)
-
-        verify(holder).setAnimation(R.raw.protected_shield)
     }
 }

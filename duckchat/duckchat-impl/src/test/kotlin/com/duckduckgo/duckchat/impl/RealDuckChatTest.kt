@@ -96,7 +96,7 @@ class RealDuckChatTest {
         isVisualDesignEnabledStateFlow.value = true
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
-        whenever(mockExperimentalThemingDataStore.isSplitOmnibarEnabled).thenReturn(isVisualDesignEnabledStateFlow)
+        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(isVisualDesignEnabledStateFlow)
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         imageUploadFeature.self().setRawStoredState(State(enable = true))

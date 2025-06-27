@@ -27,6 +27,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -58,24 +59,17 @@ class VisualDesignExperimentViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = ViewState())
 
     init {
-        combine(
-            experimentalThemingDataStore.isSplitOmnibarEnabled,
-            visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
-        ) { isExperimentEnabled, anyConflictingExperimentEnabled ->
-            _viewState.update {
-                it.copy(
-                    isBrowserThemingFeatureAvailable = false,
-                    isBrowserThemingFeatureEnabled = isExperimentEnabled,
-                    isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
-                    experimentConflictAlertVisible = anyConflictingExperimentEnabled,
-                )
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch {
-            experimentalThemingDataStore.changeExperimentFlagPreference(checked)
+            visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled.collectLatest { anyConflictingExperimentEnabled ->
+                _viewState.update {
+                    it.copy(
+                        isBrowserThemingFeatureAvailable = false,
+                        isBrowserThemingFeatureEnabled = false,
+                        isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
+                        experimentConflictAlertVisible = anyConflictingExperimentEnabled,
+                    )
+                }
+            }
         }
     }
 }

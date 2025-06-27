@@ -45,29 +45,11 @@ class ExperimentalThemingDataStoreImplTest {
         MockitoAnnotations.openMocks(this)
 
         experimentalThemingFeature.self().setRawStoredState(State(enable = true))
-        // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(State(enable = true))
         experimentalThemingFeature.singleOmnibarFeature().setRawStoredState(State(enable = true))
     }
 
-//    @Test
-//    fun `when split omnibar feature flag enabled, then experiment enabled`() = runTest {
-//        val testee = createTestee()
-//
-//        Assert.assertTrue(testee.isSplitOmnibarEnabled.value)
-//    }
-
-//    @Test
-//    fun `when split omnibar feature flag disabled, then experiment disabled`() = runTest {
-////        experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(State(enable = false))
-//
-//        val testee = createTestee()
-//
-//        Assert.assertFalse(testee.isSplitOmnibarEnabled.value)
-//    }
-
     @Test
-    fun `when single omnibar feature flag enabled and split disabled, then experiment enabled`() = runTest {
-        // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(State(enable = false))
+    fun `when single omnibar feature flag enabled , then experiment enabled`() = runTest {
         val testee = createTestee()
 
         Assert.assertTrue(testee.isSingleOmnibarEnabled.value)
@@ -75,7 +57,6 @@ class ExperimentalThemingDataStoreImplTest {
 
     @Test
     fun `when single omnibar feature flag disabled, then experiment disabled`() = runTest {
-        // experimentalThemingFeature.splitOmnibarFeature().setRawStoredState(State(enable = false))
         experimentalThemingFeature.singleOmnibarFeature().setRawStoredState(State(enable = false))
 
         val testee = createTestee()

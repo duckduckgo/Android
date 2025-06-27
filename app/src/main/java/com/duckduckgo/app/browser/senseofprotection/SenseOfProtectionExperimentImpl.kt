@@ -209,8 +209,6 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun seesNewVisualDesign(): Boolean {
-        val seesNewVisualDesing = experimentalThemingDataStore.isSplitOmnibarEnabled.value
-        logcat { "VisualDesign: seesNewVisualDesign $seesNewVisualDesing" }
-        return seesNewVisualDesing
+        return experimentalThemingDataStore.isSingleOmnibarEnabled.value
     }
 }
