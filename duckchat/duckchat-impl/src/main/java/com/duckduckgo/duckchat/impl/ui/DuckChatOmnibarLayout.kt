@@ -87,6 +87,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             field = value
             value?.invoke(duckChatInput.text.getTextToSubmit() != null)
         }
+    var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
 
     var text: String
         get() = duckChatInput.text.toString()
@@ -98,6 +99,8 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     @IdRes
     private var contentId: Int = View.NO_ID
     private var focusAnimator: ValueAnimator? = null
+    private var originalText: String? = null
+    private var hasTextChangedFromOriginal = false
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
@@ -112,6 +115,11 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         configureInputBehavior()
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
+    }
+
+    fun provideInitialText(text: String) {
+        originalText = text
+        duckChatInput.setText(text)
     }
 
     private fun configureClickListeners() {
@@ -143,7 +151,13 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
 
         doOnTextChanged { text, _, _, _ ->
+            if (!hasTextChangedFromOriginal) {
+                hasTextChangedFromOriginal = text != originalText
+            }
+            onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || duckChatInput.text.isBlank())
+
             onSendMessageAvailable?.invoke(duckChatInput.text.getTextToSubmit() != null)
+
             val isNullOrEmpty = text.isNullOrEmpty()
             fade(duckChatClearText, !isNullOrEmpty)
 
