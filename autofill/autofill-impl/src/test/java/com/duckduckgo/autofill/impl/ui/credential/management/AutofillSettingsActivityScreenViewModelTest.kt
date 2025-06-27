@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME
@@ -1065,11 +1066,11 @@ class AutofillSettingsActivityScreenViewModelTest {
 
     @Test
     fun whenOnImportPasswordsFromGooglePasswordManagerCalledThenCorrectCommandIsAdded() = runTest {
-        testee.onImportPasswordsFromGooglePasswordManager()
+        testee.onImportPasswordsFromGooglePasswordManager(PasswordManagementEmptyState)
 
         testee.commandsListView.test {
             val commands = awaitItem()
-            assertTrue(commands.contains(LaunchImportGooglePasswords(true)))
+            assertTrue(commands.contains(LaunchImportGooglePasswords(PasswordManagementEmptyState)))
             cancelAndIgnoreRemainingEvents()
         }
     }

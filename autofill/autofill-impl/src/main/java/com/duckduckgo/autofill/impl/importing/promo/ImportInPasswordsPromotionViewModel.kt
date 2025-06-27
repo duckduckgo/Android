@@ -20,7 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED
@@ -56,7 +56,7 @@ class ImportInPasswordsPromotionViewModel @Inject constructor(
     fun onPromoShown() {
         if (!promoDisplayedPixelSent) {
             promoDisplayedPixelSent = true
-            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementPromo.value)
+            val params = mapOf("source" to PasswordManagementPromo.value)
             pixel.fire(AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN, params)
         }
     }
@@ -65,10 +65,10 @@ class ImportInPasswordsPromotionViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             promoEventDispatcher.emit(
                 AutofillEffect.LaunchImportPasswords(
-                    source = AutofillImportLaunchSource.PasswordManagementPromo,
+                    source = PasswordManagementPromo,
                 ),
             )
-            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementPromo.value)
+            val params = mapOf("source" to PasswordManagementPromo.value)
             pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED, params)
         }
     }
@@ -77,6 +77,11 @@ class ImportInPasswordsPromotionViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             importInPasswordsVisibility.onPromoDismissed()
             command.send(DismissImport)
+            pixel.fire(
+                pixel = AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_DISMISSED,
+                parameters = mapOf("source" to PasswordManagementPromo.value),
+                encodedParameters = emptyMap(),
+            )
         }
     }
 }

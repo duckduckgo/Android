@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementSc
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
@@ -174,7 +175,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
             viewModel.onPasswordListClicked()
         }
         binding.autofillAvailable.importPasswordsOption.setOnClickListener {
-            viewModel.onImportPasswordsClicked(getAutofillSettingsLaunchSource())
+            viewModel.onImportPasswordsClicked(AutofillImportLaunchSource.AutofillSettings)
         }
         binding.autofillAvailable.syncDesktopPasswordsOption.setOnClickListener {
             viewModel.onImportFromDesktopWithSyncClicked(getAutofillSettingsLaunchSource())
@@ -223,7 +224,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchImportPasswordsScreen() {
-        val dialog = ImportFromGooglePasswordsDialog.instance(showInitialInstructionalPrompt = true)
+        val dialog = ImportFromGooglePasswordsDialog.instance(AutofillImportLaunchSource.AutofillSettings)
         dialog.show(supportFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
     }
 

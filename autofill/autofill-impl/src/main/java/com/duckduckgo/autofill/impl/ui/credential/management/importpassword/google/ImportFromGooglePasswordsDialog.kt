@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -37,6 +38,9 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementPromo
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
@@ -102,18 +106,26 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         if (activityResult.resultCode == Activity.RESULT_OK) {
             lifecycleScope.launch {
                 activityResult.data?.let { data ->
-                    processImportFlowResult(data)
+                    val launchSource = getLaunchSource()
+                    processImportFlowResult(data, launchSource)
                 }
             }
         }
     }
 
-    private fun ImportFromGooglePasswordsDialog.processImportFlowResult(data: Intent) {
+    private fun getLaunchSource() =
+        BundleCompat.getParcelable(arguments ?: Bundle(), KEY_LAUNCH_SOURCE, AutofillImportLaunchSource::class.java) ?: Unknown
+
+    private fun ImportFromGooglePasswordsDialog.processImportFlowResult(data: Intent, launchSource: AutofillImportLaunchSource) {
         (IntentCompat.getParcelableExtra(data, ImportGooglePasswordResult.RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)).let {
             when (it) {
-                is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully()
-                is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError(it.reason)
-                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(it.stage, canShowPreImportDialog())
+                is ImportGooglePasswordResult.Success -> viewModel.onImportFlowFinishedSuccessfully(launchSource)
+                is ImportGooglePasswordResult.Error -> viewModel.onImportFlowFinishedWithError(it.reason, launchSource)
+                is ImportGooglePasswordResult.UserCancelled -> viewModel.onImportFlowCancelledByUser(
+                    it.stage,
+                    canShowPreImportDialog(launchSource),
+                    launchSource,
+                )
                 else -> {}
             }
         }
@@ -203,14 +215,20 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         }
 
         // check if we should show the initial instructional prompt
-        if (canShowPreImportDialog()) {
-            viewModel.shouldShowInitialInstructionalPrompt()
+        val launchSource = getLaunchSource()
+        if (canShowPreImportDialog(launchSource)) {
+            viewModel.shouldShowInitialInstructionalPrompt(launchSource)
         } else {
             startImportWebFlow()
         }
     }
 
-    private fun canShowPreImportDialog() = arguments?.getBoolean(KEY_SHOW_INITIAL_INSTRUCTIONAL_PROMPT, true) ?: true
+    private fun canShowPreImportDialog(launchSource: AutofillImportLaunchSource): Boolean {
+        return when (launchSource) {
+            PasswordManagementPromo -> false
+            else -> true
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -263,7 +281,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private fun onImportGcmButtonClicked() {
         startImportWebFlow()
-        importPasswordsPixelSender.onImportPasswordsDialogImportButtonClicked()
+        importPasswordsPixelSender.onImportPasswordsDialogImportButtonClicked(getLaunchSource())
     }
 
     private fun startImportWebFlow() {
@@ -285,7 +303,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             return
         }
 
-        importPasswordsPixelSender.onUserCancelledImportPasswordsDialog()
+        importPasswordsPixelSender.onUserCancelledImportPasswordsDialog(getLaunchSource())
 
         dismiss()
     }
@@ -298,12 +316,12 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     companion object {
 
-        private const val KEY_SHOW_INITIAL_INSTRUCTIONAL_PROMPT = "showInitialInstructionalPrompt"
+        private const val KEY_LAUNCH_SOURCE = "launchSource"
 
-        fun instance(showInitialInstructionalPrompt: Boolean): ImportFromGooglePasswordsDialog {
+        fun instance(importSource: AutofillImportLaunchSource): ImportFromGooglePasswordsDialog {
             val fragment = ImportFromGooglePasswordsDialog()
             fragment.arguments = Bundle().apply {
-                putBoolean(KEY_SHOW_INITIAL_INSTRUCTIONAL_PROMPT, showInitialInstructionalPrompt)
+                putParcelable(KEY_LAUNCH_SOURCE, importSource)
             }
             return fragment
         }
