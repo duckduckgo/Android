@@ -226,7 +226,7 @@ class RealImportInPasswordsVisibilityTest {
         whenever(autofillSelfToggle.isEnabled()).thenReturn(autofillSelfEnabled)
         whenever(canImportFromGooglePasswordManagerToggle.isEnabled()).thenReturn(canImportFromGooglePasswordManager)
 
-        whenever(autofillFeature.canPromoteImportPasswords()).thenReturn(canPromoteImportPasswordsToggle)
+        whenever(autofillFeature.canPromoteImportPasswordsInPasswordManagement()).thenReturn(canPromoteImportPasswordsToggle)
         whenever(autofillFeature.self()).thenReturn(autofillSelfToggle)
         whenever(autofillFeature.canImportFromGooglePasswordManager()).thenReturn(canImportFromGooglePasswordManagerToggle)
     }
