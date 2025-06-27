@@ -682,7 +682,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
             is Command.SwitchToTab -> openExistingTab(command.tabId)
             is Command.OpenInNewTab -> launchNewTab(command.url)
-            is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
+            is Command.OpenSavedSite -> currentTab?.openSavedSite(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
             is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)

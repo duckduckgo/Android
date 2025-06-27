@@ -114,6 +114,7 @@ import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
@@ -5567,6 +5568,24 @@ class BrowserTabViewModelTest {
         assertCommandIssued<HideOnboardingDaxDialog> {
             assertEquals(cta, this.onboardingCta)
         }
+    }
+
+    @Test
+    fun givenRequestSubmittedFromBookmarkThenCorrectQueryOriginSetInBrowserViewState() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null, FromBookmark)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo", queryOrigin = FromBookmark)
+
+        assertEquals(testee.browserViewState.value?.lastQueryOrigin, FromBookmark)
+    }
+
+    @Test
+    fun givenRequestSubmittedFromUserThenCorrectQueryOriginSetInBrowserViewState() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(testee.browserViewState.value?.lastQueryOrigin, FromUser)
     }
 
     @Test
