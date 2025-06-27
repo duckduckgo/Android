@@ -32,7 +32,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 

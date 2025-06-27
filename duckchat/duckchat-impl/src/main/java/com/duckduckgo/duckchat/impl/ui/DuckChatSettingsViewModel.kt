@@ -85,10 +85,6 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun onDuckAiInputScreenToggled(checked: Boolean) {
         viewModelScope.launch {
-            if (checked) {
-                // the new input screen feature is only available when the visual design experiment is enabled
-                experimentalThemingDataStore.changeExperimentFlagPreference(enabled = true)
-            }
             duckChat.setInputScreenUserSetting(checked)
         }
     }

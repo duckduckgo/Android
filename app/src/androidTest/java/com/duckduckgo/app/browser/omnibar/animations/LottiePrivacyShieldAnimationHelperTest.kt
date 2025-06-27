@@ -216,7 +216,6 @@ class LottiePrivacyShieldAnimationHelperTest {
         verify(holder).setAnimation(R.raw.protected_shield)
     }
 
-
     @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndProtectedAndNewSignleOmnibarDesignEnabledShowCheckmarkAssets() = runTest {

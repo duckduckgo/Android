@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.omnibar.model
 
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.FADE
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
@@ -47,7 +46,6 @@ class OmnibarTypeResolverTest {
 
         assertEquals(SINGLE, omnibarType)
     }
-
 
     @Test
     fun whenNoExperimentIsEnabledThenOmnibarTypeIsScrolling() {

@@ -16,38 +16,30 @@
 
 package com.duckduckgo.common.ui.experiments.visual.store
 
-import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.ui.experiments.visual.ExperimentalThemingFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @ContributesBinding(
     scope = AppScope::class,
     boundType = ExperimentalThemingDataStore::class,
 )
-@ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
 @SingleInstanceIn(scope = AppScope::class)
 class ExperimentalThemingDataStoreImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val experimentalThemingFeature: ExperimentalThemingFeature,
-) : ExperimentalThemingDataStore, PrivacyConfigCallbackPlugin {
+) : ExperimentalThemingDataStore {
 
     private val _singleOmnibarFeatureFlagEnabled =
         MutableStateFlow(experimentalThemingFeature.singleOmnibarFeature().isEnabled())
