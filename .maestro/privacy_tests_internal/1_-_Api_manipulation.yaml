@@ -3,7 +3,7 @@ tags:
   - privacyTestInternal
 ---
 - retry:
-    maxRetries: 3
+    maxRetries: 0
     commands:
       - launchApp:
           clearState: true

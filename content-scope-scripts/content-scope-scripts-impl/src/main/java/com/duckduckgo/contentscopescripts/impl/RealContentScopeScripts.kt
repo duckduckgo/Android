@@ -16,10 +16,14 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
+import android.view.View
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.impl.features.apimanipulation.ApiManipulationContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -39,6 +43,7 @@ interface CoreContentScopeScripts {
     fun getScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
+        view: View,
     ): String
     fun isEnabled(): Boolean
 
@@ -78,10 +83,11 @@ class RealContentScopeScripts @Inject constructor(
     override fun getScript(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
+        view: View,
     ): String {
         var updateJS = false
 
-        val pluginParameters = getPluginParameters()
+        val pluginParameters = getPluginParameters(view)
 
         if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
             cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
@@ -99,7 +105,7 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments)
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments, view)
         if (cachedUserPreferencesJson != userPreferencesJson) {
             cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
@@ -119,13 +125,16 @@ class RealContentScopeScripts @Inject constructor(
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
     private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
 
-    private fun getPluginParameters(): PluginParameters {
+    private fun getPluginParameters(view: View): PluginParameters {
         var config = ""
         var preferences = ""
         val plugins = pluginPoint.getPlugins()
         plugins.forEach { plugin ->
             if (config.isNotEmpty()) {
                 config += ","
+            }
+            if (plugin is ApiManipulationContentScopeConfigPlugin) {
+                Toast.makeText(view.context, plugin.config(), LENGTH_LONG).show()
             }
             config += plugin.config()
 
@@ -187,8 +196,9 @@ class RealContentScopeScripts @Inject constructor(
         userPreferences: String,
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
+        view: View,
     ): String {
-        val experiments = getExperimentsKeyValuePair(activeExperiments)
+        val experiments = getExperimentsKeyValuePair(activeExperiments, view)
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
             "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode ?: false)},$messagingParameters"
         if (userPreferences.isEmpty()) {
@@ -202,7 +212,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
-    private fun getExperimentsKeyValuePair(activeExperiments: List<Toggle>): String {
+    private fun getExperimentsKeyValuePair(activeExperiments: List<Toggle>, view: View): String {
         return runBlocking {
             val type = Types.newParameterizedType(List::class.java, Experiment::class.java)
             val moshi = Builder().build()
@@ -216,6 +226,7 @@ class RealContentScopeScripts @Inject constructor(
                         subfeature = it.featureName().name,
                     )
                 }.let {
+                    Toast.makeText(view.context, "Active experiments: ${it.map { "${it.subfeature}: ${it.cohort}" }}", LENGTH_LONG).show()
                     return@runBlocking "\"currentCohorts\":${jsonAdapter.toJson(it)}"
                 }
         }
