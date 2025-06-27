@@ -14,13 +14,21 @@ tags:
           id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
       - scrollUntilVisible:
           element:
-            text: "Developer Settings" # or any other selector
-          direction: DOWN # DOWN|UP|LEFT|RIGHT (optional, default: DOWN)
-          timeout: 50000 # (optional, default: 20000) ms
-          speed: 40 # 0-100 (optional, default: 40) Scroll speed. Higher values scroll faster.
-          visibilityPercentage: 100 # 0-100 (optional, default: 100) Percentage of element visible in viewport
-          centerElement: false # true|false (optional, default: false)
+            text: "Developer Settings"
+          direction: DOWN
+          timeout: 50000
+          speed: 40
+          visibilityPercentage: 100
+          centerElement: false
       - tapOn: "Developer Settings"
+      - scrollUntilVisible:
+          element:
+            id: "com.duckduckgo.mobile.android:id/overridePrivacyRemoteConfigUrl"
+          direction: DOWN
+          timeout: 50000
+          speed: 40
+          visibilityPercentage: 100
+          centerElement: true
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/overridePrivacyRemoteConfigUrl"
       - tapOn:
@@ -28,7 +36,7 @@ tags:
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/internal_edit_text"
       - inputText: "https://privacy-test-pages.site/content-scope-scripts/infra/config/conditional-matching-experiments.json"
-      - pressKey: Back
+      - hideKeyboard
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/load"
       - tapOn: "OK"

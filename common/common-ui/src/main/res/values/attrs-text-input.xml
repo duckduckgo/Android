@@ -33,6 +33,7 @@
             <enum name="password" value="2"/>
             <enum name="form_mode" value="3"/>
             <enum name="ip_address" value="4"/>
+            <enum name="url" value="5"/>
         </attr>
 
     </declare-styleable>
