@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -55,6 +56,7 @@ class RealAutofillRuntimeConfigProviderTest {
     private val siteSpecificFixesStore: AutofillSiteSpecificFixesStore = mock()
     private val emailProtectionInContextAvailabilityRules: EmailProtectionInContextAvailabilityRules = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
+    private val inBrowserPromo: InBrowserImportPromo = mock()
 
     @Before
     fun setUp() {
@@ -69,11 +71,13 @@ class RealAutofillRuntimeConfigProviderTest {
             emailProtectionInContextAvailabilityRules = emailProtectionInContextAvailabilityRules,
             neverSavedSiteRepository = neverSavedSiteRepository,
             siteSpecificFixesStore = siteSpecificFixesStore,
+            inBrowserPromo = inBrowserPromo,
         )
 
         runTest {
             whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
             whenever(neverSavedSiteRepository.isInNeverSaveList(any())).thenReturn(false)
+            whenever(inBrowserPromo.canShowPromo()).thenReturn(false)
         }
 
         autofillFeature.canCategorizeUnknownUsername().setRawStoredState(State(enable = true))
@@ -85,7 +89,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 ),
             ),
         ).thenReturn("")
-        whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any())).thenReturn("")
+        whenever(runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(any(), any(), any())).thenReturn("")
         whenever(runtimeConfigurationWriter.generateUserUnprotectedDomains()).thenReturn("")
         whenever(
             runtimeConfigurationWriter.generateUserPreferences(
@@ -150,6 +154,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -174,6 +179,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -198,6 +204,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -223,6 +230,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -248,6 +256,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -273,6 +282,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -298,6 +308,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -322,6 +333,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -346,6 +358,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = eq(expectedCredentialResponse),
             emailAvailable = any(),
+            credentialsImport = any(),
         )
     }
 
@@ -360,6 +373,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = any(),
             emailAvailable = eq(true),
+            credentialsImport = any(),
         )
     }
 
@@ -374,6 +388,7 @@ class RealAutofillRuntimeConfigProviderTest {
         verify(runtimeConfigurationWriter).generateResponseGetAvailableInputTypes(
             credentialsAvailable = any(),
             emailAvailable = eq(false),
+            credentialsImport = any(),
         )
     }
 

@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.jsbridge.response
 
 import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.jsbridge.response.EmailProtectionInContextSignupDismissedAtResponse.DismissedAt
+import com.duckduckgo.autofill.impl.jsbridge.response.NewAutofillDataAvailableResponse.NewAutofillDataAvailable
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
@@ -30,6 +31,7 @@ interface AutofillResponseWriter {
     fun generateResponseForRejectingGeneratedPassword(): String
     fun generateResponseForEmailProtectionInContextSignup(installedRecently: Boolean, permanentlyDismissedAtTimestamp: Long?): String
     fun generateResponseForEmailProtectionEndOfFlow(isSignedIn: Boolean): String
+    fun generateResponseNewAutofillDataAvailable(): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -37,6 +39,7 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
 
     private val autofillDataAdapterCredentialsAvailable = moshi.adapter(ContainingCredentials::class.java).indent("  ")
     private val autofillDataAdapterCredentialsUnavailable = moshi.adapter(EmptyResponse::class.java).indent("  ")
+    private val autofillDataAdapterRefreshData = moshi.adapter(NewAutofillDataAvailableResponse::class.java).indent("  ")
     private val autofillDataAdapterAcceptGeneratedPassword = moshi.adapter(AcceptGeneratedPasswordResponse::class.java).indent("  ")
     private val autofillDataAdapterRejectGeneratedPassword = moshi.adapter(RejectGeneratedPasswordResponse::class.java).indent("  ")
     private val emailProtectionDataAdapterInContextSignup = moshi.adapter(EmailProtectionInContextSignupDismissedAtResponse::class.java).indent("  ")
@@ -76,5 +79,10 @@ class AutofillJsonResponseWriter @Inject constructor(val moshi: Moshi) : Autofil
         val response = ShowInContextEmailProtectionSignupPromptResponse.SignupResponse(isSignedIn = isSignedIn)
         val topLevelResponse = ShowInContextEmailProtectionSignupPromptResponse(success = response)
         return emailDataAdapterInContextEndOfFlow.toJson(topLevelResponse)
+    }
+
+    override fun generateResponseNewAutofillDataAvailable(): String {
+        val topLevelResponse = NewAutofillDataAvailableResponse(success = NewAutofillDataAvailable())
+        return autofillDataAdapterRefreshData.toJson(topLevelResponse)
     }
 }
