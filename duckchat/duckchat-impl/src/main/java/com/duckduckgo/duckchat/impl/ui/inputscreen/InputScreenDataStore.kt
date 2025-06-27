@@ -27,29 +27,29 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
-interface DuckAiInputScreenDataStore {
-    suspend fun getLastUsedMode(): DuckAiInputScreenMode?
-    suspend fun setLastUsedMode(mode: DuckAiInputScreenMode)
+interface InputScreenDataStore {
+    suspend fun getLastUsedMode(): InputScreenMode?
+    suspend fun setLastUsedMode(mode: InputScreenMode)
 }
 
-enum class DuckAiInputScreenMode {
+enum class InputScreenMode {
     CHAT,
     SEARCH,
     ;
 }
 
 @ContributesBinding(FragmentScope::class)
-class DuckAiInputScreenDataStoreImpl @Inject constructor(
+class InputScreenDataStoreImpl @Inject constructor(
     @DuckChat private val dataStore: DataStore<Preferences>,
-) : DuckAiInputScreenDataStore {
+) : InputScreenDataStore {
 
     private val lastUsedModeKey = stringPreferencesKey("duck.ai_input-screen_last-used-mode")
 
-    override suspend fun getLastUsedMode(): DuckAiInputScreenMode? {
+    override suspend fun getLastUsedMode(): InputScreenMode? {
         return dataStore.data.map { preferences ->
             preferences[lastUsedModeKey]?.let { modeString ->
                 try {
-                    DuckAiInputScreenMode.valueOf(modeString)
+                    InputScreenMode.valueOf(modeString)
                 } catch (e: IllegalArgumentException) {
                     null
                 }
@@ -57,7 +57,7 @@ class DuckAiInputScreenDataStoreImpl @Inject constructor(
         }.firstOrNull()
     }
 
-    override suspend fun setLastUsedMode(mode: DuckAiInputScreenMode) {
+    override suspend fun setLastUsedMode(mode: InputScreenMode) {
         dataStore.edit { preferences ->
             preferences[lastUsedModeKey] = mode.name
         }

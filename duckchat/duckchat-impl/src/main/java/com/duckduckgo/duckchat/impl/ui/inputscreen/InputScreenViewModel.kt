@@ -70,7 +70,7 @@ class InputScreenViewModel @Inject constructor(
     private val history: NavigationHistory,
     savedSitesRepository: SavedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val duckAiInputScreenDataStore: DuckAiInputScreenDataStore,
+    private val inputScreenDataStore: InputScreenDataStore,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
@@ -108,12 +108,12 @@ class InputScreenViewModel @Inject constructor(
             .launchIn(viewModelScope)
 
         viewModelScope.launch {
-            duckAiInputScreenDataStore.getLastUsedMode().let { mode ->
+            inputScreenDataStore.getLastUsedMode().let { mode ->
                 command.value = when (mode) {
                     null,
-                    DuckAiInputScreenMode.SEARCH,
+                    InputScreenMode.SEARCH,
                     -> Command.SwitchModeToSearch
-                    DuckAiInputScreenMode.CHAT -> Command.SwitchModeToChat
+                    InputScreenMode.CHAT -> Command.SwitchModeToChat
                 }
             }
         }
@@ -290,13 +290,13 @@ class InputScreenViewModel @Inject constructor(
 
     fun onSearchSelected() {
         viewModelScope.launch {
-            duckAiInputScreenDataStore.setLastUsedMode(DuckAiInputScreenMode.SEARCH)
+            inputScreenDataStore.setLastUsedMode(InputScreenMode.SEARCH)
         }
     }
 
     fun onChatSelected() {
         viewModelScope.launch {
-            duckAiInputScreenDataStore.setLastUsedMode(DuckAiInputScreenMode.CHAT)
+            inputScreenDataStore.setLastUsedMode(InputScreenMode.CHAT)
         }
     }
 }
