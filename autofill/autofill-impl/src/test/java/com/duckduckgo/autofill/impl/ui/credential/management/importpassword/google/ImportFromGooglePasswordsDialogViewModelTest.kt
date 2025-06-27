@@ -8,6 +8,7 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.In
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.ImportSuccess
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
@@ -54,6 +55,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenSuccessfulImportThenViewModeUpdatedToInProgress() = runTest {
         configureImportInProgress()
+        testee.shouldShowInitialInstructionalPrompt()
         testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             awaitImportInProgress()
@@ -63,6 +65,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenSuccessfulImportFlowThenImportFinishesNothingImportedThenViewModeUpdatedToResults() = runTest {
         configureImportFinished(savedCredentials = 0, numberSkipped = 0)
+        testee.shouldShowInitialInstructionalPrompt()
         testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             awaitImportSuccess()
@@ -72,6 +75,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenSuccessfulImportFlowThenImportFinishesCredentialsImportedNoDuplicatesThenViewModeUpdatedToResults() = runTest {
         configureImportFinished(savedCredentials = 10, numberSkipped = 0)
+        testee.shouldShowInitialInstructionalPrompt()
         testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             val result = awaitImportSuccess()
@@ -83,6 +87,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenSuccessfulImportFlowThenImportFinishesOnlyDuplicatesThenViewModeUpdatedToResults() = runTest {
         configureImportFinished(savedCredentials = 0, numberSkipped = 2)
+        testee.shouldShowInitialInstructionalPrompt()
         testee.onImportFlowFinishedSuccessfully()
         testee.viewState.test {
             val result = awaitImportSuccess()
@@ -93,7 +98,23 @@ class ImportFromGooglePasswordsDialogViewModelTest {
 
     @Test
     fun whenSuccessfulImportNoUpdatesThenThenViewModeFirstInitialisedToPreImport() = runTest {
+        testee.shouldShowInitialInstructionalPrompt()
         testee.onImportFlowFinishedSuccessfully()
+        testee.viewState.test {
+            awaitItem().assertIsPreImport()
+        }
+    }
+
+    @Test
+    fun whenFirstCreatedPreImportNotRequiredThenViewModeFirstInitialisedToDeterminingView() = runTest {
+        testee.viewState.test {
+            awaitItem().assertIsDeterminingFirstViewToShow()
+        }
+    }
+
+    @Test
+    fun whenFirstCreatedPreImportRequiredThenViewModeFirstInitialisedToPreImportView() = runTest {
+        testee.shouldShowInitialInstructionalPrompt()
         testee.viewState.test {
             awaitItem().assertIsPreImport()
         }
@@ -132,5 +153,9 @@ class ImportFromGooglePasswordsDialogViewModelTest {
 
     private fun ViewState.assertIsImporting() {
         assertTrue(viewMode is Importing)
+    }
+
+    private fun ViewState.assertIsDeterminingFirstViewToShow() {
+        assertTrue(viewMode is DeterminingFirstView)
     }
 }

@@ -49,7 +49,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loading
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportGooglePasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
@@ -339,7 +339,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
             is PromptUserToAuthenticateMassDeletion -> promptUserToAuthenticateMassDeletion(command.authConfiguration)
-            is LaunchImportPasswordsFromGooglePasswordManager -> launchImportPasswordsScreen()
+            is LaunchImportGooglePasswords -> launchImportPasswordsScreen(showInitialInstructionalPrompt = command.showImportInstructions)
             is LaunchReportAutofillBreakageConfirmation -> launchReportBreakageConfirmation(command.eTldPlusOne)
             is ShowUserReportSentMessage -> showUserReportSentMessage()
             is ReevalutePromotions -> evaluatePromotions()
@@ -357,9 +357,9 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         Snackbar.make(binding.root, R.string.autofillManagementReportBreakageSuccessMessage, Snackbar.LENGTH_LONG).show()
     }
 
-    private fun launchImportPasswordsScreen() {
+    private fun launchImportPasswordsScreen(showInitialInstructionalPrompt: Boolean) {
         context?.let {
-            val dialog = ImportFromGooglePasswordsDialog.instance()
+            val dialog = ImportFromGooglePasswordsDialog.instance(showInitialInstructionalPrompt = showInitialInstructionalPrompt)
             dialog.show(parentFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
         }
     }
