@@ -90,7 +90,10 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
 
     var text: String
         get() = duckChatInput.text.toString()
-        set(value) { duckChatInput.setText(value) }
+        set(value) {
+            duckChatInput.setText(value)
+            duckChatInput.setSelection(value.length)
+        }
 
     @IdRes
     private var contentId: Int = View.NO_ID
