@@ -24,6 +24,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -47,6 +48,8 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSuccess
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -176,6 +179,9 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             binding.actionSend.isVisible = isAvailable
             viewModel.triggerAutocomplete(binding.duckChatOmnibar.duckChatInput.text.toString(), true, true)
         }
+        onVoiceInputAllowed = { isAllowed ->
+            viewModel.onVoiceInputAllowedChange(isAllowed)
+        }
     }
 
     private fun configureVoice() {
@@ -189,11 +195,13 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
                 }
                 is SearchCancelled -> {}
                 is VoiceSearchDisabled -> {
-                    binding.actionVoice.isVisible = false
+                    viewModel.onVoiceSearchDisabled()
                 }
             }
         }
-        binding.actionVoice.isVisible = voiceSearchAvailability.isVoiceSearchAvailable
+        viewModel.visibilityState.onEach {
+            binding.actionVoice.isVisible = it.voiceInputButtonVisible
+        }.launchIn(lifecycleScope)
     }
 
     private fun exitInterstitial() {
@@ -209,6 +217,6 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
     override fun onResume() {
         super.onResume()
-        binding.actionVoice.isVisible = voiceSearchAvailability.isVoiceSearchAvailable
+        viewModel.onActivityResume()
     }
 }

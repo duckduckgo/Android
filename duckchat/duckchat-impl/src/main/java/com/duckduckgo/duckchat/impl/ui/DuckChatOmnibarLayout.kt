@@ -87,6 +87,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
             field = value
             value?.invoke(duckChatInput.text.getTextToSubmit() != null)
         }
+    var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
 
     @IdRes
     private var contentId: Int = View.NO_ID
@@ -137,7 +138,10 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
 
         doOnTextChanged { text, _, _, _ ->
+            onVoiceInputAllowed?.invoke(duckChatInput.text.isBlank())
+
             onSendMessageAvailable?.invoke(duckChatInput.text.getTextToSubmit() != null)
+
             val isNullOrEmpty = text.isNullOrEmpty()
             fade(duckChatClearText, !isNullOrEmpty)
 
