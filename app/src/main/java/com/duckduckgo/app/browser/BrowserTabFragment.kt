@@ -1551,6 +1551,7 @@ class BrowserTabFragment :
 
                         // want to ensure that we aren't offering to inject credentials from an inactive tab
                         hideDialogWithTag(CredentialAutofillPickerDialog.TAG)
+                        sitePermissionsDialogLauncher.forceDismissDialog()
                     }
                 }
             },
