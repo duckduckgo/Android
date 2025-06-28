@@ -16,11 +16,13 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperiments
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -35,6 +37,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RealContentScopeScriptsTest {
 
     private val mockPluginPoint: PluginPoint<ContentScopeConfigPlugin> = mock()
@@ -46,6 +49,7 @@ class RealContentScopeScriptsTest {
     private val mockUnprotectedTemporary: UnprotectedTemporary = mock()
     private val mockFingerprintProtectionManager: FingerprintProtectionManager = mock()
     private val contentScopeScriptsFeature = FakeFeatureToggleFactory.create(ContentScopeScriptsFeature::class.java)
+    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
 
     lateinit var testee: CoreContentScopeScripts
 
@@ -59,6 +63,7 @@ class RealContentScopeScriptsTest {
             mockUnprotectedTemporary,
             mockFingerprintProtectionManager,
             contentScopeScriptsFeature,
+            mockContentScopeExperiments,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -69,6 +74,7 @@ class RealContentScopeScriptsTest {
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
             .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
         whenever(mockFingerprintProtectionManager.getSeed()).thenReturn(sessionKey)
+        whenever(mockContentScopeExperiments.getExperimentsJson()).thenReturn("[]")
     }
 
     @Test
@@ -96,7 +102,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"foo\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -123,7 +129,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"globalPrivacyControlValue\":false,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\\{\"globalPrivacyControlValue\":false,\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -149,7 +155,8 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"globalPrivacyControlValue\":true,\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"globalPrivacyControlValue\":true,\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -176,7 +183,8 @@ class RealContentScopeScriptsTest {
                 "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -203,7 +211,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\",\"desktopModeEnabled\":true," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -214,6 +222,37 @@ class RealContentScopeScriptsTest {
         js = testee.getScript(site)
 
         verifyJsScript(js, newRegEx)
+    }
+
+    @Test
+    fun whenGetScriptAndVariablesAreCachedAndCurrentCohortsChangedThenUseNewCurrentCohortsValue() {
+        var js = testee.getScript(null)
+        verifyJsScript(js)
+
+        val newRegEx = Regex(
+            "^processConfig\\(\\{\"features\":\\{" +
+                "\"config1\":\\{\"state\":\"enabled\"\\}," +
+                "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
+                "\"unprotectedTemporary\":\\[" +
+                "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
+                "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
+                "\\{\"currentCohorts\":\\[\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
+                "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
+                "\"messageCallback\":\"([\\da-f]{32})\"," +
+                "\"javascriptInterface\":\"([\\da-f]{32})\"\\}\\)$",
+        )
+
+        whenever(mockContentScopeExperiments.getExperimentsJson()).thenReturn(
+            "[{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]",
+        )
+        js = testee.getScript(null)
+
+        verifyJsScript(js, newRegEx)
+        verify(mockUnprotectedTemporary, times(3)).unprotectedTemporaryExceptions
+        verify(mockUserAllowListRepository, times(3)).domainsInUserAllowList()
+        verify(mockContentScopeJsReader, times(2)).getContentScopeJS()
     }
 
     @Test
@@ -260,7 +299,7 @@ class RealContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +

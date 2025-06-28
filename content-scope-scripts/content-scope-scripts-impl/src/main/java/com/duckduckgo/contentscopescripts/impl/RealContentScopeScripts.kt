@@ -21,6 +21,7 @@ import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionManager
@@ -53,6 +54,7 @@ class RealContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
+    private val contentScopeExperiments: ContentScopeExperiments,
 ) : CoreContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -177,13 +179,14 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getUserPreferencesJson(userPreferences: String, site: Site?): String {
+        val experiments = getExperimentsKeyValuePair()
         val isDesktopMode = site?.isDesktopMode ?: false
         val defaultParameters = "${getVersionNumberKeyValuePair()},${getPlatformKeyValuePair()},${getLanguageKeyValuePair()}," +
             "${getSessionKeyValuePair()},${getDesktopModeKeyValuePair(isDesktopMode)},$messagingParameters"
         if (userPreferences.isEmpty()) {
-            return "{$defaultParameters}"
+            return "{$experiments,$defaultParameters}"
         }
-        return "{$userPreferences,$defaultParameters}"
+        return "{$userPreferences,$experiments,$defaultParameters}"
     }
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
@@ -191,6 +194,7 @@ class RealContentScopeScripts @Inject constructor(
     private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
+    private fun getExperimentsKeyValuePair() = "\"currentCohorts\":${contentScopeExperiments.getExperimentsJson()}"
 
     private fun getContentScopeJson(config: String, unprotectedTemporaryExceptions: List<FeatureException>): String = (
         "{\"features\":{$config},\"unprotectedTemporary\":${getUnprotectedTemporaryJson(unprotectedTemporaryExceptions)}}"
