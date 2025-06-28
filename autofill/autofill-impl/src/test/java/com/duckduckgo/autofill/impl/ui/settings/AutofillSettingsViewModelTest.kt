@@ -84,7 +84,7 @@ class AutofillSettingsViewModelTest {
     fun whenScreenRendersIfImportButtonAvailableThenPixelIsSent() = runTest {
         testee.viewState(launchSource).test {
             awaitItem()
-            val expectedParams = mapOf("source" to "settings")
+            val expectedParams = mapOf("source" to "autofill_settings")
             verify(pixel).fire(
                 pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN),
                 parameters = eq(expectedParams),
@@ -276,7 +276,7 @@ class AutofillSettingsViewModelTest {
         testee.onImportPasswordsClicked(AutofillScreenLaunchSource.SettingsActivity)
         testee.commands.test {
             assertEquals(AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle, awaitItem())
-            val expectedParams = mapOf("source" to "settings")
+            val expectedParams = mapOf("source" to "autofill_settings")
             verify(pixel).fire(
                 pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED),
                 parameters = eq(expectedParams),

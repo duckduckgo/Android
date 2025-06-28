@@ -25,9 +25,9 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
-import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Unknown
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
@@ -147,7 +147,7 @@ class AutofillSettingsViewModel @Inject constructor(
                 importGooglePasswordButtonShownPixelSent = true
                 pixel.fire(
                     pixel = AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN,
-                    parameters = mapOf("source" to (launchSource ?: Unknown).asString()),
+                    parameters = mapOf("source" to AutofillImportLaunchSource.AutofillSettings.value),
                 )
             }
         }
@@ -196,7 +196,7 @@ class AutofillSettingsViewModel @Inject constructor(
             // we use AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED for consistency with iOS
             pixel.fire(
                 AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED,
-                mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()),
+                mapOf("source" to AutofillImportLaunchSource.AutofillSettings.value),
             )
         }
     }
