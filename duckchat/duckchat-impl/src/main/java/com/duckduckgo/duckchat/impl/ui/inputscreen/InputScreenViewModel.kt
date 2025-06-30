@@ -44,11 +44,14 @@ import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.AutoCompleteViewState
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
+import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
@@ -57,6 +60,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -71,10 +75,20 @@ class InputScreenViewModel @Inject constructor(
     savedSitesRepository: SavedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val inputScreenDataStore: InputScreenDataStore,
+    private val voiceSearchAvailability: VoiceSearchAvailability,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
     private var lastAutoCompleteState: AutoCompleteViewState? = null
+
+    private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
+    private val voiceInputAllowed = MutableStateFlow(true)
+    private val _visibilityState = MutableStateFlow(
+        InputScreenVisibilityState(
+            voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
+        ),
+    )
+    val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
 
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
 
@@ -116,6 +130,24 @@ class InputScreenViewModel @Inject constructor(
                     InputScreenMode.CHAT -> Command.SwitchModeToChat
                 }
             }
+        }
+
+        combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
+            serviceAvailable && inputAllowed
+        }.onEach { voiceInputPossible ->
+            _visibilityState.update {
+                it.copy(
+                    voiceInputButtonVisible = voiceInputPossible,
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun onActivityResume() {
+        _visibilityState.update {
+            it.copy(
+                voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
+            )
         }
     }
 
@@ -297,5 +329,13 @@ class InputScreenViewModel @Inject constructor(
         viewModelScope.launch {
             inputScreenDataStore.setLastUsedMode(InputScreenMode.CHAT)
         }
+    }
+
+    fun onVoiceSearchDisabled() {
+        voiceServiceAvailable.value = false
+    }
+
+    fun onVoiceInputAllowedChange(allowed: Boolean) {
+        voiceInputAllowed.value = allowed
     }
 }

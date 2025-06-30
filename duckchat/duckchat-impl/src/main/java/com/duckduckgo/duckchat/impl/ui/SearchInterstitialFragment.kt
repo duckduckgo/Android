@@ -22,8 +22,10 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -49,6 +51,8 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSucces
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_interstitial) {
@@ -89,7 +93,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
         val params = requireActivity().intent.getActivityParams(SearchInterstitialActivityParams::class.java)
         params?.query?.let { query ->
-            binding.duckChatOmnibar.text = query
+            binding.duckChatOmnibar.provideInitialText(query)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
@@ -178,6 +182,9 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             binding.actionSend.isVisible = isAvailable
             viewModel.triggerAutocomplete(binding.duckChatOmnibar.text, true, true)
         }
+        onVoiceInputAllowed = { isAllowed ->
+            viewModel.onVoiceInputAllowedChange(isAllowed)
+        }
     }
 
     private fun configureVoice() {
@@ -191,11 +198,13 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
                 }
                 is SearchCancelled -> {}
                 is VoiceSearchDisabled -> {
-                    binding.actionVoice.isVisible = false
+                    viewModel.onVoiceSearchDisabled()
                 }
             }
         }
-        binding.actionVoice.isVisible = voiceSearchAvailability.isVoiceSearchAvailable
+        viewModel.visibilityState.onEach {
+            binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
+        }.launchIn(lifecycleScope)
     }
 
     private fun exitInterstitial() {
@@ -211,6 +220,6 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
     override fun onResume() {
         super.onResume()
-        binding.actionVoice.isVisible = voiceSearchAvailability.isVoiceSearchAvailable
+        viewModel.onActivityResume()
     }
 }
