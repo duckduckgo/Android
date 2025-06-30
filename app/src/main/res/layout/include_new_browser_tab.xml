@@ -90,6 +90,19 @@
             app:lottie_rawRes="@raw/ob_5_mag_glass" />
 
         <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/wingAnimation"
+            android:layout_width="wrap_content"
+            android:layout_height="112dp"
+            android:adjustViewBounds="true"
+            android:importantForAccessibility="no"
+            android:visibility="gone"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:lottie_rawRes="@raw/ob_3_wing" />
+
+        <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/buckEndAnimation"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
