@@ -191,17 +191,17 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenFeatureEnabledThenShowInBrowserMenuReturnsValueFromRepository() {
-        assertTrue(testee.showInBrowserMenu.value)
+    fun whenFeatureEnabledThenShowPopupMenuShortcutReturnsValueFromRepository() {
+        assertTrue(testee.showPopupMenuShortcut.value)
     }
 
     @Test
-    fun whenFeatureDisabledThenShowInBrowserMenuReturnsFalse() {
+    fun whenFeatureDisabledThenShowPopupMenuShortcutReturnsFalse() {
         duckChatFeature.self().setRawStoredState(State(false))
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInBrowserMenu.value)
+        assertFalse(testee.showPopupMenuShortcut.value)
     }
 
     @Test
@@ -242,11 +242,11 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
 
         testee.setShowInAddressBarUserSetting(true)
-        assertTrue(testee.showInAddressBar.value)
+        assertTrue(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
 
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         testee.setShowInAddressBarUserSetting(false)
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -471,12 +471,14 @@ class RealDuckChatTest {
                 settings = SETTINGS_JSON_ADDRESS_BAR,
             ),
         )
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
         testee.setEnableDuckChatUserSetting(false)
 
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(false)
-        assertFalse(testee.showInBrowserMenu.value)
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showPopupMenuShortcut.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
+        assertFalse(testee.showOmnibarShortcutInAllStates.value)
     }
 
     @Test
@@ -494,8 +496,8 @@ class RealDuckChatTest {
         testee.setEnableDuckChatUserSetting(true)
 
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(true)
-        assertTrue(testee.showInBrowserMenu.value)
-        assertTrue(testee.showInAddressBar.value)
+        assertTrue(testee.showPopupMenuShortcut.value)
+        assertTrue(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -511,8 +513,8 @@ class RealDuckChatTest {
         )
         testee.setEnableDuckChatUserSetting(true)
 
-        assertFalse(testee.showInBrowserMenu.value)
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showPopupMenuShortcut.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -527,7 +529,7 @@ class RealDuckChatTest {
         )
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInAddressBar.value)
+        assertFalse(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
     }
 
     @Test
@@ -542,7 +544,71 @@ class RealDuckChatTest {
         )
         testee.onPrivacyConfigDownloaded()
 
-        assertTrue(testee.showInAddressBar.value)
+        assertTrue(testee.showOmnibarShortcutOnNtpAndOnFocus.value)
+    }
+
+    @Test
+    fun `when should show in address bar enabled and duckAiButtonInBrowser enabled, then show in all states enabled`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
+        )
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showOmnibarShortcutInAllStates.value)
+    }
+
+    @Test
+    fun `when should show in address bar enabled and duckAiButtonInBrowser disabled, then show in all states disabled`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
+        )
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showOmnibarShortcutInAllStates.value)
+    }
+
+    @Test
+    fun `when should show in address bar disabled and duckAiButtonInBrowser enabled, then show in all states disabled`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = true,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
+        )
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showOmnibarShortcutInAllStates.value)
+    }
+
+    @Test
+    fun `when global feature flag disabled, then show in all states disabled`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+        whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(true)
+        duckChatFeature.self().setRawStoredState(
+            State(
+                enable = false,
+                settings = SETTINGS_JSON_ADDRESS_BAR,
+            ),
+        )
+        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showOmnibarShortcutInAllStates.value)
     }
 
     @Test
@@ -577,24 +643,6 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertFalse(testee.isImageUploadEnabled())
-    }
-
-    @Test
-    fun whenDuckAiInBrowserFeatureEnabledThenIsEnabledInBrowserReturnsTrue() = runTest {
-        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = true))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertTrue(testee.isEnabledInBrowser())
-    }
-
-    @Test
-    fun whenDuckAiInBrowserFeatureDisabledThenIsEnabledInBrowserReturnsFalse() = runTest {
-        duckChatFeature.duckAiButtonInBrowser().setRawStoredState(State(enable = false))
-
-        testee.onPrivacyConfigDownloaded()
-
-        assertFalse(testee.isEnabledInBrowser())
     }
 
     @Test
@@ -670,6 +718,24 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.isInputScreenFeatureAvailable())
+    }
+
+    @Test
+    fun `when global feature flag disabled then don't show settings`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showSettings.value)
+    }
+
+    @Test
+    fun `when global feature flag enabled then show settings`() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showSettings.value)
     }
 
     companion object {
