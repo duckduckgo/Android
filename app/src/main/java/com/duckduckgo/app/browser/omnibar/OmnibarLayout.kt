@@ -1030,4 +1030,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     override fun onAnimationFinished() {
         omnibarTextListener?.onTrackersCountFinished()
     }
+
+    fun setDraftTextIfNtp(query: String) {
+        viewModel.setDraftTextIfNtp(query)
+    }
 }

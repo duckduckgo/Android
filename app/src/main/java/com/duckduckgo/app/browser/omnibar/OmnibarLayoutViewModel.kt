@@ -802,4 +802,15 @@ class OmnibarLayoutViewModel @Inject constructor(
         //     }
         // }
     }
+
+    fun setDraftTextIfNtp(query: String) {
+        if (_viewState.value.viewMode is NewTab) {
+            _viewState.update {
+                it.copy(
+                    omnibarText = query,
+                    updateOmnibarText = true,
+                )
+            }
+        }
+    }
 }

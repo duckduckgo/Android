@@ -463,6 +463,10 @@ class Omnibar(
     ) {
         newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown, topOfPage))
     }
+
+    fun setDraftTextIfNtp(query: String) {
+        newOmnibar.setDraftTextIfNtp(query)
+    }
 }
 
 fun VisualDesignExperimentDataStore.getOmnibarType(): OmnibarType {
