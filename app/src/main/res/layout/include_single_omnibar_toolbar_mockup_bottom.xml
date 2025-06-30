@@ -25,7 +25,6 @@
     android:background="?daxColorToolbar"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
-
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/omniBarContainerMockup"
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
@@ -35,7 +34,7 @@
         android:layout_marginEnd="@dimen/experimentalOmnibarCardMarginEnd"
         android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
         android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
-        app:cardElevation="2dp"
+        app:cardElevation="1dp"
         app:strokeColor="?daxColorAccentBlue"
         app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth"
         app:layout_constraintBottom_toBottomOf="parent"

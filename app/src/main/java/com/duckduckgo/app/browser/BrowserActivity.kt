@@ -50,6 +50,7 @@ import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarM
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBinding
+import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
@@ -240,6 +241,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private lateinit var experimentalToolbarMockupBinding: IncludeExperimentalOmnibarToolbarMockupBinding
     private lateinit var experimentalToolbarMockupBottomBinding: IncludeExperimentalOmnibarToolbarMockupBottomBinding
     private lateinit var singleToolBarMockupBinding: IncludeSingleOmnibarToolbarMockupBinding
+    private lateinit var singleToolBarMockupBottomBinding: IncludeSingleOmnibarToolbarMockupBottomBinding
 
     private var openMessageInNewTabJob: Job? = null
 
@@ -870,6 +872,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 if (this::singleToolBarMockupBinding.isInitialized) {
                     singleToolBarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
+                if (this::singleToolBarMockupBottomBinding.isInitialized) {
+                    singleToolBarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
+                }
             },
             300,
         )
@@ -1244,20 +1249,22 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
             }
             else -> {
-                singleToolBarMockupBinding = when (settingsDataStore.omnibarPosition) {
+                when (settingsDataStore.omnibarPosition) {
                     TOP -> {
                         binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
-                        binding.topMockupSingleToolbar
+                        singleToolBarMockupBinding = binding.topMockupSingleToolbar
+
+                        singleToolBarMockupBinding.aiChatIconMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
                     }
                     BOTTOM -> {
                         binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                        binding.bottomMockupSingleToolbar
+                        singleToolBarMockupBottomBinding = binding.bottomMockupSingleToolbar
+
+                        singleToolBarMockupBottomBinding.aiChatIconMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
                     }
                 }
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()
                 binding.topMockupToolbar.appBarLayoutMockup.gone()
-
-                singleToolBarMockupBinding.aiChatIconMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
             }
         }
     }
