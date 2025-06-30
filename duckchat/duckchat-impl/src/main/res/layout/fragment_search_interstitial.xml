@@ -104,4 +104,25 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/actionNewLine"/>
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/actionForceWebSearch"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:backgroundTint="?attr/daxColorWindow"
+        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginStart="@dimen/keyline_3"
+        android:importantForAccessibility="no"
+        android:text="&#8203;"
+        android:textColor="@android:color/transparent"
+        android:visibility="gone"
+        app:icon="@drawable/ic_globe_24"
+        app:iconTint="?attr/daxColorPrimaryIcon"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        app:rippleColor="?attr/daxColorRipple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

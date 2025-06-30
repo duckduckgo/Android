@@ -86,6 +86,7 @@ class InputScreenViewModel @Inject constructor(
     private val _visibilityState = MutableStateFlow(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
+            forceWebSearchButtonVisible = false,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -322,12 +323,22 @@ class InputScreenViewModel @Inject constructor(
     fun onSearchSelected() {
         viewModelScope.launch {
             inputScreenDataStore.setLastUsedMode(InputScreenMode.SEARCH)
+            _visibilityState.update {
+                it.copy(
+                    forceWebSearchButtonVisible = false,
+                )
+            }
         }
     }
 
     fun onChatSelected() {
         viewModelScope.launch {
             inputScreenDataStore.setLastUsedMode(InputScreenMode.CHAT)
+            _visibilityState.update {
+                it.copy(
+                    forceWebSearchButtonVisible = true,
+                )
+            }
         }
     }
 
