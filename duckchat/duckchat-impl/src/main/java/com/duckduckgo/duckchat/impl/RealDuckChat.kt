@@ -400,12 +400,10 @@ class RealDuckChat @Inject constructor(
     ): Map<String, String> {
         val hasDuckChatBang = isDuckChatBang(query.toUri())
         logcat { "Duck.ai: hasDuckChatBang $hasDuckChatBang" }
-        val cleanedQuery = if (hasDuckChatBang) {
-            stripBang(query)
-        } else {
-            query
-        }
-        logcat { "Duck.ai: cleaned query $query" }
+
+        val cleanedQuery = stripBang(query)
+        logcat { "Duck.ai: cleaned query $cleanedQuery" }
+
         return mutableMapOf<String, String>().apply {
             if (cleanedQuery.isNotEmpty()) {
                 put(QUERY, cleanedQuery)
