@@ -395,6 +395,7 @@
                 android:layout_height="@dimen/toolbarIcon"
                 android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
                 android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
+                android:layout_marginEnd="@dimen/keyline_1"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/toolbar"
@@ -461,7 +462,7 @@
                 </FrameLayout>
 
                 <Space
-                    android:layout_width="10dp"
+                    android:layout_width="@dimen/experimentalOmnibarCardExtendedMarginEnd"
                     android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

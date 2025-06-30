@@ -25,7 +25,8 @@
     <dimen name="experimentalToolbarContainerPaddingTopWhenAtBottom">8dp</dimen>
     <dimen name="experimentalToolbarContainerPaddingHorizontalWhenAtBottom">2dp</dimen>
     <dimen name="experimentalOmnibarCardMarginHorizontal">16dp</dimen>
-    <dimen name="experimentalOmnibarCardMarginEnd">6dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginEnd">8dp</dimen>
+    <dimen name="experimentalOmnibarCardExtendedMarginEnd">4dp</dimen>
     <dimen name="experimentalOmnibarCardFocusedMarginEnd">16dp</dimen>
     <dimen name="experimentalOmnibarCardMarginTop">4dp</dimen>
     <dimen name="experimentalOmnibarCardMarginBottom">12dp</dimen>
