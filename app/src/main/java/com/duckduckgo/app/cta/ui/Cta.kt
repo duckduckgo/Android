@@ -58,6 +58,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
+import kotlin.collections.toMutableList
 
 interface ViewCta {
     fun showCta(
@@ -619,8 +620,12 @@ sealed class OnboardingDaxDialogCta(
                     daxDialogOption3,
                 )
 
-                // Buck dialog has a maximum of 3 options
-                val options = onboardingStore.getSitesOptions().takeLast(optionsViews.size)
+                // Buck dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
+                val options = onboardingStore.getSitesOptions()
+                    .toMutableList()
+                    .apply {
+                        removeAt(1) // Remove the regional news option
+                    }
 
                 optionsViews.forEachIndexed { index, buttonView ->
                     options[index].setOptionView(buttonView)
@@ -874,9 +879,18 @@ sealed class DaxBubbleCta(
         }
 
         options?.let { options ->
+            // Buck dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
+            val buckOptions = options
+                .toMutableList()
+                .apply {
+                    if (configuration is DaxIntroVisitSiteOptionsCta) {
+                        removeAt(1) // Remove the regional news option
+                    }
+                }.toList()
+
             optionsViews.forEachIndexed { index, buttonView ->
-                if (options.size > index) {
-                    options[index].setOptionView(buttonView)
+                if (buckOptions.size > index) {
+                    buckOptions[index].setOptionView(buttonView)
                     buttonView.show()
                 } else {
                     buttonView.gone()
