@@ -204,6 +204,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         }
         viewModel.visibilityState.onEach {
             binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
+            binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
         }.launchIn(lifecycleScope)
     }
 
