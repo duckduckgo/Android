@@ -81,7 +81,8 @@
                 "expectURL": "https://broken.third-party.site/path/to",
                 "exceptPlatforms": [
                     "web-extension",
-                    "safari-extension"
+                    "safari-extension",
+                    "windows-browser"
                 ]
             }
         ]
@@ -94,31 +95,31 @@
                 "name": "Simple domain - extract hostname portion from the URL",
                 "siteURL": "http://www.somesite.com",
                 "expectDomain": "somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a port",
                 "siteURL": "http://www.somesite.com:8000/",
                 "expectDomain": "somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a username",
                 "siteURL": "http://user:pass@www.somesite.com",
                 "expectDomain": "somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a fragment",
                 "siteURL": "http://www.somesite.com#fragment",
                 "expectDomain": "somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a query string",
                 "siteURL": "http://www.somesite.com?some=value",
                 "expectDomain": "somesite.com",
-                "exceptPlatforms": []
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Decode any %XX escapes present in the hostname",
