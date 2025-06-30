@@ -52,7 +52,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
-import android.view.WindowManager
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -126,7 +125,6 @@ import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM_TAB_NAME_PREFIX
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
-import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBuckDialogBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.ExperimentalHomeScreenWidgetBottomSheetDialog
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
 import com.duckduckgo.app.browser.favicon.FaviconManager

@@ -232,7 +232,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
                     pulseAnimation.playOn(
                         targetView = binding.fireIconImageView,
                         isSenseOfProtectionExperimentAndShieldView = false,
-                        isBuckOnboardingExperiment = false
+                        isBuckOnboardingExperiment = false,
                     )
                 }
             }
