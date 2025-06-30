@@ -850,7 +850,6 @@ sealed class DaxBubbleCta(
             binding.daxDialogOption1,
             binding.daxDialogOption2,
             binding.daxDialogOption3,
-            binding.daxDialogOption4,
         )
 
         primaryCta?.let { primaryCtaRes ->
@@ -932,7 +931,6 @@ sealed class DaxBubbleCta(
             this.daxDialogOption1.gone()
             this.daxDialogOption2.gone()
             this.daxDialogOption3.gone()
-            this.daxDialogOption4.gone()
         }
     }
 

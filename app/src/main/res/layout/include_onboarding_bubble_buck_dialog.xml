@@ -136,21 +136,6 @@
                     app:icon="@drawable/ic_find_search_16"
                     tools:ignore="DeprecatedWidgetInXml" />
 
-                <Space
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/keyline_2" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/daxDialogOption4"
-                    style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/onboardingSearchDaxDialogOption4"
-                    android:visibility="gone"
-                    app:icon="@drawable/ic_wand_16"
-                    tools:alpha="1"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
                     android:id="@+id/primaryCta"
                     style="@style/Widget.DuckDuckGo.BuckButton.TextButton.Primary"
