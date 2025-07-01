@@ -34,7 +34,7 @@ interface ContentScopeExperimentsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun bloops(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun test(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
