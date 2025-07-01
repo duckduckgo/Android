@@ -311,6 +311,23 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenOpenDuckChatCalledWithNonAiBangQueryThenActivityStartedWithBangStrippedQuery() = runTest {
+        duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
+        duckChatFeature.keepSession().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        testee.openDuckChatWithPrefill(query = "example !g")
+        verify(mockGlobalActivityStarter).startIntent(
+            mockContext,
+            DuckChatWebViewActivityWithParams(
+                url = "https://duckduckgo.com/?q=example&ia=chat&duckai=5",
+            ),
+        )
+        verify(mockContext).startActivity(any())
+        verify(mockDuckChatFeatureRepository).registerOpened()
+    }
+
+    @Test
     fun whenOpenDuckChatCalledWithBangsButNoQueryThenActivityStartedWithoutPrompt() = runTest {
         duckChatFeature.self().setRawStoredState(State(enable = true, settings = SETTINGS_JSON))
         testee.onPrivacyConfigDownloaded()
