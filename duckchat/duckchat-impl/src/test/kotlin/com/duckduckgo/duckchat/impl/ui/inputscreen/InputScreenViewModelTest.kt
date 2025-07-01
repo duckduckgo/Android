@@ -3,6 +3,8 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability

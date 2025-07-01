@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.os.Bundle
 import android.transition.ChangeBounds
@@ -26,17 +26,17 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-data class SearchInterstitialActivityParams(
+data class InputScreenActivityParams(
     val query: String,
 ) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SearchInterstitialActivityParams::class)
-class SearchInterstitialActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(InputScreenActivityParams::class)
+class InputScreenActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_search_interstitial)
+        setContentView(R.layout.activity_input_screen)
 
         val transition = ChangeBounds().apply {
             duration = TRANSITION_DURATION

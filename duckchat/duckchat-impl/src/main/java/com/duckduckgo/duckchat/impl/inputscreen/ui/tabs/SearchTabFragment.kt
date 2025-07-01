@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
 import android.os.Bundle
 import android.transition.Transition
@@ -36,12 +36,12 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
-import com.duckduckgo.duckchat.impl.ui.inputscreen.InputScreenViewModel
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.AutoCompleteViewState
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.OmnibarPosition.TOP
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.SuggestionItemDecoration
-import com.duckduckgo.duckchat.impl.ui.inputscreen.renderIfChanged
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewState
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration
+import com.duckduckgo.duckchat.impl.inputscreen.ui.util.renderIfChanged
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.newtabpage.api.NewTabPagePlugin
 import javax.inject.Inject

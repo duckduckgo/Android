@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.inputscreen.ui.util
 
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
-class InputScreenPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
-    override fun getItemCount(): Int = 2
-
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            0 -> SearchTabFragment()
-            1 -> DuckChatTabFragment()
-            else -> throw IllegalArgumentException("Invalid position: $position")
+inline fun renderIfChanged(
+    newViewState: Any,
+    lastSeenViewState: Any?,
+    block: () -> Unit,
+) {
+    if (newViewState == lastSeenViewState) {
+        logcat(
+            tag = "renderIfChanged",
+            priority = VERBOSE,
+        ) {
+            "view state identical to last seen state; skipping rendering for ${newViewState.javaClass.simpleName}"
         }
+    } else {
+        block()
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete
+package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
 
 import android.view.ViewGroup
 import androidx.annotation.UiThread
@@ -27,15 +27,15 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SWITCH_TO_TAB_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SWITCH_TO_TAB_TYPE
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,

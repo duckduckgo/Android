@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.app.Activity
 import android.content.Intent
@@ -36,13 +36,14 @@ import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.FragmentSearchInterstitialBinding
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.EditWithSelectedQuery
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchModeToChat
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchModeToSearch
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.UserSubmittedQuery
-import com.duckduckgo.duckchat.impl.ui.inputscreen.InputScreenViewModel
+import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToSearch
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -55,7 +56,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
-class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_interstitial) {
+class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
     lateinit var duckChat: DuckChat
@@ -73,11 +74,11 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         ViewModelProvider(this, viewModelFactory)[InputScreenViewModel::class.java]
     }
 
-    private val binding: FragmentSearchInterstitialBinding by viewBinding()
+    private val binding: FragmentInputScreenBinding by viewBinding()
 
     private val pageChangeCallback = object : OnPageChangeCallback() {
         override fun onPageSelected(position: Int) {
-            binding.duckChatOmnibar.selectTab(position)
+            binding.inputModeWidget.selectTab(position)
         }
     }
 
@@ -91,17 +92,17 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         configureVoice()
         configureObservers()
 
-        val params = requireActivity().intent.getActivityParams(SearchInterstitialActivityParams::class.java)
+        val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         params?.query?.let { query ->
-            binding.duckChatOmnibar.provideInitialText(query)
+            binding.inputModeWidget.provideInitialText(query)
         }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    val query = binding.duckChatOmnibar.text
-                    val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
+                    val query = binding.inputModeWidget.text
+                    val data = Intent().putExtra(InputScreenActivity.QUERY, query)
                     requireActivity().setResult(Activity.RESULT_CANCELED, data)
                     exitInterstitial()
                 }
@@ -109,13 +110,13 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         )
 
         binding.actionSend.setOnClickListener {
-            binding.duckChatOmnibar.submitMessage()
+            binding.inputModeWidget.submitMessage()
         }
-        binding.duckChatOmnibar.duckChatInput.post {
-            showKeyboard(binding.duckChatOmnibar.duckChatInput)
+        binding.inputModeWidget.inputField.post {
+            showKeyboard(binding.inputModeWidget.inputField)
         }
         binding.actionNewLine.setOnClickListener {
-            binding.duckChatOmnibar.printNewLine()
+            binding.inputModeWidget.printNewLine()
         }
     }
 
@@ -129,8 +130,8 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
 
     private fun processCommand(command: Command) {
         when (command) {
-            is UserSubmittedQuery -> binding.duckChatOmnibar.submitMessage(command.query)
-            is EditWithSelectedQuery -> binding.duckChatOmnibar.text = command.query
+            is UserSubmittedQuery -> binding.inputModeWidget.submitMessage(command.query)
+            is EditWithSelectedQuery -> binding.inputModeWidget.text = command.query
             SwitchModeToSearch -> {
                 binding.viewPager.setCurrentItem(0, false)
             }
@@ -151,16 +152,16 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
     }
 
-    private fun configureOmnibar() = with(binding.duckChatOmnibar) {
+    private fun configureOmnibar() = with(binding.inputModeWidget) {
         setContentId(R.id.viewPager)
 
         onSearchSent = { query ->
-            val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
+            val data = Intent().putExtra(InputScreenActivity.QUERY, query)
             requireActivity().setResult(Activity.RESULT_OK, data)
             exitInterstitial()
         }
-        onDuckChatSent = { query ->
-            val data = Intent().putExtra(SearchInterstitialActivity.QUERY, query)
+        onChatSent = { query ->
+            val data = Intent().putExtra(InputScreenActivity.QUERY, query)
             requireActivity().setResult(Activity.RESULT_CANCELED, data)
             requireActivity().finish()
             duckChat.openDuckChatWithAutoPrompt(query)
@@ -173,14 +174,14 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
         }
-        onDuckChatSelected = {
+        onChatSelected = {
             binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
         }
         onSendMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
-            viewModel.triggerAutocomplete(binding.duckChatOmnibar.text, true, true)
+            viewModel.triggerAutocomplete(binding.inputModeWidget.text, true, true)
         }
         onVoiceInputAllowed = { isAllowed ->
             viewModel.onVoiceInputAllowedChange(isAllowed)
@@ -194,7 +195,7 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceRecognitionSuccess -> {
-                    binding.duckChatOmnibar.submitMessage(it.result)
+                    binding.inputModeWidget.submitMessage(it.result)
                 }
                 is SearchCancelled -> {}
                 is VoiceSearchDisabled -> {
@@ -209,8 +210,8 @@ class SearchInterstitialFragment : DuckDuckGoFragment(R.layout.fragment_search_i
     }
 
     private fun exitInterstitial() {
-        hideKeyboard(binding.duckChatOmnibar.duckChatInput)
-        binding.duckChatOmnibar.animateOmnibarFocusedState(false)
+        hideKeyboard(binding.inputModeWidget.inputField)
+        binding.inputModeWidget.animateOmnibarFocusedState(false)
         requireActivity().supportFinishAfterTransition()
     }
 

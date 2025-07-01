@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen
+package com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel
 
 import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
@@ -37,11 +37,15 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.AutocompleteItemRemoved
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.EditWithSelectedQuery
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.ShowRemoveSearchSuggestionDialog
-import com.duckduckgo.duckchat.impl.ui.inputscreen.Command.SwitchToTab
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.AutoCompleteViewState
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewState
+import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
+import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenMode
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteItemRemoved
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability
