@@ -103,7 +103,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 top = toolbarContainerPaddingTopWhenAtBottom,
             )
 
-            omnibarCard.cardElevation = 1f.toPx(context)
+            omnibarCard.cardElevation = 0.5f.toPx(context)
         }
     }
 
