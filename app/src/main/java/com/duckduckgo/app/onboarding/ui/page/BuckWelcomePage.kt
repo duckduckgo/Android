@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
-import android.Manifest
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -30,7 +29,6 @@ import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.widget.FrameLayout
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RawRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
@@ -91,16 +89,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
-    private var notificationPermissionsRequested = false
-
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) { permissionGranted ->
-        if (permissionGranted) {
-            viewModel.notificationRuntimePermissionGranted()
-        }
-        if (view?.windowVisibility == View.VISIBLE) {
-            startDaxDialogAnimation(ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED)
-        }
-    }
+    private var daxDialogAnimaationStarted = false
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onAttach(context: Context) {
@@ -189,19 +178,6 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
-
-    @SuppressLint("InlinedApi")
-    private fun requestNotificationsPermissions() {
-        if (notificationPermissionsRequested) return
-        notificationPermissionsRequested = true
-
-        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            viewModel.notificationRuntimePermissionRequested()
-            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            startDaxDialogAnimation()
         }
     }
 
@@ -323,19 +299,22 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             phase = ENTER,
             onAnimationEnd = {
                 binding.longDescriptionContainer.setOnClickListener(null)
-                requestNotificationsPermissions()
+                startDaxDialogAnimation()
             },
         )
 
         binding.longDescriptionContainer.run {
             setOnClickListener {
                 setOnClickListener(null)
-                requestNotificationsPermissions()
+                startDaxDialogAnimation()
             }
         }
     }
 
-    private fun startDaxDialogAnimation(animationDelay: Long = ANIMATION_DELAY) {
+    private fun startDaxDialogAnimation() {
+        if (daxDialogAnimaationStarted) return
+        daxDialogAnimaationStarted = true
+
         var welcomeContentFadedAway = false
         var welcomeDaxFadedAway = false
 
@@ -348,7 +327,6 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         ViewCompat.animate(binding.welcomeContent as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
-            .setStartDelay(animationDelay)
             .withStartAction {
                 playAnimation(
                     animation = LottieOnboardingAnimationSpec.WALK_WAVE,
@@ -445,8 +423,6 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         private const val MIN_ALPHA = 0f
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
-        private const val ANIMATION_DELAY = 1400L
-        private const val ANIMATION_DELAY_AFTER_NOTIFICATIONS_PERMISSIONS_HANDLED = 200L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
