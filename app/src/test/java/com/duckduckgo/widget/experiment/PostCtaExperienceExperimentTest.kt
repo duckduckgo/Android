@@ -108,6 +108,7 @@ class PostCtaExperienceExperimentTest {
     fun `when fireWidgetSearchXCount and count reaches 3 then 3x pixel is fired`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(metricsPixel)
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(2)
         whenever(mockWidgetSearchCountDataStore.increaseMetricForPixelDefinition(any())).thenReturn(3)
@@ -121,6 +122,7 @@ class PostCtaExperienceExperimentTest {
     fun `when fireWidgetSearchXCount and count is already 3 then 3x pixel is not fired again`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(metricsPixel)
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(3)
 
@@ -132,6 +134,7 @@ class PostCtaExperienceExperimentTest {
     @Test
     fun `when fireWidgetSearchXCount and count reaches 5 then 5x pixel is fired`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(null)
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(metricsPixel)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(4)
@@ -145,6 +148,7 @@ class PostCtaExperienceExperimentTest {
     @Test
     fun `when fireWidgetSearchXCount and count is already 5 then 5x pixel is not fired again`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(null)
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(metricsPixel)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(5)
