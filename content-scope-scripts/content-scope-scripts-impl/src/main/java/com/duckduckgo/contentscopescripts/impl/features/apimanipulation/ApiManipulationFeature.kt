@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.contentscopescripts.impl.features.apimanipulation
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation project(':feature-toggles-api')
-    implementation project(':js-messaging-api')
-}
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "apiManipulation",
+)
 
-android {
-    namespace 'com.duckduckgo.contentscopescripts.api'
+interface ApiManipulationFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun self(): Toggle
 }

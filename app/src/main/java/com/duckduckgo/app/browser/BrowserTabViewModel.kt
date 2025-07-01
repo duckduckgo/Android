@@ -316,6 +316,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -513,6 +514,8 @@ class BrowserTabViewModel @Inject constructor(
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+
+    private var activeExperiments: List<Toggle>? = null
 
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
@@ -801,6 +804,7 @@ class BrowserTabViewModel @Inject constructor(
         if (updateMaliciousSiteStatus) {
             site?.maliciousSiteStatus = maliciousSiteStatus
         }
+        site?.activeContentScopeExperiments = activeExperiments
         onSiteChanged()
         buildingSiteFactoryJob = viewModelScope.launch {
             site?.let {
@@ -1895,7 +1899,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    override fun pageStarted(webViewNavigationState: WebViewNavigationState) {
+    override fun pageStarted(
+        webViewNavigationState: WebViewNavigationState,
+        activeExperiments: List<Toggle>,
+    ) {
+        this.activeExperiments = activeExperiments
+
         browserViewState.value =
             currentBrowserViewState().copy(
                 browserShowing = true,
@@ -3645,6 +3654,10 @@ class BrowserTabViewModel @Inject constructor(
 
             "breakageReportResult" -> if (data != null) {
                 breakageReportResult(data)
+            }
+
+            "addDebugFlag" -> {
+                site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
             }
 
             else -> {
