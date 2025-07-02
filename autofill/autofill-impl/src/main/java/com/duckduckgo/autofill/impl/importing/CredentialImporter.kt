@@ -86,10 +86,8 @@ class CredentialImporterImpl @Inject constructor(
 
         skippedCredentials += (importList.size - insertedIds.size)
 
-        // Set the flag when at least one credential was successfully imported
-        if (insertedIds.isNotEmpty()) {
-            autofillStore.hasEverImportedPasswords = true
-        }
+        // mark that the user has imported passwords at least once, regardless of the number of credentials imported
+        autofillStore.hasEverImportedPasswords = true
 
         _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials))
     }
