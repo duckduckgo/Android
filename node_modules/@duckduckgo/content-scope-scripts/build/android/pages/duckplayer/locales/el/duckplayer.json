@@ -32,6 +32,42 @@
     "title" : "<b>ΣΦΑΛΜΑ:</b> Μη έγκυρο αναγνωριστικό βίντεο",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Το Duck Player δεν μπορεί να φορτώσει το βίντεο αυτό",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Το βίντεο αυτό δεν μπορεί να προβληθεί εκτός YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Μπορείτε ακόμα να παρακολουθήσετε αυτό το βίντεο στο YouTube, αλλά χωρίς την πρόσθετη ιδιωτικότητα του Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Δυστυχώς, αυτό το βίντεο έχει περιορισμό ηλικίας",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Για να παρακολουθήσετε βίντεο με περιορισμό ηλικίας, πρέπει να συνδεθείτε στο YouTube για να επαληθεύσετε την ηλικία σας.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Μπορείτε ακόμα να παρακολουθήσετε αυτό το βίντεο, ωστόσο θα πρέπει να συνδεθείτε και να το παρακολουθήσετε στο YouTube χωρίς το πρόσθετο απόρρητο του Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Δυστυχώς, αυτό το βίντεο μπορεί να αναπαραχθεί μόνο στο YouTube",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Ο δημιουργός αυτού του βίντεο έχει επιλέξει να μην επιτρέπει την προβολή του σε άλλους ιστότοπους.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Μπορείτε ακόμα να το παρακολουθήσετε στο YouTube, αλλά χωρίς την πρόσθετη ιδιωτικότητα του Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "Το YouTube δεν θα αφήσει το Duck Player να φορτώσει το βίντεο αυτό",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Μπορείτε ακόμα να παρακολουθήσετε αυτό το βίντεο στο YouTube, αλλά χωρίς την πρόσθετη ιδιωτικότητα του Duck Player.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Δυστυχώς, το YouTube πιστεύει ότι είστε μποτ",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "Το YouTube μπλοκάρει τη φόρτωση αυτού του βίντεο. Εάν χρησιμοποιείτε VPN, δοκιμάστε να το απενεργοποιήσετε και να φορτώσετε εκ νέου αυτήν τη σελίδα.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Εάν δεν λειτουργήσει αυτό, μπορείτε να παρακολουθήσετε αυτό το βίντεο στο YouTube, ωστόσο χωρίς την πρόσθετη ιδιωτικότητα του Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Αυτό μπορεί να συμβαίνει εάν χρησιμοποιείτε VPN. Δοκιμάστε να απενεργοποιήσετε το VPN ή να αλλάξετε τοποθεσία διακομιστή και να φορτώσετε εκ νέου αυτήν τη σελίδα.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Εάν δεν λειτουργήσει αυτό, θα πρέπει να συνδεθείτε και να παρακολουθήσετε αυτό το βίντεο στο YouTube χωρίς την πρόσθετη ιδιωτικότητα του Duck Player.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

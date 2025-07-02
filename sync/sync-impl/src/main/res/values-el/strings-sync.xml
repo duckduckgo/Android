@@ -59,16 +59,18 @@
 
     <!-- Recover data screen -->
     <string name="login_screen_title">Σάρωση κώδικα QR</string>
-    <string name="login_screen_enter_code_cta">Ή εισαγάγετε μη αυτόματα τον κωδικό</string>
+    <string name="login_screen_enter_code_cta">Μη αυτόματη εισαγωγή κωδικού</string>
     <string name="login_screen_barcode_hint">Στρέψτε την κάμερα στον κωδικό QR για συγχρονισμό</string>
-    <string name="login_screen_cant_scan">Δεν είναι δυνατή η σάρωση; <font color="#7295F6">Κοινοποίηση κωδικού κειμένου</font></string>
+    <string name="login_screen_cant_scan_label">Δεν μπορείτε να πραγματοποιήσετε σάρωση;</string>
+    <string name="login_screen_cant_scan_button_text">Αντιγραφή κωδικού κειμένου</string>
+
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Σάρωση κώδικα QR</string>
-    <string name="connect_screen_scan_qr_hint">Μεταβείτε στην ενότητα <b>Ρυθμίσεις › Συγχρονισμός και δημιουργία αντιγράφων ασφάλειας</b> στο πρόγραμμα περιήγησης DuckDuckGo σε άλλη συσκευή και επιλέξτε «Συγχρονισμός με άλλη συσκευή».</string>
-    <string name="connect_screen_enter_code_cta">Ή εισαγάγετε μη αυτόματα τον κωδικό</string>
-    <string name="connect_screen_connect_qr_hint_title">Από κινητό σε κινητό;</string>
-    <string name="connect_screen_connect_qr_hint_content">Σαρώστε αυτόν τον κωδικό με άλλη συσκευή για συγχρονισμό.</string>
+    <string name="connect_screen_scan_qr_hint">Ανοίξτε την εφαρμογή DuckDuckGo στην άλλη συσκευή σας και μεταβείτε στις <b>Ρυθμίσεις &gt; Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας &gt; Συγχρονισμός με άλλη συσκευή</b>.</string>
+    <string name="connect_screen_enter_code_cta">Μη αυτόματη εισαγωγή κωδικού</string>
+    <string name="connect_screen_connect_qr_hint_title">Ή πραγματοποιήστε σάρωση με το DuckDuckGo στη συσκευή σας</string>
+    <string name="connect_screen_connect_qr_hint_content">Ανοίξτε το DuckDuckGo στην άλλη συσκευή σας και σαρώστε αυτόν τον κωδικό για συγχρονισμό.</string>
     <string name="connect_screen_share_code">Αντιγραφή κωδικού</string>
 
     <!-- Enter Code screen -->
@@ -197,4 +199,13 @@
     <string name="sync_dialog_switch_account_primary_button">Αλλαγή συγχρονισμού</string>
     <string name="sync_dialog_switch_account_secondary_button">Ακύρωση</string>
     <string name="sync_dialog_switch_account_description">Η συσκευή αυτή είναι ήδη συγχρονισμένη. Θέλετε σίγουρα να τη συγχρονίσετε με ένα διαφορετικό αντίγραφο ασφαλείας ή συσκευή; Η αλλαγή δεν θα αφαιρέσει δεδομένα που έχουν ήδη συγχρονιστεί σε αυτήν τη συσκευή.</string>
+
+    <!-- Deep link sync setup -->
+    <string name="sync_setup_deep_link_confirmation_dialog_title">Συγχρονισμός νέας συσκευής;</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_message" instruction="Placeholder is a device name. e.g., Samsung S23">Το «%1$s» δεν θα μπορεί να έχει πρόσβαση στα συγχρονισμένα δεδομένα σας DuckDuckGo.</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_positive">Συγχρόνισε τώρα</string>
+    <string name="sync_setup_deep_link_confirmation_dialog_button_negative">Ακύρωση</string>
+
+    <string name="deep_link_auth_prompt_title">Ρύθμιση της επιλογής Συγχρονισμός και δημιουργία αντιγράφων ασφαλείας</string>
+    <string name="deep_link_auth_prompt_message">Ξεκλειδώστε τη συσκευή για να ρυθμίσετε τη λειτουργία Sync &amp; Backup</string>
 </resources>

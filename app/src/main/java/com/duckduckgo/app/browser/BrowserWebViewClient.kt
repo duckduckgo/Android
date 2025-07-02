@@ -70,6 +70,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -124,6 +125,7 @@ class BrowserWebViewClient @Inject constructor(
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
+    private val contentScopeExperiments: ContentScopeExperiments,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -204,7 +206,12 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
-                        duckChat.openDuckChat(url.getQueryParameter(QUERY))
+                        val query = url.getQueryParameter(QUERY)
+                        if (query != null) {
+                            duckChat.openDuckChatWithPrefill(query)
+                        } else {
+                            duckChat.openDuckChat()
+                        }
                     }.isSuccess
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
@@ -432,14 +439,15 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList))
+        val activeExperiments = contentScopeExperiments.getActiveExperiments()
+        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, webViewClientListener?.getSite())
+            it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
         }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
@@ -479,7 +487,13 @@ class BrowserWebViewClient @Inject constructor(
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
+                        pageLoadedHandler.onPageLoaded(
+                            url = it,
+                            title = navigationList.currentItem?.title,
+                            start = safeStart,
+                            end = currentTimeProvider.elapsedRealtime(),
+                            isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
+                        )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
                             if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {

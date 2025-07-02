@@ -122,9 +122,18 @@ class AutofillSettingsViewModelTest {
     }
 
     @Test
-    fun whenSendLaunchPixelThenPixelIsSent() = runTest {
+    fun `when send launch pixel and no credentials saved then pixel is sent`() = runTest {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
         testee.sendLaunchPixel(AutofillScreenLaunchSource.SettingsActivity)
-        val expectedParams = mapOf("source" to "settings")
+        val expectedParams = mapOf("source" to "settings", "has_credentials_saved" to "0")
+        verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
+    }
+
+    @Test
+    fun `when send launch pixel and has credentials saved then pixel is sent`() = runTest {
+        whenever(mockStore.getCredentialCount()).thenReturn(flowOf(5))
+        testee.sendLaunchPixel(AutofillScreenLaunchSource.BrowserOverflow)
+        val expectedParams = mapOf("source" to "overflow_menu", "has_credentials_saved" to "1")
         verify(pixel).fire(pixel = eq(AUTOFILL_SETTINGS_OPENED), parameters = eq(expectedParams), any(), any())
     }
 

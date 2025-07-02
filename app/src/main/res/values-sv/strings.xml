@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Utseende</string>
+    <string name="settingsShowFullUrlTitle">Visa hela webbplatsadressen</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spara</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Sök privat som standard</string>
     <string name="preOnboardingComparisonChartItem2">Blockera spårare från tredje part</string>
     <string name="preOnboardingComparisonChartItem3">Blockera popup-fönster för cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Blockera spårningsannonser</string>
+    <string name="preOnboardingComparisonChartItem4">Blockera riktade annonser</string>
     <string name="preOnboardingComparisonChartItem5">Radera surfdata med en knapp</string>
     <string name="preOnboardingDaxDialog3Title">Fantastiskt! Välkommen till Duck-sidan.</string>
     <string name="preOnboardingDaxDialog3Button">Börja bläddra</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Tack! Din rapport hjälper till att göra DuckDuckGo bättre för alla!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Ny AI-chatt</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">När du rensar dina flikar och data kommer historiken för spårningsblockering att raderas och detta nummer att nollställas.\n\nDölj den här bannern om du inte vill se den i flikvyn.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Dölj banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blockerat den här sidan eftersom den kan distribuera skadlig programvara avsedd att göra intrång på din enhet eller stjäla din personliga information.\n<a href=\"\">Mer information</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Den här webbplatsen kan utge sig för att vara en legitim webbplats för att lura dig att lämna ut personlig information som lösenord eller kortnummer.\n<a href=\"\">Mer information</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Varna mig på webbplatser som har flaggats för nätfiske eller skadlig programvara</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Läs mer</annotation></string>
     <string name="maliciousSiteSettingDisabled">Om den här funktionen inaktiveras kan dina uppgifter utsättas för risker.</string>
+    <string name="threatProtectionTitle">Skydd mot hot</string>
+    <string name="threatProtectionDescription">DuckDuckGos förbättrade skydd stoppar vanliga hot samtidigt som din anslutning förblir säker.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Uppgraderar automatiskt länkar till HTTPS när det är möjligt.<br><a href=\"\">Läs mer</a>]]></string>
+    <string name="scamBlockerTitle">Bedrägeriblockerare</string>
+    <string name="scamBlockerDescription">Varna på webbplatser som har flaggats för bedrägerier, nätfiske och skadlig programvara.</string>
+    <string name="threatProtectionLearnMoreTitle">Läs mer</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prova vår widget för startsidan!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lägg till vår sök-widget på din startsida för snabb och enkel åtkomst.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lägg till widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Inte nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Sök DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget på startsidan</string>
 </resources>

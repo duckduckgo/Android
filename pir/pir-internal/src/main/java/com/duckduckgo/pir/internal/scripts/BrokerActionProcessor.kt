@@ -24,8 +24,9 @@ import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.models.ActionRequest
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
+import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirResult
+import com.duckduckgo.pir.internal.scripts.models.PirScriptError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.SolveCaptcha
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -67,7 +68,7 @@ interface BrokerActionProcessor {
 
     interface ActionResultListener {
         fun onSuccess(pirSuccessResponse: PirSuccessResponse)
-        fun onError(pirErrorReponse: PirErrorReponse)
+        fun onError(pirError: PirError)
     }
 }
 
@@ -107,6 +108,11 @@ class RealBrokerActionProcessor(
         ).add(KotlinJsonAdapterFactory())
             .build().adapter(PirResult::class.java)
     }
+
+    private val errorAdapter by lazy {
+        Moshi.Builder().build().adapter(PirScriptError::class.java)
+    }
+
     private var registeredActionResultListener: ActionResultListener? = null
 
     override fun register(
@@ -158,13 +164,13 @@ class RealBrokerActionProcessor(
         }
     }
 
-    private fun handleError(result: PirErrorReponse) {
-        logcat { "PIR-CSS: handleError: $result" }
-        registeredActionResultListener?.onError(result)
+    private fun handleError(pirError: PirError) {
+        logcat { "PIR-CSS: handleError: $pirError" }
+        registeredActionResultListener?.onError(pirError)
     }
 
     private fun handleSuccess(result: PirSuccessResponse) {
-        logcat { "PIR-CSS: handleSuccess: $result for action" } // :" $actionPushed" }
+        logcat { "PIR-CSS: handleSuccess: $result for action" }
         registeredActionResultListener?.onSuccess(result)
     }
 
@@ -174,18 +180,43 @@ class RealBrokerActionProcessor(
         id: String?,
         data: JSONObject?,
     ) {
+        logcat { "PIR-CSS: METHOD $method" }
         if (method == PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED && data != null) {
             val result = kotlin.runCatching {
                 responseAdapter.fromJson(data.toString())
             }.onFailure {
                 logcat(ERROR) { "PIR-CSS: Failed to parse JS callback message $it " }
             }.getOrNull()
+
             logcat { "PIR-CSS: JsCallback response $result " }
             if (result?.result?.success != null) {
                 handleSuccess(result.result.success)
             } else if (result?.result?.error != null) {
-                handleError(result.result.error)
+                handleError(
+                    PirError.ActionFailed(
+                        actionID = result.result.error.actionID,
+                        message = result.result.error.message,
+                    ),
+                )
+            } else {
+                handleError(PirError.JsError.ParsingErrorObjectFailed)
             }
+        } else if (method == PIRScriptConstants.RECEIVED_METHOD_NAME_ERROR && data != null) {
+            val result = kotlin.runCatching {
+                errorAdapter.fromJson(data.toString())
+            }.onFailure {
+                logcat(ERROR) { "PIR-CSS: Failed to parse JS callback message $it " }
+            }.getOrNull()
+
+            if (result?.error == "No action found.") {
+                handleError(PirError.JsError.NoActionFound)
+            } else if (result != null) {
+                handleError(PirError.JsError.Unknown(result.error))
+            } else {
+                handleError(PirError.JsError.ParsingErrorObjectFailed)
+            }
+        } else {
+            handleError(PirError.JsError.ParsingErrorObjectFailed)
         }
     }
 

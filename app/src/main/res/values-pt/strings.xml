@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aparência</string>
+    <string name="settingsShowFullUrlTitle">Mostrar endereço completo do site</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Guardar</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Pesquisa em privado por predefinição</string>
     <string name="preOnboardingComparisonChartItem2">Bloqueia rastreadores de terceiros</string>
     <string name="preOnboardingComparisonChartItem3">Bloquear pop-ups de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloqueia anúncios que rastreiam</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquear anúncios segmentados</string>
     <string name="preOnboardingComparisonChartItem5">Elimina dados de navegação com um botão</string>
     <string name="preOnboardingDaxDialog3Title">Fantástico! Damos-te as boas-vindas ao Duck Side.</string>
     <string name="preOnboardingDaxDialog3Button">Iniciar a navegação</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Obrigado! O teu relatório ajuda a melhorar o DuckDuckGo para todos!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Novo AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Deixa o DuckDuckGo proteger melhor o que fazes online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Torna-nos o teu navegador predefinido para que todos os links dos sites sejam abertos no DuckDuckGo.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Limpar os separadores e os dados elimina o teu histórico de bloqueio de rastreadores e redefine este número para zero.\n\nOculta esta faixa se preferires não a ver na vista de separadores.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar faixa</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Aviso: este site pode ser um risco para a segurança</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[O DuckDuckGo bloqueou esta página porque pode estar a distribuir malware projetado para comprometer o teu dispositivo ou roubar as tuas informações pessoais.\n<a href=\"\">Sabe mais</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Este site pode estar a fazer-se passar por um site legítimo para te enganar a fornecer informações pessoais, como palavras-passe ou números de cartão de crédito.\n<a href=\"\">Sabe mais</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Avisar-me sobre sites sinalizados como phishing ou malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="maliciousSiteSettingDisabled">Desativar esta funcionalidade pode pôr em risco as tuas informações.</string>
+    <string name="threatProtectionTitle">Proteção contra ameaças</string>
+    <string name="threatProtectionDescription">As proteções melhoradas do DuckDuckGo impedem ameaças comuns enquanto mantêm a tua ligação segura.</string>
+    <string name="smarterEncryptionTitle">Encriptação mais inteligente</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Atualiza automaticamente links para HTTPS sempre que possível.<br><a href=\"\">Sabe mais</a>]]></string>
+    <string name="scamBlockerTitle">Bloqueador de fraude</string>
+    <string name="scamBlockerDescription">Avisar sobre sites sinalizados por fraudes, phishing e malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Saiba mais</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Experimenta o nosso widget do ecrã inicial!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adicione o nosso widget de pesquisa ao seu ecrã inicial para obter acesso rápido e fácil.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adicionar widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Agora não</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Pesquisar no DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget da página principal</string>
 </resources>

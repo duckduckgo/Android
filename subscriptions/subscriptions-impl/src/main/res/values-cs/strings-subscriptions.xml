@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Získej odpovědi na časté otázky nebo přes naše stránky nápovědy kontaktuj podporu služby Privacy Pro. Dostupnost se v jednotlivých zemích liší.</string>
     <string name="subscriptionStatusSubscribed">Přihlášeno</string>
     <string name="privacyPolicyAndTermsOfService">Zásady ochrany osobních údajů a podmínky služby</string>
+    <string name="subscriptionStatusFreeTrial">Bezplatná zkušební verze je aktivní</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezplatné zkušební období ti končí %1$s a ten samý den se automaticky prodlouží jako měsíční placené předplatné.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezplatné zkušební období ti končí %1$s a ten samý den se automaticky prodlouží jako roční placené předplatné.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoje bezplatná zkušební verze končí %1$s a neprodlouží se jako placené předplatné.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavení předplatného</string>

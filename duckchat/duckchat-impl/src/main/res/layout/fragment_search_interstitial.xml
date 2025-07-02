@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.duckduckgo.duckchat.impl.ui.DuckChatOmnibarLayout
+        android:id="@+id/duckChatOmnibar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:layout_marginTop="@dimen/keyline_3"
+        app:layout_constraintTop_toBottomOf="@id/duckChatOmnibar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/actionSend"
+        android:layout_width="56dp"
+        android:layout_height="40dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
+        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginEnd="@dimen/keyline_3"
+        android:importantForAccessibility="no"
+        android:text="&#8203;"
+        android:textColor="@android:color/transparent"
+        android:visibility="gone"
+        app:icon="@drawable/ic_find_search_24"
+        app:iconTint="?attr/daxColorWhite"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        app:rippleColor="?attr/daxColorRipple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/actionNewLine"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:backgroundTint="?attr/daxColorWindow"
+        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginEnd="@dimen/keyline_3"
+        android:importantForAccessibility="no"
+        android:text="&#8203;"
+        android:textColor="@android:color/transparent"
+        android:visibility="visible"
+        app:icon="@drawable/ic_return_24"
+        app:iconTint="?attr/daxColorPrimaryIcon"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        app:rippleColor="?attr/daxColorRipple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/actionSend"/>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/actionVoice"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:backgroundTint="?attr/daxColorWindow"
+        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginEnd="@dimen/keyline_3"
+        android:importantForAccessibility="no"
+        android:text="&#8203;"
+        android:textColor="@android:color/transparent"
+        android:visibility="gone"
+        app:icon="@drawable/ic_microphone_24"
+        app:iconTint="?attr/daxColorPrimaryIcon"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        app:rippleColor="?attr/daxColorRipple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/actionNewLine"/>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/actionForceWebSearch"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:minWidth="0dp"
+        android:minHeight="0dp"
+        android:backgroundTint="?attr/daxColorWindow"
+        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginStart="@dimen/keyline_3"
+        android:importantForAccessibility="no"
+        android:text="&#8203;"
+        android:textColor="@android:color/transparent"
+        android:visibility="gone"
+        app:icon="@drawable/ic_globe_24"
+        app:iconTint="?attr/daxColorPrimaryIcon"
+        app:iconPadding="0dp"
+        app:iconGravity="textStart"
+        app:rippleColor="?attr/daxColorRipple"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

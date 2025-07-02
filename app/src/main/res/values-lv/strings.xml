@@ -203,6 +203,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izskats</string>
+    <string name="settingsShowFullUrlTitle">Rādīt pilnu vietnes adresi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -771,7 +772,7 @@
     <string name="preOnboardingComparisonChartItem1">Meklē privāti pēc noklusējuma</string>
     <string name="preOnboardingComparisonChartItem2">Bloķē trešo pušu izsekotājus</string>
     <string name="preOnboardingComparisonChartItem3">Bloķē sīkfailu uznirstošos logus</string>
-    <string name="preOnboardingComparisonChartItem4">Bloķēt izsekojošas reklāmas</string>
+    <string name="preOnboardingComparisonChartItem4">Bloķē mērķtiecīgas reklāmas</string>
     <string name="preOnboardingComparisonChartItem5">Dzēst pārlūkošanas datus ar vienu pogu</string>
     <string name="preOnboardingDaxDialog3Title">Lieliski! Apsveicam ar pievienošanos pīļu komandai.</string>
     <string name="preOnboardingDaxDialog3Button">Sākt pārlūkošanu</string>
@@ -858,10 +859,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt DuckDuckGo labāku visiem lietotājiem!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
@@ -872,7 +869,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Notīrot savas cilnes un datus, tiks izdzēsta tava izsekotāja bloķēšanas vēsture un šis skaitlis tiks atiestatīts uz nulli.\n\nPaslēp šo reklāmkarogu, ja nevēlies to redzēt cilņu skatā.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslēpt reklāmkarogu</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo bloķēja šo lapu, jo tajā, iespējams, tiek izplatīta ļaunprātīga programmatūra, kas paredzēta, lai apdraudētu tavu ierīci vai nozagtu tavu personisko informāciju.\n<a href=\"\">Uzzini vairāk</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Iespējams, ka šī vietne uzdodas par likumīgu vietni, lai tevi maldinātu sniegt personisku informāciju, piemēram, paroles vai kredītkartes numurus.\n<a href=\"\">Uzzini vairāk</a>]]></string>
@@ -887,5 +884,21 @@
     <string name="maliciousSiteToggleHint">Brīdiniet mani par vietnēm, kas atzīmētas kā pikšķerēšanas vai ļaunprātīgas programmatūras vietnes</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="maliciousSiteSettingDisabled">Šī līdzekļa atspējošana var apdraudēt tavu informāciju.</string>
+    <string name="threatProtectionTitle">Draudu aizsardzība</string>
+    <string name="threatProtectionDescription">DuckDuckGo uzlabotā aizsardzība aptur izplatītākos draudus, vienlaikus nodrošinot drošu savienojumu.</string>
+    <string name="smarterEncryptionTitle">Gudrāka šifrēšana</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automātiski jaunina saites uz HTTPS, kad vien iespējams.<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="scamBlockerTitle">Krāpniecības bloķētājs</string>
+    <string name="scamBlockerDescription">Brīdina par vietnēm, kas atzīmētas kā krāpnieciskas, pikšķerēšanas un ļaunprātīgas programmatūras vietnes.</string>
+    <string name="threatProtectionLearnMoreTitle">Uzzināt vairāk</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Pamēģini mūsu sākuma ekrāna logrīku!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pievieno mūsu meklēšanas logrīku savam sākuma ekrānam ātrai un vienkāršai piekļuvei.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pievienot logrīku</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne tagad</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Meklēt DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>
 </resources>

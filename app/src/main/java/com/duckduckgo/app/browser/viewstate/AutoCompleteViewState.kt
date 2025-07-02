@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.browser.viewstate
 
-import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
 
 data class AutoCompleteViewState(
     val showSuggestions: Boolean = false,

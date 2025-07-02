@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 
@@ -82,6 +83,8 @@ interface WebViewClientListener {
     fun surrogateDetected(surrogate: SurrogateResponse)
     fun isDesktopSiteEnabled(): Boolean
 
+    fun isTabInForeground(): Boolean
+
     fun loginDetected()
     fun dosAttackDetected()
     fun iconReceived(
@@ -130,5 +133,8 @@ interface WebViewClientListener {
         url: String,
     )
 
-    fun pageStarted(webViewNavigationState: WebViewNavigationState)
+    fun pageStarted(
+        webViewNavigationState: WebViewNavigationState,
+        activeExperiments: List<Toggle>,
+    )
 }

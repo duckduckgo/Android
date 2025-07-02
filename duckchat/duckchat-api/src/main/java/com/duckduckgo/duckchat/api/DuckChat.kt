@@ -17,7 +17,6 @@
 package com.duckduckgo.duckchat.api
 
 import android.net.Uri
-import kotlinx.coroutines.flow.StateFlow
 
 /**
  * DuckChat interface provides a set of methods for interacting and controlling DuckChat.
@@ -32,28 +31,19 @@ interface DuckChat {
     fun isEnabled(): Boolean
 
     /**
-     * Checks whether DuckChat should be shown in browser menu based on user settings.
-     *
-     * @return true if DuckChat should be shown, false otherwise.
-     */
-    val showInBrowserMenu: StateFlow<Boolean>
-
-    /**
-     * Checks whether DuckChat should be shown in address bar based on user settings.
-     *
-     * @return true if DuckChat should be shown, false otherwise.
-     */
-    val showInAddressBar: StateFlow<Boolean>
-
-    /**
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
-    fun openDuckChat(query: String? = null)
+    fun openDuckChat()
 
     /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
      */
     fun openDuckChatWithAutoPrompt(query: String)
+
+    /**
+     * Opens Duck Chat with a prefilled [String] query.
+     */
+    fun openDuckChatWithPrefill(query: String)
 
     /**
      * Determines whether a given [Uri] is a DuckChat URL.

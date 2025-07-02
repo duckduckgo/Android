@@ -29,9 +29,10 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 interface PageLoadedHandler {
-    fun onPageLoaded(url: String, title: String?, start: Long, end: Long)
+    fun onPageLoaded(url: String, title: String?, start: Long, end: Long, isTabInForeground: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
@@ -45,7 +46,7 @@ class RealPageLoadedHandler @Inject constructor(
     private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : PageLoadedHandler {
 
-    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long) {
+    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long, isTabInForeground: Boolean) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(
@@ -58,6 +59,7 @@ class RealPageLoadedHandler @Inject constructor(
                     ),
                 )
             }
+            logcat { "$$$: Page load time: ${end - start}, foreground: $isTabInForeground" }
         }
     }
 }

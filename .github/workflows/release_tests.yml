@@ -20,7 +20,7 @@ env:
 
 jobs:
   run-release-tests:
-    name: Create and Push git tag for version
+    name: Create release APK and run E2E Maestro tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -65,7 +65,7 @@ jobs:
 
       - name: Notify Mattermost of Maestro tests
         id: send-mm-tests-started
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
@@ -81,6 +81,7 @@ jobs:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
           include-tags: ${{ github.event.inputs.test-tag }}
@@ -147,7 +148,7 @@ jobs:
         # Condition 1: Our script says success
         # Condition 2: The Maestro action itself also reported overall success
         if: always() && steps.analyze-flow-results.outputs.flow_summary_status == 'success' && steps.release-tests.conclusion == 'success'
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
@@ -161,7 +162,7 @@ jobs:
       - name: Notify Mattermost - Maestro Tests FAILURES or ISSUES DETECTED
         # Condition: Our script detected 'failure' OR the Maestro action itself reported failure
         if: always() && (steps.analyze-flow-results.outputs.flow_summary_status == 'failure' || steps.release-tests.conclusion == 'failure')
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
@@ -176,7 +177,7 @@ jobs:
         # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
         # AND Maestro action itself didn't mark the whole run as a 'failure'
         if: always() && steps.analyze-flow-results.outputs.flow_summary_status == 'canceled_present' && steps.release-tests.conclusion != 'failure'
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           action: 'send-mattermost-message'
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
@@ -190,7 +191,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

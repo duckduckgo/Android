@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -38,6 +39,7 @@ import kotlinx.coroutines.launch
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
+    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -45,21 +47,26 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     data class ViewState(
         val isDuckChatUserEnabled: Boolean = false,
+        val isInputScreenEnabled: Boolean = false,
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
+        val shouldShowInputScreenToggle: Boolean = false,
         val shouldShowBrowserMenuToggle: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
     )
 
     val viewState = combine(
         duckChat.observeEnableDuckChatUserSetting(),
+        duckChat.observeInputScreenUserSettingEnabled(),
         duckChat.observeShowInBrowserMenuUserSetting(),
         duckChat.observeShowInAddressBarUserSetting(),
-    ) { isDuckChatUserEnabled, showInBrowserMenu, showInAddressBar ->
+    ) { isDuckChatUserEnabled, isInputScreenEnabled, showInBrowserMenu, showInAddressBar ->
         ViewState(
             isDuckChatUserEnabled = isDuckChatUserEnabled,
+            isInputScreenEnabled = isInputScreenEnabled,
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
+            shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
             shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
             shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
         )
@@ -73,6 +80,16 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
         viewModelScope.launch {
             duckChat.setEnableDuckChatUserSetting(checked)
+        }
+    }
+
+    fun onDuckAiInputScreenToggled(checked: Boolean) {
+        viewModelScope.launch {
+            if (checked) {
+                // the new input screen feature is only available when the visual design experiment is enabled
+                visualDesignExperimentDataStore.changeExperimentFlagPreference(enabled = true)
+            }
+            duckChat.setInputScreenUserSetting(checked)
         }
     }
 

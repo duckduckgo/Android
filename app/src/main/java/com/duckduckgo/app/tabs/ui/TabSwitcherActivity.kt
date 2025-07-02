@@ -92,6 +92,7 @@ import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import java.util.ArrayList
 import javax.inject.Inject
@@ -151,6 +152,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
@@ -681,7 +685,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
-        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu.value
+        duckChatMenuItem?.isVisible = duckAiFeatureState.showPopupMenuShortcut.value
 
         return super.onPrepareOptionsMenu(menu)
     }

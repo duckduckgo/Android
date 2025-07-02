@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Ulkoasu</string>
+    <string name="settingsShowFullUrlTitle">Näytä sivuston osoite kokonaan</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Yksityinen selaus oletuksena</string>
     <string name="preOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
-    <string name="preOnboardingComparisonChartItem4">Estä seurantamainokset</string>
+    <string name="preOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
     <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
     <string name="preOnboardingDaxDialog3Title">Mahtavaa! Tervetuloa käyttämään Duckia.</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Kiitos! Ilmoituksesi auttaa tekemään DuckDuckGosta paremman kaikille!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Uusi AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Anna DuckDuckGon suojata enemmän tekemisiäsi verkossa.</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tee meistä oletusselaimesi, niin kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tämä verkkosivusto saattaa esiintyä laillisena sivustona huijatakseen sinua antamaan henkilötietoja, kuten salasanan tai luottokortin numeron.\n<a href=\"\">Lue lisää</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Varoita sivustoista, jotka on merkitty tietojenkalastelun tai haittaohjelmien johdosta</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="maliciousSiteSettingDisabled">Tämän ominaisuuden käytöstä poistaminen voi vaarantaa tietosi.</string>
+    <string name="threatProtectionTitle">Uhkien torjunta</string>
+    <string name="threatProtectionDescription">DuckDuckGon parannetut suojaukset pysäyttävät yleisimmät uhat ja pitävät yhteytesi suojattuna.</string>
+    <string name="smarterEncryptionTitle">Älykkäämpi salaus</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Päivittää linkit automaattisesti HTTPS-yhteyteen aina kun mahdollista.<a href=\"\">Lue lisää</a>]]></string>
+    <string name="scamBlockerTitle">Huijausten esto</string>
+    <string name="scamBlockerDescription">Varoita sivustoista, jotka on merkitty huijausten, tietojenkalastelun ja haittaohjelmien johdosta.</string>
+    <string name="threatProtectionLearnMoreTitle">Lue lisää</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Kokeile aloitusnäytön widgetiä!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisää widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hae DuckDuckGosta</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Aloitusnäytön widget</string>
 </resources>

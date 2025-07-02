@@ -65,6 +65,7 @@ class ProSettingViewModel @Inject constructor(
     data class ViewState(
         val status: SubscriptionStatus = UNKNOWN,
         val region: SubscriptionRegion? = null,
+        val freeTrialEligible: Boolean = false,
     ) {
         enum class SubscriptionRegion { US, ROW }
     }
@@ -97,7 +98,13 @@ class ProSettingViewModel @Inject constructor(
                     MONTHLY_PLAN_US, YEARLY_PLAN_US -> SubscriptionRegion.US
                     else -> null
                 }
-                _viewState.emit(viewState.value.copy(status = subscriptionStatus, region = region))
+                _viewState.emit(
+                    viewState.value.copy(
+                        status = subscriptionStatus,
+                        region = region,
+                        freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
+                    ),
+                )
             }.launchIn(viewModelScope)
     }
 

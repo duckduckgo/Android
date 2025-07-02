@@ -26,7 +26,8 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.addClickableLink
+import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.quietlySetIsChecked
 import com.duckduckgo.common.ui.view.setEnabledOpacity
@@ -153,18 +154,22 @@ class VpnCustomDnsActivity : DuckDuckGoActivity() {
                 events.emit(OnApply)
             }
         }
-        binding.blockMalwareDescription.addClickableLink(
-            "learn_more_link",
+        binding.blockMalwareDescription.addClickableSpan(
             getText(R.string.netpDnsBlockMalwareByline),
-        ) {
-            globalActivityStarter.start(
-                this,
-                WebViewActivityWithParams(
-                    url = URL_FAQS_DNS_BLOCKLIST,
-                    screenTitle = getString(R.string.netpDnsBlockMalwareFaqsTitle),
-                ),
-            )
-        }
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        globalActivityStarter.start(
+                            this@VpnCustomDnsActivity,
+                            WebViewActivityWithParams(
+                                url = URL_FAQS_DNS_BLOCKLIST,
+                                screenTitle = getString(R.string.netpDnsBlockMalwareFaqsTitle),
+                            ),
+                        )
+                    }
+                },
+            ),
+        )
     }
 
     private fun render(state: State) {

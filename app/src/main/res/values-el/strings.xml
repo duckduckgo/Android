@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Εμφάνιση</string>
+    <string name="settingsShowFullUrlTitle">Εμφάνιση πλήρους διεύθυνσης ιστότοπου</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Αποθήκευση</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Ιδιωτική αναζήτηση βάσει προεπιλογής</string>
     <string name="preOnboardingComparisonChartItem2">Αποκλείστε εφαρμογές παρακολούθησης τρίτων</string>
     <string name="preOnboardingComparisonChartItem3">Αποκλεισμός αναδυόμενων παραθύρων cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός διαφημίσεων παρακολούθησης</string>
+    <string name="preOnboardingComparisonChartItem4">Αποκλεισμός στοχευμένων διαφημίσεων</string>
     <string name="preOnboardingComparisonChartItem5">Διαγράψτε τα δεδομένα περιήγησης με ένα κουμπί</string>
     <string name="preOnboardingDaxDialog3Title">Φανταστικά! Το Παπί σε καλωσορίζει!</string>
     <string name="preOnboardingDaxDialog3Button">Έναρξη περιήγησης</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Σε ευχαριστούμε! Η αναφορά σας βοηθάει ώστε να γίνει το DuckDuckGo καλύτερο για όλους!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Νέο AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Αφήστε το DuckDuckGo να προστατεύσει περισσότερα από όσα κάνετε στο διαδίκτυο</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Ορίστε μας ως το προεπιλεγμένο πρόγραμμα περιήγησής σας ώστε όλοι οι σύνδεσμοι του ιστότοπου να ανοίγουν στο DuckDuckGo.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Η εκκαθάριση των καρτελών και των δεδομένων σας θα διαγράψει το ιστορικό αποκλεισμού εφαρμογών παρακολούθησης και θα μηδενίσει αυτόν τον αριθμό.\n\nΑποκρύψτε αυτό το banner αν προτιμάτε να μην το βλέπετε στην προβολή καρτελών.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Απόκρυψη banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Προειδοποίηση: Αυτός ο ιστότοπος μπορεί να είναι επικίνδυνος για την ασφάλεια</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Το DuckDuckGo μπλόκαρε αυτήν τη σελίδα επειδή μπορεί να διανέμει κακόβουλο λογισμικό, το οποίο έχει σχεδιαστεί για να θέσει σε κίνδυνο τη συσκευή σας ή να υποκλέψει τα προσωπικά στοιχεία σας.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ο ιστότοπος αυτός μπορεί να υποδύεται έναν νόμιμο ιστότοπο προκειμένου να σας εξαπατήσει ώστε να παράσχετε προσωπικές πληροφορίες, όπως κωδικούς πρόσβασης ή αριθμούς πιστωτικών καρτών.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Να λάβω προειδοποίηση για ιστότοπους που έχουν επισημανθεί για ηλεκτρονικό ψάρεμα ή κακόβουλο λογισμικό</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="maliciousSiteSettingDisabled">Η απενεργοποίηση της λειτουργίας αυτής μπορεί να θέσει σε κίνδυνο τα στοιχεία σας.</string>
+    <string name="threatProtectionTitle">Προστασία από απειλές</string>
+    <string name="threatProtectionDescription">Οι βελτιωμένες προστασίες του DuckDuckGo σταματούν τις συνήθεις απειλές, διατηρώντας τη σύνδεσή σας ασφαλή.</string>
+    <string name="smarterEncryptionTitle">Πιο έξυπνη κρυπτογράφηση</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Αναβαθμίζει αυτόματα τους συνδέσμους σε HTTPS όποτε είναι εφικτό.<a href=\"\">Μάθετε περισσότερα</a>]]></string>
+    <string name="scamBlockerTitle">Πρόγραμμα αποκλεισμού απάτης</string>
+    <string name="scamBlockerDescription">Προειδοποίηση για ιστότοπους που έχουν επισημανθεί για απάτες, ηλεκτρονικό ψάρεμα και κακόβουλο λογισμικό.</string>
+    <string name="threatProtectionLearnMoreTitle">Μάθετε περισσότερα</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Δοκιμάστε τη μικροεφαρμογή μας για την Αρχική οθόνη!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Προσθέστε το γραφικό στοιχείο μας αναζήτησης στην αρχική οθόνη σας για γρήγορη και εύκολη πρόσβαση.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Προσθήκη γραφικού στοιχείου</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Όχι τώρα</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Αναζήτηση DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Μικροεφαρμογή αρχικής οθόνης</string>
 </resources>

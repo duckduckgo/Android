@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Uiterlijk</string>
+    <string name="settingsShowFullUrlTitle">Volledig siteadres weergeven</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Standaard privé zoeken</string>
     <string name="preOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
-    <string name="preOnboardingComparisonChartItem4">Blokkeer trackingadvertenties</string>
+    <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
     <string name="preOnboardingDaxDialog3Title">Geweldig! Welkom aan de Duck-kant.</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Bedankt! Jouw melding helpt DuckDuckGo beter te maken voor iedereen!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nieuwe AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laat DuckDuckGo meer beschermen van wat je online doet</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Maak ons je standaardbrowser zodat alle sitelinks in DuckDuckGo worden geopend.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Als je je tabbladen en gegevens wist, wordt je geschiedenis met geblokkeerde trackers verwijderd. Dit getal wordt dan weer op nul gezet.\n\nVerberg deze banner als je deze liever niet in de tabbladweergave wilt zien.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner verbergen</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Deze website kan zich voordoen als een legitieme site om je te verleiden tot het verstrekken van persoonlijke informatie, zoals wachtwoorden of creditcardnummers.\n<a href=\"\">Meer informatie</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Waarschuw me op websites die zijn aangeduid als phishing of malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="maliciousSiteSettingDisabled">Als je deze functie uitschakelt, kunnen je gegevens in gevaar komen.</string>
+    <string name="threatProtectionTitle">Bescherming tegen bedreigingen</string>
+    <string name="threatProtectionDescription">De verbeterde beveiligingen van DuckDuckGo stoppen veelvoorkomende bedreigingen en houden je verbinding veilig.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Links worden waar mogelijk automatisch naar HTTPS geüpgraded.<br><a href=\"\">Meer informatie</a>]]></string>
+    <string name="scamBlockerTitle">Scamblocker</string>
+    <string name="scamBlockerDescription">Waarschuwing geven over sites die zijn aangeduid als oplichting, phishing en malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Meer informatie</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probeer onze widget op het startscherm!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Voeg onze zoekwidget toe aan je startscherm voor snelle en gemakkelijke toegang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget toevoegen</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Niet nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Zoek in DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startschermwidget</string>
 </resources>

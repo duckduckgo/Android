@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Gaukite atsakymus į dažniausiai užduodamus klausimus arba susisiekite su „Privacy Pro“ palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
     <string name="subscriptionStatusSubscribed">Prenumeruota</string>
     <string name="privacyPolicyAndTermsOfService">Privatumo politika ir paslaugų teikimo sąlygos</string>
+    <string name="subscriptionStatusFreeTrial">Nemokama bandomoji versija aktyvi</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Nemokama bandomoji versija baigiasi %1$s ir tą dieną automatiškai taps mėnesine mokama prenumerata.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Nemokama bandomoji versija baigiasi %1$s ir tą dieną automatiškai taps metine mokama prenumerata.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Jūsų nemokama bandomoji versija baigiasi %1$s ir nebus pakeista į mokamą prenumeratą.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Prenumeratos nustatymai</string>

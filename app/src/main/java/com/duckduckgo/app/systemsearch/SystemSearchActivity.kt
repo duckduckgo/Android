@@ -37,7 +37,6 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.string
@@ -57,6 +56,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.*
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hideKeyboard
@@ -354,7 +354,9 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureTextInput() {
         omnibarTextInput.setOnEditorActionListener(
             TextView.OnEditorActionListener { _, actionId, keyEvent ->
-                if (actionId == EditorInfo.IME_ACTION_GO || keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER) {
+                if ((keyEvent == null && actionId == EditorInfo.IME_ACTION_GO) ||
+                    (keyEvent?.keyCode == KeyEvent.KEYCODE_ENTER && keyEvent.action == KeyEvent.ACTION_DOWN)
+                ) {
                     viewModel.userSubmittedQuery(omnibarTextInput.text.toString())
                     return@OnEditorActionListener true
                 }

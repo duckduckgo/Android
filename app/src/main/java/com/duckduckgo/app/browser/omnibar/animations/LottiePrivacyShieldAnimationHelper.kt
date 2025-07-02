@@ -30,6 +30,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @ContributesBinding(AppScope::class)
@@ -48,7 +49,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         val protectedShieldDark: Int
         val unprotectedShield: Int
         val unprotectedShieldDark: Int
-        if (senseOfProtectionExperiment.shouldShowNewPrivacyShield()) {
+        if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
             protectedShield = R.raw.protected_shield_experiment
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment

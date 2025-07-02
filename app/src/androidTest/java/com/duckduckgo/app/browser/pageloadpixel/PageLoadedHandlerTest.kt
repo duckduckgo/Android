@@ -51,7 +51,7 @@ class PageLoadedHandlerTest {
 
     @Test
     fun whenInvokingWithValidUrlThenPixelIsAdded() {
-        testee.onPageLoaded(VALID_URL, "title", 0L, 10L)
+        testee.onPageLoaded(VALID_URL, "title", 0L, 10L, true)
         val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
         verify(pageLoadedPixelDao).add(argumentCaptor.capture())
         Assert.assertEquals(10L, argumentCaptor.firstValue.elapsedTime)
@@ -59,7 +59,7 @@ class PageLoadedHandlerTest {
 
     @Test
     fun whenInvokingWithInvalidUrlThenPixelIsAdded() {
-        testee.onPageLoaded(INVALID_URL, "title", 0L, 10L)
+        testee.onPageLoaded(INVALID_URL, "title", 0L, 10L, true)
         verify(pageLoadedPixelDao, never()).add(any())
     }
 }

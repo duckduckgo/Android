@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku Privacy Pro putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
     <string name="subscriptionStatusSubscribed">Pretplaćen</string>
     <string name="privacyPolicyAndTermsOfService">Pravila privatnosti i Uvjeti pružanja usluge</string>
+    <string name="subscriptionStatusFreeTrial">Besplatno probno razdoblje je aktivno</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja besplatna probna verzija završava %1$s i tog se dana automatski pretvara u mjesečnu plaćenu pretplatu.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja besplatna probna verzija završava %1$s i tog se dana automatski pretvara u godišnju plaćenu pretplatu.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja besplatna probna verzija završava %1$s i neće se pretvoriti u plaćenu pretplatu.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Postavke pretplate</string>

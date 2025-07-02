@@ -52,10 +52,17 @@ jobs:
 
       - name: Move APK to new folder
         if: always()
-        run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
+        run: find . -name "*play-release*.apk" -exec mv '{}' apk/release.apk \;
+
+      - name: Assemble internal release APK
+        run: ./gradlew assembleInternalRelease -Pforce-default-variant -Pskip-onboarding
+
+      - name: Move APK to new folder
+        if: always()
+        run: find . -name "*internal-release*.apk" -exec mv '{}' apk/internal.apk \;
 
       - name: Onboarding flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -68,7 +75,7 @@ jobs:
           include-tags: onboardingTest
 
       - name: Ad click detection flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -82,7 +89,7 @@ jobs:
 
       - name: Privacy Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -94,9 +101,23 @@ jobs:
           workspace: .maestro
           include-tags: privacyTest
 
-      - name: Security Tests
+      - name: Internal Privacy Tests
         if: always()
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        timeout-minutes: 120
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: internalPrivacyTest_${{ github.sha }}
+          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/internal.apk
+          android-api-level: 34
+          workspace: .maestro
+          include-tags: privacyTestInternal
+
+      - name: Security Tests
+        if: always()
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -110,7 +131,7 @@ jobs:
 
       - name: Release Tests
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -124,7 +145,7 @@ jobs:
 
       - name: Notifications permissions Android 13+
         if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}

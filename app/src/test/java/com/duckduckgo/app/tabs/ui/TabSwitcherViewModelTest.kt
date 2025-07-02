@@ -65,6 +65,7 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.fakes.FakePixel
@@ -137,6 +138,9 @@ class TabSwitcherViewModelTest {
     private lateinit var duckChatMock: DuckChat
 
     @Mock
+    private lateinit var duckAiFeatureStateMock: DuckAiFeatureState
+
+    @Mock
     private lateinit var faviconManager: FaviconManager
 
     @Mock
@@ -198,7 +202,7 @@ class TabSwitcherViewModelTest {
         whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
             defaultVisualExperimentStateFlow,
         )
-        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -232,6 +236,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
             tabManagerFeatureFlags,
             senseOfProtectionExperiment,
             mockWebTrackersBlockedAppRepository,
@@ -841,7 +846,6 @@ class TabSwitcherViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "0"))
         verify(duckChatMock).openDuckChat()
     }
@@ -852,8 +856,27 @@ class TabSwitcherViewModelTest {
 
         testee.onDuckChatMenuClicked()
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN)
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, mapOf("was_used_before" to "1"))
+        verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when Duck Chat fab clicked and it wasn't used before then open Duck Chat and send a pixel`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(false)
+
+        testee.onDuckChatFabClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "0"))
+        verify(duckChatMock).openDuckChat()
+    }
+
+    @Test
+    fun `when Duck Chat fab clicked and it was used before then open Duck Chat and send a pixel`() = runTest {
+        whenever(duckChatMock.wasOpenedBefore()).thenReturn(true)
+
+        testee.onDuckChatFabClicked()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, mapOf("was_used_before" to "1"))
         verify(duckChatMock).openDuckChat()
     }
 
@@ -1488,7 +1511,6 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckChatMock.isEnabled()).thenReturn(true)
 
         initializeViewModel()
 
@@ -1501,8 +1523,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckChatMock.isEnabled()).thenReturn(true)
-        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
 
         initializeViewModel()
 

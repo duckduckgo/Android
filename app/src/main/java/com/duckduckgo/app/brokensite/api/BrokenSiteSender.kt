@@ -149,6 +149,22 @@ class BrokenSiteSubmitter @Inject constructor(
                 }
             }
 
+            brokenSite.contentScopeExperiments
+                ?.mapNotNull { experiment ->
+                    experiment.getCohort()?.let { cohort ->
+                        "${experiment.featureName().name}:${cohort.name}"
+                    }
+                }?.sorted()
+                ?.let { activeExperiments ->
+                    if (activeExperiments.isNotEmpty()) {
+                        params[CONTENT_SCOPE_EXPERIMENTS] = activeExperiments.joinToString(",")
+                    }
+                }
+
+            brokenSite.debugFlags?.takeIf { it.isNotEmpty() }?.toSortedSet()?.let { debugFlags ->
+                params[DEBUG_FLAGS] = debugFlags.joinToString(",")
+            }
+
             val lastSentDay = brokenSiteLastSentReport.getLastSentDay(domain.orEmpty())
             if (lastSentDay != null) {
                 params[LAST_SENT_DAY] = lastSentDay
@@ -228,6 +244,8 @@ class BrokenSiteSubmitter @Inject constructor(
         private const val OPENER_CONTEXT = "openerContext"
         private const val JS_PERFORMANCE = "jsPerformance"
         private const val BLOCKLIST_EXPERIMENT = "blockListExperiment"
+        private const val CONTENT_SCOPE_EXPERIMENTS = "contentScopeExperiments"
+        private const val DEBUG_FLAGS = "debugFlags"
     }
 }
 

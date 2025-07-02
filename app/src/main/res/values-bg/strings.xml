@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Външен вид</string>
+    <string name="settingsShowFullUrlTitle">Показване на пълния адрес на сайта</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Запази</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
     <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
     <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
-    <string name="preOnboardingComparisonChartItem4">Блокиране на проследяващи реклами</string>
+    <string name="preOnboardingComparisonChartItem4">Блокиране на целеви реклами</string>
     <string name="preOnboardingComparisonChartItem5">Изтриване на данните за сърфиране с един бутон</string>
     <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Благодарим ви! Вашето докладване ни помага да направим DuckDuckGo по-добър за всички!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Този уебсайт може да имитира легитимен сайт, за да ви подмами да предоставите лична информация, като например пароли или номера на кредитни карти.\n<a href=\"\">Научете повече</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Предупреди ме за сайтове, отбелязани за фишинг или злонамерен софтуер</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="maliciousSiteSettingDisabled">Деактивирането на тази функция може да изложи информацията Ви на риск.</string>
+    <string name="threatProtectionTitle">Защита от заплахи</string>
+    <string name="threatProtectionDescription">Усъвършенстваните защити на DuckDuckGo предотвратяват често срещаните заплахи, като същевременно запазват връзката ви сигурна.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Автоматично надграждане на връзките до HTTPS, когато е възможно.<a href=\"\">Научете повече</a>]]></string>
+    <string name="scamBlockerTitle">Блокиране на измами</string>
+    <string name="scamBlockerDescription">Предупреждения в сайтове, за които има сигнали за измами, фишинг и злонамерен софтуер.</string>
+    <string name="threatProtectionLearnMoreTitle">Научете повече</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Опитайте нашия уиджет на началния екран!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Добавете нашето приспособление за търсене към началния си екран за бърз и лесен достъп.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Добави приспособлението</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Не сега</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Търсене с DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Уиджет на началния екран</string>
 </resources>

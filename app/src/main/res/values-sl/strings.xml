@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>
+    <string name="settingsShowFullUrlTitle">Prikaži polni naslov spletnega mesta</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Shrani</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Privzeto išče zasebno</string>
     <string name="preOnboardingComparisonChartItem2">Blokirajte sledilnike tretjih oseb</string>
     <string name="preOnboardingComparisonChartItem3">Blokirajte pojavna okna za piškotke</string>
-    <string name="preOnboardingComparisonChartItem4">Blokiraj oglase, ki sledijo</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiranje ciljnih oglasov</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o brskanju z enim gumbom</string>
     <string name="preOnboardingDaxDialog3Title">Odlično! Veseli nas, da ste se nam pridružili.</string>
     <string name="preOnboardingDaxDialog3Button">Začni brskanje</string>
@@ -874,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Hvala! Vaše poročilo pripomore k temu, da lahko DuckDuckGo postane boljši za vse!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Novi klepet z umetno inteligenco</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Naj DuckDuckGo zaščiti več vaše dejavnosti na spletu.</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastavite nas kot privzeti brskalnik, da se vse povezave do spletnih mest odprejo v DuckDuckGo.</string>
@@ -888,7 +885,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Če izbrišete zavihke in podatke, boste izbrisali zgodovino blokiranja sledilnika in to številko ponastavili na nič.\n\nSkrijte to pasico, če je ne želite videti v pogledu zavihkov.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrij pasico</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Opozorilo: To spletno mesto je lahko varnostno tveganje</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokiral to stran, ker morda distribuira zlonamerno programsko opremo, namenjeno ogrožanju vaše naprave ali kraji vaših osebnih podatkov.\n<a href=\"\">Več o tem</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[To spletno mesto se morda predstavlja kot zakonito spletno mesto, da bi vas pretentalo, da posredujete osebne podatke, kot so gesla ali številke kreditnih kartic.\n<a href=\"\">Več o tem</a>]]></string>
@@ -903,5 +900,21 @@
     <string name="maliciousSiteToggleHint">Opozori me na spletnih mestih, označenih za lažno predstavljanje ali zlonamerno programsko opremo</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="maliciousSiteSettingDisabled">Če onemogočite to funkcijo, lahko ogrozite varnost svojih podatkov.</string>
+    <string name="threatProtectionTitle">Zaščita pred grožnjami</string>
+    <string name="threatProtectionDescription">Izboljšana zaščita DuckDuckGo prestreže pogoste grožnje in obenem skrbi za varnost vaše povezave.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Samodejno nadgradi povezave na HTTPS, kadar je to mogoče.<a href=\"\">Več o tem</a>]]></string>
+    <string name="scamBlockerTitle">Preprečevanje prevar</string>
+    <string name="scamBlockerDescription">Prikaži opozorilo na spletnih mestih, označenih zaradi prevar, lažnega predstavljanja in zlonamerne programske opreme.</string>
+    <string name="threatProtectionLearnMoreTitle">Več</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Preizkusite naš pripomoček za domači zaslon!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodajte naš gradnik za iskanje na domači zaslon za hiter in preprost dostop.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj gradnik</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne zdaj</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Poišči DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Pripomoček na domačem zaslonu</string>
 </resources>

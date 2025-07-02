@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Apparence</string>
+    <string name="settingsShowFullUrlTitle">Afficher l\'adresse complète du site</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Enregistrer</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Faire une recherche privée par défaut</string>
     <string name="preOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
     <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités qui pistent</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités ciblées</string>
     <string name="preOnboardingComparisonChartItem5">Supprimez les données de navigation d\'un seul clic</string>
     <string name="preOnboardingDaxDialog3Title">Génial ! Bienvenue chez DuckDuckGo.</string>
     <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
@@ -842,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Merci ! Votre signalement contribue à améliorer DuckDuckGo pour tous.</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nouvel AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laissez DuckDuckGo protéger davantage ce que vous faites en ligne</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Choisissez-nous comme navigateur par défaut afin que tous les liens de site s\'ouvrent dans DuckDuckGo.</string>
@@ -856,7 +853,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">En effaçant vos onglets et vos données, vous supprimerez votre historique de blocage des traqueurs et remettrez ce nombre à zéro.\n\nMasquez cette bannière si vous préférez ne pas la voir dans la vue des onglets.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Masquer la bannière</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait diffuser des logiciels malveillants conçus pour compromettre votre appareil ou voler vos informations personnelles.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ce site Web se fait peut-être passer pour un site légitime afin de vous inciter à communiquer des informations personnelles, telles que des mots de passe ou des numéros de carte bancaire.\n<a href=\"\">En savoir plus</a>]]></string>
@@ -871,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Mettez-moi en garde contre les sites signalés pour hameçonnage ou comme étant des logiciels malveillants</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">En savoir plus</annotation></string>
     <string name="maliciousSiteSettingDisabled">La désactivation de cette fonctionnalité peut mettre vos informations en danger.</string>
+    <string name="threatProtectionTitle">Protection contre les menaces</string>
+    <string name="threatProtectionDescription">Les protections améliorées de DuckDuckGo arrêtent les menaces courantes tout en maintenant votre connexion sécurisée.</string>
+    <string name="smarterEncryptionTitle">Meilleur cryptage</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Met automatiquement à niveau les liens vers HTTPS lorsque cela est possible.<br><a href=\"\">En savoir plus</a>]]></string>
+    <string name="scamBlockerTitle">Bloqueur d\'escroqueries</string>
+    <string name="scamBlockerDescription">M’avertir sur les sites signalés pour des escroqueries, de l’hameçonnage et des logiciels malveillants.</string>
+    <string name="threatProtectionLearnMoreTitle">En savoir plus</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Essayez notre widget d\'écran d\'accueil !</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Ajoutez notre widget de recherche à votre écran d\'accueil pour un accès rapide et facile.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Ajouter un widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Pas maintenant</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Rechercher avec DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget écran d\'accueil</string>
 </resources>

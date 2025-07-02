@@ -20,6 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.LoadUrl
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
@@ -46,6 +47,15 @@ class LoadUrlFailedEventHandler @Inject constructor() : EventHandler {
 
         if (state.pendingUrl == null) {
             return Next(state)
+        }
+
+        if (actualEvent.url == RECOVERY_URL) {
+            return Next(
+                nextState = state.copy(
+                    pendingUrl = null,
+                ),
+                nextEvent = BrokerStepCompleted(false),
+            )
         }
 
         return Next(

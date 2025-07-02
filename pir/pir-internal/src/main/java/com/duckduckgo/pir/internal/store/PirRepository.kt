@@ -19,9 +19,7 @@ package com.duckduckgo.pir.internal.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirErrorReponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
-import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse.ScrapedData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.service.DbpService
@@ -53,7 +51,6 @@ import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
-import java.util.regex.Pattern
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -94,7 +91,7 @@ interface PirRepository {
     suspend fun saveErrorResult(
         brokerName: String,
         actionType: String,
-        error: PirErrorReponse,
+        message: String,
     )
 
     suspend fun saveExtractProfileResult(
@@ -187,7 +184,7 @@ interface PirRepository {
             override val completionTimeInMillis: Long,
             override val actionType: String,
             val profileQuery: ProfileQuery?,
-            val extractResults: List<ScrapedData> = emptyList(),
+            val extractResults: List<ExtractedProfile> = emptyList(),
         ) : ScanResult(brokerName, completionTimeInMillis, actionType)
 
         data class ErrorResult(
@@ -219,9 +216,7 @@ class RealPirRepository(
     private val optOutResultsDao: OptOutResultsDao,
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
-    private val scrapedDataAdapter by lazy { moshi.adapter(ScrapedData::class.java) }
     private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
-    private val validExtractedProfilePattern by lazy { Pattern.compile(".*\"result\"\\s*:\\s*true.*") }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -308,9 +303,7 @@ class RealPirRepository(
 
     override suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String> = withContext(dispatcherProvider.io()) {
         scanResultsDao.getAllExtractProfileResult().filter {
-            it.extractResults.isNotEmpty() && it.extractResults.any { result ->
-                validExtractedProfilePattern.matcher(result).find()
-            }
+            it.extractResults.isNotEmpty()
         }.map {
             it.brokerName
         }.run {
@@ -345,14 +338,14 @@ class RealPirRepository(
     override suspend fun saveErrorResult(
         brokerName: String,
         actionType: String,
-        error: PirErrorReponse,
+        message: String,
     ) {
         withContext(dispatcherProvider.io()) {
             scanResultsDao.insertScanErrorResult(
                 ScanErrorResult(
                     brokerName = brokerName,
                     actionType = actionType,
-                    message = error.message,
+                    message = message,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 ),
             )
@@ -370,9 +363,9 @@ class RealPirRepository(
                     actionType = response.actionType,
                     completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     userData = profileQueryAdapter.toJson(response.meta?.userData),
-                    extractResults = response.meta?.extractResults?.map {
-                        scrapedDataAdapter.toJson(it)
-                    } ?: emptyList(),
+                    extractResults = response.response.map {
+                        extractedProfileAdapter.toJson(it)
+                    },
                 ),
             )
         }
@@ -385,7 +378,7 @@ class RealPirRepository(
                 completionTimeInMillis = this.completionTimeInMillis,
                 actionType = this.actionType,
                 extractResults = this.extractResults.mapNotNull {
-                    scrapedDataAdapter.fromJson(it)
+                    extractedProfileAdapter.fromJson(it)
                 },
                 profileQuery = null,
             )
@@ -421,7 +414,7 @@ class RealPirRepository(
                     actionType = it.actionType,
                     profileQuery = profileQueryAdapter.fromJson(it.userData),
                     extractResults = it.extractResults.mapNotNull { data ->
-                        scrapedDataAdapter.fromJson(data)
+                        extractedProfileAdapter.fromJson(data)
                     },
                 )
             }
@@ -520,7 +513,7 @@ class RealPirRepository(
             it.filter {
                 it.isSubmitSuccess
             }.map {
-                (extractedProfileAdapter.fromJson(it.extractedProfile)?.profileUrl?.identifier ?: "Unknown") to it.brokerName
+                (extractedProfileAdapter.fromJson(it.extractedProfile)?.identifier ?: "Unknown") to it.brokerName
             }.distinct().toMap()
         }
     }

@@ -32,6 +32,42 @@
     "title" : "<b>KĻŪDA:</b> Nederīgs video ID",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player nevar ielādēt šo video.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Šo video nevar skatīties ārpus YouTube.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Šo videoklipu joprojām vari skatīties vietnē YouTube, taču bez papildu Duck Player konfidencialitātes.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Atvaino, šim videoklipam ir vecuma ierobežojums.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Lai skatītos videoklipus ar vecuma ierobežojumu, tev jāpiesakās YouTube, lai pārbaudītu savu vecumu.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Tu joprojām vari skatīties šo videoklipu, taču tev būs jāpiesakās un jāskatās to vietnē YouTube bez papildu privātuma, ko nodrošina Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Atvaino, šo video var atskaņot tikai vietnē YouTube.",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Šī video veidotājs ir izvēlējies neļaut to skatīties citās vietnēs.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Joprojām vari to skatīties vietnē YouTube, taču bez papildu Duck Player privātuma.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube neļauj Duck Player ielādēt šo video",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Šo videoklipu joprojām vari skatīties vietnē YouTube, taču bez papildu Duck Player konfidencialitātes.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Atvainojiet, YouTube uzskata, ka esi robots",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube bloķē šī video ielādi. Ja tu izmanto VPN, mēģini to izslēgt un pārlādēt šo lapu.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Ja tas nedarbojas, joprojām vari skatīties šo video vietnē YouTube, taču bez papildu privātuma, ko nodrošina Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "Tas var notikt, ja tu izmanto VPN. Mēģini izslēgt VPN vai mainīt servera atrašanās vietu un pārlādēt šo lapu.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Ja tas nedarbojas, tev būs jāpierakstās un jāskatās šis video vietnē YouTube bez papildu Duck Player privātuma.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

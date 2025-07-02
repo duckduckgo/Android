@@ -21,11 +21,13 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -86,6 +88,7 @@ class CtaViewModel @Inject constructor(
     private val brokenSitePrompt: BrokenSitePrompt,
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
+    private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -179,6 +182,9 @@ class CtaViewModel @Inject constructor(
             }
 
             cta.cancelPixel?.let {
+                if (cta is AddWidgetAuto || cta is AddWidgetAutoOnboardingExperiment) {
+                    onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDismiss()
+                }
                 pixel.fire(it, cta.pixelCancelParameters())
             }
             if (viaCloseBtn) {
@@ -195,6 +201,9 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onUserClickCtaOkButton(cta: Cta) {
         cta.okPixel?.let {
+            if (cta is AddWidgetAuto || cta is AddWidgetAutoOnboardingExperiment) {
+                onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetAdd()
+            }
             pixel.fire(it, cta.pixelOkParameters())
         }
         if (cta is BrokenSitePromptDialogCta) {
@@ -209,21 +218,11 @@ class CtaViewModel @Inject constructor(
         detectedRefreshPatterns: Set<RefreshPattern>,
     ): Cta? {
         return withContext(dispatcher) {
-            markOnboardingAsCompletedIfRequiredCtasShown()
             if (isBrowserShowing) {
                 getBrowserCta(site, detectedRefreshPatterns)
             } else {
                 getHomeCta()
             }
-        }
-    }
-
-    // Temporary function to complete onboarding if all CTAs were shown
-    private suspend fun markOnboardingAsCompletedIfRequiredCtasShown() {
-        if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            logcat { "Auto completing DAX ONBOARDING" }
-            userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-            pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETE)
         }
     }
 
@@ -283,7 +282,18 @@ class CtaViewModel @Inject constructor(
 
             // Add Widget
             canShowWidgetCta() -> {
-                if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+                if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+                    onboardingHomeScreenWidgetExperiment.enroll()
+                    if (onboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()) {
+                        onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDisplay()
+                        AddWidgetAutoOnboardingExperiment
+                    } else {
+                        onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDisplay()
+                        AddWidgetAuto
+                    }
+                } else {
+                    AddWidgetInstructions
+                }
             }
 
             else -> null

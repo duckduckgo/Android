@@ -40,6 +40,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PASSWORDS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PERMISSIONS_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_PRIVATE_SEARCH_PRESSED
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_WEB_TRACKING_PROTECTION_PRESSED
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAddHomeScreenWidget
@@ -63,6 +64,8 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearch
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
+import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -70,11 +73,13 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -87,9 +92,14 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ActivityScope::class)
@@ -105,10 +115,15 @@ class SettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val settingsPixelDispatcher: SettingsPixelDispatcher,
     private val autofillFeature: AutofillFeature,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val settingsPageFeature: SettingsPageFeature,
+    private val widgetCapabilities: WidgetCapabilities,
+    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -121,8 +136,11 @@ class SettingsViewModel @Inject constructor(
         val isAutoconsentEnabled: Boolean = false,
         val isPrivacyProEnabled: Boolean = false,
         val isDuckPlayerEnabled: Boolean = false,
+        val isNewThreatProtectionSettingsEnabled: Boolean = false,
         val isDuckChatEnabled: Boolean = false,
         val isVoiceSearchVisible: Boolean = false,
+        val isAddWidgetInProtectionsVisible: Boolean = false,
+        val widgetsInstalled: Boolean = false,
     )
 
     sealed class Command {
@@ -132,7 +150,7 @@ class SettingsViewModel @Inject constructor(
         data object LaunchAutofillPasswordsManagement : Command()
         data object LaunchAutofillSettings : Command()
         data object LaunchAccessibilitySettings : Command()
-        data object LaunchAddHomeScreenWidget : Command()
+        data class LaunchAddHomeScreenWidget(val simpleWidgetPrompt: Boolean) : Command()
         data object LaunchAppTPTrackersScreen : Command()
         data object LaunchAppTPOnboarding : Command()
         data object LaunchSyncSettings : Command()
@@ -155,8 +173,14 @@ class SettingsViewModel @Inject constructor(
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     private val appTPPollJob = ConflatedJob()
 
+    private var widgetPromptShown = false
+
     init {
         pixel.fire(SETTINGS_OPENED)
+
+        duckAiFeatureState.showSettings.onEach { showDuckAiSettings ->
+            viewState.update { it.copy(isDuckChatEnabled = showDuckAiSettings) }
+        }.launchIn(viewModelScope)
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -186,8 +210,14 @@ class SettingsViewModel @Inject constructor(
                     isAutoconsentEnabled = autoconsent.isSettingEnabled(),
                     isPrivacyProEnabled = subscriptions.isEligible(),
                     isDuckPlayerEnabled = duckPlayer.getDuckPlayerState().let { it == ENABLED || it == DISABLED_WIH_HELP_LINK },
-                    isDuckChatEnabled = duckChat.isEnabled(),
+                    isNewThreatProtectionSettingsEnabled = androidBrowserConfigFeature.newThreatProtectionSettings().isEnabled(),
                     isVoiceSearchVisible = voiceSearchAvailability.isVoiceSearchSupported,
+                    isAddWidgetInProtectionsVisible = withContext(dispatcherProvider.io()) {
+                        settingsPageFeature.self().isEnabled() && settingsPageFeature.widgetAsProtection().isEnabled()
+                    },
+                    widgetsInstalled = withContext(dispatcherProvider.io()) {
+                        widgetCapabilities.hasInstalledWidgets
+                    },
                 ),
             )
         }
@@ -220,7 +250,15 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun userRequestedToAddHomeScreenWidget() {
-        viewModelScope.launch { command.send(LaunchAddHomeScreenWidget) }
+        viewModelScope.launch(dispatcherProvider.io()) {
+            postCtaExperienceExperiment.enroll()
+            val simpleWidgetPrompt = postCtaExperienceExperiment.isSimpleSearchWidgetPrompt()
+            command.send(LaunchAddHomeScreenWidget(simpleWidgetPrompt))
+            if (!currentViewState().widgetsInstalled) {
+                widgetPromptShown = true
+            }
+            postCtaExperienceExperiment.fireSettingsWidgetDisplay()
+        }
     }
 
     fun onChangeAddressBarPositionClicked() {
@@ -303,6 +341,20 @@ class SettingsViewModel @Inject constructor(
                 command.send(LaunchAppTPOnboarding)
             }
             pixel.fire(SETTINGS_APPTP_PRESSED)
+        }
+    }
+
+    fun refreshWidgetsInstalledState() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            val widgetsInstalled = widgetCapabilities.hasInstalledWidgets
+            viewState.update { it.copy(widgetsInstalled = widgetsInstalled) }
+            if (widgetPromptShown) {
+                widgetPromptShown = false
+                if (!widgetsInstalled) {
+                    logcat { "Widget bottom sheet was dismissed." }
+                    postCtaExperienceExperiment.fireSettingsWidgetDismiss()
+                }
+            }
         }
     }
 

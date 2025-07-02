@@ -42,6 +42,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.channels.Channel
@@ -95,6 +96,8 @@ class BrowserViewModelTest {
     private val defaultBrowserPromptsExperimentCommandsFlow = Channel<DefaultBrowserPromptsExperiment.Command>(capacity = Channel.CONFLATED)
 
     @Mock private lateinit var mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment
+
+    @Mock private lateinit var mockDuckChat: DuckChat
 
     private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
@@ -292,7 +295,7 @@ class BrowserViewModelTest {
         testee.onBookmarksActivityResult(bookmarkUrl)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenInNewTab(bookmarkUrl), commandCaptor.lastValue)
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
     }
 
     @Test
@@ -506,6 +509,17 @@ class BrowserViewModelTest {
         assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
     }
 
+    @Test
+    fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = false))
+        val bookmarkUrl = "https://www.example.com"
+
+        testee.onBookmarksActivityResult(bookmarkUrl)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -521,6 +535,7 @@ class BrowserViewModelTest {
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
+            duckChat = mockDuckChat,
         )
     }
 

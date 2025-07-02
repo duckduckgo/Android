@@ -40,11 +40,13 @@ interface BrokerStepsParser {
      *
      * @param brokerName - name of the broker to which these steps belong to
      * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
+     * @return list of broker steps resulting from the passed params. If the step is of type OptOut, it will return a list of
+     *  OptOutSteps where an OptOut step is mapped to each of the profile for the broker.
      */
     suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
-    ): BrokerStep?
+    ): List<BrokerStep>
 
     sealed class BrokerStep(
         open val brokerName: String = "", // this will be set later / not coming from json
@@ -63,7 +65,7 @@ interface BrokerStepsParser {
             override val stepType: String,
             override val actions: List<BrokerAction>,
             val optOutType: String,
-            val profilesToOptOut: List<ExtractedProfile> = emptyList(),
+            val profileToOptOut: ExtractedProfile = ExtractedProfile(), // this will be set later / not coming from json
         ) : BrokerStep(brokerName, stepType, actions)
     }
 }
@@ -99,24 +101,24 @@ class RealBrokerStepsParser @Inject constructor(
     override suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
-    ): BrokerStep? = withContext(dispatcherProvider.io()) {
+    ): List<BrokerStep> = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
             adapter.fromJson(stepsJson)?.run {
                 if (this is OptOutStep) {
-                    this.copy(
-                        brokerName = brokerName,
-                        profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.filter {
-                            it.result
-                        }?.map {
-                            it.scrapedData
-                        } ?: emptyList(),
-                    )
+                    repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.map {
+                        this.copy(
+                            brokerName = brokerName,
+                            profileToOptOut = it,
+                        )
+                    }
                 } else {
-                    (this as ScanStep).copy(brokerName = brokerName)
+                    listOf((this as ScanStep).copy(brokerName = brokerName))
                 }
-            }
+            } ?: emptyList<BrokerStep>()
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
-        }.getOrNull()
+        }.getOrElse {
+            emptyList<BrokerStep>()
+        }
     }
 }

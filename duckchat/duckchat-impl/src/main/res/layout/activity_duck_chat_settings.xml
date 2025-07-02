@@ -78,6 +78,14 @@
                 app:primaryText="@string/duck_chat_enable_duck_ai_setting"
                 app:showSwitch="true"/>
 
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiInputScreenEnabledToggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duck_ai_setting_input_screen_title"
+                app:secondaryText="@string/duck_ai_setting_input_screen_description"
+                app:showSwitch="true"/>
+
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/duckChatToggleSettingsTitle"
                 android:layout_width="match_parent"

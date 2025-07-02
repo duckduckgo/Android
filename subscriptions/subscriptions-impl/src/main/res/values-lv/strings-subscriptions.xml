@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar Privacy Pro atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
     <string name="subscriptionStatusSubscribed">Abonēts</string>
     <string name="privacyPolicyAndTermsOfService">Privātuma politika un Pakalpojumu sniegšanas noteikumi</string>
+    <string name="subscriptionStatusFreeTrial">Bezmaksas izmēģinājuma periods ir aktīvs</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tavs bezmaksas izmēģinājuma periods beidzas %1$s un tajā dienā automātiski pārvēršas par ikmēneša maksas abonementu.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tavs bezmaksas izmēģinājuma periods beidzas %1$s un tajā pašā dienā automātiski pārvēršas par par gada maksas abonementu.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tava bezmaksas izmēģinājuma versija beidzas %1$s un tā netiks pārvērsta par maksas abonementu.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonementa iestatījumi</string>

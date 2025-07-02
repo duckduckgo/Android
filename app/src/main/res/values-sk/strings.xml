@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhľad</string>
+    <string name="settingsShowFullUrlTitle">Zobraziť úplnú adresu lokality</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Predvolené vyhľadávanie so súkromím</string>
     <string name="preOnboardingComparisonChartItem2">Blokovať sledovanie tretími stranami</string>
     <string name="preOnboardingComparisonChartItem3">Blokovanie vyskakovacích okien o súboroch cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blokovať reklamy, ktoré sledujú</string>
+    <string name="preOnboardingComparisonChartItem4">Blokovanie cielených reklám</string>
     <string name="preOnboardingComparisonChartItem5">Odstráni údaje prehliadania jedným tlačidlom</string>
     <string name="preOnboardingDaxDialog3Title">Úžasné! Vitajte vo svete Duck.</string>
     <string name="preOnboardingDaxDialog3Button">Začnite prehliadať</string>
@@ -874,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Ďakujeme! Vaše hlásenie pomáha zlepšovať DuckDuckGo pre všetkých!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nový AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Nechaj DuckDuckGo chrániť viac toho, čo robíš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás ako svoj predvolený prehliadač, aby sa všetky odkazy na stránky otvárali v DuckDuckGo.</string>
@@ -888,7 +885,7 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazaním tvojich kariet a údajov sa odstráni história blokovania sledovania, a toto číslo sa vynuluje.\n\nSkry tento banner, ak ho nechceš vidieť v zobrazení kariet.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skryť banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Upozornenie: Táto lokalita môže predstavovať bezpečnostné riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo zablokoval túto stránku, pretože môže šíriť škodlivý softvér určený na ohrozenie tvojho zariadenia alebo krádež tvojich osobných údajov.\n<a href=\"\">Viac informácií</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Táto webová lokalita sa môže vydávať za legitímnu lokalitu s cieľom oklamať vás k poskytnutiu osobných údajov, ako sú heslá alebo čísla kreditných kariet.\n<a href=\"\">Viac informácií</a>]]></string>
@@ -903,5 +900,21 @@
     <string name="maliciousSiteToggleHint">Upozorni ma na stránkach označených ako phishing alebo malvér.</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Zistiť viac</annotation></string>
     <string name="maliciousSiteSettingDisabled">Deaktivácia tejto funkcie môže ohroziť tvoje údaje.</string>
+    <string name="threatProtectionTitle">Ochrana pred hrozbami</string>
+    <string name="threatProtectionDescription">Vylepšené ochrany DuckDuckGo zastavujú bežné hrozby a zároveň udržiavajú tvoje pripojenie bezpečné.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automaticky inovuje odkazy na HTTPS vždy, keď je to možné.<br><a href=\"\">Zisti viac</a>]]></string>
+    <string name="scamBlockerTitle">Blokátor podvodov</string>
+    <string name="scamBlockerDescription">Upozorniť na stránkach označených ako podvod, phishing a malvér.</string>
+    <string name="threatProtectionLearnMoreTitle">Zistite viac</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyskúšaj náš widget na úvodnej obrazovke!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na domovskú obrazovku.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridať miniaplikáciu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teraz nie</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Vyhľadať v DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Miniaplikácia úvodnej obrazovky</string>
 </resources>

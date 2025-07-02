@@ -102,12 +102,14 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @InjectWith(FragmentScope::class)
@@ -144,7 +146,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     sealed class StateChange {
-        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState) : StateChange()
+        data class OmnibarStateChange(val omnibarViewState: OmnibarViewState, val forceRender: Boolean = false) : StateChange()
         data class LoadingStateChange(val loadingViewState: LoadingViewState) : StateChange()
     }
 
@@ -173,6 +175,9 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -616,7 +621,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun shouldShowUpdatedPrivacyShield(navigationBarEnabled: Boolean): Boolean {
-        return senseOfProtectionExperiment.shouldShowNewPrivacyShield() || navigationBarEnabled
+        return runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() } || navigationBarEnabled
     }
 
     open fun renderButtons(viewState: ViewState) {
@@ -696,7 +701,10 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderHint(viewState: ViewState) {
-        if (!viewState.isVisualDesignExperimentEnabled && viewState.viewMode is NewTab && duckChat.showInAddressBar.value) {
+        if (!viewState.isVisualDesignExperimentEnabled &&
+            viewState.viewMode is NewTab &&
+            duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value
+        ) {
             omnibarTextInput.hint = context.getString(R.string.search)
         } else {
             omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
@@ -808,7 +816,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 pulseAnimation.playOn(
                     targetView,
                     isPrivacyShieldAnimation &&
-                        senseOfProtectionExperiment.shouldShowNewPrivacyShield(),
+                        runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() },
                 )
             }
         } else {
@@ -996,6 +1004,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun isOmnibarScrollingEnabled(): Boolean {
         return isScrollingEnabled
+    }
+
+    override fun isBottomNavEnabled(): Boolean {
+        return false
     }
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout> {

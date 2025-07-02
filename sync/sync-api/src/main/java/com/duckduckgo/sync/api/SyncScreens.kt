@@ -25,3 +25,14 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
  * ```
  */
 object SyncActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
+
+/**
+ * Use this class to launch the sync screen with a URL-based sync pairing code
+ * It is not expected that the URL would be hand-crafted
+ * This is to support the flow when a URL-based sync setup QR code is scanned using the normal camera app and we're the default browser
+ *
+ * ```kotlin
+ * globalActivityStarter.start(context, SyncActivityFromSetupUrl("https://duckduckgo.com/sync/pairing/#&code=ABC-123&deviceName=iPhone"))
+ * ```
+ */
+data class SyncActivityFromSetupUrl(val url: String) : GlobalActivityStarter.ActivityParams

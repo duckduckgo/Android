@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Uzyskaj odpowiedzi na często zadawane pytania lub skontaktuj się z pomocą techniczną Privacy Pro na naszych stronach pomocy. Dostępność funkcji różni się w zależności od kraju.</string>
     <string name="subscriptionStatusSubscribed">Subskrypcja</string>
     <string name="privacyPolicyAndTermsOfService">Polityka prywatności i warunki użytkowania</string>
+    <string name="subscriptionStatusFreeTrial">Aktywny bezpłatny okres próbny</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezpłatny okres próbny kończy się %1$s i tego samego dnia automatycznie przekształca się w miesięczną płatną subskrypcję.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezpłatny okres próbny kończy się %1$s i tego samego dnia automatycznie przekształca się w roczną płatną subskrypcję.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Bezpłatny okres próbny kończy się %1$s i nie zostanie przekształcony w płatną subskrypcję.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Ustawienia subskrypcji</string>

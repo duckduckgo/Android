@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη του Privacy Pro από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
     <string name="subscriptionStatusSubscribed">Έχει γίνει εγγραφή</string>
     <string name="privacyPolicyAndTermsOfService">Πολιτική απορρήτου και Όροι χρήσης υπηρεσιών</string>
+    <string name="subscriptionStatusFreeTrial">Η δωρεάν δοκιμή είναι ενεργή</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Η δωρεάν δοκιμή σας λήγει στις %1$s και μετατρέπεται αυτόματα σε μηνιαία συνδρομή επί πληρωμή την ίδια ημέρα.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Η δωρεάν δοκιμή σας λήγει στις %1$s και μετατρέπεται αυτόματα σε ετήσια συνδρομή επί πληρωμή την ίδια ημέρα.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Η δωρεάν δοκιμή σας λήγει %1$s και δεν θα μετατραπεί σε συνδρομή επί πληρωμή.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Ρυθμίσεις συνδρομής</string>
