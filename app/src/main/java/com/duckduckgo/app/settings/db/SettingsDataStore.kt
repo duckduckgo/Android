@@ -28,6 +28,7 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -38,7 +39,6 @@ interface SettingsDataStore {
 
     @Deprecated(message = "hideTips variable is deprecated and no longer available in onboarding")
     var hideTips: Boolean
-    var autoCompleteSuggestionsEnabled: Boolean
     var maliciousSiteProtectionEnabled: Boolean
     var appIcon: AppIcon
     var selectedFireAnimation: FireAnimation
@@ -91,11 +91,18 @@ interface SettingsDataStore {
     fun clearAppBackgroundTimestamp()
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SettingsDataStore::class,
+)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = AutoCompleteSettings::class,
+)
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-) : SettingsDataStore {
+) : SettingsDataStore, AutoCompleteSettings {
 
     private val fireAnimationMapper = FireAnimationPrefsMapper()
 

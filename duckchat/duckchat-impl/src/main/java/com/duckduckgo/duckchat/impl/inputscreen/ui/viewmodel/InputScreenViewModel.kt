@@ -33,6 +33,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -80,6 +81,7 @@ class InputScreenViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val inputScreenDataStore: InputScreenDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val autoCompleteSettings: AutoCompleteSettings,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
@@ -275,7 +277,7 @@ class InputScreenViewModel @Inject constructor(
             currentAutoCompleteViewState().searchResults
         }
 
-        val autoCompleteSuggestionsEnabled = true
+        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused =

@@ -287,6 +287,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
@@ -409,6 +410,7 @@ class BrowserTabViewModel @Inject constructor(
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
+    private val autoCompleteSettings: AutoCompleteSettings,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
@@ -2229,7 +2231,7 @@ class BrowserTabViewModel @Inject constructor(
             currentAutoCompleteViewState().searchResults
         }
 
-        val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
+        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused =

@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -138,9 +139,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 viewModel.onUserDismissedAutoCompleteInAppMessage()
             },
             autoCompleteOpenSettingsClickListener = {
-                // TODO: expose this screen param
                 viewModel.onUserDismissedAutoCompleteInAppMessage()
-                // globalActivityStarter.start(context, PrivateSearchScreenNoParams)
+                globalActivityStarter.start(context, PrivateSearchScreenNoParams)
             },
             autoCompleteLongPressClickListener = {
                 viewModel.userLongPressedAutocomplete(it)

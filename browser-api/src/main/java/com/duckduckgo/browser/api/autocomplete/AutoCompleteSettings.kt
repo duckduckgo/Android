@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.privatesearch
+package com.duckduckgo.browser.api.autocomplete
 
-import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-
-/**
- * Use this model to launch the PrivateSearch screen
- */
-object PrivateSearchScreenNoParams : ActivityParams
+interface AutoCompleteSettings {
+    var autoCompleteSuggestionsEnabled: Boolean
+}

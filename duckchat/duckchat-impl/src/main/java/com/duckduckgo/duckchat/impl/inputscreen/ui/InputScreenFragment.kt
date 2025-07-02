@@ -223,5 +223,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onResume() {
         super.onResume()
         viewModel.onActivityResume()
+        // TODO: This should be triggered via Flow
+        viewModel.triggerAutocomplete(binding.inputModeWidget.text, true, true)
     }
 }
