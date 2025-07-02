@@ -87,16 +87,6 @@
                         tools:ignore="InvalidColorAttribute" />
                 </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/placeholder"
-                    android:layout_width="wrap_content"
-                    android:layout_height="96dp"
-                    android:layout_gravity="center"
-                    android:adjustViewBounds="true"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_privacy_pro_128"
-                    tools:visibility="visible" />
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/daxDialogOption1"
                     style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
