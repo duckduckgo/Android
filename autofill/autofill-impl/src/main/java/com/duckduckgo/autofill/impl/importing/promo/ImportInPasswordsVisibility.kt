@@ -29,7 +29,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -82,7 +81,7 @@ class RealImportInPasswordsVisibility @Inject constructor(
     }
 
     private suspend fun evaluateIfUserCanShowImportPromo(): Boolean {
-        if (autofillFeature.canPromoteImportPasswords().isEnabled().not()) return false
+        if (autofillFeature.canPromoteImportPasswordsInPasswordManagement().isEnabled().not()) return false
 
         if (internalAutofillStore.hasEverImportedPasswords || internalAutofillStore.hasDismissedImportedPasswordsPromo) return false
 
