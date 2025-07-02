@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen
+package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 
 data class InputScreenVisibilityState(
     val voiceInputButtonVisible: Boolean,

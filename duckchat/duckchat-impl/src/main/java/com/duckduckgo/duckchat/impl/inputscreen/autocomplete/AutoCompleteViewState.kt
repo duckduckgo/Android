@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen
+package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
 
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 
-sealed class Command {
-    data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
-    data object AutocompleteItemRemoved : Command()
-    data class SwitchToTab(val tabId: String) : Command()
-    data class UserSubmittedQuery(val query: String) : Command()
-    data class EditWithSelectedQuery(val query: String) : Command()
-    data object SwitchModeToSearch : Command()
-    data object SwitchModeToChat : Command()
-}
+data class AutoCompleteViewState(
+    val showSuggestions: Boolean = false,
+    val showFavorites: Boolean = false,
+    val searchResults: AutoComplete.AutoCompleteResult = AutoComplete.AutoCompleteResult("", emptyList()),
+    val favorites: List<Favorite> = emptyList(),
+)

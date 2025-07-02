@@ -285,8 +285,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivity.Companion.QUERY
-import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -1036,7 +1036,7 @@ class BrowserTabFragment :
         omnibar.omniBarClickCatcher?.setOnClickListener {
             val intent = globalActivityStarter.startIntent(
                 requireContext(),
-                SearchInterstitialActivityParams(query = omnibar.getText()),
+                InputScreenActivityParams(query = omnibar.getText()),
             )
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 requireActivity(),

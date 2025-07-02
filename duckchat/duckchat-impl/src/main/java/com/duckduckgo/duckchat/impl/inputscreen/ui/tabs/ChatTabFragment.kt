@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete
+package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
-enum class OmnibarPosition {
-    TOP, BOTTOM
-}
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.impl.R
+
+@InjectWith(FragmentScope::class)
+class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab)

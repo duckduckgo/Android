@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete
+package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
-import com.duckduckgo.browser.api.autocomplete.AutoComplete
-import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
-data class AutoCompleteViewState(
-    val showSuggestions: Boolean = false,
-    val showFavorites: Boolean = false,
-    val searchResults: AutoComplete.AutoCompleteResult = AutoComplete.AutoCompleteResult("", emptyList()),
-    val favorites: List<Favorite> = emptyList(),
-)
+class InputScreenPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    override fun getItemCount(): Int = 2
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> SearchTabFragment()
+            1 -> ChatTabFragment()
+            else -> throw IllegalArgumentException("Invalid position: $position")
+        }
+    }
+}

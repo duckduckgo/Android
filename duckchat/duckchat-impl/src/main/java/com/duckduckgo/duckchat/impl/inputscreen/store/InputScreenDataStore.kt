@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen
+package com.duckduckgo.duckchat.impl.inputscreen.store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

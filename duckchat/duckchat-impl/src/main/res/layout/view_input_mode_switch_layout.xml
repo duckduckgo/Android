@@ -3,7 +3,7 @@
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <com.google.android.material.tabs.TabLayout
-        android:id="@+id/duckChatTabLayout"
+        android:id="@+id/inputModeSwitch"
         style="@style/Widget.DuckChat.TabLayout.Rounded"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
@@ -13,14 +13,14 @@
         app:layout_constrainedWidth="true">
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_search"
+            android:id="@+id/tabSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/ic_find_search_24"
             android:text="@string/duck_chat_search_tab" />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/tab_duck_ai"
+            android:id="@+id/tabDuckAi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/ic_ai_chat_24"
@@ -29,7 +29,7 @@
     </com.google.android.material.tabs.TabLayout>
 
     <ImageView
-        android:id="@+id/duckChatBack"
+        android:id="@+id/InputModeWidgetBack"
         android:layout_width="@dimen/toolbarIcon"
         android:layout_height="@dimen/toolbarIcon"
         android:layout_gravity="center"
@@ -41,19 +41,19 @@
         android:scaleType="center"
         app:srcCompat="@drawable/ic_arrow_left_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/duckChatTabLayout"
-        app:layout_constraintBottom_toBottomOf="@id/duckChatTabLayout"/>
+        app:layout_constraintTop_toTopOf="@id/inputModeSwitch"
+        app:layout_constraintBottom_toBottomOf="@id/inputModeSwitch"/>
 
     <Space
         android:id="@+id/spacer"
         android:layout_width="0dp"
         android:layout_height="10dp"
-        app:layout_constraintTop_toBottomOf="@id/duckChatTabLayout"
+        app:layout_constraintTop_toBottomOf="@id/inputModeSwitch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/duckChatControls"
+        android:id="@+id/inputModeWidgetCard"
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -69,14 +69,14 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-            android:id="@+id/duckChatControlsContent"
+            android:id="@+id/inputModeWidgetCardContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="@dimen/keyline_0">
 
             <EditText
-                android:id="@+id/duckChatInput"
+                android:id="@+id/inputField"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -100,7 +100,7 @@
                 app:type="multi_line" />
 
             <ImageView
-                android:id="@+id/duckChatClearText"
+                android:id="@+id/inputFieldClearText"
                 android:layout_width="@dimen/toolbarIcon"
                 android:layout_height="@dimen/toolbarIcon"
                 android:layout_gravity="top"

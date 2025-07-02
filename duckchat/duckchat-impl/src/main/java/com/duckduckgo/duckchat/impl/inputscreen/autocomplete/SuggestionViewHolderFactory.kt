@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete
+package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
 
 import android.view.LayoutInflater
 import android.view.View
@@ -36,9 +36,9 @@ import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySuggestio
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.SuggestionItemDecoration.Companion.OTHER_ITEM
-import com.duckduckgo.duckchat.impl.ui.inputscreen.autocomplete.SuggestionItemDecoration.Companion.SEARCH_ITEM
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration.Companion.OTHER_ITEM
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration.Companion.SEARCH_ITEM
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface SuggestionViewHolderFactory {
@@ -56,7 +56,8 @@ interface SuggestionViewHolderFactory {
     )
 }
 
-class SearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
+class SearchSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) :
+    SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -209,11 +210,18 @@ class EmptySuggestionViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
-class DefaultSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) : SuggestionViewHolderFactory {
+class DefaultSuggestionViewHolderFactory(private val omnibarPosition: OmnibarPosition) :
+    SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return AutoCompleteViewHolder.DefaultSuggestionViewHolder(ItemAutocompleteDefaultBinding.inflate(inflater, parent, false))
+        return AutoCompleteViewHolder.DefaultSuggestionViewHolder(
+            ItemAutocompleteDefaultBinding.inflate(
+                inflater,
+                parent,
+                false,
+            ),
+        )
     }
 
     override fun onBindViewHolder(

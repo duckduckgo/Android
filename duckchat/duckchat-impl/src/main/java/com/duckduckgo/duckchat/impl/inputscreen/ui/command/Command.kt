@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.inputscreen
+package com.duckduckgo.duckchat.impl.inputscreen.ui.command
 
-import logcat.LogPriority.VERBOSE
-import logcat.logcat
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 
-inline fun renderIfChanged(
-    newViewState: Any,
-    lastSeenViewState: Any?,
-    block: () -> Unit,
-) {
-    if (newViewState == lastSeenViewState) {
-        logcat(
-            tag = "renderIfChanged",
-            priority = VERBOSE,
-        ) {
-            "view state identical to last seen state; skipping rendering for ${newViewState.javaClass.simpleName}"
-        }
-    } else {
-        block()
-    }
+sealed class Command {
+    data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
+    data object AutocompleteItemRemoved : Command()
+    data class SwitchToTab(val tabId: String) : Command()
+    data class UserSubmittedQuery(val query: String) : Command()
+    data class EditWithSelectedQuery(val query: String) : Command()
+    data object SwitchModeToSearch : Command()
+    data object SwitchModeToChat : Command()
 }
