@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle
 import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -205,7 +206,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     }
 
     private fun createPixelDefinitionWithValidWindow(): PixelDefinition {
-        val today = LocalDate.now().minusDays(5)
+        val today = LocalDate.now(ZoneId.of("America/New_York")).minusDays(5)
         return PixelDefinition(
             "pixel_name",
             mapOf(
@@ -216,7 +217,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     }
 
     private fun createPixelDefinitionWithInvalidWindow(): PixelDefinition {
-        val pastDate = LocalDate.now().minusDays(20)
+        val pastDate = LocalDate.now(ZoneId.of("America/New_York")).minusDays(20)
         return PixelDefinition(
             "pixel_name",
             mapOf(

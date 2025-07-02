@@ -26,6 +26,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -159,11 +161,11 @@ class PostCtaExperienceExperimentTest {
     }
 
     private fun createPixelDefinitionWithValidWindow(): PixelDefinition {
-        val today = java.time.LocalDate.now().minusDays(5)
+        val pastDate = LocalDate.now(ZoneId.of("America/New_York")).minusDays(5)
         return PixelDefinition(
             "pixel_name",
             mapOf(
-                "enrollmentDate" to today.toString(),
+                "enrollmentDate" to pastDate.toString(),
                 "conversionWindowDays" to "5-7",
             ),
         )
