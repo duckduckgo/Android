@@ -55,11 +55,11 @@
             android:layout_marginHorizontal="@dimen/keyline_4"
             android:layout_marginTop="@dimen/keyline_4"
             android:layout_marginBottom="0dp"
-            app:layout_goneMarginBottom="36dp"
             app:layout_constraintBottom_toTopOf="@id/wingAnimation"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginBottom="36dp"
             tools:alpha="1">
 
             <LinearLayout
@@ -91,6 +91,14 @@
                     android:layout_height="wrap_content">
 
                     <TextView
+                        android:id="@+id/hiddenTextCta"
+                        style="@style/Typography.Buck.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        tools:ignore="DeprecatedWidgetInXml" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogTextCta"
                         style="@style/Typography.Buck.Body1"
                         android:layout_width="match_parent"
@@ -143,6 +151,16 @@
                     android:layout_marginTop="@dimen/keyline_1">
 
                     <TextView
+                        android:id="@+id/suggestionsHiddenTextCta"
+                        style="@style/Typography.Buck.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/onboardingSitesDaxDialogDescription"
+                        android:visibility="invisible"
+                        tools:visibility="visible"
+                        tools:ignore="DeprecatedWidgetInXml" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/suggestionsDialogTextCta"
                         style="@style/Typography.Buck.Body1"
                         android:layout_width="match_parent"
@@ -151,6 +169,7 @@
                         android:focusable="true"
                         android:textColor="@color/buckColorPrimaryText"
                         tools:ignore="InvalidColorAttribute" />
+
                 </FrameLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -159,8 +178,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:alpha="0"
                     android:text="@string/onboardingSitesDaxDialogOption1"
                     app:icon="@drawable/ic_globe_16"
+                    tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml" />
 
                 <Space
@@ -172,8 +193,10 @@
                     style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:alpha="0"
                     android:text="@string/onboardingSitesDaxDialogOption2"
                     app:icon="@drawable/ic_globe_16"
+                    tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml" />
 
                 <Space
@@ -185,8 +208,10 @@
                     style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:alpha="0"
                     android:text="@string/onboardingSitesDaxDialogOption3"
                     app:icon="@drawable/ic_globe_16"
+                    tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml" />
 
             </LinearLayout>
