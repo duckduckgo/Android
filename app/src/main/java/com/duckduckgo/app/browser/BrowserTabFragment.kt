@@ -873,7 +873,7 @@ class BrowserTabFragment :
             if (result.resultCode == RESULT_OK) {
                 submitQuery(query)
             } else {
-                omnibar.setText(query)
+                omnibar.setDraftTextIfNtp(query)
             }
         }
 
