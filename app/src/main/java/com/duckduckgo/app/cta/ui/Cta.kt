@@ -20,6 +20,7 @@ import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewPropertyAnimator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
@@ -59,6 +60,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
+import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
 
 interface ViewCta {
@@ -256,12 +258,14 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDialogSuggestionsContent.gone()
                 onboardingDaxDialogContainer.show()
                 onboardingDialogContent.show()
-                animateBuckOnboardingDialogEntrance(onAnimationEnd = {
-                    setSkipTypingAnimationClickListeners()
-                    dialogTextCta.startTypingAnimation(message, true) {
-                        afterAnimation()
-                    }
-                })
+                animateBuckOnboardingDialogEntrance(
+                    onAnimationEnd = {
+                        setSkipTypingAnimationClickListeners()
+                        dialogTextCta.startTypingAnimation(message, true) {
+                            afterAnimation()
+                        }
+                    },
+                )
             }
         }
     }
@@ -891,10 +895,12 @@ sealed class DaxBubbleCta(
         configuration: DaxBubbleCta,
         onAnimationEnd: () -> Unit,
     ) {
+        val context = binding.root.context
         ctaView = binding.root
         clearBubbleBuckDialog(binding)
-        val daxTitle = binding.root.context.getString(title)
-        val daxText = binding.root.context.getString(description)
+
+        val daxTitle = context.getString(title)
+        val daxText = context.getString(description)
         val optionsViews: List<MaterialButton> = listOf(
             binding.daxDialogOption1,
             binding.daxDialogOption2,
@@ -904,14 +910,16 @@ sealed class DaxBubbleCta(
         primaryCta?.let { primaryCtaRes ->
             with(binding.primaryCta) {
                 show()
-                text = binding.root.context.getString(primaryCtaRes)
+                alpha = 0f
+                text = context.getString(primaryCtaRes)
             }
         }
 
         secondaryCta?.let { secondaryCtaRes ->
             with(binding.secondaryCta) {
                 show()
-                text = binding.root.context.getString(secondaryCtaRes)
+                alpha = 0f
+                text = context.getString(secondaryCtaRes)
             }
         }
 
@@ -928,6 +936,7 @@ sealed class DaxBubbleCta(
             optionsViews.forEachIndexed { index, buttonView ->
                 if (buckOptions.size > index) {
                     buckOptions[index].setOptionView(buttonView)
+                    buttonView.alpha = 0f
                     buttonView.show()
                 } else {
                     buttonView.gone()
@@ -943,16 +952,52 @@ sealed class DaxBubbleCta(
         }
 
         with(binding) {
-            dialogTextCta.text = daxText.html(root.context)
-            daxBubbleDialogTitle.text = daxTitle.html(root.context)
+            dialogTextCta.text = ""
+            hiddenTextCta.text = daxText.html(context)
 
-            binding.root.show()
-            buckOnboardingDialogView.animateEntrance(
-                onAnimationEnd = {
-                    daxDialogDismissButton.animate().alpha(1f).setDuration(500)
-                    onAnimationEnd()
-                },
-            )
+            with(daxBubbleDialogTitle) {
+                text = daxTitle.html(context)
+                alpha = 0f
+            }
+
+            root.show()
+
+            fun View.fadeIn(): ViewPropertyAnimator {
+                return animate().alpha(1f).setDuration(500)
+            }
+
+            val afterAnimation = {
+                dialogTextCta.finishAnimation()
+                primaryCta.fadeIn()
+                secondaryCta.fadeIn()
+                options?.let {
+                    optionsViews.forEachIndexed { index, buttonView ->
+                        if (it.size > index) {
+                            buttonView.fadeIn()
+                        }
+                    }
+                }
+
+                onAnimationEnd()
+            }
+
+            with(buckOnboardingDialogView) {
+                animateEntrance(
+                    onAnimationEnd = {
+                        daxDialogDismissButton.fadeIn()
+                        daxBubbleDialogTitle.fadeIn()
+                            .withEndAction {
+                                dialogTextCta.startTypingAnimation(daxText, true) {
+                                    afterAnimation()
+                                }
+                            }
+                    },
+                )
+                setOnClickListener {
+                    afterAnimation()
+                }
+            }
+            dialogTextCta.setOnClickListener { afterAnimation() }
         }
     }
 
