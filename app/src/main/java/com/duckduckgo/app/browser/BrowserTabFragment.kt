@@ -352,6 +352,8 @@ import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -4387,11 +4389,14 @@ class BrowserTabFragment :
 
             if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
                 if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
+                    lifecycleScope.launch {
                     with(newBrowserTab.wingAnimation) {
+                        delay(2.5.seconds)
                         show()
                         playAnimation()
                     }
                 }
+            }
 
                 if (configuration is DaxBubbleCta.DaxEndCta) {
                     lifecycleScope.launch {
