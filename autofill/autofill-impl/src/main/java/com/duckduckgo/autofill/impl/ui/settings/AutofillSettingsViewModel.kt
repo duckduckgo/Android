@@ -190,13 +190,13 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onImportPasswordsClicked(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
+    fun onImportPasswordsClicked(launchSource: AutofillImportLaunchSource) {
         viewModelScope.launch {
             _commands.send(ImportPasswordsFromGoogle)
             // we use AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED for consistency with iOS
             pixel.fire(
                 AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED,
-                mapOf("source" to AutofillImportLaunchSource.AutofillSettings.value),
+                mapOf("source" to launchSource.value),
             )
         }
     }

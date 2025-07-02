@@ -34,6 +34,7 @@ import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -454,7 +455,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             autofillEffectDispatcher.effects.collect { effect ->
                 when {
-                    effect is LaunchImportPasswords -> addCommand(LaunchImportGooglePasswords(showImportInstructions = false))
+                    effect is LaunchImportPasswords -> addCommand(LaunchImportGooglePasswords(PasswordManagementPromo))
                 }
             }
         }
@@ -738,9 +739,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
     }
 
-    fun onImportPasswordsFromGooglePasswordManager() {
+    fun onImportPasswordsFromGooglePasswordManager(importSource: AutofillImportLaunchSource) {
         viewModelScope.launch(dispatchers.io()) {
-            addCommand(LaunchImportGooglePasswords(showImportInstructions = true))
+            addCommand(LaunchImportGooglePasswords(importSource))
         }
     }
 
@@ -814,7 +815,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun recordImportGooglePasswordButtonShown() {
         if (!importGooglePasswordButtonShownPixelSent) {
             importGooglePasswordButtonShownPixelSent = true
-            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementEmpty.value)
+            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementEmptyState.value)
             pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN, params)
         }
     }
@@ -904,7 +905,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
-        data class LaunchImportGooglePasswords(val showImportInstructions: Boolean) : ListModeCommand()
+        data class LaunchImportGooglePasswords(val importSource: AutofillImportLaunchSource) : ListModeCommand()
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
         data object ReevalutePromotions : ListModeCommand()

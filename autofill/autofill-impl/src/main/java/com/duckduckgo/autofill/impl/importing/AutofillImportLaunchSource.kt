@@ -16,8 +16,14 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-enum class AutofillImportLaunchSource(val value: String) {
-    PasswordManagementPromo("passwords_management_promo"),
-    AutofillSettings("autofill_settings"),
-    PasswordManagementEmpty("passwords_management_empty"),
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+enum class AutofillImportLaunchSource(val value: String) : Parcelable {
+    PasswordManagementPromo("password_management_promo"),
+    PasswordManagementEmptyState("password_management_empty_state"),
+    PasswordManagementOverflow("password_management_overflow"),
+    AutofillSettings("autofill_settings_button"),
+    Unknown("unknown"),
 }
