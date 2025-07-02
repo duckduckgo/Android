@@ -915,13 +915,6 @@ sealed class DaxBubbleCta(
             }
         }
 
-        placeholder?.let { placeholderImageRes ->
-            with(binding.placeholder) {
-                show()
-                setImageResource(placeholderImageRes)
-            }
-        }
-
         options?.let { options ->
             // Buck dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
             val buckOptions = options
@@ -985,7 +978,6 @@ sealed class DaxBubbleCta(
             this.daxDialogDismissButton.alpha = 0f
             this.primaryCta.gone()
             this.secondaryCta.gone()
-            this.placeholder.gone()
             this.daxDialogOption1.gone()
             this.daxDialogOption2.gone()
             this.daxDialogOption3.gone()
