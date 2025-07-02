@@ -76,7 +76,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportGooglePasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
@@ -1069,7 +1069,7 @@ class AutofillSettingsActivityScreenViewModelTest {
 
         testee.commandsListView.test {
             val commands = awaitItem()
-            assertTrue(commands.contains(LaunchImportPasswordsFromGooglePasswordManager))
+            assertTrue(commands.contains(LaunchImportGooglePasswords(true)))
             cancelAndIgnoreRemainingEvents()
         }
     }

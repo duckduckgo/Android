@@ -223,7 +223,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchImportPasswordsScreen() {
-        val dialog = ImportFromGooglePasswordsDialog.instance()
+        val dialog = ImportFromGooglePasswordsDialog.instance(showInitialInstructionalPrompt = true)
         dialog.show(supportFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
     }
 
