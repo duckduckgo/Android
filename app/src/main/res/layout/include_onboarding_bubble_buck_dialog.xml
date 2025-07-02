@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/buckColorPrimaryText"
-                    tools:ignore="InvalidColorAttribute"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute"
                     tools:text="@string/onboardingSearchDaxDialogTitle" />
 
                 <FrameLayout
@@ -79,10 +79,22 @@
                     android:layout_marginTop="@dimen/keyline_1">
 
                     <TextView
+                        android:id="@+id/hiddenTextCta"
+                        style="@style/Typography.Buck.Body1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="invisible"
+                        tools:ignore="DeprecatedWidgetInXml"
+                        tools:text="@string/onboardingSearchDaxDialogDescription"
+                        tools:visibility="visible" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogTextCta"
                         style="@style/Typography.Buck.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:textColor="@color/buckColorPrimaryText"
                         tools:ignore="InvalidColorAttribute" />
                 </FrameLayout>
@@ -93,9 +105,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
+                    android:alpha="0"
                     android:text="@string/onboardingSearchDaxDialogOption1"
                     android:visibility="gone"
                     app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml" />
 
                 <Space
@@ -107,9 +121,11 @@
                     style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:alpha="0"
                     android:text="@string/onboardingSearchDaxDialogOption2"
                     android:visibility="gone"
                     app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml" />
 
                 <Space
@@ -121,9 +137,11 @@
                     style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:alpha="0"
                     android:text="@string/onboardingSearchDaxDialogOption3"
                     android:visibility="gone"
                     app:icon="@drawable/ic_find_search_16"
+                    tools:alpha="1"
                     tools:ignore="DeprecatedWidgetInXml" />
 
                 <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
