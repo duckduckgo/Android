@@ -31,6 +31,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface SettingsDataStore {
@@ -99,6 +100,7 @@ interface SettingsDataStore {
     scope = AppScope::class,
     boundType = AutoCompleteSettings::class,
 )
+@SingleInstanceIn(AppScope::class)
 class SettingsSharedPreferences @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
