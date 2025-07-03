@@ -45,6 +45,10 @@ import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserViewModel.Command
+import com.duckduckgo.app.browser.animations.slideAndFadeInFromLeft
+import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
+import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
+import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
@@ -777,13 +781,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         isDuckChatVisible = false
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.setCustomAnimations(
-                com.duckduckgo.mobile.android.R.anim.slide_from_right,
-                com.duckduckgo.mobile.android.R.anim.slide_to_right,
-            )
-            transaction.hide(fragment)
-            transaction.commit()
+            animateDuckAiFragmentOut {
+                val transaction = supportFragmentManager.beginTransaction()
+                transaction.hide(fragment)
+                transaction.commit()
+            }
         }
     }
 
@@ -803,6 +805,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun launchNewDuckChat(duckChatUrl: String?) {
+        val wasFragmentVisible = duckAiFragment?.isVisible ?: false
         val fragment = DuckChatWebViewFragment().apply {
             duckChatUrl?.let {
                 arguments = Bundle().apply {
@@ -813,22 +816,41 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         duckAiFragment = fragment
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.setCustomAnimations(
-            com.duckduckgo.mobile.android.R.anim.slide_from_right,
-            com.duckduckgo.mobile.android.R.anim.slide_to_right,
-        )
         transaction.replace(binding.duckAiFragmentContainer.id, fragment)
         transaction.commit()
+
+        if (!wasFragmentVisible) {
+            // If the fragment was already visible but needs to be force-reloaded, we don't want to animate it in again.
+            animateDuckAiFragmentIn()
+        }
     }
 
     private fun restoreDuckChat(fragment: DuckChatWebViewFragment) {
+        if (fragment.isVisible) {
+            return
+        }
+
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.setCustomAnimations(
-            com.duckduckgo.mobile.android.R.anim.slide_from_right,
-            com.duckduckgo.mobile.android.R.anim.slide_to_right,
-        )
         transaction.show(fragment)
         transaction.commit()
+
+        animateDuckAiFragmentIn()
+    }
+
+    private fun animateDuckAiFragmentIn() {
+        val duckAiContainer = binding.duckAiFragmentContainer
+        val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
+
+        duckAiContainer.slideAndFadeInFromRight()
+        browserContainer.slideAndFadeOutToLeft()
+    }
+
+    private fun animateDuckAiFragmentOut(onComplete: () -> Unit) {
+        val duckAiContainer = binding.duckAiFragmentContainer
+        val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
+
+        duckAiContainer.slideAndFadeOutToRight(onComplete)
+        browserContainer.slideAndFadeInFromLeft()
     }
 
     private fun configureOnBackPressedListener() {
