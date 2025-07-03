@@ -57,7 +57,6 @@ import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
-import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.NewTab
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceSearch
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
@@ -692,15 +691,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
         renderLeadingIconState(viewState)
 
-        renderHint(viewState)
-    }
-
-    private fun renderHint(viewState: ViewState) {
-        if (!viewState.isExperimentalThemingEnabled && viewState.viewMode is NewTab && duckChat.showInAddressBar.value) {
-            omnibarTextInput.hint = context.getString(R.string.search)
-        } else {
-            omnibarTextInput.hint = context.getString(R.string.omnibarInputHint)
-        }
+        omnibarTextInput.hint = context.getString(R.string.search)
     }
 
     private fun renderCustomTabMode(
