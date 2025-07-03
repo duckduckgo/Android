@@ -297,6 +297,94 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
+    fun whenLightModeAndProtectedAndNewSignleOmnibarDesignEnabledShowCheckmarkAssets() = runTest {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
+            disabledVisualExperimentStateFlow,
+        )
+        whenever(visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled).thenReturn(
+            enabledVisualExperimentStateFlow,
+        )
+
+        val holder: LottieAnimationView = mock()
+        val appTheme: AppTheme = mock()
+        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
+
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, visualDesignExperimentDataStore)
+
+        testee.setAnimationView(holder, PROTECTED)
+
+        verify(holder).setAnimation(R.raw.protected_shield_new_design)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenLightModeAndUnprotectedAndNewSignleOmnibarDesignEnabledThenUseExperimentAssets() = runTest {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
+            disabledVisualExperimentStateFlow,
+        )
+        whenever(visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled).thenReturn(
+            enabledVisualExperimentStateFlow,
+        )
+
+        val holder: LottieAnimationView = mock()
+        val appTheme: AppTheme = mock()
+        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
+
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, visualDesignExperimentDataStore)
+
+        testee.setAnimationView(holder, UNPROTECTED)
+
+        verify(holder).setAnimation(R.raw.unprotected_shield_visual_updates)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenDarkModeAndProtectedAndNewSignleOmnibarDesignEnabledShowCheckmarkAssets() = runTest {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
+            disabledVisualExperimentStateFlow,
+        )
+        whenever(visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled).thenReturn(
+            enabledVisualExperimentStateFlow,
+        )
+
+        val holder: LottieAnimationView = mock()
+        val appTheme: AppTheme = mock()
+        whenever(appTheme.isLightModeEnabled()).thenReturn(false)
+
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, visualDesignExperimentDataStore)
+
+        testee.setAnimationView(holder, PROTECTED)
+
+        verify(holder).setAnimation(R.raw.dark_protected_shield_new_design)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenDarkModeAndUnprotectedAndNewSignleOmnibarDesignEnabledThenUseExperimentAssets() = runTest {
+        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
+        whenever(visualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
+            disabledVisualExperimentStateFlow,
+        )
+        whenever(visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled).thenReturn(
+            enabledVisualExperimentStateFlow,
+        )
+
+        val holder: LottieAnimationView = mock()
+        val appTheme: AppTheme = mock()
+        whenever(appTheme.isLightModeEnabled()).thenReturn(false)
+
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment, visualDesignExperimentDataStore)
+
+        testee.setAnimationView(holder, UNPROTECTED)
+
+        verify(holder).setAnimation(R.raw.dark_unprotected_shield_visual_updates)
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
     fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewVisualDesignShieldThenUseNonExperimentAssets() = runTest {
         whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
         whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
