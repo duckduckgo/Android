@@ -109,15 +109,23 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 shadowColor = ContextCompat.getColor(context, CommonR.color.background_omnibar_shadow),
             )
         }
-        if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            // When omnibar is at the bottom, we're adding an additional space at the top
-            toolbarContainer.updatePadding(
-                top = toolbarContainerPaddingTopWhenAtBottom,
-            )
 
-            // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-                omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                    omnibarCardShadow.cardElevation = 2f.toPx(context)
+                }
+            }
+            OmnibarPosition.BOTTOM -> {
+                // When omnibar is at the bottom, we're adding an additional space at the top
+                toolbarContainer.updatePadding(
+                    top = toolbarContainerPaddingTopWhenAtBottom,
+                )
+
+                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+                }
             }
         }
     }
