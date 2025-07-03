@@ -1,0 +1,33 @@
+appId: com.duckduckgo.mobile.android
+---
+# Open settings and set Duck Player to always
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+
+- scrollUntilVisible:
+    element:
+      id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
+    direction: DOWN
+
+- tapOn:
+    id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
+
+- scrollUntilVisible:
+    element:
+      text: "Duck Player"
+    direction: DOWN
+
+- tapOn:
+    text: "Duck Player"
+
+- tapOn:
+    text: "Open YouTube Videos in Duck Player"
+
+- tapOn:
+    text: "Always"
+
+- tapOn:
+    text: "Save"
+
+- pressKey: back
+- pressKey: back
