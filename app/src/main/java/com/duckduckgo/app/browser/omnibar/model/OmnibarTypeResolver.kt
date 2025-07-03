@@ -16,7 +16,19 @@
 
 package com.duckduckgo.app.browser.omnibar.model
 
-enum class OmnibarType {
-    SCROLLING,
-    SINGLE,
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
+import javax.inject.Inject
+
+class OmnibarTypeResolver @Inject constructor(
+    private val experimentsDataStore: ExperimentalThemingDataStore,
+) {
+    fun getOmnibarType(): OmnibarType {
+        return if (experimentsDataStore.isSingleOmnibarEnabled.value) {
+            SINGLE
+        } else {
+            SCROLLING
+        }
+    }
 }

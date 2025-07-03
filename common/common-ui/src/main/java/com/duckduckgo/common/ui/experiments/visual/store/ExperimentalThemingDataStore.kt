@@ -18,12 +18,12 @@ package com.duckduckgo.common.ui.experiments.visual.store
 
 import kotlinx.coroutines.flow.StateFlow
 
-interface VisualDesignExperimentDataStore {
-
+interface ExperimentalThemingDataStore {
     /**
-     * State flow which returns `true` if the feature flag for the experiment is enabled and there are no conflicting experiments detected.
+     * State flow which returns `true` if the feature flag for the new design without the bottom navigation bar is enabled
+     * and there are no conflicting experiments detected (the full new design with the bottom bar).
      */
-    val isExperimentEnabled: StateFlow<Boolean>
+    val isSingleOmnibarEnabled: StateFlow<Boolean>
 
-    suspend fun changeExperimentFlagPreference(enabled: Boolean)
+    suspend fun countSingleOmnibarUser()
 }

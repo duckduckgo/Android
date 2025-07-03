@@ -24,7 +24,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.fakes.FakePixel
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
@@ -51,7 +51,7 @@ class SenseOfProtectionExperimentImplTest {
     private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
 
     @Mock
-    private lateinit var mockExperimentDataStore: VisualDesignExperimentDataStore
+    private lateinit var mockExperimentDataStore: ExperimentalThemingDataStore
 
     private lateinit var testee: SenseOfProtectionExperimentImpl
     private lateinit var fakeUserBrowserProperties: FakeUserBrowserProperties
@@ -77,14 +77,14 @@ class SenseOfProtectionExperimentImplTest {
             userBrowserProperties = fakeUserBrowserProperties,
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            visualDesignExperimentDataStore = mockExperimentDataStore,
+            experimentalThemingDataStore = mockExperimentDataStore,
             pixel = FakePixel(),
         )
     }
 
     @Test
     fun `when user is new and and visual design updates not enabled then user can be enrolled`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -102,7 +102,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and and visual design updates not enabled then user can't be enrolled`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(true))
+        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(true))
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -120,7 +120,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and experiment is enabled but for different cohort then isEnabled returns false`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -136,7 +136,7 @@ class SenseOfProtectionExperimentImplTest {
 
     @Test
     fun `when user is new and experiment is disabled then isEnabled returns false`() = runTest {
-        whenever(mockExperimentDataStore.isExperimentEnabled).thenReturn(MutableStateFlow(false))
+        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(10)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(

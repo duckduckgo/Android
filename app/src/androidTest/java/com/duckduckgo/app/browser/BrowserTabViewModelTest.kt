@@ -220,7 +220,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -557,7 +557,7 @@ class BrowserTabViewModelTest {
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
     val mockStack: WebBackForwardList = mock()
 
-    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
     private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
@@ -709,9 +709,6 @@ class BrowserTabViewModelTest {
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
-            defaultVisualExperimentStateFlow,
-        )
 
         whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
 
@@ -790,7 +787,7 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
