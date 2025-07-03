@@ -907,4 +907,14 @@
     <string name="scamBlockerTitle">Blokowanie oszustw</string>
     <string name="scamBlockerDescription">Ostrzegaj przed witrynami oznaczonymi z powodu oszustw, wyłudzania informacji i złośliwego oprogramowania.</string>
     <string name="threatProtectionLearnMoreTitle">Dowiedz się więcej</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Wypróbuj nasz widżet ekranu głównego!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widżet</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nie teraz</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Szukaj w DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widżet ekranu głównego</string>
 </resources>

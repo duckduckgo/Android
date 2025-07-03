@@ -20,6 +20,7 @@ import android.content.Intent
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
 import com.duckduckgo.app.onboarding.store.*
 import com.duckduckgo.app.pixels.AppPixelName.*
@@ -75,6 +76,7 @@ class SystemSearchViewModelTest {
     private val mockSettingsStore: SettingsDataStore = mock()
     private val mockHistory: NavigationHistory = mock()
     private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
+    private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
 
     private val commandObserver: Observer<Command> = mock()
     private val commandCaptor = argumentCaptor<Command>()
@@ -100,6 +102,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             mockPostCtaExperienceExperiment,
+            mockOnboardingHomeScreenWidgetExperiment,
         )
         testee.command.observeForever(commandObserver)
     }
@@ -413,6 +416,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             mockPostCtaExperienceExperiment,
+            mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -439,6 +443,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             mockPostCtaExperienceExperiment,
+            mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val viewState = testee.resultsViewState.value as QuickAccessItems
@@ -492,6 +497,7 @@ class SystemSearchViewModelTest {
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
             mockPostCtaExperienceExperiment,
+            mockOnboardingHomeScreenWidgetExperiment,
         )
 
         val viewState = testee.resultsViewState.value as SystemSearchViewModel.Suggestions.QuickAccessItems

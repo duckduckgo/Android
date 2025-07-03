@@ -35,6 +35,7 @@ dependencies {
     implementation project(':feature-toggles-api')
     implementation project(':js-messaging-api')
     implementation project(':duckplayer-api')
+    implementation project(':data-store-api')
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')

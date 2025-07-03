@@ -875,4 +875,14 @@
     <string name="scamBlockerTitle">Scamblocker</string>
     <string name="scamBlockerDescription">Waarschuwing geven over sites die zijn aangeduid als oplichting, phishing en malware.</string>
     <string name="threatProtectionLearnMoreTitle">Meer informatie</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probeer onze widget op het startscherm!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Voeg onze zoekwidget toe aan je startscherm voor snelle en gemakkelijke toegang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget toevoegen</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Niet nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Zoek in DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startschermwidget</string>
 </resources>

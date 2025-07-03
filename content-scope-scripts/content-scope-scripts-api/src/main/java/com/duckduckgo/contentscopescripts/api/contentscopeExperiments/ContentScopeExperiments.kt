@@ -14,20 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.contentscopescripts.api.contentscopeExperiments
 
-import androidx.fragment.app.Fragment
-import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.duckduckgo.feature.toggles.api.Toggle
 
-class InputScreenPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
-
-    override fun getItemCount(): Int = 2
-
-    override fun createFragment(position: Int): Fragment {
-        return when (position) {
-            0 -> SearchTabFragment()
-            1 -> DuckChatTabFragment()
-            else -> throw IllegalArgumentException("Invalid position: $position")
-        }
-    }
+interface ContentScopeExperiments {
+    fun getActiveExperiments(): List<Toggle>
 }

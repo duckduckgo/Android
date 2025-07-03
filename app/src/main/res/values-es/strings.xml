@@ -875,4 +875,14 @@
     <string name="scamBlockerTitle">Bloqueador de estafas</string>
     <string name="scamBlockerDescription">Avisar sobre sitios marcados como estafas, phishing y malware.</string>
     <string name="threatProtectionLearnMoreTitle">Más información</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">¡Prueba nuestro widget de pantalla de inicio!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Añade nuestro widget de búsqueda a tu pantalla de inicio para facilitar y agilizar el acceso.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Añadir widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ahora no</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Buscar en DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget de pantalla de inicio</string>
 </resources>
