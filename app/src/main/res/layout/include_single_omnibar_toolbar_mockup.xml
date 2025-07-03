@@ -23,64 +23,70 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/experimentalToolbarSize"
     android:background="?daxColorToolbar"
+    android:clipChildren="false"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
-
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/omniBarContainerMockup"
-        style="@style/Widget.DuckDuckGo.OmnibarCardView"
+        android:id="@+id/mockOmniBarContainerShadow"
+        app:cardCornerRadius="@dimen/largeShapeCornerRadius"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/experimentalOmnibarCardMarginHorizontal"
         android:layout_marginEnd="@dimen/experimentalOmnibarCardMarginEnd"
         android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
         android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
-        app:cardElevation="2dp"
-        app:strokeColor="?daxColorAccentBlue"
-        app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/iconsContainer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/omniBarContainerMockup"
+            style="@style/Widget.DuckDuckGo.OmnibarCardView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            app:cardElevation="0dp">
 
-            <ImageView
-                android:id="@+id/searchIconMockup"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:importantForAccessibility="no"
-                android:paddingVertical="6dp"
-                android:paddingStart="10dp"
-                android:paddingEnd="8dp"
-                android:src="@drawable/ic_find_search_small_24" />
+                android:orientation="horizontal">
 
-            <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/omnibarTextInputMockup"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="start|center"
-                android:maxLines="1"
-                android:paddingEnd="8dp"
-                android:text="@string/omnibarInputHint"
-                android:textColor="?attr/daxColorSecondaryText" />
+                <ImageView
+                    android:id="@+id/searchIconMockup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:paddingVertical="6dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="8dp"
+                    android:src="@drawable/ic_find_search_small_24" />
 
-            <ImageView
-                android:id="@+id/aiChatIconMockup"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:importantForAccessibility="no"
-                android:paddingVertical="6dp"
-                android:paddingHorizontal="10dp"
-                android:src="@drawable/ic_ai_chat_24" />
+                <com.duckduckgo.common.ui.view.text.DaxTextView
+                    android:id="@+id/omnibarTextInputMockup"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="start|center"
+                    android:maxLines="1"
+                    android:paddingEnd="8dp"
+                    android:text="@string/search"
+                    android:textColor="?attr/daxColorSecondaryText" />
 
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/aiChatIconMockup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:importantForAccessibility="no"
+                    android:paddingVertical="6dp"
+                    android:paddingHorizontal="10dp"
+                    android:src="@drawable/ic_ai_chat_24" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -93,7 +99,7 @@
         android:layout_marginEnd="@dimen/keyline_1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
+        app:layout_constraintStart_toEndOf="@id/mockOmniBarContainerShadow"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.duckduckgo.app.browser.tabswitcher.NewTabSwitcherButton

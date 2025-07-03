@@ -18,12 +18,18 @@ package com.duckduckgo.app.browser.omnibar.experiments
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.Outline
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
+import androidx.annotation.ColorInt
+import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -35,6 +41,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.extensions.addBottomShadow
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
@@ -58,6 +65,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
+    private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
@@ -97,13 +105,24 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            omnibarCardShadow.addBottomShadow(
+                shadowSizeDp = 12f,
+                offsetYDp = 3f,
+                insetDp = 3f,
+                shadowColor = ContextCompat.getColor(context, CommonR.color.background_omnibar_shadow),
+            )
+        }
         if (omnibarPosition == OmnibarPosition.BOTTOM) {
             // When omnibar is at the bottom, we're adding an additional space at the top
             toolbarContainer.updatePadding(
                 top = toolbarContainerPaddingTopWhenAtBottom,
             )
 
-            omnibarCard.cardElevation = 0.5f.toPx(context)
+            // Try to reduce the bottom omnibar material shadow when not using the custom shadow
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+            }
         }
     }
 
