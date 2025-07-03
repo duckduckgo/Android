@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Accept prompt and verify Duck Player loads"
+name: "DuckPlayer: Accept to use Duck Player from YouTube overlay and verify it loads"
 tags:
-  - duckplayer
+  - duckplayerlocal
 ---
 - retry:
     maxRetries: 0
