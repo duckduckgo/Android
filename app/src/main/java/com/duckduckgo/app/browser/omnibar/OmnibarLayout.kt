@@ -781,9 +781,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPulseAnimation(viewState: ViewState) {
-        val targetView = if (viewState.highlightFireButton.isHighlighted()) {
+        val targetView = if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
             fireIconImageView
-        } else if (viewState.highlightPrivacyShield.isHighlighted()) {
+        } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PRIVACY_SHIELD) {
             placeholder
         } else {
             null
