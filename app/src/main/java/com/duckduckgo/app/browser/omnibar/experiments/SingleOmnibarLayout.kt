@@ -147,7 +147,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             globeIcon.gone()
             duckPlayerIcon.gone()
         } else {
-            backIcon.gone()
+            backIcon.hide()
         }
 
         omniBarClickCatcher.isVisible = viewState.showClickCatcher
