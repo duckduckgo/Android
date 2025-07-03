@@ -24,7 +24,7 @@ tags:
       
       # Core assertion: Verify we're still on regular YouTube (not Duck Player)
       - assertNotVisible:
-          text: "duck://player/"
+          text: "duck://player/.*"
       
       # Verify we're still on YouTube mobile URL
       - assertVisible:
