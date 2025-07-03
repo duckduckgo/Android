@@ -1,0 +1,16 @@
+appId: com.duckduckgo.mobile.android
+---
+# Select a YouTube video from SERP
+- tapOn:
+    id: "omnibarTextInput"
+- inputText: "DuckDuckGo none of our business video"
+- pressKey: Enter
+
+- extendedWaitUntil:
+    visible:
+      text: "Videos for DuckDuckGo none of our business video"
+    timeout: 15000
+
+- tapOn:
+    text: "YouTube"
+    index: 0

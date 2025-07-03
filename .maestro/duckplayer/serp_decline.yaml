@@ -1,0 +1,34 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Open video from SERP and decline Duck Player prompt"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 0
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: common/load_serp_video.yaml
+
+
+      - assertVisible:
+          text: "Duck Player lets you watch YouTube without targeted ads"
+
+      - tapOn:
+          text: "Watch on YouTube"
+
+      # Wait for prompt to disappear
+      - extendedWaitUntil:
+          notVisible:
+            text: "Duck Player lets you watch YouTube without targeted ads"
+          timeout: 5000
+
+      # Core assertion: Verify we're still on regular YouTube (not Duck Player)
+      - assertNotVisible:
+          text: "duck://player/"
+
+      # Verify we're still on YouTube mobile URL
+      - assertVisible:
+          text: ".*youtube.*"
