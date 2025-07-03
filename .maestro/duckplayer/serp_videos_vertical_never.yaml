@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Set Duck Player to always and open from SERP"
+name: "DuckPlayer: Set Duck Player to never and open from SERP videos vertical"
 tags:
   - duckplayer
 ---
