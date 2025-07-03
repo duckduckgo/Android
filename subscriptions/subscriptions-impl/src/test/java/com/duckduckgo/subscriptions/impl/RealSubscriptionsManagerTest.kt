@@ -1214,7 +1214,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertTrue(awaitItem() is CurrentPurchase.Failure)
 
             verify(pixelSender).reportPurchaseFailureAccountCreation()
-            verify(pixelSender).reportPurchaseFailureOther("PURCHASE_EXCEPTION_An error happened")
+            verify(pixelSender).reportPurchaseFailureOther("PURCHASE_EXCEPTION", "An error happened")
             verifyNoMoreInteractions(pixelSender)
 
             cancelAndConsumeRemainingEvents()

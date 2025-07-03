@@ -261,6 +261,7 @@ enum class SubscriptionPixel(
 
 object SubscriptionPixelParameter {
     const val ERROR_TYPE = "errorType"
+    const val REASON = "reason"
 }
 
 internal val PixelType.pixelNameSuffix: String

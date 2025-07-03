@@ -874,7 +874,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             val error = extractError(e)
             logcat(ERROR) { "Subs: $error" }
-            pixelSender.reportPurchaseFailureOther("${SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name}_$error")
+            pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name, error)
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
         }
     }
