@@ -1,0 +1,32 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Set Duck Player to always and open from SERP"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 0
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: common/enable_duck_player_always.yaml
+      - runFlow: common/load_serp_video.yaml
+
+      - assertNotVisible:
+          text: "Duck Player lets you watch YouTube without targeted ads"
+
+      # Wait for Duck Player to load
+      - extendedWaitUntil:
+          visible:
+            text: "duck://player/.*"
+          timeout: 15000
+
+      # Core assertion: Duck Player is now active (confirmed by extendedWaitUntil above)
+
+      - assertNotVisible:
+          text: "Turn on Duck Player to watch without targeted ads"
+      - assertNotVisible:
+          text: "Turn On Duck Player"
+      - assertNotVisible:
+          text: "No Thanks"
