@@ -66,6 +66,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
+import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -74,7 +76,6 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
-import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Placement
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
@@ -111,7 +112,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private var isExpandable = true
     private var showPlaceholders = false
-    private var placement = Placement.NEW_TAB_PAGE
+    private var placement: FavoritesPlacement = FavoritesPlacement.NEW_TAB_PAGE
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
@@ -142,8 +143,16 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
             showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
-            placement = Placement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
+            placement = FavoritesPlacement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
             recycle()
+        }
+    }
+
+    constructor(context: Context, config: FavoritesGridConfig?) : this(context, null, 0) {
+        config?.let {
+            isExpandable = it.isExpandable
+            showPlaceholders = it.showPlaceholders
+            placement = it.placement
         }
     }
 
