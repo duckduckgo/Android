@@ -226,7 +226,17 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             backIcon.gone()
         }
 
-        omniBarClickCatcher.isVisible = viewState.showClickCatcher
+        enableClickCatcher(viewState.showClickCatcher)
+    }
+
+    private fun enableClickCatcher(enabled: Boolean) {
+        omniBarClickCatcher.isVisible = enabled
+
+        omnibarTextInput.apply {
+            isEnabled = !enabled
+            isFocusable = !enabled
+            isFocusableInTouchMode = !enabled
+        }
     }
 
     /**
