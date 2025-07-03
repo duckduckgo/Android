@@ -101,7 +101,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= 28) {
             omnibarCardShadow.addBottomShadow(
                 shadowSizeDp = 12f,
                 offsetYDp = 3f,
@@ -112,7 +112,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                if (Build.VERSION.SDK_INT < 28) {
                     omnibarCardShadow.cardElevation = 2f.toPx(context)
                 }
             }
@@ -123,7 +123,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 )
 
                 // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                if (Build.VERSION.SDK_INT < 28) {
                     omnibarCardShadow.cardElevation = 0.5f.toPx(context)
                 }
             }

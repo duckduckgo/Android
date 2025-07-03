@@ -1249,7 +1249,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             else -> {
                 singleToolBarMockupBinding = when (settingsDataStore.omnibarPosition) {
                     TOP -> {
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        if (Build.VERSION.SDK_INT < 28) {
                             binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
                         }
 
@@ -1257,7 +1257,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         binding.topMockupSingleToolbar
                     }
                     BOTTOM -> {
-                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+                        if (Build.VERSION.SDK_INT < 28) {
                             binding.bottomMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
                         }
 
@@ -1268,7 +1268,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
                 singleToolBarMockupBinding.aiChatIconMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (Build.VERSION.SDK_INT >= 28) {
                     singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
                         shadowSizeDp = 12f,
                         offsetYDp = 3f,

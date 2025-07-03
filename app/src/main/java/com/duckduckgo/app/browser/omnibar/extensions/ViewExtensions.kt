@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.omnibar.extensions
 
 import android.graphics.Outline
-import android.os.Build
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.annotation.ColorInt
@@ -34,7 +33,7 @@ import com.google.android.material.card.MaterialCardView
  * @param insetDp Optional horizontal inset in dp to prevent shadow from being cut off
  * @param shadowColor Optional shadow color (Android P and above only)
  */
-@RequiresApi(Build.VERSION_CODES.P)
+@RequiresApi(28)
 fun View.addBottomShadow(
     shadowSizeDp: Float,
     offsetYDp: Float = 2f,
