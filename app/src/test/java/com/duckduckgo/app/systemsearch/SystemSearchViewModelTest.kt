@@ -42,6 +42,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.history.api.NavigationHistory
@@ -74,6 +75,7 @@ class SystemSearchViewModelTest {
     private val mocksavedSitesRepository: SavedSitesRepository = mock()
     private val mockPixel: Pixel = mock()
     private val mockSettingsStore: SettingsDataStore = mock()
+    private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
     private val mockHistory: NavigationHistory = mock()
     private val mockPostCtaExperienceExperiment: PostCtaExperienceExperiment = mock()
     private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
@@ -90,7 +92,7 @@ class SystemSearchViewModelTest {
         whenever(mockDeviceAppLookup.query(QUERY)).thenReturn(appQueryResult)
         whenever(mockDeviceAppLookup.query(BLANK_QUERY)).thenReturn(appBlankResult)
         whenever(mocksavedSitesRepository.getFavorites()).thenReturn(flowOf())
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee = SystemSearchViewModel(
             mockUserStageStore,
             mockAutoComplete,
@@ -98,6 +100,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockAutoCompleteSettings,
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
@@ -202,7 +205,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenUsersUpdatesWithAutoCompleteEnabledThenAutoCompleteSuggestionsIsNotEmpty() = runTest {
-        doReturn(true).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.userUpdatedQuery(QUERY)
 
         val observer = Observer<SystemSearchViewModel.Suggestions> { state ->
@@ -217,7 +220,7 @@ class SystemSearchViewModelTest {
 
     @Test
     fun whenUsersUpdatesWithAutoCompleteDisabledThenViewStateReset() = runTest {
-        doReturn(false).whenever(mockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(false).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.userUpdatedQuery(QUERY)
 
         assertTrue(testee.resultsViewState.value is SystemSearchViewModel.Suggestions.QuickAccessItems)
@@ -412,6 +415,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockAutoCompleteSettings,
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
@@ -439,6 +443,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockAutoCompleteSettings,
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,
@@ -493,6 +498,7 @@ class SystemSearchViewModelTest {
             mockPixel,
             mocksavedSitesRepository,
             mockSettingsStore,
+            mockAutoCompleteSettings,
             mockHistory,
             coroutineRule.testDispatcherProvider,
             coroutineRule.testScope,

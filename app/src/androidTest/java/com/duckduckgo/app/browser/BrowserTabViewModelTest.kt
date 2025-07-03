@@ -216,6 +216,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
@@ -431,6 +432,8 @@ class BrowserTabViewModelTest {
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
+
+    private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
 
     private val mockAdClickManager: AdClickManager = mock()
 
@@ -796,6 +799,7 @@ class BrowserTabViewModelTest {
             onboardingDesignExperimentToggles = fakeOnboardingDesignExperimentToggles,
             tabManager = tabManager,
             addressDisplayFormatter = mockAddressDisplayFormatter,
+            autoCompleteSettings = mockAutoCompleteSettings,
         )
 
         testee.loadData("abc", null, false, false)
@@ -1532,14 +1536,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() = runTest {
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(emptyList())
-        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
     }
 
     @Test
     fun whenTriggeringAutoCompleteButNoQueryChangeThenAutoCompleteSuggestionsNotShown() {
-        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
@@ -1560,7 +1564,7 @@ class BrowserTabViewModelTest {
                     ),
                 ),
             )
-        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
         assertTrue(autoCompleteViewState().showFavorites)
@@ -1582,7 +1586,7 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.flowTabs).thenReturn(
                 flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
             )
-            doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
 
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
@@ -1608,7 +1612,7 @@ class BrowserTabViewModelTest {
                 flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
             whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
-            doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
             testee.autoCompleteStateFlow.value = "query"
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()

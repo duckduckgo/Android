@@ -2,6 +2,7 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -29,6 +30,7 @@ class InputScreenViewModelTest {
     private val appCoroutineScope: CoroutineScope = mock()
     private val inputScreenDataStore: InputScreenDataStore = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
+    private val autoCompleteSettings: AutoCompleteSettings = mock()
 
     private lateinit var viewModel: InputScreenViewModel
 
@@ -42,6 +44,7 @@ class InputScreenViewModelTest {
             appCoroutineScope = appCoroutineScope,
             inputScreenDataStore = inputScreenDataStore,
             voiceSearchAvailability = voiceSearchAvailability,
+            autoCompleteSettings = autoCompleteSettings,
         )
     }
 
