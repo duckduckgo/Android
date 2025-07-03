@@ -839,6 +839,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun animateDuckAiFragmentIn() {
         val duckAiContainer = binding.duckAiFragmentContainer
+        duckAiContainer.isVisible = true
         val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
 
         duckAiContainer.slideAndFadeInFromRight()
@@ -849,7 +850,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val duckAiContainer = binding.duckAiFragmentContainer
         val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
 
-        duckAiContainer.slideAndFadeOutToRight(onComplete)
+        duckAiContainer.slideAndFadeOutToRight {
+            onComplete()
+            duckAiContainer.isVisible = false
+        }
         browserContainer.slideAndFadeInFromLeft()
     }
 
