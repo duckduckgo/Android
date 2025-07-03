@@ -1,10 +1,10 @@
 appId: com.duckduckgo.mobile.android
 ---
-# Open settings and set Duck Player to always
+# Open settings and set Duck Player to never
 - runFlow: open_duck_player_settings.yaml
 
 - tapOn:
-    text: "Always"
+    text: "Never"
 
 - tapOn:
     text: "Save"

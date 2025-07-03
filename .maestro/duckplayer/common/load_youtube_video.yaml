@@ -6,16 +6,4 @@ appId: com.duckduckgo.mobile.android
 - inputText: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 - pressKey: Enter
 
-- runFlow:
-    when:
-      visible: "Before you continue to YouTube"
-    commands:
-      - scrollUntilVisible:
-          element:
-            text: "Reject the use of cookies and other data for the purposes described"
-            optional: true
-          direction: DOWN
-
-      - tapOn:
-          text: "Reject the use of cookies and other data for the purposes described"
-          optional: true
+- runFlow: handle_youtube_cookies.yaml
