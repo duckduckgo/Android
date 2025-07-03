@@ -56,6 +56,7 @@ import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.retry
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -873,7 +874,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             val error = extractError(e)
             logcat(ERROR) { "Subs: $error" }
-            pixelSender.reportPurchaseFailureOther()
+            pixelSender.reportPurchaseFailureOther("${SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name}_$error")
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
         }
     }

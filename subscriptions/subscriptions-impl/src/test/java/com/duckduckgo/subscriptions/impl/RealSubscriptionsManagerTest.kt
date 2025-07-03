@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.auth2.TokenPair
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.model.Entitlement
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
@@ -1214,7 +1215,7 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
             assertTrue(awaitItem() is CurrentPurchase.Failure)
 
             verify(pixelSender).reportPurchaseFailureAccountCreation()
-            verify(pixelSender).reportPurchaseFailureOther()
+            verify(pixelSender).reportPurchaseFailureOther("PURCHASE_EXCEPTION_An error happened")
             verifyNoMoreInteractions(pixelSender)
 
             cancelAndConsumeRemainingEvents()
