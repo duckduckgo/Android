@@ -24,6 +24,7 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
+import org.hamcrest.Matchers.allOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,7 +46,7 @@ class BasicJourneyTest {
         onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
 
         // tap on PopupMenu
-        onView(withId(R.id.browserMenu)).perform(click())
+        onView(allOf(withId(R.id.browserMenu), isClickable())).perform(click())
 
         // check that the forward arrow is visible
         onView(withId(R.id.forwardMenuItem)).check(matches(isDisplayed()))

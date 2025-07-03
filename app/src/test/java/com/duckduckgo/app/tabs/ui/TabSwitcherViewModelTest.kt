@@ -62,7 +62,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.blockingObserve
 import com.duckduckgo.common.ui.DuckDuckGoTheme
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -168,7 +168,7 @@ class TabSwitcherViewModelTest {
         State.Cohort(name = VARIANT_2.cohortName, weight = 1),
     )
 
-    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
     private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private lateinit var testee: TabSwitcherViewModel
@@ -199,9 +199,7 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(mockVisualDesignExperimentDataStore.isNewDesignEnabled).thenReturn(
-            defaultVisualExperimentStateFlow,
-        )
+        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(defaultVisualExperimentStateFlow)
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
@@ -215,7 +213,7 @@ class TabSwitcherViewModelTest {
             userBrowserProperties = FakeUserBrowserProperties(),
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             pixel = FakePixel(),
         )
 
@@ -243,7 +241,7 @@ class TabSwitcherViewModelTest {
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
-            mockVisualDesignExperimentDataStore,
+            mockExperimentalThemingDataStore,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)

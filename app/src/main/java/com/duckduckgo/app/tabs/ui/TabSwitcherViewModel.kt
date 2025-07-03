@@ -56,7 +56,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -101,7 +101,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
-    visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -131,13 +131,13 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-        visualDesignExperimentDataStore.isNewDesignEnabled,
+        experimentalThemingDataStore.isSingleOmnibarEnabled,
         duckAiFeatureState.showPopupMenuShortcut,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, isVisualDesignExperimentEnabled, showInBrowserMenu ->
+    ) { viewState, tabSwitcherItems, tabSwitcherData, isSingleOmnibarEnabled, showInBrowserMenu ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
-            isNewVisualDesignEnabled = isVisualDesignExperimentEnabled,
+            isNewVisualDesignEnabled = isSingleOmnibarEnabled,
             isDuckChatEnabled = showInBrowserMenu,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())

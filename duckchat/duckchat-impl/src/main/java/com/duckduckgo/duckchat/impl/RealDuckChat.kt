@@ -28,7 +28,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -206,7 +206,7 @@ data class DuckChatSettingJson(
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckChatFeature: DuckChatFeature,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
@@ -244,7 +244,7 @@ class RealDuckChat @Inject constructor(
     init {
         if (isMainProcess) {
             cacheConfig()
-            visualDesignExperimentDataStore.isNewDesignEnabled.onEach { isExperimentEnabled ->
+            experimentalThemingDataStore.isSingleOmnibarEnabled.onEach { isExperimentEnabled ->
                 if (!isExperimentEnabled) {
                     // the new input screen feature is only available when the visual design experiment is enabled
                     setInputScreenUserSetting(false)
@@ -565,7 +565,7 @@ class RealDuckChat @Inject constructor(
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
         val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatEnabled && isDuckChatUserEnabled &&
-            visualDesignExperimentDataStore.isNewDesignEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+            experimentalThemingDataStore.isSingleOmnibarEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
         _showInputScreen.emit(showInputScreen)
 
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&

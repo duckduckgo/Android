@@ -18,12 +18,14 @@ package com.duckduckgo.app.browser.omnibar.experiments
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -35,10 +37,12 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
+import com.duckduckgo.app.browser.omnibar.extensions.addBottomShadow
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -57,6 +61,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
+    private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
@@ -96,11 +101,32 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
 
-        if (omnibarPosition == OmnibarPosition.BOTTOM) {
-            // When omnibar is at the bottom, we're adding an additional space at the top
-            toolbarContainer.updatePadding(
-                top = toolbarContainerPaddingTopWhenAtBottom,
+        if (Build.VERSION.SDK_INT >= 28) {
+            omnibarCardShadow.addBottomShadow(
+                shadowSizeDp = 12f,
+                offsetYDp = 3f,
+                insetDp = 3f,
+                shadowColor = ContextCompat.getColor(context, CommonR.color.background_omnibar_shadow),
             )
+        }
+
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                if (Build.VERSION.SDK_INT < 28) {
+                    omnibarCardShadow.cardElevation = 2f.toPx(context)
+                }
+            }
+            OmnibarPosition.BOTTOM -> {
+                // When omnibar is at the bottom, we're adding an additional space at the top
+                toolbarContainer.updatePadding(
+                    top = toolbarContainerPaddingTopWhenAtBottom,
+                )
+
+                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
+                if (Build.VERSION.SDK_INT < 28) {
+                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+                }
+            }
         }
     }
 
@@ -144,7 +170,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             globeIcon.gone()
             duckPlayerIcon.gone()
         } else {
-            backIcon.gone()
+            backIcon.hide()
         }
 
         omniBarClickCatcher.isVisible = viewState.showClickCatcher

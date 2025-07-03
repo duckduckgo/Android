@@ -142,7 +142,6 @@ import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
-import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.omnibar.Omnibar
@@ -152,6 +151,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
+import com.duckduckgo.app.browser.omnibar.model.OmnibarType
 import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
@@ -244,7 +244,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_TH
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -556,7 +556,7 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
 
     @Inject
     lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
@@ -846,8 +846,6 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private lateinit var browserNavigationBarIntegration: BrowserNavigationBarViewIntegration
-
     private fun showTrackersExperimentShieldPopAnimation() {
         experimentTrackersAnimationHelper.startShieldPopAnimation(
             omnibarShieldAnimationView = omnibar.shieldIconExperiment,
@@ -953,7 +951,15 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarTypeResolver.getOmnibarType(), binding)
+
+        val omnibarType = omnibarTypeResolver.getOmnibarType()
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarType, binding)
+
+        if (omnibarType == OmnibarType.SINGLE) {
+            lifecycleScope.launch {
+                experimentalThemingDataStore.countSingleOmnibarUser()
+            }
+        }
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1092,14 +1098,6 @@ class BrowserTabFragment :
                 viewModel.onNavigationBarBookmarksButtonClicked()
             }
         }
-
-        browserNavigationBarIntegration = BrowserNavigationBarViewIntegration(
-            lifecycleScope = lifecycleScope,
-            browserTabFragmentBinding = binding,
-            isExperimentEnabled = visualDesignExperimentDataStore.isNewDesignEnabled.value,
-            omnibar = omnibar,
-            browserNavigationBarObserver = observer,
-        )
     }
 
     private fun configureEditModeChangeDetection() {
@@ -1175,7 +1173,6 @@ class BrowserTabFragment :
             )
             requireActivity().window.navigationBarColor = customTabToolbarColor
             requireActivity().window.statusBarColor = customTabToolbarColor
-            browserNavigationBarIntegration.configureCustomTab()
         }
     }
 
@@ -1185,14 +1182,9 @@ class BrowserTabFragment :
     }
 
     private fun createPopupMenu() {
-        val popupMenuResourceType = if (!isActiveCustomTab() && visualDesignExperimentDataStore.isNewDesignEnabled.value) {
-            // when not custom tab and bottom navigation bar is enabled, we always inflate the popup menu from the bottom
-            BrowserPopupMenu.ResourceType.BOTTOM
-        } else {
-            when (settingsDataStore.omnibarPosition) {
-                TOP -> BrowserPopupMenu.ResourceType.TOP
-                BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
-            }
+        val popupMenuResourceType = when (settingsDataStore.omnibarPosition) {
+            TOP -> BrowserPopupMenu.ResourceType.TOP
+            BOTTOM -> BrowserPopupMenu.ResourceType.BOTTOM
         }
 
         popupMenu = BrowserPopupMenu(
@@ -1311,16 +1303,11 @@ class BrowserTabFragment :
         startActivity(intent)
     }
 
-    private fun launchPopupMenu(anchorToNavigationBar: Boolean) {
+    private fun launchPopupMenu() {
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
-                if (anchorToNavigationBar) {
-                    val anchorView = browserNavigationBarIntegration.navigationBarView.popupMenuAnchor
-                    popupMenu.showAnchoredView(requireActivity(), binding.rootView, anchorView)
-                } else {
-                    popupMenu.show(binding.rootView, omnibar.toolbar)
-                }
+                popupMenu.show(binding.rootView, omnibar.toolbar)
                 viewModel.onPopupMenuLaunched()
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
@@ -1417,7 +1404,6 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
-        browserNavigationBarIntegration.onDestroyView()
         super.onDestroyView()
     }
 
@@ -1579,7 +1565,6 @@ class BrowserTabFragment :
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.setViewMode(ViewMode.NewTab)
-        browserNavigationBarIntegration.configureNewTabViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorLayout.gone()
@@ -1598,7 +1583,6 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Browser(viewModel.url))
-        browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
     private fun showError(
@@ -1611,7 +1595,6 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         omnibar.setViewMode(ViewMode.Error)
-        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -1637,7 +1620,6 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
-        browserNavigationBarIntegration.configureBrowserViewMode()
         webView?.onPause()
         webView?.hide()
         webView?.stopLoading()
@@ -1727,7 +1709,6 @@ class BrowserTabFragment :
         webView?.onPause()
         webView?.hide()
         omnibar.setViewMode(ViewMode.SSLWarning)
-        browserNavigationBarIntegration.configureBrowserViewMode()
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         maliciousWarningView.gone()
@@ -2145,7 +2126,7 @@ class BrowserTabFragment :
 
             is Command.LaunchPopupMenu -> {
                 hideKeyboard()
-                launchPopupMenu(it.anchorToNavigationBar)
+                launchPopupMenu()
             }
 
             is Command.LaunchBookmarksActivity -> {
@@ -2732,8 +2713,7 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = visualDesignExperimentDataStore.isNewDesignEnabled.value ||
-                    visualDesignExperimentDataStore.isNewDesignWithoutBottomBarEnabled.value,
+                addExtraDividerPadding = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             ),
         )
     }
@@ -4256,7 +4236,6 @@ class BrowserTabFragment :
                 }
 
                 omnibar.renderBrowserViewState(viewState)
-                browserNavigationBarIntegration.configureFireButtonHighlight(highlighted = viewState.fireButton.isHighlighted())
                 if (omnibar.isPulseAnimationPlaying()) {
                     webView?.setBottomMatchingBehaviourEnabled(true) // only execute if animation is playing
                 }
@@ -4525,7 +4504,6 @@ class BrowserTabFragment :
 
             omnibar.setViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
-            browserNavigationBarIntegration.configureNewTabViewMode()
 
             viewModel.onNewTabShown()
         }
