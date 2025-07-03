@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.R
+import androidx.fragment.app.Fragment
+import androidx.viewpager2.adapter.FragmentStateAdapter
 
-@InjectWith(FragmentScope::class)
-class DuckChatTabFragment : DuckDuckGoFragment(R.layout.fragment_duck_chat_tab)
+class InputScreenPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
+
+    override fun getItemCount(): Int = 2
+
+    override fun createFragment(position: Int): Fragment {
+        return when (position) {
+            0 -> SearchTabFragment()
+            1 -> ChatTabFragment()
+            else -> throw IllegalArgumentException("Invalid position: $position")
+        }
+    }
+}

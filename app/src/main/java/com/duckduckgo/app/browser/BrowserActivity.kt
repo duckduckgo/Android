@@ -104,6 +104,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewFragment.Companion.KEY_DUCK_AI_URL
@@ -185,6 +186,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
@@ -282,6 +286,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     var destroyedByBackPress: Boolean = false
 
     var isDataClearingInProgress: Boolean = false
+    var isDuckChatVisible: Boolean = false
 
     private val startBookmarksActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
@@ -556,6 +561,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
+            isDuckChatVisible = true
             val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
             viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive)
             return
@@ -686,7 +692,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
             is Command.SwitchToTab -> openExistingTab(command.tabId)
             is Command.OpenInNewTab -> launchNewTab(command.url)
-            is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
+            is Command.OpenSavedSite -> currentTab?.openSavedSite(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
             is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
@@ -774,6 +780,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun closeDuckChat() {
+        isDuckChatVisible = false
         val fragment = duckAiFragment
         if (fragment?.isVisible == true) {
             val transaction = supportFragmentManager.beginTransaction()
@@ -803,7 +810,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private fun launchNewDuckChat(duckChatUrl: String?) {
         val fragment = DuckChatWebViewFragment().apply {
-            logcat { "Duck.ai url passed $duckChatUrl" }
             duckChatUrl?.let {
                 arguments = Bundle().apply {
                     putString(KEY_DUCK_AI_URL, duckChatUrl)
@@ -1244,7 +1250,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
                 binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
 
-                toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
+                toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckAiFeatureState.showOmnibarShortcutInAllStates.value
             }
             else -> {
                 singleToolBarMockupBinding = when (settingsDataStore.omnibarPosition) {
@@ -1266,7 +1272,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     }
                 }
 
-                singleToolBarMockupBinding.aiChatIconMockup.isVisible = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser()
+                if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                    singleToolBarMockupBinding.aiChatIconMockup.isVisible = false
+                }
 
                 if (Build.VERSION.SDK_INT >= 28) {
                     singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(

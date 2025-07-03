@@ -224,7 +224,7 @@ class RealDuckChatJSHelperTest {
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
 
         verify(mockDataStore).updateUserPreferences(payloadString)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -235,7 +235,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, null))
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test
@@ -247,7 +247,7 @@ class RealDuckChatJSHelperTest {
 
         assertNull(testee.processJsCallbackMessage(featureName, method, id, data))
         verify(mockDataStore).updateUserPreferences(null)
-        verify(mockDuckChat).openDuckChat()
+        verify(mockDuckChat).openNewDuckChatSession()
     }
 
     @Test

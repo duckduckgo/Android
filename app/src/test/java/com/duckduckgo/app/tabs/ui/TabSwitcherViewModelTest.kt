@@ -65,6 +65,7 @@ import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.fakes.FakePixel
@@ -137,6 +138,9 @@ class TabSwitcherViewModelTest {
     private lateinit var duckChatMock: DuckChat
 
     @Mock
+    private lateinit var duckAiFeatureStateMock: DuckAiFeatureState
+
+    @Mock
     private lateinit var faviconManager: FaviconManager
 
     @Mock
@@ -195,8 +199,8 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(false))
         whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(defaultVisualExperimentStateFlow)
+        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -230,6 +234,7 @@ class TabSwitcherViewModelTest {
             mockPixel,
             swipingTabsFeatureProvider,
             duckChatMock,
+            duckAiFeatureState = duckAiFeatureStateMock,
             tabManagerFeatureFlags,
             senseOfProtectionExperiment,
             mockWebTrackersBlockedAppRepository,
@@ -1504,7 +1509,6 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckChatMock.isEnabled()).thenReturn(true)
 
         initializeViewModel()
 
@@ -1517,8 +1521,7 @@ class TabSwitcherViewModelTest {
     @Test
     fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckChatMock.isEnabled()).thenReturn(true)
-        whenever(duckChatMock.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
 
         initializeViewModel()
 

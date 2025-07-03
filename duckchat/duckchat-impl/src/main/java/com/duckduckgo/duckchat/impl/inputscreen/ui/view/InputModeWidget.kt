@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -48,7 +48,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 
 @InjectWith(ActivityScope::class)
-class DuckChatOmnibarLayout @JvmOverloads constructor(
+class InputModeWidget @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -68,79 +68,69 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
-    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.duckChatControls) }
-    private val omnibarContent: View by lazy { findViewById(R.id.duckChatControlsContent) }
+    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.inputModeWidgetCard) }
+    private val omnibarContent: View by lazy { findViewById(R.id.inputModeWidgetCardContent) }
 
-    val duckChatInput: EditText
-    val duckChatClearText: View
-    val duckChatControls: View
-    val duckChatBack: View
-    val duckChatTabLayout: TabLayout
+    val inputField: EditText
+    val inputFieldClearText: View
+    val inputModeWidgetBack: View
+    val inputModeSwitch: TabLayout
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
-    var onDuckChatSent: ((String) -> Unit)? = null
+    var onChatSent: ((String) -> Unit)? = null
     var onSearchSelected: (() -> Unit)? = null
-    var onDuckChatSelected: (() -> Unit)? = null
+    var onChatSelected: (() -> Unit)? = null
     var onSendMessageAvailable: ((Boolean) -> Unit)? = null
         set(value) {
             field = value
-            value?.invoke(!duckChatInput.text.isNullOrEmpty())
+            value?.invoke(inputField.text.getTextToSubmit() != null)
+        }
+    var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
+
+    var text: String
+        get() = inputField.text.toString()
+        set(value) {
+            inputField.setText(value)
+            inputField.setSelection(value.length)
         }
 
     @IdRes
     private var contentId: Int = View.NO_ID
     private var focusAnimator: ValueAnimator? = null
-    private var minHeight = 0
+    private var originalText: String? = null
+    private var hasTextChangedFromOriginal = false
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_duck_chat_omnibar, this, true)
+        LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_layout, this, true)
 
-        duckChatInput = findViewById(R.id.duckChatInput)
-        duckChatClearText = findViewById(R.id.duckChatClearText)
-        duckChatControls = findViewById(R.id.duckChatControls)
-        duckChatBack = findViewById(R.id.duckChatBack)
-        duckChatTabLayout = findViewById(R.id.duckChatTabLayout)
+        inputField = findViewById(R.id.inputField)
+        inputFieldClearText = findViewById(R.id.inputFieldClearText)
+        inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
+        inputModeSwitch = findViewById(R.id.inputModeSwitch)
 
         configureClickListeners()
         configureInputBehavior()
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
+    }
 
-        onSearchSelected?.invoke()
+    fun provideInitialText(text: String) {
+        originalText = text
+        inputField.setText(text)
     }
 
     private fun configureClickListeners() {
-        duckChatClearText.setOnClickListener {
-            duckChatInput.text.clear()
-            duckChatInput.setSelection(0)
-            duckChatInput.scrollTo(0, 0)
+        inputFieldClearText.setOnClickListener {
+            inputField.text.clear()
+            inputField.setSelection(0)
+            inputField.scrollTo(0, 0)
             beginChangeBoundsTransition()
         }
-        duckChatBack.setOnClickListener { onBack?.invoke() }
+        inputModeWidgetBack.setOnClickListener { onBack?.invoke() }
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (minHeight == 0) {
-            val currentMinLines = duckChatInput.minLines
-            val currentMaxLines = duckChatInput.maxLines
-
-            duckChatInput.minLines = DUCK_CHAT_MIN_LINES
-            duckChatInput.maxLines = DUCK_CHAT_MIN_LINES
-            super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
-            minHeight = measuredHeight
-
-            duckChatInput.minLines = currentMinLines
-            duckChatInput.maxLines = currentMaxLines
-        }
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-
-        if (measuredHeight < minHeight) {
-            setMeasuredDimension(measuredWidth, minHeight)
-        }
-    }
-
-    private fun configureInputBehavior() = with(duckChatInput) {
+    private fun configureInputBehavior() = with(inputField) {
         maxLines = MAX_LINES
         setHorizontallyScrolling(false)
         setRawInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
@@ -159,28 +149,33 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
 
         doOnTextChanged { text, _, _, _ ->
-            val isNullOrEmpty = text.isNullOrEmpty()
-            fade(duckChatClearText, !isNullOrEmpty)
-            onSendMessageAvailable?.invoke(!isNullOrEmpty)
+            if (!hasTextChangedFromOriginal) {
+                hasTextChangedFromOriginal = text != originalText
+            }
+            onVoiceInputAllowed?.invoke(!hasTextChangedFromOriginal || inputField.text.isBlank())
 
-            if (isNullOrEmpty && duckChatInput.minLines > 1) {
-                duckChatInput.post {
-                    beginChangeBoundsTransition()
-                    duckChatInput.minLines = if (duckChatTabLayout.selectedTabPosition == 0) SEARCH_MIN_LINES else DUCK_CHAT_MIN_LINES
+            onSendMessageAvailable?.invoke(inputField.text.getTextToSubmit() != null)
+
+            val isNullOrEmpty = text.isNullOrEmpty()
+            fade(inputFieldClearText, !isNullOrEmpty)
+
+            if (isNullOrEmpty && inputField.minLines > 1) {
+                inputField.post {
+                    inputField.minLines = if (inputModeSwitch.selectedTabPosition == 0) SEARCH_MIN_LINES else DUCK_CHAT_MIN_LINES
                 }
             }
         }
     }
 
     private fun configureTabBehavior() {
-        duckChatTabLayout.addOnTabSelectedListener(
+        inputModeSwitch.addOnTabSelectedListener(
             object : TabLayout.OnTabSelectedListener {
                 override fun onTabSelected(tab: TabLayout.Tab) {
                     val isSearchTab = tab.position == 0
                     applyModeSpecificInputBehaviour(isSearchTab = isSearchTab)
                     when (tab.position) {
                         0 -> onSearchSelected?.invoke()
-                        1 -> onDuckChatSelected?.invoke()
+                        1 -> onChatSelected?.invoke()
                     }
                 }
                 override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -190,9 +185,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun applyModeSpecificInputBehaviour(isSearchTab: Boolean) {
-        beginChangeBoundsTransition()
-
-        duckChatInput.apply {
+        inputField.apply {
             if (isSearchTab) {
                 minLines = SEARCH_MIN_LINES
                 hint = context.getString(R.string.duck_chat_search_or_type_url)
@@ -203,7 +196,7 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
             }
         }
-        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(duckChatInput)
+        (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
     }
 
     private fun beginChangeBoundsTransition() {
@@ -221,20 +214,21 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
     }
 
     fun submitMessage(message: String? = null) {
-        val text = message?.also(duckChatInput::setText) ?: duckChatInput.text.toString().trim()
-        if (text.isNotBlank()) {
-            if (duckChatTabLayout.selectedTabPosition == 0) {
-                onSearchSent?.invoke(text)
+        val text = message?.also(inputField::setText) ?: inputField.text
+        val textToSubmit = text.getTextToSubmit()?.toString()
+        if (textToSubmit != null) {
+            if (inputModeSwitch.selectedTabPosition == 0) {
+                onSearchSent?.invoke(textToSubmit)
             } else {
-                onDuckChatSent?.invoke(text)
+                onChatSent?.invoke(textToSubmit)
             }
-            duckChatInput.clearFocus()
+            inputField.clearFocus()
         }
     }
 
     fun selectTab(index: Int) {
-        duckChatTabLayout.post {
-            duckChatTabLayout.getTabAt(index)?.select()
+        inputModeSwitch.post {
+            inputModeSwitch.getTabAt(index)?.select()
         }
     }
 
@@ -309,11 +303,25 @@ class DuckChatOmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    fun printNewLine() {
+        val currentText = inputField.text.toString()
+        val selectionStart = inputField.selectionStart
+        val selectionEnd = inputField.selectionEnd
+        val newText = currentText.substring(0, selectionStart) + "\n" + currentText.substring(selectionEnd)
+        inputField.setText(newText)
+        inputField.setSelection(selectionStart + 1)
+    }
+
+    private fun CharSequence.getTextToSubmit(): CharSequence? {
+        val text = this.trim()
+        return text.ifBlank { null }
+    }
+
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
         private const val FADE_DURATION = 150L
         private const val MAX_LINES = 8
-        private const val SEARCH_MIN_LINES = 1
-        private const val DUCK_CHAT_MIN_LINES = 3
+        private const val SEARCH_MIN_LINES = 2
+        private const val DUCK_CHAT_MIN_LINES = 2
     }
 }

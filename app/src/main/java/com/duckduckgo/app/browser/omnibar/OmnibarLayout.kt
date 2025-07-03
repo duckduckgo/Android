@@ -101,6 +101,7 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
@@ -173,6 +174,9 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -1019,6 +1023,10 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     override fun onAnimationFinished() {
         omnibarTextListener?.onTrackersCountFinished()
+    }
+
+    fun setDraftTextIfNtp(query: String) {
+        viewModel.setDraftTextIfNtp(query)
     }
 }
 

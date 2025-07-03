@@ -35,6 +35,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.baseHost
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -73,7 +74,6 @@ class OmnibarLayoutViewModelTest {
 
     private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
     private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val duckChatShowInputScreenFlow = MutableStateFlow(false)
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
@@ -81,7 +81,10 @@ class OmnibarLayoutViewModelTest {
 
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
-    private val duckChatShowInAddressBarFlow = MutableStateFlow(true)
+    private val duckAiFeatureState: DuckAiFeatureState = mock()
+    private val duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow = MutableStateFlow(true)
+    private val duckAiShowOmnibarShortcutInAllStatesFlow = MutableStateFlow(true)
+    private val duckAiShowInputScreenFlow = MutableStateFlow(false)
     private val settingsDataStore: SettingsDataStore = mock()
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
         mock {
@@ -107,10 +110,10 @@ class OmnibarLayoutViewModelTest {
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
         whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
-        whenever(duckChat.showInAddressBar).thenReturn(duckChatShowInAddressBarFlow)
+        whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
+        whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
-        whenever(duckChat.isEnabledInBrowser()).thenReturn(true)
-        whenever(duckChat.showInputScreen).thenReturn(duckChatShowInputScreenFlow)
+        whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
 
         initializeViewModel()
     }
@@ -150,6 +153,7 @@ class OmnibarLayoutViewModelTest {
             experimentalThemingDataStore = mockExperimentalThemingDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
+            duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
         )
@@ -1139,8 +1143,35 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenViewModeIsNewTabAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
-        duckChatShowInAddressBarFlow.value = false
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         testee.onViewModeChanged(ViewMode.NewTab)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenShowDuckAiInAllStatesThenShowChatMenuTrue() = runTest {
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = true
+
+        testee.viewState.test {
+            var viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+            testee.onViewModeChanged(ViewMode.NewTab)
+            viewState = awaitItem()
+            assertTrue(viewState.showChatMenu)
+        }
+    }
+
+    @Test
+    fun whenShowDuckAiInAllStatesAndCustomTabThenShowChatMenuFalse() = runTest {
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = true
+        testee.onViewModeChanged(ViewMode.CustomTab(0, "example", "example.com", false))
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1160,7 +1191,8 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenNavigationBarExperimentEnabledAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
-        duckChatShowInAddressBarFlow.value = false
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = false
+        duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
         disabledVisualExperimentNavBarStateFlow.value = true
 
         testee.viewState.test {
@@ -1302,7 +1334,7 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAIPoCEnabledThenShowClickCatcherTrue() = runTest {
-        duckChatShowInputScreenFlow.value = true
+        duckAiShowInputScreenFlow.value = true
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
@@ -1313,22 +1345,12 @@ class OmnibarLayoutViewModelTest {
 
     @Test
     fun whenDuckAIPoCDisabledThenShowClickCatcherFalse() = runTest {
-        duckChatShowInputScreenFlow.value = false
+        duckAiShowInputScreenFlow.value = false
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showClickCatcher)
             cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledTheButtonIsNotVisible() = runTest {
-        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
-        initializeViewModel()
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertFalse(viewState.showChatMenu)
         }
     }
 
@@ -1495,8 +1517,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledAndOtherConditionsAreNotMetThenButtonIsNotVisible() = runTest {
-        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
+    fun whenShowDuckAiInAllStatesDisabledAndOtherConditionsAreNotMetThenButtonIsNotVisible() = runTest {
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         initializeViewModel()
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1505,8 +1527,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledButInNewTabThenShowChatMenuIsTrue() = runTest {
-        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
+    fun whenShowDuckAiInAllStatesDisabledButInNewTabThenShowChatMenuIsTrue() = runTest {
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         initializeViewModel()
 
         testee.onViewModeChanged(ViewMode.NewTab)
@@ -1519,8 +1541,8 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenDuckAiButtonInBrowserFeatureFlagIsDisabledButHasFocusAndTextThenShowChatMenuIsTrue() = runTest {
-        whenever(duckChat.isEnabledInBrowser()).thenReturn(false)
+    fun whenShowDuckAiInAllStatesDisabledButHasFocusAndTextThenShowChatMenuIsTrue() = runTest {
+        duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         initializeViewModel()
 
         testee.onInputStateChanged(QUERY, hasFocus = true, clearQuery = false, deleteLastCharacter = false)

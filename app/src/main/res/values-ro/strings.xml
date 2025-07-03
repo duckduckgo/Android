@@ -891,4 +891,14 @@
     <string name="scamBlockerTitle">Instrument de blocare a înșelătoriilor</string>
     <string name="scamBlockerDescription">Avertizează cu privire la site-urile marcate ca incluzând escrocherii, phishing și programe rău intenționate.</string>
     <string name="threatProtectionLearnMoreTitle">Află mai multe</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Încearcă widgetul nostru pentru ecranul de întâmpinare!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adăugă widget-ul de căutare la ecranul de pornire, pentru acces rapid și ușor.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adaugă widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nu acum</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Căutare DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget pe ecranul de pornire</string>
 </resources>

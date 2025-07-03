@@ -59,6 +59,7 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -72,6 +73,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -95,13 +97,14 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
         ViewState(
-            showChatMenu = duckChat.showInAddressBar.value && duckChat.isEnabledInBrowser(),
+            showChatMenu = duckAiFeatureState.showOmnibarShortcutInAllStates.value,
         ),
     )
 
@@ -110,18 +113,33 @@ class OmnibarLayoutViewModel @Inject constructor(
         tabRepository.flowTabs,
         defaultBrowserPromptsExperiment.highlightPopupMenu,
         experimentalThemingDataStore.isSingleOmnibarEnabled,
-        duckChat.showInAddressBar,
-    ) { state, tabs, highlightOverflowMenu, isSingleOmnibarEnabled, showInAddressBar ->
+    ) { state, tabs, highlightOverflowMenu, isSingleOmnibarEnabled ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
             isExperimentalThemingEnabled = isSingleOmnibarEnabled,
-            showChatMenu = showInAddressBar && state.viewMode !is CustomTab &&
-                (state.viewMode is NewTab || state.hasFocus && state.omnibarText.isNotBlank() || duckChat.isEnabledInBrowser()),
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
+
+    private val showDuckAiButton = combine(
+        _viewState,
+        duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
+        duckAiFeatureState.showOmnibarShortcutInAllStates,
+    ) { viewState, showOnNtpAndOnFocus, showInAllStates ->
+        when {
+            viewState.viewMode is CustomTab -> {
+                false
+            }
+
+            showInAllStates -> {
+                true
+            }
+
+            else -> showOnNtpAndOnFocus && (viewState.viewMode is NewTab || viewState.hasFocus && viewState.omnibarText.isNotBlank())
+        }
+    }.distinctUntilChanged()
 
     private val command = Channel<Command>(1, DROP_OLDEST)
     fun commands(): Flow<Command> = command.receiveAsFlow()
@@ -184,11 +202,17 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     init {
         logVoiceSearchAvailability()
-        duckChat.showInputScreen.onEach { inputScreenEnabled ->
+        duckAiFeatureState.showInputScreen.onEach { inputScreenEnabled ->
             _viewState.update {
                 it.copy(
                     showClickCatcher = inputScreenEnabled,
                 )
+            }
+        }.launchIn(viewModelScope)
+
+        showDuckAiButton.onEach { showDuckAiButton ->
+            _viewState.update {
+                it.copy(showChatMenu = showDuckAiButton)
             }
         }.launchIn(viewModelScope)
     }
@@ -814,5 +838,16 @@ class OmnibarLayoutViewModel @Inject constructor(
         //         )
         //     }
         // }
+    }
+
+    fun setDraftTextIfNtp(query: String) {
+        if (_viewState.value.viewMode is NewTab) {
+            _viewState.update {
+                it.copy(
+                    omnibarText = query,
+                    updateOmnibarText = true,
+                )
+            }
+        }
     }
 }

@@ -148,6 +148,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
+import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
@@ -185,6 +186,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
@@ -283,8 +285,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivity.Companion.QUERY
-import com.duckduckgo.duckchat.impl.ui.SearchInterstitialActivityParams
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -872,7 +874,7 @@ class BrowserTabFragment :
             if (result.resultCode == RESULT_OK) {
                 submitQuery(query)
             } else {
-                omnibar.setText(query)
+                omnibar.setDraftTextIfNtp(query)
             }
         }
 
@@ -1043,7 +1045,7 @@ class BrowserTabFragment :
         omnibar.omniBarClickCatcher?.setOnClickListener {
             val intent = globalActivityStarter.startIntent(
                 requireContext(),
-                SearchInterstitialActivityParams(query = omnibar.getText()),
+                InputScreenActivityParams(query = omnibar.getText()),
             )
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 requireActivity(),
@@ -1378,8 +1380,8 @@ class BrowserTabFragment :
 
         viewModel.onViewResumed()
 
-        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible.
-        if (fragmentIsVisible()) {
+        // onResume can be called for a hidden/backgrounded fragment, ensure this tab is visible and Duck.ai is not
+        if (fragmentIsVisible() && (requireActivity() as? BrowserActivity)?.isDuckChatVisible == false) {
             viewModel.onViewVisible()
         }
 
@@ -1728,6 +1730,10 @@ class BrowserTabFragment :
             logcat { "SSLError: no previous page to load, showing home" }
             viewModel.recoverFromWarningPage(false)
         }
+    }
+
+    fun openSavedSite(url: String) {
+        viewModel.onUserSubmittedQuery(url, QueryOrigin.FromBookmark)
     }
 
     fun submitQuery(query: String) {
@@ -2886,7 +2892,7 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedChatUserQuery(query)
+        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
@@ -4319,7 +4325,7 @@ class BrowserTabFragment :
 
         private fun showCta(configuration: Cta) {
             when (configuration) {
-                is HomePanelCta -> showHomeCta(configuration)
+                is HomePanelCta -> showBottomSheetCta(configuration)
                 is DaxBubbleCta -> showDaxOnboardingBubbleCta(configuration)
                 is OnboardingDaxDialogCta -> showOnboardingDialogCta(configuration)
                 is BrokenSitePromptDialogCta -> showBrokenSitePromptCta(configuration)
@@ -4397,6 +4403,14 @@ class BrowserTabFragment :
             )
         }
 
+        private fun showBottomSheetCta(configuration: HomePanelCta) {
+            if (configuration is AddWidgetAutoOnboardingExperiment) {
+                showExperimentalHomeWidget(configuration)
+            } else {
+                showHomeCta(configuration)
+            }
+        }
+
         private fun showExperimentalHomeWidget(
             configuration: HomePanelCta,
         ) {
@@ -4409,22 +4423,18 @@ class BrowserTabFragment :
                 )
                 experimentalBottomSheet.eventListener = object : ExperimentalHomeScreenWidgetBottomSheetDialog.EventListener {
                     override fun onShown() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogShown()
                         viewModel.onCtaShown()
                     }
 
                     override fun onCanceled() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogCancelled()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
 
                     override fun onAddWidgetButtonClicked() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogAddWidgetClicked()
                         viewModel.onUserClickCtaOkButton(configuration)
                     }
 
                     override fun onNotNowButtonClicked() {
-                        viewModel.onExperimentalHomeScreenWidgetBottomSheetDialogNotNowClicked()
                         viewModel.onUserClickCtaSecondaryButton(configuration)
                     }
                 }
