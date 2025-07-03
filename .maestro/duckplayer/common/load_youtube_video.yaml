@@ -6,19 +6,16 @@ appId: com.duckduckgo.mobile.android
 - inputText: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 - pressKey: Enter
 
-# Optional wait for the cookie prompt to appear in case it's not automatically handled
-- extendedWaitUntil:
-    visible:
-      text: "Before you continue to YouTube"
-      optional: true
-    timeout: 15000
+- runFlow:
+    when:
+      visible: "Before you continue to YouTube"
+    commands:
+      - scrollUntilVisible:
+          element:
+            text: "Reject the use of cookies and other data for the purposes described"
+            optional: true
+          direction: DOWN
 
-- scrollUntilVisible:
-    element:
-      text: "Reject the use of cookies and other data for the purposes described"
-      optional: true
-    direction: DOWN
-
-- tapOn:
-    text: "Reject the use of cookies and other data for the purposes described"
-    optional: true
+      - tapOn:
+          text: "Reject the use of cookies and other data for the purposes described"
+          optional: true
