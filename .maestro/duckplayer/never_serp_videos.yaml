@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Open video from SERP and accept Duck Player prompt"
+name: "DuckPlayer: Never > YouTube"
 tags:
   - duckplayer
 ---
@@ -10,21 +10,23 @@ tags:
           clearState: true
 
       - runFlow: ../shared/skip_all_onboarding.yaml
-      - runFlow: common/load_serp_video.yaml
+      - runFlow: common/enable_duck_player_never.yaml
+      - runFlow: common/load_serp_videos_vertical.yaml
 
-      - assertVisible:
+
+      - assertNotVisible:
           text: "Duck Player lets you watch YouTube without targeted ads"
 
-      - tapOn:
-          text: "Watch in Duck Player"
+      - runFlow: common/handle_youtube_cookies.yaml
 
-      # Wait for Duck Player to load
+      # Wait for video to load
       - extendedWaitUntil:
           visible:
-            text: "duck://player/.*"
+            text: "https://m.youtube.com/watch?v=1W706zdVwc0"
           timeout: 15000
 
-      # Core assertion: Duck Player is now active (confirmed by extendedWaitUntil above)
+      - assertNotVisible:
+          text: "duck://player/.*"
 
       # Overlay not shown
       - runFlow: common/assert_overlay_not_shown.yaml

@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Set Duck Player to always and open from SERP"
+name: "DuckPlayer: Always > SERP > Organic > Duck Player"
 tags:
   - duckplayer
 ---
@@ -11,7 +11,7 @@ tags:
 
       - runFlow: ../shared/skip_all_onboarding.yaml
       - runFlow: common/enable_duck_player_always.yaml
-      - runFlow: common/load_serp_video.yaml
+      - runFlow: common/load_serp_videos_organic.yaml
 
       - assertNotVisible:
           text: "Duck Player lets you watch YouTube without targeted ads"
