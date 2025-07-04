@@ -34,6 +34,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
@@ -62,6 +63,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowIn
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -183,6 +185,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
     private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
         context?.let {
+            var afterTypingAnimation: () -> Unit = {}
             viewModel.onDialogShown(onboardingDialogType)
             when (onboardingDialogType) {
                 INITIAL_REINSTALL_USER -> {
@@ -190,12 +193,38 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                     binding.daxDialogCta.initial.root.isVisible = true
 
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
-                    binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
                     binding.daxDialogCta.secondaryCta.isVisible = true
+                    binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
 
-                    binding.daxDialogCta.cardView.animateEntrance()
+                    binding.daxDialogCta.cardView.animateEntrance(
+                        onAnimationEnd = {
+                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBuck)
+                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBuck)
+
+                            afterTypingAnimation = {
+                                binding.daxDialogCta.initial.dialogTitle.finishAnimation()
+                                binding.daxDialogCta.initial.dialogBody.finishAnimation()
+                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
+
+                                if (binding.daxDialogCta.initial.dialogBody.text.isEmpty()) {
+                                    binding.daxDialogCta.initial.dialogBody.text = descriptionText
+                                }
+
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                                binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(titleText, afterAnimation = {
+                                binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
+                                    descriptionText,
+                                    afterAnimation = { afterTypingAnimation() },
+                                )
+                            },)
+                        },
+                    )
 
                     playAnimation(
                         animation = LottieOnboardingAnimationSpec.POPUP,
@@ -208,10 +237,34 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                     binding.daxDialogCta.initial.root.isVisible = true
 
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
-                    binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL) }
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.secondaryCta.isVisible = false
 
-                    binding.daxDialogCta.cardView.animateEntrance()
+                    binding.daxDialogCta.cardView.animateEntrance(
+                        onAnimationEnd = {
+                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBuck)
+                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBuck)
+
+                            afterTypingAnimation = {
+                                binding.daxDialogCta.initial.dialogTitle.finishAnimation()
+                                binding.daxDialogCta.initial.dialogBody.finishAnimation()
+                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+
+                                if (binding.daxDialogCta.initial.dialogBody.text.isEmpty()) {
+                                    binding.daxDialogCta.initial.dialogBody.text = descriptionText
+                                }
+
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(titleText, afterAnimation = {
+                                binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
+                                    descriptionText,
+                                    afterAnimation = { afterTypingAnimation() },
+                                )
+                            },)
+                        },
+                    )
 
                     playAnimation(
                         animation = LottieOnboardingAnimationSpec.POPUP,
@@ -227,10 +280,26 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                             TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                             binding.daxDialogCta.comparisonChart.root.isVisible = true
 
-                            val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2TitleBuck).html(context = it)
-                            binding.daxDialogCta.comparisonChart.title.text = titleText
+                            val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2TitleBuck)
+                            binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
                             binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
-                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+                            binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+
+                            val comparisonChartViews = binding.daxDialogCta.comparisonChart.root.children
+                                .filter { view -> view != binding.daxDialogCta.comparisonChart.titleContainer }
+
+                            comparisonChartViews.forEach { view -> view.alpha = MIN_ALPHA }
+
+                            afterTypingAnimation = {
+                                comparisonChartViews.forEach { view ->
+                                    view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                                }
+
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+                            }
+
+                            scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) { afterTypingAnimation() }
 
                             playAnimation(
                                 animation = LottieOnboardingAnimationSpec.WING,
@@ -247,13 +316,37 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                             TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                             binding.daxDialogCta.skipOnboarding.root.isVisible = true
 
-                            binding.daxDialogCta.skipOnboarding.description.text = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
-                                .html(context = it)
+                            val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
+                            val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+
+                            binding.daxDialogCta.skipOnboarding.dialogTitleInvisible.text = titleText.html(context = it)
+                            binding.daxDialogCta.skipOnboarding.descriptionInvisible.text = descriptionText.html(context = it)
 
                             binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
-                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                            binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                             binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
-                            binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                            binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
+
+                            afterTypingAnimation = {
+                                binding.daxDialogCta.skipOnboarding.dialogTitle.finishAnimation()
+                                binding.daxDialogCta.skipOnboarding.description.finishAnimation()
+                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION) }
+
+                                if (binding.daxDialogCta.skipOnboarding.description.text.isEmpty()) {
+                                    binding.daxDialogCta.skipOnboarding.description.text = descriptionText.html(context = it)
+                                }
+
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                                binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            binding.daxDialogCta.skipOnboarding.dialogTitle.startTypingAnimation(titleText, afterAnimation = {
+                                binding.daxDialogCta.skipOnboarding.description.startTypingAnimation(
+                                    descriptionText,
+                                    afterAnimation = { afterTypingAnimation() },
+                                )
+                            },)
                         },
                     )
                 }
@@ -268,20 +361,37 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
                             setAddressBarPositionOptions(true)
                             binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
-                            binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
-                            binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
-                                viewModel.onAddressBarPositionOptionSelected(true)
+                            binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+
+                            val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
+                            contentViews.forEach { view -> view.alpha = MIN_ALPHA }
+                            val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle)
+
+                            afterTypingAnimation = {
+                                binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
+                                    viewModel.onAddressBarPositionOptionSelected(true)
+                                }
+                                binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
+                                    viewModel.onAddressBarPositionOptionSelected(false)
+                                }
+
+                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
+
+                                contentViews.forEach { view ->
+                                    view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                                }
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                             }
-                            binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
-                                viewModel.onAddressBarPositionOptionSelected(false)
-                            }
-                            binding.daxDialogCta.addressBarPosition.root.animate().alpha(MAX_ALPHA).duration = ANIMATION_DURATION
+
+                            scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) { afterTypingAnimation() }
 
                             playAnimation(LottieOnboardingAnimationSpec.POPUP_SMALL)
                         },
                     )
                 }
             }
+            binding.sceneBg.setOnClickListener { afterTypingAnimation() }
+            binding.daxDialogCta.cardContainer.setOnClickListener { afterTypingAnimation() }
         }
     }
 
@@ -341,6 +451,13 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
                 welcomeContentFadedAway = true
                 onAnimationFinished()
             }
+    }
+
+    private fun scheduleTypingAnimation(textView: TypeAnimationTextView, text: String, afterAnimation: () -> Unit = {}) {
+        textView.postDelayed(
+            { textView.startTypingAnimation(text, afterAnimation = afterAnimation) },
+            ANIMATION_DURATION,
+        )
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {

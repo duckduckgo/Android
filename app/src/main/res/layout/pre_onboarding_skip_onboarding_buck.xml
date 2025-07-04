@@ -22,20 +22,49 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <TextView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/dialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingDaxDialog3Title"/>
+            tools:text="@string/highlightsPreOnboardingDaxDialog3Title" />
 
-    <TextView
+        <TextView
+            android:id="@+id/dialogTitleInvisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Typography.Buck.H1"
+            android:textColor="@color/buckColorPrimaryText"
+            android:visibility="invisible" />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4">
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
             android:textAppearance="@style/Typography.Buck.Body1"
             android:textColor="@color/buckColorPrimaryText"
-            tools:text="@string/highlightsPreOnboardingDaxDialog3Text"/>
+            tools:text="@string/highlightsPreOnboardingDaxDialog3Text" />
+
+        <TextView
+            android:id="@+id/descriptionInvisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Typography.Buck.Body1"
+            android:textColor="@color/buckColorPrimaryText"
+            android:visibility="invisible" />
+
+    </FrameLayout>
 
 </LinearLayout>
