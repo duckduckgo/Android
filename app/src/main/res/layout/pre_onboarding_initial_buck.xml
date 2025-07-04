@@ -22,19 +22,50 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-    <TextView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingDaxDialog1TitleBuck"/>
+            android:text="@string/highlightsPreOnboardingDaxDialog1TitleBuck"
+            android:visibility="invisible" />
 
-    <TextView
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pangea_medium"
+            android:textSize="32sp"
+            android:textColor="@color/buckColorPrimaryText"/>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
             android:textAppearance="@style/Typography.Buck.Body1"
             android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingDaxDialog1DescriptionBuck"/>
+            android:text="@string/highlightsPreOnboardingDaxDialog1DescriptionBuck"
+            android:visibility="invisible" />
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/dialogBody"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:fontFamily="@font/pangea"
+            android:textSize="16sp"
+            android:textColor="@color/buckColorPrimaryText"/>
+
+    </FrameLayout>
 
 </LinearLayout>

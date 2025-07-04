@@ -20,18 +20,36 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/title"
+    <FrameLayout
+        android:id="@+id/titleContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:fontFamily="@font/pangea"
-        android:textSize="40sp"
-        android:lineSpacingExtra="-10sp"
-        android:textColor="@color/buckColorPrimaryText"
-        tools:text="Protections activated!"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:fontFamily="@font/pangea"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-10sp"
+            tools:text="Protections activated!"
+            android:textColor="@color/buckColorPrimaryText" />
+
+        <TextView
+            android:id="@+id/titleInvisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:fontFamily="@font/pangea"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-10sp"
+            android:textColor="@color/buckColorPrimaryText"
+            android:visibility="invisible" />
+
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/ddgLogo"
@@ -40,7 +58,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         android:padding="@dimen/keyline_1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintTop_toBottomOf="@id/titleContainer"
         app:srcCompat="@drawable/ic_dax_icon" />
 
     <ImageView

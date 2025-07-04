@@ -20,17 +20,31 @@
     android:id="@+id/daxCtaContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:alpha="0"
     android:clipChildren="false"
     android:orientation="vertical"
     tools:alpha="1">
 
-    <TextView
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/dialogTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/pangea_medium"
+            android:textSize="24sp"
+            android:textColor="@color/buckColorPrimaryText"/>
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingAddressBarTitle"/>
+            android:text="@string/highlightsPreOnboardingAddressBarTitle"
+            android:visibility="invisible" />
+
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/option1"
