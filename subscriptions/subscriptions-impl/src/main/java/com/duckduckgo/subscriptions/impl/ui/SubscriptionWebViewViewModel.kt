@@ -52,6 +52,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIA
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
@@ -227,7 +228,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
             val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
             if (id.isNullOrBlank()) {
-                pixelSender.reportPurchaseFailureOther()
+                pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
             } else {
                 command.send(SubscriptionSelected(id, offerId, experimentName, experimentCohort))
