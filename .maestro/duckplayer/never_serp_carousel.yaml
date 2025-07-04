@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Set Duck Player to never and open from SERP videos vertical"
+name: "DuckPlayer: Never > SERP > Carousel > YouTube"
 tags:
   - duckplayer
 ---
@@ -11,8 +11,7 @@ tags:
 
       - runFlow: ../shared/skip_all_onboarding.yaml
       - runFlow: common/enable_duck_player_never.yaml
-      - runFlow: common/load_serp_videos_vertical.yaml
-
+      - runFlow: common/load_serp_video_carousel.yaml
 
       - assertNotVisible:
           text: "Duck Player lets you watch YouTube without targeted ads"
