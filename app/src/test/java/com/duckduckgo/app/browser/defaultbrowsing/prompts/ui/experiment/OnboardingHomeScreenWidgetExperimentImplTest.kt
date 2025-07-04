@@ -23,6 +23,7 @@ import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle
 import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -137,6 +138,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     fun `when fireWidgetSearchXCount and count reaches 3 then 3x pixel is fired`() = runTest {
         val pixelDefinition = createPixelDefinitionWithValidWindow()
         whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch3xMetric()).thenReturn(mockMetricsPixel)
+        whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(mockMetricsPixel.getPixelDefinitions()).thenReturn(listOf(pixelDefinition))
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(2)
         whenever(mockWidgetSearchCountDataStore.increaseMetricForPixelDefinition(any())).thenReturn(3)
@@ -150,6 +152,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     fun `when fireWidgetSearchXCount and count is already 3 then 3x pixel is not fired again`() = runTest {
         val pixelDefinition = createPixelDefinitionWithValidWindow()
         whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch3xMetric()).thenReturn(mockMetricsPixel)
+        whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(mockMetricsPixel.getPixelDefinitions()).thenReturn(listOf(pixelDefinition))
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(3)
 
@@ -162,6 +165,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     @Test
     fun `when fireWidgetSearchXCount and count reaches 5 then 5x pixel is fired`() = runTest {
         val pixelDefinition = createPixelDefinitionWithValidWindow()
+        whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch3xMetric()).thenReturn(null)
         whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch5xMetric()).thenReturn(mockMetricsPixel)
         whenever(mockMetricsPixel.getPixelDefinitions()).thenReturn(listOf(pixelDefinition))
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(4)
@@ -176,6 +180,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     fun `when fireWidgetSearchXCount and pixel is outside conversion window then metrics are not updated`() = runTest {
         val pixelDefinition = createPixelDefinitionWithInvalidWindow()
         whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch3xMetric()).thenReturn(mockMetricsPixel)
+        whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(mockMetricsPixel.getPixelDefinitions()).thenReturn(listOf(pixelDefinition))
 
         testee.fireWidgetSearchXCount()
@@ -189,6 +194,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     fun `when fireWidgetSearchXCount and count is less than threshold then pixel is not fired`() = runTest {
         val pixelDefinition = createPixelDefinitionWithValidWindow()
         whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch3xMetric()).thenReturn(mockMetricsPixel)
+        whenever(mockOnboardingHomeScreenWidgetPixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(mockMetricsPixel.getPixelDefinitions()).thenReturn(listOf(pixelDefinition))
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(1)
         whenever(mockWidgetSearchCountDataStore.increaseMetricForPixelDefinition(any())).thenReturn(2)
@@ -200,7 +206,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     }
 
     private fun createPixelDefinitionWithValidWindow(): PixelDefinition {
-        val today = LocalDate.now().minusDays(5)
+        val today = LocalDate.now(ZoneId.of("America/New_York")).minusDays(5)
         return PixelDefinition(
             "pixel_name",
             mapOf(
@@ -211,7 +217,7 @@ class OnboardingHomeScreenWidgetExperimentTest {
     }
 
     private fun createPixelDefinitionWithInvalidWindow(): PixelDefinition {
-        val pastDate = LocalDate.now().minusDays(20)
+        val pastDate = LocalDate.now(ZoneId.of("America/New_York")).minusDays(20)
         return PixelDefinition(
             "pixel_name",
             mapOf(

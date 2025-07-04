@@ -32,6 +32,7 @@ import com.duckduckgo.espresso.*
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import org.hamcrest.Matchers.allOf
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -93,7 +94,7 @@ class SurrogatesTest {
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
-        onView(withId(R.id.browserMenu)).perform(ViewActions.click())
+        onView(allOf(withId(R.id.browserMenu), isClickable())).perform(ViewActions.click())
         onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
         onView(withId(R.id.privacyProtectionMenuItem)).perform(ViewActions.click())
 

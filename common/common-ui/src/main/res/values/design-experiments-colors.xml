@@ -77,4 +77,7 @@
     <attr name="daxColorFireButtonTwo" format="color"/>
     <attr name="daxColorFireButtonThree" format="color"/>
 
+    <!-- Shadows -->
+    <color name="background_omnibar_shadow">#FF000000</color>
+
 </resources>

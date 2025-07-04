@@ -181,6 +181,32 @@ class ContentScopeScriptsJsMessagingTest {
         assertEquals(0, callback.counter)
     }
 
+    @Test
+    fun `when processing addDebugFlag message with valid secret and domain then process message`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, contentScopeScriptsJsMessaging.secret)
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun `when processing addDebugFlag message with wrong secret then do nothing`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
+        """.trimIndent()
+
+        contentScopeScriptsJsMessaging.process(message, "wrongSecret")
+
+        assertEquals(0, callback.counter)
+    }
+
     private val callback = object : JsMessageCallback() {
         var counter = 0
         override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {

@@ -216,10 +216,11 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -231,6 +232,7 @@ import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
@@ -431,6 +433,8 @@ class BrowserTabViewModelTest {
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
 
+    private val mockAutoCompleteSettings: AutoCompleteSettings = mock()
+
     private val mockAdClickManager: AdClickManager = mock()
 
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
@@ -442,6 +446,8 @@ class BrowserTabViewModelTest {
     private val mockDuckPlayer: DuckPlayer = mock()
 
     private val mockDuckChat: DuckChat = mock()
+
+    private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
@@ -551,7 +557,7 @@ class BrowserTabViewModelTest {
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
     val mockStack: WebBackForwardList = mock()
 
-    private val mockVisualDesignExperimentDataStore: VisualDesignExperimentDataStore = mock()
+    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
     private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
@@ -643,8 +649,8 @@ class BrowserTabViewModelTest {
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
-        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
-        whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(false))
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -702,9 +708,6 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
         whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
-        )
-        whenever(mockVisualDesignExperimentDataStore.isExperimentEnabled).thenReturn(
-            defaultVisualExperimentStateFlow,
         )
 
         whenever(mockSiteErrorHandlerKillSwitch.self()).thenReturn(mockSiteErrorHandlerKillSwitchToggle)
@@ -764,6 +767,7 @@ class BrowserTabViewModelTest {
             httpErrorPixels = { mockHttpErrorPixels },
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
+            duckAiFeatureState = mockDuckAiFeatureState,
             duckPlayerJSHelper = DuckPlayerJSHelper(
                 mockDuckPlayer,
                 mockAppBuildConfig,
@@ -783,7 +787,7 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            visualDesignExperimentDataStore = mockVisualDesignExperimentDataStore,
+            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
@@ -792,6 +796,7 @@ class BrowserTabViewModelTest {
             onboardingDesignExperimentToggles = fakeOnboardingDesignExperimentToggles,
             tabManager = tabManager,
             addressDisplayFormatter = mockAddressDisplayFormatter,
+            autoCompleteSettings = mockAutoCompleteSettings,
         )
 
         testee.loadData("abc", null, false, false)
@@ -875,7 +880,7 @@ class BrowserTabViewModelTest {
     fun whenViewBecomesVisibleAndDuckAIPoCIsEnabledThenKeyboardNotShown() = runTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockDisabledToggle)
         whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true)
-        whenever(mockDuckChat.showInputScreen).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(true))
 
         testee.onViewVisible()
 
@@ -921,7 +926,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatDisabledThenDuckChatNotVisible() {
-        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertFalse(browserViewState().showDuckChatOption)
@@ -929,7 +934,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenViewBecomesVisibleAndDuckChatEnabledThenDuckChatIsVisible() {
-        whenever(mockDuckChat.showInBrowserMenu).thenReturn(MutableStateFlow(true))
+        whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
         setBrowserShowing(true)
         testee.onViewVisible()
         assertTrue(browserViewState().showDuckChatOption)
@@ -1528,14 +1533,14 @@ class BrowserTabViewModelTest {
     @Test
     fun whenTriggeringAutocompleteThenAutoCompleteSuggestionsShown() = runTest {
         whenever(mockAutoCompleteService.autoComplete("foo")).thenReturn(emptyList())
-        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = true)
         assertTrue(autoCompleteViewState().showSuggestions)
     }
 
     @Test
     fun whenTriggeringAutoCompleteButNoQueryChangeThenAutoCompleteSuggestionsNotShown() {
-        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("foo", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
     }
@@ -1556,7 +1561,7 @@ class BrowserTabViewModelTest {
                     ),
                 ),
             )
-        doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+        doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
         testee.triggerAutocomplete("https://example.com", true, hasQueryChanged = false)
         assertFalse(autoCompleteViewState().showSuggestions)
         assertTrue(autoCompleteViewState().showFavorites)
@@ -1578,7 +1583,7 @@ class BrowserTabViewModelTest {
             whenever(mockTabRepository.flowTabs).thenReturn(
                 flowOf(listOf(TabEntity(tabId = "1", position = 1, url = "https://example.com", title = "title"))),
             )
-            doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
 
             whenever(mockAutoCompleteRepository.wasHistoryInAutoCompleteIAMDismissed()).thenReturn(false)
             whenever(mockAutoCompleteRepository.countHistoryInAutoCompleteIAMShown()).thenReturn(0)
@@ -1604,7 +1609,7 @@ class BrowserTabViewModelTest {
                 flowOf(listOf(Favorite("abc", "title", "https://example.com", position = 1, lastModified = null))),
             )
             whenever(mockNavigationHistory.getHistory()).thenReturn(flowOf(emptyList()))
-            doReturn(true).whenever(ctaViewModelMockSettingsStore).autoCompleteSuggestionsEnabled
+            doReturn(true).whenever(mockAutoCompleteSettings).autoCompleteSuggestionsEnabled
             testee.autoCompleteStateFlow.value = "query"
             testee.autoCompleteSuggestionsGone()
             verify(mockAutoCompleteRepository, never()).submitUserSeenHistoryIAM()

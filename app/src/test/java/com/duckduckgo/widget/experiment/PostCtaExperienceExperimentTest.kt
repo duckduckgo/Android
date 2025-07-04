@@ -26,6 +26,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.PixelDefinition
 import com.duckduckgo.feature.toggles.api.Toggle
+import java.time.LocalDate
+import java.time.ZoneId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -108,6 +110,7 @@ class PostCtaExperienceExperimentTest {
     fun `when fireWidgetSearchXCount and count reaches 3 then 3x pixel is fired`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(metricsPixel)
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(2)
         whenever(mockWidgetSearchCountDataStore.increaseMetricForPixelDefinition(any())).thenReturn(3)
@@ -121,6 +124,7 @@ class PostCtaExperienceExperimentTest {
     fun `when fireWidgetSearchXCount and count is already 3 then 3x pixel is not fired again`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(metricsPixel)
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(null)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(3)
 
@@ -132,6 +136,7 @@ class PostCtaExperienceExperimentTest {
     @Test
     fun `when fireWidgetSearchXCount and count reaches 5 then 5x pixel is fired`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(null)
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(metricsPixel)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(4)
@@ -145,6 +150,7 @@ class PostCtaExperienceExperimentTest {
     @Test
     fun `when fireWidgetSearchXCount and count is already 5 then 5x pixel is not fired again`() = runTest {
         val pixelDefinitions = listOf(createPixelDefinitionWithValidWindow())
+        whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch3xMetric()).thenReturn(null)
         whenever(mockPostCtaExperiencePixelsPlugin.getWidgetSearch5xMetric()).thenReturn(metricsPixel)
         whenever(metricsPixel.getPixelDefinitions()).thenReturn(pixelDefinitions)
         whenever(mockWidgetSearchCountDataStore.getMetricForPixelDefinition(any())).thenReturn(5)
@@ -155,11 +161,11 @@ class PostCtaExperienceExperimentTest {
     }
 
     private fun createPixelDefinitionWithValidWindow(): PixelDefinition {
-        val today = java.time.LocalDate.now().minusDays(5)
+        val pastDate = LocalDate.now(ZoneId.of("America/New_York")).minusDays(5)
         return PixelDefinition(
             "pixel_name",
             mapOf(
-                "enrollmentDate" to today.toString(),
+                "enrollmentDate" to pastDate.toString(),
                 "conversionWindowDays" to "5-7",
             ),
         )

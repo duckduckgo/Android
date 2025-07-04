@@ -21,14 +21,13 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -37,13 +36,13 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class VisualDesignExperimentViewModel @Inject constructor(
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val visualUpdatesDesignExperimentConflictChecker: VisualUpdatesDesignExperimentConflictChecker,
     private val themingDataStore: ThemingDataStore,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
-        val isBrowserThemingFeatureAvailable: Boolean = true,
+        val isBrowserThemingFeatureAvailable: Boolean = false,
         val isBrowserThemingFeatureChangeable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
         val experimentConflictAlertVisible: Boolean = false,
@@ -58,24 +57,17 @@ class VisualDesignExperimentViewModel @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Lazily, initialValue = ViewState())
 
     init {
-        combine(
-            visualDesignExperimentDataStore.isExperimentEnabled,
-            visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled,
-        ) { isExperimentEnabled, anyConflictingExperimentEnabled ->
-            _viewState.update {
-                it.copy(
-                    isBrowserThemingFeatureAvailable = true,
-                    isBrowserThemingFeatureEnabled = isExperimentEnabled,
-                    isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
-                    experimentConflictAlertVisible = anyConflictingExperimentEnabled,
-                )
-            }
-        }.launchIn(viewModelScope)
-    }
-
-    fun onExperimentalUIModeChanged(checked: Boolean) {
         viewModelScope.launch {
-            visualDesignExperimentDataStore.changeExperimentFlagPreference(checked)
+            visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled.collectLatest { anyConflictingExperimentEnabled ->
+                _viewState.update {
+                    it.copy(
+                        isBrowserThemingFeatureAvailable = false,
+                        isBrowserThemingFeatureEnabled = false,
+                        isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
+                        experimentConflictAlertVisible = anyConflictingExperimentEnabled,
+                    )
+                }
+            }
         }
     }
 }

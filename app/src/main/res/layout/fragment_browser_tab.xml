@@ -26,8 +26,8 @@
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
 
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-        android:id="@+id/fadeOmnibar"
+    <com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
+        android:id="@+id/singleOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
@@ -146,18 +146,11 @@
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-        android:id="@+id/fadeOmnibarBottom"
+    <com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
+        android:id="@+id/singleOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
-        android:id="@+id/navigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:showShadows="true"
-        android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

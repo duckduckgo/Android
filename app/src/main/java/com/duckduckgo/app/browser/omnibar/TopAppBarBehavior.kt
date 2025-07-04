@@ -40,7 +40,6 @@ class TopAppBarBehavior(
         private val viewsExemptedFromOffset = setOf(
             R.id.browserLayout,
             R.id.webViewFullScreenContainer,
-            R.id.navigationBar,
         )
     }
 
@@ -85,7 +84,7 @@ class TopAppBarBehavior(
         if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
             val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
 
-            params.anchorId = R.id.navigationBar
+            params.anchorId = child.id
             params.anchorGravity = Gravity.TOP
             params.gravity = Gravity.TOP
             snackbarLayout.layoutParams = params

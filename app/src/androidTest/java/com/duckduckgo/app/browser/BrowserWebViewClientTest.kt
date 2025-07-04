@@ -73,6 +73,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -81,6 +82,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Off
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -164,6 +166,7 @@ class BrowserWebViewClientTest {
         mock(),
     )
     private val mockDuckChat: DuckChat = mock()
+    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
 
     @UiThreadTest
     @Before
@@ -202,6 +205,7 @@ class BrowserWebViewClientTest {
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
             mockDuckChat,
+            mockContentScopeExperiments,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -221,8 +225,11 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() {
+        val toggle: Toggle = mock()
+        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
+
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).pageStarted(any())
+        verify(listener).pageStarted(any(), eq(listOf(toggle)))
     }
 
     @UiThreadTest
@@ -1185,7 +1192,12 @@ class BrowserWebViewClientTest {
         var countFinished = 0
         var countStarted = 0
 
-        override fun onPageStarted(webView: WebView, url: String?, site: Site?) {
+        override fun onPageStarted(
+            webView: WebView,
+            url: String?,
+            isDesktopMode: Boolean?,
+            activeExperiments: List<Toggle>,
+        ) {
             countStarted++
         }
 

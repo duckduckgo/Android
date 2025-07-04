@@ -24,4 +24,4 @@ tags:
           id: "omnibarTextInput"
       - eraseText
       - assertVisible:
-          text: "Search or type URL"
+          text: "Search"

@@ -61,7 +61,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
@@ -132,7 +131,11 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         logcat { "New Tab: render $viewState" }
-        if (viewState.message == null && viewState.favourites.isEmpty()) {
+
+        val isHomeBackgroundLogoVisible = (!viewState.onboardingComplete || viewState.message == null) &&
+            viewState.favourites.isEmpty()
+
+        if (isHomeBackgroundLogoVisible) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()
