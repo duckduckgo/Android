@@ -50,6 +50,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -66,6 +67,9 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
     private var showShadows: Boolean = false
 
@@ -232,7 +236,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
                     pulseAnimation.playOn(
                         targetView = binding.fireIconImageView,
                         isSenseOfProtectionExperimentAndShieldView = false,
-                        isBuckOnboardingExperiment = false,
+                        isBuckOnboardingExperiment = onboardingDesignExperimentToggles.buckOnboarding().isEnabled(),
                     )
                 }
             }
