@@ -40,6 +40,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -86,6 +87,7 @@ class SystemSearchViewModel @Inject constructor(
     private val pixel: Pixel,
     private val savedSitesRepository: SavedSitesRepository,
     private val appSettingsPreferencesStore: SettingsDataStore,
+    private val autoCompleteSettings: AutoCompleteSettings,
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -243,7 +245,7 @@ class SystemSearchViewModel @Inject constructor(
             return
         }
 
-        if (appSettingsPreferencesStore.autoCompleteSuggestionsEnabled) {
+        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
             val trimmedQuery = query.trim()
             resultsStateFlow.value = trimmedQuery
         }
@@ -278,7 +280,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     private fun inputCleared() {
-        if (appSettingsPreferencesStore.autoCompleteSuggestionsEnabled) {
+        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
             resultsStateFlow.value = ""
         }
         resetResultsState()

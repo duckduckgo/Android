@@ -30,6 +30,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RECENT_SITES_GENERAL_
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.history.api.NavigationHistory
@@ -55,6 +56,7 @@ import logcat.logcat
 @ContributesViewModel(ActivityScope::class)
 class GeneralSettingsViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
+    private val autoCompleteSettings: AutoCompleteSettings,
     private val pixel: Pixel,
     private val history: NavigationHistory,
     private val voiceSearchAvailability: VoiceSearchAvailability,
@@ -91,12 +93,12 @@ class GeneralSettingsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(dispatcherProvider.io()) {
-            val autoCompleteEnabled = settingsDataStore.autoCompleteSuggestionsEnabled
+            val autoCompleteEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
             if (!autoCompleteEnabled) {
                 history.setHistoryUserEnabled(false)
             }
             _viewState.value = ViewState(
-                autoCompleteSuggestionsEnabled = settingsDataStore.autoCompleteSuggestionsEnabled,
+                autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled,
                 autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = history.isHistoryUserEnabled(),
                 storeHistoryEnabled = history.isHistoryFeatureAvailable(),
                 showVoiceSearch = voiceSearchAvailability.isVoiceSearchSupported,
@@ -117,7 +119,7 @@ class GeneralSettingsViewModel @Inject constructor(
     fun onAutocompleteSettingChanged(enabled: Boolean) {
         logcat(INFO) { "User changed autocomplete setting, is now enabled: $enabled" }
         viewModelScope.launch(dispatcherProvider.io()) {
-            settingsDataStore.autoCompleteSuggestionsEnabled = enabled
+            autoCompleteSettings.autoCompleteSuggestionsEnabled = enabled
             if (!enabled) {
                 history.setHistoryUserEnabled(false)
             }

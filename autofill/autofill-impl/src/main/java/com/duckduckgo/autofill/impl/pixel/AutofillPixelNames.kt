@@ -161,6 +161,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED("autofill_import_google_passwords_import_button_tapped"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN("autofill_import_google_passwords_import_button_shown"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_DISMISSED("autofill_import_google_passwords_import_button_dismissed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_OVERFLOW_MENU("autofill_import_google_passwords_overflow_menu_tapped"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_DISPLAYED("autofill_import_google_passwords_preimport_prompt_displayed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED("autofill_import_google_passwords_preimport_prompt_confirmed"),

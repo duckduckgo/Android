@@ -24,8 +24,9 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 
-class FakeSettingsDataStore : SettingsDataStore {
+class FakeSettingsDataStore : SettingsDataStore, AutoCompleteSettings {
     private val store = mutableMapOf<String, Any?>()
 
     override var lastExecutedJobId: String?

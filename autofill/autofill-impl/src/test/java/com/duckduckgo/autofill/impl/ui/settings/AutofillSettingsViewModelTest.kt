@@ -9,7 +9,9 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.SettingsActivity
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
@@ -84,7 +86,7 @@ class AutofillSettingsViewModelTest {
     fun whenScreenRendersIfImportButtonAvailableThenPixelIsSent() = runTest {
         testee.viewState(launchSource).test {
             awaitItem()
-            val expectedParams = mapOf("source" to "settings")
+            val expectedParams = mapOf("source" to AutofillSettings.value)
             verify(pixel).fire(
                 pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN),
                 parameters = eq(expectedParams),
@@ -273,10 +275,10 @@ class AutofillSettingsViewModelTest {
 
     @Test
     fun whenUserClickOnImportGooglePasswordsThenCommandIsSent() = runTest {
-        testee.onImportPasswordsClicked(AutofillScreenLaunchSource.SettingsActivity)
+        testee.onImportPasswordsClicked(AutofillSettings)
         testee.commands.test {
             assertEquals(AutofillSettingsViewModel.Command.ImportPasswordsFromGoogle, awaitItem())
-            val expectedParams = mapOf("source" to "settings")
+            val expectedParams = mapOf("source" to AutofillSettings.value)
             verify(pixel).fire(
                 pixel = eq(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED),
                 parameters = eq(expectedParams),

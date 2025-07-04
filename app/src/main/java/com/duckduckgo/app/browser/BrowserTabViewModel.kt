@@ -287,10 +287,11 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
@@ -409,6 +410,7 @@ class BrowserTabViewModel @Inject constructor(
     private val navigationAwareLoginDetector: NavigationAwareLoginDetector,
     private val autoComplete: AutoComplete,
     private val appSettingsPreferencesStore: SettingsDataStore,
+    private val autoCompleteSettings: AutoCompleteSettings,
     private val longPressHandler: LongPressHandler,
     private val webViewSessionStorage: WebViewSessionStorage,
     private val specialUrlDetector: SpecialUrlDetector,
@@ -463,7 +465,7 @@ class BrowserTabViewModel @Inject constructor(
     private val tabStatsBucketing: TabStatsBucketing,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
@@ -2229,7 +2231,7 @@ class BrowserTabViewModel @Inject constructor(
             currentAutoCompleteViewState().searchResults
         }
 
-        val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
+        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused =
@@ -2814,7 +2816,7 @@ class BrowserTabViewModel @Inject constructor(
                 showMenuButton = HighlightableButton.Visible(highlighted = false),
             )
         }
-        command.value = LaunchPopupMenu(anchorToNavigationBar = !isCustomTab && visualDesignExperimentDataStore.isExperimentEnabled.value)
+        command.value = LaunchPopupMenu
     }
 
     fun onPopupMenuLaunched() {

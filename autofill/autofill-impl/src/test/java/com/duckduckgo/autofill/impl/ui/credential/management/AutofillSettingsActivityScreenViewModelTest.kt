@@ -38,6 +38,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
+import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME
@@ -55,6 +56,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAK
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
+import com.duckduckgo.autofill.impl.store.AutofillEffectDispatcher
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command
@@ -75,6 +77,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingExisting
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportGooglePasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
 import com.duckduckgo.autofill.impl.ui.credential.management.searching.CredentialListFilter
@@ -88,6 +91,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -133,6 +137,7 @@ class AutofillSettingsActivityScreenViewModelTest {
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
     private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+    private val autofillEffectDispatcher: AutofillEffectDispatcher = mock()
 
     private val testee = AutofillPasswordsManagementViewModel(
         autofillStore = mockStore,
@@ -154,6 +159,7 @@ class AutofillSettingsActivityScreenViewModelTest {
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
         webViewCapabilityChecker = webViewCapabilityChecker,
         autofillFeature = autofillFeature,
+        autofillEffectDispatcher = autofillEffectDispatcher,
     )
 
     @Before
@@ -167,6 +173,7 @@ class AutofillSettingsActivityScreenViewModelTest {
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
             whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
             whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
+            whenever(autofillEffectDispatcher.effects).thenReturn(MutableSharedFlow())
             autofillFeature.self().setRawStoredState(State(enable = true))
             autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(State(enable = true))
             autofillFeature.settingsScreen().setRawStoredState(State(enable = true))
@@ -1053,6 +1060,17 @@ class AutofillSettingsActivityScreenViewModelTest {
         testee.onInitialiseListMode()
         testee.commands.test {
             awaitItem().verifyHasCommandToShowLegacyListMode()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnImportPasswordsFromGooglePasswordManagerCalledThenCorrectCommandIsAdded() = runTest {
+        testee.onImportPasswordsFromGooglePasswordManager(PasswordManagementEmptyState)
+
+        testee.commandsListView.test {
+            val commands = awaitItem()
+            assertTrue(commands.contains(LaunchImportGooglePasswords(PasswordManagementEmptyState)))
             cancelAndIgnoreRemainingEvents()
         }
     }

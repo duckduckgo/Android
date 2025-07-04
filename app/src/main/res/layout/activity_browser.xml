@@ -30,11 +30,11 @@
         layout="@layout/include_omnibar_toolbar_mockup" />
 
     <include
-        android:id="@+id/topMockupExperimentalToolbar"
+        android:id="@+id/topMockupSingleToolbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/experimentalToolbarSize"
         android:layout_alignParentTop="true"
-        layout="@layout/include_experimental_omnibar_toolbar_mockup" />
+        layout="@layout/include_single_omnibar_toolbar_mockup" />
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
@@ -50,7 +50,8 @@
     <FrameLayout
         android:id="@+id/duckAiFragmentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
     <View
         android:id="@+id/clearingInProgressView"
@@ -67,10 +68,10 @@
         layout="@layout/include_omnibar_toolbar_mockup" />
 
     <include
-        android:id="@+id/bottomMockupExperimentalToolbar"
+        android:id="@+id/bottomMockupSingleToolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/experimentalToolbarSize"
         android:layout_alignParentBottom="true"
-        layout="@layout/include_experimental_omnibar_toolbar_mockup_bottom" />
+        layout="@layout/include_single_omnibar_toolbar_mockup" />
 
 </RelativeLayout>

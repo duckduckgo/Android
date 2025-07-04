@@ -68,6 +68,8 @@ dependencies {
 
     implementation "de.siegmar:fastcsv:_"
 
+    implementation "com.airbnb.android:lottie:_"
+
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
