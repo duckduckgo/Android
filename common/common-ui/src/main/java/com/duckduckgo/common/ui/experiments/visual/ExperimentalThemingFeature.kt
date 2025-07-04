@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 @ContributesRemoteFeature(
@@ -30,6 +31,7 @@ interface ExperimentalThemingFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
+    @InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun singleOmnibarFeature(): Toggle
 
