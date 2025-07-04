@@ -122,7 +122,7 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
             setMessage(
                 Message(
                     topAnimation = R.raw.anim_password_keys,
-                    title = context.getString(R.string.passwords_import_promo_title),
+                    title = context.getString(R.string.passwords_import_promo_title_forced_line_break),
                     subtitle = context.getString(R.string.passwords_import_promo_subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
                     messageType = REMOTE_MESSAGE,

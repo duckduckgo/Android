@@ -35,10 +35,12 @@ interface AutofillPrefsStore {
     var hasEverBeenPromptedToSaveLogin: Boolean
     var hasEverImportedPasswords: Boolean
     fun hasEverImportedPasswordsFlow(): Flow<Boolean>
-    var hasDismissedImportedPasswordsPromo: Boolean
+    var hasDeclinedPasswordManagementImportPromo: Boolean
+    var hasDeclinedInBrowserPasswordImportPromo: Boolean
     val autofillStateSetByUser: Boolean
     var timestampUserLastPromptedToDisableAutofill: Long?
     var domainTargetDatasetVersion: Long
+    var inBrowserImportPromoShownCount: Int
 
     /**
      * Returns if Autofill was enabled by default.
@@ -105,11 +107,18 @@ class RealAutofillPrefsStore(
             .distinctUntilChanged()
     }
 
-    override var hasDismissedImportedPasswordsPromo: Boolean
-        get() = prefs.getBoolean(HAS_DISMISSED_IMPORT_PASSWORDS_PROMO, false)
+    override var hasDeclinedPasswordManagementImportPromo: Boolean
+        get() = prefs.getBoolean(HAS_DECLINED_PASSWORD_MANAGEMENT_IMPORT_PASSWORDS_PROMO, false)
         set(value) {
-            prefs.edit { putBoolean(HAS_DISMISSED_IMPORT_PASSWORDS_PROMO, value) }
+            prefs.edit { putBoolean(HAS_DECLINED_PASSWORD_MANAGEMENT_IMPORT_PASSWORDS_PROMO, value) }
         }
+
+    override var hasDeclinedInBrowserPasswordImportPromo: Boolean
+        get() = prefs.getBoolean(HAS_DECLINED_IN_BROWSER_IMPORT_PASSWORDS_PROMO, false)
+        set(value) {
+            prefs.edit { putBoolean(HAS_DECLINED_IN_BROWSER_IMPORT_PASSWORDS_PROMO, value) }
+        }
+
     override val autofillStateSetByUser: Boolean
         get() = autofillStateSetByUser()
 
@@ -128,6 +137,13 @@ class RealAutofillPrefsStore(
         set(value) {
             prefs.edit {
                 putLong(DOMAIN_TARGET_DATASET_VERSION, value)
+            }
+        }
+    override var inBrowserImportPromoShownCount: Int
+        get() = prefs.getInt(BROWSER_IMPORT_PROMO_SHOWN_COUNT, 0)
+        set(value) {
+            prefs.edit {
+                putInt(BROWSER_IMPORT_PROMO_SHOWN_COUNT, value)
             }
         }
 
@@ -180,7 +196,9 @@ class RealAutofillPrefsStore(
         const val AUTOFILL_ENABLED = "autofill_enabled"
         const val HAS_EVER_BEEN_PROMPTED_TO_SAVE_LOGIN = "autofill_has_ever_been_prompted_to_save_login"
         const val HAS_EVER_IMPORT_PASSWORDS = "autofill_has_ever_import_passwords"
-        const val HAS_DISMISSED_IMPORT_PASSWORDS_PROMO = "autofill_dismissed_import_passwords_promo"
+        const val HAS_DECLINED_IN_BROWSER_IMPORT_PASSWORDS_PROMO = "autofill_declined_in_browser_import_passwords_promo"
+        const val HAS_DECLINED_PASSWORD_MANAGEMENT_IMPORT_PASSWORDS_PROMO = "autofill_dismissed_import_passwords_promo"
+        const val BROWSER_IMPORT_PROMO_SHOWN_COUNT = "autofill_in_browser_import_promo_shown_count"
         const val TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL = "timestamp_when_user_last_prompted_to_disable_autofill"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"

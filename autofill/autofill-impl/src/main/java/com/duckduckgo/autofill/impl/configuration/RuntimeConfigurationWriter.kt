@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
+import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesProvider.AvailableInputTypes
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputSuccessResponse
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.di.scopes.AppScope
@@ -25,11 +26,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 interface RuntimeConfigurationWriter {
-    fun generateResponseGetAvailableInputTypes(
-        credentialsAvailable: AvailableInputTypeCredentials,
-        emailAvailable: Boolean,
-    ): String
-
+    fun generateResponseGetAvailableInputTypes(availableInputTypes: AvailableInputTypes): String
     fun generateContentScope(settingsJson: AutofillSiteSpecificFixesSettings): String
     fun generateUserUnprotectedDomains(): String
     fun generateUserPreferences(
@@ -49,12 +46,10 @@ interface RuntimeConfigurationWriter {
 class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : RuntimeConfigurationWriter {
     private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
 
-    override fun generateResponseGetAvailableInputTypes(
-        credentialsAvailable: AvailableInputTypeCredentials,
-        emailAvailable: Boolean,
-    ): String {
-        val availableInputTypes = AvailableInputSuccessResponse(credentialsAvailable, emailAvailable)
-        return availableInputTypesAdapter.toJson(availableInputTypes)
+    override fun generateResponseGetAvailableInputTypes(availableInputTypes: AvailableInputTypes): String {
+        val credentialTypes = AvailableInputTypeCredentials(username = availableInputTypes.username, password = availableInputTypes.password)
+        val response = AvailableInputSuccessResponse(credentialTypes, availableInputTypes.email, availableInputTypes.credentialsImport)
+        return availableInputTypesAdapter.toJson(response)
     }
 
     private fun generateSiteSpecificFixesJson(settingsJson: AutofillSiteSpecificFixesSettings): String {

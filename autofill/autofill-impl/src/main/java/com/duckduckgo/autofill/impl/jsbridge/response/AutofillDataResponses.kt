@@ -44,6 +44,16 @@ data class RejectGeneratedPasswordResponse(
     data class RejectGeneratedPassword(val action: String = "rejectGeneratedPassword")
 }
 
+data class NewAutofillDataAvailableResponse(
+    val type: String = "getAutofillDataResponse",
+    val success: NewAutofillDataAvailable,
+) {
+    data class NewAutofillDataAvailable(
+        val action: String = "refreshAvailableInputTypes",
+        val availableInputTypes: AvailableInputSuccessResponse,
+    )
+}
+
 data class EmptyResponse(
     val type: String = "getAutofillDataResponse",
     val success: EmptyCredentialResponse,
@@ -57,6 +67,7 @@ data class EmptyResponse(
 data class AvailableInputSuccessResponse(
     val credentials: AvailableInputTypeCredentials,
     val email: Boolean,
+    val credentialsImport: Boolean,
 )
 
 data class AvailableInputTypeCredentials(

@@ -164,7 +164,7 @@ class RealImportInPasswordsVisibilityTest {
         testee.onPromoDismissed()
 
         assertFalse(testee.canShowImportInPasswords(5))
-        verify(internalAutofillStore).hasDismissedImportedPasswordsPromo = true
+        verify(internalAutofillStore).hasDeclinedPasswordManagementImportPromo = true
     }
 
     @Test
@@ -244,6 +244,6 @@ class RealImportInPasswordsVisibilityTest {
         hasDismissedImportedPasswordsPromo: Boolean = false,
     ) {
         whenever(internalAutofillStore.hasEverImportedPasswords).thenReturn(hasEverImportedPasswords)
-        whenever(internalAutofillStore.hasDismissedImportedPasswordsPromo).thenReturn(hasDismissedImportedPasswordsPromo)
+        whenever(internalAutofillStore.hasDeclinedPasswordManagementImportPromo).thenReturn(hasDismissedImportedPasswordsPromo)
     }
 }
