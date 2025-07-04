@@ -293,4 +293,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Sinchronizuoti darbalaukio slaptažodžius</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Iš naujo nustatyti neįtrauktas svetaines</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Perkelk savo slaptažodžius iš&lt;br /&gt;Google“ į „DuckDuckGo“</string>
+    <string name="passwords_import_promo_subtitle">Greitai ir saugiai importuok savo slaptažodžius į „DuckDuckGo“. „Google“ gali paprašyti tavęs įvesti slaptažodį.</string>
+    <string name="passwords_import_promo_action">Importuok iš „Google“</string>
+
 </resources>
