@@ -3,7 +3,7 @@ appId: com.duckduckgo.mobile.android
 # Select a YouTube video from SERP videos vertical
 - tapOn:
     id: "omnibarTextInput"
-- inputText: "DuckDuckGo none of our business video"
+- inputText: "https://duckduckgo.com/?q=DuckDuckGo+none+of+our+business+site%3Ayoutube.com&atb=v469-1-wb&ia=web"
 - pressKey: Enter
 
 - extendedWaitUntil:

@@ -3,7 +3,10 @@ appId: com.duckduckgo.mobile.android
 # Navigate to a YouTube video
 - tapOn:
     id: "omnibarTextInput"
-- inputText: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+- inputText: "https://m.youtube.com/results?sp=mAEA&search_query=DuckDuckGo+none+of+our+business"
 - pressKey: Enter
 
 - runFlow: handle_youtube_cookies.yaml
+
+- tapOn:
+      text: "DuckDuckGo: None of Our Business by DuckDuckGo.*"
