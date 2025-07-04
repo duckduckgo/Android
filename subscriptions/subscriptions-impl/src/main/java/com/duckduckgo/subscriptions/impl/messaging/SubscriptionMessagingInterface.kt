@@ -368,8 +368,10 @@ class SubscriptionMessagingInterface @Inject constructor(
             if (privacyProFeature.enableNewSubscriptionMessages().isEnabled().not()) return
 
             val authV2Enabled = privacyProFeature.enableSubscriptionFlowsV2().isEnabled()
+            val duckAiSubscriberModelsEnabled = privacyProFeature.duckAiPlus().isEnabled()
             val resultJson = JSONObject().apply {
                 put("useSubscriptionsAuthV2", authV2Enabled)
+                put("usePaidDuckAi", duckAiSubscriberModelsEnabled)
             }
 
             val response = JsRequestResponse.Success(
