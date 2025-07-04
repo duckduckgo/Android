@@ -1,0 +1,21 @@
+appId: com.duckduckgo.mobile.android
+---
+# Select a YouTube video from SERP videos vertical
+- tapOn:
+      id: "omnibarTextInput"
+- inputText: "https://duckduckgo.com/?q=DuckDuckGo+none+of+our+business+site%3Ayoutube.com&atb=v469-1-wb&ia=web"
+- pressKey: Enter
+
+- extendedWaitUntil:
+      visible:
+          text: "Videos for DuckDuckGo none of our business.*"
+      timeout: 15000
+
+- scrollUntilVisible:
+      element:
+          text: "DuckDuckGo: None of Our Business - YouTube"
+      direction: DOWN
+
+- tapOn:
+      text: "DuckDuckGo: None of Our Business - YouTube"
+      index: 0
