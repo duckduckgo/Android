@@ -71,6 +71,7 @@
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 
     <color name="bbSurfaceColor">#FBFBFA</color>
+    <color name="bbPulseOrange">#F05C2B</color>
 
     <color name="bbColorButtonPrimaryContainer">#F05C2B</color>
     <color name="bbColorButtonPrimaryContainerPressed">#993A18</color>

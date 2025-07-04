@@ -29,6 +29,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.common.ui.view.setAllParentsClip
 import com.duckduckgo.common.utils.ConflatedJob
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +38,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecycleObserver {
+class PulseAnimation(
+    private val lifecycleOwner: LifecycleOwner,
+    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+) : DefaultLifecycleObserver {
+
     private var pulseAnimation: AnimatorSet = AnimatorSet()
     private var highlightImageView: View? = null
     private val conflatedJob = ConflatedJob()
@@ -60,9 +65,9 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         conflatedJob.cancel()
     }
 
-    fun playOn(targetView: View, isSenseOfProtectionExperimentAndShieldView: Boolean, isBuckOnboardingExperiment: Boolean) {
+    fun playOn(targetView: View, isSenseOfProtectionExperimentAndShieldView: Boolean) {
         if (highlightImageView == null) {
-            highlightImageView = addHighlightView(targetView, isSenseOfProtectionExperimentAndShieldView, isBuckOnboardingExperiment)
+            highlightImageView = addHighlightView(targetView, isSenseOfProtectionExperimentAndShieldView)
             highlightImageView?.doOnLayout {
                 it.setAllParentsClip(enabled = false)
                 startPulseAnimation(it, isSenseOfProtectionExperimentAndShieldView)
@@ -130,22 +135,29 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
     private fun addHighlightView(
         targetView: View,
         isSenseOfProtectionExperimentAndShieldView: Boolean,
-        isBuckOnboardingExperiment: Boolean,
     ): View {
         if (targetView.parent !is ViewGroup) error("targetView parent should be ViewGroup")
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
         val gravity: Int
-        if (isSenseOfProtectionExperimentAndShieldView) {
-            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
-            gravity = Gravity.START
-        } else if (isBuckOnboardingExperiment) {
-            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
-            gravity = Gravity.CENTER
-        } else {
-            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
-            gravity = Gravity.CENTER
+        when {
+            isSenseOfProtectionExperimentAndShieldView -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
+                gravity = Gravity.START
+            }
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
+                gravity = Gravity.CENTER
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_bb)
+                gravity = Gravity.CENTER
+            }
+            else -> {
+                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
+                gravity = Gravity.CENTER
+            }
         }
         val layoutParams = FrameLayout.LayoutParams(targetView.width, targetView.height, gravity)
         (targetView.parent as ViewGroup).addView(highlightImageView, 0, layoutParams)
