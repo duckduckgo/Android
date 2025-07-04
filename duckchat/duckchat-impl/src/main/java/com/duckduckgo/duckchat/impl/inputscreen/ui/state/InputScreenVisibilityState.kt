@@ -19,4 +19,5 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 data class InputScreenVisibilityState(
     val voiceInputButtonVisible: Boolean,
     val forceWebSearchButtonVisible: Boolean,
+    val favoritesVisible: Boolean,
 )

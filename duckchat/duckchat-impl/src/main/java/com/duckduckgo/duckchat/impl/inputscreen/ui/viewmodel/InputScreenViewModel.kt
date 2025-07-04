@@ -93,6 +93,7 @@ class InputScreenViewModel @Inject constructor(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             forceWebSearchButtonVisible = false,
+            favoritesVisible = true,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -122,8 +123,10 @@ class InputScreenViewModel @Inject constructor(
             .flowOn(dispatchers.io())
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
+                    val currentState = currentAutoCompleteViewState()
                     val favorites = filteredFavourites.map { it }
-                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
+                    val showFavorites = !currentState.showSuggestions && favorites.isNotEmpty()
+                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites, showFavorites = showFavorites)
                 }
             }
             .launchIn(viewModelScope)
@@ -148,6 +151,16 @@ class InputScreenViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+
+        autoCompleteViewState.observeForever { viewState ->
+            if (viewState != null) {
+                _visibilityState.update {
+                    it.copy(
+                        favoritesVisible = viewState.showFavorites,
+                    )
+                }
+            }
+        }
     }
 
     fun onActivityResume() {

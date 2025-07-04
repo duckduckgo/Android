@@ -33,7 +33,6 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
@@ -44,15 +43,18 @@ import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecor
 import com.duckduckgo.duckchat.impl.inputscreen.ui.util.renderIfChanged
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.newtabpage.api.NewTabPagePlugin
+import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
+import com.duckduckgo.savedsites.api.views.FavoritesPlacement
+import com.duckduckgo.savedsites.api.views.SavedSitesViewsProvider
 import javax.inject.Inject
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
 
     @Inject
-    lateinit var newTabPagePlugins: ActivePluginPoint<NewTabPagePlugin>
+    lateinit var savedSitesViewsProvider: SavedSitesViewsProvider
 
     @Inject lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -67,62 +69,67 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private val binding: FragmentSearchTabBinding by viewBinding()
+    private lateinit var favoritesView: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         renderer = SearchInterstitialFragmentRenderer()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
         super.onViewCreated(view, savedInstanceState)
 
         requireActivity().window.sharedElementEnterTransition?.addListener(
             object : Transition.TransitionListener {
                 override fun onTransitionEnd(transition: Transition) {
-                    setupNewTabPage()
+                    configureFavorites()
+                    configureAutoComplete()
+                    configureObservers()
                     transition.removeListener(this)
                 }
+
                 override fun onTransitionStart(transition: Transition) {}
                 override fun onTransitionCancel(transition: Transition) {}
                 override fun onTransitionPause(transition: Transition) {}
                 override fun onTransitionResume(transition: Transition) {}
             },
         )
-
-        configureObservers()
-        configureAutoComplete()
     }
 
-    private fun setupNewTabPage() {
-        lifecycleScope.launch {
-            newTabPagePlugins.getPlugins().firstOrNull()?.let { plugin ->
-                val newTabView = plugin.getView(requireContext())
-                newTabView.alpha = 0f
+    private fun configureFavorites() {
+        val favoritesGridConfig = FavoritesGridConfig(
+            isExpandable = false,
+            showPlaceholders = false,
+            placement = FavoritesPlacement.FOCUSED_STATE,
+        )
+        favoritesView = savedSitesViewsProvider.getFavoritesGridView(requireContext(), config = favoritesGridConfig)
+        favoritesView.alpha = 0f
 
-                val displayMetrics = requireContext().resources.displayMetrics
-                val slideDistance = displayMetrics.heightPixels * CONTENT_SLIDE_DISTANCE
-                newTabView.translationY = -slideDistance
+        val displayMetrics = requireContext().resources.displayMetrics
+        val slideDistance = displayMetrics.heightPixels * CONTENT_SLIDE_DISTANCE
+        favoritesView.translationY = -slideDistance
 
-                binding.contentContainer.addView(
-                    newTabView,
-                    ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                    ),
-                )
+        binding.contentContainer.addView(
+            favoritesView,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            ),
+        )
 
-                newTabView.animate()
-                    .alpha(1f)
-                    .setDuration(CONTENT_ANIMATION_DURATION)
-                    .start()
+        favoritesView.animate()
+            .alpha(1f)
+            .setDuration(CONTENT_ANIMATION_DURATION)
+            .start()
 
-                newTabView.animate()
-                    .translationY(0f)
-                    .setInterpolator(OvershootInterpolator(CONTENT_INTERPOLATOR_TENSION))
-                    .setDuration(CONTENT_ANIMATION_DURATION)
-                    .start()
-            }
-        }
+        favoritesView.animate()
+            .translationY(0f)
+            .setInterpolator(OvershootInterpolator(CONTENT_INTERPOLATOR_TENSION))
+            .setDuration(CONTENT_ANIMATION_DURATION)
+            .start()
     }
 
     private fun configureAutoComplete() {
@@ -190,6 +197,9 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         ) {
             it?.let { renderer.renderAutocomplete(it) }
         }
+        viewModel.visibilityState.onEach {
+            favoritesView.isVisible = it.favoritesVisible
+        }.launchIn(lifecycleScope)
     }
 
     companion object {
