@@ -65,6 +65,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -821,6 +822,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(authRepository.getSubscription())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender).reportAuthV2InvalidRefreshTokenSignedOut()
+
+        // Access token is invalid, so call to /logout can't succeed anyway.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
     }
 
     @Test
@@ -844,6 +849,10 @@ class RealSubscriptionsManagerTest(private val authApiV2Enabled: Boolean) {
         assertNull(authRepository.getRefreshTokenV2())
         assertNull(authRepository.getAccount())
         assertNull(authRepository.getSubscription())
+
+        // Account doesn't exist, so there is no point in notifying BE about logout.
+        advanceUntilIdle()
+        verify(authClient, never()).tryLogout(any())
 
         // Store login has 0 chance of success when account doesn't exist, so there should be no attempt.
         verify(authClient, never()).authorize(any())
