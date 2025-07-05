@@ -88,7 +88,7 @@ class SubscriptionMessagingInterface @Inject constructor(
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, secret, jsMessageCallback)
+                    }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -137,7 +137,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     }
 
     inner class SubscriptionsHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params)
         }
 
@@ -158,7 +158,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         private val dispatcherProvider: DispatcherProvider,
     ) : JsMessageHandler {
 
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             if (jsMessage.id == null) return
 
             val authToken: String? = runBlocking(dispatcherProvider.io()) {
@@ -203,7 +203,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         private val pixelSender: SubscriptionPixelSender,
         private val subscriptionsChecker: SubscriptionsChecker,
     ) : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             try {
                 val token = jsMessage.params.getString("token")
                 appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -229,7 +229,7 @@ class SubscriptionMessagingInterface @Inject constructor(
     ) : JsMessageHandler {
         override fun process(
             jsMessage: JsMessage,
-            secret: String,
+            jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
             appCoroutineScope.launch {
@@ -286,7 +286,7 @@ class SubscriptionMessagingInterface @Inject constructor(
 
         override fun process(
             jsMessage: JsMessage,
-            secret: String,
+            jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
             val jsMessageId = jsMessage.id ?: return
