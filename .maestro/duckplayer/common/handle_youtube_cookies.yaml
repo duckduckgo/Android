@@ -1,0 +1,16 @@
+appId: com.duckduckgo.mobile.android
+---
+# Handle YouTube cookies consent dialog if visible
+- runFlow:
+    when:
+      visible: "Before you continue to YouTube"
+    commands:
+      - scrollUntilVisible:
+          element:
+            text: "Reject the use of cookies and other data for the purposes described"
+            optional: true
+          direction: DOWN
+
+      - tapOn:
+          text: "Reject the use of cookies and other data for the purposes described"
+          optional: true
