@@ -168,6 +168,9 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlus(): Toggle
+
     /**
      * Android supports v2 token, but still relies on old v1 subscription messaging.
      * We are introducing new JS messaging. Use this flag as kill-switch if necessary.
