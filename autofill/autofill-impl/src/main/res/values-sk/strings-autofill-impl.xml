@@ -293,4 +293,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Synchronizuj heslá pracovnej plochy</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Obnovenie vylúčených lokalít</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Prenes si heslá z&lt;br /&gt;Google do DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Rýchlo a bezpečne importuj svoje heslá do DuckDuckGo. Google ťa môže požiadať o zadanie hesla.</string>
+    <string name="passwords_import_promo_action">Importovať z Google</string>
+
 </resources>
