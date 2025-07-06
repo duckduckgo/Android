@@ -281,4 +281,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Masaüstü Şifrelerini Senkronize Et</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Hariç Tutulan Siteleri Sıfırla</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Şifrelerinizi Google\'dan&lt;br /&gt;DuckDuckGo\'ya getirin</string>
+    <string name="passwords_import_promo_subtitle">Şifrelerinizi hızlı ve güvenli bir şekilde DuckDuckGo\'ya aktarın. Google sizden şifrenizi girmenizi isteyebilir.</string>
+    <string name="passwords_import_promo_action">Google\'dan İçe Aktar</string>
+
 </resources>
