@@ -206,7 +206,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     private fun showShadow() {
         if (Build.VERSION.SDK_INT >= 28) {
-            outlineProvider = omnibarCardShadow.addBottomShadow()
+            omnibarCardShadow.addBottomShadow()
         } else {
             when (omnibarPosition) {
                 OmnibarPosition.TOP -> {
@@ -218,6 +218,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 }
             }
         }
+        outlineProvider = omnibarCardShadow.outlineProvider
     }
 
     private fun onFindInPageShown() {

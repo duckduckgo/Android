@@ -39,7 +39,7 @@ fun MaterialCardView.addBottomShadow(
     offsetYDp: Float = 3f,
     insetDp: Float = 3f,
     @ColorInt shadowColor: Int = ContextCompat.getColor(this.context, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-): ViewOutlineProvider {
+) {
     val shadowSize = shadowSizeDp.toPx(context)
     val offsetY = offsetYDp.toPx(context)
     val inset = insetDp.toPx(context).toInt()
@@ -65,6 +65,4 @@ fun MaterialCardView.addBottomShadow(
 
     clipToOutline = false
     elevation = shadowSize
-
-    return outlineProvider
 }
