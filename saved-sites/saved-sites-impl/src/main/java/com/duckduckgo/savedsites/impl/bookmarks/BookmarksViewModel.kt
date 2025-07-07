@@ -379,7 +379,7 @@ class BookmarksViewModel @Inject constructor(
         showSyncPromotionIfEligible()
     }
 
-    fun sortElements(
+    private fun sortElements(
         bookmarkItems: List<BookmarksItemTypes>,
         sortingMode: SortingMode,
     ): List<BookmarksItemTypes> {

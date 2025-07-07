@@ -46,6 +46,8 @@ class BookmarksQueryListener(
                     filteredBookmarks,
                     showEmptyHint = false,
                     showEmptySearchHint = true,
+                    // when filtering, we don't need to account for moves because the relative order of items doesn't change,
+                    // this allows to optimization calculations
                     detectMoves = false,
                 )
             }
