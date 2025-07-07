@@ -92,11 +92,7 @@ class OptOutAndAutoconsentDoneMessageHandlerPluginTest {
 
     @Test
     fun whenProcessOptOutWithSelfTestThenAutoconsentCallsEvaluateJavascript() {
-        val expected = """
-        javascript:(function() {
-            window.autoconsentMessageCallback({ "type": "selfTest" }, window.origin);
-        })();
-        """.trimIndent()
+        val expected = """javascript:(function() {window.autoconsentMessageCallback({ "type": "selfTest" }, window.origin);})();"""
 
         handler.process(getOptOut(), optOutMessage(result = true, selfTest = true), webView, mockCallback)
         handler.process(getAutoconsentType(), autoconsentDoneMessage(), webView, mockCallback)
