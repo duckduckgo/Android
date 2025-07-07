@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.Manifest
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
@@ -286,6 +287,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.TAB_ID
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
@@ -870,11 +872,21 @@ class BrowserTabFragment :
 
     private val searchInterstitialLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val query = result.data?.getStringExtra(QUERY) ?: return@registerForActivityResult
-            if (result.resultCode == RESULT_OK) {
-                submitQuery(query)
-            } else {
-                omnibar.setDraftTextIfNtp(query)
+            val data = result.data ?: return@registerForActivityResult
+
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    data.getStringExtra(QUERY)?.let { query ->
+                        submitQuery(query)
+                    } ?: data.getStringExtra(TAB_ID)?.let { tabId ->
+                        browserActivity?.openExistingTab(tabId)
+                    }
+                }
+                RESULT_CANCELED -> {
+                    data.getStringExtra(QUERY)?.let { query ->
+                        omnibar.setDraftTextIfNtp(query)
+                    }
+                }
             }
         }
 
