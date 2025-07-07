@@ -287,4 +287,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Sinhronizēt darbvirsmas paroles</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Atiestatīt izslēgtās vietnes</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Pārnes savas paroles no&lt;br /&gt;Google uz DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Ātri un droši importē savas paroles DuckDuckGo. Google var lūgt tevi ievadīt savu paroli.</string>
+    <string name="passwords_import_promo_action">Importēt no Google</string>
+
 </resources>
