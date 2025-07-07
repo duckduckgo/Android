@@ -281,4 +281,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Синхронизиране на паролите от работния плот</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Нулиране на изключените сайтове</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Пренесете паролите си от&lt;br /&gt;Google в DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Можете бързо и сигурно да импортирате паролите си в DuckDuckGo. Google може да поиска да въведете парола.</string>
+    <string name="passwords_import_promo_action">Импортиране от Google</string>
+
 </resources>
