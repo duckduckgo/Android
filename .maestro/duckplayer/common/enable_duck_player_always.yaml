@@ -9,5 +9,6 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     text: "Save"
 
-- pressKey: back
-- pressKey: back
+- pressKey: Back
+- launchApp:
+      stopApp: true
