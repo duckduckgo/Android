@@ -25,7 +25,6 @@ import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
