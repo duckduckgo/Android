@@ -34,7 +34,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -1303,12 +1302,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 if (Build.VERSION.SDK_INT >= 28) {
-                    singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
-                        shadowSizeDp = 12f,
-                        offsetYDp = 3f,
-                        insetDp = 3f,
-                        shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-                    )
+                    singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
 
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()

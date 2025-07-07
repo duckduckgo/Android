@@ -34,21 +34,15 @@ import com.google.android.material.card.MaterialCardView
  * @param shadowColor Optional shadow color (Android P and above only)
  */
 @RequiresApi(28)
-fun View.addBottomShadow(
-    shadowSizeDp: Float,
-    offsetYDp: Float = 2f,
-    insetDp: Float = 0f,
-    @ColorInt shadowColor: Int,
-) {
+fun MaterialCardView.addBottomShadow(
+    shadowSizeDp: Float = 12f,
+    offsetYDp: Float = 3f,
+    insetDp: Float = 3f,
+    @ColorInt shadowColor: Int = ContextCompat.getColor(this.context, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
+): ViewOutlineProvider {
     val shadowSize = shadowSizeDp.toPx(context)
     val offsetY = offsetYDp.toPx(context)
     val inset = insetDp.toPx(context).toInt()
-
-    // Get corner radius if view is a card
-    val cornerRadius = when (this) {
-        is MaterialCardView -> this.radius
-        else -> 0f
-    }
 
     outlineProvider = object : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) {
@@ -58,7 +52,7 @@ fun View.addBottomShadow(
                 0,
                 view.width + inset,
                 view.height,
-                cornerRadius,
+                radius,
             )
             // Make the shadow appear only below the view
             outline.offset(0, offsetY.toInt())
@@ -71,4 +65,6 @@ fun View.addBottomShadow(
 
     clipToOutline = false
     elevation = shadowSize
+
+    return outlineProvider
 }
