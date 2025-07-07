@@ -443,9 +443,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Ne možeš koristiti App Tracking Protection zbog svog VPN-a? Prebaci se na DuckDuckGo VPN – jedini VPN koji je kompatibilan. <annotation type="ppro_upsell_link">Saznaj više</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Ne možeš koristiti App Tracking Protection zbog svog VPN-a? Prebaci se na DuckDuckGo VPN – jedini VPN koji je kompatibilan. <annotation type="ppro_upsell_link">Isprobaj besplatno!</annotation>.</string>
     <string name="apptp_PproUpsellInfoRevoked"><b>Zaštita App Tracking Protection je onemogućena</b>\nJe li tvoj VPN onemogućio App Tracking Protection? Koristi gornji gumb za ponovno uključivanje.\n\nNabavi DuckDuckGo VPN — jedini VPN koji radi s uslugom za zaštitu App Tracking Protection. <annotation type="ppro_upsell_link">Saznaj više</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>Zaštita App Tracking Protection je onemogućena</b>\nJe li tvoj VPN onemogućio App Tracking Protection? Koristi gore prikazani gumb za ponovno uključivanje.\n\nPrebaci se na DuckDuckGo VPN – jedini VPN koji radi s uslugom za zaštitu App Tracking Protection. <annotation type="ppro_upsell_link">Isprobaj besplatno!</annotation>.</string>
     <string name="apptp_PproUpsellBannerTitle">Podigni svoju privatnost na višu razinu</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo ima jedini VPN koji je kompatibilan s uslugom App Tracking Protection. Aktiviraj uz plaćenu pretplatu na Privacy Pro.</string>
     <string name="apptp_PproUpsellBannerAction">Saznajte više</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Pretplati se na DuckDuckGo i nabavi jedini VPN koji je kompatibilan sa zaštitom App Tracking Protection.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Isprobaj besplatno!</string>
 
 </resources>
