@@ -16,7 +16,6 @@
 
 package com.duckduckgo.common.ui.view.shape
 
-import android.app.UiModeManager
 import android.content.Context
 import android.util.AttributeSet
 import com.duckduckgo.common.ui.view.toPx
@@ -41,9 +40,19 @@ class BBCardView @JvmOverloads constructor(
             offsetPx = 56.toPx(),
         )
 
-        shapeAppearanceModel = ShapeAppearanceModel.builder()
-            .setAllCornerSizes(56.toPx() * 1f)
-            .setTopEdge(offsetEdgeTreatment)
-            .build()
+        val shapeBuilder = ShapeAppearanceModel.builder()
+
+        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.BBCardView, defStyleAttr, 0)
+        val defaultCornerSize = 56.toPx() * 1f
+
+        shapeAppearanceModel = shapeBuilder.apply {
+            setAllCornerSizes(defaultCornerSize)
+
+            if (attr.hasValue(R.styleable.BBCardView_topRightCornerRadius)) {
+                setTopRightCornerSize(attr.getDimension(R.styleable.BBCardView_topRightCornerRadius, 0f))
+            }
+
+            setTopEdge(offsetEdgeTreatment)
+        }.build()
     }
 }
