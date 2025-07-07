@@ -397,7 +397,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun observeItemsToDisplay() {
-        viewModel.sortedItems.onEach { items ->
+        viewModel.itemsToDisplay.onEach { items ->
             bookmarksAdapter.setItems(
                 items,
                 showEmptyHint = items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,

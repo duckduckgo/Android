@@ -128,8 +128,8 @@ class BookmarksViewModel @Inject constructor(
 
     data class HiddenBookmarksIds(val items: List<String> = emptyList())
 
-    private val _sortedItems = MutableStateFlow<List<BookmarksItemTypes>>(emptyList())
-    val sortedItems = _sortedItems.asStateFlow()
+    private val _itemsToDisplay = MutableStateFlow<List<BookmarksItemTypes>>(emptyList())
+    val itemsToDisplay = _itemsToDisplay.asStateFlow()
 
     init {
         viewState.value = ViewState()
@@ -366,7 +366,7 @@ class BookmarksViewModel @Inject constructor(
         }
 
         val sortingMode = bookmarksDataStore.getSortingMode()
-        _sortedItems.value = sortElements(bookmarkItems, sortingMode)
+        _itemsToDisplay.value = sortElements(bookmarkItems, sortingMode)
         withContext(dispatcherProvider.main()) {
             viewState.value = viewState.value?.copy(
                 favorites = favorites,
@@ -501,7 +501,7 @@ class BookmarksViewModel @Inject constructor(
             bookmarksDataStore.setSortingMode(mode)
             val bookmarkItems = viewState.value?.bookmarkItems
             val sortedBookmarks = sortElements(bookmarkItems ?: emptyList(), mode)
-            _sortedItems.value = sortedBookmarks
+            _itemsToDisplay.value = sortedBookmarks
             withContext(dispatcherProvider.main()) {
                 viewState.value = viewState.value?.copy(
                     sortingMode = bookmarksDataStore.getSortingMode(),

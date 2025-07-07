@@ -79,15 +79,17 @@ class BookmarksAdapter(
         showEmptySearchHint: Boolean,
         detectMoves: Boolean,
     ) {
-        val oldBookmarkItems = bookmarkItems.toList()
-        bookmarkItemsUpdateJob += lifecycleOwner.lifecycleScope.launch {
-            val generatedList = generateNewList(newBookmarkItems, showEmptyHint, showEmptySearchHint)
-            val diffCallback = DiffCallback(old = oldBookmarkItems, new = generatedList)
-            val diffResult = DiffUtil.calculateDiff(diffCallback, detectMoves)
-            withContext(dispatcherProvider.main()) {
-                bookmarkItems.clear().also { bookmarkItems.addAll(generatedList) }
-                diffResult.dispatchUpdatesTo(this@BookmarksAdapter)
+        bookmarkItemsUpdateJob += lifecycleOwner.lifecycleScope.launch(dispatcherProvider.main()) {
+            val oldBookmarkItemsLocalRef = bookmarkItems.toList()
+            val newBookmarkItemsLocalRef = newBookmarkItems.toList()
+            val (generatedList, diffResult) = withContext(dispatcherProvider.computation()) {
+                val generatedList = generateNewList(newBookmarkItemsLocalRef, showEmptyHint, showEmptySearchHint)
+                val diffCallback = DiffCallback(old = oldBookmarkItemsLocalRef, new = generatedList)
+                val diffResult = DiffUtil.calculateDiff(diffCallback, detectMoves)
+                generatedList to diffResult
             }
+            bookmarkItems.clear().also { bookmarkItems.addAll(generatedList) }
+            diffResult.dispatchUpdatesTo(this@BookmarksAdapter)
         }
     }
 

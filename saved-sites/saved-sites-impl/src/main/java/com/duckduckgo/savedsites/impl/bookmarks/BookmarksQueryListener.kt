@@ -26,7 +26,6 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTy
 import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 class BookmarksQueryListener(
     private val viewModel: BookmarksViewModel,
@@ -41,7 +40,7 @@ class BookmarksQueryListener(
             delay(DEBOUNCE_PERIOD)
             viewModel.onSearchQueryUpdated(newText)
             val favorites = viewModel.viewState.value?.favorites
-            viewModel.sortedItems.value.let { bookmarks ->
+            viewModel.itemsToDisplay.value.let { bookmarks ->
                 val filteredBookmarks = filterBookmarks(newText, bookmarks, favorites)
                 bookmarksAdapter.setItems(
                     filteredBookmarks,
