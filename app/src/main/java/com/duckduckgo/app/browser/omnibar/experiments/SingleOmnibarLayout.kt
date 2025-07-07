@@ -22,10 +22,10 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -71,6 +71,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
     }
     private var isFindInPageVisible = false
+    private var outlineProvider: ViewOutlineProvider? = null
+
     private val findInPageLayoutVisibilityChangeListener = OnGlobalLayoutListener {
         val isVisible = findInPage.findInPageContainer.isVisible
         if (isFindInPageVisible != isVisible) {
@@ -101,32 +103,13 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         AndroidSupportInjection.inject(this)
 
-        if (Build.VERSION.SDK_INT >= 28) {
-            omnibarCardShadow.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = ContextCompat.getColor(context, CommonR.color.background_omnibar_shadow),
+        showShadow()
+
+        if (omnibarPosition == OmnibarPosition.BOTTOM) {
+            // When omnibar is at the bottom, we're adding an additional space at the top
+            toolbarContainer.updatePadding(
+                top = toolbarContainerPaddingTopWhenAtBottom,
             )
-        }
-
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 2f.toPx(context)
-                }
-            }
-            OmnibarPosition.BOTTOM -> {
-                // When omnibar is at the bottom, we're adding an additional space at the top
-                toolbarContainer.updatePadding(
-                    top = toolbarContainerPaddingTopWhenAtBottom,
-                )
-
-                // Try to reduce the bottom omnibar material shadow when not using the custom shadow
-                if (Build.VERSION.SDK_INT < 28) {
-                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
-                }
-            }
         }
     }
 
@@ -149,6 +132,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         } else {
             animateOmnibarFocusedState(focused = false)
         }
+
+        omnibarCardShadow.isVisible = viewState.viewMode !is ViewMode.CustomTab
     }
 
     override fun renderButtons(viewState: ViewState) {
@@ -199,6 +184,40 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
         animator.start()
         focusAnimator = animator
+
+        if (focused) {
+            disableShadow()
+        } else {
+            enableShadow()
+        }
+    }
+
+    private fun disableShadow() {
+        if (omnibarCardShadow.outlineProvider != null) {
+            omnibarCardShadow.outlineProvider = null
+        }
+    }
+
+    private fun enableShadow() {
+        if (omnibarCardShadow.outlineProvider == null) {
+            omnibarCardShadow.outlineProvider = outlineProvider
+        }
+    }
+
+    private fun showShadow() {
+        if (Build.VERSION.SDK_INT >= 28) {
+            outlineProvider = omnibarCardShadow.addBottomShadow()
+        } else {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> {
+                    omnibarCardShadow.cardElevation = 2f.toPx(context)
+                }
+                OmnibarPosition.BOTTOM -> {
+                    // Try to reduce the bottom omnibar material shadow when not using the custom shadow
+                    omnibarCardShadow.cardElevation = 0.5f.toPx(context)
+                }
+            }
+        }
     }
 
     private fun onFindInPageShown() {
