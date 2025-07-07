@@ -293,4 +293,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Sinkroniziraj lozinke za radnu površinu</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Resetiraj isključene web lokacije</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Prenesi svoje lozinke s&lt;br /&gt;Googlea na DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Brzo i sigurno uvezi svoje lozinke u DuckDuckGo. Google će te možda zamoliti da uneseš svoju lozinku.</string>
+    <string name="passwords_import_promo_action">Uvezi s Googlea</string>
+
 </resources>
