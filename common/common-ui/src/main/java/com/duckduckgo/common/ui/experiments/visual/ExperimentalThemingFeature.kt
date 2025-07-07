@@ -30,7 +30,8 @@ interface ExperimentalThemingFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun singleOmnibarFeature(): Toggle
 
     enum class ExperimentalThemingCohortName(override val cohortName: String) : CohortName {
