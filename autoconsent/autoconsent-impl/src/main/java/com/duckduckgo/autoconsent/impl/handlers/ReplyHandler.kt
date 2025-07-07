@@ -16,45 +16,12 @@
 
 package com.duckduckgo.autoconsent.impl.handlers
 
-import java.io.BufferedReader
-import java.io.StringReader
-import kotlin.sequences.forEach
-
 object ReplyHandler {
     fun constructReply(message: String): String {
         return """
             (function() {
                 window.autoconsentMessageCallback($message, window.origin);
             })();
-        """.trimIndentEfficient()
-    }
-
-    private fun String.trimIndentEfficient(): String {
-        val reader1 = BufferedReader(StringReader(this))
-        var minIndent = Int.MAX_VALUE
-        reader1.useLines { lines ->
-            lines.forEach { line ->
-                if (line.isNotBlank()) {
-                    val indent = line.takeWhile(Char::isWhitespace).length
-                    if (indent < minIndent) minIndent = indent
-                }
-            }
-        }
-        if (minIndent == Int.MAX_VALUE) minIndent = 0
-
-        val sb = StringBuilder(this.length)
-        val reader2 = BufferedReader(StringReader(this))
-        reader2.useLines { lines ->
-            lines.forEach { line ->
-                if (line.length >= minIndent) {
-                    sb.append(line, minIndent, line.length)
-                } else {
-                    sb.append(line)
-                }
-                sb.append('\n')
-            }
-        }
-
-        return sb.toString()
+        """
     }
 }
