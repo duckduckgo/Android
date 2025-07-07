@@ -73,6 +73,9 @@
     <color name="bbSurfaceColor">#FBFBFA</color>
     <color name="bbPulseOrange">#F05C2B</color>
 
+    <color name="bbColorPrimaryText">#27251F</color>
+    <color name="bbColorSecondaryText">#646153</color>
+
     <color name="bbColorButtonPrimaryContainer">#F05C2B</color>
     <color name="bbColorButtonPrimaryContainerPressed">#993A18</color>
     <color name="bbColorButtonPrimaryText">#FBFBFA</color>
@@ -82,6 +85,8 @@
 
     <color name="bbColorButtonOptionContainer">#EEEEEA</color>
     <color name="bbColorButtonOptionText">#27251F</color>
+
+    <color name="bbColorButtonFAB">@color/white</color>
 
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>

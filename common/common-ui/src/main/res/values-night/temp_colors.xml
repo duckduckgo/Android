@@ -48,10 +48,15 @@
 
     <color name="bbSurfaceColor">#161615</color>
 
+    <color name="bbColorPrimaryText">#EDEDEC</color>
+    <color name="bbColorSecondaryText">#A1A09A</color>
+
     <color name="bbColorButtonSecondaryText">#EDEDEC</color>
     <color name="bbColorButtonOptionPressed">@color/white12</color>
 
     <color name="bbColorButtonOptionContainer">#232320</color>
     <color name="bbColorButtonOptionText">#EDEDEC</color>
+
+    <color name="bbColorButtonFAB">#272727</color>
 
 </resources>
