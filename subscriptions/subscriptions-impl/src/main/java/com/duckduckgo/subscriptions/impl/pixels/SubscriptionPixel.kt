@@ -259,9 +259,19 @@ enum class SubscriptionPixel(
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
 }
 
+object SubscriptionPixelParameter {
+    const val ERROR_TYPE = "errorType"
+    const val REASON = "reason"
+}
+
 internal val PixelType.pixelNameSuffix: String
     get() = when (this) {
         is Count -> "c"
         is Daily -> "d"
         is Unique -> "u"
     }
+
+internal enum class SubscriptionFailureErrorType {
+    INVALID_PRODUCT_ID,
+    PURCHASE_EXCEPTION,
+}

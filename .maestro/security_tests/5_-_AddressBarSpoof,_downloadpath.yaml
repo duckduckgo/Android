@@ -22,7 +22,7 @@ tags:
             - tapOn: "Save to Downloads"
             - copyTextFrom:
                 id: "omnibarTextInput"
-            - assertTrue: ${maestro.copiedText == "Search or type URL"} # Downloads should occur in empty origin.
+            - assertTrue: ${maestro.copiedText == "Search"} # Downloads should occur in empty origin.
             - pressKey: Back
             # Download Cancel Flow:
             - tapOn: "Start"
