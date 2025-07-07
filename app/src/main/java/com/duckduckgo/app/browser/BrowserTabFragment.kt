@@ -656,6 +656,9 @@ class BrowserTabFragment :
     private val buckDialogInContext
         get() = binding.includeOnboardingInContextBuckDialog
 
+    private val bbDialogInContext
+        get() = binding.includeOnboardingInContextBBDialog
+
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
 
@@ -2211,7 +2214,11 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+            bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        } else {
+            daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        }
     }
 
     private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
@@ -3100,10 +3107,16 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            onboardingCta.hideBuckOnboardingCta(binding)
-        } else {
-            onboardingCta.hideOnboardingCta(binding)
+        when {
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingCta.hideBuckOnboardingCta(binding)
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingCta.hideBBOnboardingCta(binding)
+            }
+            else -> {
+                onboardingCta.hideOnboardingCta(binding)
+            }
         }
     }
 
