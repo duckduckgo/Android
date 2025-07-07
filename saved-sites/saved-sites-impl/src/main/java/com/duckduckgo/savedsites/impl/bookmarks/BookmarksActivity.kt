@@ -92,13 +92,13 @@ import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)

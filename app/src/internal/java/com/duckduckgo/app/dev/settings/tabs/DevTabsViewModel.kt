@@ -109,7 +109,7 @@ class DevTabsViewModel @Inject constructor(
                 val randomIndex = randomUrls.indices.random()
                 savedSitesRepository.insertBookmark(
                     title = "",
-                    url = randomUrls[randomIndex]
+                    url = randomUrls[randomIndex],
                 )
             }
         }
