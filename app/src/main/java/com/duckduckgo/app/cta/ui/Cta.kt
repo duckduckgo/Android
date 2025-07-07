@@ -141,6 +141,10 @@ sealed class OnboardingDaxDialogCta(
         }
     }
 
+    fun hideBBOnboardingCta(binding: FragmentBrowserTabBinding) {
+        binding.includeOnboardingInContextBBDialog.root.gone()
+    }
+
     internal fun setOnboardingDialogView(
         daxTitle: String? = null,
         daxText: String,
@@ -270,6 +274,61 @@ sealed class OnboardingDaxDialogCta(
         }
     }
 
+    internal fun setBBOnboardingDialogView(
+        title: String? = null,
+        message: String,
+        primaryCtaText: String?,
+        binding: FragmentBrowserTabBinding,
+        onPrimaryCtaClicked: () -> Unit,
+        onTypingAnimationFinished: () -> Unit = {},
+        onDismissCtaClicked: () -> Unit,
+    ) {
+        val binding = binding.includeOnboardingInContextBBDialog
+
+        with(binding) {
+            root.show()
+            primaryCta.setOnClickListener(null)
+
+            val parsedMessage = message.html(binding.root.context)
+            dialogTextCta.text = ""
+            hiddenTextCta.text = parsedMessage
+
+            title?.let {
+                with(onboardingDialogTitle) {
+                    show()
+                    text = title
+                }
+            } ?: onboardingDialogTitle.gone()
+
+            primaryCtaText?.let {
+                with(primaryCta) {
+                    alpha = MIN_ALPHA
+                    show()
+                    text = primaryCtaText
+                }
+            } ?: primaryCta.gone()
+
+            onboardingDialogSuggestionsContent.gone()
+            onboardingDialogContent.show()
+            root.alpha = MAX_ALPHA
+
+            TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+
+            val afterAnimation = {
+                dialogTextCta.finishAnimation()
+                primaryCtaText?.let { primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
+                primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
+                daxDialogDismissButton.setOnClickListener { onDismissCtaClicked.invoke() }
+                onTypingAnimationFinished.invoke()
+            }
+
+            dialogTextCta.startTypingAnimation(message, true) { afterAnimation() }
+            onboardingDaxDialogBackground.setOnClickListener { afterAnimation() }
+            onboardingDialogContent.setOnClickListener { afterAnimation() }
+            onboardingDialogSuggestionsContent.setOnClickListener { afterAnimation() }
+        }
+    }
+
     class DaxSerpCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
@@ -296,24 +355,36 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                setBuckOnboardingDialogView(
-                    message = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
-            } else {
-                setOnboardingDialogView(
-                    daxText = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    setBuckOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    setBBOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                else -> {
+                    setOnboardingDialogView(
+                        daxText = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onSecondaryCtaClicked = onSecondaryCtaClicked,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
             }
         }
     }
@@ -346,25 +417,38 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                setBuckOnboardingDialogView(
-                    message = getTrackersDescription(context, trackers),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
-            } else {
-                setOnboardingDialogView(
-                    daxText = getTrackersDescription(context, trackers),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    setBuckOnboardingDialogView(
+                        message = getTrackersDescription(context, trackers),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    setBBOnboardingDialogView(
+                        message = getTrackersDescription(context, trackers),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                else -> {
+                    setOnboardingDialogView(
+                        daxText = getTrackersDescription(context, trackers),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onSecondaryCtaClicked = onSecondaryCtaClicked,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
             }
         }
 
@@ -420,24 +504,36 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                setBuckOnboardingDialogView(
-                    message = getTrackersDescription(context),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
-            } else {
-                setOnboardingDialogView(
-                    daxText = getTrackersDescription(context),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    setBuckOnboardingDialogView(
+                        message = getTrackersDescription(context),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    setBBOnboardingDialogView(
+                        message = getTrackersDescription(context),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                else -> {
+                    setOnboardingDialogView(
+                        daxText = getTrackersDescription(context),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onSecondaryCtaClicked = onSecondaryCtaClicked,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
             }
         }
 
@@ -489,24 +585,36 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                setBuckOnboardingDialogView(
-                    message = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
-            } else {
-                setOnboardingDialogView(
-                    daxText = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    setBuckOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    setBBOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                else -> {
+                    setOnboardingDialogView(
+                        daxText = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onSecondaryCtaClicked = onSecondaryCtaClicked,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
             }
         }
     }
@@ -537,24 +645,36 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                setBuckOnboardingDialogView(
-                    message = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
-            } else {
-                setOnboardingDialogView(
-                    daxText = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    setBuckOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    setBBOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                else -> {
+                    setOnboardingDialogView(
+                        daxText = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onSecondaryCtaClicked = onSecondaryCtaClicked,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
             }
         }
     }
@@ -583,47 +703,57 @@ sealed class OnboardingDaxDialogCta(
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
         ) {
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                showBuckOnboardingCta(
-                    binding = binding,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onSuggestedOptionClicked = onSuggestedOptionClicked,
-                )
-            } else {
-                val context = binding.root.context
-                val daxDialog = binding.includeOnboardingInContextDaxDialog
-                val daxText = description?.let { context.getString(it) }.orEmpty()
-
-                binding.includeOnboardingInContextDaxDialog.onboardingDialogContent.gone()
-                binding.includeOnboardingInContextDaxDialog.onboardingDialogSuggestionsContent.show()
-                daxDialog.suggestionsDialogTextCta.text = ""
-                daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
-                TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
-                val afterAnimation = {
-                    onTypingAnimationFinished()
-                    val optionsViews = listOf<DaxButton>(
-                        daxDialog.daxDialogOption1,
-                        daxDialog.daxDialogOption2,
-                        daxDialog.daxDialogOption3,
-                        daxDialog.daxDialogOption4,
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    showBuckOnboardingCta(
+                        binding = binding,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onSuggestedOptionClicked = onSuggestedOptionClicked,
                     )
-
-                    optionsViews.forEachIndexed { index, buttonView ->
-                        val options = onboardingStore.getSitesOptions()
-                        options[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                    }
-
-                    val options = onboardingStore.getSitesOptions()
-                    daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
-                    daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
-                    daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
-                    daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
                 }
-                daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
-                daxDialog.onboardingDialogContent.setOnClickListener {
-                    daxDialog.dialogTextCta.finishAnimation()
-                    afterAnimation()
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    showBBOnboardingCta(
+                        binding = binding,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onSuggestedOptionClicked = onSuggestedOptionClicked,
+                    )
+                }
+                else -> {
+                    val context = binding.root.context
+                    val daxDialog = binding.includeOnboardingInContextDaxDialog
+                    val daxText = description?.let { context.getString(it) }.orEmpty()
+
+                    binding.includeOnboardingInContextDaxDialog.onboardingDialogContent.gone()
+                    binding.includeOnboardingInContextDaxDialog.onboardingDialogSuggestionsContent.show()
+                    daxDialog.suggestionsDialogTextCta.text = ""
+                    daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
+                    TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
+                    val afterAnimation = {
+                        onTypingAnimationFinished()
+                        val optionsViews = listOf<DaxButton>(
+                            daxDialog.daxDialogOption1,
+                            daxDialog.daxDialogOption2,
+                            daxDialog.daxDialogOption3,
+                            daxDialog.daxDialogOption4,
+                        )
+
+                        optionsViews.forEachIndexed { index, buttonView ->
+                            val options = onboardingStore.getSitesOptions()
+                            options[index].setOptionView(buttonView)
+                            buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                        }
+
+                        val options = onboardingStore.getSitesOptions()
+                        daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
+                        daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
+                        daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
+                        daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
+                    }
+                    daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+                    daxDialog.onboardingDialogContent.setOnClickListener {
+                        daxDialog.dialogTextCta.finishAnimation()
+                        afterAnimation()
+                    }
                 }
             }
         }
@@ -707,6 +837,56 @@ sealed class OnboardingDaxDialogCta(
                 playAnimation()
             }
         }
+
+        private fun showBBOnboardingCta(
+            binding: FragmentBrowserTabBinding,
+            onTypingAnimationFinished: () -> Unit,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+        ) {
+            val binding = binding.includeOnboardingInContextBBDialog
+            val context = binding.root.context
+
+            val daxText = description?.let { context.getString(it) }.orEmpty()
+
+            with(binding) {
+                onboardingDialogContent.gone()
+                onboardingDialogSuggestionsContent.show()
+                suggestionsDialogTextCta.text = ""
+                suggestionsHiddenTextCta.text = daxText.html(context)
+
+                TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+
+                val afterAnimation = {
+                    onTypingAnimationFinished()
+                    val optionsViews = listOf(
+                        daxDialogOption1,
+                        daxDialogOption2,
+                        daxDialogOption3,
+                    )
+
+                    // BB dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
+                    val options = onboardingStore.getSitesOptions()
+                        .toMutableList()
+                        .apply {
+                            removeAt(1) // Remove the regional news option
+                        }
+
+                    optionsViews.forEachIndexed { index, buttonView ->
+                        options[index].setOptionView(buttonView)
+                        buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                        buttonView.setOnClickListener {
+                            onSuggestedOptionClicked?.invoke(options[index])
+                        }
+                    }
+                }
+
+                suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+                onboardingDialogContent.setOnClickListener {
+                    dialogTextCta.finishAnimation()
+                    afterAnimation()
+                }
+            }
+        }
     }
 
     class DaxEndCta(
@@ -737,24 +917,36 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                setBuckOnboardingDialogView(
-                    message = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
-            } else {
-                setOnboardingDialogView(
-                    daxText = description?.let { context.getString(it) }.orEmpty(),
-                    primaryCtaText = buttonText?.let { context.getString(it) },
-                    binding = binding,
-                    onPrimaryCtaClicked = onPrimaryCtaClicked,
-                    onSecondaryCtaClicked = onSecondaryCtaClicked,
-                    onTypingAnimationFinished = onTypingAnimationFinished,
-                    onDismissCtaClicked = onDismissCtaClicked,
-                )
+            when {
+                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    setBuckOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    setBBOnboardingDialogView(
+                        message = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
+                else -> {
+                    setOnboardingDialogView(
+                        daxText = description?.let { context.getString(it) }.orEmpty(),
+                        primaryCtaText = buttonText?.let { context.getString(it) },
+                        binding = binding,
+                        onPrimaryCtaClicked = onPrimaryCtaClicked,
+                        onSecondaryCtaClicked = onSecondaryCtaClicked,
+                        onTypingAnimationFinished = onTypingAnimationFinished,
+                        onDismissCtaClicked = onDismissCtaClicked,
+                    )
+                }
             }
         }
     }
@@ -1063,6 +1255,7 @@ sealed class DaxBubbleCta(
         binding: FragmentBrowserTabBinding,
     ) {
         binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble.root.gone()
+        binding.includeNewBrowserTab.includeOnboardingBBDialogBubble.root.gone()
         binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.root.gone()
     }
 
