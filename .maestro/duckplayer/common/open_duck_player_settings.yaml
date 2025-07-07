@@ -1,24 +1,8 @@
 appId: com.duckduckgo.mobile.android
 ---
 # Open Duck Player video settings
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
-
-- scrollUntilVisible:
-    element:
-      id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
-    direction: DOWN
-
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/settingsMenuItem"
-
-- scrollUntilVisible:
-    element:
-      text: "Duck Player"
-    direction: DOWN
-
-- tapOn:
-    text: "Duck Player"
+- openLink:
+    link: duck://settings.player
 
 - tapOn:
     text: "Open YouTube Videos in Duck Player"
