@@ -52,6 +52,8 @@ class InputScreenActivity : DuckDuckGoActivity() {
     companion object {
         // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
         const val QUERY = "query"
+        const val TAB_ID = "tab_id"
+
         const val TRANSITION_DURATION = 300L
         const val TRANSITION_INTERPOLATOR_TENSION = 1F
     }

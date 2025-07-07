@@ -208,7 +208,6 @@ class InputScreenViewModel @Inject constructor(
     }
 
     private fun onUserSwitchedToTab(tabId: String) {
-        // TODO: handle switch to tab
         command.value = SwitchToTab(tabId)
     }
 

@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToSearch
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -132,6 +133,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         when (command) {
             is UserSubmittedQuery -> binding.inputModeWidget.submitMessage(command.query)
             is EditWithSelectedQuery -> binding.inputModeWidget.text = command.query
+            is SwitchToTab -> {
+                val data = Intent().putExtra(InputScreenActivity.TAB_ID, command.tabId)
+                requireActivity().setResult(Activity.RESULT_OK, data)
+                exitInterstitial()
+            }
             SwitchModeToSearch -> {
                 binding.viewPager.setCurrentItem(0, false)
             }
