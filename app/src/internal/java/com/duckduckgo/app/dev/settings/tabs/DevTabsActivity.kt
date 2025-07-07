@@ -59,7 +59,7 @@ class DevTabsActivity : DuckDuckGoActivity() {
         }
 
         binding.addBookmarksButton.setOnClickListener {
-            viewModel.addBookmarks(binding.tabCount.text.toInt())
+            viewModel.addBookmarks(binding.bookmarksCount.text.toInt())
         }
 
         binding.clearBookmarksButton.setOnClickListener {
