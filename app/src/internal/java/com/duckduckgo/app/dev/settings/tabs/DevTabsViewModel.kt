@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.tabs.model.TabDataRepository
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.savedsites.api.SavedSitesRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,10 +59,12 @@ private val randomUrls = listOf(
 class DevTabsViewModel @Inject constructor(
     private val dispatcher: DispatcherProvider,
     private val tabDataRepository: TabDataRepository,
+    private val savedSitesRepository: SavedSitesRepository,
 ) : ViewModel() {
 
     data class ViewState(
         val tabCount: Int = 0,
+        val bookmarkCount: Int = 0,
     )
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -71,6 +74,13 @@ class DevTabsViewModel @Inject constructor(
         tabDataRepository.flowTabs
             .onEach { tabs ->
                 _viewState.update { it.copy(tabCount = tabs.count()) }
+            }
+            .flowOn(dispatcher.io())
+            .launchIn(viewModelScope)
+
+        savedSitesRepository.getBookmarks()
+            .onEach { bookmarks ->
+                _viewState.update { it.copy(bookmarkCount = bookmarks.count()) }
             }
             .flowOn(dispatcher.io())
             .launchIn(viewModelScope)
@@ -90,6 +100,24 @@ class DevTabsViewModel @Inject constructor(
     fun clearTabs() {
         viewModelScope.launch(dispatcher.io()) {
             tabDataRepository.deleteAll()
+        }
+    }
+
+    fun addBookmarks(count: Int) {
+        viewModelScope.launch(dispatcher.io()) {
+            repeat(count) {
+                val randomIndex = randomUrls.indices.random()
+                savedSitesRepository.insertBookmark(
+                    title = "",
+                    url = randomUrls[randomIndex]
+                )
+            }
+        }
+    }
+
+    fun clearBookmarks() {
+        viewModelScope.launch(dispatcher.io()) {
+            savedSitesRepository.deleteAll()
         }
     }
 }
