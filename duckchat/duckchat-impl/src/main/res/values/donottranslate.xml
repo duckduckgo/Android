@@ -41,4 +41,8 @@
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chat privately with subscriber-exclusive AI models.\n<a href="">Learn More</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Open Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Learn more</string>
 </resources>

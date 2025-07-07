@@ -116,7 +116,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
     private fun processCommands(command: Command) {
         when (command) {
             is OpenDuckAiPlusSettings -> {
-                // TODO: navigate to Duck Ai Plus settings
+                globalActivityStarter.start(context, DuckAiPaidSettingsNoParams)
             }
         }
     }
