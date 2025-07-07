@@ -323,7 +323,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun setupBookmarksRecycler() {
         bookmarksAdapter = BookmarksAdapter(
             viewModel,
-            this,
+            lifecycleOwner = this,
+            dispatcherProvider = dispatchers,
             faviconManager,
             onBookmarkClick = { bookmark ->
                 viewModel.onSelected(bookmark)
@@ -491,7 +492,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksQueryListener(viewModel, bookmarksAdapter)
+        searchListener = BookmarksQueryListener(viewModel, bookmarksAdapter, dispatchers)
         if (bookmarksSortingFeature.self().isEnabled()) {
             binding.searchMenu.setOnClickListener {
                 showSearchBar()

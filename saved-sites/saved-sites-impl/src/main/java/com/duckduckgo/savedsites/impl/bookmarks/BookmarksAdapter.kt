@@ -20,9 +20,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.saved.sites.impl.databinding.RowBookmarkTwoLineItemBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptyHintBinding
 import com.duckduckgo.saved.sites.impl.databinding.ViewSavedSiteEmptySearchHintBinding
@@ -34,11 +37,14 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.Bookma
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.BookmarksViewHolder
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptyHint
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarkScreenViewHolders.EmptySearchHint
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Collections
 
 class BookmarksAdapter(
     private val viewModel: BookmarksViewModel,
     private val lifecycleOwner: LifecycleOwner,
+    private val dispatcherProvider: DispatcherProvider,
     private val faviconManager: FaviconManager,
     private val onBookmarkClick: (Bookmark) -> Unit,
     private val onBookmarkOverflowClick: (View, Bookmark) -> Unit,
@@ -59,6 +65,8 @@ class BookmarksAdapter(
     var isReordering = false
     var isReorderingEnabled = false
 
+    private val bookmarkItemsUpdateJob = ConflatedJob()
+
     sealed interface BookmarksItemTypes
     data object EmptyHint : BookmarksItemTypes
     data object EmptySearchHint : BookmarksItemTypes
@@ -71,11 +79,16 @@ class BookmarksAdapter(
         showEmptySearchHint: Boolean,
         detectMoves: Boolean,
     ) {
-        val generatedList = generateNewList(newBookmarkItems, showEmptyHint, showEmptySearchHint)
-        val diffCallback = DiffCallback(old = bookmarkItems, new = generatedList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback, detectMoves)
-        bookmarkItems.clear().also { bookmarkItems.addAll(generatedList) }
-        diffResult.dispatchUpdatesTo(this@BookmarksAdapter)
+        val oldBookmarkItems = bookmarkItems.toList()
+        bookmarkItemsUpdateJob += lifecycleOwner.lifecycleScope.launch {
+            val generatedList = generateNewList(newBookmarkItems, showEmptyHint, showEmptySearchHint)
+            val diffCallback = DiffCallback(old = oldBookmarkItems, new = generatedList)
+            val diffResult = DiffUtil.calculateDiff(diffCallback, detectMoves)
+            withContext(dispatcherProvider.main()) {
+                bookmarkItems.clear().also { bookmarkItems.addAll(generatedList) }
+                diffResult.dispatchUpdatesTo(this@BookmarksAdapter)
+            }
+        }
     }
 
     private fun generateNewList(

@@ -18,6 +18,7 @@ package com.duckduckgo.savedsites.impl.bookmarks
 
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkFolderItem
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
@@ -25,16 +26,18 @@ import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTy
 import java.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 class BookmarksQueryListener(
     private val viewModel: BookmarksViewModel,
     private val bookmarksAdapter: BookmarksAdapter,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
 
     private var searchJob = ConflatedJob()
 
     fun onQueryTextChange(newText: String) {
-        searchJob += viewModel.viewModelScope.launch {
+        searchJob += viewModel.viewModelScope.launch(dispatcherProvider.computation()) {
             delay(DEBOUNCE_PERIOD)
             viewModel.onSearchQueryUpdated(newText)
             val favorites = viewModel.viewState.value?.favorites
