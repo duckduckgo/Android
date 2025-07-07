@@ -366,8 +366,9 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
                 bookmarksAdapter.setItems(
                     items,
-                    items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
-                    false,
+                    showEmptyHint = items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
+                    showEmptySearchHint = false,
+                    detectMoves = true,
                 )
                 binding.searchMenu.isVisible =
                     viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT

@@ -66,15 +66,16 @@ class BookmarksAdapter(
     data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
 
     fun setItems(
-        bookmarkItems: List<BookmarksItemTypes>,
+        newBookmarkItems: List<BookmarksItemTypes>,
         showEmptyHint: Boolean,
         showEmptySearchHint: Boolean,
+        detectMoves: Boolean,
     ) {
-        val generatedList = generateNewList(bookmarkItems, showEmptyHint, showEmptySearchHint)
-        val diffCallback = DiffCallback(old = this.bookmarkItems, new = generatedList)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        this.bookmarkItems.clear().also { this.bookmarkItems.addAll(generatedList) }
-        diffResult.dispatchUpdatesTo(this)
+        val generatedList = generateNewList(newBookmarkItems, showEmptyHint, showEmptySearchHint)
+        val diffCallback = DiffCallback(old = bookmarkItems, new = generatedList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback, detectMoves)
+        bookmarkItems.clear().also { bookmarkItems.addAll(generatedList) }
+        diffResult.dispatchUpdatesTo(this@BookmarksAdapter)
     }
 
     private fun generateNewList(
