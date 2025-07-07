@@ -68,6 +68,7 @@ import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -89,7 +90,6 @@ class BookmarksViewModel @Inject constructor(
     data class ViewState(
         val enableSearch: Boolean = false,
         val bookmarkItems: List<BookmarksItemTypes>? = null,
-        val sortedItems: List<BookmarksItemTypes> = emptyList(),
         val favorites: List<Favorite> = emptyList(),
         val searchQuery: String = "",
         val canShowPromo: Boolean = false,
@@ -127,6 +127,9 @@ class BookmarksViewModel @Inject constructor(
     private val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
 
     data class HiddenBookmarksIds(val items: List<String> = emptyList())
+
+    private val _sortedItems = MutableStateFlow<List<BookmarksItemTypes>>(emptyList())
+    val sortedItems = _sortedItems.asStateFlow()
 
     init {
         viewState.value = ViewState()
@@ -362,12 +365,12 @@ class BookmarksViewModel @Inject constructor(
             }
         }
 
+        val sortingMode = bookmarksDataStore.getSortingMode()
+        _sortedItems.value = sortElements(bookmarkItems, sortingMode)
         withContext(dispatcherProvider.main()) {
-            val sortingMode = bookmarksDataStore.getSortingMode()
             viewState.value = viewState.value?.copy(
                 favorites = favorites,
                 bookmarkItems = bookmarkItems,
-                sortedItems = sortElements(bookmarkItems, sortingMode),
                 enableSearch = bookmarkItems.size >= MIN_ITEMS_FOR_SEARCH,
                 sortingMode = sortingMode,
             )
@@ -498,10 +501,10 @@ class BookmarksViewModel @Inject constructor(
             bookmarksDataStore.setSortingMode(mode)
             val bookmarkItems = viewState.value?.bookmarkItems
             val sortedBookmarks = sortElements(bookmarkItems ?: emptyList(), mode)
+            _sortedItems.value = sortedBookmarks
             withContext(dispatcherProvider.main()) {
                 viewState.value = viewState.value?.copy(
                     sortingMode = bookmarksDataStore.getSortingMode(),
-                    sortedItems = sortedBookmarks,
                 )
             }
             when (mode) {

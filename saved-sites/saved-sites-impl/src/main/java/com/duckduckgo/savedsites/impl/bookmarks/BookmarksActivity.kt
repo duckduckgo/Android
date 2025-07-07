@@ -92,6 +92,8 @@ import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -173,6 +175,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
         setupBookmarksRecycler()
         observeViewModel()
+        observeItemsToDisplay()
         initializeSearchBar()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
@@ -355,8 +358,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let { state ->
-                val items = state.sortedItems
-
                 if (state.sortingMode == MANUAL) {
                     bookmarksAdapter.isReorderingEnabled = true
                     itemTouchHelper.attachToRecyclerView(contentBookmarksBinding.recycler)
@@ -365,15 +366,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     itemTouchHelper.attachToRecyclerView(null)
                 }
 
-                bookmarksAdapter.setItems(
-                    items,
-                    showEmptyHint = items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
-                    showEmptySearchHint = false,
-                    detectMoves = true,
-                )
                 binding.searchMenu.isVisible =
                     viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
-                exportMenuItem?.isEnabled = items.isNotEmpty()
                 configurePromotionsContainer()
             }
         }
@@ -400,6 +394,18 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is LaunchAddFolder -> launchAddFolder()
             }
         }
+    }
+
+    private fun observeItemsToDisplay() {
+        viewModel.sortedItems.onEach { items ->
+            bookmarksAdapter.setItems(
+                items,
+                showEmptyHint = items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
+                showEmptySearchHint = false,
+                detectMoves = true,
+            )
+            exportMenuItem?.isEnabled = items.isNotEmpty()
+        }.launchIn(lifecycleScope)
     }
 
     private fun launchSyncSettings() {
