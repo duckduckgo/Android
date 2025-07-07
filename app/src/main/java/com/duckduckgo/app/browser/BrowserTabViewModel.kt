@@ -4138,10 +4138,16 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-        } else {
-            command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+        when {
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
+            }
+            else -> {
+                command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+            }
         }
     }
 
@@ -4150,6 +4156,13 @@ class BrowserTabViewModel @Inject constructor(
             R.drawable.onboarding_background_bitmap_light
         } else {
             R.drawable.onboarding_background_bitmap_dark
+        }
+
+    private fun getBBBackgroundResource(lightModeEnabled: Boolean): Int =
+        if (lightModeEnabled) {
+            R.drawable.onboarding_background_bb_bitmap_light
+        } else {
+            R.drawable.onboarding_background_bb_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {
