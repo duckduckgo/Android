@@ -830,6 +830,7 @@
     <string name="onboardingEndDaxDialogButton">Всё готово!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Кстати, пока не забыл...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[В DuckDuckGo также есть встроенный <b>VPN</b>!<br/><br/>Для активации этой услуги требуется <b>платная подписка Privacy Pro</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo также предлагает подписку, которая включает надежный <b>VPN</b>-сервис и 2 вида премиум-защиты. <b>Ознакомление бесплатное!</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Узнать больше</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Пропустить</string>
 
