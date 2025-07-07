@@ -27,9 +27,6 @@
     <string name="devStartupTracingByline">Enable/disable start-up tracing</string>
     <string name="devSettingsTriggerAnr">Trigger ANR</string>
     <string name="devSettingsTriggerAnrSubtitle">Click here to trigger an ANR in the app</string>
-    <string name="devSettingsClearSavedSites">Clear saved sites</string>
-    <string name="devSettingsClearSavedSitesSubtitle">Click here to clear all bookmarks, folders and favorites</string>
-    <string name="devSettingsClearSavedSitesConfirmation">Saved sites cleared</string>
     <string name="devSettingsUseSandBoxSurvey">Use Sandbox Survey</string>
     <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
     <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>

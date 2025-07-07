@@ -39,7 +39,6 @@ import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.CustomTabs
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Notifications
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.OpenUASelector
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.SendTdsIntent
-import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.ShowSavedSitesClearedConfirmation
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command.Tabs
 import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
@@ -101,9 +100,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
                 Thread.sleep(10000)
             }
         }
-        binding.clearSavedSites.setOnClickListener {
-            viewModel.clearSavedSites()
-        }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
@@ -135,7 +131,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         when (it) {
             is SendTdsIntent -> sendTdsIntent()
             is OpenUASelector -> showUASelector()
-            is ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
             is ChangePrivacyConfigUrl -> showChangePrivacyUrl()
             is CustomTabs -> showCustomTabs()
             Notifications -> showNotifications()
@@ -165,10 +160,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             onMenuItemClicked(view.findViewById(R.id.webView)) { viewModel.onUserAgentSelected(UAOverride.WEBVIEW) }
         }
         popup.show(binding.root, binding.overrideUserAgentSelector)
-    }
-
-    private fun showSavedSitesClearedConfirmation() {
-        Toast.makeText(this, getString(R.string.devSettingsClearSavedSitesConfirmation), Toast.LENGTH_SHORT).show()
     }
 
     private fun showChangePrivacyUrl() {
