@@ -739,12 +739,12 @@
     <style name="Widget.DuckDuckGo.BBButton.Option" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="cornerRadius">10dp</item>
         <item name="android:textAppearance">@style/Typography.DuckDuckGo.BBButton.Option</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
-        <item name="android:insetTop">0dp</item>
-        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetTop">4dp</item>
+        <item name="android:insetBottom">4dp</item>
         <item name="android:textColor">@color/bbColorButtonOptionText</item>
         <item name="backgroundTint">@color/bbColorButtonOptionContainer</item>
         <item name="iconTint">@color/bbColorButtonOptionText</item>
