@@ -798,6 +798,7 @@
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo ayrıca güvenli bir <b>VPN</b> + 2 premium koruma içeren bir abonelik sunar.<b>Ücretsiz deneyin!</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
