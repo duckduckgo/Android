@@ -19,12 +19,10 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 import android.os.Bundle
 import android.transition.Transition
 import android.view.View
-import android.view.ViewGroup
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
@@ -47,8 +45,6 @@ import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
 import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.api.views.SavedSitesViewsProvider
 import javax.inject.Inject
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
