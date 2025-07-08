@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.bookmarks
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,6 +74,7 @@ class BookmarksAdapter(
     data class BookmarkItem(val bookmark: SavedSite.Bookmark) : BookmarksItemTypes
     data class BookmarkFolderItem(val bookmarkFolder: BookmarkFolder) : BookmarksItemTypes
 
+    @SuppressLint("AvoidComputationUsage")
     fun setItems(
         newBookmarkItems: List<BookmarksItemTypes>,
         showEmptyHint: Boolean,

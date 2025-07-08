@@ -16,6 +16,7 @@
 
 package com.duckduckgo.savedsites.impl.bookmarks
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -35,6 +36,7 @@ class BookmarksQueryListener(
 
     private var searchJob = ConflatedJob()
 
+    @SuppressLint("AvoidComputationUsage")
     fun onQueryTextChange(newText: String) {
         searchJob += viewModel.viewModelScope.launch(dispatcherProvider.computation()) {
             delay(DEBOUNCE_PERIOD)
@@ -47,7 +49,7 @@ class BookmarksQueryListener(
                     showEmptyHint = false,
                     showEmptySearchHint = true,
                     // when filtering, we don't need to account for moves because the relative order of items doesn't change,
-                    // this allows to optimization calculations
+                    // this allows to optimize recycler diff calculations
                     detectMoves = false,
                 )
             }
