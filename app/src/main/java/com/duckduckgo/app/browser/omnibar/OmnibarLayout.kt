@@ -899,7 +899,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 customTabToolbarContainer.customTabShieldIcon
             }
 
-            privacyShieldView.setAnimationView(shieldIconView, privacyShield)
+            privacyShieldView.setAnimationView(shieldIconView, privacyShield, viewMode)
         }
     }
 
