@@ -23,28 +23,27 @@ import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewState
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration
-import com.duckduckgo.duckchat.impl.inputscreen.ui.util.renderIfChanged
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
 import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.api.views.SavedSitesViewsProvider
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
 class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
@@ -60,17 +59,10 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         ViewModelProvider(requireParentFragment(), viewModelFactory)[InputScreenViewModel::class.java]
     }
 
-    private lateinit var renderer: SearchInterstitialFragmentRenderer
-
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private val binding: FragmentSearchTabBinding by viewBinding()
     private lateinit var favoritesView: View
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        renderer = SearchInterstitialFragmentRenderer()
-    }
 
     override fun onViewCreated(
         view: View,
@@ -154,33 +146,17 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         )
     }
 
-    inner class SearchInterstitialFragmentRenderer {
-
-        private var lastSeenAutoCompleteViewState: AutoCompleteViewState? = null
-
-        fun renderAutocomplete(viewState: AutoCompleteViewState) {
-            renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
-                lastSeenAutoCompleteViewState = viewState
-
-                if (viewState.showSuggestions) {
-                    binding.autoCompleteSuggestionsList.show()
-                    autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
-                } else {
-                    if (binding.autoCompleteSuggestionsList.isVisible) {
-                        viewModel.autoCompleteSuggestionsGone()
-                    }
-                    binding.autoCompleteSuggestionsList.gone()
-                }
-            }
-        }
-    }
-
     private fun configureObservers() {
-        viewModel.autoCompleteViewState.observe(
-            viewLifecycleOwner,
-        ) {
-            it?.let { renderer.renderAutocomplete(it) }
-        }
+        viewModel.visibilityState.onEach {
+            binding.autoCompleteSuggestionsList.isVisible = it.autoCompleteSuggestionsVisible
+            if (!it.autoCompleteSuggestionsVisible) {
+                viewModel.autoCompleteSuggestionsGone()
+            }
+        }.launchIn(lifecycleScope)
+
+        viewModel.autoCompleteSuggestionResults.onEach {
+            autoCompleteSuggestionsAdapter.updateData(it.query, it.suggestions)
+        }.launchIn(lifecycleScope)
     }
 
     companion object {
