@@ -650,6 +650,9 @@ class BrowserTabFragment :
     private val buckDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble
 
+    private val bbDialogIntroBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingBBDialogBubble
+
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
@@ -3139,12 +3142,13 @@ class BrowserTabFragment :
     private fun hideDaxBubbleCta() {
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             newBrowserTab.newTabLayout.setBackgroundColor(
-                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
+                    requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
         } else {
             newBrowserTab.browserBackground.setImageResource(0)
         }
         buckDialogIntroBubble.root.gone()
+        bbDialogIntroBubble.root.gone()
         daxDialogIntroBubble.root.gone()
     }
 
@@ -4411,13 +4415,21 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                    showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
-                        setOnOptionClicked { userEnteredQuery(it.link) }
+                when {
+                    onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                        showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
+                            setOnOptionClicked { userEnteredQuery(it.link) }
+                        }
                     }
-                } else {
-                    showCta(daxDialogIntroBubble.daxCtaContainer) {
-                        setOnOptionClicked { userEnteredQuery(it.link) }
+                    onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                        showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
+                            setOnOptionClicked { userEnteredQuery(it.link) }
+                        }
+                    }
+                    else -> {
+                        showCta(daxDialogIntroBubble.daxCtaContainer) {
+                            setOnOptionClicked { userEnteredQuery(it.link) }
+                        }
                     }
                 }
 

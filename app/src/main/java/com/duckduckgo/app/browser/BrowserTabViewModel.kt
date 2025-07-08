@@ -4123,10 +4123,16 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-        } else {
-            command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+        when {
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                command.value = SetBrowserBackground(getBBBackgroundResource(lightModeEnabled))
+            }
+            else -> {
+                command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+            }
         }
     }
 
