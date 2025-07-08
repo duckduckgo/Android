@@ -7302,9 +7302,6 @@
       let id = null;
       const vParam = url.searchParams.get("v");
       const tParam = url.searchParams.get("t");
-      if (url.searchParams.has("list") && !url.searchParams.has("index")) {
-        return null;
-      }
       let time = null;
       if (vParam && _VideoParams.validVideoId.test(vParam)) {
         id = vParam;
