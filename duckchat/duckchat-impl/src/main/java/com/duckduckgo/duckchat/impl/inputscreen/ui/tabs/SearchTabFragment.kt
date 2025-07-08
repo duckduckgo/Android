@@ -162,16 +162,9 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             renderIfChanged(viewState, lastSeenAutoCompleteViewState) {
                 lastSeenAutoCompleteViewState = viewState
 
-                if (viewState.showSuggestions || viewState.showFavorites) {
-                    if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        if (binding.autoCompleteSuggestionsList.isVisible) {
-                            viewModel.autoCompleteSuggestionsGone()
-                        }
-                        binding.autoCompleteSuggestionsList.gone()
-                    } else {
-                        binding.autoCompleteSuggestionsList.show()
-                        autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
-                    }
+                if (viewState.showSuggestions) {
+                    binding.autoCompleteSuggestionsList.show()
+                    autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, viewState.searchResults.suggestions)
                 } else {
                     if (binding.autoCompleteSuggestionsList.isVisible) {
                         viewModel.autoCompleteSuggestionsGone()

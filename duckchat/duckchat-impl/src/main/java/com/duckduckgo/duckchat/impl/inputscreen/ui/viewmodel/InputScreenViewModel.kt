@@ -48,7 +48,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSea
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -77,7 +76,6 @@ class InputScreenViewModel @Inject constructor(
     private val autoComplete: AutoComplete,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
-    savedSitesRepository: SavedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val inputScreenDataStore: InputScreenDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
@@ -100,12 +98,6 @@ class InputScreenViewModel @Inject constructor(
     val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-
-    data class HiddenBookmarksIds(
-        val favorites: List<String> = emptyList(),
-        val bookmarks: List<String> = emptyList(),
-    )
 
     @VisibleForTesting
     internal val autoCompleteStateFlow = MutableStateFlow("")
@@ -114,21 +106,6 @@ class InputScreenViewModel @Inject constructor(
 
     init {
         initializeViewStates()
-
-        savedSitesRepository.getFavorites()
-            .combine(hiddenIds) { favorites, hiddenIds ->
-                favorites.filter { it.id !in hiddenIds.favorites }
-            }
-            .flowOn(dispatchers.io())
-            .onEach { filteredFavourites ->
-                withContext(dispatchers.main()) {
-                    val currentState = currentAutoCompleteViewState()
-                    val favorites = filteredFavourites.map { it }
-                    val showFavorites = !currentState.showSuggestions && favorites.isNotEmpty()
-                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites, showFavorites = showFavorites)
-                }
-            }
-            .launchIn(viewModelScope)
 
         viewModelScope.launch {
             inputScreenDataStore.getLastUsedMode().let { mode ->
@@ -259,7 +236,7 @@ class InputScreenViewModel @Inject constructor(
     fun onUserSubmittedQuery(query: String) {
         command.value = Command.UserSubmittedQuery(query)
         autoCompleteViewState.value =
-            currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
+            currentAutoCompleteViewState().copy(showSuggestions = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
     private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
@@ -280,20 +257,10 @@ class InputScreenViewModel @Inject constructor(
 
         val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
-        val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
-            val urlFocused =
-                hasFocus && query.isNotBlank() && !hasQueryChanged && (com.duckduckgo.app.browser.UriString.isWebUrl(query))
-            val emptyQuery = query.isBlank()
-            val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
-            hasFocus && (urlFocused || emptyQuery) && favoritesAvailable
-        } else {
-            false
-        }
 
         autoCompleteViewState.value = currentAutoCompleteViewState()
             .copy(
                 showSuggestions = showAutoCompleteSuggestions,
-                showFavorites = showFavoritesAsSuggestions,
                 searchResults = autoCompleteSearchResults,
             )
 
