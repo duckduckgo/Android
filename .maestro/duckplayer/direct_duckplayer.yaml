@@ -19,7 +19,7 @@ tags:
       - extendedWaitUntil:
           visible:
             text: "duck://player/3ml7yeKBUhc"
-          timeout: 15000
+          timeout: 5000
 
       - assertNotVisible:
           text: ".*youtube.com/watch.*"
