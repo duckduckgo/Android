@@ -34,6 +34,7 @@ import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBbDialogBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingBubbleBuckDialogBinding
 import com.duckduckgo.app.browser.databinding.IncludeOnboardingInContextBuckDialogBinding
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
@@ -1082,6 +1083,100 @@ sealed class DaxBubbleCta(
         view.findViewById<View>(R.id.cardContainer).setOnClickListener { afterAnimation() }
     }
 
+    fun showBBCta(
+        binding: IncludeOnboardingBubbleBbDialogBinding,
+        configuration: DaxBubbleCta,
+        onTypingAnimationFinished: () -> Unit,
+    ) {
+        val context = binding.root.context
+        ctaView = binding.root
+        clearBubbleBBDialog(binding)
+
+        val daxTitle = context.getString(title)
+        val daxText = context.getString(description)
+        val optionsViews: List<MaterialButton> = listOf(
+            binding.daxDialogOption1,
+            binding.daxDialogOption2,
+            binding.daxDialogOption3,
+        )
+
+        primaryCta?.let { primaryCtaRes ->
+            with(binding.primaryCta) {
+                show()
+                alpha = 0f
+                text = context.getString(primaryCtaRes)
+            }
+        }
+
+        secondaryCta?.let { secondaryCtaRes ->
+            with(binding.secondaryCta) {
+                show()
+                alpha = 0f
+                text = context.getString(secondaryCtaRes)
+            }
+        }
+
+        options?.let { options ->
+            // BB dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
+            val bbOptions = options
+                .toMutableList()
+                .apply {
+                    if (configuration is DaxIntroVisitSiteOptionsCta) {
+                        removeAt(1) // Remove the regional news option
+                    }
+                }.toList()
+
+            optionsViews.forEachIndexed { index, buttonView ->
+                if (bbOptions.size > index) {
+                    bbOptions[index].setOptionView(buttonView)
+                    buttonView.show()
+                } else {
+                    buttonView.gone()
+                }
+            }
+        }
+
+        fun View.fadeIn(): ViewPropertyAnimator {
+            return animate().alpha(1f).setDuration(500)
+        }
+
+        with(binding) {
+            val afterAnimation = {
+                dialogTextCta.finishAnimation()
+                primaryCta.fadeIn()
+                secondaryCta.fadeIn()
+                options?.let {
+                    optionsViews.forEachIndexed { index, buttonView ->
+                        if (it.size > index) {
+                            buttonView.fadeIn()
+                        }
+                    }
+                }
+                onTypingAnimationFinished()
+            }
+
+            TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+            root.show()
+
+            dialogTextCta.text = ""
+            hiddenTextCta.text = daxText.html(context)
+            daxBubbleDialogTitle.apply {
+                alpha = 0f
+                text = daxTitle.html(context)
+            }
+
+            root.fadeIn().setStartDelay(600).withEndAction {
+                daxBubbleDialogTitle.fadeIn()
+                    .withEndAction {
+                        dialogTextCta.startTypingAnimation(daxText, true) {
+                            afterAnimation()
+                        }
+                    }
+            }
+            cardContainer.setOnClickListener { afterAnimation() }
+        }
+    }
+
     fun showBuckCta(
         binding: IncludeOnboardingBubbleBuckDialogBinding,
         configuration: DaxBubbleCta,
@@ -1218,6 +1313,21 @@ sealed class DaxBubbleCta(
             this.daxDialogOption1.gone()
             this.daxDialogOption2.gone()
             this.daxDialogOption3.gone()
+        }
+    }
+
+    private fun clearBubbleBBDialog(binding: IncludeOnboardingBubbleBbDialogBinding) {
+        binding.apply {
+            primaryCta.alpha = 0f
+            primaryCta.gone()
+            secondaryCta.alpha = 0f
+            secondaryCta.gone()
+            daxDialogOption1.alpha = 0f
+            daxDialogOption1.gone()
+            daxDialogOption2.alpha = 0f
+            daxDialogOption2.gone()
+            daxDialogOption3.alpha = 0f
+            daxDialogOption3.gone()
         }
     }
 
