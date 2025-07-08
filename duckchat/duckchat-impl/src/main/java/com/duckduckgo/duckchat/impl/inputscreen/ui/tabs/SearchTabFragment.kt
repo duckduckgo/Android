@@ -112,13 +112,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         val slideDistance = displayMetrics.heightPixels * CONTENT_SLIDE_DISTANCE
         favoritesView.translationY = -slideDistance
 
-        binding.contentContainer.addView(
-            favoritesView,
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-            ),
-        )
+        binding.contentContainer.addView(favoritesView)
 
         favoritesView.animate()
             .alpha(1f)
@@ -197,9 +191,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         ) {
             it?.let { renderer.renderAutocomplete(it) }
         }
-        viewModel.visibilityState.onEach {
-            favoritesView.isVisible = it.favoritesVisible
-        }.launchIn(lifecycleScope)
     }
 
     companion object {

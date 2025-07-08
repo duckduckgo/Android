@@ -93,7 +93,6 @@ class InputScreenViewModel @Inject constructor(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             forceWebSearchButtonVisible = false,
-            favoritesVisible = true,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -151,16 +150,6 @@ class InputScreenViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
-
-        autoCompleteViewState.observeForever { viewState ->
-            if (viewState != null) {
-                _visibilityState.update {
-                    it.copy(
-                        favoritesVisible = viewState.showFavorites,
-                    )
-                }
-            }
-        }
     }
 
     fun onActivityResume() {
