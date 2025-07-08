@@ -830,6 +830,7 @@
     <string name="onboardingEndDaxDialogButton">Všechno je hotové!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Než to zapomenu...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má také integrovanou <b>VPN</b>!<br/><br/>Můžete ji aktivovat pomocí <b>placeného předplatného Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo má také předplatné s bezpečnou <b>VPN</b> a dvěma dalšími prémiovými ochranami. <b>Vyzkoušej ho zdarma!</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
 
