@@ -281,4 +281,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Synkronisera lösenord för dator</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Återställ exkluderade webbplatser</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Ta med dina lösenord från&lt;br /&gt;Google till DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importera snabbt och säkert dina lösenord till DuckDuckGo. Google kan be dig att ange ditt lösenord.</string>
+    <string name="passwords_import_promo_action">Importera från Google</string>
+
 </resources>
