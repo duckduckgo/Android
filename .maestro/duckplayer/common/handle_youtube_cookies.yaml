@@ -1,5 +1,10 @@
 appId: com.duckduckgo.mobile.android
 ---
+- extendedWaitUntil:
+    notVisible:
+      id: pageLoadingIndicator
+    timeout: 5000
+    optional: true
 # Handle YouTube cookies consent dialog if visible
 - runFlow:
     when:

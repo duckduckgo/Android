@@ -1,21 +1,18 @@
 appId: com.duckduckgo.mobile.android
 ---
 # Select a YouTube video from SERP videos vertical
-- tapOn:
-      id: "omnibarTextInput"
-- inputText: "https://duckduckgo.com/?q=DuckDuckGo+none+of+our+business+site%3Ayoutube.com&atb=v469-1-wb&ia=web"
-- pressKey: Enter
+- runFlow: input_search.yaml
 
 - extendedWaitUntil:
       visible:
-          text: "Videos for DuckDuckGo none of our business.*"
+          text: "Videos for DuckDuckGo vs Google: 5 Reasons You Should Switch.*"
       timeout: 15000
 
 - scrollUntilVisible:
       element:
-          text: "DuckDuckGo: None of Our Business - YouTube"
+          text: "DuckDuckGo vs Google: 5 Reasons You Should Switch - YouTube"
       direction: DOWN
 
 - tapOn:
-      text: "DuckDuckGo: None of Our Business - YouTube"
+      text: "DuckDuckGo vs Google: 5 Reasons You Should Switch - YouTube"
       index: 0

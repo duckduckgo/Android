@@ -3,10 +3,8 @@ appId: com.duckduckgo.mobile.android
 # Navigate to a YouTube video
 - tapOn:
     id: "omnibarTextInput"
-- inputText: "https://m.youtube.com/results?sp=mAEA&search_query=DuckDuckGo+none+of+our+business"
+- inputText: "https://m.youtube.com/results?sp=mAEA&search_query=DuckDuckGo+vs+Google%3A+5+Reasons+You+Should+Switch"
 - pressKey: Enter
-
 - runFlow: handle_youtube_cookies.yaml
-
 - tapOn:
-      text: "DuckDuckGo: None of Our Business by DuckDuckGo.*"
+      text: "DuckDuckGo vs Google: 5 Reasons You Should Switch by DuckDuckGo.*"
