@@ -9,5 +9,4 @@ appId: com.duckduckgo.mobile.android
     timeout: 5000
 
 - tapOn:
-    text: "YouTube"
-    index: 0
+    text: "DuckDuckGo vs Google: 5 Reasons You Should Switch"
