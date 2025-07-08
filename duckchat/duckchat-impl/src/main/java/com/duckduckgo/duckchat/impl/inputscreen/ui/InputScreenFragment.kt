@@ -179,6 +179,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
+            viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
         }
         onChatSelected = {
             binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
@@ -187,7 +188,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onSendMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
-            viewModel.triggerAutocomplete(binding.inputModeWidget.text, true, true)
+            if (binding.viewPager.currentItem == 0) {
+                viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
+            }
         }
         onVoiceInputAllowed = { isAllowed ->
             viewModel.onVoiceInputAllowedChange(isAllowed)
@@ -229,7 +232,5 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onResume() {
         super.onResume()
         viewModel.onActivityResume()
-        // TODO: This should be triggered via Flow
-        viewModel.triggerAutocomplete(binding.inputModeWidget.text, true, true)
     }
 }
