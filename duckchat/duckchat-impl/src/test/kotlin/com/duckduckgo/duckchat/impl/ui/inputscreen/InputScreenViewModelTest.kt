@@ -7,7 +7,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.assertFalse
@@ -26,7 +25,6 @@ class InputScreenViewModelTest {
 
     private val autoComplete: AutoComplete = mock()
     private val history: NavigationHistory = mock()
-    private val savedSitesRepository: SavedSitesRepository = mock()
     private val appCoroutineScope: CoroutineScope = mock()
     private val inputScreenDataStore: InputScreenDataStore = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
@@ -40,7 +38,6 @@ class InputScreenViewModelTest {
             autoComplete = autoComplete,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
-            savedSitesRepository = savedSitesRepository,
             appCoroutineScope = appCoroutineScope,
             inputScreenDataStore = inputScreenDataStore,
             voiceSearchAvailability = voiceSearchAvailability,

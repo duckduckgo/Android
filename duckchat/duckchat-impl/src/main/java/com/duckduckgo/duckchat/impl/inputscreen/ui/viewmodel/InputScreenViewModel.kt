@@ -133,9 +133,11 @@ class InputScreenViewModel @Inject constructor(
     }
 
     fun onActivityResume() {
+        val showAutoCompleteSuggestions = shouldShowAutoCompleteSuggestions()
         _visibilityState.update {
             it.copy(
                 voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
+                autoCompleteSuggestionsVisible = showAutoCompleteSuggestions,
             )
         }
     }
@@ -211,13 +213,12 @@ class InputScreenViewModel @Inject constructor(
     }
 
     fun onSearchInputTextChanged(query: String) {
-        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
-        val showAutoCompleteSuggestions = autoCompleteSuggestionsEnabled && query.isNotBlank()
+        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
+            searchInputTextState.value = query.trim()
+        }
+        val showAutoCompleteSuggestions = shouldShowAutoCompleteSuggestions()
         _visibilityState.update {
             it.copy(autoCompleteSuggestionsVisible = showAutoCompleteSuggestions)
-        }
-        if (autoCompleteSuggestionsEnabled) {
-            searchInputTextState.value = query.trim()
         }
     }
 
@@ -264,5 +265,9 @@ class InputScreenViewModel @Inject constructor(
 
     fun onVoiceInputAllowedChange(allowed: Boolean) {
         voiceInputAllowed.value = allowed
+    }
+
+    private fun shouldShowAutoCompleteSuggestions(): Boolean {
+        return autoCompleteSettings.autoCompleteSuggestionsEnabled && searchInputTextState.value.isNotBlank()
     }
 }
