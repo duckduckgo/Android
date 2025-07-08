@@ -122,8 +122,10 @@ class InputScreenViewModel @Inject constructor(
             .flowOn(dispatchers.io())
             .onEach { filteredFavourites ->
                 withContext(dispatchers.main()) {
+                    val currentState = currentAutoCompleteViewState()
                     val favorites = filteredFavourites.map { it }
-                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
+                    val showFavorites = !currentState.showSuggestions && favorites.isNotEmpty()
+                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites, showFavorites = showFavorites)
                 }
             }
             .launchIn(viewModelScope)

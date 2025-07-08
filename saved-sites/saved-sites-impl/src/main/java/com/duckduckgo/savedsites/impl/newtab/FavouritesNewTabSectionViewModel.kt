@@ -32,6 +32,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName.*
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
@@ -70,23 +71,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         val savedSite: SavedSite,
         val bookmarkFolder: BookmarkFolder?,
     )
-
-    enum class Placement {
-        FOCUSED_STATE,
-        NEW_TAB_PAGE,
-        ;
-
-        companion object {
-            fun from(type: Int): Placement {
-                // same order as attrs-saved-sites.xml
-                return when (type) {
-                    0 -> Placement.FOCUSED_STATE
-                    1 -> Placement.NEW_TAB_PAGE
-                    else -> Placement.FOCUSED_STATE
-                }
-            }
-        }
-    }
 
     sealed class Command {
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
@@ -288,14 +272,14 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
-    fun onFavoriteClicked(placement: Placement) {
+    fun onFavoriteClicked(placement: FavoritesPlacement) {
         pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED, placement))
         pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED_DAILY, placement), type = Daily())
     }
 
     private fun formatPixelWithPlacement(
         pixelName: SavedSitesPixelName,
-        placement: Placement,
+        placement: FavoritesPlacement,
     ): String {
         return pixelName.pixelName + "_" + placement.name.lowercase()
     }

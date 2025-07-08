@@ -20,6 +20,18 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:layout_height="wrap_content"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:adjustViewBounds="true"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:srcCompat="@drawable/logo_full"
+        android:visibility="gone"
+        android:layout_gravity="center_horizontal" />
+
     <LinearLayout
         android:id="@+id/sectionHeaderLayout"
         android:layout_width="match_parent"
