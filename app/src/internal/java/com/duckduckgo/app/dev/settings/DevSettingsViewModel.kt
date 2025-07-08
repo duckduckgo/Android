@@ -25,7 +25,6 @@ import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
@@ -44,7 +43,6 @@ class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
     private val userAgentProvider: UserAgentProvider,
-    private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val surveyEndpointDataStore: SurveyEndpointDataStore,
     private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
@@ -60,7 +58,6 @@ class DevSettingsViewModel @Inject constructor(
     sealed class Command {
         object SendTdsIntent : Command()
         object OpenUASelector : Command()
-        object ShowSavedSitesClearedConfirmation : Command()
         object ChangePrivacyConfigUrl : Command()
         object CustomTabs : Command()
         data object Notifications : Command()
@@ -134,13 +131,6 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.selectedUA = userAgent
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
-        }
-    }
-
-    fun clearSavedSites() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            savedSitesRepository.deleteAll()
-            command.send(Command.ShowSavedSitesClearedConfirmation)
         }
     }
 

@@ -100,5 +100,78 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/bookmarksCountHeader"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="@string/devSettingsTabsBookmarksScreenHeader"
+            app:typography="caption_allCaps" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/generateBookmarksItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/bookmarksCount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:primaryText="@string/devSettingsTabsScreenBookmarksToAdd" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/bookmarksCount"
+                style="@style/Widget.DuckDuckGo.TextInput"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="25"
+                app:layout_constraintBottom_toBottomOf="@id/generateBookmarksItem"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/generateBookmarksItem"
+                app:layout_constraintTop_toTopOf="@id/generateBookmarksItem"
+                app:type="single_line"
+                tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/addBookmarksButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsTabsScreenAddBookmarksButtonText"
+                app:daxButtonSize="large" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/clearBookmarksButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsTabsScreenClearBookmarksButtonText"
+                app:daxButtonSize="large" />
+
+            <androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/bookmarksFlowView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:constraint_referenced_ids="addBookmarksButton,clearBookmarksButton"
+                app:flow_horizontalStyle="spread"
+                app:flow_wrapMode="chain"
+                app:layout_constraintTop_toBottomOf="@id/generateBookmarksItem" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </LinearLayout>
 </LinearLayout>

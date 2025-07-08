@@ -27,9 +27,6 @@
     <string name="devStartupTracingByline">Enable/disable start-up tracing</string>
     <string name="devSettingsTriggerAnr">Trigger ANR</string>
     <string name="devSettingsTriggerAnrSubtitle">Click here to trigger an ANR in the app</string>
-    <string name="devSettingsClearSavedSites">Clear saved sites</string>
-    <string name="devSettingsClearSavedSitesSubtitle">Click here to clear all bookmarks, folders and favorites</string>
-    <string name="devSettingsClearSavedSitesConfirmation">Saved sites cleared</string>
     <string name="devSettingsUseSandBoxSurvey">Use Sandbox Survey</string>
     <string name="devEnableWebContentDebuggingTitle">Web Content Debugging</string>
     <string name="devEnableWebContentDebuggingByline">Enable WebView debugging in Chrome DevTools</string>
@@ -49,13 +46,17 @@
     <string name="devSettingsShowTabSwitcherAnimatedTile">Reset TabSwitcher Animated Tile</string>
     <string name="devSettingsShowTabSwitcherAnimatedSubtitle">Click here to reset the animated tile if you have previously dismissed it</string>
 
-    <!-- Tabs -->
-    <string name="devSettingsScreenTabs">Tabs</string>
-    <string name="devSettingsScreenTabsSubtitle">Create tabs for testing</string>
+    <!-- Tabs and Saved Sites -->
+    <string name="devSettingsScreenTabs">Tabs and Saved Sites</string>
+    <string name="devSettingsScreenTabsSubtitle">Create tabs or bookmarks for testing</string>
     <string name="devSettingsTabsScreenHeader" instruction="Not translated">Current tab count: %1$d</string>
     <string name="devSettingsTabsScreenTabsToAdd">Tabs to add</string>
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
     <string name="devSettingsTabsScreenClearTabsButtonText">Clear Tabs</string>
+    <string name="devSettingsTabsBookmarksScreenHeader" instruction="Not translated">Current bookmarks count: %1$d</string>
+    <string name="devSettingsTabsScreenBookmarksToAdd">Bookmarks to add</string>
+    <string name="devSettingsTabsScreenAddBookmarksButtonText">Add Bookmarks</string>
+    <string name="devSettingsTabsScreenClearBookmarksButtonText">Clear Bookmarks</string>
 
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle">Audit Settings</string>
