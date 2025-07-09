@@ -25,7 +25,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
 import com.squareup.anvil.annotations.ContributesMultibinding

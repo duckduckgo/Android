@@ -41,6 +41,11 @@ class SubscriptionsContentScopeJsMessageHandler @Inject constructor() : ContentS
         override val methods: List<String> = listOf(
             "handshake",
             "subscriptionDetails",
+            "getAuthAccessToken",
+            "getFeatureConfig",
+            "backToSettings",
+            "openSubscriptionActivation",
+            "openSubscriptionPurchase",
         )
     }
 }
