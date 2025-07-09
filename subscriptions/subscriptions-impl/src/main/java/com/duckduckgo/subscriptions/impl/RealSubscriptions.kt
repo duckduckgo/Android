@@ -168,6 +168,11 @@ interface PrivacyProFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProFreeTrial(): Toggle
 
+    /**
+     * Enables/Disables duckAi for subscribers (advanced models)
+     * This flag is used to hide the feature in the native client and FE.
+     * It will be used for the feature rollout and kill-switch if necessary.
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiPlus(): Toggle
 
