@@ -16,18 +16,24 @@
 
 package com.duckduckgo.subscriptions.impl.messaging
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
+import com.duckduckgo.subscriptions.impl.AccessTokenResult
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptionsJSHelper @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
+    private val privacyProFeature: PrivacyProFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionsJSHelper {
 
     override suspend fun processJsCallbackMessage(
@@ -35,23 +41,53 @@ class RealSubscriptionsJSHelper @Inject constructor(
         method: String,
         id: String?,
         data: JSONObject?,
-    ): JsCallbackData? = when (method) {
-        METHOD_HANDSHAKE -> id?.let {
-            val jsonPayload = JSONObject().apply {
-                put(AVAILABLE_MESSAGES, JSONArray().put(SUBSCRIPTION_DETAILS))
-                put(PLATFORM, ANDROID)
+    ): JsCallbackData? = withContext(dispatcherProvider.io()) {
+        when (method) {
+            METHOD_HANDSHAKE -> id?.let {
+                val availableMethods = if (privacyProFeature.duckAISubscriptionMessaging().isEnabled()) {
+                    JSONArray().apply {
+                        put(SUBSCRIPTION_DETAILS)
+                        put(GET_AUTH_ACCESS_TOKEN)
+                        put(GET_FEATURE_CONFIG)
+                    }
+                } else {
+                    JSONArray().apply {
+                        put(SUBSCRIPTION_DETAILS)
+                    }
+                }
+                val jsonPayload = JSONObject().apply {
+                    put(
+                        AVAILABLE_MESSAGES,
+                        availableMethods,
+                    )
+                    put(PLATFORM, ANDROID)
+                }
+                return@withContext JsCallbackData(jsonPayload, featureName, method, id)
             }
-            return JsCallbackData(jsonPayload, featureName, method, id)
-        }
 
-        METHOD_SUBSCRIPTION_DETAILS -> id?.let {
-            getSubscriptionDetailsData(featureName, method, it)
-        }
+            METHOD_SUBSCRIPTION_DETAILS -> id?.let {
+                getSubscriptionDetailsData(featureName, method, it)
+            }
 
-        else -> null
+            METHOD_GET_AUTH_ACCESS_TOKEN -> id?.let {
+                if (privacyProFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
+                getAuthAccessTokenData(featureName, method, it)
+            }
+
+            METHOD_GET_FEATURE_CONFIG -> id?.let {
+                if (privacyProFeature.duckAISubscriptionMessaging().isEnabled().not()) return@withContext null
+                getFeatureConfigData(featureName, method, it)
+            }
+
+            else -> null
+        }
     }
 
-    private suspend fun getSubscriptionDetailsData(featureName: String, method: String, id: String): JsCallbackData {
+    private suspend fun getSubscriptionDetailsData(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
         val jsonPayload = subscriptionsManager.getSubscription()?.let { userSubscription ->
             JSONObject().apply {
                 put(IS_SUBSCRIBED, userSubscription.isActive())
@@ -68,11 +104,43 @@ class RealSubscriptionsJSHelper @Inject constructor(
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
 
+    private suspend fun getAuthAccessTokenData(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val jsonPayload = when (val result = subscriptionsManager.getAccessToken()) {
+            is AccessTokenResult.Success -> JSONObject().apply {
+                put(ACCESS_TOKEN, result.accessToken)
+            }
+
+            is AccessTokenResult.Failure -> JSONObject()
+        }
+
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
+    private suspend fun getFeatureConfigData(
+        featureName: String,
+        method: String,
+        id: String,
+    ): JsCallbackData {
+        val jsonPayload = JSONObject().apply {
+            put(USE_PAID_DUCK_AI, privacyProFeature.duckAiPlus().isEnabled())
+        }
+
+        return JsCallbackData(jsonPayload, featureName, method, id)
+    }
+
     companion object {
         private const val METHOD_HANDSHAKE = "handshake"
         private const val METHOD_SUBSCRIPTION_DETAILS = "subscriptionDetails"
+        private const val METHOD_GET_AUTH_ACCESS_TOKEN = "getAuthAccessToken"
+        private const val METHOD_GET_FEATURE_CONFIG = "getFeatureConfig"
         private const val AVAILABLE_MESSAGES = "availableMessages"
         private const val SUBSCRIPTION_DETAILS = "subscriptionDetails"
+        private const val GET_AUTH_ACCESS_TOKEN = "getAuthAccessToken"
+        private const val GET_FEATURE_CONFIG = "getFeatureConfig"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"
         private const val IS_SUBSCRIBED = "isSubscribed"
@@ -81,5 +149,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val EXPIRES_OR_RENEWS_AT = "expiresOrRenewsAt"
         private const val PAYMENT_PLATFORM = "paymentPlatform"
         private const val STATUS = "status"
+        private const val ACCESS_TOKEN = "accessToken"
+        private const val USE_PAID_DUCK_AI = "usePaidDuckAi"
     }
 }
