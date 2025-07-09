@@ -17,16 +17,13 @@
 package com.duckduckgo.autofill.impl.securestorage
 
 import android.content.Context
-import androidx.lifecycle.LifecycleOwner
 import androidx.room.Room
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.store.db.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
@@ -46,25 +43,22 @@ interface SecureStorageDatabaseFactory {
     scope = AppScope::class,
     boundType = SecureStorageDatabaseFactory::class,
 )
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
-)
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
     private val autofillFeature: AutofillFeature,
-) : SecureStorageDatabaseFactory, MainProcessLifecycleObserver {
+) : SecureStorageDatabaseFactory {
     private var _database: SecureStorageDatabase? = null
 
     private val mutex = Mutex()
 
-    override fun onCreate(owner: LifecycleOwner) {
+    init {
         logcat { "Loading the sqlcipher native library" }
         try {
             LibraryLoader.loadLibrary(context, "sqlcipher")
+            logcat { "sqlcipher native library loaded ok" }
         } catch (t: Throwable) {
-            // error loading the library, return null db
+            // error loading the library
             logcat(ERROR) { "Error loading sqlcipher library: ${t.asLog()}" }
         }
     }
