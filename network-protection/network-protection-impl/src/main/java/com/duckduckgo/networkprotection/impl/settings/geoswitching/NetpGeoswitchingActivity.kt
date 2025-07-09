@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.onEach
 class NetpGeoswitchingActivity : DuckDuckGoActivity() {
     private val binding: ActivityNetpGeoswitchingBinding by viewBinding()
     private val viewModel: NetpGeoSwitchingViewModel by bindViewModel()
-    private lateinit var lastSelectedButton: CompoundButton
+    private var lastSelectedButton: CompoundButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -110,7 +110,7 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
 
             this.radioButton.setOnCheckedChangeListener { view, isChecked ->
                 if (isChecked && view != lastSelectedButton) {
-                    lastSelectedButton.isChecked = false
+                    lastSelectedButton?.isChecked = false
                     lastSelectedButton = view
                     viewModel.onNearestAvailableCountrySelected()
                 }
@@ -154,7 +154,7 @@ class NetpGeoswitchingActivity : DuckDuckGoActivity() {
 
         itemBinding.root.radioButton.setOnCheckedChangeListener { view, isChecked ->
             if (isChecked && view != lastSelectedButton) {
-                lastSelectedButton.isChecked = false
+                lastSelectedButton?.isChecked = false
                 lastSelectedButton = view
                 viewModel.onCountrySelected(this.countryCode)
             }
