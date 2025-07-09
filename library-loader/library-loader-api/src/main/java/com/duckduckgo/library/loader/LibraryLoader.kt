@@ -1,9 +1,9 @@
 package com.duckduckgo.library.loader
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 
+@SuppressLint("NoSystemLoadLibrary")
 object LibraryLoader {
 
     /**
@@ -21,8 +21,6 @@ object LibraryLoader {
      */
     @JvmStatic
     fun loadLibrary(context: Context, name: String, listener: LibraryLoaderListener) {
-        val mainHandler = Handler(Looper.getMainLooper())
-
         // Run the loading operation on the main thread
         Thread {
             try {
