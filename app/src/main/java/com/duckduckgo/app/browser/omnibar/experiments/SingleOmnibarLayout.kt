@@ -149,6 +149,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         } else {
             animateOmnibarFocusedState(focused = false)
         }
+
+        omnibarCardShadow.isVisible = viewState.viewMode !is ViewMode.CustomTab
     }
 
     override fun renderButtons(viewState: ViewState) {
