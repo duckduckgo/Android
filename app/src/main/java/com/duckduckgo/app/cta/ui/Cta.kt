@@ -63,6 +63,7 @@ import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
+import com.duckduckgo.mobile.android.R as CommonR
 
 interface ViewCta {
     fun showCta(
@@ -285,6 +286,7 @@ sealed class OnboardingDaxDialogCta(
         onDismissCtaClicked: () -> Unit,
     ) {
         val binding = binding.includeOnboardingInContextBBDialog
+        val context = binding.root.context
 
         with(binding) {
             root.show()
@@ -300,7 +302,11 @@ sealed class OnboardingDaxDialogCta(
                     show()
                     text = parsedTitle
                 }
-            } ?: onboardingDialogTitle.gone()
+                dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorSecondaryText))
+            } ?: {
+                onboardingDialogTitle.gone()
+                dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorPrimaryText))
+            }
 
             primaryCtaText?.let {
                 with(primaryCta) {
