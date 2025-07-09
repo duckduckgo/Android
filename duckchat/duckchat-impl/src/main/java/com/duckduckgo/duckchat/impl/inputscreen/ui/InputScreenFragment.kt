@@ -139,11 +139,11 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 exitInterstitial()
             }
             SwitchModeToSearch -> {
-                binding.viewPager.setCurrentItem(0, false)
+                // binding.viewPager.setCurrentItem(0, false)
             }
 
             SwitchModeToChat -> {
-                binding.viewPager.setCurrentItem(1, false)
+                // binding.viewPager.setCurrentItem(1, false)
             }
 
             else -> {

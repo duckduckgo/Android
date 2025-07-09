@@ -112,7 +112,8 @@ class InputModeWidget @JvmOverloads constructor(
         configureClickListeners()
         configureInputBehavior()
         configureTabBehavior()
-        applyModeSpecificInputBehaviour(isSearchTab = true)
+        inputModeSwitch.getTabAt(1)?.select()
+        applyModeSpecificInputBehaviour(isSearchTab = false)
     }
 
     fun provideInitialText(text: String) {
@@ -228,7 +229,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun selectTab(index: Int) {
         inputModeSwitch.post {
-            inputModeSwitch.getTabAt(index)?.select()
+            // inputModeSwitch.getTabAt(index)?.select()
         }
     }
 

@@ -56,7 +56,7 @@
         android:id="@+id/inputModeWidgetCard"
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/experimentalOmnibarCardMarginHorizontal"
         android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
         android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
@@ -66,19 +66,20 @@
         android:transitionName="omnibar_transition"
         app:layout_constraintTop_toBottomOf="@id/spacer"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:id="@+id/inputModeWidgetCardContent"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
             android:padding="@dimen/keyline_0">
 
             <EditText
                 android:id="@+id/inputField"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="@dimen/keyline_4"
                 android:layout_weight="1"

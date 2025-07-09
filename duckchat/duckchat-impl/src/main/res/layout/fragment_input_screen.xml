@@ -24,7 +24,7 @@
     <com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeWidget
         android:id="@+id/inputModeWidget"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="505dp"
         android:layout_marginTop="@dimen/keyline_2"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,6 +41,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <View
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/actionSend"
         android:layout_width="56dp"
@@ -48,7 +56,7 @@
         android:minWidth="0dp"
         android:minHeight="0dp"
         android:backgroundTint="?attr/daxColorButtonPrimaryContainer"
-        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginBottom="18dp"
         android:layout_marginEnd="@dimen/keyline_3"
         android:importantForAccessibility="no"
         android:text="&#8203;"
@@ -60,7 +68,7 @@
         app:iconGravity="textStart"
         app:rippleColor="?attr/daxColorRipple"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="@id/guideline"/>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/actionNewLine"
@@ -69,7 +77,7 @@
         android:minWidth="0dp"
         android:minHeight="0dp"
         android:backgroundTint="?attr/daxColorWindow"
-        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginBottom="18dp"
         android:layout_marginEnd="@dimen/keyline_3"
         android:importantForAccessibility="no"
         android:text="&#8203;"
@@ -90,7 +98,7 @@
         android:minWidth="0dp"
         android:minHeight="0dp"
         android:backgroundTint="?attr/daxColorWindow"
-        android:layout_marginBottom="@dimen/keyline_3"
+        android:layout_marginBottom="18dp"
         android:layout_marginEnd="@dimen/keyline_3"
         android:importantForAccessibility="no"
         android:text="&#8203;"
@@ -111,8 +119,8 @@
         android:minWidth="0dp"
         android:minHeight="0dp"
         android:backgroundTint="?attr/daxColorWindow"
-        android:layout_marginBottom="@dimen/keyline_3"
-        android:layout_marginStart="@dimen/keyline_3"
+        android:layout_marginBottom="18dp"
+        android:layout_marginStart="22dp"
         android:importantForAccessibility="no"
         android:text="&#8203;"
         android:textColor="@android:color/transparent"

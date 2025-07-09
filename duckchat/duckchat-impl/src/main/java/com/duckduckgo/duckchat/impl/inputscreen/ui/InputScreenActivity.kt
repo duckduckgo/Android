@@ -55,6 +55,6 @@ class InputScreenActivity : DuckDuckGoActivity() {
         const val TAB_ID = "tab_id"
 
         const val TRANSITION_DURATION = 300L
-        const val TRANSITION_INTERPOLATOR_TENSION = 1F
+        const val TRANSITION_INTERPOLATOR_TENSION = 0F
     }
 }
