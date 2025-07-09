@@ -50,7 +50,6 @@ dependencies {
 
     implementation AndroidX.work.runtimeKtx
 
-    implementation JakeWharton.timber
 
     testImplementation AndroidX.work.testing
     testImplementation AndroidX.test.ext.junit
@@ -75,6 +74,7 @@ android {
     }
     lint {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

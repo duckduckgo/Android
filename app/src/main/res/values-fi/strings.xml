@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Ruudukkonäkymä</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt; edellisen seitsemän päivän aikana</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt; edellisen seitsemän päivän aikana</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s seurantaohjelmaa estetty &lt;/b&gt;</string>
     <string name="inTheLast7Days">viimeisten 7 päivän aikana</string>
 
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Ulkoasu</string>
+    <string name="settingsShowFullUrlTitle">Näytä sivuston osoite kokonaan</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -711,8 +712,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d yksityinen välilehti</item>
-        <item quantity="other">%1$d yksityistä välilehteä</item>
+        <item quantity="one">1 välilehti</item>
+        <item quantity="other">%1$d välilehteä</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Yksityinen selaus oletuksena</string>
     <string name="preOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
-    <string name="preOnboardingComparisonChartItem4">Estä seurantamainokset</string>
+    <string name="preOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
     <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
     <string name="preOnboardingDaxDialog3Title">Mahtavaa! Tervetuloa käyttämään Duckia.</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
@@ -823,6 +824,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Ylävitonen!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kokeile sitä</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Ohita</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tämä on jo entuudestaan tuttua</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Selvä! Ohitan muut vinkit.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Muista: voit poistaa kaikki välilehdet, historian ja selaustiedot kahdella napautuksella <b>Fire Button</b> ‑painikkeella 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näytä opetusohjelma</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Osoitekenttä</string>
@@ -838,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Kiitos! Ilmoituksesi auttaa tekemään DuckDuckGosta paremman kaikille!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Uusi AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Anna DuckDuckGon suojata enemmän tekemisiäsi verkossa.</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tee meistä oletusselaimesi, niin kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
@@ -852,10 +853,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tämä verkkosivusto saattaa esiintyä laillisena sivustona huijatakseen sinua antamaan henkilötietoja, kuten salasanan tai luottokortin numeron.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa yrittää huijata tai manipuloida sinua siirtämään rahaa, ostamaan väärennettyjä tuotteita tai asentamaan haittaohjelmia väärin perustein.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Poistu sivustolta</string>
     <string name="maliciousSiteAdvancedCTA">Lisäasetukset</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jos uskot, että tämä verkkosivusto on turvallinen, voit <a href=\"\">ilmoittaa virheestä</a>. Voit silti vierailla verkkosivustolla omalla vastuullasi.]]></string>
@@ -866,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Varoita sivustoista, jotka on merkitty tietojenkalastelun tai haittaohjelmien johdosta</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="maliciousSiteSettingDisabled">Tämän ominaisuuden käytöstä poistaminen voi vaarantaa tietosi.</string>
+    <string name="threatProtectionTitle">Uhkien torjunta</string>
+    <string name="threatProtectionDescription">DuckDuckGon parannetut suojaukset pysäyttävät yleisimmät uhat ja pitävät yhteytesi suojattuna.</string>
+    <string name="smarterEncryptionTitle">Älykkäämpi salaus</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Päivittää linkit automaattisesti HTTPS-yhteyteen aina kun mahdollista.<a href=\"\">Lue lisää</a>]]></string>
+    <string name="scamBlockerTitle">Huijausten esto</string>
+    <string name="scamBlockerDescription">Varoita sivustoista, jotka on merkitty huijausten, tietojenkalastelun ja haittaohjelmien johdosta.</string>
+    <string name="threatProtectionLearnMoreTitle">Lue lisää</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Kokeile aloitusnäytön widgetiä!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisää widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hae DuckDuckGosta</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Aloitusnäytön widget</string>
 </resources>

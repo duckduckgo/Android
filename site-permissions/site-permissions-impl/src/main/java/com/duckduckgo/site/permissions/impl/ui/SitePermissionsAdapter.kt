@@ -195,33 +195,33 @@ class SitePermissionsAdapter(
             val iconRes = when (item.text) {
                 R.string.sitePermissionsSettingsLocation -> {
                     if (item.enable) {
-                        R.drawable.ic_location_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_location_24
                     } else {
-                        R.drawable.ic_location_blocked_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_location_blocked_24
                     }
                 }
 
                 R.string.sitePermissionsSettingsCamera -> {
                     if (item.enable) {
-                        R.drawable.ic_video_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_video_24
                     } else {
-                        R.drawable.ic_video_blocked_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_video_blocked_24
                     }
                 }
 
                 R.string.sitePermissionsSettingsMicrophone -> {
                     if (item.enable) {
-                        R.drawable.ic_microphone_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_microphone_24
                     } else {
-                        R.drawable.ic_microphone_blocked_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_microphone_blocked_24
                     }
                 }
 
                 R.string.sitePermissionsSettingsDRM -> {
                     if (item.enable) {
-                        R.drawable.ic_video_player_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_video_player_24
                     } else {
-                        R.drawable.ic_video_player_blocked_24
+                        com.duckduckgo.mobile.android.R.drawable.ic_video_player_blocked_24
                     }
                 }
 

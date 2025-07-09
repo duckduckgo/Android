@@ -19,7 +19,6 @@ package com.duckduckgo.subscriptions.impl.survey
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.productIdToBillingPeriod
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import java.util.concurrent.TimeUnit
@@ -41,8 +40,7 @@ class PproBillingParameterPlugin @Inject constructor(
     override val surveyParamKey: String = "ppro_billing"
 
     override suspend fun evaluate(): String {
-        val productId = subscriptionsManager.getSubscription()?.productId
-        return productId?.productIdToBillingPeriod() ?: ""
+        return subscriptionsManager.getSubscription()?.billingPeriod ?: ""
     }
 }
 

@@ -35,7 +35,7 @@ dependencies {
 
     implementation AndroidX.appCompat
     implementation Google.android.material
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
 
@@ -78,6 +78,7 @@ android {
     }
     lint {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

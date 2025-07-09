@@ -121,7 +121,7 @@
     <string name="tabSwitcherGridViewMenu">Tinklelio vaizdas</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt; per paskutines 7 dienas</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt; per paskutines 7 dienas</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s sekikliai (-ių) užblokuoti &lt;/b&gt;</string>
     <string name="inTheLast7Days">per paskutines 7 dienas</string>
 
@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Išvaizda</string>
+    <string name="settingsShowFullUrlTitle">Rodyti visą svetainės adresą</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -737,10 +738,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privatus skirtukas</item>
-        <item quantity="few">%1$d privatūs skirtukai</item>
-        <item quantity="many">%1$d privataus skirtuko</item>
-        <item quantity="other">%1$d privačiu skirtukų</item>
+        <item quantity="one">1 skirtukas</item>
+        <item quantity="few">%1$d skirtukai</item>
+        <item quantity="many">%1$d skirtuko</item>
+        <item quantity="other">%1$d skirtukų</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Vykdykite paiešką privačiai pagal numatytąjį nustatymą</string>
     <string name="preOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
     <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
-    <string name="preOnboardingComparisonChartItem4">Blokuoti sekimo skelbimus</string>
+    <string name="preOnboardingComparisonChartItem4">Blokuoti tikslines reklamas</string>
     <string name="preOnboardingComparisonChartItem5">Vienu mygtuku ištrink naršymo duomenis</string>
     <string name="preOnboardingDaxDialog3Title">Nuostabu! Sveiki prisijungę prie „Duck“!</string>
     <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
@@ -855,6 +856,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Duok penkis!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Išbandykite</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Praleisti</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Aš jau čia buvau.</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Supratau! Praleisiu kitus patarimus.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Atminkite: visus skirtukus, istoriją ir naršymo duomenis galite ištrinti dviem <b>„Fire Button“</b> 🔥 bakstelėjimais.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Rodyti mokymo priemonę</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adreso juosta</string>
@@ -870,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>
@@ -884,10 +885,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ši svetainė gali apsimesti teisėta svetaine, siekiant apgauti jus pateikti asmeninę informaciją, pvz., slaptažodžius ar kredito kortelių numerius.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jis gali bandyti apgauti ar manipuliuoti tavimi, siekdamas, kad pervestum pinigus, pirktum padirbtas prekes arba įdiegtum kenkėjiškas programas prisidengiant melagingais pretekstais.\n<a href=\"\">Sužinokite daugiau</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Išeiti iš šios svetainės</string>
     <string name="maliciousSiteAdvancedCTA">Išplėstinė</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jei manote, kad ši svetainė yra saugi, galite <a href=\"\">pranešti apie klaidą</a>. Vis dar galite apsilankyti svetainėje savo rizika.]]></string>
@@ -898,5 +900,21 @@
     <string name="maliciousSiteToggleHint">Gauti saugos įspėjimą svetainėse, pažymėtose dėl sukčiavimo ar kenkėjiškų programų</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="maliciousSiteSettingDisabled">Išjungus šią funkciją, gali kilti pavojus jūsų informacijai.</string>
+    <string name="threatProtectionTitle">Grėsmių apsauga</string>
+    <string name="threatProtectionDescription">„DuckDuckGo“ patobulintos apsaugos priemonės sustabdo įprastas grėsmes ir užtikrina tavo ryšio saugumą.</string>
+    <string name="smarterEncryptionTitle">Išmanesnis šifravimas</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatiškai atnaujina saitus į HTTPS, kai tik įmanoma.<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="scamBlockerTitle">Sukčiavimo blokavimo įrankis</string>
+    <string name="scamBlockerDescription">Įspėti svetainėse, pažymėtose dėl sukčiavimo, apgaulingo duomenų išviliojimo ir kenkėjiškų programų.</string>
+    <string name="threatProtectionLearnMoreTitle">Sužinoti daugiau</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Išbandyk mūsų pagrindinio ekrano valdiklį!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pridėkite mūsų paieškos valdiklį prie pagrindinio ekrano, kad galėtumėte greitai ir lengvai jį pasiekti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridėti valdiklį</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne dabar</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Ieškoti „DuckDuckGo“</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Pagrindinio ekrano valdiklis</string>
 </resources>

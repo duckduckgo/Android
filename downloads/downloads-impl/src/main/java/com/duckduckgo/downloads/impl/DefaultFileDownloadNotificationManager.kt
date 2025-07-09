@@ -79,17 +79,21 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
             .setContentText("$filename ($progress%).")
             .setShowWhen(false)
-            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setProgress(100, progress, progress == 0)
             .setOngoing(true)
             .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
-            .addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsCancel), pendingIntent)
+            .addAction(
+                com.duckduckgo.mobile.android.R.drawable.ic_downloads_white_16,
+                applicationContext.getString(R.string.downloadsCancel),
+                pendingIntent,
+            )
             .build()
 
         val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
             .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
-            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
             .setGroupSummary(true)
             .build()
@@ -122,7 +126,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setContentText(applicationContext.getString(R.string.notificationDownloadComplete))
             .setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
             .setAutoCancel(true)
-            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .build()
 
         cancelDownloadFileNotification(downloadId)
@@ -138,7 +142,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
             .setContentTitle(applicationContext.getString(R.string.notificationDownloadFailed))
-            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .apply {
                 url?.let { fileUrl ->
                     val pendingIntent = PendingIntent.getBroadcast(
@@ -147,7 +151,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
                         FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     )
-                    addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsRetry), pendingIntent)
+                    addAction(
+                        com.duckduckgo.mobile.android.R.drawable.ic_downloads_white_16,
+                        applicationContext.getString(R.string.downloadsRetry),
+                        pendingIntent,
+                    )
                 }
                 groupNotificationsCounter.get()[downloadId]?.let { fileName ->
                     setContentText(fileName)

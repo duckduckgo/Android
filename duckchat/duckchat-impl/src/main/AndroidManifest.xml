@@ -27,5 +27,8 @@
             android:exported="false"
             android:label="@string/duck_chat_title"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"/>
+        <activity
+            android:name="com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity"
+            android:exported="false" />
     </application>
 </manifest>

@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 android {
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     anvil {
         generateDaggerFactories = true // default is false
@@ -137,6 +138,7 @@ dependencies {
     testImplementation project(':common-test')
     testImplementation project(':vpn-api-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation project(':data-store-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

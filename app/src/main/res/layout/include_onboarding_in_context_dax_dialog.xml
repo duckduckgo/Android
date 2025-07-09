@@ -25,6 +25,7 @@
     tools:alpha="1">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/onboardingDaxDialogContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipChildren="false">
@@ -50,6 +51,7 @@
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/daxDialogDismissButton"
+            style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_0"
@@ -199,7 +201,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption1"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -210,7 +212,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption2"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
@@ -221,7 +223,7 @@
                         android:alpha="0"
                         android:gravity="start|center_vertical"
                         android:text="@string/onboardingSitesDaxDialogOption3"
-                        app:icon="@drawable/ic_globe_gray_16dp"
+                        app:icon="@drawable/ic_globe_16"
                         tools:alpha="1" />
 
                     <com.duckduckgo.common.ui.view.button.DaxButtonSecondary

@@ -19,12 +19,11 @@ package com.duckduckgo.malicioussiteprotection.impl
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionExceptionsStore
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     featureName = "maliciousSiteProtection",
-    exceptionsStore = MaliciousSiteProtectionExceptionsStore::class,
 )
 /**
  * This is the class that represents the maliciousSiteProtection feature flags
@@ -35,13 +34,24 @@ interface MaliciousSiteProtectionFeature {
      * If the remote feature is not present defaults to `false`
      */
     @Toggle.InternalAlwaysEnabled
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
     @Toggle.InternalAlwaysEnabled
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun visibleAndOnByDefault(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun canUpdateDatasets(): Toggle
+
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun scamProtection(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripWWWPrefix(): Toggle
+
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun enableCaching(): Toggle
 }

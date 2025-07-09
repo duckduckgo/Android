@@ -32,7 +32,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @WorkerThread
 interface SurveyNotificationScheduler {
@@ -79,7 +80,7 @@ class SurveyNotificationSchedulerImpl @Inject constructor(
         unit: TimeUnit,
         tag: String,
     ) {
-        Timber.v("Scheduling notification in $duration $unit")
+        logcat(VERBOSE) { "Scheduling notification in $duration $unit" }
         val request = builder
             .addTag(tag)
             .setInitialDelay(duration, unit)

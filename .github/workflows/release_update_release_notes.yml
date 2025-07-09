@@ -13,7 +13,7 @@ on:
         default: 'Bug fixes and other improvements'
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
 
 jobs:
@@ -54,9 +54,9 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Update Release Notes

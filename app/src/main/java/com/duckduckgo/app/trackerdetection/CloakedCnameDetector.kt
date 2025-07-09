@@ -25,7 +25,8 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface CloakedCnameDetector {
     fun detectCnameCloakedHost(documentUrl: String?, url: Uri): String?
@@ -47,7 +48,7 @@ class CloakedCnameDetectorImpl @Inject constructor(
         url.host?.let { host ->
             tdsCnameEntityDao.get(host)?.let { cnameEntity ->
                 var uncloakedHostName = cnameEntity.uncloakedHostName
-                Timber.v("$host is a CNAME cloaked host. Uncloaked host name: $uncloakedHostName")
+                logcat(VERBOSE) { "$host is a CNAME cloaked host. Uncloaked host name: $uncloakedHostName" }
                 url.path?.let { path ->
                     uncloakedHostName += path
                 }

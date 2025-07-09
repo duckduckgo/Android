@@ -22,13 +22,8 @@ import android.content.Intent
 import android.os.Build
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import timber.log.Timber
-
-interface DefaultRoleBrowserDialog {
-    fun createIntent(context: Context): Intent?
-    fun shouldShowDialog(): Boolean
-    fun dialogShown()
-}
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class RealDefaultRoleBrowserDialog(
     private val appInstallStore: AppInstallStore,
@@ -49,7 +44,7 @@ class RealDefaultRoleBrowserDialog(
                 return if (!isRoleHeld) {
                     roleManager.createRequestRoleIntent(RoleManager.ROLE_BROWSER)
                 } else {
-                    Timber.i("Browser role held")
+                    logcat(INFO) { "Browser role held" }
                     null
                 }
             }

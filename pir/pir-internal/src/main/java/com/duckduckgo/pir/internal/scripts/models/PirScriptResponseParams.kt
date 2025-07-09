@@ -47,17 +47,11 @@ sealed class PirSuccessResponse(
     data class ExtractedResponse(
         override val actionID: String,
         override val actionType: String,
+        val response: List<ExtractedProfile>,
         val meta: AdditionalData? = null,
     ) : PirSuccessResponse(actionID, actionType) {
         data class AdditionalData(
             val userData: ProfileQuery,
-            val extractResults: List<ScrapedData>,
-        )
-        data class ScrapedData(
-            val scrapedData: ExtractedProfile,
-            val result: Boolean,
-            val score: Int,
-            val matchedFields: List<String>,
         )
     }
 
@@ -83,6 +77,7 @@ sealed class PirSuccessResponse(
         data class ResponseData(
             val callback: CallbackData,
         )
+
         data class CallbackData(
             val eval: String,
         )

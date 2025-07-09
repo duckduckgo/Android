@@ -28,7 +28,7 @@ import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -65,8 +65,8 @@ class SubscriptionFeaturesFetcher @Inject constructor(
 
     private suspend fun fetchSubscriptionFeatures() {
         playBillingManager.productsFlow
-            .first { it.isNotEmpty() }
-            .find { it.productId == BASIC_SUBSCRIPTION }
+            .firstOrNull() { it.isNotEmpty() }
+            ?.find { it.productId == BASIC_SUBSCRIPTION }
             ?.subscriptionOfferDetails
             ?.map { it.basePlanId }
             ?.filter { authRepository.getFeatures(it).isEmpty() }

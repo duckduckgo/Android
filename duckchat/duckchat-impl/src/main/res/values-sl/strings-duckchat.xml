@@ -18,9 +18,30 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">Duck.ai je izbirna funkcija, ki vam omogoča anonimen klepet s priljubljenimi modeli za klepet z umetno inteligenco drugih ponudnikov. Vaši klepeti se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
-    <string name="duck_chat_visibility_setting">Prikaži Duck.ai v meniju brskalnika</string>
-
     <string name="duck_chat_download_finished_action_name">Odpri</string>
     <string name="duck_chat_cannot_open_file_error_message">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Ni bilo mogoče dostopati do kamere</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Naložite sliko</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izberite datoteko</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Posnemite fotografijo</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere v tej napravi</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Odpri nastavitve</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Ni bilo mogoče dostopati do snemalnika zvoka</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Dovolite, da lahko DuckDuckGo zahteva dostop do snemalnika zvoka v tej napravi</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Spletna mesta lahko uporabljajo snemalnik zvoka le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+
+    <!-- Settings -->
+    <string name="duck_chat_settings_activity_description">Duck.ai je izbirna funkcija, ki vam omogoča anonimen klepet s priljubljenimi modeli za klepet z umetno inteligenco drugih ponudnikov. Vaši klepeti se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Omogoči Duck.ai</string>
+    <string name="duck_chat_show_in_heading">Bližnjice</string>
+    <string name="duck_chat_visibility_setting">Meni brskalnika</string>
+    <string name="duck_chat_address_bar_visibility_setting">Naslovna vrstica</string>
+    <string name="duck_chat_assist_settings_title">Nastavitve modula Assist</string>
+    <string name="duck_chat_assist_settings_description">Izberite, kako pogosto želite, da se odgovori s pomočjo umetne inteligence prikazujejo v vaših iskanjih</string>
 </resources>

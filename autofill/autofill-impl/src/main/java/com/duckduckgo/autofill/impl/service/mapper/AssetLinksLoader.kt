@@ -22,7 +22,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 interface AssetLinksLoader {
     /**
@@ -40,7 +42,7 @@ class RealAssetLinksLoader @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             kotlin.runCatching {
                 assetLinksService.getAssetLinks("${domain.normalizeScheme()}$ASSET_LINKS_PATH").also {
-                    Timber.d("Autofill-mapping: Assetlinks of $domain: ${it.size}")
+                    logcat { "Autofill-mapping: Assetlinks of $domain: ${it.size}" }
                 }.filter {
                     it.relation.any { relation -> relation in supportedRelations } &&
                         !it.target.package_name.isNullOrEmpty() &&
@@ -50,7 +52,7 @@ class RealAssetLinksLoader @Inject constructor(
             }.getOrElse {
                 // This can fail for a lot of reasons: invalid url from package name, absence of assetlinks, malformed assetlinks
                 // If it does, we don't want to crash the app. We only want to return empty
-                Timber.e(it, "Autofill-mapping: Failed to obtain assetlinks for: $domain")
+                logcat(ERROR) { "Autofill-mapping: Failed to obtain assetlinks for: $domain: ${it.asLog()}" }
                 emptyMap()
             }
         }

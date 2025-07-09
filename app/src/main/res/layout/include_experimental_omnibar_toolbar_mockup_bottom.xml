@@ -47,18 +47,29 @@
             android:importantForAccessibility="no"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_find_search_20_a05" />
+            android:src="@drawable/ic_find_search_small_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/omnibarTextInputMockup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="start|center"
             android:maxLines="1"
             android:paddingStart="5dp"
             android:paddingEnd="8dp"
             android:text="@string/omnibarInputHint"
             android:textColor="?attr/daxColorSecondaryText" />
+
+        <ImageView
+            android:id="@+id/aiChatIconMockup"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="10dp"
+            android:src="@drawable/ic_ai_chat_24" />
 
     </LinearLayout>
 
@@ -87,7 +98,7 @@
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_add_24e" />
+                android:src="@drawable/ic_add_24" />
         </FrameLayout>
 
         <Space
@@ -106,7 +117,7 @@
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_bookmarks_stacked_24e" />
+                android:src="@drawable/ic_bookmarks_24" />
         </FrameLayout>
 
         <Space
@@ -116,17 +127,16 @@
 
         <FrameLayout
             android:id="@+id/fireButton"
-            android:layout_width="80dp"
+            android:layout_width="@dimen/bottomNavIconContainer"
             android:layout_height="@dimen/bottomNavIconContainer"
-            android:foreground="@drawable/bottom_nav_fire_button_foreground"
-            android:background="@drawable/bottom_nav_fire_button_background">
+            android:background="?attr/selectableItemBackgroundBorderless">
 
             <ImageView
                 android:id="@+id/fireIconImageView"
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_fire_new_24e" />
+                android:src="@drawable/ic_fire_24" />
         </FrameLayout>
 
         <Space
@@ -145,7 +155,7 @@
                 android:layout_width="@dimen/bottomNavIcon"
                 android:layout_height="@dimen/bottomNavIcon"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_tab_switcher_experiment" />
+                android:src="@drawable/ic_tab_24" />
         </FrameLayout>
 
         <Space

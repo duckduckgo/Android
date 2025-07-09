@@ -1,0 +1,127 @@
+appId: com.duckduckgo.mobile.android
+name: "Autofill: Autofill Settings Screen"
+tags:
+  - autofillNoAuthTests
+---
+# Pre-requisite: on an autofill-eligible device
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
+      - assertVisible: "Settings"
+      - tapOn: "Settings"
+
+      - scrollUntilVisible:
+          element:
+            text: "Passwords.*"
+      - assertVisible: "Passwords.*"
+      - tapOn: "Passwords.*"
+
+      - assertVisible:
+          id: secondaryText
+          text: "0"
+
+      - assertVisible:
+          text: "Ask to Save and Autofill"
+
+      - assertVisible:
+          id: syncDesktopPasswordsOption
+
+      - tapOn:
+          id: passwordsListItem
+
+      - assertVisible:
+          text: "No passwords saved yet"
+      - assertNotVisible:
+          id: searchLogins
+
+      - runScript: steps/2_script.js
+
+      - repeat:
+          while:
+            true: ${output.addLogins.counter < output.addLogins.domains.length}
+          commands:
+            - tapOn:
+                id: addLoginManually
+            - assertVisible:
+                text: Add Password
+            - assertNotVisible:
+                id: view_menu_save
+
+            - scrollUntilVisible:
+                element:
+                  id: usernameEditText
+            - tapOn:
+                id: usernameEditText
+            - inputText: "user"
+
+            - assertVisible:
+                id: view_menu_save
+
+            - scrollUntilVisible:
+                element:
+                  id: passwordEditText
+            - tapOn:
+                id: passwordEditText
+            - inputText: "123"
+
+            - scrollUntilVisible:
+                element:
+                  id: domainEditText
+            - tapOn:
+                id: domainEditText
+            - inputText: "${output.addLogins.domains[output.addLogins.counter]}"
+
+            - scrollUntilVisible:
+                element:
+                  id: notesEditText
+            - tapOn:
+                id: notesEditText
+            - inputText: "a note"
+
+            - tapOn:
+                id: view_menu_save
+                retryTapIfNoChange: false
+
+            - scrollUntilVisible:
+                element:
+                  text: "Last updated.*"
+            - assertVisible: "Last updated.*"
+
+            - tapOn: "Navigate up"
+
+            - evalScript: ${output.addLogins.counter++}
+
+      - scrollUntilVisible:
+          element:
+            text: "#"
+      - assertVisible:
+          text: "#"
+
+      - scrollUntilVisible:
+          element:
+            text: "a.example.com"
+      - assertVisible:
+          text: "a.example.com"
+
+      - assertNotVisible:
+          text: "https://a.example.com"
+
+      - scrollUntilVisible:
+          element:
+            text: "fill.dev"
+      - assertVisible:
+          text: "fill.dev"
+
+      - assertNotVisible:
+          text: "fill.dev/example"
+
+      - tapOn: "Navigate up"
+
+      - assertVisible:
+          id: secondaryText
+          text: "3"

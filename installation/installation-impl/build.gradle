@@ -34,7 +34,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation "androidx.datastore:datastore-preferences:_"
@@ -55,6 +55,7 @@ android {
     }
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

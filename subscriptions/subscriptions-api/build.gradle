@@ -23,6 +23,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':navigation-api')
+    implementation project(':js-messaging-api')
     implementation KotlinX.coroutines.core
 }
 

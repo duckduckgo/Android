@@ -27,6 +27,7 @@ dependencies {
     implementation project(':anvil-annotations')
     implementation project(':di')
     implementation project(':subscriptions-api')
+    implementation project(':js-messaging-api')
 
     implementation KotlinX.coroutines.android
     implementation Google.dagger

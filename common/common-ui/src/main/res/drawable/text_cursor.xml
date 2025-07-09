@@ -18,4 +18,5 @@
     android:shape="rectangle">
     <size android:width="2dp" />
     <solid android:color="?attr/daxColorAccentBlue" />
+    <corners android:radius="1dp" />
 </shape>

@@ -29,7 +29,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
@@ -60,7 +60,7 @@ class VpnRemoteSettingsStore @Inject constructor(
                 }
             }
         }.onFailure {
-            logcat(LogPriority.WARN) { it.asLog() }
+            logcat(WARN) { it.asLog() }
         }
     }
 

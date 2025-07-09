@@ -96,6 +96,12 @@ class ExceptionListsSettingStoreTest {
 
     @Test
     fun whenEmptyJsonStoreNothing() {
+        exceptionListsSettingStore.store("{}")
+        verifyNoInteractions(mockVpnDatabase)
+    }
+
+    @Test
+    fun whenInvalidJsonStoreNothingAndDoNotCrash() {
         exceptionListsSettingStore.store("")
         verifyNoInteractions(mockVpnDatabase)
     }

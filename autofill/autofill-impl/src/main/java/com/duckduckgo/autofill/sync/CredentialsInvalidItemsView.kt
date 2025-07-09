@@ -26,8 +26,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Sync
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ViewCredentialsInvalidItemsWarningBinding
 import com.duckduckgo.autofill.sync.CredentialsInvalidItemsViewModel.Command
@@ -127,6 +127,6 @@ class CredentialsInvalidItemsView @JvmOverloads constructor(
     }
 
     private fun navigateToCredentials() {
-        globalActivityStarter.start(this.context, AutofillSettingsScreen(source = AutofillSettingsLaunchSource.Sync))
+        globalActivityStarter.start(this.context, AutofillPasswordsManagementScreen(source = Sync))
     }
 }

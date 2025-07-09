@@ -121,7 +121,7 @@
     <string name="tabSwitcherGridViewMenu">Widok siatki</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Liczba zablokowanych mechanizmów śledzących: %1$s &lt;/b&gt; w ciągu ostatnich 7 dni</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;Liczba zablokowanych mechanizmów śledzących: %1$s &lt;/b&gt; w ciągu ostatnich 7 dni</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Liczba zablokowanych mechanizmów śledzących: %1$s &lt;/b&gt;</string>
     <string name="inTheLast7Days">w ciągu ostatnich 7 dni</string>
 
@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Wygląd</string>
+    <string name="settingsShowFullUrlTitle">Pokaż pełny adres witryny internetowej</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -737,10 +738,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d prywatna karta</item>
-        <item quantity="few">%1$d prywatne karty</item>
-        <item quantity="many">%1$d prywatnych kart</item>
-        <item quantity="other">%1$d prywatnych kart</item>
+        <item quantity="one">1 karta</item>
+        <item quantity="few">%1$d karty</item>
+        <item quantity="many">%1$d kart</item>
+        <item quantity="other">%1$d karty</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Domyślnie szukaj prywatnie</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj mechanizmy śledzące innych firm</string>
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blokowanie śledzących reklam</string>
+    <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
     <string name="preOnboardingDaxDialog3Title">Fantastycznie! Witaj po Kaczej Stronie Mocy!</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
@@ -855,6 +856,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Piątka!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Wypróbuj</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Pomiń</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Już to wiem</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Rozumiem! Pominę pozostałe wskazówki.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamiętaj: możesz usunąć wszystkie swoje karty, historię i dane przeglądania, dotykając dwukrotnie przycisku <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Pokaż samouczek</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Pasek adresu</string>
@@ -870,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dziękujemy! Twoje zgłoszenie pomoże ulepszyć DuckDuckGo u wszystkich użytkowników!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nowy AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Skorzystaj z DuckDuckGo, aby chronić swoją aktywność w Internecie</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Ustaw naszą przeglądarkę jako domyślną, aby wszystkie linki były otwierane w DuckDuckGo.</string>
@@ -884,10 +885,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Wyczyszczenie kart i danych spowoduje usunięcie historii blokowania mechanizmów śledzących i zresetowanie tej liczby do zera.\n\nUkryj ten baner, jeśli wolisz go nie widzieć w widoku kart.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ukryj baner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Ostrzeżenie: ta witryna może stanowić zagrożenie dla bezpieczeństwa</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez DuckDuckGo, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ta witryna może podszywać się pod legalną witrynę w celu nakłonienia użytkownika do podania danych osobowych, takich jak hasła lub numery kart kredytowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Przeglądarka DuckDuckGo zablokowała tę stronę ze względu na prawdopodobieństwo próby oszukania użytkownika, skłonienia do przesłania pieniędzy, zakupu podrobionych towarów lub zainstalowania złośliwego oprogramowania pod fałszywym pretekstem.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Opuść tę stronę</string>
     <string name="maliciousSiteAdvancedCTA">Zaawansowane</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Jeśli uważasz, że ta strona jest bezpieczna, możesz <a href=\"\">zgłosić błąd</a>. Możesz odwiedzić tę stronę internetową na własne ryzyko.]]></string>
@@ -898,5 +900,21 @@
     <string name="maliciousSiteToggleHint">Ostrzegaj mnie przed witrynami oznaczonymi jako wyłudzanie informacji lub złośliwe oprogramowanie</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="maliciousSiteSettingDisabled">Wyłączenie tej funkcji może narazić Twoje dane na ryzyko.</string>
+    <string name="threatProtectionTitle">Ochrona przed zagrożeniami</string>
+    <string name="threatProtectionDescription">Ulepszone mechanizmy ochrony dostępne w DuckDuckGo blokują typowe zagrożenia, a jednocześnie zapewniają bezpieczeństwo połączenia.</string>
+    <string name="smarterEncryptionTitle">Inteligentniejsze szyfrowanie</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatycznie aktualizuje łącza do protokołu HTTPS, jeśli to możliwe.<br><a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="scamBlockerTitle">Blokowanie oszustw</string>
+    <string name="scamBlockerDescription">Ostrzegaj przed witrynami oznaczonymi z powodu oszustw, wyłudzania informacji i złośliwego oprogramowania.</string>
+    <string name="threatProtectionLearnMoreTitle">Dowiedz się więcej</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Wypróbuj nasz widżet ekranu głównego!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widżet</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nie teraz</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Szukaj w DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widżet ekranu głównego</string>
 </resources>

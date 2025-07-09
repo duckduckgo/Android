@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.pixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ACTIVE_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
@@ -33,6 +34,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PAS
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_USER_TOOK_NO_ACTION
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_MANAGEMENT_SCREEN_OPENED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
@@ -49,6 +51,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PA
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORD_SELECTED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_SUGGESTION_CONFIRMED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SETTINGS_OPENED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_AVAILABLE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAKAGE_REPORT_CONFIRMATION_CONFIRMED
@@ -145,6 +148,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
         "m_autofill_device_capability_secure_storage_unavailable_and_device_auth_disabled",
     ),
     AUTOFILL_DEVICE_CAPABILITY_UNKNOWN_ERROR("m_autofill_device_capability_unknown"),
+    AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE("autofill_device_auth_error_hardware_unavailable"),
 
     AUTOFILL_SURVEY_AVAILABLE_PROMPT_DISPLAYED("m_autofill_management_screen_visit_survey_available"),
 
@@ -157,6 +161,7 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
 
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED("autofill_import_google_passwords_import_button_tapped"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN("autofill_import_google_passwords_import_button_shown"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_DISMISSED("autofill_import_google_passwords_import_button_dismissed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_OVERFLOW_MENU("autofill_import_google_passwords_overflow_menu_tapped"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_DISPLAYED("autofill_import_google_passwords_preimport_prompt_displayed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED("autofill_import_google_passwords_preimport_prompt_confirmed"),
@@ -194,6 +199,9 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_SERVICE_PASSWORDS_SEARCH("autofill_extension_passwords_search"),
     AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT("autofill_extension_passwords_search_input"), // when user types in the search bar first time
     AUTOFILL_SERVICE_CRASH("autofill_service_crash"),
+
+    AUTOFILL_SETTINGS_OPENED("autofill_settings_opened"),
+    AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU("autofill_reset_excluded_overflow_menu_tapped"),
 }
 
 @ContributesMultibinding(
@@ -256,6 +264,10 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_SERVICE_PASSWORDS_SEARCH.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SERVICE_PASSWORDS_SEARCH_INPUT.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SERVICE_CRASH.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SETTINGS_OPENED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

@@ -36,6 +36,7 @@ interface SubscriptionsDataStore {
 
     // Subscription
     var expiresOrRenewsAt: Long?
+    var billingPeriod: String?
     var startedAt: Long?
     var platform: String?
     var status: String?
@@ -52,7 +53,7 @@ interface SubscriptionsDataStore {
  * THINK TWICE before using this class directly.
  * Usages of this class should all go through [AuthRepository]
  */
-internal class SubscriptionsEncryptedDataStore constructor(
+internal class SubscriptionsEncryptedDataStore(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : SubscriptionsDataStore {
     private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
@@ -196,6 +197,14 @@ internal class SubscriptionsEncryptedDataStore constructor(
             }
         }
 
+    override var billingPeriod: String?
+        get() = encryptedPreferences?.getString(KEY_BILLING_PERIOD, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_BILLING_PERIOD, value)
+            }
+        }
+
     override var subscriptionFeatures: String?
         get() = encryptedPreferences?.getString(KEY_SUBSCRIPTION_FEATURES, null)
         set(value) {
@@ -222,6 +231,7 @@ internal class SubscriptionsEncryptedDataStore constructor(
         const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
         const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"
         const val KEY_STARTED_AT = "KEY_STARTED_AT"
+        const val KEY_BILLING_PERIOD = "KEY_BILLING_PERIOD"
         const val KEY_ENTITLEMENTS = "KEY_ENTITLEMENTS"
         const val KEY_STATUS = "KEY_STATUS"
         const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"

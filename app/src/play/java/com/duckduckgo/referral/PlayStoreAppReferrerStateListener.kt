@@ -57,7 +57,12 @@ import com.duckduckgo.experiments.impl.VariantManagerImpl.Companion.RESERVED_EU_
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.delay
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 class PlayStoreAppReferrerStateListener @Inject constructor(
@@ -87,7 +92,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                     loadPreviousReferrerData()
                 }
 
-                Timber.i("Already inspected this referrer data")
+                logcat(INFO) { "Already inspected this referrer data" }
                 return
             }
 
@@ -97,7 +102,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
                 referralResult = ParseFailure(ReferralServiceUnavailable)
             }
         } catch (e: RuntimeException) {
-            Timber.w(e, "Failed to obtain referrer information")
+            logcat(WARN) { "Failed to obtain referrer information: ${e.asLog()}" }
             referralResult = ParseFailure(UnknownError)
         }
     }
@@ -105,28 +110,28 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     private fun loadPreviousReferrerData(): ParsedReferrerResult {
         val suffix = loadFromDataStore()
         return if (suffix == null) {
-            Timber.i("Already saw referrer data, but no campaign suffix saved")
+            logcat(INFO) { "Already saw referrer data, but no campaign suffix saved" }
             ReferrerNotFound(fromCache = true)
         } else {
-            Timber.i("Already have referrer data from previous run - $suffix")
+            logcat(INFO) { "Already have referrer data from previous run - $suffix" }
             CampaignReferrerFound(suffix, fromCache = true)
         }
     }
 
     override fun onInstallReferrerSetupFinished(responseCode: Int) {
         val referrerRetrievalDurationMs = System.currentTimeMillis() - initialisationStartTime
-        Timber.i("Took ${referrerRetrievalDurationMs}ms to get initial referral data callback")
+        logcat(INFO) { "Took ${referrerRetrievalDurationMs}ms to get initial referral data callback" }
         try {
             when (responseCode) {
                 OK -> {
                     kotlin.runCatching {
-                        Timber.d("Successfully connected to Referrer service")
+                        logcat { "Successfully connected to Referrer service" }
                         val response = referralClient.installReferrer
                         val referrer = response.installReferrer
                         val parsedResult = appInstallationReferrerParser.parse(referrer)
                         referralResultReceived(parsedResult)
                     }.onFailure {
-                        Timber.e(it, "Error getting install referrer")
+                        logcat(ERROR) { "Error getting install referrer: ${it.asLog()}" }
                         referralResultFailed(UnknownError)
                     }
                 }
@@ -139,7 +144,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
 
             referralClient.endConnection()
         } catch (e: RuntimeException) {
-            Timber.w(e, "Failed to retrieve referrer data")
+            logcat(WARN) { "Failed to retrieve referrer data: ${e.asLog()}" }
             referralResultFailed(UnknownError)
         }
     }
@@ -152,15 +157,15 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
      */
     override suspend fun waitForReferrerCode(): ParsedReferrerResult {
         if (referralResult != ReferrerInitialising) {
-            Timber.d("Referrer already determined (%s); immediately answering", referralResult.javaClass.simpleName)
+            logcat { "Referrer already determined (${referralResult.javaClass.simpleName}); immediately answering" }
             return referralResult
         }
 
-        Timber.i("Referrer: Retrieving referral code from Play Store referrer service")
+        logcat(INFO) { "Referrer: Retrieving referral code from Play Store referrer service" }
 
         // poll, awaiting referral result to become available
         while (referralResult == ReferrerInitialising) {
-            Timber.v("Still initialising - waiting")
+            logcat(VERBOSE) { "Still initialising - waiting" }
             delay(10)
         }
 
@@ -211,7 +216,7 @@ class PlayStoreAppReferrerStateListener @Inject constructor(
     }
 
     override fun onInstallReferrerServiceDisconnected() {
-        Timber.i("Referrer: ServiceDisconnected")
+        logcat(INFO) { "Referrer: ServiceDisconnected" }
     }
 
     override suspend fun beforeAtbInit() {

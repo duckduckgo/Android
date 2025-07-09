@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DenyListedApi"
@@ -21,83 +21,6 @@
             file="src/main/java/com/duckduckgo/experiments/impl/reinstalls/BackupServiceDataStore.kt"
             line="35"
             column="69"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R &amp;&amp; !reinstallSharedPrefs.get().isReturningUserChecked()) {"
-        errorLine2="                                     ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListener.kt"
-            line="53"
-            column="38"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="Use com.duckduckgo.data.store.api.SharedPreferencesProvider instead"
-        errorLine1="        return context.getSharedPreferences(filename, Context.MODE_PRIVATE)"
-        errorLine2="               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListener.kt"
-            line="98"
-            column="16"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.Q)"
-        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListenerTest.kt"
-            line="71"
-            column="56"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)"
-        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListenerTest.kt"
-            line="80"
-            column="56"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)"
-        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListenerTest.kt"
-            line="90"
-            column="56"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)"
-        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListenerTest.kt"
-            line="104"
-            column="56"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="No one remembers what these constants map to. Use the API level integer value directly since it&apos;s self-defining."
-        errorLine1="        whenever(mockAppBuildConfig.sdkInt).thenReturn(Build.VERSION_CODES.R)"
-        errorLine2="                                                       ~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/experiments/impl/reinstalls/ReinstallAtbListenerTest.kt"
-            line="118"
-            column="56"/>
     </issue>
 
 </issues>

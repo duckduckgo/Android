@@ -39,7 +39,7 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
     implementation Google.dagger
@@ -48,6 +48,7 @@ dependencies {
     implementation Square.retrofit2.converter.moshi
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit

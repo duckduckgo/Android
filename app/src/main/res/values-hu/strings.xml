@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Rácsnézet</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s nyomkövető blokkolva &lt;/b&gt; az elmúlt 7 napban</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s nyomkövető blokkolva &lt;/b&gt; az elmúlt 7 napban</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s nyomkövető letiltva &lt;/b&gt;</string>
     <string name="inTheLast7Days">az elmúlt 7 napban</string>
 
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Megjelenés</string>
+    <string name="settingsShowFullUrlTitle">Teljes webhelycím megjelenítése</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -711,8 +712,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privát lap</item>
-        <item quantity="other">%1$d privát lap</item>
+        <item quantity="one">1 lap</item>
+        <item quantity="other">%1$d lap</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
     <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
-    <string name="preOnboardingComparisonChartItem4">Nyomon követő hirdetések blokkolása</string>
+    <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
     <string name="preOnboardingDaxDialog3Title">Nagyszerű! Üdvözlünk a kacsa világában!</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
@@ -823,6 +824,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Pacsi!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Kipróbálom</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Kihagyás</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Már jártam itt korábban</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Értem! Kihagyom a többi tippet.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Ne feledd: a <b>Fire Button</b> 🔥 segítségével két érintéssel törölheted az összes lapodat, előzményedet és böngészési adatodat]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Útmutató megjelenítése</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Címsor</string>
@@ -838,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Új AI-csevegés</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
@@ -852,10 +853,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[A DuckDuckGo letiltotta ezt az oldalt, mert feltehetően megtévesztő vagy manipulatív módon, valótlan állításokkal próbál meg rávenni pénz átutalására, hamisított termékek vásárlására vagy rosszindulatú program telepítésére.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Webhely elhagyása</string>
     <string name="maliciousSiteAdvancedCTA">Haladó</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ha úgy gondolod, hogy ez a weboldal biztonságos, <a href=\"\">tegyél hibabejelentést</a>. A weboldalt továbbra is saját felelősségedre látogathatod.]]></string>
@@ -866,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Figyelmeztetés az adathalászat vagy rosszindulatú programok miatt megjelölt webhelyekre</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">További tudnivalók</annotation></string>
     <string name="maliciousSiteSettingDisabled">Ennek a funkciónak a letiltása veszélyt jelenthet az adataidra.</string>
+    <string name="threatProtectionTitle">Fenyegetések elleni védelem</string>
+    <string name="threatProtectionDescription">A DuckDuckGo továbbfejlesztett védelmi megoldásai megállítják a gyakori fenyegetéseket, miközben megőrzik a kapcsolat biztonságát.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Linkek automatikus frissítése HTTPS-re, amikor csak lehetséges.<a href=\"\">További részletek</a>]]></string>
+    <string name="scamBlockerTitle">Csalásblokkoló</string>
+    <string name="scamBlockerDescription">Figyelmeztetés azokra az oldalakra, amelyeket csalás, adathalászat vagy rosszindulatú programok miatt jelöltek meg.</string>
+    <string name="threatProtectionLearnMoreTitle">További részletek</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Próbáld ki kezdőképernyő-minialkalmazásunkat!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Minialkalmazás hozzáadása</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Most nem</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a DuckDuckGo alkalmazásban</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>
 </resources>

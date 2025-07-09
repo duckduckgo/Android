@@ -47,7 +47,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation AndroidX.appCompat
     implementation Google.android.material
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
     implementation KotlinX.coroutines.core
     implementation AndroidX.core.ktx
@@ -55,7 +55,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:_'
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation "com.squareup.logcat:logcat:_"
 
     // ViewModel and LiveData
     implementation AndroidX.lifecycle.runtime.ktx
@@ -95,6 +94,7 @@ android {
     }
     lint {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

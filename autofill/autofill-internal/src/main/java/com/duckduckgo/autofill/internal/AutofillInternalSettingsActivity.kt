@@ -34,8 +34,8 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
@@ -316,6 +316,17 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
             }
             importCsvLauncher.launch(intent)
         }
+
+        binding.importPasswordsResetImportedFlagButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasEverImportedPasswords = false
+            }
+            Toast.makeText(
+                this@AutofillInternalSettingsActivity,
+                getString(R.string.autofillDevSettingsResetGooglePasswordsImportFlagConfirmation),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
     }
 
     private fun configureEngagementEventHandlers() {
@@ -483,7 +494,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSavedLoginsButton.setClickListener {
-            globalActivityStarter.start(this, AutofillSettingsScreen(source = InternalDevSettings))
+            globalActivityStarter.start(this, AutofillPasswordsManagementScreen(source = InternalDevSettings))
         }
     }
 

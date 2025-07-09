@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/daxPromptBrowserComparisonContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/daxPromptBackground"
+    tools:context=".ui.DaxPromptBrowserComparisonActivity"
+    tools:ignore="InvalidColorAttribute">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/orangeShape"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="36dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/daxShape"
+        app:srcCompat="@drawable/background_shape" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/daxPromptBrowserComparisonCloseButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:background="@drawable/background_close_button_with_ripple"
+        android:drawableStart="@drawable/ic_close_16"
+        android:drawablePadding="@dimen/keyline_2"
+        android:paddingStart="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_2"
+        android:text="@string/dax_prompt_browser_comparison_close"
+        android:textColor="?attr/daxColorPrimaryText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:typography="body1_bold" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/daxShape"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="-80dp"
+        app:layout_constraintBottom_toBottomOf="@id/daxPromptBrowserComparisonMessageContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/daxPromptBrowserComparisonMessageContainer"
+        app:srcCompat="@drawable/dax_with_magnifying_glass_no_feet" />
+
+    <LinearLayout
+        android:id="@+id/daxPromptBrowserComparisonMessageContainer"
+        android:layout_width="0dp"
+        android:layout_height="260dp"
+        android:layout_marginStart="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginBottom="46dp"
+        android:background="@drawable/background_dax_message"
+        android:orientation="vertical"
+        android:padding="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/daxPromptBrowserComparisonTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/dax_prompt_browser_comparison_message_title"
+            app:typography="title" />
+
+        <include
+            android:id="@+id/daxPromptBrowserComparisonChart"
+            layout="@layout/browser_comparison_chart"
+            android:layout_width="match_parent"
+            android:layout_height="70dp" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/daxPromptBrowserComparisonMoreLink"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginBottom="@dimen/keyline_4"
+            android:text="@string/dax_prompt_browser_comparison_more_link" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/daxPromptBrowserComparisonPrimaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:background="@drawable/background_button_with_ripple"
+            android:gravity="center"
+            android:padding="14dp"
+            android:text="@string/dax_prompt_browser_comparison_message_primary_button"
+            android:textColor="@color/white"
+            app:typography="body2_bold" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

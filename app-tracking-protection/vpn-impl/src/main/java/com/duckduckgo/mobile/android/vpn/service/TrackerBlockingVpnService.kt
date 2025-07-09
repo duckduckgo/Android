@@ -45,6 +45,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
+import com.duckduckgo.mobile.android.vpn.integration.NgVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -75,6 +76,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -237,6 +239,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 if (notifyVpnStart()) {
                     synchronized(this) {
                         launch(serviceDispatcher) {
+                            // Give Android a moment to complete foreground transition
+                            // You might think this is a hack (and it kind of is)
+                            // but it's a workaround to avoid early establish() binding failures
+                            delay(100)
                             async {
                                 startVpn(intent.alwaysOnTriggered())
                             }.await()
@@ -399,9 +405,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
         tunnelConfig?.let { config ->
             // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
-            if (config.dns.map { it.hostAddress }.contains("10.11.12.1")) {
-                // noop whenever NetP is enabled
-            } else if (config.dns.isNotEmpty()) {
+            if (vpnNetworkStack is NgVpnNetworkStack && config.dns.isNotEmpty()) {
+                // This solution is only relevant for AppTP
                 // just temporary pixel to know quantify how many users would be impacted
                 deviceShieldPixels.reportMotoGFix()
                 dnsChangeCallback.register()
@@ -422,16 +427,32 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         return runCatching {
             Builder().run {
                 allowFamily(AF_INET6)
-                addAddress(InetAddress.getByName("10.0.100.100"), 32)
-                addAddress(InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1"), 128)
+                try {
+                    addAddress(InetAddress.getByName("10.0.100.100"), 32)
+                } catch (e: Exception) {
+                    throw IllegalStateException("Failed to add IPv4 address 10.0.100.100/32", e)
+                }
+                try {
+                    addAddress(InetAddress.getByName("fd00::1"), 128)
+                } catch (e: Exception) {
+                    throw IllegalStateException("Failed to add IPv6 address fd00::1/128", e)
+                }
                 // nobody will be listening here we just want to make sure no app has connection
-                addDnsServer("10.0.100.1")
+                try {
+                    addDnsServer("10.0.100.1")
+                } catch (e: Exception) {
+                    throw IllegalStateException("Failed to add DNS server 10.0.100.1", e)
+                }
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
                 safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
                 setBlocking(true)
                 setMtu(1280)
-                prepare(this@TrackerBlockingVpnService)
+                try {
+                    prepare(this@TrackerBlockingVpnService)
+                } catch (e: Exception) {
+                    throw IllegalStateException("VPN service not prepared", e)
+                }
                 establish()
             }.also {
                 logcat { "VPN log: Hole TUN created ${it?.fd}" }
@@ -810,7 +831,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 //                }
 //            }.onFailure {
 //                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
-//                Timber.w(it, "VPN log: Failed to start trampoline service")
+//                logcat(WARN) { "VPN log: Failed to start trampoline service: ${it.asLog()} }
 //                startVpnService(applicationContext)
 //            }
 //        }

@@ -50,6 +50,7 @@ interface Pixel {
         const val LAST_USED_DAY = "duck_address_last_used"
         const val WEBVIEW_VERSION = "webview_version"
         const val WEBVIEW_FULL_VERSION = "webview_full_version"
+        const val IS_DUCKDUCKGO_PACKAGE = "is_duckduckgo_app_package"
         const val DEFAULT_BROWSER = "default_browser"
         const val EMAIL = "email"
         const val MESSAGE_SHOWN = "message"
@@ -65,8 +66,7 @@ interface Pixel {
         const val TAB_INACTIVE_1W = "tab_inactive_1w"
         const val TAB_INACTIVE_2W = "tab_inactive_2w"
         const val TAB_INACTIVE_3W = "tab_inactive_3w"
-        const val NO_ANIMATION = "no_animation"
-        const val GREEN_SHIELD_COUNT = "greenshield_count"
+        const val IS_ENABLED = "is_enabled"
     }
 
     object PixelValues {

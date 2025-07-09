@@ -201,11 +201,6 @@ enum class SubscriptionPixel(
         type = Count,
         includedParameters = setOf(ATB, APP_VERSION),
     ),
-    SUBSCRIPTION_PURCHASE_WITH_RESTORED_ACCOUNT(
-        baseName = "m_privacy-pro_app_purchase_with_restored_account",
-        type = Count,
-        includedParameters = setOf(APP_VERSION),
-    ),
     AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED(
         baseName = "m_privacy-pro_auth_invalid_refresh_token_detected",
         types = setOf(Count, Daily()),
@@ -264,9 +259,19 @@ enum class SubscriptionPixel(
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
 }
 
+object SubscriptionPixelParameter {
+    const val ERROR_TYPE = "errorType"
+    const val REASON = "reason"
+}
+
 internal val PixelType.pixelNameSuffix: String
     get() = when (this) {
         is Count -> "c"
         is Daily -> "d"
         is Unique -> "u"
     }
+
+internal enum class SubscriptionFailureErrorType {
+    INVALID_PRODUCT_ID,
+    PURCHASE_EXCEPTION,
+}

@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -60,10 +61,11 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ViewScope::class)
 class NewTabLegacyPageView @JvmOverloads constructor(
@@ -86,6 +88,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
@@ -125,8 +130,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     }
 
     private fun render(viewState: ViewState) {
-        Timber.d("New Tab: render $viewState")
-        if (viewState.message == null && viewState.favourites.isEmpty()) {
+        logcat { "New Tab: render $viewState" }
+
+        val isHomeBackgroundLogoVisible = (!viewState.onboardingComplete || viewState.message == null) &&
+            viewState.favourites.isEmpty()
+
+        if (isHomeBackgroundLogoVisible) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()
@@ -184,7 +193,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         try {
             context.startActivity(Intent.createChooser(share, null, pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 
@@ -209,7 +218,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         val shouldRender = parentVisible && (newMessage || binding.messageCta.isGone)
 
         if (shouldRender) {
-            binding.messageCta.setMessage(message.asMessage())
+            binding.messageCta.setMessage(message.asMessage(isLightModeEnabled = appTheme.isLightModeEnabled()))
             binding.messageCta.onCloseButtonClicked {
                 viewModel.onMessageCloseButtonClicked()
             }

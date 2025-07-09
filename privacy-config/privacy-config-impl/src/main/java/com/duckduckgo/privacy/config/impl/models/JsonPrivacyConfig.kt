@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.models
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import org.json.JSONObject
 
 data class JsonPrivacyConfig(

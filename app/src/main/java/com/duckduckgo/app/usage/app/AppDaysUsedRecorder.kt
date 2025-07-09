@@ -26,7 +26,8 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -38,7 +39,7 @@ class AppDaysUsedRecorder @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            Timber.i("Recording app used today")
+            logcat(INFO) { "Recording app used today" }
             appDaysUsedRepository.recordAppUsedToday()
         }
     }

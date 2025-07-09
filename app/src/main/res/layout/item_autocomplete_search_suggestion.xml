@@ -20,21 +20,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="6dp"
     android:background="?attr/selectableItemBackground"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingStart="@dimen/keyline_4"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingStart="?attr/autocompleteListItemStartPadding"
+    android:paddingEnd="?attr/autocompleteListItemEndPadding">
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/keyline_0"
         android:importantForAccessibility="no"
-        android:src="@drawable/ic_find_search_20"
+        android:src="@drawable/ic_find_search_24"
+        android:paddingVertical="?attr/autocompleteListItemVerticalPadding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -43,29 +39,25 @@
         android:id="@+id/phrase"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
+        android:layout_marginStart="?attr/autocompleteListItemIconMargin"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
         android:maxLines="1"
         app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintEnd_toStartOf="@id/editQueryImage"
+        app:layout_constraintEnd_toStartOf="@+id/editQueryImage"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
         app:layout_constraintTop_toTopOf="@id/phraseOrUrlIndicator"
-        tools:text="phrase or URL suggestion"/>
+        tools:text="phrase or URL suggestion" />
 
     <ImageView
         android:id="@+id/editQueryImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:background="?selectableItemBackgroundBorderless"
+        android:background="@drawable/selectable_item_experimental_background"
         android:contentDescription="@string/editQueryBeforeSubmitting"
-        android:paddingStart="5dp"
-        android:paddingTop="3dp"
-        android:paddingEnd="1dp"
-        android:paddingBottom="3dp"
-        android:src="@drawable/ic_autocomplete_20dp"
+        android:padding="@dimen/keyline_2"
+        android:src="@drawable/ic_arrow_circle_up_left_16"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

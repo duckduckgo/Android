@@ -21,6 +21,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.IsMaliciousResult.ConfirmedResult
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.impl.data.RealMaliciousSiteRepository
@@ -89,9 +90,11 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
     private val mockPixel: Pixel = mock()
     private val moshi = Moshi.Builder().build()
     private val mockMaliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository = mock()
-    private val urlCanonicalization: UrlCanonicalization = RealUrlCanonicalization()
-    private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
+    private val urlCanonicalization: UrlCanonicalization = RealUrlCanonicalization(
+        mockMaliciousSiteProtectionRCFeature,
+    )
+    private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
@@ -146,9 +149,9 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
             ),
         )
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(true)
-        whenever(mockMaliciousSiteProtectionRCRepository.isExempted(any())).thenReturn(false)
-        repository.loadFilters()
-        repository.loadHashPrefixes()
+        whenever(mockMaliciousSiteProtectionRCFeature.stripWWWPrefix()).thenReturn(true)
+        repository.loadFilters(*enumValues<Feed>())
+        repository.loadHashPrefixes(*enumValues<Feed>())
 
         testee = RealMaliciousSiteProtection(
             coroutineRule.testDispatcherProvider,

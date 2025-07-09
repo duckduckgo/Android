@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Erhalte Antworten auf häufig gestellte Fragen oder kontaktiere den Privacy-Pro-Support über unsere Hilfeseiten. Die Verfügbarkeit von Funktionen variiert je nach Land.</string>
     <string name="subscriptionStatusSubscribed">Abonniert</string>
     <string name="privacyPolicyAndTermsOfService">Datenschutzerklärung und Nutzungsbedingungen</string>
+    <string name="subscriptionStatusFreeTrial">Kostenlose Testphase aktiv</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Deine kostenlose Testphase endet am %1$s und wird an diesem Tag automatisch in ein kostenpflichtiges Monatsabo umgewandelt.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Deine kostenlose Testphase endet am %1$s und wird an diesem Tag automatisch in ein kostenpflichtiges Jahresabo umgewandelt.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Deine kostenlose Testphase endet am %1$s und wird nicht in ein kostenpflichtiges Abonnement umgewandelt.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnementeinstellungen</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Dazu gehört unsere VPN, Personal Information Removal und Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Dazu gehört unser VPN und Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Privacy Pro kaufen</string>
+    <string name="subscriptionSettingTryFreeTrial">Privacy Pro kostenlos testen</string>
     <string name="subscriptionSettingRestore">Ich habe ein Abonnement</string>
     <string name="subscriptionSettingExpired">Dein Privacy Pro Abonnement ist abgelaufen</string>
     <string name="subscriptionSettingExpiredViewPlans">Tarife anzeigen</string>

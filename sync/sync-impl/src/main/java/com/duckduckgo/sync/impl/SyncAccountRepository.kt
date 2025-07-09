@@ -33,11 +33,17 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.EXCHANGE_FAILED
 import com.duckduckgo.sync.impl.AccountErrorCodes.GENERIC_ERROR
 import com.duckduckgo.sync.impl.AccountErrorCodes.INVALID_CODE
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
-import com.duckduckgo.sync.impl.CodeType.UNKNOWN
 import com.duckduckgo.sync.impl.ExchangeResult.*
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.SyncAuthCode.Connect
+import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
+import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.pixels.*
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrlWrapper
 import com.duckduckgo.sync.store.*
 import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
@@ -46,29 +52,46 @@ import java.util.UUID
 import javax.inject.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface SyncAccountRepository {
 
-    fun getCodeType(stringCode: String): CodeType
+    fun parseSyncAuthCode(stringCode: String): SyncAuthCode
     fun isSyncSupported(): Boolean
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
-    fun processCode(stringCode: String): Result<Boolean>
+    fun processCode(code: SyncAuthCode): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
     fun deleteAccount(): Result<Boolean>
     fun latestToken(): String
-    fun getRecoveryCode(): Result<String>
+    fun getRecoveryCode(): Result<AuthCode>
     fun getThisConnectedDevice(): ConnectedDevice?
     fun getConnectedDevices(): Result<List<ConnectedDevice>>
-    fun getConnectQR(): Result<String>
+    fun getConnectQR(): Result<AuthCode>
     fun pollConnectionKeys(): Result<Boolean>
-    fun generateExchangeInvitationCode(): Result<String>
+    fun generateExchangeInvitationCode(): Result<AuthCode>
     fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean>
     fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult>
     fun renameDevice(device: ConnectedDevice): Result<Boolean>
     fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean>
+
+    data class AuthCode(
+        /**
+         * A code that is suitable for displaying in a QR code.
+         */
+        val qrCode: String,
+
+        /**
+         * Just the code (b64-encoded)
+         */
+        val rawCode: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -85,6 +108,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val syncFeature: SyncFeature,
     private val deviceKeyGenerator: DeviceKeyGenerator,
+    private val syncCodeUrlWrapper: SyncBarcodeUrlWrapper,
 ) : SyncAccountRepository {
 
     /**
@@ -114,61 +138,75 @@ class AppSyncAccountRepository @Inject constructor(
         }
     }
 
-    override fun processCode(stringCode: String): Result<Boolean> {
-        val decodedCode: String? = kotlin.runCatching {
-            return@runCatching stringCode.decodeB64()
-        }.getOrNull()
-        if (decodedCode == null) {
-            Timber.w("Failed while b64 decoding barcode; barcode is unusable")
-            return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
-        }
-
-        kotlin.runCatching {
-            Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery
-        }.getOrNull()?.let {
-            Timber.d("Sync: code is a recovery code")
-            return login(it)
-        }
-
-        kotlin.runCatching {
-            Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect
-        }.getOrNull()?.let {
-            Timber.d("Sync: code is a connect code")
-            return connectDevice(it)
-        }
-
-        kotlin.runCatching {
-            Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey
-        }.getOrNull()?.let {
-            if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
-                Timber.w("Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled")
-                return@let null
+    override fun processCode(code: SyncAuthCode): Result<Boolean> {
+        when (code) {
+            is Recovery -> {
+                logcat { "Sync: code is a recovery code" }
+                return login(code.b64Code)
             }
 
-            return onInvitationCodeReceived(it)
-        }
+            is Connect -> {
+                logcat { "Sync: code is a connect code" }
+                return connectDevice(code.b64Code)
+            }
 
-        Timber.e("Sync: code is not supported")
+            is Exchange -> {
+                if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
+                    logcat(WARN) { "Sync: Scanned exchange code type but exchanging keys to sync with another device is disabled" }
+                } else {
+                    return onInvitationCodeReceived(code.b64Code)
+                }
+            }
+
+            else -> {
+                logcat { "Sync: code type unknown" }
+            }
+        }
+        logcat(ERROR) { "Sync: code type (${code.javaClass.simpleName}) is not supported" }
         return Error(code = INVALID_CODE.code, reason = "Failed to decode code")
     }
 
-    override fun getCodeType(stringCode: String): CodeType {
+    override fun parseSyncAuthCode(stringCode: String): SyncAuthCode {
+        // check first if it's a URL which contains the code
+        val (code, wasInUrl) = kotlin.runCatching {
+            SyncBarcodeUrl.parseUrl(stringCode)?.webSafeB64EncodedCode?.removeUrlSafetyToRestoreB64()
+                ?.let { Pair(it, true) }
+                ?: Pair(stringCode, false)
+        }.getOrDefault(Pair(stringCode, false))
+
+        if (wasInUrl && syncFeature.canScanUrlBasedSyncSetupBarcodes().isEnabled().not()) {
+            logcat(ERROR) { "Feature to allow scanning URL-based sync setup codes is disabled" }
+            return Unknown(code)
+        }
+
         return kotlin.runCatching {
-            val decodedCode = stringCode.decodeB64()
-            when {
-                Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery != null -> CodeType.RECOVERY
-                Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect != null -> CodeType.CONNECT
-                Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey != null -> CodeType.EXCHANGE
-                else -> UNKNOWN
+            val decodedCode = code.decodeB64()
+
+            canParseAsRecoveryCode(decodedCode)?.let {
+                if (wasInUrl) {
+                    throw IllegalArgumentException("Sync: Recovery code found inside a URL which is not acceptable")
+                } else {
+                    Recovery(it)
+                }
             }
-        }.onFailure {
-            Timber.e(it, "Failed to decode code")
-        }.getOrDefault(UNKNOWN)
+                ?: canParseAsExchangeCode(decodedCode)?.let { Exchange(it) }
+                ?: canParseAsConnectCode(decodedCode)?.let { Connect(it) }
+                ?: Unknown(code)
+        }.onSuccess {
+            logcat(INFO) { "Sync: code type is ${it.javaClass.simpleName}. was inside url: $wasInUrl" }
+        }.getOrElse {
+            logcat(ERROR) { "Failed to decode code: ${it.asLog()}" }
+            Unknown(code)
+        }
     }
+
+    private fun canParseAsRecoveryCode(decodedCode: String) = Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.recovery
+    private fun canParseAsExchangeCode(decodedCode: String) = Adapters.invitationCodeAdapter.fromJson(decodedCode)?.exchangeKey
+    private fun canParseAsConnectCode(decodedCode: String) = Adapters.recoveryCodeAdapter.fromJson(decodedCode)?.connect
 
     private fun onInvitationCodeReceived(invitationCode: InvitationCode): Result<Boolean> {
         // Sync: InviteFlow - B (https://app.asana.com/0/72649045549333/1209571867429615)
-        Timber.d("Sync-exchange: InviteFlow - B. code is an exchange code $invitationCode")
+        logcat { "Sync-exchange: InviteFlow - B. code is an exchange code $invitationCode" }
 
         // generate new ID and public/private key-pair for receiving device
         val deviceDetailsAsReceiver = kotlin.runCatching {
@@ -195,33 +233,33 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun pollForRecoveryCodeAndLogin(): Result<ExchangeResult> {
         // Sync: InviteFlow - E (https://app.asana.com/0/72649045549333/1209571867429615)
-        Timber.d("Sync-exchange: InviteFlow - E")
+        logcat { "Sync-exchange: InviteFlow - E" }
 
         val pendingInvite = exchangeDeviceDetailsAsReceiver
             ?: return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: No pending invite initialized").also {
-                Timber.w("Sync-exchange: no pending invite initialized")
+                logcat(WARN) { "Sync-exchange: no pending invite initialized" }
             }
 
         return when (val result = syncApi.getEncryptedMessage(pendingInvite.keyId)) {
             is Error -> {
                 when (result.code) {
                     NOT_FOUND.code -> {
-                        Timber.v("Sync-exchange: no encrypted recovery code found yet")
+                        logcat(VERBOSE) { "Sync-exchange: no encrypted recovery code found yet" }
                         return Success(Pending)
                     }
                     GONE.code -> {
-                        Timber.w("Sync-exchange: keys expired: ${result.reason}")
+                        logcat(WARN) { "Sync-exchange: keys expired: ${result.reason}" }
                         return Error(code = EXCHANGE_FAILED.code, reason = "Exchange: keys expired").alsoFireAccountErrorPixel()
                     }
                     else -> {
-                        Timber.e("Sync-exchange: error getting encrypted recovery code: ${result.reason}")
+                        logcat(ERROR) { "Sync-exchange: error getting encrypted recovery code: ${result.reason}" }
                         result.alsoFireAccountErrorPixel()
                     }
                 }
             }
 
             is Success -> {
-                Timber.d("Sync-exchange: received encrypted recovery code")
+                logcat { "Sync-exchange: received encrypted recovery code" }
 
                 val decryptedJson = kotlin.runCatching {
                     nativeLib.sealOpen(result.data, pendingInvite.publicKey, pendingInvite.privateKey)
@@ -300,15 +338,18 @@ class AppSyncAccountRepository @Inject constructor(
         )
     }
 
-    override fun getRecoveryCode(): Result<String> {
+    override fun getRecoveryCode(): Result<AuthCode> {
         val primaryKey = syncStore.primaryKey ?: return Error(reason = "Get Recovery Code: Not existing primary Key").alsoFireAccountErrorPixel()
         val userID = syncStore.userId ?: return Error(reason = "Get Recovery Code: Not existing userId").alsoFireAccountErrorPixel()
-        return Success(Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64())
+        val b64Encoded = Adapters.recoveryCodeAdapter.toJson(LinkCode(RecoveryCode(primaryKey, userID))).encodeB64()
+
+        // no additional formatting on the QR code for recovery codes, so qrCode always identical to rawCode
+        return Success(AuthCode(qrCode = b64Encoded, rawCode = b64Encoded))
     }
 
-    override fun generateExchangeInvitationCode(): Result<String> {
+    override fun generateExchangeInvitationCode(): Result<AuthCode> {
         // Sync: InviteFlow - A (https://app.asana.com/0/72649045549333/1209571867429615)
-        Timber.d("Sync-exchange: InviteFlow - A. Generating invitation code")
+        logcat { "Sync-exchange: InviteFlow - A. Generating invitation code" }
 
         // generate new ID and and public/private key-pair for inviter device
         val deviceDetailsAsInviter = kotlin.runCatching {
@@ -321,14 +362,19 @@ class AppSyncAccountRepository @Inject constructor(
         val invitationWrapper = InvitationCodeWrapper(invitationCode)
 
         return kotlin.runCatching {
-            val code = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
-            Success(code)
+            val b64Encoded = Adapters.invitationCodeAdapter.toJson(invitationWrapper).encodeB64()
+            val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
+                syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
+            } else {
+                b64Encoded
+            }
+            Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
         }.getOrElse {
             Error(code = EXCHANGE_FAILED.code, reason = "Error generating invitation code").alsoFireAccountErrorPixel()
         }
     }
 
-    override fun getConnectQR(): Result<String> {
+    override fun getConnectQR(): Result<AuthCode> {
         val prepareForConnect = kotlin.runCatching {
             nativeLib.prepareForConnect().also {
                 it.checkResult("Creating ConnectQR code failed")
@@ -344,7 +390,13 @@ class AppSyncAccountRepository @Inject constructor(
             LinkCode(connect = ConnectCode(deviceId = deviceId, secretKey = prepareForConnect.publicKey)),
         ) ?: return Error(reason = "Error generating Linking Code").alsoFireAccountErrorPixel()
 
-        return Success(linkingQRCode.encodeB64())
+        val b64Encoded = linkingQRCode.encodeB64()
+        val qrCode = if (syncFeature.syncSetupBarcodeIsUrlBased().isEnabled()) {
+            syncCodeUrlWrapper.wrapCodeInUrl(b64Encoded)
+        } else {
+            b64Encoded
+        }
+        return Success(AuthCode(qrCode = qrCode, rawCode = b64Encoded))
     }
 
     private fun connectDevice(connectKeys: ConnectCode): Result<Boolean> {
@@ -398,7 +450,7 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun pollSecondDeviceExchangeAcknowledgement(): Result<Boolean> {
         // Sync: InviteFlow - C (https://app.asana.com/0/72649045549333/1209571867429615)
-        Timber.d("Sync-exchange: InviteFlow - C")
+        logcat { "Sync-exchange: InviteFlow - C" }
 
         val keyId = exchangeDeviceDetailsAsInviter?.keyId ?: return Error(reason = "No pending invitation initialized")
 
@@ -416,7 +468,7 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Success -> {
-                Timber.v("Sync-exchange: Found invitation acceptance for keyId: $keyId} ${result.data}")
+                logcat(VERBOSE) { "Sync-exchange: Found invitation acceptance for keyId: $keyId} ${result.data}" }
 
                 val decrypted = kotlin.runCatching {
                     val pending = exchangeDeviceDetailsAsInviter
@@ -429,7 +481,7 @@ class AppSyncAccountRepository @Inject constructor(
                     return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error opening seal")
                 }
 
-                Timber.v("Sync-exchange: invitation acceptance received: $decrypted")
+                logcat(VERBOSE) { "Sync-exchange: invitation acceptance received: $decrypted" }
 
                 val response = Adapters.invitedDeviceAdapter.fromJson(decrypted)
                     ?: return Error(code = EXCHANGE_FAILED.code, reason = "Connect: Error reading invitation response").alsoFireAccountErrorPixel()
@@ -437,14 +489,18 @@ class AppSyncAccountRepository @Inject constructor(
                 val otherDevicePublicKey = response.publicKey
                 val otherDeviceKeyId = response.keyId
 
-                Timber.v(
-                    "Sync-exchange: We have received the other device's details. " +
-                        "name:${response.deviceName}, keyId:${response.keyId}, public key: ${response.publicKey}",
-                )
+                logcat(VERBOSE) {
+                    """
+                    Sync-exchange: We have received the other device's details. 
+                    name:${response.deviceName}, 
+                    keyId:${response.keyId}, 
+                    public key: ${response.publicKey}
+                    """.trimIndent()
+                }
 
                 // we encrypt our secrets with otherDevicePublicKey, and send them to the backend endpoint
                 return sendSecrets(otherDeviceKeyId, otherDevicePublicKey).onFailure {
-                    Timber.w("Sync-exchange: failed to send secrets. error code: ${it.code} ${it.reason}")
+                    logcat(WARN) { "Sync-exchange: failed to send secrets. error code: ${it.code} ${it.reason}" }
                     return it.copy(code = EXCHANGE_FAILED.code)
                 }
             }
@@ -453,19 +509,19 @@ class AppSyncAccountRepository @Inject constructor(
 
     private fun sendSecrets(keyId: String, publicKey: String): Result<Boolean> {
         // Sync: InviteFlow - D (https://app.asana.com/0/72649045549333/1209571867429615)
-        Timber.d("Sync-exchange: InviteFlow - D")
+        logcat { "Sync-exchange: InviteFlow - D" }
 
         when (val recoveryCode = getRecoveryCode()) {
             is Error -> {
-                Timber.e("Sync-exchange: failed to get recovery code. error code: ${recoveryCode.code} ${recoveryCode.reason}")
+                logcat(ERROR) { "Sync-exchange: failed to get recovery code. error code: ${recoveryCode.code} ${recoveryCode.reason}" }
                 return Error(code = GENERIC_ERROR.code, reason = "Connect: Error getting recovery code").alsoFireAccountErrorPixel()
             }
             is Success -> {
-                Timber.v("Sync-exchange: Got recovery code, ready to share encrypted data for key ID: $keyId")
+                logcat(VERBOSE) { "Sync-exchange: Got recovery code, ready to share encrypted data for key ID: $keyId" }
 
                 // recovery code comes b64 encoded, so we need to decode it, then encrypt, which automatically b64 encodes the encrypted form
                 return kotlin.runCatching {
-                    val json = recoveryCode.data.decodeB64()
+                    val json = recoveryCode.data.rawCode.decodeB64()
                     val encryptedJson = nativeLib.seal(json, publicKey)
                     syncApi.sendEncryptedMessage(keyId, encryptedJson)
                 }.getOrElse {
@@ -596,7 +652,8 @@ class AppSyncAccountRepository @Inject constructor(
             }
 
             is Success -> {
-                val loginResult = processCode(stringCode)
+                val codeType = parseSyncAuthCode(stringCode)
+                val loginResult = processCode(codeType)
                 if (loginResult is Error) {
                     syncPixels.fireUserSwitchedLoginError()
                 }
@@ -606,7 +663,7 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     private fun generateInviterDeviceDetails(): DeviceDetailsForKeyExchange {
-        Timber.i("Sync-exchange: Generating inviter device details")
+        logcat(INFO) { "Sync-exchange: Generating inviter device details" }
         val keyId = deviceKeyGenerator.generate()
         val prepareForConnect = nativeLib.prepareForConnect()
 
@@ -616,13 +673,13 @@ class AppSyncAccountRepository @Inject constructor(
             publicKey = prepareForConnect.publicKey,
         ).also {
             exchangeDeviceDetailsAsInviter = it
-            Timber.w("Sync-exchange: this (inviter) device's key ID is $keyId")
-            Timber.w("Sync-exchange: this (inviter) device's public key is ${it.publicKey}")
+            logcat(WARN) { "Sync-exchange: this (inviter) device's key ID is $keyId" }
+            logcat(WARN) { "Sync-exchange: this (inviter) device's public key is ${it.publicKey}" }
         }
     }
 
     private fun generateReceiverDeviceDetails(): DeviceDetailsForKeyExchange {
-        Timber.i("Sync-exchange: Generating receiver device details")
+        logcat(INFO) { "Sync-exchange: Generating receiver device details" }
         val thisDeviceKeyId = deviceKeyGenerator.generate()
         val thisDeviceKeyPair = nativeLib.prepareForConnect()
 
@@ -632,8 +689,8 @@ class AppSyncAccountRepository @Inject constructor(
             publicKey = thisDeviceKeyPair.publicKey,
         ).also {
             exchangeDeviceDetailsAsReceiver = it
-            Timber.w("Sync-exchange: this (receiver) device's key ID is ${it.keyId}")
-            Timber.w("Sync-exchange: this (receiver) device's public key is ${it.publicKey}")
+            logcat(WARN) { "Sync-exchange: this (receiver) device's key ID is ${it.keyId}" }
+            logcat(WARN) { "Sync-exchange: this (receiver) device's public key is ${it.publicKey}" }
         }
     }
 
@@ -684,7 +741,7 @@ class AppSyncAccountRepository @Inject constructor(
             is Success -> {
                 syncStore.storeCredentials(account.userId, deviceId, deviceName, account.primaryKey, account.secretKey, result.data.token)
                 syncEngine.triggerSync(ACCOUNT_CREATION)
-                Timber.d("Sync-Account: recovery code is ${getRecoveryCode()}")
+                logcat { "Sync-Account: recovery code is ${getRecoveryCode()}" }
                 Success(true)
             }
         }
@@ -882,11 +939,11 @@ enum class AccountErrorCodes(val code: Int) {
     EXCHANGE_FAILED(56),
 }
 
-enum class CodeType {
-    RECOVERY,
-    CONNECT,
-    EXCHANGE,
-    UNKNOWN,
+sealed interface SyncAuthCode {
+    data class Recovery(val b64Code: RecoveryCode) : SyncAuthCode
+    data class Connect(val b64Code: ConnectCode) : SyncAuthCode
+    data class Exchange(val b64Code: InvitationCode) : SyncAuthCode
+    data class Unknown(val code: String) : SyncAuthCode
 }
 
 sealed class Result<out R> {

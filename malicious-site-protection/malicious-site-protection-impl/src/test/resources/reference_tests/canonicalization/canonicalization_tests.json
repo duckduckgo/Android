@@ -74,6 +74,16 @@
                     "web-extension",
                     "safari-extension"
                 ]
+            },
+            {
+                "name": "multiple encoded slashes in path with www. prefix",
+                "siteURL": "https://www.broken.third-party.site/path/to/%2F%2F%2F%2F%2F%2F%2F%2F%2F",
+                "expectURL": "https://broken.third-party.site/path/to",
+                "exceptPlatforms": [
+                    "web-extension",
+                    "safari-extension",
+                    "windows-browser"
+                ]
             }
         ]
     },
@@ -84,49 +94,49 @@
             {
                 "name": "Simple domain - extract hostname portion from the URL",
                 "siteURL": "http://www.somesite.com",
-                "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "expectDomain": "somesite.com",
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a port",
                 "siteURL": "http://www.somesite.com:8000/",
-                "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "expectDomain": "somesite.com",
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a username",
                 "siteURL": "http://user:pass@www.somesite.com",
-                "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "expectDomain": "somesite.com",
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a fragment",
                 "siteURL": "http://www.somesite.com#fragment",
-                "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "expectDomain": "somesite.com",
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Simple domain with a query string",
                 "siteURL": "http://www.somesite.com?some=value",
-                "expectDomain": "www.somesite.com",
-                "exceptPlatforms": []
+                "expectDomain": "somesite.com",
+                "exceptPlatforms": [ "windows-browser" ]
             },
             {
                 "name": "Decode any %XX escapes present in the hostname",
                 "siteURL": "http://www.%73ome%73ite.com",
-                "expectDomain": "www.somesite.com",
+                "expectDomain": "somesite.com",
                 "exceptPlatforms": ["windows-browser"]
             },
             {
                 "name": "Discard any leading and/or trailing full-stops",
                 "siteURL": "http://.www.somesite.com.",
-                "expectDomain": "www.somesite.com",
+                "expectDomain": "somesite.com",
                 "exceptPlatforms": ["windows-browser"]
             },
             {
                 "name": "Replace sequences of two or more full-stops with a single full-stop.",
                 "siteURL": "http://www..example...com",
-                "expectDomain": "www.example.com",
+                "expectDomain": "example.com",
                 "exceptPlatforms": ["windows-browser"]
             },
             {
@@ -146,7 +156,13 @@
                 "siteURL": "http://192.168.001.001:8080/",
                 "expectDomain": "192.168.1.1",
                 "exceptPlatforms": []
-            }            
+            },
+            {
+                "name": "If there are more than six components in the resulting hostname, discard all but the rightmost six components after removing www prefix.",
+                "siteURL": "http://www.a.b.c.d.e.f.g.h.i.j.example.com",
+                "expectDomain": "g.h.i.j.example.com",
+                "exceptPlatforms": []
+            }
         ]
     }
 }

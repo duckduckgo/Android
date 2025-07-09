@@ -32,14 +32,15 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
@@ -124,7 +125,11 @@ class RealSubscriptions @Inject constructor(
         val eTld = uri.host?.toTldPlusOne() ?: return false
         val size = uri.pathSegments.size
         val path = uri.pathSegments.firstOrNull()
-        return eTld == PRIVACY_PRO_ETLD && size == 1 && path == PRIVACY_PRO_PATH
+        return eTld == PRIVACY_PRO_ETLD && size == 1 && (path == PRIVACY_PRO_PATH || path == PRIVACY_SUBSCRIPTIONS_PATH)
+    }
+
+    override suspend fun isFreeTrialEligible(): Boolean {
+        return subscriptionsManager.isFreeTrialEligible()
     }
 }
 
@@ -134,39 +139,51 @@ class RealSubscriptions @Inject constructor(
     toggleStore = PrivacyProFeatureStore::class,
 )
 interface PrivacyProFeature {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun allowPurchase(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useUnifiedFeedback(): Toggle
 
     // Kill switch
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun allowEmailFeedback(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun serpPromoCookie(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun authApiV2(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun isLaunchedROW(): Toggle
 
     // Kill switch
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun featuresApi(): Toggle
 
-    @Toggle.DefaultValue(false)
-    fun privacyProFreeTrialJan25(): Toggle
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun privacyProFreeTrial(): Toggle
 
-    enum class Cohorts(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        TREATMENT("treatment"),
-    }
+    /**
+     * Android supports v2 token, but still relies on old v1 subscription messaging.
+     * We are introducing new JS messaging. Use this flag as kill-switch if necessary.
+     * It doesn't control which version of messaging FE uses.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun enableNewSubscriptionMessages(): Toggle
+
+    /**
+     * When enabled, we signal FE if v2 is available, enabling v2 messaging
+     * When disabled, FE works with old messaging (v1)
+     * This flag will be used to select FE subscription messaging mode.
+     * The value is added into GetFeatureConfig to allow FE to select the mode.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun enableSubscriptionFlowsV2(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

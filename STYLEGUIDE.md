@@ -15,15 +15,21 @@ If you want to do this automatically upon commit we recommend the existing [pre-
 ##  Code conventions
 
 ### Logging
-When logging with Timber we use the new Kotlin styles strings
+We use Square's logcat library for logging. When logging, we use Kotlin string interpolation:
 
-```Timber.w("Loading $url")```
+```logcat { "Loading $url" }```
 
-Rather than C style strings
+By default, calling logcat without a priority logs at DEBUG level.
 
-```Timber.w("Loading %s", url)```
+For different log levels, specify the priority:
 
-Mixing the two styles within a single statement can lead to crashes so we have standardized on the more readable Kotlin style. This is slightly less efficient - should efficiency become an issue we can use proguard to optimize away log statements for releases.
+```logcat(WARN) { "Loading $url" }```
+
+For logging exceptions, use the `asLog()` extension:
+
+```logcat(ERROR) { "Failed to load: ${exception.asLog()}" }```
+
+This approach provides better performance and readability compared to traditional string formatting.
 
 ### Package Names
 Case in package names is problematic as some file system and tools do not handle case sensitive file changes well. For this reason, we opt for lowercase packages in our project. Thus we have:

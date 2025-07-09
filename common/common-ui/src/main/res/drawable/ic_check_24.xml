@@ -1,26 +1,10 @@
-<!--
-  ~ Copyright (c) 2022 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M20.618,4.214c0.434,0.34 0.51,0.97 0.168,1.404l-11,14c-0.186,0.237 -0.47,0.378 -0.772,0.382 -0.301,0.004 -0.589,-0.128 -0.782,-0.36l-5,-6c-0.354,-0.424 -0.296,-1.055 0.128,-1.408 0.424,-0.354 1.055,-0.296 1.408,0.128l4.21,5.05L19.213,4.382c0.34,-0.434 0.97,-0.51 1.404,-0.168z"
+      android:pathData="M20.712,4.159a0.75,0.75 0,0 1,0.13 1.053l-10.095,12.92a2.25,2.25 0,0 1,-3.515 0.038L3.17,13.2a0.75,0.75 0,1 1,1.161 -0.95l4.062,4.97a0.75,0.75 0,0 0,1.172 -0.012l10.094,-12.92a0.75,0.75 0,0 1,1.053 -0.129Z"
       android:fillColor="@color/primary_icon_color_selector"
       android:fillType="evenOdd"/>
 </vector>

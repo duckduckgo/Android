@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Gitteransicht</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s Tracker wurden in den letzten 7 Tagen blockiert &lt;/b&gt;</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s Tracker wurden in den letzten 7 Tagen blockiert &lt;/b&gt;</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s Tracker blockiert &lt;/b&gt;</string>
     <string name="inTheLast7Days">in den letzten 7 Tagen</string>
 
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aussehen</string>
+    <string name="settingsShowFullUrlTitle">Vollständige Website-Adresse anzeigen</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Speichern</string>
@@ -711,8 +712,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privater Tab</item>
-        <item quantity="other">%1$d private Tabs</item>
+        <item quantity="one">%1$d Tab</item>
+        <item quantity="other">%1$d Tabs</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Standardmäßig privat suchen</string>
     <string name="preOnboardingComparisonChartItem2">Blockiert Tracker von Drittanbietern</string>
     <string name="preOnboardingComparisonChartItem3">Cookie-Pop-ups blockieren</string>
-    <string name="preOnboardingComparisonChartItem4">Tracking-Anzeigen blockieren</string>
+    <string name="preOnboardingComparisonChartItem4">Gezielte Werbung blockieren</string>
     <string name="preOnboardingComparisonChartItem5">Browsing-Daten mit einem Klick löschen</string>
     <string name="preOnboardingDaxDialog3Title">Fantastisch! Willkommen auf der Entenseite.</string>
     <string name="preOnboardingDaxDialog3Button">Mit dem Browsen beginnen</string>
@@ -823,6 +824,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Schlag ein!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Ausprobieren</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Überspringen</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Ich war schon einmal hier</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Verstanden. Ich überspringe die anderen Tipps.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Denk daran: Mit dem <b>Fire Button</b> musst du nur zweimal tippen, um alle deine Tabs, den Verlauf und deine Browserdaten zu löschen 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Tutorial anzeigen</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresszeile</string>
@@ -838,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Vielen Dank! Dein Bericht hilft, DuckDuckGo für alle zu verbessern!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Neuer AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Mit DuckDuckGo kannst du mehr von dem schützen, was du online tust</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Mach uns zu deinem Standardbrowser, damit alle Links in DuckDuckGo geöffnet werden.</string>
@@ -852,10 +853,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Wenn du deine Tabs und Daten löschst, wird der Verlauf deiner Tracker-Blockade gelöscht und diese Zahl auf Null zurückgesetzt.\n\nBlende dieses Banner aus, wenn du es nicht in der Tab-Ansicht sehen willst.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner ausblenden</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warnung: Diese Website stellt möglicherweise ein Sicherheitsrisiko dar</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo hat diese Seite blockiert, weil sie möglicherweise Malware verbreitet, die darauf abzielt, dein Gerät zu kompromittieren oder deine persönlichen Daten zu stehlen.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Diese Website gibt sich möglicherweise als legitime Website aus, um dich dazu zu verleiten, personenbezogene Daten wie Passwörter oder Kreditkartennummern preiszugeben.\n<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo hat diese Seite blockiert, weil sie möglicherweise versucht, dich zu täuschen oder zu manipulieren, um dich unter Vorspiegelung falscher Tatsachen zur Überweisung von Geld, zum Kauf gefälschter Waren oder zur Installation von Malware zu verleiten.<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Diese Website verlassen</string>
     <string name="maliciousSiteAdvancedCTA">Erweitert</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Wenn du glaubst, dass diese Website sicher ist, kannst du <a href=\"\">einen Fehler melden</a>. Du kannst die Website weiterhin auf eigenes Risiko besuchen.]]></string>
@@ -866,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Warne mich vor Websites, die als Phishing- oder Malware-Websites gekennzeichnet sind</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="maliciousSiteSettingDisabled">Das Deaktivieren dieser Funktion kann deine Daten gefährden.</string>
+    <string name="threatProtectionTitle">Schutz vor Bedrohungen</string>
+    <string name="threatProtectionDescription">Der erweitere Schutz von DuckDuckGo schützt deine Verbindung und stoppt gängige Bedrohungen.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Links nach Möglichkeit automatisch auf HTTPS aktualisieren.<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="scamBlockerTitle">Betrugsblocker</string>
+    <string name="scamBlockerDescription">Warnt vor Websites, die als betrügerische, Phishing- und Malware-Websites gekennzeichnet sind.</string>
+    <string name="threatProtectionLearnMoreTitle">Mehr erfahren</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probiere unser Startbildschirm-Widget aus!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Füge unser Such-Widget für einen schnellen und einfachen Zugriff zu deinem Startbildschirm hinzu.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget hinzufügen</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Jetzt nicht</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Mit DuckDuckGo suchen</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget für Startbildschirm</string>
 </resources>

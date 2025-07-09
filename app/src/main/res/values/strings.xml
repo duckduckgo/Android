@@ -118,7 +118,7 @@
     <string name="tabSwitcherGridViewMenu">Grid view</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers blocked &lt;/b&gt; in the last 7 days</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked > 1">&lt;b&gt;%1$s trackers blocked &lt;/b&gt; in the last 7 days</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackers blocked &lt;/b&gt;</string>
     <string name="inTheLast7Days">in the last 7 days</string>
 
@@ -201,6 +201,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Appearance</string>
+    <string name="settingsShowFullUrlTitle">Show Full Site Address</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
@@ -756,7 +757,7 @@
     <string name="preOnboardingComparisonChartItem1">Search privately by default</string>
     <string name="preOnboardingComparisonChartItem2">Block 3rd-party trackers</string>
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
-    <string name="preOnboardingComparisonChartItem4">Block tracking ads</string>
+    <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
     <string name="preOnboardingDaxDialog3Title">Awesome! Welcome to the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
@@ -822,6 +823,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">High five!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Try It</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Skip</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">I\'ve been here before</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Got it! I\'ll skip the other tips.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Remember: you can delete all your tabs, history, and browsing data in two taps with the <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Show Tutorial</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Address Bar</string>
@@ -837,10 +842,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">New AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
@@ -851,10 +852,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blocked this page because it may be trying to deceive or manipulate you into transferring money, buying counterfeit goods, or installing malware under false pretenses.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Leave This Site</string>
     <string name="maliciousSiteAdvancedCTA">Advanced</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[If you believe this website is safe, you can <a href="">report an error</a>. You can still visit the website at your own risk.]]></string>
@@ -865,5 +867,21 @@
     <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
     <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
+    <string name="threatProtectionTitle">Threat Protection</string>
+    <string name="threatProtectionDescription">DuckDuckGo\'s enhanced protections stop common threats while keeping your connection secure.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatically upgrades links to HTTPS whenever possible.<br><a href="">Learn More</a>]]></string>
+    <string name="scamBlockerTitle">Scam Blocker</string>
+    <string name="scamBlockerDescription">Warn on sites flagged for scams, phishing and malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Learn more</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Try our Home screen widget!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Add our search widget to your Home screen for quick and easy access.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Add Widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Not Now</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Search DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Home Screen Widget</string>
 </resources>

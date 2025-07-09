@@ -61,6 +61,12 @@ class OnboardingViewModel @Inject constructor(
         }
     }
 
+    fun onOnboardingSkipped() {
+        viewModelScope.launch(dispatchers.io()) {
+            onboardingSkipper.markOnboardingAsCompleted()
+        }
+    }
+
     fun initializeOnboardingSkipper() {
         if (!appBuildConfig.canSkipOnboarding) return
 

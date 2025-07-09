@@ -67,7 +67,7 @@
             android:padding="@dimen/keyline_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/shape_grey_circle_24"
+            android:src="@drawable/ic_shape_circle_24"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@id/favicon"
             app:layout_constraintEnd_toEndOf="parent"

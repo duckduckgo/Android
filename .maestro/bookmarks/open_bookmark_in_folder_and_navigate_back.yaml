@@ -13,13 +13,12 @@ tags:
             - runFlow: ../shared/skip_all_onboarding.yaml
 
             - tapOn:
-                  text: "search or type URL"
+                  id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site/"
             - pressKey: Enter
             - assertVisible:
                   text: "Privacy Test Pages"
-            - tapOn:
-                  id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+            - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
             - assertVisible:
                   text: "add bookmark"
             - tapOn:
@@ -30,8 +29,7 @@ tags:
             - pressKey: Enter
             - assertVisible:
                 text: "Search engine"
-            - tapOn:
-                  id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+            - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
             - assertVisible:
                   text: "bookmarks"
             - tapOn:

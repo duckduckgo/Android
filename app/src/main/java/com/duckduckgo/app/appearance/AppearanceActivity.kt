@@ -55,7 +55,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class, screenName = "appearance")
@@ -87,9 +87,13 @@ class AppearanceActivity : DuckDuckGoActivity() {
             .show()
     }
 
+    private val showFullUrlToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        viewModel.onFullUrlSettingChanged(isChecked)
+    }
+
     private val changeIconFlow = registerForActivityResult(ChangeIconContract()) { resultOk ->
         if (resultOk) {
-            Timber.d("Icon changed.")
+            logcat { "Icon changed." }
         }
     }
 
@@ -121,6 +125,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.experimentalNightMode.isEnabled = viewState.canForceDarkMode
                     binding.experimentalNightMode.isVisible = viewState.supportsForceDarkMode
                     updateSelectedOmnibarPosition(it.isOmnibarPositionFeatureEnabled, it.omnibarPosition)
+                    binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
                 }
             }.launchIn(lifecycleScope)
 

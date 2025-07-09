@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Primește răspunsuri la întrebările frecvente sau contactează asistența Privacy Pro din paginile noastre de ajutor. Disponibilitatea funcțiilor variază în funcție de țară.</string>
     <string name="subscriptionStatusSubscribed">Abonat</string>
     <string name="privacyPolicyAndTermsOfService">Politica de confidențialitate și Condițiile de prestare a serviciului</string>
+    <string name="subscriptionStatusFreeTrial">Perioada de încercare gratuită este activă</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și se transformă automat într-un abonament lunar cu plată, începând din ziua respectivă.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și se transformă automat într-un abonament anual cu plată, începând din ziua respectivă.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și nu se va transforma într-un abonament cu plată.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Setări pentru abonament</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Include VPN, Personal Information Removal și Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Include VPN-ul nostru și Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Obține Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Încearcă Privacy Pro gratuit</string>
     <string name="subscriptionSettingRestore">Am un abonament</string>
     <string name="subscriptionSettingExpired">Abonamentul tău Privacy Pro a expirat</string>
     <string name="subscriptionSettingExpiredViewPlans">Vezi planurile</string>

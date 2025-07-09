@@ -9,9 +9,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create Asana task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: '414730916066338'
           action: 'create-asana-issue-task'
   add-comment:

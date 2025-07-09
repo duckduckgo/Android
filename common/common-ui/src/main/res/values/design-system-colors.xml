@@ -86,9 +86,11 @@
     <attr name="daxColorButtonDestructiveGhostContainerPressed" format="color"/>
 
     <attr name="daxColorFabPrimaryContainer" format="color"/>
+    <attr name="daxColorFabPrimaryContainerPressed" format="color"/>
     <attr name="daxColorFabPrimaryText" format="color"/>
     <attr name="daxColorFabPrimaryIcon" format="color"/>
     <attr name="daxColorFabSecondaryContainer" format="color"/>
+    <attr name="daxColorFabSecondaryContainerPressed" format="color"/>
     <attr name="daxColorFabSecondaryText" format="color"/>
     <attr name="daxColorFabSecondaryIcon" format="color"/>
 
@@ -117,6 +119,8 @@
 
     <attr name="daxColorTextInputFocusedOutline" format="color"/>
     <attr name="daxColorTextInputEnabledOutline" format="color"/>
+
+    <attr name="daxColorWebViewScrollbarTrack" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>

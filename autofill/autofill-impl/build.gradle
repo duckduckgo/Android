@@ -37,7 +37,6 @@ dependencies {
     implementation project(path: ':common-ui')
     implementation project(path: ':autofill-api')
     implementation project(path: ':browser-api')
-    implementation project(path: ':autofill-store')
     implementation project(path: ':statistics-api')
     testImplementation project(path: ':autofill-test')
     implementation project(path: ':sync-api')
@@ -51,10 +50,13 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
 
+    implementation AndroidX.security.crypto
+    implementation Square.okio
+
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation "androidx.autofill:autofill:_"
 
     implementation KotlinX.coroutines.core
@@ -64,6 +66,8 @@ dependencies {
     implementation "androidx.datastore:datastore-preferences:_"
 
     implementation "de.siegmar:fastcsv:_"
+
+    implementation "com.airbnb.android:lottie:_"
 
     implementation Square.retrofit2.converter.moshi
     implementation "com.squareup.moshi:moshi-kotlin:_"
@@ -107,6 +111,7 @@ android {
     }
     lint {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {
@@ -124,13 +129,20 @@ android {
             buildConfigField "boolean", "AUTH_REQUIRED", "true"
         }
     }
+    sourceSets {
+        test.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 tasks.register('installForAutofillTesting', Exec) {
-    commandLine "$rootDir/gradlew", ':app:installInternalRelease', "-P$autofillDisableAuthRequirementBuildFlag"
+    commandLine "$rootDir/gradlew", ':app:installInternalRelease', "-Pforce-default-variant", "-P$autofillDisableAuthRequirementBuildFlag"
 }
 
 tasks.register('autofillTestLocal', Exec) {
-    commandLine 'maestro', 'test', '--include-tags', 'autofillNoAuthTests', "$rootDir/.maestro"
+    commandLine 'maestro', 'test', '--include-tags', 'autofillNoAuthTests,autofillPasswordGeneration,autofillBackfillingUsername', "$rootDir/.maestro"
     dependsOn 'installForAutofillTesting'
 }

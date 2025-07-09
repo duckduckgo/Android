@@ -80,7 +80,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:background="?attr/selectableItemBackgroundBorderless"
-                            android:src="@drawable/ic_search_24" />
+                            android:src="@drawable/ic_find_search_24" />
                     </FrameLayout>
 
                     <FrameLayout

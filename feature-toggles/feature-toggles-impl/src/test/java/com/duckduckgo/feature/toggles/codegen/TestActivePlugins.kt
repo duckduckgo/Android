@@ -20,6 +20,7 @@ import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
 
 @ContributesActivePluginPoint(
@@ -42,7 +43,7 @@ private interface TriggeredMyPluginTrigger
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = TriggeredMyPlugin::class,
-    defaultActiveValue = false,
+    defaultActiveValue = DefaultFeatureValue.FALSE,
 )
 class FooActiveTriggeredMyPlugin @Inject constructor() : TriggeredMyPlugin {
     override fun doSomething() {
@@ -52,9 +53,19 @@ class FooActiveTriggeredMyPlugin @Inject constructor() : TriggeredMyPlugin {
 @ContributesActivePlugin(
     scope = AppScope::class,
     boundType = MyPlugin::class,
-    defaultActiveValue = false,
+    defaultActiveValue = DefaultFeatureValue.FALSE,
 )
 class FooActivePlugin @Inject constructor() : MyPlugin {
+    override fun doSomething() {
+    }
+}
+
+@ContributesActivePlugin(
+    scope = AppScope::class,
+    boundType = MyPlugin::class,
+    defaultActiveValue = DefaultFeatureValue.INTERNAL,
+)
+class FooActiveInternalPlugin @Inject constructor() : MyPlugin {
     override fun doSomething() {
     }
 }

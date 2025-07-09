@@ -2,7 +2,8 @@
  * Deny-listed APIs that we don't want people to use.
  *
  * From https://gist.github.com/JakeWharton/1f102d98cd10133b03a5f374540c327a but using our own rules
- */@file:Suppress("UnstableApiUsage")
+ */
+@file:Suppress("UnstableApiUsage")
 
 package com.duckduckgo.lint
 
@@ -35,11 +36,20 @@ import java.util.EnumSet
  * Steps for adding a new deny-listed API:
  * 1. Add it to [config].
  * 2. For allowing existing usages,
- *   - Delete all existing baselines: `find . -name "lint-baseline.xml" -type f -delete`.
- *   - Regenerate new baselines: `./gradlew lintDebug -Dlint.baselines.continue=true -DabortOnLintErrors=false`.
+ *   - Regenerate new baselines: `./gradlew updateLintBaseline`.
  */
 internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner {
     private val config = DenyListConfig(
+        DenyListedEntry(
+            className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
+            functionName = "first",
+            errorMessage = "first() will throw if flow is empty, firstOrNull() it's a safer option."
+        ),
+        DenyListedEntry(
+            className = "kotlinx.coroutines.flow.FlowKt__ReduceKt",
+            functionName = "last",
+            errorMessage = "last() will throw if there's not at least one item, lastOrNull() it's a safer option."
+        ),
         DenyListedEntry(
             className = "com.duckduckgo.feature.toggles.api.Toggle",
             functionName = "setRawStoredState",
@@ -140,6 +150,8 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                 val function = node.resolve() ?: return
 
                 val className = function.containingClass?.qualifiedName
+                // uncomment below for debugging only
+                // println("Resolved call: ${className}.${function.name}")
                 val typeConfig = typeConfigs[className] ?: return
 
                 val functionName = if (node.isConstructorCall()) {

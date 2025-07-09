@@ -40,13 +40,12 @@
         android:background="@drawable/background_voice_search_indicator"
         android:clickable="false"
         android:focusable="false"
-        android:padding="16dp"
         tools:ignore="ContentDescription">
 
             <ImageView
                 android:layout_width="@dimen/keyline_6"
                 android:layout_height="@dimen/keyline_6"
-                android:src="@drawable/ic_microphone_filled_dark"
+                android:src="@drawable/ic_microphone_solid_24"
                 android:layout_gravity="center"
                 tools:ignore="ContentDescription" />
 

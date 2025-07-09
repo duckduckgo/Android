@@ -29,7 +29,6 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Comm
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ForceFinish
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.RequestAuthentication
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
@@ -40,7 +39,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillProviderChooseViewModel @Inject constructor(
@@ -76,11 +76,11 @@ class AutofillProviderChooseViewModel @Inject constructor(
     }
 
     fun continueAfterAuthentication(credentialId: Long) {
-        Timber.i("DDGAutofillService request to autofill login with credentialId: $credentialId")
+        logcat(INFO) { "DDGAutofillService request to autofill login with credentialId: $credentialId" }
         viewModelScope.launch(dispatchers.io()) {
             autofillStore.getCredentialsWithId(credentialId)?.let { loginCredential ->
                 loginCredential.updateLastUsedTimestamp()
-                Timber.i("DDGAutofillService $credentialId found, autofilling")
+                logcat(INFO) { "DDGAutofillService $credentialId found, autofilling" }
                 pixel.fire(AUTOFILL_SERVICE_SUGGESTION_CONFIRMED)
                 command.send(AutofillLogin(loginCredential))
             } ?: run {

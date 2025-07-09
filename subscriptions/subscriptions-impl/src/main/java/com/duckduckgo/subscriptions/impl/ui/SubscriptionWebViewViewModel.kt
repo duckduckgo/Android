@@ -30,14 +30,15 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
-import com.duckduckgo.subscriptions.impl.PrivacyProFeature.Cohorts
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_PIR
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
@@ -46,11 +47,12 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PIR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PLATFORM
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ROW_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
@@ -84,7 +86,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val networkProtectionAccessState: NetworkProtectionAccessState,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProFeature: PrivacyProFeature,
-    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -224,18 +225,26 @@ class SubscriptionWebViewViewModel @Inject constructor(
         viewModelScope.launch(dispatcherProvider.io()) {
             val id = runCatching { data?.getString("id") }.getOrNull()
             val offerId = runCatching { data?.getString("offerId") }.getOrNull()
+            val experimentName = runCatching { data?.getJSONObject("experiment")?.getString("name") }.getOrNull()
+            val experimentCohort = runCatching { data?.getJSONObject("experiment")?.getString("cohort") }.getOrNull()
             if (id.isNullOrBlank()) {
-                pixelSender.reportPurchaseFailureOther()
+                pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.INVALID_PRODUCT_ID.name)
                 _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
             } else {
-                command.send(SubscriptionSelected(id, offerId))
+                command.send(SubscriptionSelected(id, offerId, experimentName, experimentCohort))
             }
         }
     }
 
-    fun purchaseSubscription(activity: Activity, planId: String, offerId: String?) {
+    fun purchaseSubscription(
+        activity: Activity,
+        planId: String,
+        offerId: String?,
+        experimentName: String?,
+        experimentCohort: String?,
+    ) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            subscriptionsManager.purchase(activity, planId, offerId)
+            subscriptionsManager.purchase(activity, planId, offerId, experimentName, experimentCohort)
         }
     }
 
@@ -259,10 +268,19 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val subscriptionOptions = if (privacyProFeature.allowPurchase().isEnabled()) {
                 val subscriptionOffers = subscriptionsManager.getSubscriptionOffer().associateBy { it.offerId ?: it.planId }
                 when {
-                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) && isFreeTrialEligible() -> {
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
                         createSubscriptionOptions(
                             monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_US),
                             yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_US),
+                        )
+                    }
+
+                    subscriptionOffers.keys.containsAll(listOf(MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)) &&
+                        subscriptionsManager.isFreeTrialEligible() -> {
+                        createSubscriptionOptions(
+                            monthlyOffer = subscriptionOffers.getValue(MONTHLY_FREE_TRIAL_OFFER_ROW),
+                            yearlyOffer = subscriptionOffers.getValue(YEARLY_FREE_TRIAL_OFFER_ROW),
                         )
                     }
 
@@ -287,12 +305,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             sendOptionJson(subscriptionOptions)
-            pixelSender.reportFreeTrialExperimentOnPaywallImpression() // move to paywallShown() if needed after experiment
         }
-    }
-
-    private fun isFreeTrialEligible(): Boolean {
-        return privacyProFeature.privacyProFreeTrialJan25().isEnabled(Cohorts.TREATMENT)
     }
 
     private suspend fun createSubscriptionOptions(
@@ -301,8 +314,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
     ): SubscriptionOptionsJson {
         return SubscriptionOptionsJson(
             options = listOf(
-                createOptionsJson(yearlyOffer, YEARLY),
-                createOptionsJson(monthlyOffer, MONTHLY),
+                createOptionsJson(yearlyOffer, YEARLY.lowercase()),
+                createOptionsJson(monthlyOffer, MONTHLY.lowercase()),
             ),
             features = monthlyOffer.features.map(::FeatureJson),
         )
@@ -322,8 +335,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private suspend fun getOfferJson(offer: SubscriptionOffer): OfferJson? {
         return offer.offerId?.let {
-            val offerType = when (offer.offerId) {
-                MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US -> OfferType.FREE_TRIAL
+            val offerType = when {
+                LIST_OF_FREE_TRIAL_OFFERS.contains(offer.offerId) -> OfferType.FREE_TRIAL
                 else -> OfferType.UNKNOWN
             }
 
@@ -331,7 +344,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 type = offerType.type,
                 id = it,
                 durationInDays = offer.pricingPhases.first().getBillingPeriodInDays(),
-                isUserEligible = !subscriptionsManager.hadTrial(),
+                isUserEligible = subscriptionsManager.isFreeTrialEligible(),
             )
         }
     }
@@ -358,9 +371,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     fun paywallShown() {
         pixelSender.reportOfferScreenShown()
-        viewModelScope.launch {
-            freeTrialExperimentDataStore.increaseMetricForPaywallImpressions()
-        }
     }
 
     data class SubscriptionOptionsJson(
@@ -411,6 +421,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class SubscriptionSelected(
             val id: String,
             val offerId: String?,
+            val experimentName: String?,
+            val experimentCohort: String?,
         ) : Command()
         data object RestoreSubscription : Command()
         data object GoToITR : Command()

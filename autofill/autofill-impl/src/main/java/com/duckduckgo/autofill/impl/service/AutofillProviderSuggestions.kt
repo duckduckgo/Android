@@ -39,7 +39,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlin.random.Random
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface AutofillProviderSuggestions {
     suspend fun buildSuggestionsResponse(
@@ -69,20 +70,25 @@ class RealAutofillProviderSuggestions @Inject constructor(
         request: FillRequest,
     ): FillResponse {
         val fillableFields = nodeToAutofill.parsedAutofillFields.filter { it.type != UNKNOWN }
-        Timber.i(
-            "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n" +
-                fillableFields.joinToString(separator = "\n"),
-        )
+        logcat(INFO) {
+            "DDGAutofillService Fillable Request for rootNode: ${nodeToAutofill.website} and ${nodeToAutofill.packageId} for fields:\n${
+            fillableFields.joinToString(
+                separator = "\n",
+            )
+            }"
+        }
 
         val response = FillResponse.Builder()
         // We add credential suggestions
         fillableFields.forEach { fieldsToAutofill ->
             var inlineSuggestionsToShow = getMaxInlinedSuggestions(request) - RESERVED_SUGGESTIONS_SIZE
             val credentials = loginCredentials(nodeToAutofill)
-            Timber.i(
-                "DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}" +
-                    "credentials: ${credentials?.joinToString(separator = "\n")}",
-            )
+            logcat(INFO) {
+                """
+                    DDGAutofillService suggesting credentials for ${fieldsToAutofill.autofillId}credentials: 
+                    ${credentials.joinToString(separator = "\n")}
+                """.trimIndent()
+            }
             credentials?.forEach { credential ->
                 val datasetBuilder = Dataset.Builder()
                 val suggestionUISpecs = suggestionsFormatter.getSuggestionSpecs(credential)
@@ -105,10 +111,9 @@ class RealAutofillProviderSuggestions @Inject constructor(
                     suggestionUISpecs.subtitle,
                     suggestionUISpecs.icon,
                 )
-                Timber.i(
-                    "DDGAutofillService adding suggestion: " +
-                        "${fieldsToAutofill.autofillId}-${fieldsToAutofill.type} with ${suggestionUISpecs.title}",
-                )
+                logcat(INFO) {
+                    "DDGAutofillService adding suggestion: ${fieldsToAutofill.autofillId}-${fieldsToAutofill.type} with ${suggestionUISpecs.title}"
+                }
                 datasetBuilder.setValue(
                     fieldsToAutofill.autofillId,
                     autofillValue(credential, fieldsToAutofill.type),
@@ -129,7 +134,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             nodeToAutofill.website.orEmpty(),
             nodeToAutofill.packageId.orEmpty(),
         )
-        Timber.i("DDGAutofillService adding suggestion DuckDuckGo Search")
+        logcat(INFO) { "DDGAutofillService adding suggestion DuckDuckGo Search" }
         response.addDataset(ddgAppDataSetBuild)
 
         val unknownIds = nodeToAutofill.parsedAutofillFields.filter { it.type == UNKNOWN }.map { it.autofillId }
@@ -184,7 +189,7 @@ class RealAutofillProviderSuggestions @Inject constructor(
             icon,
             inlinePresentationSpec,
         )?.let { inlinePresentation ->
-            Timber.i("DDGAutofillService adding inlinePresentation for suggestion: $suggestionTitle")
+            logcat(INFO) { "DDGAutofillService adding inlinePresentation for suggestion: $suggestionTitle" }
             this.setInlinePresentation(inlinePresentation)
         }
     }

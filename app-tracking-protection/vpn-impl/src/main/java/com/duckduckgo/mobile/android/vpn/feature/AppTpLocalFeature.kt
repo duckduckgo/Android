@@ -19,6 +19,7 @@ package com.duckduckgo.mobile.android.vpn.feature
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
  * Local feature/settings - they will never be in remote config
@@ -28,9 +29,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
     featureName = "appTpLocalFeature",
 )
 interface AppTpLocalFeature {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun verboseLogging(): Toggle
 }

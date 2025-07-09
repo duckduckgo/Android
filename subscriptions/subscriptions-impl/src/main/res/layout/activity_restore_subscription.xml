@@ -76,7 +76,7 @@
                     android:id="@+id/restoreSubscriptionEmailTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:leadingIcon="@drawable/ic_email_16"
+                    app:leadingIcon="@drawable/ic_email_24"
                     app:leadingIconBackground="circular"
                     app:primaryText="@string/restoreSubscriptionEmailTitle"
                     app:secondaryText="@string/restoreSubscriptionEmailDescription" />
@@ -126,7 +126,7 @@
                     android:id="@+id/restoreSubscriptionGooglePlayTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:leadingIcon="@drawable/ic_platform_playstore_16"
+                    app:leadingIcon="@drawable/ic_platform_playstore_24"
                     app:leadingIconBackground="circular"
                     app:primaryText="@string/restoreSubscriptionGooglePlayTitle"
                     app:secondaryText="@string/restoreSubscriptionGooglePlayDescription" />

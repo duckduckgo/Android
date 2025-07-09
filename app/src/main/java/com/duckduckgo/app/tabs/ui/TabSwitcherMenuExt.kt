@@ -101,12 +101,12 @@ fun Menu.createDynamicInterface(
     findItem(R.id.layoutTypeMenuItem).apply {
         when (dynamicMenu.layoutButtonType) {
             GRID -> {
-                setIcon(R.drawable.ic_grid_view_24)
+                setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_grid_24)
                 title = toolbar.resources.getString(R.string.tabSwitcherGridViewMenu)
                 isVisible = true
             }
             LIST -> {
-                setIcon(R.drawable.ic_list_view_24)
+                setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_list_24)
                 title = toolbar.resources.getString(R.string.tabSwitcherListViewMenu)
                 isVisible = true
             }

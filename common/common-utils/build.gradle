@@ -26,6 +26,7 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 android {
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {
@@ -57,7 +58,7 @@ dependencies {
 
     implementation Google.dagger
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation Square.okHttp3.okHttp
     implementation Square.retrofit2.retrofit

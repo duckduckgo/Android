@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -47,7 +48,7 @@ interface InstallSourceFullPackageFeature {
      * If the remote feature is not present defaults to `false`
      */
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }
 

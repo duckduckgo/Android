@@ -18,6 +18,7 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'com.squareup.anvil'
+    id 'kotlin-parcelize'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -54,7 +55,7 @@ dependencies {
 
     implementation AndroidX.appCompat
     implementation Google.android.material
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
     implementation AndroidX.fragment.ktx
@@ -110,6 +111,7 @@ android {
     }
     lint {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

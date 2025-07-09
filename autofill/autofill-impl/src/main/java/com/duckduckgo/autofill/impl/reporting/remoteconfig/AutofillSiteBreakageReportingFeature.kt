@@ -19,13 +19,13 @@ package com.duckduckgo.autofill.impl.reporting.remoteconfig
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
     boundType = AutofillSiteBreakageReportingFeature::class,
     featureName = "autofillBreakageReporter",
     settingsStore = AutofillSiteBreakageReportingRemoteSettingsPersister::class,
-    exceptionsStore = AutofillSiteBreakageReportingExceptionsPersister::class,
 )
 /**
  * This is the class that represents the feature flag for offering to report Autofill breakages
@@ -38,6 +38,6 @@ interface AutofillSiteBreakageReportingFeature {
      */
 
     @Toggle.InternalAlwaysEnabled
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }

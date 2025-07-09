@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.browser.mediaplayback.store
 
+import com.duckduckgo.app.browser.mediaplayback.MediaPlaybackFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
+import com.duckduckgo.feature.toggles.api.FeatureException
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
@@ -29,38 +32,41 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface MediaPlaybackRepository {
-    fun updateAll(exceptions: List<MediaPlaybackExceptionEntity>)
-    val exceptions: CopyOnWriteArrayList<FeatureExceptions.FeatureException>
+    val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = MediaPlaybackRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 @SingleInstanceIn(AppScope::class)
 class RealMediaPlaybackRepository @Inject constructor(
-    private val mediaPlaybackDao: MediaPlaybackDao,
-    @AppCoroutineScope appCoroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider,
-    @IsMainProcess isMainProcess: Boolean,
-) : MediaPlaybackRepository {
+    private val mediaPlaybackFeature: MediaPlaybackFeature,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    @IsMainProcess private val isMainProcess: Boolean,
+) : MediaPlaybackRepository, PrivacyConfigCallbackPlugin {
 
-    override val exceptions = CopyOnWriteArrayList<FeatureExceptions.FeatureException>()
+    override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (isMainProcess) {
-                loadToMemory()
-            }
-        }
+        loadToMemory()
     }
 
-    override fun updateAll(exceptions: List<MediaPlaybackExceptionEntity>) {
-        mediaPlaybackDao.updateAll(exceptions)
+    override fun onPrivacyConfigDownloaded() {
         loadToMemory()
     }
 
     private fun loadToMemory() {
-        exceptions.clear()
-        mediaPlaybackDao.getAll().map {
-            exceptions.add(it.toFeatureException())
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                exceptions.clear()
+                exceptions.addAll(mediaPlaybackFeature.self().getExceptions())
+            }
         }
     }
 }

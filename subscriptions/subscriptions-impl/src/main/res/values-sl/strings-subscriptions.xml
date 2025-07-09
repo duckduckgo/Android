@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Poiščite odgovore na pogosta vprašanja ali stopite v stik s podporo za naročnino Privacy Pro na naših straneh za pomoč. Razpoložljivost funkcij se razlikuje po državah.</string>
     <string name="subscriptionStatusSubscribed">Naročeni</string>
     <string name="privacyPolicyAndTermsOfService">Pravilnik o zasebnosti in pogoji storitve</string>
+    <string name="subscriptionStatusFreeTrial">Brezplačni preizkus je aktiven</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Vaša brezplačna preizkusna različica se konča dne %1$s in se na ta dan samodejno spremeni v mesečno plačljivo naročnino.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Vaša brezplačna preizkusna različica se konča dne %1$s in se na ta dan samodejno spremeni v letno plačljivo naročnino.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Vaša brezplačna preizkusna različica se konča dne %1$s in se ne bo spremenila v plačljivo naročnino.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavitve naročnine</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Vključuje naše storitve VPN, Personal Information Removal in Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Vključuje naš VPN in Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Pridobite Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Preizkusite Privacy Pro brezplačno</string>
     <string name="subscriptionSettingRestore">Imam naročnino</string>
     <string name="subscriptionSettingExpired">Vaša naročnina na Privacy Pro je potekla</string>
     <string name="subscriptionSettingExpiredViewPlans">Oglejte si načrte</string>

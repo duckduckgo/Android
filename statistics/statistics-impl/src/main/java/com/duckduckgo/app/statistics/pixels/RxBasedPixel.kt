@@ -25,7 +25,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RxBasedPixel @Inject constructor(
@@ -53,15 +56,12 @@ class RxBasedPixel @Inject constructor(
             .subscribe(
                 { result ->
                     when (result) {
-                        PIXEL_SENT -> Timber.v("Pixel sent: $pixelName with params: $parameters $encodedParameters")
-                        PIXEL_IGNORED -> Timber.v("Pixel ignored: $pixelName with params: $parameters $encodedParameters")
+                        PIXEL_SENT -> logcat(VERBOSE) { "Pixel sent: $pixelName with params: $parameters $encodedParameters" }
+                        PIXEL_IGNORED -> logcat(VERBOSE) { "Pixel ignored: $pixelName with params: $parameters $encodedParameters" }
                     }
                 },
                 {
-                    Timber.w(
-                        it,
-                        "Pixel failed: $pixelName with params: $parameters $encodedParameters",
-                    )
+                    logcat(WARN) { "Pixel failed: $pixelName with params: $parameters $encodedParameters: ${it.asLog()}" }
                 },
             )
     }
@@ -91,15 +91,10 @@ class RxBasedPixel @Inject constructor(
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
-                    Timber.v(
-                        "Pixel enqueued: $pixelName with params: $parameters $encodedParameters",
-                    )
+                    logcat(VERBOSE) { "Pixel enqueued: $pixelName with params: $parameters $encodedParameters" }
                 },
                 {
-                    Timber.w(
-                        it,
-                        "Pixel failed: $pixelName with params: $parameters $encodedParameters",
-                    )
+                    logcat(WARN) { "Pixel failed: $pixelName with params: $parameters $encodedParameters: ${it.asLog()}" }
                 },
             )
     }

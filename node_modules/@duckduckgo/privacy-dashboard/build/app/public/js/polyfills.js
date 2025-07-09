@@ -6797,5 +6797,5 @@
   });
 
   // shared/js/polyfill.js
-  var import_polyfill = __toESM(require_polyfill());
+  var import_polyfill = __toESM(require_polyfill(), 1);
 })();

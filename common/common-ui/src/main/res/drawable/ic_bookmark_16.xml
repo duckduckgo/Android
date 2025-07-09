@@ -3,8 +3,12 @@
     android:height="16dp"
     android:viewportWidth="16"
     android:viewportHeight="16">
-  <path
-      android:pathData="M3,2.25C3,1.007 4.007,0 5.25,0h5.5C11.993,0 13,1.007 13,2.25v12.126c0,0.967 -1.05,1.567 -1.884,1.077L8,13.62l-3.116,1.833C4.05,15.943 3,15.343 3,14.376L3,2.25zM5.25,1.5c-0.414,0 -0.75,0.336 -0.75,0.75v11.689l2.866,-1.686c0.391,-0.23 0.877,-0.23 1.268,0l2.866,1.686L11.5,2.25c0,-0.414 -0.336,-0.75 -0.75,-0.75h-5.5z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-      android:fillType="evenOdd"/>
+  <group>
+    <clip-path
+        android:pathData="M0,0h16v16H0z"/>
+    <path
+        android:pathData="M2,4a4,4 0,0 1,4 -4h4a4,4 0,0 1,4 4v9.684c0,1.857 -2.079,2.957 -3.614,1.912l-1.788,-1.218a1.063,1.063 0,0 0,-1.196 0l-1.788,1.218C4.08,16.64 2,15.54 2,13.684L2,4ZM6,1.25A2.75,2.75 0,0 0,3.25 4v9.684c0,0.854 0.955,1.359 1.66,0.878l1.788,-1.217a2.313,2.313 0,0 1,2.604 0l1.787,1.217a1.063,1.063 0,0 0,1.661 -0.878L12.75,4A2.75,2.75 0,0 0,10 1.25L6,1.25Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"
+        android:fillType="evenOdd"/>
+  </group>
 </vector>

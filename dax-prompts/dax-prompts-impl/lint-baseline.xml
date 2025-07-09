@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
+
+    <issue
+        id="NoRobolectricTestRunnerAnnotation"
+        message="The RobolectricTestRunner parameter must not be used in the RunWith annotation."
+        errorLine1="@RunWith(RobolectricTestRunner::class)"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/daxprompts/impl/ui/DaxPromptDuckPlayerViewModelTest.kt"
+            line="35"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (975 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="            android:pathData=&quot;M57.87,351.87C58.01,352.26 58.18,352.65 58.36,353.03C59.22,354.8 61.97,356.13 65.28,356.25C65.46,356.26 65.65,356.26 65.84,356.26C66.37,356.26 66.88,356.23 67.38,356.18C67.83,356.09 68.29,356.02 68.76,355.96C69.52,355.86 70.31,355.82 71.12,355.82C74.05,355.82 76.72,356.46 78.67,357.51C78.98,357.67 79.26,357.86 79.52,358.05C79.69,358.18 79.88,358.3 80.08,358.42C81.53,359.3 83.62,359.85 85.94,359.85C88.25,359.85 90.33,359.3 91.78,358.43C91.99,358.31 92.18,358.19 92.35,358.05C92.61,357.86 92.9,357.67 93.21,357.5C95.17,356.46 97.83,355.82 100.75,355.82C101.77,355.82 102.75,355.9 103.68,356.04C103.82,356.07 103.95,356.09 104.09,356.11C104.76,356.21 105.47,356.27 106.21,356.27H106.49C109.9,356.2 112.79,354.86 113.67,353.03C113.86,352.64 114.03,352.25 114.18,351.85C114.67,350.52 114.92,349.15 114.92,347.75C114.92,338.05 102.69,329.93 86.3,327.88C86.12,327.86 85.92,327.86 85.74,327.88C69.35,329.93 57.11,338.05 57.11,347.75C57.11,349.16 57.37,350.54 57.87,351.88V351.87Z&quot;"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/dax.xml"
+            line="139"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1053 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="            android:pathData=&quot;M133.02,351.61C133.63,351.81 134.23,351.99 134.85,352.17C137.73,352.99 141.36,352.86 143.86,351.79C144,351.73 144.14,351.67 144.27,351.6C144.64,351.42 144.97,351.22 145.25,351.02C145.45,350.8 145.68,350.59 145.95,350.39C146.36,350.07 146.86,349.76 147.43,349.48C149.5,348.46 152.21,347.93 154.93,347.91C155.36,347.91 155.79,347.92 156.22,347.96C156.51,347.98 156.79,347.99 157.09,348C159.23,348.04 161.41,347.65 163.04,346.85C164.68,346.04 165.45,344.97 165.37,343.92C165.36,343.77 165.33,343.63 165.29,343.48C165.22,343.27 165.18,343.05 165.19,342.83C165.24,341.5 166.3,340.17 168.37,339.15C169.09,338.79 169.89,338.5 170.73,338.27C170.86,338.23 170.98,338.2 171.1,338.17C171.72,338 172.29,337.79 172.81,337.53C172.87,337.5 172.94,337.46 173,337.43C175.33,336.2 175.66,334.34 173.95,332.88C173.59,332.57 173.2,332.26 172.79,331.96C171.45,330.96 169.88,330.01 168.09,329.13C155.71,323.02 136.7,322.18 122.49,326.6C122.33,326.65 122.19,326.71 122.09,326.79C113.13,333.8 114.84,343.17 127.22,349.28C129.03,350.17 130.97,350.94 133.03,351.61L133.02,351.61Z&quot;"
+        errorLine2="                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/dax.xml"
+            line="145"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1060 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="        android:pathData=&quot;M582.59,77.56C577.41,68.68 571.94,59.99 566.28,51.49C539.94,12.02 491.69,-7.72 445.85,4.38C443.3,5.05 440.73,5.82 438.2,6.68C431.09,9.09 424.37,12.13 418.08,15.74C418.08,15.74 418.07,15.74 418.04,15.75C412.73,20.04 407.09,24.01 401.15,27.57C391.66,33.33 381.41,38.14 370.47,41.85C330.74,55.34 289.33,51.81 254.17,35.19C248.56,32.55 243.26,29.32 238.17,25.78C234.76,23.4 231.23,21.21 227.59,19.23C200.63,4.57 167.82,0.76 136.45,11.41C105.09,22.05 81.5,44.93 69.01,72.91C67.28,76.76 65.77,80.73 64.48,84.77C62.59,90.78 60.29,96.68 57.41,102.28C39.61,136.73 8.96,164.59 -30.64,178.02C-44.41,182.7 -58.37,185.33 -72.21,186.06C-74.23,186.07 -76.24,186.13 -78.3,186.27C-88.28,186.83 -98.37,188.75 -108.32,192.13C-109.57,192.55 -110.83,192.98 -112.04,193.46C-157.75,210.74 -185.76,256.9 -182.51,305.7C-181.83,316.11 -180.8,326.54 -179.48,336.98C-175.11,371.57 -167.2,406.26 -155.56,440.56C-75.02,677.88 158.04,820.26 396.98,795.26C399.67,794.98 402.27,794.1 404.54,792.7C609.33,667.06 707.59,412.29 627.05,174.97C615.32,140.41 600.35,107.82 582.58,77.51L582.59,77.56Z&quot; />"
+        errorLine2="                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/orange_shape.xml"
+            line="24"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/daxPromptBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_dax_prompt_browser_comparison.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/daxPromptBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_dax_prompt_duck_player.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="27"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="36"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="54"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="64"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="74"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="104"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="114"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="124"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="154"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="164"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="174"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="204"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="214"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="ContentDescription"
+        message="Missing `contentDescription` attribute on image"
+        errorLine1="        &lt;ImageView"
+        errorLine2="         ~~~~~~~~~">
+        <location
+            file="src/main/res/layout/browser_comparison_chart.xml"
+            line="224"
+            column="10"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_dax_prompt_browser_comparison.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="InvalidColorAttribute"
+        message="@colors are not allowed, used ?attr/daxColor instead"
+        errorLine1="    android:background=&quot;@color/daxPromptBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/activity_dax_prompt_duck_player.xml"
+            line="23"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingSmartlingRequiredDirectives"
+        message="Missing directive: &lt;!-- smartling.entity_escaping = false -->">
+        <location
+            file="src/main/res/values/strings-daxprompts.xml"/>
+    </issue>
+
+    <issue
+        id="MissingSmartlingRequiredDirectives"
+        message="Missing directive: &lt;!-- smartling.instruction_attributes = instruction -->">
+        <location
+            file="src/main/res/values/strings-daxprompts.xml"/>
+    </issue>
+
+</issues>

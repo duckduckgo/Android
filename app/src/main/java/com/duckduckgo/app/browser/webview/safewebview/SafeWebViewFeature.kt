@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.webview.safewebview
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -27,6 +28,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 
 interface SafeWebViewFeature {
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

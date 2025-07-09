@@ -72,8 +72,6 @@ tags:
 
                 - tapOn: "Navigate up"
 
-                - assertVisible:
-                      text: "Save and autofill passwords"
                 - evalScript: ${output.addLogins.counter++}
 
       - scrollUntilVisible:

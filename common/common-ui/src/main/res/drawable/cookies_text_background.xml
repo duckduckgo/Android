@@ -20,7 +20,7 @@
         android:width="1dp"
         android:color="?attr/daxColorSurface" />
     <corners android:topLeftRadius="0dp"
-        android:topRightRadius="@dimen/smallShapeCornerRadius"
+        android:topRightRadius="?attr/cookiesAnimationRadius"
         android:bottomLeftRadius="0dp"
-        android:bottomRightRadius="@dimen/smallShapeCornerRadius" />
+        android:bottomRightRadius="?attr/cookiesAnimationRadius" />
 </shape>

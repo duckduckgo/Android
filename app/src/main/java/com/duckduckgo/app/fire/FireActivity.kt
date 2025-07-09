@@ -23,8 +23,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
-import com.duckduckgo.app.global.view.fadeTransitionConfig
-import com.duckduckgo.app.global.view.noAnimationConfig
+import com.duckduckgo.common.ui.view.fadeTransitionConfig
+import com.duckduckgo.common.ui.view.noAnimationConfig
 import com.duckduckgo.di.scopes.ActivityScope
 
 /**

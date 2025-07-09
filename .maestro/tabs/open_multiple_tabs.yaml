@@ -13,22 +13,20 @@ tags:
             - runFlow: ../shared/skip_all_onboarding.yaml
 
             - tapOn:
-                text: "search or type URL"
+                id: "omnibarTextInput"
             - inputText: "https://privacy-test-pages.site"
             - pressKey: Enter
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/tabCount"
+            - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
             - assertVisible:
                 text: "Privacy Test Pages - Home"
             - tapOn: "New Tab"
             - assertVisible:
-                text: "Search or type URL"
+                id: "omnibarTextInput"
             - inputText: "https://www.search-company.site"
             - pressKey: Enter
             - assertVisible:
                 text: "Search engine"
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/tabCount"
+            - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
             - assertVisible:
                 text: "Ad Click Flow"
             - assertVisible:
@@ -39,8 +37,7 @@ tags:
                 text: "Ad Click Flow"
             - assertVisible:
                 text: "Privacy Test Pages - Home"
-            - tapOn:
-                id: "com.duckduckgo.mobile.android:id/tabCount"
+            - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
             - assertVisible:
                 text: "Ad Click Flow"
             - tapOn:

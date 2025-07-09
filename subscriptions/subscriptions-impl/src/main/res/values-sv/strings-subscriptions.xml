@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Få svar på vanliga frågor eller kontakta supporten för Privacy Pro på våra hjälpsidor. Funktionstillgänglighet varierar mellan olika länder.</string>
     <string name="subscriptionStatusSubscribed">Prenumererad</string>
     <string name="privacyPolicyAndTermsOfService">Integritetspolicy och användarvillkor</string>
+    <string name="subscriptionStatusFreeTrial">Gratis provperiod aktiv</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt månadsabonnemang på den dagen.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och övergår automatiskt till ett betalt årsabonnemang på den dagen.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Din kostnadsfria provperiod upphör den %1$s och kommer inte att övergå till ett betalt abonnemang.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnemangsinställningar</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Det inkluderar vårt VPN, Personal Information Removal och Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Inkluderar vårt VPN och Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Skaffa Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Prova Privacy Pro gratis</string>
     <string name="subscriptionSettingRestore">Jag har ett abonnemang</string>
     <string name="subscriptionSettingExpired">Din prenumeration på Privacy Pro har gått ut</string>
     <string name="subscriptionSettingExpiredViewPlans">Visa abonnemang</string>

@@ -55,7 +55,6 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Compani
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -163,7 +162,7 @@ class ProSettingView @JvmOverloads constructor(
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.isVisible = true
                     subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
-                    subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_red_16)
+                    subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_recolorable_16)
                 }
             }
             else -> {
@@ -176,7 +175,12 @@ class ProSettingView @JvmOverloads constructor(
                             else -> ""
                         },
                     )
-                    subscriptionGet.setText(R.string.subscriptionSettingGet)
+                    subscriptionGet.setText(
+                        when (viewState.freeTrialEligible) {
+                            true -> R.string.subscriptionSettingTryFreeTrial
+                            false -> R.string.subscriptionSettingGet
+                        },
+                    )
 
                     subscriptionBuyContainer.isVisible = true
                     subscriptionRestoreContainer.isVisible = true
@@ -197,6 +201,7 @@ class ProSettingView @JvmOverloads constructor(
                     context,
                     SubscriptionsWebViewActivityWithParams(
                         url = SubscriptionsConstants.BUY_URL,
+                        origin = "funnel_appsettings_android",
                     ),
                 )
             }

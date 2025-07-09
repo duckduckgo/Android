@@ -54,4 +54,12 @@
     <!-- Skip Onboarding (not user-facing) -->
     <string name="skipOnboarding">Skip Onboarding</string>"
 
+    <!-- Trackers blocked animation-->
+    <string name="trackerBlockedInTheLast7days" instruction="Placeholder is 1 tracker blocked" >&lt;b&gt;%1$s tracker blocked &lt;/b&gt; in the last 7 days</string>
+
+    <!-- Browser tab -->
+    <string name="browserDuckPlayerShortUrl">Duck Player</string>
+
+    <!-- DuckChat -->
+    <string name="duckChatMenuItem">@string/duck_chat_title</string>
 </resources>

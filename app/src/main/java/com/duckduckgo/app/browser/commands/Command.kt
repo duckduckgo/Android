@@ -24,8 +24,8 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
+import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.ErrorNavigationState
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
@@ -41,6 +41,7 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -69,6 +70,7 @@ sealed class Command {
     class SendEmail(val emailAddress: String) : Command()
     object ShowKeyboard : Command()
     object HideKeyboard : Command()
+    object HideKeyboardForChat : Command()
     class ShowFullScreen(val view: View) : Command()
     class DownloadImage(
         val url: String,
@@ -265,12 +267,15 @@ sealed class Command {
     object OpenDuckPlayerOverlayInfo : Command()
     object OpenDuckPlayerPageInfo : Command()
     class SetBrowserBackground(@DrawableRes val backgroundRes: Int) : Command()
+    class SetBrowserBackgroundColor(@ColorRes val colorRes: Int) : Command()
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
+    class SetOnboardingDialogBackgroundColor(@ColorRes val colorRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
     data class SwitchToTab(val tabId: String) : Command()
     data object CloseCustomTab : Command()
-    data class LaunchPopupMenu(val anchorToNavigationBar: Boolean) : Command()
+    data object LaunchPopupMenu : Command()
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
     data object LaunchBookmarksActivity : Command()
     data object StartTrackersExperimentShieldPopAnimation : Command()
+    data object RefreshOmnibar : Command()
 }

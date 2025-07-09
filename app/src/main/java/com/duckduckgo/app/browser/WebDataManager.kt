@@ -21,6 +21,7 @@ import android.webkit.WebStorage
 import android.webkit.WebView
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -39,7 +40,10 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface WebDataManager {
     suspend fun clearData(
@@ -60,6 +64,7 @@ class WebViewDataManager @Inject constructor(
     private val webViewHttpAuthStore: WebViewHttpAuthStore,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val webLocalStorageManager: WebLocalStorageManager,
+    private val indexedDBManager: IndexedDBManager,
     private val crashLogger: CrashLogger,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
@@ -94,7 +99,7 @@ class WebViewDataManager @Inject constructor(
                     webLocalStorageManager.clearWebLocalStorage()
                     continuation.resume(Unit)
                 }.onFailure { e ->
-                    Timber.e(e, "WebDataManager: Could not selectively clear web storage")
+                    logcat(ERROR) { "WebDataManager: Could not selectively clear web storage: ${e.asLog()}" }
                     if (appBuildConfig.isInternalBuild()) {
                         sendCrashPixel(e)
                     }
@@ -123,7 +128,8 @@ class WebViewDataManager @Inject constructor(
      * Deletes web view directory content except the following directories
      *  app_webview/Cookies
      *  app_webview/Default/Cookies
-     *  app_webview/Default/Local Storage
+     *  app_webview/Default/Local Storage (when flag enabled)
+     *  app_webview/Default/IndexedDB (when flag enabled)
      *
      *  the excluded directories above are to avoid clearing unnecessary cookies and because localStorage is cleared using clearWebStorage
      */
@@ -132,11 +138,21 @@ class WebViewDataManager @Inject constructor(
         fileDeleter.deleteContents(File(dataDir, "app_webview"), listOf("Default", "Cookies"))
 
         // We don't delete the Default dir as Cookies may be inside however we do clear any other content
+        val excludedDirectories = mutableListOf("Cookies")
+
         if (androidBrowserConfigFeature.webLocalStorage().isEnabled()) {
-            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies", "Local Storage"))
-        } else {
-            fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), listOf("Cookies"))
+            excludedDirectories.add("Local Storage")
         }
+        if (androidBrowserConfigFeature.indexedDB().isEnabled()) {
+            runCatching {
+                indexedDBManager.clearIndexedDB()
+            }.onSuccess {
+                excludedDirectories.add("IndexedDB")
+            }.onFailure { t ->
+                logcat(WARN) { "Failed to clear IndexedDB, will delete it instead: ${t.asLog()}" }
+            }
+        }
+        fileDeleter.deleteContents(File(dataDir, "app_webview/Default"), excludedDirectories)
     }
 
     private suspend fun clearAuthentication(webView: WebView) {

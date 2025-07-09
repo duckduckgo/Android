@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Importálhatod a mentett jelszavaidat egy másik böngészőből a DuckDuckGo böngészőjébe.</string>
 
     <string name="autofillManagementImportPasswords">Jelszavak importálása</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Asztali jelszavak szinkronizálása</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Jelszavak importálásának módja</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Asztali jelszavak szinkronizálásának módja</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importálj jelszavakat a DuckDuckGo böngésző asztali verziójába, majd szinkronizáld őket az eszközök között.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Asztali böngésző letöltése</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link másolva</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Jelszavak importálása a Google-ból</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Jelszavak importálása a Google-ból</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">DuckDuckGo-jelszavak szinkronizálása</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">DuckDuckGo-jelszavak szinkronizálása</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Asztali jelszavak szinkronizálása</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Asztali jelszavak szinkronizálása</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Google-jelszavaid importálása</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">A jelszó importálása nem sikerült</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Kihagyott (ismétlődő vagy érvénytelen): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importált jelszó: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Jelszavak megnyitása</string>
+    <string name="autofill_service_select_password_activity">Mentett jelszó kiválasztása</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Jelszavak és automatikus kitöltés</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Kizárt webhelyek visszaállítása?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">A kizárt webhelyek visszaállítása esetén a rendszer a jelszavad mentését kéri, amikor legközelebb bejelentkezel ezen webhelyek bármelyikére.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Visszaállítás</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Mégsem</string>
+    <string name="autofillSettingsPasswordsEntry">Jelszavak</string>
+    <string name="autofillSettingsAutofillToggleLabel">Rákérdezés a mentésre és automatikus kitöltésre</string>
+    <string name="autofillSettingsAutofillSubtitle">A jelszavak titkosítva vannak. Rajtad kívül senki sem láthatja őket, még mi sem. <annotation type="learn_more_link">További tudnivalók</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Jelszavak importálása</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Jelszavak importálása a Google-ból</string>
+    <string name="autofillSettingsImportFromDesktopSync">Asztali jelszavak szinkronizálása</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Kizárt webhelyek visszaállítása</string>
 
 </resources>

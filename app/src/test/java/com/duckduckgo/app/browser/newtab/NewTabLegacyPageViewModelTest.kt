@@ -204,7 +204,7 @@ class NewTabLegacyPageViewModelTest {
     }
 
     @Test
-    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDontDismiss() = runTest {
+    fun whenRemoteMessageActionButtonClickedThenFirePixelAndDismiss() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList())
         whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(flowOf(remoteMessage))
 

@@ -22,7 +22,6 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.productIdToBillingPeriod
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -41,8 +40,7 @@ class RMFPProBillingPeriodMatchingAttribute @Inject constructor(
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {
     override suspend fun evaluate(matchingAttribute: MatchingAttribute): Boolean? {
         if (matchingAttribute is PProBillingPeriodMatchingAttribute) {
-            val productId = subscriptionsManager.getSubscription()?.productId
-            return productId != null && matchingAttribute.value == productId.productIdToBillingPeriod()
+            return matchingAttribute.value == subscriptionsManager.getSubscription()?.billingPeriod
         }
         return null
     }
@@ -65,6 +63,6 @@ internal data class PProBillingPeriodMatchingAttribute(
     val value: String,
 ) : MatchingAttribute {
     companion object {
-        const val KEY = "privacyProBillingPeriod"
+        const val KEY = "pproBillingPeriod"
     }
 }

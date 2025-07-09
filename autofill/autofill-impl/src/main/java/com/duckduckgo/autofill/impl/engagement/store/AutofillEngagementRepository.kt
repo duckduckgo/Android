@@ -41,7 +41,8 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AutofillEngagementRepository {
 
@@ -79,7 +80,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
     override suspend fun recordAutofilledToday() {
         withContext(dispatchers.io()) {
             val engagement = todaysEngagement().copy(autofilled = true)
-            Timber.v("upserting %s because user autofilled", engagement)
+            logcat(VERBOSE) { "upserting $engagement because user autofilled" }
             processEvent(engagement)
         }
     }
@@ -87,7 +88,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
     override suspend fun recordSearchedToday() {
         withContext(dispatchers.io()) {
             val engagement = todaysEngagement().copy(searched = true)
-            Timber.v("upserting %s because user searched", engagement)
+            logcat(VERBOSE) { "upserting $engagement because user searched" }
             processEvent(engagement)
             processOnFirstSearchEvent()
         }
@@ -95,7 +96,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
 
     private suspend fun processOnFirstSearchEvent() {
         if (!canSendAutofillToggleStatus()) {
-            Timber.v("Unable to determine autofill toggle status")
+            logcat(VERBOSE) { "Unable to determine autofill toggle status" }
             return
         }
 

@@ -25,8 +25,8 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Sync
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.impl.databinding.ViewCredentialsSyncPausedWarningBinding
 import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command
 import com.duckduckgo.autofill.sync.CredentialsSyncPausedViewModel.Command.NavigateToCredentials
@@ -39,7 +39,6 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -114,7 +113,7 @@ class CredentialsSyncPausedView @JvmOverloads constructor(
     }
 
     private fun navigateToCredentials() {
-        globalActivityStarter.start(this.context, AutofillSettingsScreen(source = AutofillSettingsLaunchSource.Sync))
+        globalActivityStarter.start(this.context, AutofillPasswordsManagementScreen(source = Sync))
     }
 
     companion object {

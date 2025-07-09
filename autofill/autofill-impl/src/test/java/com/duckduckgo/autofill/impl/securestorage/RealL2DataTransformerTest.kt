@@ -16,51 +16,58 @@
 
 package com.duckduckgo.securestorage
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.impl.securestorage.RealL2DataTransformer
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageKeyProvider
+import com.duckduckgo.common.test.CoroutineTestRule
 import java.security.Key
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class RealL2DataTransformerTest {
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     private lateinit var testee: RealL2DataTransformer
     private lateinit var encryptionHelper: FakeEncryptionHelper
 
-    @Mock
-    private lateinit var secureStorageKeyProvider: SecureStorageKeyProvider
+    private val secureStorageKeyProvider: SecureStorageKeyProvider = mock()
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         MockitoAnnotations.openMocks(this)
         val key = mock(Key::class.java)
         whenever(secureStorageKeyProvider.getl2Key()).thenReturn(key)
         encryptionHelper = FakeEncryptionHelper(expectedEncryptedData, expectedEncryptedIv, expectedDecryptedData)
-        testee = RealL2DataTransformer(encryptionHelper, secureStorageKeyProvider)
+        testee = RealL2DataTransformer(encryptionHelper, secureStorageKeyProvider, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
     }
 
     @Test
-    fun whenCanProcessDataThenReturnCanAccessKeyStoreTrue() {
+    fun whenCanProcessDataThenReturnCanAccessKeyStoreTrue() = runTest {
         whenever(secureStorageKeyProvider.canAccessKeyStore()).thenReturn(true)
 
         assertTrue(testee.canProcessData())
     }
 
     @Test
-    fun whenCanProcessDataFalseThenReturnCanAccessKeyStoreFalse() {
+    fun whenCanProcessDataFalseThenReturnCanAccessKeyStoreFalse() = runTest {
         whenever(secureStorageKeyProvider.canAccessKeyStore()).thenReturn(false)
 
         assertFalse(testee.canProcessData())
     }
 
     @Test
-    fun whenDataIsEncryptedThenDelegateEncryptionToEncryptionHelper() {
+    fun whenDataIsEncryptedThenDelegateEncryptionToEncryptionHelper() = runTest {
         val result = testee.encrypt("test123")
 
         assertEquals(expectedEncryptedData, result.data)
@@ -68,7 +75,7 @@ class RealL2DataTransformerTest {
     }
 
     @Test
-    fun whenDataIsDecryptedThenDelegateDecryptionToEncryptionHelper() {
+    fun whenDataIsDecryptedThenDelegateDecryptionToEncryptionHelper() = runTest {
         val result = testee.decrypt("test123", "iv")
 
         assertEquals(decodedDecryptedData, result)

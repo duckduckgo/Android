@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Gittervisning</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s trackere blokeret &lt;/b&gt; inden for de seneste 7 dage</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s trackere blokeret &lt;/b&gt; inden for de seneste 7 dage</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s tracker blokeret &lt;/b&gt;</string>
     <string name="inTheLast7Days">inden for de seneste 7 dage</string>
 
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">udseende</string>
+    <string name="settingsShowFullUrlTitle">Vis hele webstedsadressen</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -711,8 +712,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d Privat fane</item>
-        <item quantity="other">%1$d Private faner</item>
+        <item quantity="one">1 fane</item>
+        <item quantity="other">%1$d faner</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Søg fortroligt som standard</string>
     <string name="preOnboardingComparisonChartItem2">Bloker tredjeparts-trackere</string>
     <string name="preOnboardingComparisonChartItem3">Bloker pop op-vinduer om cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Bloker sporende annoncer</string>
+    <string name="preOnboardingComparisonChartItem4">Bloker målrettede annoncer</string>
     <string name="preOnboardingComparisonChartItem5">Slet browsingdata med én knap</string>
     <string name="preOnboardingDaxDialog3Title">Fantastisk! Velkommen til den \"anden\" side.</string>
     <string name="preOnboardingDaxDialog3Button">Start søgning</string>
@@ -823,6 +824,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Giv mig fem!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Prøv det</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Spring over</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Jeg har været her før</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Forstået! Jeg springer de andre tips over.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Husk: Du kan slette alle dine faner, historik og browserdata med to tryk på <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Vis vejledning</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresselinje</string>
@@ -838,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Ny AI-chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lad DuckDuckGo beskytte mere af det, du foretager dig online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gør os til din standardbrowser, så alle links åbner i DuckDuckGo.</string>
@@ -852,10 +853,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Hvis du rydder dine faner og data, slettes din tracker-blokeringshistorik, og dette tal nulstilles.\n\nSkjul dette banner, hvis du ikke ønsker at se det i fanebladene.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skjul banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Advarsel: Dette websted kan udgøre en sikkerhedsrisiko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis distribuerer malware, der er designet til at kompromittere din enhed eller stjæle dine personlige oplysninger.\n<a href=\"\">Få mere at vide</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Dette websted efterligner muligvis et legitimt websted for at narre dig til at give personlige oplysninger, såsom adgangskoder eller kreditkortnumre.\n<a href=\"\">Få mere at vide</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo har blokeret denne side, fordi den muligvis forsøger at bedrage eller manipulere dig til at overføre penge, købe forfalskede varer eller installere malware under falske forudsætninger.\n<a href=\"\">Få mere at vide</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Forlad dette websted</string>
     <string name="maliciousSiteAdvancedCTA">Avanceret</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Hvis du mener, at dette websted er sikkert, kan du <a href=\"\">anmelde en fejl</a>. Du kan stadig besøge webstedet på eget ansvar.]]></string>
@@ -866,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Advar mig på websteder, der er registreret for phishing eller malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Få mere at vide</annotation></string>
     <string name="maliciousSiteSettingDisabled">Deaktivering af denne funktion kan bringe dine oplysninger i fare.</string>
+    <string name="threatProtectionTitle">Trusselsbeskyttelse</string>
+    <string name="threatProtectionDescription">DuckDuckGos forbedrede beskyttelser stopper almindelige trusler, mens de holder din forbindelse sikker.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Opgraderer automatisk links til HTTPS, når det er muligt.<br><a href=\"\">Mere info</a>]]></string>
+    <string name="scamBlockerTitle">Blokering af svindel</string>
+    <string name="scamBlockerDescription">Advar på websteder, der er registreret for svindel, phishing og malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Mere info</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prøv vores widget til startskærmen!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Tilføj widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søg på DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startskærmswidget</string>
 </resources>

@@ -67,7 +67,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
                     android:layout_marginEnd="10dp"
-                    android:src="@drawable/ic_exclamation_red_16" />
+                    android:src="@drawable/ic_exclamation_recolorable_16" />
 
                 <com.duckduckgo.common.ui.view.text.DaxTextView
                     android:id="@+id/subscriptionExpiredStatusText"

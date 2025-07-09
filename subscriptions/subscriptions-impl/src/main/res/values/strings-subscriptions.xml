@@ -60,6 +60,10 @@
     <string name="privacyProFaqSecondary">Get answers to frequently asked questions or contact Privacy Pro support from our help pages. Feature availability varies by country.</string>
     <string name="subscriptionStatusSubscribed">Subscribed</string>
     <string name="privacyPolicyAndTermsOfService">Privacy Policy and Terms of Service</string>
+    <string name="subscriptionStatusFreeTrial">Free Trial Active</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Your free trial ends on %1$s &amp; automatically converts to a monthly paid subscription on that day.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Your free trial ends on %1$s &amp; automatically converts to a yearly paid subscription on that day.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Your free trial ends on %1$s &amp; will not convert to a paid subscription.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
@@ -67,6 +71,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Includes our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Includes our VPN and Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Try Privacy Pro Free</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>
     <string name="subscriptionSettingExpired">Your Privacy Pro subscription expired</string>
     <string name="subscriptionSettingExpiredViewPlans">View Plans</string>

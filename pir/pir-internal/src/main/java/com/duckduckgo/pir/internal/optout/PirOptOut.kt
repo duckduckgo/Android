@@ -19,16 +19,16 @@ package com.duckduckgo.pir.internal.optout
 import android.content.Context
 import android.webkit.WebView
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
-import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory
-import com.duckduckgo.pir.internal.common.PirActionsRunnerFactory.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJob
+import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
+import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.scripts.models.Address
@@ -40,15 +40,15 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.LocalDate
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface PirOptOut {
     /**
      * This method can be used to execute pir opt-out for a given list of [brokers] names.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
      * @param brokers List of broker names
      * @param context Context in which we want to create the detached WebView from
@@ -56,22 +56,22 @@ interface PirOptOut {
     suspend fun execute(
         brokers: List<String>,
         context: Context,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
      * This method can be used to execute pir opt out for all active brokers where the user's profile has been identified as a record.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
      * @param context Context in which we want to create the detached WebView from
      */
     suspend fun executeForBrokersWithRecords(
         context: Context,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
      * This method should only be used if we want to debug opt-out and pass in a specific [webView] which will allow us to see the run in action.
      * Do not use this for non-debug scenarios.
+     * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
      * @param brokers - brokers in which we want to run the opt out flow
      * @param webView - attached/visible WebView in which we will run the opt-out flow.
@@ -79,7 +79,6 @@ interface PirOptOut {
     suspend fun debugExecute(
         brokers: List<String>,
         webView: WebView,
-        coroutineScope: CoroutineScope,
     ): Result<Unit>
 
     /**
@@ -97,8 +96,9 @@ class RealPirOptOut @Inject constructor(
     private val repository: PirRepository,
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
-    private val pirActionsRunnerFactory: PirActionsRunnerFactory,
+    private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val dispatcherProvider: DispatcherProvider,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
     private var profileQuery: ProfileQuery = ProfileQuery(
@@ -124,9 +124,8 @@ class RealPirOptOut @Inject constructor(
     override suspend fun debugExecute(
         brokers: List<String>,
         webView: WebView,
-        coroutineScope: CoroutineScope,
-    ): Result<Unit> {
-        onJobStarted(coroutineScope)
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        onJobStarted()
         emitStartPixel()
         if (runners.isNotEmpty()) {
             cleanRunners()
@@ -137,7 +136,7 @@ class RealPirOptOut @Inject constructor(
         logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
 
         runners.add(
-            pirActionsRunnerFactory.createInstance(
+            pirActionsRunnerFactory.create(
                 webView.context,
                 pirCssScriptLoader.getScript(),
                 OPTOUT,
@@ -145,57 +144,62 @@ class RealPirOptOut @Inject constructor(
         )
 
         // Start each runner on a subset of the broker steps
-        return runBlocking {
-            brokers.mapNotNull { broker ->
-                repository.getBrokerOptOutSteps(broker)?.run {
-                    brokerStepsParser.parseStep(broker, this)
-                }
-            }.filter {
-                (it as OptOutStep).profilesToOptOut.isNotEmpty()
-            }.also { list ->
+
+        brokers.mapNotNull { broker ->
+            repository.getBrokerOptOutSteps(broker)?.run {
+                brokerStepsParser.parseStep(broker, this)
+            }
+        }.filter {
+            it.isNotEmpty()
+        }.flatten()
+            .also { list ->
                 runners[0].startOn(webView, profileQuery, list)
+                runners[0].stop()
             }
 
-            logcat { "PIR-OPT-OUT: Optout completed for all runners" }
-            emitCompletedPixel()
-            onJobCompleted()
-            Result.success(Unit)
-        }
+        logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+        emitCompletedPixel()
+        onJobCompleted()
+        return@withContext Result.success(Unit)
     }
 
     override suspend fun execute(
         brokers: List<String>,
         context: Context,
-        coroutineScope: CoroutineScope,
-    ): Result<Unit> {
-        onJobStarted(coroutineScope)
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        onJobStarted()
         emitStartPixel()
-        runBlocking {
-            if (runners.isNotEmpty()) {
-                cleanRunners()
-                runners.clear()
-            }
-            obtainProfile()
+        if (runners.isNotEmpty()) {
+            cleanRunners()
+            runners.clear()
         }
+        obtainProfile()
 
         logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
 
-        val script = runBlocking {
-            pirCssScriptLoader.getScript()
-        }
+        val script = pirCssScriptLoader.getScript()
 
-        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
-            brokers.size
+        val brokerSteps = brokers.mapNotNull { broker ->
+            repository.getBrokerOptOutSteps(broker)?.run {
+                brokerStepsParser.parseStep(broker, this)
+            }
+        }.filter {
+            it.isNotEmpty()
+        }.flatten()
+
+        maxWebViewCount = if (brokerSteps.size <= MAX_DETACHED_WEBVIEW_COUNT) {
+            brokerSteps.size
         } else {
             MAX_DETACHED_WEBVIEW_COUNT
         }
+
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
         var createCount = 0
         while (createCount != maxWebViewCount) {
             runners.add(
-                pirActionsRunnerFactory.createInstance(
+                pirActionsRunnerFactory.create(
                     context,
                     script,
                     OPTOUT,
@@ -205,25 +209,18 @@ class RealPirOptOut @Inject constructor(
         }
 
         // Start each runner on a subset of the broker steps
-        return runBlocking {
-            brokers.mapNotNull { broker ->
-                repository.getBrokerOptOutSteps(broker)?.run {
-                    brokerStepsParser.parseStep(broker, this)
+        brokerSteps.splitIntoParts(maxWebViewCount)
+            .mapIndexed { index, part ->
+                async {
+                    runners[index].start(profileQuery, part)
+                    runners[index].stop()
                 }
-            }.filter {
-                (it as OptOutStep).profilesToOptOut.isNotEmpty()
-            }.splitIntoParts(maxWebViewCount)
-                .mapIndexed { index, part ->
-                    async {
-                        runners[index].start(profileQuery, part)
-                    }
-                }.awaitAll()
+            }.awaitAll()
 
-            logcat { "PIR-OPT-OUT: Optout completed for all runners" }
-            emitCompletedPixel()
-            onJobCompleted()
-            Result.success(Unit)
-        }
+        logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+        emitCompletedPixel()
+        onJobCompleted()
+        return@withContext Result.success(Unit)
     }
 
     private suspend fun obtainProfile() {
@@ -256,10 +253,9 @@ class RealPirOptOut @Inject constructor(
 
     override suspend fun executeForBrokersWithRecords(
         context: Context,
-        coroutineScope: CoroutineScope,
-    ): Result<Unit> {
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
         val brokers = repository.getBrokersForOptOut(formOptOutOnly = true)
-        return execute(brokers, context, coroutineScope)
+        return@withContext execute(brokers, context)
     }
 
     private fun cleanRunners() {

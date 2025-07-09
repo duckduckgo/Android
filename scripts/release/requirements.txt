@@ -1,0 +1,2 @@
+GitPython>=3.1.40
+asana>=3.2.2

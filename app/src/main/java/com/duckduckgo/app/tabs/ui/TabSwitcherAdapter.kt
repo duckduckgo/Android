@@ -74,7 +74,8 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class TabSwitcherAdapter(
     private val isVisualExperimentEnabled: Boolean,
@@ -152,9 +153,15 @@ class TabSwitcherAdapter(
             is TabSwitcherViewHolder.TrackerAnimationInfoPanelViewHolder -> {
                 val trackerAnimationInfoPanel = list[position] as TabSwitcherItem.TrackerAnimationInfoPanel
 
+                val stringRes = if (trackerAnimationInfoPanel.trackerCount == 1) {
+                    R.string.trackerBlockedInTheLast7days
+                } else {
+                    R.string.trackersBlockedInTheLast7days
+                }
+
                 trackerCountAnimator.animateTrackersBlockedCountView(
                     context = holder.binding.root.context,
-                    stringRes = R.string.trackersBlockedInTheLast7days,
+                    stringRes = stringRes,
                     totalTrackerCount = trackerAnimationInfoPanel.trackerCount,
                     trackerTextView = holder.binding.infoPanelText,
                 )
@@ -228,10 +235,10 @@ class TabSwitcherAdapter(
         when (tab) {
             is SelectableTab -> {
                 if (tab.isSelected) {
-                    holder.selectionIndicator.setImageResource(CommonR.drawable.ic_check_blue_round_24)
+                    holder.selectionIndicator.setImageResource(CommonR.drawable.ic_check_blue_24)
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabSelectedIndicator)
                 } else {
-                    holder.selectionIndicator.setImageResource(CommonR.drawable.shape_grey_circle_24)
+                    holder.selectionIndicator.setImageResource(CommonR.drawable.ic_shape_circle_24)
                     holder.selectionIndicator.contentDescription = holder.rootView.resources.getString(R.string.tabNotSelectedIndicator)
                 }
                 holder.selectionIndicator.show()
@@ -288,7 +295,7 @@ class TabSwitcherAdapter(
         for (payload in payloads) {
             val bundle = payload as Bundle
             for (key in bundle.keySet()) {
-                Timber.v("$key changed - Need an update for ${tab.tabEntity}")
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
@@ -321,7 +328,7 @@ class TabSwitcherAdapter(
         for (payload in payloads) {
             val bundle = payload as Bundle
             for (key in bundle.keySet()) {
-                Timber.v("$key changed - Need an update for ${tab.tabEntity}")
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
             bundle.getString(DIFF_KEY_URL)?.let {

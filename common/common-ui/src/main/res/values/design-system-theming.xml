@@ -131,7 +131,17 @@
         <!--disables the overlay so that elevated surfaces are always daxColorSurface-->
         <item name="elevationOverlayEnabled">false</item>
 
-        <item name="tabItemSelectionCircleWidth">2dp</item>
+        <item name="daxColorWebViewScrollbarTrack">@color/webViewScrollbarTrackColor</item>
+
+        <item name="autocompleteListItemHorizontalPadding">@dimen/keyline_4</item>
+        <item name="autocompleteListItemStartPadding">18dp</item>
+        <item name="autocompleteListItemEndPadding">@dimen/keyline_2</item>
+        <item name="autocompleteListItemIconMargin">10dp</item>
+        <item name="autocompleteListItemWithoutTrailIconEndPadding">@dimen/keyline_4</item>
+        <item name="autocompleteListItemVerticalPadding">12dp</item>
+
+        <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -195,11 +205,13 @@
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue20</item>
+        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
         <item name="daxColorFabPrimaryText">@color/black</item>
         <item name="daxColorFabPrimaryIcon">@color/black</item>
-        <item name="daxColorFabSecondaryContainer">@color/blue20</item>
-        <item name="daxColorFabSecondaryText">@color/black</item>
-        <item name="daxColorFabSecondaryIcon">@color/black</item>
+        <item name="daxColorFabSecondaryContainer">@color/blue0</item>
+        <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
+        <item name="daxColorFabSecondaryText">@color/blue70</item>
+        <item name="daxColorFabSecondaryIcon">@color/blue70</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray50</item>
@@ -233,6 +245,7 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue20</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple20</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
+        <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorDark</item>
 
     </style>
 
@@ -296,9 +309,11 @@
 
         <!-- Fab -->
         <item name="daxColorFabPrimaryContainer">@color/blue50</item>
+        <item name="daxColorFabPrimaryContainerPressed">?attr/daxColorButtonPrimaryContainerPressed</item>
         <item name="daxColorFabPrimaryText">@color/white</item>
         <item name="daxColorFabPrimaryIcon">@color/white</item>
         <item name="daxColorFabSecondaryContainer">@color/blue0</item>
+        <item name="daxColorFabSecondaryContainerPressed">@color/blue20</item>
         <item name="daxColorFabSecondaryText">@color/blue70</item>
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
 
@@ -334,6 +349,7 @@
         <item name="daxColorPreonboardingProgressBarStart">@color/blue50</item>
         <item name="daxColorPreonboardingProgressBarCenter">@color/purple100</item>
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
+        <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
     </style>
 

@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -62,8 +63,15 @@ class SyncConnectActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        onBackPressedDispatcher.addCallback(this) {
+            onUserCancelled()
+        }
+
         observeUiEvents()
         configureListeners()
+        if (savedInstanceState == null) {
+            viewModel.onBarcodeScreenShown()
+        }
     }
 
     override fun onResume() {
@@ -74,6 +82,11 @@ class SyncConnectActivity : DuckDuckGoActivity() {
     override fun onPause() {
         super.onPause()
         binding.qrCodeReader.pause()
+    }
+
+    private fun onUserCancelled() {
+        viewModel.onUserCancelledWithoutSyncSetup()
+        finish()
     }
 
     private fun observeUiEvents() {

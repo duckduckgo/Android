@@ -24,12 +24,16 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.AttachedBehavior
 import androidx.coordinatorlayout.widget.CoordinatorLayout.Behavior
 import androidx.core.view.doOnAttach
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.PulseAnimation
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewBrowserNavigationBarBinding
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyAutofillButtonClicked
@@ -45,7 +49,7 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.webview.BrowserContainerLayoutBehavior
+import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
@@ -63,6 +67,16 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
 
+    private var showShadows: Boolean = false
+
+    init {
+        context.theme.obtainStyledAttributes(attrs, R.styleable.BrowserNavigationBarView, defStyle, 0)
+            .apply {
+                showShadows = getBoolean(R.styleable.BrowserNavigationBarView_showShadows, true)
+                recycle()
+            }
+    }
+
     override fun setVisibility(visibility: Int) {
         val isVisibilityUpdated = this.visibility != visibility
 
@@ -70,7 +84,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
 
         /**
          * This notifies all view behaviors that depend on the [BrowserNavigationBarView] to recalculate whenever the bar's visibility changes,
-         * for example, we require that in [BrowserContainerLayoutBehavior] to remove the bottom inset when navigation bar disappears.
+         * for example, we require that in [TopOmnibarBrowserContainerLayoutBehavior] to remove the bottom inset when navigation bar disappears.
          * The base coordinator behavior doesn't notify dependent views when visibility changes, so we need to do that manually.
          */
         val parent = parent
@@ -94,6 +108,14 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     private var conflatedCommandsJob: ConflatedJob = ConflatedJob()
     private var conflatedStateJob: ConflatedJob = ConflatedJob()
 
+    private val lifecycleOwner: LifecycleOwner by lazy {
+        requireNotNull(findViewTreeLifecycleOwner())
+    }
+
+    private val pulseAnimation: PulseAnimation by lazy {
+        PulseAnimation(lifecycleOwner)
+    }
+
     val popupMenuAnchor: View = binding.menuButton
 
     var browserNavigationBarObserver: BrowserNavigationBarObserver? = null
@@ -107,6 +129,12 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     fun setViewMode(viewMode: ViewMode) {
         doOnAttach {
             viewModel.setViewMode(viewMode)
+        }
+    }
+
+    fun setFireButtonHighlight(highlighted: Boolean) {
+        doOnAttach {
+            viewModel.setFireButtonHighlight(highlighted)
         }
     }
 
@@ -168,6 +196,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
+        binding.shadowView.isVisible = showShadows
         binding.root.isVisible = viewState.isVisible
 
         binding.newTabButton.isVisible = viewState.newTabButtonVisible
@@ -175,6 +204,10 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         binding.bookmarksButton.isVisible = viewState.bookmarksButtonVisible
         binding.fireButton.isVisible = viewState.fireButtonVisible
         binding.tabsButton.isVisible = viewState.tabsButtonVisible
+        binding.tabsButton.count = viewState.tabsCount
+        binding.tabsButton.hasUnread = viewState.hasUnreadTabs
+
+        renderFireButtonPulseAnimation(enabled = viewState.fireButtonHighlighted)
     }
 
     private fun processCommands(command: Command) {
@@ -189,6 +222,18 @@ class BrowserNavigationBarView @JvmOverloads constructor(
             NotifyBookmarksButtonClicked -> browserNavigationBarObserver?.onBookmarksButtonClicked()
             NotifyNewTabButtonClicked -> browserNavigationBarObserver?.onNewTabButtonClicked()
             NotifyAutofillButtonClicked -> browserNavigationBarObserver?.onAutofillButtonClicked()
+        }
+    }
+
+    private fun renderFireButtonPulseAnimation(enabled: Boolean) {
+        if (enabled) {
+            if (!pulseAnimation.isActive) {
+                doOnLayout {
+                    pulseAnimation.playOn(binding.fireIconImageView, isExperimentAndShieldView = false)
+                }
+            }
+        } else {
+            pulseAnimation.stop()
         }
     }
 

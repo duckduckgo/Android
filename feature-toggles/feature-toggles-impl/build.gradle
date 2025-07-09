@@ -32,15 +32,15 @@ dependencies {
     implementation project(':feature-toggles-internal-api')
     implementation project(":statistics-api")
     implementation project(":data-store-api")
+    implementation project(':remote-messaging-api')
 
     implementation AndroidX.appCompat
     implementation Google.android.material
     implementation AndroidX.constraintLayout
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Google.dagger
     implementation AndroidX.core.ktx
     implementation Square.okHttp3.okHttp
-    implementation "com.squareup.logcat:logcat:_"
 
     // Testing dependencies
     testImplementation project(':feature-toggles-test')

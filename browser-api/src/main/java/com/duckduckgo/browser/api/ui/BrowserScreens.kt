@@ -51,4 +51,9 @@ sealed class BrowserScreens {
      * Use this model to launch the New Tab Settings screen
      */
     object NewTabSettingsScreenNoParams : GlobalActivityStarter.ActivityParams
+
+    /**
+     * Use this model to launch the PrivateSearch screen
+     */
+    object PrivateSearchScreenNoParams : GlobalActivityStarter.ActivityParams
 }

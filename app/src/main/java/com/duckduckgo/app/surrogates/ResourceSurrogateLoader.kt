@@ -29,7 +29,10 @@ import java.io.ByteArrayInputStream
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @WorkerThread
 @ContributesMultibinding(
@@ -48,7 +51,7 @@ class ResourceSurrogateLoader @Inject constructor(
     }
 
     fun loadData() {
-        Timber.v("Loading surrogate data")
+        logcat(VERBOSE) { "Loading surrogate data" }
         if (surrogatesDataStore.hasData()) {
             val bytes = surrogatesDataStore.loadData()
             resourceSurrogates.loadSurrogates(convertBytes(bytes))
@@ -60,7 +63,7 @@ class ResourceSurrogateLoader @Inject constructor(
         return try {
             parse(bytes)
         } catch (e: Throwable) {
-            Timber.w(e, "Failed to parse surrogates file; file may be corrupt or badly formatted")
+            logcat(WARN) { "Failed to parse surrogates file; file may be corrupt or badly formatted: ${e.asLog()}" }
             emptyList()
         }
     }
@@ -89,7 +92,7 @@ class ResourceSurrogateLoader @Inject constructor(
                 with(ruleName.split("/")) {
                     scriptId = this.last()
                 }
-                Timber.d("Found new surrogate rule: $scriptId - $ruleName - $mimeType")
+                logcat { "Found new surrogate rule: $scriptId - $ruleName - $mimeType" }
                 nextLineIsNewRule = false
                 return@forEach
             }
@@ -114,7 +117,7 @@ class ResourceSurrogateLoader @Inject constructor(
             functionBuilder.append("\n")
         }
 
-        Timber.d("Processed ${surrogates.size} surrogates")
+        logcat { "Processed ${surrogates.size} surrogates" }
         return surrogates
     }
 

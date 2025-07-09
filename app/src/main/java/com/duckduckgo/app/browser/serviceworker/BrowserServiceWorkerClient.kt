@@ -27,7 +27,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
@@ -38,7 +39,7 @@ class BrowserServiceWorkerClient @Inject constructor(
     override fun shouldInterceptRequest(request: WebResourceRequest): WebResourceResponse? {
         return runBlocking {
             val documentUrl: Uri? = (request.requestHeaders[HEADER_ORIGIN] ?: request.requestHeaders[HEADER_REFERER])?.toUri()
-            Timber.v("Intercepting Service Worker resource ${request.url} type:${request.method} on page $documentUrl")
+            logcat(VERBOSE) { "Intercepting Service Worker resource ${request.url} type:${request.method} on page $documentUrl" }
             requestInterceptor.shouldInterceptFromServiceWorker(request, documentUrl)
         }
     }

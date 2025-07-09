@@ -20,41 +20,45 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
-import com.duckduckgo.malicioussiteprotection.impl.data.db.FeatureExceptionEntity
-import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
+import com.duckduckgo.feature.toggles.api.FeatureException
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 interface MaliciousSiteProtectionRCRepository {
-    fun insertAllExceptions(exceptions: List<FeatureException>)
     fun isExempted(hostName: String): Boolean
     val exceptions: CopyOnWriteArrayList<FeatureException>
 }
 
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = MaliciousSiteProtectionRCRepository::class,
+)
+@ContributesMultibinding(
+    scope = AppScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
+@SingleInstanceIn(AppScope::class)
 class RealMaliciousSiteProtectionRCRepository @Inject constructor(
-    @AppCoroutineScope coroutineScope: CoroutineScope,
-    dispatcherProvider: DispatcherProvider,
-    val dao: MaliciousSiteDao,
-    @IsMainProcess isMainProcess: Boolean,
-) : MaliciousSiteProtectionRCRepository {
+    private val feature: MaliciousSiteProtectionFeature,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    @IsMainProcess private val isMainProcess: Boolean,
+) : MaliciousSiteProtectionRCRepository, PrivacyConfigCallbackPlugin {
 
     override val exceptions = CopyOnWriteArrayList<FeatureException>()
 
     init {
-        coroutineScope.launch(dispatcherProvider.io()) {
-            if (isMainProcess) {
-                loadToMemory()
-            }
-        }
+        loadToMemory()
     }
 
-    override fun insertAllExceptions(exceptions: List<FeatureException>) {
-        dao.updateAllExceptions(exceptions.map { FeatureExceptionEntity(domain = it.domain, reason = it.reason) })
+    override fun onPrivacyConfigDownloaded() {
         loadToMemory()
     }
 
@@ -63,8 +67,11 @@ class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     }
 
     private fun loadToMemory() {
-        exceptions.clear()
-        val exceptionsEntityList = dao.getExceptions()
-        exceptions.addAll(exceptionsEntityList.map { FeatureException(domain = it.domain, reason = it.reason) })
+        coroutineScope.launch(dispatcherProvider.io()) {
+            if (isMainProcess) {
+                exceptions.clear()
+                exceptions.addAll(feature.self().getExceptions())
+            }
+        }
     }
 }

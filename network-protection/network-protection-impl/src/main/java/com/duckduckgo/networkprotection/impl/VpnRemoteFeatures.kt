@@ -25,6 +25,7 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.squareup.anvil.annotations.ContributesBinding
@@ -43,16 +44,16 @@ import kotlinx.coroutines.launch
     settingsStore = VpnRemoteSettingsStore::class,
 )
 interface VpnRemoteFeatures {
-    @Toggle.DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun showExcludeAppPrompt(): Toggle // kill switch
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun allowDnsBlockMalware(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun localVpnControllerDns(): Toggle
 }
 

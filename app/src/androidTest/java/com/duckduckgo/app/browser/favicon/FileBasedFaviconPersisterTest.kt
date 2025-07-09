@@ -18,12 +18,16 @@
 
 package com.duckduckgo.app.browser.favicon
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.sha256
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import java.io.File
 import java.io.FileOutputStream
 import kotlinx.coroutines.test.runTest
@@ -40,6 +44,7 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 
+@SuppressLint("DenyListedApi")
 class FileBasedFaviconPersisterTest {
 
     @get:Rule
@@ -52,10 +57,12 @@ class FileBasedFaviconPersisterTest {
     private val secondaryTestDirectory = "otherTest"
     private val subFolder = "subFolder"
     private val domain = "www.example.com"
+    private val fakeBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     @Before
     fun setup() {
-        testee = FileBasedFaviconPersister(context, mockFileDeleter, coroutineRule.testDispatcherProvider)
+        fakeBrowserConfigFeature.storeFaviconSuspend().setRawStoredState(Toggle.State(true))
+        testee = FileBasedFaviconPersister(context, mockFileDeleter, fakeBrowserConfigFeature, coroutineRule.testDispatcherProvider)
     }
 
     @After

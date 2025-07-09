@@ -14,25 +14,59 @@
   ~ limitations under the License.
   -->
 
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.widget.RelativeLayout">
+    android:id="@+id/tabsButton"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/selectable_item_experimental_background"
+    tools:layout_height="@dimen/bottomNavIconContainer"
+    tools:layout_width="@dimen/bottomNavIconContainer">
 
-
-    <!-- This TextView doesn't migrate to DaxTextView, special case for the Tabs icon  -->
-    <TextView
-        tools:ignore="DeprecatedWidgetInXml"
-        android:id="@+id/tabCount"
+    <ImageView
+        android:id="@+id/tabsImageView"
         android:layout_width="@dimen/bottomNavIcon"
         android:layout_height="@dimen/bottomNavIcon"
-        android:textColor="?attr/daxColorPrimaryIcon"
-        android:textSize="11sp"
-        android:fontFamily="sans-serif-black"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:paddingBottom="3dp"
-        android:paddingStart="3dp"
-        android:background="@drawable/ic_tab_switcher_experiment"
-        tools:text="66" />
+        android:layout_gravity="center"
+        android:contentDescription="@string/tabsMenuItem"
+        android:scaleType="center"
+        android:src="@drawable/ic_tab_24" />
 
-</merge>
+    <!--
+         Below TextViews aren't a DaxTextView, special case for the Tabs icon.
+         They also uses DP instead of SP, because the background icon can't resize to accommodate
+         different font sizes.
+         The "∞" character is separated into its own view because the horizontal center-line
+         of that character is at a different height than numbers' horizontal center-line.
+    -->
+
+    <TextView
+        android:id="@+id/tabCount"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="11.75dp"
+        android:layout_marginTop="7.5dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:textColor="?attr/daxColorPrimaryIcon"
+        android:textSize="9dp"
+        android:textStyle="bold"
+        tools:ignore="DeprecatedWidgetInXml,SpUsage"
+        tools:text="99" />
+
+    <TextView
+        android:id="@+id/tabCountInfinite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="6dp"
+        android:fontFamily="sans-serif-condensed"
+        android:gravity="center"
+        android:text="∞"
+        android:textColor="?attr/daxColorPrimaryIcon"
+        android:textSize="11dp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        tools:ignore="DeprecatedWidgetInXml,HardcodedText,SpUsage" />
+
+</FrameLayout>

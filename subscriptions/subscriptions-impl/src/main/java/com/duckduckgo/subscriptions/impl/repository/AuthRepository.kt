@@ -163,27 +163,30 @@ internal class RealAuthRepository constructor(
     override suspend fun setSubscription(subscription: Subscription?) = withContext(dispatcherProvider.io()) {
         with(subscriptionsDataStore) {
             productId = subscription?.productId
-            platform = subscription?.platform
+            billingPeriod = subscription?.billingPeriod
             startedAt = subscription?.startedAt
             expiresOrRenewsAt = subscription?.expiresOrRenewsAt
             status = subscription?.status?.statusName
+            platform = subscription?.platform
             freeTrialActive = subscription?.activeOffers?.contains(ActiveOfferType.TRIAL) ?: false
         }
     }
 
     override suspend fun getSubscription(): Subscription? = withContext(dispatcherProvider.io()) {
         val productId = subscriptionsDataStore.productId ?: return@withContext null
-        val platform = subscriptionsDataStore.platform ?: return@withContext null
+        val billingPeriod = subscriptionsDataStore.billingPeriod ?: return@withContext null
         val startedAt = subscriptionsDataStore.startedAt ?: return@withContext null
         val expiresOrRenewsAt = subscriptionsDataStore.expiresOrRenewsAt ?: return@withContext null
         val status = subscriptionsDataStore.status?.toStatus() ?: return@withContext null
+        val platform = subscriptionsDataStore.platform ?: return@withContext null
         val activeOffers = if (subscriptionsDataStore.freeTrialActive) listOf(ActiveOfferType.TRIAL) else listOf()
         Subscription(
             productId = productId,
-            platform = platform,
+            billingPeriod = billingPeriod,
             startedAt = startedAt,
             expiresOrRenewsAt = expiresOrRenewsAt,
             status = status,
+            platform = platform,
             activeOffers = activeOffers,
         )
     }
@@ -249,6 +252,7 @@ data class Account(
 
 data class Subscription(
     val productId: String,
+    val billingPeriod: String,
     val startedAt: Long,
     val expiresOrRenewsAt: Long,
     val status: SubscriptionStatus,

@@ -20,7 +20,7 @@ on:
           - playRelease
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GOOGLE_APPLICATION_CREDENTIALS: '#{ENV["HOME"]}/jenkins_static/com.duckduckgo.mobile.android/ddg-upload-firebase.json'
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
 

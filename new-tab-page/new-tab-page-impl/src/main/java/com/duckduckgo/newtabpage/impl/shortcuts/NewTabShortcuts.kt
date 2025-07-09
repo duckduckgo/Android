@@ -22,6 +22,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NewTabPageShortcutPlugin
 import com.duckduckgo.newtabpage.api.NewTabShortcut
 import com.duckduckgo.newtabpage.impl.R
@@ -76,6 +77,6 @@ class AIChatNewTabShortcutPlugin @Inject constructor(
     featureName = "aIChatNewTabShortcutSetting",
 )
 interface AIChatNewTabShortcutSetting {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }

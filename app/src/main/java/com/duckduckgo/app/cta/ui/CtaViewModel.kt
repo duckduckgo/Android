@@ -21,10 +21,13 @@ import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAuto
+import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetAutoOnboardingExperiment
 import com.duckduckgo.app.cta.ui.HomePanelCta.AddWidgetInstructions
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
@@ -42,6 +45,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -63,7 +67,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 class CtaViewModel @Inject constructor(
@@ -83,6 +87,8 @@ class CtaViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val userBrowserProperties: UserBrowserProperties,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
+    private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -164,7 +170,7 @@ class CtaViewModel @Inject constructor(
 
     private suspend fun completeStageIfDaxOnboardingCompleted() {
         if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            Timber.d("Completing DAX ONBOARDING")
+            logcat { "Completing DAX ONBOARDING" }
             userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
         }
     }
@@ -176,6 +182,9 @@ class CtaViewModel @Inject constructor(
             }
 
             cta.cancelPixel?.let {
+                if (cta is AddWidgetAuto || cta is AddWidgetAutoOnboardingExperiment) {
+                    onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDismiss()
+                }
                 pixel.fire(it, cta.pixelCancelParameters())
             }
             if (viaCloseBtn) {
@@ -192,6 +201,9 @@ class CtaViewModel @Inject constructor(
 
     suspend fun onUserClickCtaOkButton(cta: Cta) {
         cta.okPixel?.let {
+            if (cta is AddWidgetAuto || cta is AddWidgetAutoOnboardingExperiment) {
+                onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetAdd()
+            }
             pixel.fire(it, cta.pixelOkParameters())
         }
         if (cta is BrokenSitePromptDialogCta) {
@@ -203,23 +215,14 @@ class CtaViewModel @Inject constructor(
         dispatcher: CoroutineContext,
         isBrowserShowing: Boolean,
         site: Site? = null,
+        detectedRefreshPatterns: Set<RefreshPattern>,
     ): Cta? {
         return withContext(dispatcher) {
-            markOnboardingAsCompletedIfRequiredCtasShown()
             if (isBrowserShowing) {
-                getBrowserCta(site)
+                getBrowserCta(site, detectedRefreshPatterns)
             } else {
                 getHomeCta()
             }
-        }
-    }
-
-    // Temporary function to complete onboarding if all CTAs were shown
-    private suspend fun markOnboardingAsCompletedIfRequiredCtasShown() {
-        if (daxOnboardingActive() && allOnboardingCtasShown()) {
-            Timber.d("Auto completing DAX ONBOARDING")
-            userStageStore.stageCompleted(AppStage.DAX_ONBOARDING)
-            pixel.fire(AppPixelName.ONBOARDING_AUTO_COMPLETE)
         }
     }
 
@@ -255,6 +258,7 @@ class CtaViewModel @Inject constructor(
 
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
+                senseOfProtectionExperiment.enrolUserInNewExperimentIfEligible()
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
 
@@ -278,7 +282,18 @@ class CtaViewModel @Inject constructor(
 
             // Add Widget
             canShowWidgetCta() -> {
-                if (widgetCapabilities.supportsAutomaticWidgetAdd) AddWidgetAuto else AddWidgetInstructions
+                if (widgetCapabilities.supportsAutomaticWidgetAdd) {
+                    onboardingHomeScreenWidgetExperiment.enroll()
+                    if (onboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()) {
+                        onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDisplay()
+                        AddWidgetAutoOnboardingExperiment
+                    } else {
+                        onboardingHomeScreenWidgetExperiment.fireOnboardingWidgetDisplay()
+                        AddWidgetAuto
+                    }
+                } else {
+                    AddWidgetInstructions
+                }
             }
 
             else -> null
@@ -306,7 +321,7 @@ class CtaViewModel @Inject constructor(
     }
 
     @WorkerThread
-    private suspend fun getBrowserCta(site: Site?): Cta? {
+    private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>): Cta? {
         val nonNullSite = site ?: return null
 
         val host = nonNullSite.domain
@@ -320,7 +335,8 @@ class CtaViewModel @Inject constructor(
             }
 
             if (areInContextDaxDialogsCompleted()) {
-                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url)) {
+                return if (brokenSitePrompt.shouldShowBrokenSitePrompt(nonNullSite.url, detectedRefreshPatterns)
+                ) {
                     BrokenSitePromptDialogCta()
                 } else {
                     null

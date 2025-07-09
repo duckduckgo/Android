@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools"
-          package="com.duckduckgo.app.browser">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.duckduckgo.app.browser">
 
     <application>
+        <activity
+            android:name=".webview.WebViewDevSettingsActivity"
+            android:exported="true"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            android:label="@string/webview_dev_settings_label"
+            />
         <activity
             android:name="com.duckduckgo.app.dev.settings.DevSettingsActivity"
             android:label="@string/devSettingsTitle"

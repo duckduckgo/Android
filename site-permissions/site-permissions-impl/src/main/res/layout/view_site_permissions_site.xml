@@ -20,5 +20,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:leadingIcon="@drawable/ic_globe_gray_16dp"
+    app:leadingIcon="@drawable/ic_globe_16"
     app:leadingIconBackground="circular"/>

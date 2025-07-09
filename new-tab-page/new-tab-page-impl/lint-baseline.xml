@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DuplicateIncludedIds"
@@ -54,6 +54,17 @@
             file="src/main/java/com/duckduckgo/newtabpage/impl/settings/NewTabSettingsStore.kt"
             line="39"
             column="58"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        isEnabled.first()"
+        errorLine2="        ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/newtabpage/impl/shortcuts/NewTabShortcutDataStore.kt"
+            line="62"
+            column="9"/>
     </issue>
 
     <issue

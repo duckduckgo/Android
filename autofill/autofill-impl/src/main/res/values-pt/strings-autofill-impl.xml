@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Podes importar palavras-passe guardadas de outro navegador para o DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importar palavras-passe</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sincronizar palavras-passe com o computador</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Como importar palavras-passe</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Como sincronizar palavras-passe com o computador</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importa palavras-passe na versão para computadores do navegador DuckDuckGo e sincroniza-as entre dispositivos.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obter navegador para computador</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiado</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importar palavras-passe do Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importar palavras-passe do Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar palavras-passe do DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar palavras-passe do DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar palavras-passe com o computador</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar palavras-passe com o computador</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importa as tuas palavras-passe do Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Falha na importação da palavra-passe</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ignorada (duplicada ou inválida): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Palavras-passe importadas: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Abrir palavras-passe</string>
+    <string name="autofill_service_select_password_activity">Selecionar uma palavra-passe guardada</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Palavras-passe e preenchimento automático</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Repor sites excluídos?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Se repuseres os sites excluídos, ser-te-á pedido que guardes a tua palavra-passe da próxima vez que iniciares sessão num destes sites.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Reset</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Cancelar</string>
+    <string name="autofillSettingsPasswordsEntry">Palavras-passe</string>
+    <string name="autofillSettingsAutofillToggleLabel">Pedir para guardar e preencher automaticamente</string>
+    <string name="autofillSettingsAutofillSubtitle">As palavras-passe estão encriptadas. Ninguém além de ti pode vê-las, nem mesmo nós. <annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importar palavras-passe</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importar palavras-passe do Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sincronizar palavras-passe com o computador</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Repor sites excluídos</string>
 
 </resources>

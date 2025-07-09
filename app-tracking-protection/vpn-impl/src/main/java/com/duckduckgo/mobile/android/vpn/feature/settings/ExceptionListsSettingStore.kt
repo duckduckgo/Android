@@ -33,7 +33,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
@@ -50,9 +50,7 @@ class ExceptionListsSettingStore @Inject constructor(
     override fun store(jsonString: String) {
         logcat { "Received configuration: $jsonString" }
         runCatching {
-            jsonAdapter.fromJson(jsonString)?.let { model ->
-
-                val exceptionLists = model.exceptionLists
+            jsonAdapter.fromJson(jsonString)?.exceptionLists?.let { exceptionLists ->
 
                 val appTrackerExceptionRuleList = exceptionLists.appTrackerAllowList.map { appTrackerAllowRule ->
                     AppTrackerExceptionRule(
@@ -73,12 +71,12 @@ class ExceptionListsSettingStore @Inject constructor(
                 }
             }
         }.onFailure {
-            logcat(LogPriority.WARN) { it.asLog() }
+            logcat(WARN) { it.asLog() }
         }
     }
 
     private data class JsonConfigModel(
-        val exceptionLists: JsonExceptionListsModel,
+        val exceptionLists: JsonExceptionListsModel?,
     )
 
     private data class JsonExceptionListsModel(

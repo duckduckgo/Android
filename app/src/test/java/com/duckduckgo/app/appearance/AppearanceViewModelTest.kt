@@ -18,6 +18,7 @@ package com.duckduckgo.app.appearance
 
 import android.annotation.SuppressLint
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
@@ -39,12 +40,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 internal class AppearanceViewModelTest {
     @get:Rule
     @Suppress("unused")
@@ -216,6 +219,34 @@ internal class AppearanceViewModelTest {
         testee.onOmnibarPositionUpdated(TOP)
         verify(mockAppSettingsDataStore).omnibarPosition = TOP
         verify(mockPixel).fire(AppPixelName.SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP)
+    }
+
+    @Test
+    fun whenFullSiteAddressEnabled() = runTest {
+        val enabled = true
+        testee.onFullUrlSettingChanged(enabled)
+        verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun whenFullSiteAddressDisabled() = runTest {
+        val enabled = false
+        testee.onFullUrlSettingChanged(enabled)
+        verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
     }
 
     @Test

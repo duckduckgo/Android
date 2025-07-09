@@ -21,7 +21,8 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 /**
  * Exists purely to pull out the intent extra and launch the query in a new tab.
@@ -46,7 +47,7 @@ class SelectedTextSearchActivity : AppCompatActivity() {
         val webSearchQuery = intent.getStringExtra(SearchManager.QUERY)
         if (webSearchQuery != null) return webSearchQuery
 
-        Timber.w("SelectedTextSearchActivity launched with unexpected intent format")
+        logcat(WARN) { "SelectedTextSearchActivity launched with unexpected intent format" }
         return null
     }
 }

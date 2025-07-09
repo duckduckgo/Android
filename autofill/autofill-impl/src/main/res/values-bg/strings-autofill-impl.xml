@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Можете да импортирате запазени пароли от друг браузър в DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Импортиране на пароли</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Синхронизиране на паролите от работния плот</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Как се импортират пароли</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Как да синхронизирате паролите от работния плот</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Импортирайте пароли в десктоп версията на браузъра DuckDuckGo, след което ги синхронизирайте с различни устройства.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Вземете браузъра за работен плот</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Връзката е копирана</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Импортиране на пароли от Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Импортиране на пароли от Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизиране на паролите от DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизиране на паролите от DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизиране на паролите от работния плот</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизиране на паролите от работния плот</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Импортиране на вашите пароли от Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Импортирането на паролата е неуспешно</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Пропуснати (дублирани или невалидни): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Импортирани пароли: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Отваряне на паролите</string>
+    <string name="autofill_service_select_password_activity">Изберете запазена парола</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Пароли и автоматично попълване</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Нулиране на изключените сайтове?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Ако нулирате изключените сайтове, при следващото влизане в някой от тези сайтове ще бъдете подканени да запазите паролата за вход.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Нулиране</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Отмени</string>
+    <string name="autofillSettingsPasswordsEntry">Пароли</string>
+    <string name="autofillSettingsAutofillToggleLabel">Запитване за запазване и автоматично попълване</string>
+    <string name="autofillSettingsAutofillSubtitle">Паролите са криптирани. Никой освен Вас не може да ги види, дори ние. <annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Импортиране на пароли</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Импортиране на пароли от Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Синхронизиране на паролите от работния плот</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Нулиране на изключените сайтове</string>
 
 </resources>

@@ -60,14 +60,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/closeContentDescription"
-            android:layout_marginEnd="@dimen/keyline_2"
+            android:padding="@dimen/keyline_2"
             android:src="@drawable/ic_close_solid_16"
             android:background="@drawable/selectable_circular_ripple"
             app:tint="?attr/daxColorTabHighlight"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <ImageView
             android:id="@+id/selectionIndicator"
@@ -76,7 +75,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
-            android:src="@drawable/shape_grey_circle_24"
+            android:src="@drawable/ic_shape_circle_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

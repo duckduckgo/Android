@@ -13,55 +13,85 @@ inputs:
   username:
     description: 'The Github username to search for'
     required: true
+outputs:
+  task_id:
+    description: 'The Asana task ID that was found and assigned'
 runs:
   using: 'composite'
   steps:
-    - name: Find task in Asana and assign it to owner
+    - name: Find task, assign it, and write ID to file
       shell: bash
+      env: # Make inputs available as environment variables for easier access in the script
+        INPUT_TASK_NAME: ${{ inputs.task_name }}
+        INPUT_ASANA_TOKEN: ${{ inputs.asana_token }}
+        INPUT_PROJECT_GID: ${{ inputs.project_gid }}
+        INPUT_USERNAME: ${{ inputs.username }}
+        OUTPUT_FILE_PATH: "${{ github.workspace }}/asana_task_id.txt" # Define the output file path
       run: |
-        task_name="${{ inputs.task_name }}"
-        asana_token="${{ inputs.asana_token }}"
-        project_gid="${{ inputs.project_gid }}"
-        username="${{ inputs.username }}"
+        set -e # Exit immediately if a command exits with a non-zero status.
+        echo "Searching for task: '$INPUT_TASK_NAME' in project GID: '$INPUT_PROJECT_GID'"
+        
+        asana_api_response=$(curl -s -X GET "https://app.asana.com/api/1.0/projects/${INPUT_PROJECT_GID}/tasks" \
+          -H "Authorization: Bearer ${INPUT_ASANA_TOKEN}")
+        
+        # Using jq to extract the task_id - ensure it's robust
+        # This will get the first matching task ID if multiple tasks have the same name.
+        # Add error handling if multiple tasks with the same name is an issue.
+        found_task_id=$(echo "$asana_api_response" | jq -r --arg TASK_NAME "$INPUT_TASK_NAME" '.data[] | select(.name == $TASK_NAME) | .gid | select(.)' | head -n 1)
 
-        # Make the API request to get tasks from the specified project
-        response=$(curl -s -X GET "https://app.asana.com/api/1.0/projects/${project_gid}/tasks" \
-          -H "Authorization: Bearer ${asana_token}")
-
-        # Check if the response contains any tasks that match the specified task name exactly
-        task_id=$(echo "$response" | jq -r '.data[] | select(.name == "'"$task_name"'") | .gid')
-
-        if [ -z "$task_id" ]; then
-          echo "No tasks with the exact name '$task_name' found in project GID '$project_gid'."
+        if [ -z "$found_task_id" ]; then
+          echo "::error::No task with the exact name '$INPUT_TASK_NAME' found in project GID '$INPUT_PROJECT_GID'."
+          # Write an empty string or a specific marker to the file if task not found
+          echo "TASK_NOT_FOUND" > "$OUTPUT_FILE_PATH" 
           exit 1
         else
-          echo "Task ID for the task named '$task_name': $task_id"        
+          echo "Found Task ID: '$found_task_id'"
+          # Write the found task ID to the specified file
+          echo "$found_task_id" > "$OUTPUT_FILE_PATH"
+          echo "Task ID successfully written to $OUTPUT_FILE_PATH"
+        fi
+
+        # --- Get Asana User ID ---
+        # Assuming github_asana_mapping.yml is at .github/actions/assign-release-task/github_asana_mapping.yml
+        # relative to the REPO ROOT, not the action directory itself during runtime.
+        # For composite actions, paths in scripts are relative to github.workspace.
+        # If the mapping file is part of the action's folder, the path might need to be:
+        # ${{ github.action_path }}/github_asana_mapping.yml
+        # However, it's often better if such mapping files are at a known repo location.
+        # Let's assume it's checked into the root for simplicity here, or adjust as needed.
+        MAPPING_FILE="${{ github.workspace }}/.github/actions/assign-release-task/github_asana_mapping.yml" # Or adjust path
+        
+        echo "Looking up Asana User ID for GitHub user: '$INPUT_USERNAME' in file: '$MAPPING_FILE'"
+        if [ ! -f "$MAPPING_FILE" ]; then
+            echo "::error::Mapping file not found at $MAPPING_FILE"
+            echo "USER_MAPPING_FILE_NOT_FOUND" > "$OUTPUT_FILE_PATH" # Overwrite with error state
+            exit 1
         fi
       
-        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
-
-        if [ -z "asana_user_id" ]; then
-          echo "User $username not found."
-          exit 1
-        else
-          echo "User ID for $username: $asana_user_id"            
-        fi
-        
-        echo "Assigning task ID $task_id to user ID $asana_user_id"
-
-        # Assign the task to the user
-        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
-          -H "Authorization: Bearer ${asana_token}" \
-          -H "Content-Type: application/json" \
-          -d "{\"data\": {\"assignee\": \"${asana_user_id}\"}}")            
-
-        # Check if the assignment was successful
-        status=$(echo $response | jq -r '.errors')
-
-        if [ "$status" == "null" ]; then
-          echo "Task $task_id successfully assigned to user $asana_user_id."                
-        else
-          echo "Failed to assign task: $status"
-          exit 1
-        fi
-        
+#        asana_user_id=$(grep -E "^$username: " .github/actions/assign-release-task/github_asana_mapping.yml | awk -F': ' '{print $2}' | tr -d '"')
+#
+#        if [ -z "asana_user_id" ]; then
+#          echo "User $username not found."
+#          exit 1
+#        else
+#          echo "User ID for $username: $asana_user_id"
+#        fi
+#
+#        echo "Assigning task ID $task_id to user ID $asana_user_id"
+#
+#        # Assign the task to the user
+#        response=$(curl -s -X PUT "https://app.asana.com/api/1.0/tasks/${task_id}" \
+#          -H "Authorization: Bearer ${asana_token}" \
+#          -H "Content-Type: application/json" \
+#          -d "{\"data\": {\"assignee\": \"${asana_user_id}\"}}")
+#
+#        # Check if the assignment was successful
+#        status=$(echo $response | jq -r '.errors')
+#
+#        if [ "$status" == "null" ]; then
+#          echo "Task $task_id successfully assigned to user $asana_user_id."
+#        else
+#          echo "Failed to assign task: $status"
+#          exit 1
+#        fi
+#

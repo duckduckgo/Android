@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Získaj odpovede na často kladené otázky alebo kontaktuj podporu programu Privacy Pro na našich stránkach pomoci. Dostupnosť funkcií sa líši podľa krajiny.</string>
     <string name="subscriptionStatusSubscribed">Prihlásený/-á</string>
     <string name="privacyPolicyAndTermsOfService">Zásady ochrany osobných údajov a podmienky služby</string>
+    <string name="subscriptionStatusFreeTrial">Bezplatná skúšobná verzia je aktívna</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja bezplatná skúšobná verzia končí dňa %1$s a v ten deň sa automaticky zmení na mesačné platené predplatné.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja bezplatná skúšobná verzia končí dňa %1$s a v ten deň sa automaticky zmení na ročné platené predplatné.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Tvoja bezplatná skúšobná verzia končí %1$s a nebude sa automaticky meniť na platené predplatné.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavenia predplatného</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Zahŕňa naše služby VPN, Personal Information Removal a Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Zahŕňa našu VPN a Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Získaj Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Vyskúšaj Privacy Pro zadarmo</string>
     <string name="subscriptionSettingRestore">Mám predplatné</string>
     <string name="subscriptionSettingExpired">Vaše predplatné Privacy Pro vypršalo</string>
     <string name="subscriptionSettingExpiredViewPlans">Zobraziť plány</string>

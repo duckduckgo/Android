@@ -32,7 +32,7 @@
             android:layout_height="@dimen/listItemImageMediumSize"
             android:layout_gravity="center"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_ai_chat_24"
+            android:src="@drawable/ic_ai_chat_color_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -43,29 +43,15 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
             android:breakStrategy="balanced"
-            android:text="@string/duckChatTitle"
+            android:text="@string/duck_chat_title"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/newPill"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toEndOf="@id/leadingIcon"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_default="wrap"
             app:typography="body1" />
-
-        <ImageView
-            android:id="@+id/newPill"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_2"
-            android:layout_marginEnd="@dimen/keyline_1"
-            android:src="@drawable/ic_new_pill"
-            android:importantForAccessibility="no"
-            app:layout_constraintBottom_toBottomOf="@id/primaryText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@id/primaryText"
-            app:layout_constraintTop_toTopOf="@id/primaryText"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

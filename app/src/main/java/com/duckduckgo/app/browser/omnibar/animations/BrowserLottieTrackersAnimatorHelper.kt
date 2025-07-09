@@ -41,7 +41,6 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.ImageLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.LetterLogo
 import com.duckduckgo.app.browser.omnibar.animations.TrackerLogo.StackedLogo
-import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -49,7 +48,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.MainScope
@@ -60,7 +58,6 @@ import kotlinx.coroutines.launch
 class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     private val theme: AppTheme,
     private val trackerCountAnimator: TrackerCountAnimator,
-    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : BrowserTrackersAnimatorHelper {
 
     private var listener: TrackersAnimatorListener? = null
@@ -90,6 +87,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
+        visualDesignExperimentEnabled: Boolean,
     ) {
         if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
         if (trackersAnimationView.isAnimating) return
@@ -108,7 +106,12 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             return
         }
 
-        val animationRawRes = getAnimationRawRes(logos, theme)
+        val animationRawRes = if (visualDesignExperimentEnabled) {
+            getVisualDesignAnimationRawRes(logos, theme)
+        } else {
+            getAnimationRawRes(logos, theme)
+        }
+
         with(trackersAnimationView) {
             this.setCacheComposition(false) // ensure assets are not cached
             this.setAnimation(animationRawRes)
@@ -152,8 +155,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         this.shieldAnimation = shieldAnimationView
 
         tryToStartCookiesAnimation(context, omnibarViews)
-
-        privacyDashboardExternalPixelParams.setPixelParams(PixelParameter.NO_ANIMATION, "true")
     }
 
     override fun startExperimentVariant2OrVariant3Animation(
@@ -458,6 +459,20 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2 else R.raw.dark_trackers_2
             trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
             else -> TODO()
+        }
+    }
+
+    private fun getVisualDesignAnimationRawRes(
+        logos: List<TrackerLogo>,
+        theme: AppTheme,
+    ): Int {
+        val trackers = logos.size
+        return when {
+            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
+            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1_visual_updates else R.raw.dark_trackers_1_visual_updates
+            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2_visual_updates else R.raw.dark_trackers_2_visual_updates
+            // we shouldn't be here but we also don't want to crash so we'll show the default
+            else -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
         }
     }
 

@@ -33,7 +33,7 @@
         android:background="@drawable/omnibar_field_background"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
+        app:layout_constraintEnd_toStartOf="@id/aiChatIconMenuMockup"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -45,7 +45,8 @@
             android:importantForAccessibility="no"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_find_search_20_a05" />
+            android:layout_marginStart="2dp"
+            android:src="@drawable/ic_find_search_small_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/omnibarTextInputMockup"
@@ -53,12 +54,32 @@
             android:layout_height="match_parent"
             android:gravity="start|center"
             android:maxLines="1"
-            android:paddingStart="5dp"
             android:paddingEnd="8dp"
-            android:text="@string/omnibarInputHint"
+            android:text="@string/search"
             android:textColor="?attr/daxColorSecondaryText" />
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/aiChatIconMenuMockup"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="6dp"
+        android:padding="@dimen/keyline_2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/fireIconMenuMockup"
+        app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/aiChatIconImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:contentDescription="Duck.ai"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_ai_chat_24" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/fireIconMenuMockup"
@@ -68,7 +89,7 @@
         android:layout_marginEnd="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/tabsMenuMockup"
-        app:layout_constraintStart_toEndOf="@id/omniBarContainerMockup"
+        app:layout_constraintStart_toEndOf="@id/aiChatIconMenuMockup"
         app:layout_constraintTop_toTopOf="parent"
         tools:visibility="visible">
 
@@ -79,7 +100,7 @@
             android:layout_gravity="center"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/browserPopupMenu"
-            android:src="@drawable/ic_fire" />
+            android:src="@drawable/ic_fire_24" />
     </FrameLayout>
 
     <com.duckduckgo.app.browser.tabswitcher.ProductionTabSwitcherButton

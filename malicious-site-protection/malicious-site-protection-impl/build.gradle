@@ -35,6 +35,10 @@ dependencies {
     implementation project(":app-build-config-api")
     implementation project(":malicious-site-protection-api")
     implementation project(':browser-api')
+    implementation project(':common-ui')
+    implementation project(':common-utils')
+    implementation project(':navigation-api')
+    implementation project(':settings-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -51,7 +55,6 @@ dependencies {
     implementation project(path: ':common-utils')
 
     implementation "com.squareup.logcat:logcat:_"
-    implementation JakeWharton.timber
 
     implementation Google.android.material
 
@@ -88,6 +91,7 @@ android {
     }
     lint {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

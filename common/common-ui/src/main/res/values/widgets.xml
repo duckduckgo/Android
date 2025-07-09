@@ -213,6 +213,7 @@
         <item name="android:textColor">?attr/daxColorFabPrimaryText</item>
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay</item>
         <item name="android:height">@dimen/fabHeight</item>
+        <item name="rippleColor">@color/fab_primary_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.ExtendedFloatingActionButton.Overlay">
@@ -226,11 +227,16 @@
         <item name="shapeAppearanceOverlay">@style/Widget.DuckDuckGo.FloatingActionButton.Overlay</item>
         <item name="fabSize">mini</item>
         <item name="elevation">9dp</item>
+        <item name="rippleColor">@color/fab_secondary_ripple_selector</item>
     </style>
 
     <style name="Widget.DuckDuckGo.FloatingActionButton.Overlay">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/keyline_3</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.FloatingActionButton.Circular" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.FloatingActionButton</item>
     </style>
 
     <!-- List Items -->
@@ -388,6 +394,9 @@
     <!-- The color of the cursor comes from the theme, not the widget itself -->
     <style name="Widget.DuckDuckGo.TextInputCursor">
         <item name="android:colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="colorControlActivated">?attr/daxColorAccentBlue</item>
+        <item name="android:colorPrimary">?attr/daxColorAccentBlue</item>
+        <item name="colorPrimary">?attr/daxColorAccentBlue</item>
     </style>
 
     <style name="Widget.DuckDuckGo.RoundedDialog" parent="@style/ThemeOverlay.MaterialComponents.MaterialAlertDialog">
@@ -632,6 +641,55 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">@dimen/checkListItemHeight</item>
+    </style>
+
+    <style name="Typography.DuckDuckGo.BuckButton">
+        <item name="fontFamily">@font/pangea_bold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="lineHeight">11sp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BuckButton.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="cornerRadius">30dp</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.BuckButton</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="rippleColor">@color/buckColorButtonPrimaryContainerPressed</item>
+        <item name="android:stateListAnimator">@animator/buck_button_animator_set</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BuckButton.TextButton.Primary">
+        <item name="android:textColor">@color/buckColorButtonPrimaryText</item>
+        <item name="backgroundTint">@color/buckColorButtonPrimaryContainer</item>
+        <item name="iconTint">@color/buckColorButtonPrimaryText</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.BuckButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="cornerRadius">30dp</item>
+        <item name="android:textAppearance">@style/Typography.DuckDuckGo.BuckButton</item>
+        <item name="android:textColor">@color/buckColorButtonSecondaryText</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:paddingTop">0dp</item>
+        <item name="android:paddingBottom">0dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="iconGravity">end</item>
+        <item name="iconSize">24dp</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="rippleColor">@color/buckColorButtonSecondaryContainerPressed</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:stateListAnimator">@animator/buck_button_animator_set</item>
+        <item name="strokeColor">@color/buckColorButtonSecondaryBorder</item>
+        <item name="iconTint">@color/buckColorButtonSecondaryText</item>
+        <item name="iconPadding">@dimen/keyline_2</item>
     </style>
 
 </resources>

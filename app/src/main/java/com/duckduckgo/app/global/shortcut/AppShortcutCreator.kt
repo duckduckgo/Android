@@ -35,6 +35,7 @@ import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.ui.themepreview.ui.AppComponentsActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity
 import com.squareup.anvil.annotations.ContributesTo
@@ -44,8 +45,12 @@ import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @Module
 @ContributesTo(AppScope::class)
@@ -64,8 +69,8 @@ class AppShortcutCreatorLifecycleObserver(
 ) : MainProcessLifecycleObserver {
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.i("Configure app shortcuts")
-        appShortcutCreator.configureAppShortcuts()
+        logcat(INFO) { "Configure app shortcuts" }
+        appShortcutCreator.refreshAppShortcuts()
     }
 }
 
@@ -75,10 +80,18 @@ class AppShortcutCreator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
     private val dispatchers: DispatcherProvider,
 ) {
 
-    fun configureAppShortcuts() {
+    init {
+        duckAiFeatureState.showPopupMenuShortcut
+            .onEach { refreshAppShortcuts() }
+            .flowOn(dispatchers.io())
+            .launchIn(appCoroutineScope)
+    }
+
+    fun refreshAppShortcuts() {
         appCoroutineScope.launch(dispatchers.io()) {
             val shortcutList = mutableListOf<ShortcutInfo>()
 
@@ -86,11 +99,9 @@ class AppShortcutCreator @Inject constructor(
             shortcutList.add(buildClearDataShortcut(context))
             shortcutList.add(buildBookmarksShortcut(context))
 
-            if (duckChat.isEnabled()) {
+            if (duckAiFeatureState.showPopupMenuShortcut.value) {
                 shortcutList.add(buildDuckChatShortcut(context))
-            }
-
-            if (appBuildConfig.isInternalBuild()) {
+            } else if (appBuildConfig.isInternalBuild()) {
                 shortcutList.add(buildAndroidDesignSystemShortcut(context))
             }
 
@@ -164,7 +175,7 @@ class AppShortcutCreator @Inject constructor(
 
         return ShortcutInfoCompat.Builder(context, SHORTCUT_ID_DUCK_AI)
             .setShortLabel(context.getString(com.duckduckgo.duckchat.impl.R.string.duck_chat_title))
-            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcuts_duck_ai))
+            .setIcon(IconCompat.createWithResource(context, R.drawable.ic_app_shortcut_duck_ai))
             .setIntents(stackBuilder.intents)
             .build().toShortcutInfo()
     }

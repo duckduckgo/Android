@@ -203,7 +203,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Poți importa parolele salvate dintr-un alt browser în DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importă parolele</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sincronizează parolele de pe desktop</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Cum să imporți parolele</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Cum se sincronizează parolele de pe desktop</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importă parolele în versiunea desktop a browserului DuckDuckGo, apoi sincronizează-le între dispozitive.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Obține browserul pentru desktop</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiat</string>
@@ -251,8 +253,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importă parole de la Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importă parole de la Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizează parolele DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizează parolele DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizează parolele de pe desktop</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizează parolele de pe desktop</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importă parolele tale Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
@@ -266,5 +268,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Importarea parolelor nu a reușit</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Omise (duplicate sau nevalide): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Parole importate: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Deschide parolele</string>
+    <string name="autofill_service_select_password_activity">Selectează o parolă salvată</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Parole și completare automată</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Resetezi site-urile excluse?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Dacă resetezi site-urile excluse, ți se va solicita să îți salvezi parola data viitoare când te conectezi la oricare dintre aceste site-uri.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Resetează</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Anulare</string>
+    <string name="autofillSettingsPasswordsEntry">Parole</string>
+    <string name="autofillSettingsAutofillToggleLabel">Solicită salvarea și completarea automată</string>
+    <string name="autofillSettingsAutofillSubtitle">Parolele sunt criptate. Nimeni în afară de tine nu le poate vedea, nici măcar noi. <annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importă parolele</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importă parole de la Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sincronizează parolele de pe desktop</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Resetează site-urile excluse</string>
 
 </resources>

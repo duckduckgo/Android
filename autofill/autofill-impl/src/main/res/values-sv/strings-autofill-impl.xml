@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Du kan importera sparade lösenord från andra webbläsare till DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importera lösenord</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Synkronisera lösenord för dator</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Så här importerar du lösenord</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Så här synkroniserar du lösenord för dator</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importera lösenord i versionen av DuckDuckGo-webbläsaren för dator och synkronisera sedan mellan enheter.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Hämta webbläsare för dator</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Länken har kopierats</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importera lösenord från Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importera lösenord från Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronisera DuckDuckGo-lösenord</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronisera DuckDuckGo-lösenord</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronisera lösenord för dator</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronisera lösenord för dator</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importera dina Google-lösenord</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Lösenordsimporten misslyckades</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Hoppade över (dubblett eller ogiltig): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Importerade lösenord: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Öppna lösenord</string>
+    <string name="autofill_service_select_password_activity">Välj ett sparat lösenord</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Lösenord och automatisk ifyllning</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Återställ exkluderade webbplatser?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Om du återställer exkluderade webbplatser kommer du att uppmanas att spara ditt lösenord nästa gång du loggar in på någon av dessa webbplatser.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Återställ</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Avbryt</string>
+    <string name="autofillSettingsPasswordsEntry">Lösenord</string>
+    <string name="autofillSettingsAutofillToggleLabel">Fråga om att spara och fylla i automatiskt</string>
+    <string name="autofillSettingsAutofillSubtitle">Lösenorden är krypterade. Ingen annan än du kan se dem, inte ens vi. <annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importera lösenord</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importera lösenord från Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Synkronisera lösenord för dator</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Återställ exkluderade webbplatser</string>
 
 </resources>

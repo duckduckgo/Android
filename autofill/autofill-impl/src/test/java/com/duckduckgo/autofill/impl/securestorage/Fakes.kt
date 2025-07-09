@@ -19,17 +19,28 @@ package com.duckduckgo.securestorage
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageKeyGenerator
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
-import com.duckduckgo.securestorage.store.SecureStorageKeyRepository
+import com.duckduckgo.autofill.store.SecureStorageKeyRepository
 import java.security.Key
 import okio.ByteString.Companion.decodeBase64
 
-class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) : SecureStorageKeyRepository {
-    override var password: ByteArray? = null
-    override var l1Key: ByteArray? = null
-    override var passwordSalt: ByteArray? = null
-    override var encryptedL2Key: ByteArray? = null
-    override var encryptedL2KeyIV: ByteArray? = null
-    override fun canUseEncryption(): Boolean = canUseEncryption
+class FakeSecureStorageKeyRepository(private val canUseEncryption: Boolean) :
+    SecureStorageKeyRepository {
+    private var _password: ByteArray? = null
+    override suspend fun getPassword(): ByteArray? = _password
+    override suspend fun setPassword(value: ByteArray?) { _password = value }
+    private var _l1Key: ByteArray? = null
+    override suspend fun getL1Key(): ByteArray? = _l1Key
+    override suspend fun setL1Key(value: ByteArray?) { _l1Key = value }
+    private var _passwordSalt: ByteArray? = null
+    override suspend fun getPasswordSalt(): ByteArray? = _passwordSalt
+    override suspend fun setPasswordSalt(value: ByteArray?) { _passwordSalt = value }
+    private var _encryptedL2Key: ByteArray? = null
+    override suspend fun getEncryptedL2Key(): ByteArray? = _encryptedL2Key
+    override suspend fun setEncryptedL2Key(value: ByteArray?) { _encryptedL2Key = value }
+    private var _encryptedL2KeyIV: ByteArray? = null
+    override suspend fun getEncryptedL2KeyIV(): ByteArray? = _encryptedL2KeyIV
+    override suspend fun setEncryptedL2KeyIV(value: ByteArray?) { _encryptedL2KeyIV = value }
+    override suspend fun canUseEncryption(): Boolean = canUseEncryption
 }
 
 class FakeEncryptionHelper constructor(
@@ -37,7 +48,7 @@ class FakeEncryptionHelper constructor(
     private val expectedEncryptedIv: String,
     private val expectedDecryptedData: String,
 ) : EncryptionHelper {
-    override fun encrypt(
+    override suspend fun encrypt(
         raw: ByteArray,
         key: Key,
     ): EncryptedBytes = EncryptedBytes(
@@ -45,7 +56,7 @@ class FakeEncryptionHelper constructor(
         expectedEncryptedIv.decodeBase64()!!.toByteArray(),
     )
 
-    override fun decrypt(
+    override suspend fun decrypt(
         toDecrypt: EncryptedBytes,
         key: Key,
     ): ByteArray = expectedDecryptedData.decodeBase64()!!.toByteArray()

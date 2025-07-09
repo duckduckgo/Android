@@ -48,7 +48,7 @@
       android:layout_gravity="center_vertical"
       android:background="?attr/selectableItemBackgroundBorderless"
       app:tint="@color/material_on_background_emphasis_medium"
-      app:srcCompat="@drawable/ic_open_in_new_24dp"
+      app:srcCompat="@drawable/ic_open_in_24"
       tools:ignore="ContentDescription" />
 
 </merge>

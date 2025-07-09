@@ -33,8 +33,6 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
-import com.duckduckgo.app.browser.refreshpixels.RefreshDao
-import com.duckduckgo.app.browser.refreshpixels.RefreshEntity
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
@@ -75,7 +73,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 57,
+    version = 58,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -108,7 +106,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
-        RefreshEntity::class,
         ExperimentAppUsageEntity::class,
     ],
 )
@@ -162,8 +159,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
-
-    abstract fun refreshDao(): RefreshDao
 
     abstract fun experimentAppUsageDao(): ExperimentAppUsageDao
 }
@@ -693,6 +688,12 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_57_TO_58: Migration = object : Migration(57, 58) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DROP TABLE IF EXISTS `refreshes`")
+        }
+    }
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -775,6 +776,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_54_TO_55,
             MIGRATION_55_TO_56,
             MIGRATION_56_TO_57,
+            MIGRATION_57_TO_58,
         )
 
     @Deprecated(

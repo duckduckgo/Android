@@ -22,7 +22,6 @@ import android.content.pm.PackageManager
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.*
@@ -45,12 +44,8 @@ import com.duckduckgo.app.browser.httperrors.HttpCodeSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandler
 import com.duckduckgo.app.browser.httperrors.StringSiteErrorHandlerImpl
 import com.duckduckgo.app.browser.logindetection.*
-import com.duckduckgo.app.browser.mediaplayback.store.ALL_MIGRATIONS
-import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
-import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
-import com.duckduckgo.app.browser.refreshpixels.RefreshDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -62,6 +57,7 @@ import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.fire.*
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
@@ -69,6 +65,7 @@ import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -209,6 +206,10 @@ class BrowserModule {
         requestFilterer: RequestFilterer,
         duckPlayer: DuckPlayer,
         maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+        dispatchers: DispatcherProvider,
+        @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        @IsMainProcess isMainProcess: Boolean,
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -222,6 +223,10 @@ class BrowserModule {
             requestFilterer,
             duckPlayer,
             maliciousSiteBlockerWebViewIntegration,
+            dispatchers,
+            androidBrowserConfigFeature,
+            appCoroutineScope,
+            isMainProcess,
         )
 
     @Provides
@@ -257,8 +262,9 @@ class BrowserModule {
         context: Context,
         fileDeleter: FileDeleter,
         dispatcherProvider: DispatcherProvider,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): FaviconPersister {
-        return FileBasedFaviconPersister(context, fileDeleter, dispatcherProvider)
+        return FileBasedFaviconPersister(context, fileDeleter, androidBrowserConfigFeature, dispatcherProvider)
     }
 
     @Provides
@@ -339,22 +345,6 @@ class BrowserModule {
         return appDatabase.pagePaintedPixelDao()
     }
 
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideMediaPlaybackDatabase(context: Context): MediaPlaybackDatabase {
-        return Room.databaseBuilder(context, MediaPlaybackDatabase::class.java, "media_playback.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesMediaPlaybackDao(mediaPlaybackDatabase: MediaPlaybackDatabase): MediaPlaybackDao {
-        return mediaPlaybackDatabase.mediaPlaybackDao()
-    }
-
     private val Context.indonesiaNewTabSectionDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "indonesia_new_tab_section_store",
     )
@@ -364,12 +354,6 @@ class BrowserModule {
     @IndonesiaNewTabSection
     fun provideIndonesiaNewTabSectionDataStore(context: Context): DataStore<Preferences> {
         return context.indonesiaNewTabSectionDataStore
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideRefreshDao(appDatabase: AppDatabase): RefreshDao {
-        return appDatabase.refreshDao()
     }
 
     @Provides

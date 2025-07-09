@@ -210,7 +210,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
     private fun ActivityNetpManagementBinding.renderLocationState(locationState: LocationState?) {
         if (locationState == null || locationState.location.isNullOrEmpty()) {
             locationDetails.locationItem.setDetails(getString(R.string.netpManagementLocationPlaceholder))
-            locationDetails.locationItem.setLeadingIcon(R.drawable.ic_location)
+            locationDetails.locationItem.setLeadingIcon(com.duckduckgo.mobile.android.R.drawable.ic_location_24)
             locationDetails.locationItem.status.gone()
         } else {
             locationDetails.locationItem.apply {
@@ -244,6 +244,7 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         netpStatusDescription.setText(R.string.netpManagementDescriptionOn)
         netpToggle.indicator.setImageDrawable(AppCompatResources.getDrawable(applicationContext, R.drawable.indicator_vpn_connected))
         netpToggle.quietlySetChecked(true)
+        netpToggle.jumpDrawablesToCurrentState()
         netpToggle.isEnabled = true
 
         locationDetails.locationHeader.setText(R.string.netpManagementLocationHeaderVpnOn)

@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Ottieni risposte alle domande frequenti o contatta l\'assistenza di Privacy Pro dalle nostre pagine di assistenza. La disponibilità delle funzioni varia in base al paese.</string>
     <string name="subscriptionStatusSubscribed">Iscritto</string>
     <string name="privacyPolicyAndTermsOfService">Privacy policy e Termini del servizio</string>
+    <string name="subscriptionStatusFreeTrial">Prova gratuita attiva</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">La prova gratuita termina il %1$s e lo stesso giorno si converte automaticamente in un abbonamento mensile a pagamento.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">La prova gratuita termina il %1$s e lo stesso giorno si converte automaticamente in un abbonamento annuale a pagamento.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">La prova gratuita termina il %1$s e non si convertirà in un abbonamento a pagamento.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Impostazioni dell\'abbonamento</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Includi VPN, Personal Information Removal e Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Include i nostri servizi di VPN e Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Ottieni Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Prova Privacy Pro gratis</string>
     <string name="subscriptionSettingRestore">Ho un abbonamento</string>
     <string name="subscriptionSettingExpired">Il tuo abbonamento Privacy Pro è scaduto</string>
     <string name="subscriptionSettingExpiredViewPlans">Visualizza i piani</string>

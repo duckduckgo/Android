@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya Privacy Pro destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
     <string name="subscriptionStatusSubscribed">Abone olundu</string>
     <string name="privacyPolicyAndTermsOfService">Gizlilik Politikası ve Hizmet Koşulları</string>
+    <string name="subscriptionStatusFreeTrial">Ücretsiz Deneme Süresi Aktif</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz denemeniz %1$s tarihinde sona erecek ve aynı gün otomatik olarak aylık ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz denemeniz %1$s tarihinde sona erecek ve aynı gün otomatik olarak yıllık ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz deneme sürümünüz %1$s tarihinde sona erecek ve ücretli aboneliğe dönüşmeyecektir.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonelik Ayarları</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">VPN, Personal Information Removal ve Identity Theft Restoration\'ı içerir.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">VPN ve Identity Theft Restoration hizmetlerimizi içerir.</string>
     <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
+    <string name="subscriptionSettingTryFreeTrial">Privacy Pro\'yu Ücretsiz Deneyin</string>
     <string name="subscriptionSettingRestore">Aboneliğim Var</string>
     <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
     <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>

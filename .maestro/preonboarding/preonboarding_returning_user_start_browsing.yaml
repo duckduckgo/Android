@@ -1,0 +1,25 @@
+appId: com.duckduckgo.mobile.android
+name: "Preonboarding: Ensuring user can skip onboarding and start browsing"
+tags:
+  - preonboardingTest
+---
+# Pre-requisite: None
+
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+- assertVisible:
+    text: ".*Ready for a faster browser that keeps you protected?.*"
+- assertVisible: "let's do it!"
+- tapOn: "I've been here before"
+- assertVisible:
+    text: "Got it! I'll skip the other tips."
+- assertVisible:
+    text: ".*Remember: you can delete all your tabs, history, and browsing data in two taps with the Fire Button..*"
+- assertVisible:
+    text: "Show Tutorial"
+- tapOn: "Start Browsing"
+- assertVisible:
+    id: "omnibarTextInput"

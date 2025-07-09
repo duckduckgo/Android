@@ -32,6 +32,7 @@ android {
     }
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
 }
 
@@ -61,6 +62,7 @@ dependencies {
 
     // Testing dependencies
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(':feature-toggles-test')
     implementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing

@@ -18,12 +18,17 @@ package com.duckduckgo.app.launch
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import com.duckduckgo.app.global.install.AppInstallStore
+import com.duckduckgo.app.launch.LaunchViewModel.Command.DaxPromptBrowserComparison
+import com.duckduckgo.app.launch.LaunchViewModel.Command.DaxPromptDuckPlayer
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Home
 import com.duckduckgo.app.launch.LaunchViewModel.Command.Onboarding
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.referral.StubAppReferrerFoundStateListener
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.daxprompts.api.DaxPrompts
+import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Rule
@@ -44,6 +49,8 @@ class LaunchViewModelTest {
 
     private val userStageStore = mock<UserStageStore>()
     private val mockCommandObserver: Observer<LaunchViewModel.Command> = mock()
+    private val mockDaxPrompts: DaxPrompts = mock()
+    private val mockAppInstallStore: AppInstallStore = mock()
 
     private lateinit var testee: LaunchViewModel
 
@@ -57,7 +64,10 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
+            mockDaxPrompts,
+            mockAppInstallStore,
         )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
@@ -71,7 +81,10 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
+            mockDaxPrompts,
+            mockAppInstallStore,
         )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
@@ -85,7 +98,10 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockDaxPrompts,
+            mockAppInstallStore,
         )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.NEW)
         testee.command.observeForever(mockCommandObserver)
 
@@ -99,7 +115,10 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx"),
+            mockDaxPrompts,
+            mockAppInstallStore,
         )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
@@ -111,7 +130,10 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = 1_000),
+            mockDaxPrompts,
+            mockAppInstallStore,
         )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
@@ -123,10 +145,43 @@ class LaunchViewModelTest {
         testee = LaunchViewModel(
             userStageStore,
             StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockDaxPrompts,
+            mockAppInstallStore,
         )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.NONE)
         whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         testee.command.observeForever(mockCommandObserver)
         testee.determineViewToShow()
         verify(mockCommandObserver).onChanged(any<Home>())
+    }
+
+    @Test
+    fun whenEvaluateReturnsDuckPlayerVariantThenCommandIsDaxPromptDuckPlayer() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockDaxPrompts,
+            mockAppInstallStore,
+        )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_VARIANT_DUCKPLAYER)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        testee.command.observeForever(mockCommandObserver)
+        testee.determineViewToShow()
+        verify(mockCommandObserver).onChanged(any<DaxPromptDuckPlayer>())
+    }
+
+    @Test
+    fun whenEvaluateReturnsBrowserComparisonVariantThenCommandIsDaxPromptBrowserComparison() = runTest {
+        testee = LaunchViewModel(
+            userStageStore,
+            StubAppReferrerFoundStateListener("xx", mockDelayMs = Long.MAX_VALUE),
+            mockDaxPrompts,
+            mockAppInstallStore,
+        )
+        whenever(mockDaxPrompts.evaluate()).thenReturn(ActionType.SHOW_VARIANT_BROWSER_COMPARISON)
+        whenever(userStageStore.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        testee.command.observeForever(mockCommandObserver)
+        testee.determineViewToShow()
+        verify(mockCommandObserver).onChanged(any<DaxPromptBrowserComparison>())
     }
 }

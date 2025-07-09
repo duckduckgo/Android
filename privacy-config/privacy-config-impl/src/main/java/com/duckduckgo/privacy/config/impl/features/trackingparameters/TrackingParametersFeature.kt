@@ -16,7 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.trackingparameters
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 
 data class TrackingParametersFeature(
     val state: String,

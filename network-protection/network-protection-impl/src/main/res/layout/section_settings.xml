@@ -29,7 +29,7 @@
         android:id="@+id/settings_vpn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_settings"
+        app:leadingIcon="@drawable/ic_settings_24"
         app:leadingIconBackground="circular"
         app:primaryText="@string/netpManagementVpnSettings" />
 
@@ -37,7 +37,7 @@
         android:id="@+id/settings_exclusion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_exclusion"
+        app:leadingIcon="@drawable/ic_view_grid_24"
         app:leadingIconBackground="circular"
         app:primaryText="@string/netpManagementManageItemExclusion"
         app:secondaryText="@string/netpManagementManageItemExclusionSubtitleEmpty" />

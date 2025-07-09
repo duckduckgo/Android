@@ -26,7 +26,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import java.time.OffsetDateTime
 import javax.inject.Inject
 import javax.inject.Named
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 @Named("timestampStrategy")
@@ -43,21 +43,21 @@ class SavedSitesTimestampPersister @Inject constructor(
         val localFolder = savedSitesRepository.getFolder(folder.id)
         if (localFolder != null) {
             if (folder.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: remote folder ${folder.id} exists locally but was deleted, deleting locally")
+                logcat { "Sync-Bookmarks-Persister: remote folder ${folder.id} exists locally but was deleted, deleting locally" }
                 savedSitesRepository.delete(localFolder)
             } else {
                 if (localFolder.modifiedAfter(folder.lastModified)) {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified before local folder, nothing to do")
+                    logcat { "Sync-Bookmarks-Persister: folder ${folder.id} modified before local folder, nothing to do" }
                 } else {
-                    Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} modified after local folder, replacing content")
+                    logcat { "Sync-Bookmarks-Persister: folder ${folder.id} modified after local folder, replacing content" }
                     syncSavedSitesRepository.replaceBookmarkFolder(folder, children)
                 }
             }
         } else {
             if (folder.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} not present locally but was deleted, nothing to do")
+                logcat { "Sync-Bookmarks-Persister: folder ${folder.id} not present locally but was deleted, nothing to do" }
             } else {
-                Timber.d("Sync-Bookmarks-Persister: folder ${folder.id} not present locally, inserting")
+                logcat { "Sync-Bookmarks-Persister: folder ${folder.id} not present locally, inserting" }
                 savedSitesRepository.insert(folder)
             }
         }
@@ -80,21 +80,21 @@ class SavedSitesTimestampPersister @Inject constructor(
         val storedBookmark = savedSitesRepository.getBookmarkById(bookmark.id)
         if (storedBookmark != null) {
             if (bookmark.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} deleted, deleting local bookmark")
+                logcat { "Sync-Bookmarks-Persister: remote bookmark ${bookmark.id} deleted, deleting local bookmark" }
                 savedSitesRepository.delete(storedBookmark)
             } else {
                 if (storedBookmark.modifiedAfter(bookmark.lastModified)) {
-                    Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified before local bookmark, nothing to do")
+                    logcat { "Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified before local bookmark, nothing to do" }
                 } else {
-                    Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified after local bookmark, replacing content")
+                    logcat { "Sync-Bookmarks-Persister: bookmark ${bookmark.id} modified after local bookmark, replacing content" }
                     syncSavedSitesRepository.replaceBookmark(bookmark, bookmark.id)
                 }
             }
         } else {
             if (bookmark.isDeleted()) {
-                Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally but was deleted, nothing to do")
+                logcat { "Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally but was deleted, nothing to do" }
             } else {
-                Timber.d("Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally, inserting")
+                logcat { "Sync-Bookmarks-Persister: bookmark ${bookmark.id} not present locally, inserting" }
                 savedSitesRepository.insert(bookmark)
             }
         }

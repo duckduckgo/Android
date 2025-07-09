@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.defaultbrowsing.prompts
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 @ContributesRemoteFeature(
@@ -27,10 +28,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 )
 interface DefaultBrowserPromptsFeatureToggles {
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun defaultBrowserAdditionalPrompts202501(): Toggle
 
     enum class AdditionalPromptsCohortName(override val cohortName: String) : CohortName {

@@ -34,7 +34,6 @@ import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus.Ready
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus.Unknown
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.logcat
 
@@ -51,7 +50,6 @@ interface NativeBrokerActionHandler {
             override val actionId: String,
             val brokerName: String,
             val email: String,
-            val pollingIntervalSeconds: Float,
         ) : NativeAction(actionId)
 
         data class SubmitCaptchaInfo(
@@ -125,46 +123,36 @@ class RealNativeBrokerActionHandler(
 
     private suspend fun handleAwaitConfirmation(action: GetEmailStatus): NativeActionResult {
         return kotlin.runCatching {
-            var attempt = 0
-            var result: Pair<ConfirmationStatus, String?> = Unknown to null
-            while (attempt < MAX_AWAIT_EMAIL_ATTEMPT) {
-                attempt++
-                // https://dub.duckduckgo.com/duckduckgo/dbp-api?tab=readme-ov-file#get-dbpemv0linkseemail_address
-                result = repository.getEmailConfirmation(action.email)
-                logcat { "PIR-EMAIL: $result" }
-                if (result.first is Ready) {
-                    return NativeActionResult.Success(
-                        data = NativeSuccessData.EmailConfirmation(
-                            email = action.email,
-                            link = result.second!!,
-                            status = result.first,
-                        ),
-                    )
-                } else if (result.first is Unknown) {
-                    return NativeActionResult.Failure(
-                        actionId = action.actionId,
-                        message = "Unable to confirm email: ${action.email} as email doesn't exist in the backend",
-                    )
-                } else if (attempt == MAX_AWAIT_EMAIL_ATTEMPT) {
-                    // Final attempt failed
-                    return NativeActionResult.Failure(
-                        actionId = action.actionId,
-                        message = "Timeout reached to confirm email: ${action.email}. Link is still pending",
-                    )
-                } else {
-                    delay(action.pollingIntervalSeconds.toLong() * 1000)
-                }
-            }
+            // https://dub.duckduckgo.com/duckduckgo/dbp-api?tab=readme-ov-file#get-dbpemv0linkseemail_address
+            val result: Pair<ConfirmationStatus, String?> = repository.getEmailConfirmation(action.email)
+            logcat { "PIR-EMAIL: $result" }
+            return when (result.first) {
+                is Ready -> NativeActionResult.Success(
+                    data = NativeSuccessData.EmailConfirmation(
+                        email = action.email,
+                        link = result.second!!,
+                        status = result.first,
+                    ),
+                )
 
-            NativeActionResult.Failure(
-                actionId = action.actionId,
-                message = "Unable to confirm email: ${action.email}, last status: ${result.first} }",
-            )
+                is Unknown -> Failure(
+                    actionId = action.actionId,
+                    message = "Unable to confirm email: ${action.email} as email doesn't exist in the backend",
+                    retryNativeAction = false,
+                )
+
+                else -> Failure(
+                    actionId = action.actionId,
+                    message = "Timeout reached to confirm email: ${action.email}. Link is still pending",
+                    retryNativeAction = true,
+                )
+            }
         }.getOrElse { error ->
             logcat { "PIR-EMAIL: $error" }
-            NativeActionResult.Failure(
+            Failure(
                 actionId = action.actionId,
                 message = "Unknown error while getting email : ${error.message}",
+                retryNativeAction = false,
             )
         }
     }
@@ -177,7 +165,7 @@ class RealNativeBrokerActionHandler(
                 )
             }
         }.getOrElse { error ->
-            NativeActionResult.Failure(
+            Failure(
                 actionId = action.actionId,
                 message = "Unknown error while getting email : ${error.message}",
             )
@@ -199,20 +187,20 @@ class RealNativeBrokerActionHandler(
 
                 is CaptchaResolverResult.CaptchaFailure -> if (this.type == CaptchaResolverError.TransientFailure) {
                     // Transient failures mean that client should retry after a minute
-                    NativeActionResult.Failure(
+                    Failure(
                         actionId = nativeAction.actionId,
                         message = this.message,
                         retryNativeAction = true,
                     )
                 } else {
-                    NativeActionResult.Failure(
+                    Failure(
                         actionId = nativeAction.actionId,
                         message = this.message,
                         retryNativeAction = false,
                     )
                 }
 
-                else -> NativeActionResult.Failure(
+                else -> Failure(
                     actionId = nativeAction.actionId,
                     message = "Invalid scenario",
                     retryNativeAction = false,
@@ -256,9 +244,5 @@ class RealNativeBrokerActionHandler(
                 )
             }
         }
-    }
-
-    companion object {
-        private const val MAX_AWAIT_EMAIL_ATTEMPT = 3
     }
 }

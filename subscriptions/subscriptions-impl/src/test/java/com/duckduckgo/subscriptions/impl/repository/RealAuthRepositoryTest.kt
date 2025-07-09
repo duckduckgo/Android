@@ -50,6 +50,7 @@ class RealAuthRepositoryTest {
     @Test
     fun whenClearSubscriptionThenClearData() = runTest {
         authStore.status = "expired"
+        authStore.billingPeriod = "Monthly"
         authStore.startedAt = 1000L
         authStore.expiresOrRenewsAt = 1000L
         authStore.platform = "google"
@@ -59,6 +60,7 @@ class RealAuthRepositoryTest {
         authRepository.setSubscription(null)
 
         assertNull(authStore.status)
+        assertNull(authStore.billingPeriod)
         assertNull(authStore.startedAt)
         assertNull(authStore.expiresOrRenewsAt)
         assertNull(authStore.platform)

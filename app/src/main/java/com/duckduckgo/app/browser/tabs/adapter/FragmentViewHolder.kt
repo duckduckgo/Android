@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.tabs.adapter
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.fragment.app.FragmentContainerView
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -43,22 +42,6 @@ class FrameLayoutViewHolder private constructor(container: FrameLayout) : Fragme
             container.id = View.generateViewId()
             container.isSaveEnabled = false
             return FrameLayoutViewHolder(container)
-        }
-    }
-}
-
-class FragmentContainerViewHolder private constructor(container: FragmentContainerView) : FragmentViewHolder(container) {
-    companion object {
-        @JvmStatic
-        fun create(parent: ViewGroup): FragmentViewHolder {
-            val container = FragmentContainerView(parent.context)
-            container.layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-            )
-            container.id = View.generateViewId()
-            container.isSaveEnabled = false
-            return FragmentContainerViewHolder(container)
         }
     }
 }

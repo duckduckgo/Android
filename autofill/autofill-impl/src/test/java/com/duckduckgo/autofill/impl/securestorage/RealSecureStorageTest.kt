@@ -18,10 +18,10 @@ package com.duckduckgo.autofill.impl.securestorage
 
 import app.cash.turbine.test
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedString
+import com.duckduckgo.autofill.store.SecureStorageRepository
+import com.duckduckgo.autofill.store.SecureStorageRepository.Factory
+import com.duckduckgo.autofill.store.db.WebsiteLoginCredentialsEntity
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.securestorage.store.SecureStorageRepository
-import com.duckduckgo.securestorage.store.SecureStorageRepository.Factory
-import com.duckduckgo.securestorage.store.db.WebsiteLoginCredentialsEntity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -32,7 +32,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
@@ -46,11 +46,9 @@ class RealSecureStorageTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
-    @Mock
-    private lateinit var secureStorageRepository: SecureStorageRepository
+    private val secureStorageRepository: SecureStorageRepository = mock()
 
-    @Mock
-    private lateinit var l2DataTransformer: L2DataTransformer
+    private val l2DataTransformer: L2DataTransformer = mock()
     private val testCredentials = WebsiteLoginDetailsWithCredentials(
         details = WebsiteLoginDetails(
             domain = "test.com",
@@ -77,7 +75,7 @@ class RealSecureStorageTest {
     )
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
         MockitoAnnotations.openMocks(this)
         whenever(l2DataTransformer.decrypt(any(), any())).thenReturn(expectedDecryptedData)
         whenever(l2DataTransformer.encrypt(any())).thenReturn(
@@ -177,6 +175,8 @@ class RealSecureStorageTest {
     @Test
     fun whenNoSecureStorageRepositoryThenCanAccessSecureStorageFalse() = runTest {
         setUpNoSecureStorageRepository()
+
+        whenever(l2DataTransformer.canProcessData()).thenReturn(true)
 
         assertFalse(testee.canAccessSecureStorage())
     }

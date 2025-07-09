@@ -45,23 +45,17 @@ data class Address(
 data class ExtractedProfile(
     val id: Int? = null,
     val name: String? = null,
-    val alternativeNamesList: List<String>? = emptyList(),
-    val addressFull: List<AddressCityState>? = emptyList(),
-    val addressCityState: List<AddressCityState>? = emptyList(),
-    val phoneNumbers: List<String>? = null,
-    val relativesList: List<String>? = null,
-    val profileUrl: ProfileUrl? = null,
-    val reportId: String? = null,
+    val alternativeNames: List<String>? = emptyList(),
     val age: String? = null,
+    val addresses: List<AddressCityState>? = emptyList(),
+    val phoneNumbers: List<String>? = emptyList(),
+    val relatives: List<String>? = emptyList(),
+    val profileUrl: String? = null,
+    val identifier: String? = null,
+    val reportId: String? = null,
     val email: String? = null,
     val removedDate: String? = null,
     val fullName: String? = null,
-    val identifier: String? = null,
-)
-
-data class ProfileUrl(
-    val profileUrl: String,
-    val identifier: String,
 )
 
 data class AddressCityState(

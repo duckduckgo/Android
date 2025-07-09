@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.networkprotection.impl.di.ProdNetPConfigTogglesDao
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigToggle
 import com.duckduckgo.networkprotection.store.remote_config.NetPConfigTogglesDao
@@ -41,43 +42,43 @@ import kotlinx.coroutines.launch
     toggleStore = NetPSettingsLocalConfigStore::class,
 )
 interface NetPSettingsLocalConfig {
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun vpnNotificationAlerts(): Toggle
 
     /**
      * When `true` the VPN routes will exclude local networks
      */
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun vpnExcludeLocalNetworkRoutes(): Toggle
 
     /**
      * When `true` the VPN will automatically pause when a call is started and will automatically restart after.
      */
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun vpnPauseDuringCalls(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun excludeSystemAppsCommunication(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun excludeSystemAppsNetworking(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun excludeSystemAppsMedia(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun excludeSystemAppsOthers(): Toggle
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun blockMalware(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun permanentRemoveExcludeAppPrompt(): Toggle
 
-    @Toggle.DefaultValue(false)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun autoExcludeBrokenApps(): Toggle
 }
 

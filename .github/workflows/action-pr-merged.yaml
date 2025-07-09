@@ -8,10 +8,10 @@ jobs:
   add-pr-merged-comment:
     runs-on: ubuntu-latest
     steps:
-      - uses: duckduckgo/native-github-asana-sync@v1.8
+      - uses: duckduckgo/native-github-asana-sync@v2.0
         if: github.event.pull_request.merged
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           trigger-phrase: "Task/Issue URL:"
           action: 'notify-pr-merged'
           is-complete: true

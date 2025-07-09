@@ -22,7 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 class CredentialsSyncMetadata @Inject constructor(
@@ -78,11 +79,11 @@ class CredentialsSyncMetadata @Inject constructor(
         val syncMetadataEntity = dao.getSyncMetadata(localId)
         return if (syncMetadataEntity != null) {
             syncMetadataEntity.modified_at = currentTime
-            Timber.i("SyncMetadata: onEntityChanged modified_at ${syncMetadataEntity.syncId} and... ${syncMetadataEntity.modified_at}")
+            logcat(INFO) { "SyncMetadata: onEntityChanged modified_at ${syncMetadataEntity.syncId} and... ${syncMetadataEntity.modified_at}" }
             syncMetadataEntity
         } else {
             val newEntity = CredentialsSyncMetadataEntity(localId = localId, deleted_at = null, modified_at = currentTime)
-            Timber.i("SyncMetadata: onEntityChanged modified_at ${newEntity.syncId} and... ${newEntity.modified_at}")
+            logcat(INFO) { "SyncMetadata: onEntityChanged modified_at ${newEntity.syncId} and... ${newEntity.modified_at}" }
             newEntity
         }
     }
@@ -91,7 +92,7 @@ class CredentialsSyncMetadata @Inject constructor(
         val syncId = dao.getSyncMetadata(localId)
         if (syncId != null) {
             syncId.deleted_at = SyncDateProvider.now()
-            Timber.i("SyncMetadata: onEntityRemoved -> updateDeletedAt ${syncId.deleted_at}")
+            logcat(INFO) { "SyncMetadata: onEntityRemoved -> updateDeletedAt ${syncId.deleted_at}" }
             dao.insert(syncId)
         }
     }
@@ -101,7 +102,7 @@ class CredentialsSyncMetadata @Inject constructor(
         val toBeDeleted: List<CredentialsSyncMetadataEntity> = localIds
             .mapNotNull { dao.getSyncMetadata(it) }
             .onEach { it.deleted_at = deletionTimestamp }
-        Timber.i("SyncMetadata: onEntitiesRemoved -> ${toBeDeleted.size} entities had updateDeletedAt set $deletionTimestamp")
+        logcat(INFO) { "SyncMetadata: onEntitiesRemoved -> ${toBeDeleted.size} entities had updateDeletedAt set $deletionTimestamp" }
         dao.insert(toBeDeleted)
     }
 

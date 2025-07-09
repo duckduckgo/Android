@@ -22,11 +22,13 @@ import android.content.res.Configuration
 import android.text.Spanned
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
+import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -44,6 +46,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.recyclerviewext.GridColumnCalculator
 import com.duckduckgo.common.ui.recyclerviewext.disableAnimation
 import com.duckduckgo.common.ui.recyclerviewext.enableAnimation
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -64,6 +67,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
+import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
+import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
@@ -72,7 +77,6 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
-import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Placement
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
@@ -82,7 +86,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -105,9 +108,13 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
+
     private var isExpandable = true
     private var showPlaceholders = false
-    private var placement = Placement.NEW_TAB_PAGE
+    private var showDaxWhenEmpty = false
+    private var placement: FavoritesPlacement = FavoritesPlacement.NEW_TAB_PAGE
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
 
@@ -138,8 +145,17 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         ).apply {
             isExpandable = getBoolean(R.styleable.FavouritesNewTabSectionView_isExpandable, true)
             showPlaceholders = getBoolean(R.styleable.FavouritesNewTabSectionView_showPlaceholders, true)
-            placement = Placement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
+            placement = FavoritesPlacement.from(getInt(R.styleable.FavouritesNewTabSectionView_favoritesPlacement, 1))
             recycle()
+        }
+    }
+
+    constructor(context: Context, config: FavoritesGridConfig?) : this(context, null, 0) {
+        config?.let {
+            isExpandable = it.isExpandable
+            showPlaceholders = it.showPlaceholders
+            showDaxWhenEmpty = it.showDaxWhenEmpty
+            placement = it.placement
         }
     }
 
@@ -170,6 +186,13 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (swipingTabsFeature.isEnabled) {
+            parent.requestDisallowInterceptTouchEvent(true)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun configureHomeTabQuickAccessGrid() {
@@ -334,6 +357,7 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
             viewModel.onNewTabFavouritesShown()
         }
+        binding.ddgLogo.isVisible = showDaxWhenEmpty && viewState.favourites.isEmpty()
     }
 
     private fun processCommands(command: Command) {

@@ -1,78 +1,13 @@
-<!--
-  ~ Copyright (c) 2023 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
   <path
-      android:pathData="M8.75,15C8.336,15 8,15.336 8,15.75V16.25C8,16.664 8.336,17 8.75,17H15.25C15.664,17 16,16.664 16,16.25V15.75C16,15.336 15.664,15 15.25,15H8.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
+      android:pathData="M9,15a1,1 0,1 0,0 2h6a1,1 0,1 0,0 -2L9,15ZM5,7.75A0.75,0.75 0,0 1,5.75 7h0.5a0.75,0.75 0,0 1,0.75 0.75v0.5a0.75,0.75 0,0 1,-0.75 0.75h-0.5A0.75,0.75 0,0 1,5 8.25v-0.5ZM5.75,11a0.75,0.75 0,0 0,-0.75 0.75v0.5c0,0.414 0.336,0.75 0.75,0.75h0.5a0.75,0.75 0,0 0,0.75 -0.75v-0.5a0.75,0.75 0,0 0,-0.75 -0.75h-0.5ZM5,15.75a0.75,0.75 0,0 1,0.75 -0.75h0.5a0.75,0.75 0,0 1,0.75 0.75v0.5a0.75,0.75 0,0 1,-0.75 0.75h-0.5a0.75,0.75 0,0 1,-0.75 -0.75v-0.5ZM8.75,7a0.75,0.75 0,0 0,-0.75 0.75v0.5c0,0.414 0.336,0.75 0.75,0.75h0.5a0.75,0.75 0,0 0,0.75 -0.75v-0.5A0.75,0.75 0,0 0,9.25 7h-0.5ZM8,11.75a0.75,0.75 0,0 1,0.75 -0.75h0.5a0.75,0.75 0,0 1,0.75 0.75v0.5a0.75,0.75 0,0 1,-0.75 0.75h-0.5a0.75,0.75 0,0 1,-0.75 -0.75v-0.5ZM11.75,7a0.75,0.75 0,0 0,-0.75 0.75v0.5c0,0.414 0.336,0.75 0.75,0.75h0.5a0.75,0.75 0,0 0,0.75 -0.75v-0.5a0.75,0.75 0,0 0,-0.75 -0.75h-0.5ZM11,11.75a0.75,0.75 0,0 1,0.75 -0.75h0.5a0.75,0.75 0,0 1,0.75 0.75v0.5a0.75,0.75 0,0 1,-0.75 0.75h-0.5a0.75,0.75 0,0 1,-0.75 -0.75v-0.5ZM14.75,11a0.75,0.75 0,0 0,-0.75 0.75v0.5c0,0.414 0.336,0.75 0.75,0.75h0.5a0.75,0.75 0,0 0,0.75 -0.75v-0.5a0.75,0.75 0,0 0,-0.75 -0.75h-0.5ZM14,7.75a0.75,0.75 0,0 1,0.75 -0.75h0.5a0.75,0.75 0,0 1,0.75 0.75v0.5a0.75,0.75 0,0 1,-0.75 0.75h-0.5a0.75,0.75 0,0 1,-0.75 -0.75v-0.5ZM17.75,7a0.75,0.75 0,0 0,-0.75 0.75v0.5c0,0.414 0.336,0.75 0.75,0.75h0.5a0.75,0.75 0,0 0,0.75 -0.75v-0.5a0.75,0.75 0,0 0,-0.75 -0.75h-0.5ZM17,11.75a0.75,0.75 0,0 1,0.75 -0.75h0.5a0.75,0.75 0,0 1,0.75 0.75v0.5a0.75,0.75 0,0 1,-0.75 0.75h-0.5a0.75,0.75 0,0 1,-0.75 -0.75v-0.5ZM17.75,15a0.75,0.75 0,0 0,-0.75 0.75v0.5c0,0.414 0.336,0.75 0.75,0.75h0.5a0.75,0.75 0,0 0,0.75 -0.75v-0.5a0.75,0.75 0,0 0,-0.75 -0.75h-0.5Z"
+      android:fillColor="?attr/daxColorPrimaryIcon"/>
   <path
-      android:pathData="M11,11.75C11,11.336 11.336,11 11.75,11H12.25C12.664,11 13,11.336 13,11.75V12.25C13,12.664 12.664,13 12.25,13H11.75C11.336,13 11,12.664 11,12.25V11.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M8.75,7C8.336,7 8,7.336 8,7.75V8.25C8,8.664 8.336,9 8.75,9H9.25C9.664,9 10,8.664 10,8.25V7.75C10,7.336 9.664,7 9.25,7H8.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M8,11.75C8,11.336 8.336,11 8.75,11H9.25C9.664,11 10,11.336 10,11.75V12.25C10,12.664 9.664,13 9.25,13H8.75C8.336,13 8,12.664 8,12.25V11.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M5.75,11C5.336,11 5,11.336 5,11.75V12.25C5,12.664 5.336,13 5.75,13H6.25C6.664,13 7,12.664 7,12.25V11.75C7,11.336 6.664,11 6.25,11H5.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M5,15.75C5,15.336 5.336,15 5.75,15H6.25C6.664,15 7,15.336 7,15.75V16.25C7,16.664 6.664,17 6.25,17H5.75C5.336,17 5,16.664 5,16.25V15.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M5.75,7C5.336,7 5,7.336 5,7.75V8.25C5,8.664 5.336,9 5.75,9H6.25C6.664,9 7,8.664 7,8.25V7.75C7,7.336 6.664,7 6.25,7H5.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M14,11.75C14,11.336 14.336,11 14.75,11H15.25C15.664,11 16,11.336 16,11.75V12.25C16,12.664 15.664,13 15.25,13H14.75C14.336,13 14,12.664 14,12.25V11.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M11.75,7C11.336,7 11,7.336 11,7.75V8.25C11,8.664 11.336,9 11.75,9H12.25C12.664,9 13,8.664 13,8.25V7.75C13,7.336 12.664,7 12.25,7H11.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M17,11.75C17,11.336 17.336,11 17.75,11H18.25C18.664,11 19,11.336 19,11.75V12.25C19,12.664 18.664,13 18.25,13H17.75C17.336,13 17,12.664 17,12.25V11.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M17.75,15C17.336,15 17,15.336 17,15.75V16.25C17,16.664 17.336,17 17.75,17H18.25C18.664,17 19,16.664 19,16.25V15.75C19,15.336 18.664,15 18.25,15H17.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M14,7.75C14,7.336 14.336,7 14.75,7H15.25C15.664,7 16,7.336 16,7.75V8.25C16,8.664 15.664,9 15.25,9H14.75C14.336,9 14,8.664 14,8.25V7.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M17.75,7C17.336,7 17,7.336 17,7.75V8.25C17,8.664 17.336,9 17.75,9H18.25C18.664,9 19,8.664 19,8.25V7.75C19,7.336 18.664,7 18.25,7H17.75Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"
-  />
-  <path
-      android:pathData="M6,3C3.791,3 2,4.791 2,7V17C2,19.209 3.791,21 6,21H18C20.209,21 22,19.209 22,17V7C22,4.791 20.209,3 18,3H6ZM4,7C4,5.895 4.895,5 6,5H18C19.105,5 20,5.895 20,7V17C20,18.105 19.105,19 18,19H6C4.895,19 4,18.105 4,17V7Z"
+      android:pathData="M5.75,3A3.75,3.75 0,0 0,2 6.75v10.5A3.75,3.75 0,0 0,5.75 21h12.5A3.75,3.75 0,0 0,22 17.25V6.75A3.75,3.75 0,0 0,18.25 3H5.75ZM3.5,6.75A2.25,2.25 0,0 1,5.75 4.5h12.5a2.25,2.25 0,0 1,2.25 2.25v10.5a2.25,2.25 0,0 1,-2.25 2.25H5.75a2.25,2.25 0,0 1,-2.25 -2.25V6.75Z"
       android:fillColor="?attr/daxColorPrimaryIcon"
       android:fillType="evenOdd"/>
 </vector>

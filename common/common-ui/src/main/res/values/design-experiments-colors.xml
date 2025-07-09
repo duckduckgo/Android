@@ -35,6 +35,7 @@
     <!-- Icons -->
     <color name="icon_primary_dark">#C7FFFFFF</color>
     <color name="icon_secondary_dark">#7AFFFFFF</color>
+    <color name="icon_tertiary_dark">#3DFFFFFF</color>
 
     <!-- Lines-->
     <color name="lines_dark">#1FF9F9F9</color>
@@ -47,32 +48,36 @@
 
     <!-- Light Palette -->
     <!-- Backgrounds -->
-    <color name="background_background_light">#E9EBEC</color>
-    <color name="background_surface_light">#F4F5F6</color>
-    <color name="background_window_light">#F9FAFA</color>
-    <color name="background_container_light">#F9FAFA</color>
+    <color name="background_background_light">#F2F2F2</color>
+    <color name="background_surface_light">#F9F9F9</color>
+    <color name="background_window_light">#FFFFFF</color>
+    <color name="background_container_light">#FFFFFF</color>
 
     <!-- Text -->
-    <color name="text_primary_light">#1C1F21</color>
+    <color name="text_primary_light">#1F1F1F</color>
     <color name="text_secondary_light">#B81C1F21</color>
-    <color name="text_tertiary_light">#661C1F21</color>
+    <color name="text_tertiary_light">#661F1F1F</color>
 
     <!-- Icons -->
-    <color name="icon_primary_light">#D61C1F21</color>
-    <color name="icon_secondary_light">#991C1F21</color>
+    <color name="icon_primary_light">#D61F1F1F</color>
+    <color name="icon_secondary_light">#991F1F1F</color>
+    <color name="icon_tertiary_light">#661F1F1F</color>
 
     <!-- Lines-->
-    <color name="lines_light">#171C1F21</color>
+    <color name="lines_light">#171F1F1F</color>
 
     <!-- Controls -->
-    <color name="controls_fill_primary_light">#171C1F21</color>
-    <color name="controls_fill_secondary_light">#1F1C1F21</color>
-    <color name="controls_fill_tertiary_light">#2E1C1F21</color>
-    <color name="controls_decoration_tertiary_light">#991C1F21</color>
+    <color name="controls_fill_primary_light">#171F1F1F</color>
+    <color name="controls_fill_secondary_light">#1F1F1F1F</color>
+    <color name="controls_fill_tertiary_light">#2E1F1F1F</color>
+    <color name="controls_decoration_tertiary_light">#991F1F1F</color>
 
     <!-- Experimental Fire Button -->
     <attr name="daxColorFireButtonOne" format="color"/>
     <attr name="daxColorFireButtonTwo" format="color"/>
     <attr name="daxColorFireButtonThree" format="color"/>
+
+    <!-- Shadows -->
+    <color name="background_omnibar_shadow">#FF000000</color>
 
 </resources>

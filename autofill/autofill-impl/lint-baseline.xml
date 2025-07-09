@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DefaultLocale"
@@ -10,6 +10,1364 @@
             file="src/main/java/com/duckduckgo/autofill/impl/deviceauth/AuthLauncher.kt"
             line="103"
             column="32"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/appIcon, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/appIcon, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/appIcon]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/content_import_from_google_password_dialog.xml"
+            line="47"
+            column="13"
+            message="Duplicate id @+id/appIcon, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/appIcon, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/appIcon]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_pre_flow.xml"
+            line="34"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/appIcon"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="34"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/appIcon"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/autofillDialogContentContainer, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/content_import_from_google_password_dialog.xml"
+            line="47"
+            column="13"
+            message="Duplicate id @+id/autofillDialogContentContainer, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_pre_flow.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/autofillDialogContentContainer"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/dialogTitle, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/dialogTitle, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/dialogTitle]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/content_import_from_google_password_dialog.xml"
+            line="47"
+            column="13"
+            message="Duplicate id @+id/dialogTitle, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/dialogTitle, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/dialogTitle]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_pre_flow.xml"
+            line="45"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/dialogTitle"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="45"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/dialogTitle"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/guidelineEnd, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/guidelineEnd, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/content_import_from_google_password_dialog.xml"
+            line="47"
+            column="13"
+            message="Duplicate id @+id/guidelineEnd, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/guidelineEnd, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_pre_flow.xml"
+            line="30"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/guidelineEnd"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="30"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="30"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="31"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/guidelineStart, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/guidelineStart, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart]"
+        errorLine1="            &lt;include"
+        errorLine2="            ^">
+        <location
+            file="src/main/res/layout/content_import_from_google_password_dialog.xml"
+            line="47"
+            column="13"
+            message="Duplicate id @+id/guidelineStart, defined or included multiple times in layout/content_import_from_google_password_dialog.xml: [layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/guidelineStart, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart, layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_pre_flow.xml"
+            line="26"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_pre_flow.xml defines @+id/guidelineStart"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="26"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="26"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="27"
+            column="9"
+            message="Defined here, included via layout/content_import_from_google_password_dialog.xml => layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/autofillDialogContentContainer, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="69"
+            column="9"
+            message="Duplicate id @+id/autofillDialogContentContainer, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="20"
+            column="5"
+            message="Defined here"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/guidelineEnd, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="69"
+            column="9"
+            message="Duplicate id @+id/guidelineEnd, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="30"
+            column="9"
+            message="Defined here"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="30"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="31"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/guidelineStart, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="69"
+            column="9"
+            message="Duplicate id @+id/guidelineStart, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="26"
+            column="9"
+            message="Defined here"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="26"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="27"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/autofillDialogContentContainer, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="73"
+            column="9"
+            message="Duplicate id @+id/autofillDialogContentContainer, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="20"
+            column="5"
+            message="Defined here"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/autofillDialogContentContainer"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="20"
+            column="5"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/autofillDialogContentContainer"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/guidelineEnd, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="73"
+            column="9"
+            message="Duplicate id @+id/guidelineEnd, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="30"
+            column="9"
+            message="Defined here"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="30"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineEnd"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="31"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineEnd"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/guidelineStart, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="73"
+            column="9"
+            message="Duplicate id @+id/guidelineStart, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="26"
+            column="9"
+            message="Defined here"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="26"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/guidelineStart"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="27"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/guidelineStart"/>
+    </issue>
+
+    <issue
+        id="DuplicateIncludedIds"
+        message="Duplicate id @+id/resultsContainer, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/resultsContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/resultsContainer]"
+        errorLine1="        &lt;include"
+        errorLine2="        ^">
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow.xml"
+            line="73"
+            column="9"
+            message="Duplicate id @+id/resultsContainer, defined or included multiple times in layout/content_import_google_password_post_flow.xml: [layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/resultsContainer, layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/resultsContainer]"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_result.xml"
+            line="34"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_result.xml defines @+id/resultsContainer"/>
+        <location
+            file="src/main/res/layout/content_import_google_password_post_flow_in_progress.xml"
+            line="35"
+            column="9"
+            message="Defined here, included via layout/content_import_google_password_post_flow.xml => layout/content_import_google_password_post_flow_in_progress.xml defines @+id/resultsContainer"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `supportsInlineSuggestions` is only used in API level 30 and higher (current min is 26)"
+        errorLine1="    android:supportsInlineSuggestions=&quot;true&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="19"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="28"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="31"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="34"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="37"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="40"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="43"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="46"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="49"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="52"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="55"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="58"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="61"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="64"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="67"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="70"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="73"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="76"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="79"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="82"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="85"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="88"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="91"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="94"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="97"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="100"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="103"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="106"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="109"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="112"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="115"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="118"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="121"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="124"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="127"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="130"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="133"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="136"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="139"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="142"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="145"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="148"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="151"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="154"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="157"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="160"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="163"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="166"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="169"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="172"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="175"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="178"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="181"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="184"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="187"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="190"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="193"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="196"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="199"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="202"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="205"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="208"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="211"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="214"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="217"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="220"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="223"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="226"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="229"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="232"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="235"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="238"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="241"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="244"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="247"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="250"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="253"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="256"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="259"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="262"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="265"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="268"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="271"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="274"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="277"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="280"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="283"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="286"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="289"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="292"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="295"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="298"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="301"
+            column="9"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `maxLongVersionCode` is only used in API level 28 and higher (current min is 26)"
+        errorLine1="        android:maxLongVersionCode=&quot;10000000000&quot; />"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/xml/service_configuration.xml"
+            line="304"
+            column="9"/>
     </issue>
 
     <issue
@@ -146,6 +1504,17 @@
 
     <issue
         id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        if (autofillStore.getCredentialCount().first() == 0) {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/management/AutofillSettingsViewModel.kt"
+            line="332"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="            surveysFeature.self().setRawStoredState(State(enable = true))"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -173,7 +1542,7 @@
         errorLine2="                                                                                  ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
-            line="146"
+            line="141"
             column="83"/>
     </issue>
 
@@ -184,7 +1553,7 @@
         errorLine2="                                                                                                                              ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
-            line="146"
+            line="141"
             column="127"/>
     </issue>
 
@@ -195,8 +1564,261 @@
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/autofill/impl/ui/credential/passwordgeneration/AutofillUseGeneratedPasswordDialogFragment.kt"
-            line="151"
+            line="146"
             column="41"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="94"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="116"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="140"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="164"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="189"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="213"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="233"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLastModifiedWinsStrategyTest.kt"
+            line="255"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="94"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="117"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="142"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="168"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="193"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="214"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="237"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsLocalWinsStrategyTest.kt"
+            line="256"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="94"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="117"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="142"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="168"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="193"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="214"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CredentialsRemoteWinsStrategyTest.kt"
+            line="237"
+            column="28"/>
     </issue>
 
     <issue
@@ -208,6 +1830,72 @@
             file="src/main/java/com/duckduckgo/autofill/sync/CredentialsSyncStore.kt"
             line="97"
             column="17"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CrendentialsDedupStrategyTest.kt"
+            line="94"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CrendentialsDedupStrategyTest.kt"
+            line="117"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CrendentialsDedupStrategyTest.kt"
+            line="143"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CrendentialsDedupStrategyTest.kt"
+            line="176"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CrendentialsDedupStrategyTest.kt"
+            line="201"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val storedValues = secureStorage.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/sync/persister/CrendentialsDedupStrategyTest.kt"
+            line="222"
+            column="28"/>
     </issue>
 
     <issue
@@ -272,7 +1960,7 @@
         errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/autofill/impl/configuration/RealAutofillRuntimeConfigProviderTest.kt"
-            line="75"
+            line="77"
             column="9"/>
     </issue>
 
@@ -310,6 +1998,50 @@
     </issue>
 
     <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val result = testee.websiteLoginDetails().first()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
+            line="139"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val result = testee.websiteLoginDetailsForDomain(&quot;test.com&quot;).first()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
+            line="150"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val result = testee.websiteLoginDetailsWithCredentials().first()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
+            line="161"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="DenyListedApi"
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="        val result = testee.websiteLoginDetailsWithCredentialsForDomain(&quot;test.com&quot;).first()"
+        errorLine2="                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/test/java/com/duckduckgo/autofill/impl/securestorage/RealSecureStorageTest.kt"
+            line="172"
+            column="22"/>
+    </issue>
+
+    <issue
         id="VectorRaster"
         message="Limit vector icons sizes to 200×200 to keep icon drawing fast; see https://developer.android.com/studio/write/vector-asset-studio#when for more"
         errorLine1="    android:width=&quot;220dp&quot;"
@@ -327,7 +2059,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="156"
+            line="158"
             column="5"/>
     </issue>
 
@@ -338,7 +2070,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="156"
+            line="158"
             column="5"/>
     </issue>
 
@@ -349,7 +2081,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="156"
+            line="158"
             column="5"/>
     </issue>
 
@@ -360,7 +2092,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="156"
+            line="158"
             column="5"/>
     </issue>
 
@@ -371,7 +2103,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="165"
+            line="167"
             column="5"/>
     </issue>
 
@@ -382,7 +2114,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="165"
+            line="167"
             column="5"/>
     </issue>
 
@@ -393,7 +2125,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="165"
+            line="167"
             column="5"/>
     </issue>
 
@@ -404,7 +2136,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="165"
+            line="167"
             column="5"/>
     </issue>
 
@@ -415,7 +2147,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="172"
+            line="174"
             column="5"/>
     </issue>
 
@@ -426,7 +2158,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="172"
+            line="174"
             column="5"/>
     </issue>
 
@@ -437,7 +2169,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="172"
+            line="174"
             column="5"/>
     </issue>
 
@@ -448,7 +2180,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="172"
+            line="174"
             column="5"/>
     </issue>
 
@@ -459,7 +2191,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="178"
+            line="180"
             column="5"/>
     </issue>
 
@@ -470,7 +2202,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="178"
+            line="180"
             column="5"/>
     </issue>
 
@@ -481,7 +2213,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="178"
+            line="180"
             column="5"/>
     </issue>
 
@@ -492,7 +2224,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="178"
+            line="180"
             column="5"/>
     </issue>
 
@@ -503,7 +2235,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="184"
+            line="186"
             column="5"/>
     </issue>
 
@@ -514,7 +2246,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="184"
+            line="186"
             column="5"/>
     </issue>
 
@@ -525,7 +2257,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="184"
+            line="186"
             column="5"/>
     </issue>
 
@@ -536,7 +2268,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="184"
+            line="186"
             column="5"/>
     </issue>
 
@@ -547,7 +2279,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="190"
+            line="192"
             column="5"/>
     </issue>
 
@@ -558,7 +2290,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="190"
+            line="192"
             column="5"/>
     </issue>
 
@@ -569,7 +2301,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="190"
+            line="192"
             column="5"/>
     </issue>
 
@@ -580,7 +2312,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="190"
+            line="192"
             column="5"/>
     </issue>
 
@@ -591,7 +2323,7 @@
         errorLine2="                                                     ^">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="161"
+            line="163"
             column="54"/>
     </issue>
 
@@ -1658,7 +3390,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-bg/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1669,7 +3401,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-da/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1680,7 +3412,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-de/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1691,7 +3423,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-el/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1702,7 +3434,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-es/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1713,7 +3445,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-et/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1724,7 +3456,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fi/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1735,7 +3467,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-fr/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1746,7 +3478,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hu/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1757,7 +3489,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-it/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1768,7 +3500,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nb/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1779,7 +3511,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-nl/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1790,7 +3522,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pt/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1801,7 +3533,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sv/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1812,7 +3544,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-tr/strings-autofill-impl.xml"
-            line="214"
+            line="216"
             column="70"/>
     </issue>
 
@@ -1823,7 +3555,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lv/strings-autofill-impl.xml"
-            line="220"
+            line="222"
             column="70"/>
     </issue>
 
@@ -1834,7 +3566,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ro/strings-autofill-impl.xml"
-            line="220"
+            line="222"
             column="70"/>
     </issue>
 
@@ -1845,7 +3577,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-cs/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
     </issue>
 
@@ -1856,7 +3588,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
     </issue>
 
@@ -1867,7 +3599,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-lt/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
     </issue>
 
@@ -1878,7 +3610,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-pl/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
     </issue>
 
@@ -1889,7 +3621,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-ru/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
     </issue>
 
@@ -1900,7 +3632,7 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sk/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
     </issue>
 
@@ -1911,8 +3643,30 @@
         errorLine2="                                                                     ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values-sl/strings-autofill-impl.xml"
-            line="226"
+            line="228"
             column="70"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;passwords&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;autofillImportGooglePasswordsSuccessMessage&quot; instruction=&quot;Placeholder is the number of passwords imported&quot;>%1$d passwords imported from Google&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-autofill-impl.xml"
+            line="238"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;passwords&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;autofillImportCsvPasswordsSuccessMessage&quot; instruction=&quot;Placeholder is the number of passwords imported&quot;>%1$d passwords imported from CSV&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings-autofill-impl.xml"
+            line="239"
+            column="5"/>
     </issue>
 
     <issue
@@ -1922,7 +3676,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="156"
+            line="158"
             column="5"/>
     </issue>
 
@@ -1933,7 +3687,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="167"
+            line="169"
             column="5"/>
     </issue>
 
@@ -1944,7 +3698,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="176"
+            line="178"
             column="5"/>
     </issue>
 
@@ -1955,7 +3709,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="184"
+            line="186"
             column="5"/>
     </issue>
 
@@ -1966,7 +3720,7 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="192"
+            line="194"
             column="5"/>
     </issue>
 
@@ -1977,8 +3731,19 @@
         errorLine2="    ^">
         <location
             file="src/main/res/values-hr/strings-autofill-impl.xml"
-            line="200"
+            line="202"
             column="5"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1435 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;m112.37,39.8 l-1.54,0.4a0.88,0.88 0,0 0,-0.63 0.63l-0.4,1.54a0.84,0.84 0,0 1,-0.8 0.63c-0.4,0 -0.74,-0.29 -0.8,-0.63l-0.4,-1.54a0.88,0.88 0,0 0,-0.63 -0.63l-1.54,-0.4A0.84,0.84 0,0 1,105 39c0,-0.4 0.29,-0.74 0.63,-0.8l1.54,-0.4a0.88,0.88 0,0 0,0.63 -0.63l0.4,-1.54a0.84,0.84 0,0 1,0.8 -0.63c0.4,0 0.74,0.29 0.8,0.63l0.4,1.54a0.88,0.88 0,0 0,0.63 0.63l1.54,0.4c0.4,0.11 0.63,0.46 0.63,0.8 0,0.4 -0.29,0.74 -0.63,0.8ZM26.06,34.2 L23.74,34.8c-0.43,0.09 -0.86,0.51 -0.94,0.94l-0.6,2.31c-0.17,0.6 -0.69,0.94 -1.2,0.94 -0.6,0 -1.11,-0.43 -1.2,-0.94l-0.6,-2.31c-0.09,-0.43 -0.51,-0.86 -0.94,-0.94l-2.31,-0.6c-0.6,-0.17 -0.94,-0.69 -0.94,-1.2 0,-0.6 0.43,-1.11 0.94,-1.2l2.31,-0.6c0.43,-0.09 0.86,-0.51 0.94,-0.94l0.6,-2.31c0.17,-0.6 0.69,-0.94 1.2,-0.94 0.6,0 1.11,0.43 1.2,0.94l0.6,2.31c0.09,0.43 0.51,0.86 0.94,0.94l2.31,0.6c0.6,0.17 0.94,0.69 0.94,1.2 0,0.6 -0.43,1.11 -0.94,1.2ZM7.37,54.8l-1.54,0.4a0.88,0.88 0,0 0,-0.63 0.63l-0.4,1.54A0.84,0.84 0,0 1,4 58c-0.4,0 -0.74,-0.29 -0.8,-0.63l-0.4,-1.54a0.88,0.88 0,0 0,-0.63 -0.63L0.63,54.8A0.84,0.84 0,0 1,0 54c0,-0.4 0.29,-0.74 0.63,-0.8l1.54,-0.4a0.88,0.88 0,0 0,0.63 -0.63l0.4,-1.54a0.84,0.84 0,0 1,0.8 -0.63c0.4,0 0.74,0.29 0.8,0.63l0.4,1.54a0.88,0.88 0,0 0,0.63 0.63l1.54,0.4c0.4,0.11 0.63,0.46 0.63,0.8 0,0.4 -0.29,0.74 -0.63,0.8ZM126.5,52c-0.82,0 -1.5,-0.68 -1.5,-1.5s0.68,-1.5 1.5,-1.5 1.5,0.68 1.5,1.5 -0.68,1.5 -1.5,1.5ZM23,70c-1.1,0 -2,-0.9 -2,-2s0.9,-2 2,-2 2,0.9 2,2 -0.9,2 -2,2Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/autofill_gpm_export_instruction.xml"
+            line="7"
+            column="25"/>
     </issue>
 
     <issue
@@ -2011,6 +3776,39 @@
         <location
             file="src/main/res/drawable/ic_autofill_keychain.xml"
             line="28"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (3704 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M22,12C22,17.525 17.525,22 12,22C6.475,22 2,17.525 2,12C2,6.475 6.475,2 12,2C17.525,2 22,6.475 22,12ZM20.75,12C20.75,16.833 16.833,20.75 12,20.75C7.168,20.75 3.25,16.833 3.25,12C3.25,7.168 7.168,3.25 12,3.25C16.833,3.25 20.75,7.168 20.75,12ZM19.813,12C19.813,15.754 17.165,18.889 13.635,19.641C13.539,19.427 13.444,19.21 13.365,19.026C13.098,19.109 12.719,19.148 12.447,19.157C12.24,19.157 12.073,19.148 11.985,19.026C11.456,19.478 10.387,20.081 10.173,19.94C9.765,19.677 9.381,17.656 9.687,17.233C9.755,17.136 9.881,17.087 10.037,17.073C9.891,17.671 10.231,19.148 10.421,19.298C10.605,19.444 11.928,18.657 11.87,18.472C11.753,18.084 11.753,17.734 11.768,17.515C11.821,17.442 11.985,17.33 12.097,17.282C12.087,17.335 12.083,17.394 12.087,17.462C12.087,17.69 12.116,18.084 12.175,18.254C12.253,18.463 12.335,18.599 12.705,18.594C13.079,18.589 13.681,18.506 13.774,18.341C13.866,18.176 13.744,17.505 13.667,17.292L13.623,17.19C13.618,17.18 13.613,17.17 13.608,17.165H13.738C13.933,17.209 14.099,17.292 14.148,18.187C14.148,18.367 15.406,18.71 15.634,18.613C15.654,18.604 15.664,18.594 15.668,18.584C15.775,18.035 15.712,16.67 15.226,16.091C15.129,15.975 14.133,16.606 13.535,17.053C13.409,16.917 13.186,16.84 12.763,16.908C12.723,16.913 12.687,16.921 12.652,16.928C12.627,16.933 12.602,16.938 12.578,16.942C12.369,16.261 12.248,15.664 12.296,15.275C11.83,15.027 11.519,14.741 11.46,14.629C11.358,14.444 11.529,14.357 11.616,14.405C11.621,14.41 11.631,14.415 11.645,14.42C12.136,14.687 12.923,14.979 13.992,15.032C14.118,15.037 14.25,15.042 14.381,15.042C16.106,15.027 17.112,14.357 16.937,14.021C16.854,13.866 16.496,13.905 15.96,13.965C15.36,14.032 14.536,14.123 13.628,13.992C12.355,13.808 12.228,13.224 12.389,12.977C12.633,12.601 13.093,12.622 13.75,12.65C14.097,12.666 14.499,12.683 14.954,12.646C16.271,12.539 17.019,12.17 17.432,11.699C17.651,11.451 17.748,11.184 17.666,11.023C17.588,10.882 17.369,10.829 16.747,11.067C16.315,11.232 15.664,11.446 14.794,11.548C14.944,10.581 14.493,7.078 12.019,6.548C12.01,6.543 12,6.538 11.99,6.529C11.237,5.567 9.706,5.129 8.249,5.324C8.239,5.324 8.234,5.328 8.229,5.333C8.186,5.353 8.186,5.435 8.234,5.455C8.399,5.513 8.594,5.601 8.739,5.732C8.531,5.844 8.224,6.028 8.054,6.266C8.045,6.276 8.045,6.286 8.045,6.295C8.045,6.325 8.069,6.349 8.103,6.344C8.812,6.203 9.536,6.271 9.964,6.66C9.993,6.684 9.979,6.728 9.94,6.738C6.237,7.743 6.971,10.965 7.957,14.915C8.457,16.918 8.842,18.354 9.092,19.253C6.217,18.1 4.188,15.287 4.188,12C4.188,7.685 7.685,4.188 12,4.188C16.315,4.188 19.813,7.685 19.813,12ZM14.05,8.652L14.032,8.644C13.904,8.587 13.745,8.516 13.472,8.511C13.186,8.506 13.006,8.579 12.889,8.642C12.85,8.662 12.792,8.623 12.811,8.584C12.908,8.429 13.122,8.307 13.472,8.307C13.822,8.307 13.987,8.448 14.099,8.599C14.123,8.628 14.084,8.667 14.05,8.652ZM14.313,10.197C14.313,10.494 14.07,10.737 13.769,10.737C13.467,10.737 13.224,10.494 13.224,10.197C13.224,9.901 13.467,9.658 13.769,9.658C14.07,9.658 14.313,9.896 14.313,10.197ZM9.541,9.94C9.891,9.94 10.173,10.222 10.173,10.571C10.173,10.921 9.891,11.203 9.541,11.203C9.191,11.203 8.91,10.921 8.91,10.571C8.905,10.222 9.191,9.94 9.541,9.94ZM8.88,8.783C8.54,8.924 8.433,9.08 8.365,9.182C8.341,9.221 8.249,9.216 8.249,9.172C8.249,8.978 8.428,8.681 8.807,8.54C9.235,8.38 9.561,8.526 9.706,8.647C9.74,8.672 9.711,8.715 9.672,8.706C9.488,8.662 9.22,8.642 8.88,8.783ZM14.153,10.017C14.153,10.095 14.089,10.158 14.012,10.158C13.934,10.158 13.871,10.095 13.871,10.017C13.871,9.94 13.934,9.877 14.012,9.877C14.089,9.877 14.153,9.94 14.153,10.017ZM9.988,10.358C9.988,10.45 9.915,10.523 9.823,10.523C9.731,10.523 9.658,10.45 9.658,10.358C9.658,10.265 9.731,10.192 9.823,10.192C9.915,10.192 9.988,10.265 9.988,10.358Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_dax_silhouette_primary_24.xml"
+            line="7"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1424 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;m105.63,38.2 l1.54,-0.4a0.88,0.88 0,0 0,0.63 -0.63l0.4,-1.54A0.84,0.84 0,0 1,109 35c0.4,0 0.74,0.29 0.8,0.63l0.4,1.54a0.88,0.88 0,0 0,0.63 0.63l1.54,0.4c0.4,0.11 0.63,0.46 0.63,0.8 0,0.4 -0.29,0.74 -0.63,0.8l-1.54,0.4a0.88,0.88 0,0 0,-0.63 0.63l-0.4,1.54a0.84,0.84 0,0 1,-0.8 0.63c-0.4,0 -0.74,-0.29 -0.8,-0.63l-0.4,-1.54a0.88,0.88 0,0 0,-0.63 -0.63l-1.54,-0.4A0.84,0.84 0,0 1,105 39c0,-0.4 0.29,-0.74 0.63,-0.8m-89.69,-6.4 l2.31,-0.6c0.43,-0.09 0.86,-0.51 0.94,-0.94l0.6,-2.31c0.17,-0.6 0.69,-0.94 1.2,-0.94 0.6,0 1.11,0.43 1.2,0.94l0.6,2.31c0.09,0.43 0.51,0.86 0.94,0.94l2.31,0.6c0.6,0.17 0.94,0.69 0.94,1.2 0,0.6 -0.43,1.11 -0.94,1.2l-2.31,0.6c-0.43,0.09 -0.86,0.51 -0.94,0.94l-0.6,2.31c-0.17,0.6 -0.69,0.94 -1.2,0.94 -0.6,0 -1.11,-0.43 -1.2,-0.94l-0.6,-2.31c-0.09,-0.43 -0.51,-0.86 -0.94,-0.94l-2.31,-0.6c-0.6,-0.17 -0.94,-0.69 -0.94,-1.2 0,-0.6 0.43,-1.11 0.94,-1.2ZM0.63,53.2l1.54,-0.4a0.88,0.88 0,0 0,0.63 -0.63l0.4,-1.54A0.84,0.84 0,0 1,4 50c0.4,0 0.74,0.29 0.8,0.63l0.4,1.54a0.88,0.88 0,0 0,0.63 0.63l1.54,0.4c0.4,0.11 0.63,0.46 0.63,0.8 0,0.4 -0.29,0.74 -0.63,0.8l-1.54,0.4a0.88,0.88 0,0 0,-0.63 0.63l-0.4,1.54A0.84,0.84 0,0 1,4 58c-0.4,0 -0.74,-0.29 -0.8,-0.63l-0.4,-1.54a0.88,0.88 0,0 0,-0.63 -0.63L0.63,54.8A0.84,0.84 0,0 1,0 54c0,-0.4 0.29,-0.74 0.63,-0.8ZM126.5,52c-0.82,0 -1.5,-0.68 -1.5,-1.5s0.68,-1.5 1.5,-1.5 1.5,0.68 1.5,1.5 -0.68,1.5 -1.5,1.5M23,70c-1.1,0 -2,-0.9 -2,-2s0.9,-2 2,-2 2,0.9 2,2 -0.9,2 -2,2&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_passwords_import_128.xml"
+            line="8"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1676 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M96.84,19.91C97.93,21.67 98.54,24.11 98.03,26.08C97.66,27.48 96.76,28.4 95.66,28.91C94.66,29.38 93.55,29.49 92.61,29.5C91.71,29.5 90.78,29.41 90,29.32C90.03,29.57 90.07,29.84 90.1,30.11C90.17,30.58 90.23,31.04 90.29,31.48C90.34,31.83 90.38,32.16 90.42,32.48C90.51,33.11 90.6,33.82 90.6,34.2C90.6,34.62 90.52,35.22 90.1,35.77C89.65,36.36 89.03,36.61 88.52,36.68C87.68,36.79 86.88,36.47 86.45,36.28C85.43,35.82 84.17,34.99 83.07,34.24C82.73,34.01 82.41,33.79 82.1,33.58C81.78,33.35 81.47,33.14 81.18,32.94C81.19,33.12 81.2,33.3 81.21,33.49C81.22,33.58 81.23,33.67 81.23,33.76C81.3,34.86 81.4,36.27 81.12,37.65C80.9,38.71 79.86,39.4 78.79,39.18C77.73,38.96 77.04,37.92 77.26,36.85C77.43,36.02 77.37,35.11 77.29,33.86C77.29,33.82 77.29,33.78 77.28,33.74C77.21,32.55 77.12,31 77.55,29.47C77.66,29.1 77.88,28.7 78.26,28.39C78.64,28.09 79.04,27.97 79.35,27.92C79.89,27.85 80.36,27.99 80.58,28.07C81.08,28.24 81.62,28.54 82.06,28.82C82.76,29.24 83.61,29.83 84.43,30.4C84.72,30.6 85.01,30.8 85.29,30.99C85.66,31.24 86.01,31.48 86.34,31.69C86.29,31.34 86.24,30.97 86.2,30.62C86.09,29.79 85.99,28.95 85.94,28.3C85.91,27.98 85.89,27.64 85.91,27.35C85.91,27.22 85.93,26.96 86.01,26.69C86.05,26.56 86.14,26.27 86.37,25.97C86.64,25.63 87.17,25.2 87.95,25.2C88.59,25.2 89.36,25.29 90.05,25.37C90.13,25.38 90.22,25.39 90.3,25.4C91.12,25.49 91.89,25.56 92.58,25.56C93.3,25.55 93.75,25.46 94,25.35C94.15,25.28 94.18,25.24 94.21,25.1C94.38,24.44 94.19,23.1 93.5,21.99C92.81,20.89 92.24,20.85 91.9,20.97C90.87,21.31 89.75,20.75 89.41,19.72C89.07,18.69 89.62,17.58 90.65,17.23C93.56,16.26 95.75,18.16 96.84,19.91ZM89.84,27.52C89.84,27.51 89.84,27.51 89.84,27.53C89.84,27.52 89.84,27.52 89.84,27.52Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_success_128.xml"
+            line="121"
             column="25"/>
     </issue>
 

@@ -50,6 +50,13 @@
         app:leadingIcon="@drawable/ic_shield_color_24"
         app:primaryText="@string/settingsWebTrackingProtectionTitle" />
 
+    <LinearLayout
+        android:id="@+id/settingsSectionThreatProtection"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+    </LinearLayout>
+
     <com.duckduckgo.common.ui.view.listitem.SettingsListItem
         android:id="@+id/cookiePopupProtectionSetting"
         android:layout_width="match_parent"
@@ -70,5 +77,12 @@
         android:layout_height="wrap_content"
         app:leadingIcon="@drawable/ic_email_protection_color_24"
         app:primaryText="@string/settingsEmailProtectionTitle" />
+
+    <com.duckduckgo.common.ui.view.listitem.SettingsListItem
+        android:id="@+id/widgetPromptSetting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_home_screen_widget_color_24"
+        app:primaryText="@string/settingsAddHomeWidgetTitle" />
 
 </LinearLayout>

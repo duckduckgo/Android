@@ -21,9 +21,8 @@ import androidx.room.RoomDatabase
 
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
-        AutoconsentExceptionEntity::class,
         DisabledCmpsEntity::class,
     ],
 )

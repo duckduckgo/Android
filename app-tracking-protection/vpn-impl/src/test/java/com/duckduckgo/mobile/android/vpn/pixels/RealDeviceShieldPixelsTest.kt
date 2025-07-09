@@ -18,14 +18,17 @@ package com.duckduckgo.mobile.android.vpn.pixels
 
 import androidx.core.content.edit
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
 
@@ -35,6 +38,9 @@ class RealDeviceShieldPixelsTest {
     private val sharedPreferencesProvider = mock<SharedPreferencesProvider>()
     private val prefs = InMemorySharedPreferences()
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Before
@@ -43,7 +49,13 @@ class RealDeviceShieldPixelsTest {
             sharedPreferencesProvider.getSharedPreferences(eq("com.duckduckgo.mobile.android.device.shield.pixels"), eq(true), eq(true)),
         ).thenReturn(prefs)
 
-        deviceShieldPixels = RealDeviceShieldPixels(pixel, sharedPreferencesProvider)
+        deviceShieldPixels = RealDeviceShieldPixels(
+            pixel,
+            sharedPreferencesProvider,
+            mock<AppTpTDSPixelsPlugin>(),
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @Test

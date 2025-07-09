@@ -18,9 +18,30 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">Duck.ai on valikuline funktsioon, mis võimaldab anonüümselt vestelda populaarsete kolmanda poole AI vestlusmudelitega. Teie vestlusi ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
-    <string name="duck_chat_visibility_setting">Kuva Duck.ai brauseri menüüs</string>
-
     <string name="duck_chat_download_finished_action_name">Avatud</string>
     <string name="duck_chat_cannot_open_file_error_message">Faili ei saa avada. Otsi ühilduvat rakendust.</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Juurdepääs kaamerale nurjus</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Laadi pilt üles</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vali fail</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tee pilt</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme kaamerale</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Saidid saavad sinu kaamerat kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Ava sätted</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Loobu</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Ei saanud juurdepääsu helisalvestile</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Luba DuckDuckGo’l küsida juurdepääsu selle seadme helisalvestile</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Saidid saavad helisalvestit kasutada ainult siis, kui lubad DuckDuckGo’l küsida sellele juurdepääsu.</string>
+
+    <!-- Settings -->
+    <string name="duck_chat_settings_activity_description">Duck.ai on valikuline funktsioon, mis võimaldab anonüümselt vestelda populaarsete kolmanda poole AI vestlusmudelitega. Teie vestlusi ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Luba Duck.ai</string>
+    <string name="duck_chat_show_in_heading">Otseteed</string>
+    <string name="duck_chat_visibility_setting">Brauseri menüü</string>
+    <string name="duck_chat_address_bar_visibility_setting">Aadressiriba</string>
+    <string name="duck_chat_assist_settings_title">Assisti seaded</string>
+    <string name="duck_chat_assist_settings_description">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
 </resources>

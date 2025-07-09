@@ -1,0 +1,48 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M7,2a4,4 0,0 0,-4 4v12a4,4 0,0 0,4 4h3.787c0.652,0 0.99,-0.987 0.59,-1.5a6.5,6.5 0,0 1,8.124 -9.768c0.616,0.322 1.499,-0.08 1.499,-0.775V6a4,4 0,0 0,-4 -4H7Z"
+      android:fillColor="#F5F5F5"/>
+  <path
+      android:pathData="M7,3.5h10A2.5,2.5 0,0 1,19.5 6v4.732c0.617,0.322 1.5,-0.08 1.5,-0.775V6a4,4 0,0 0,-4 -4H7a4,4 0,0 0,-4 4v12a4,4 0,0 0,4 4h3.787c0.652,0 0.99,-0.987 0.59,-1.5H7A2.5,2.5 0,0 1,4.5 18V6A2.5,2.5 0,0 1,7 3.5Z"
+      android:fillColor="#666"/>
+  <path
+      android:pathData="M10.174,15a6.52,6.52 0,0 0,0.324 4H7a1,1 0,0 1,-1 -1v-2a1,1 0,0 1,1 -1h3.174Z"
+      android:fillColor="#DDD"/>
+  <path
+      android:pathData="M6,6a1,1 0,0 1,1 -1h10a1,1 0,0 1,1 1v0.5a1,1 0,0 1,-1 1H7a1,1 0,0 1,-1 -1V6Z"
+      android:fillColor="#DE5833"/>
+  <path
+      android:pathData="M6,9.75A0.75,0.75 0,0 1,6.75 9h4.5a0.75,0.75 0,0 1,0 1.5h-4.5A0.75,0.75 0,0 1,6 9.75ZM6,12.75a0.75,0.75 0,0 1,0.75 -0.75h5.06a6.52,6.52 0,0 0,-1.078 1.5L6.75,13.5a0.75,0.75 0,0 1,-0.75 -0.75Z"
+      android:fillColor="#AAA"/>
+  <path
+      android:pathData="M22,16.5a5.5,5.5 0,1 1,-11 0,5.5 5.5,0 0,1 11,0Z"
+      android:fillColor="#DE5833"/>
+  <path
+      android:pathData="M16.5,20.667a4.167,4.167 0,1 0,0 -8.334,4.167 4.167,0 0,0 0,8.334ZM16.5,22a5.5,5.5 0,1 0,0 -11,5.5 5.5,0 0,0 0,11Z"
+      android:fillColor="#9A3216"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M13.834,16.5c0,-0.368 0.298,-0.667 0.666,-0.667h4a0.667,0.667 0,0 1,0 1.334h-4a0.667,0.667 0,0 1,-0.666 -0.667Z"
+      android:fillColor="#fff"
+      android:fillType="evenOdd"/>
+</vector>

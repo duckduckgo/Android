@@ -17,19 +17,14 @@
 package com.duckduckgo.brokensite.impl
 
 import android.net.Uri
-import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
+import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal const val REFRESH_COUNT_WINDOW = 20L
-
-@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-internal const val REFRESH_COUNT_LIMIT = 3
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealBrokenSitePrompt @Inject constructor(
@@ -65,23 +60,16 @@ class RealBrokenSitePrompt @Inject constructor(
         brokenSiteReportRepository.addRefresh(url, currentTimeProvider.localDateTimeNow())
     }
 
-    override fun resetRefreshCount() {
-        brokenSiteReportRepository.resetRefreshCount()
+    override fun getUserRefreshPatterns(): Set<RefreshPattern> {
+        return brokenSiteReportRepository.getRefreshPatterns(currentTimeProvider.localDateTimeNow())
     }
 
-    override fun getUserRefreshesCount(): Int {
-        return brokenSiteReportRepository.getAndUpdateUserRefreshesBetween(
-            currentTimeProvider.localDateTimeNow().minusSeconds(REFRESH_COUNT_WINDOW),
-            currentTimeProvider.localDateTimeNow(),
-        ).also {
-            if (it >= REFRESH_COUNT_LIMIT) {
-                brokenSiteReportRepository.resetRefreshCount()
-            }
+    override suspend fun shouldShowBrokenSitePrompt(url: String, refreshPatterns: Set<RefreshPattern>): Boolean {
+        if (!isFeatureEnabled() || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            return false
         }
-    }
 
-    override suspend fun shouldShowBrokenSitePrompt(url: String): Boolean {
-        if (!isFeatureEnabled() || getUserRefreshesCount() < REFRESH_COUNT_LIMIT || duckGoUrlDetector.isDuckDuckGoUrl(url)) {
+        if (refreshPatterns.none { it == RefreshPattern.THRICE_IN_20_SECONDS }) {
             return false
         }
 
@@ -90,15 +78,18 @@ class RealBrokenSitePrompt @Inject constructor(
         // Check if we're still in a cooldown period
         brokenSiteReportRepository.getNextShownDate()?.let { nextDate ->
             if (currentTimestamp.isBefore(nextDate)) {
+                logcat { "BrokenSitePrompt should NOT show bc cooldown: NextDate= $nextDate" }
                 return false
             }
         }
 
+        // Check if we've reached max dismissals
         val dismissStreakResetDays = brokenSiteReportRepository.getDismissStreakResetDays().toLong()
         val dismissalCount = brokenSiteReportRepository.getDismissalCountBetween(
             currentTimestamp.minusDays(dismissStreakResetDays),
             currentTimestamp,
         )
+        logcat { "BrokenSitePrompt final check: dismissCount($dismissalCount) < maxDismissStreak?" }
 
         return dismissalCount < brokenSiteReportRepository.getMaxDismissStreak()
     }

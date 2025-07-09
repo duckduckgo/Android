@@ -209,7 +209,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">В DuckDuckGo можно импортировать сохраненные пароли из другого браузера.</string>
 
     <string name="autofillManagementImportPasswords">Импорт паролей</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Взять пароли из настольного приложения</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Как импортировать пароли</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Как синхронизировать пароли из настольного браузера</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Импортируйте пароли в настольную версию браузера DuckDuckGo, а затем синхронизируйте их между устройствами.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Скачать настольный браузер</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ссылка скопирована</string>
@@ -257,8 +259,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Импортировать пароли из Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Импортировать пароли из Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизировать пароли с DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизировать пароли с DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Взять пароли из настольного приложения</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Взять пароли из настольного приложения</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Импорт паролей из Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
@@ -272,5 +274,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Не удалось импортировать пароли</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Пропущено (дубликаты и недействительные): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Импортировано паролей: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Открыть пароли</string>
+    <string name="autofill_service_select_password_activity">Выберите сохраненный пароль</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Пароли и автозаполнение</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Сбросить список исключений?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Если вы очистите список исключений, при следующем входе на любой из этих сайтов система предложит вам сохранить пароль.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Сбросить</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Отменить</string>
+    <string name="autofillSettingsPasswordsEntry">Пароли</string>
+    <string name="autofillSettingsAutofillToggleLabel">Предлагать сохранение и автозаполнение данных</string>
+    <string name="autofillSettingsAutofillSubtitle">Пароли подвергаются шифрованию. Никто, кроме вас, их не увидит. Даже мы. <annotation type="learn_more_link">Подробнее...</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Импорт паролей</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Импортировать пароли из Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Взять пароли из настольного приложения</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Сбросить список исключений</string>
 
 </resources>

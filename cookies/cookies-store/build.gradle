@@ -31,7 +31,7 @@ dependencies {
 
     implementation AndroidX.core.ktx
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi
 
     // Room
@@ -58,5 +58,6 @@ android {
     namespace 'com.duckduckgo.cookies.store'
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
 }

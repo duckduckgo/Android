@@ -27,8 +27,10 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DEFAULT_BROWSER
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_FULL_VERSION
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.WEBVIEW_VERSION
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
@@ -41,7 +43,9 @@ import javax.inject.Inject
 import javax.inject.Provider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -58,6 +62,7 @@ class EnqueuedPixelWorker @Inject constructor(
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val privacyProtectionsPopupExperimentExternalPixels: PrivacyProtectionsPopupExperimentExternalPixels,
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall,
+    private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
@@ -69,20 +74,21 @@ class EnqueuedPixelWorker @Inject constructor(
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        Timber.d("onStart called")
+        logcat { "onStart called" }
 
         if (launchedByFireAction) {
             // skip the next on_start if branch
-            Timber.i("Suppressing app launch pixel")
+            logcat(INFO) { "Suppressing app launch pixel" }
             launchedByFireAction = false
             return
         }
-        Timber.i("Sending app launch pixel")
+        logcat(INFO) { "Sending app launch pixel" }
         val collectWebViewFullVersion =
             androidBrowserConfigFeature.self().isEnabled() && androidBrowserConfigFeature.collectFullWebViewVersion().isEnabled()
         val paramsMap = mutableMapOf<String, String>().apply {
             put(WEBVIEW_VERSION, webViewVersionProvider.getMajorVersion())
             put(DEFAULT_BROWSER, defaultBrowserDetector.isDefaultBrowser().toString())
+            put(IS_DUCKDUCKGO_PACKAGE, isDuckDuckGoAppPackage(appBuildConfig.applicationId))
             if (collectWebViewFullVersion) {
                 put(WEBVIEW_FULL_VERSION, webViewVersionProvider.getFullVersion())
             }
@@ -104,10 +110,14 @@ class EnqueuedPixelWorker @Inject constructor(
         }
     }
 
+    private fun isDuckDuckGoAppPackage(applicationId: String): String {
+        return (applicationId == "com.duckduckgo.mobile.android" || applicationId == "com.duckduckgo.mobile.android.debug").toString()
+    }
+
     private fun isLaunchByFireAction(): Boolean {
         val timeDifferenceMillis = System.currentTimeMillis() - unsentForgetAllPixelStore.lastClearTimestamp
         if (timeDifferenceMillis <= APP_RESTART_CAUSED_BY_FIRE_GRACE_PERIOD) {
-            Timber.i("The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)")
+            logcat(INFO) { "The app was re-launched as a result of the fire action being triggered (happened ${timeDifferenceMillis}ms ago)" }
             return true
         }
         return false
@@ -115,7 +125,7 @@ class EnqueuedPixelWorker @Inject constructor(
 
     fun submitUnsentFirePixels() {
         val count = unsentForgetAllPixelStore.pendingPixelCountClearData
-        Timber.i("Found $count unsent clear data pixels")
+        logcat(INFO) { "Found $count unsent clear data pixels" }
         if (count > 0) {
             for (i in 1..count) {
                 pixel.get().fire(AppPixelName.FORGET_ALL_EXECUTED)
@@ -129,7 +139,7 @@ class EnqueuedPixelWorker @Inject constructor(
         private const val WORKER_SEND_ENQUEUED_PIXELS = "com.duckduckgo.pixels.enqueued.worker"
 
         private fun scheduleWorker(workManager: WorkManager) {
-            Timber.v("Scheduling the EnqueuedPixelWorker")
+            logcat(VERBOSE) { "Scheduling the EnqueuedPixelWorker" }
 
             val request = PeriodicWorkRequestBuilder<RealEnqueuedPixelWorker>(2, TimeUnit.HOURS)
                 .addTag(WORKER_SEND_ENQUEUED_PIXELS)
@@ -153,7 +163,7 @@ class RealEnqueuedPixelWorker(
     lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
     override suspend fun doWork(): Result {
-        Timber.v("Sending enqueued pixels")
+        logcat(VERBOSE) { "Sending enqueued pixels" }
 
         enqueuedPixelWorker.submitUnsentFirePixels()
 

@@ -29,20 +29,50 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class DuckChatFeatureRepositoryTest {
-    private val mockDatabase: DuckChatDataStore = mock()
+    private val mockDataStore: DuckChatDataStore = mock()
 
-    private val testee = RealDuckChatFeatureRepository(mockDatabase)
+    private val testee = RealDuckChatFeatureRepository(mockDataStore)
 
     @Test
-    fun whenSetShowInBrowserMenuThenSetInDatabase() = runTest {
-        testee.setShowInBrowserMenu(true)
+    fun whenSetDuckChatUserEnabledThenSetInDataStore() = runTest {
+        testee.setDuckChatUserEnabled(true)
 
-        verify(mockDatabase).setShowInBrowserMenu(true)
+        verify(mockDataStore).setDuckChatUserEnabled(true)
     }
 
     @Test
-    fun whenObserveShowInBrowserMenuThenObserveDatabase() = runTest {
-        whenever(mockDatabase.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
+    fun whenSetShowInBrowserMenuThenSetInDataStore() = runTest {
+        testee.setShowInBrowserMenu(true)
+
+        verify(mockDataStore).setShowInBrowserMenu(true)
+    }
+
+    @Test
+    fun whenSetShowInAddressBarThenSetInDataStore() = runTest {
+        testee.setShowInAddressBar(false)
+
+        verify(mockDataStore).setShowInAddressBar(false)
+    }
+
+    @Test
+    fun `when setInputScreenUserSetting then set in data store`() = runTest {
+        testee.setInputScreenUserSetting(false)
+
+        verify(mockDataStore).setInputScreenUserSetting(false)
+    }
+
+    @Test
+    fun whenObserveDuckChatUserEnabledThenObserveDataStore() = runTest {
+        whenever(mockDataStore.observeDuckChatUserEnabled()).thenReturn(flowOf(true, false))
+
+        val results = testee.observeDuckChatUserEnabled().take(2).toList()
+        assertTrue(results[0])
+        assertFalse(results[1])
+    }
+
+    @Test
+    fun whenObserveShowInBrowserMenuThenObserveDataStore() = runTest {
+        whenever(mockDataStore.observeShowInBrowserMenu()).thenReturn(flowOf(true, false))
 
         val results = testee.observeShowInBrowserMenu().take(2).toList()
         assertTrue(results[0])
@@ -50,22 +80,58 @@ class DuckChatFeatureRepositoryTest {
     }
 
     @Test
-    fun whenShouldShowInBrowserMenuThenGetFromDatabase() {
-        whenever(mockDatabase.getShowInBrowserMenu()).thenReturn(true)
+    fun whenObserveShowInAddressBarThenObserveDataStore() = runTest {
+        whenever(mockDataStore.observeShowInAddressBar()).thenReturn(flowOf(false, true))
+
+        val results = testee.observeShowInAddressBar().take(2).toList()
+        assertFalse(results[0])
+        assertTrue(results[1])
+    }
+
+    @Test
+    fun `when observeInputScreenUserSettingEnabled then observe data store`() = runTest {
+        whenever(mockDataStore.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(false, true))
+
+        val results = testee.observeInputScreenUserSettingEnabled().take(2).toList()
+        assertFalse(results[0])
+        assertTrue(results[1])
+    }
+
+    @Test
+    fun whenIsDuckChatUserEnabledThenGetFromDataStore() = runTest {
+        whenever(mockDataStore.isDuckChatUserEnabled()).thenReturn(false)
+        assertFalse(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenShouldShowInBrowserMenuThenGetFromDataStore() = runTest {
+        whenever(mockDataStore.getShowInBrowserMenu()).thenReturn(true)
 
         assertTrue(testee.shouldShowInBrowserMenu())
     }
 
     @Test
-    fun `when register Duck Chat opened, then data store called`() = runTest {
-        testee.registerOpened()
-
-        verify(mockDatabase).registerOpened()
+    fun whenShouldShowInAddressBarThenGetFromDataStore() = runTest {
+        whenever(mockDataStore.getShowInAddressBar()).thenReturn(true)
+        assertTrue(testee.shouldShowInAddressBar())
     }
 
     @Test
-    fun `when was opened before checked, then return data from the store`() = runTest {
-        whenever(mockDatabase.wasOpenedBefore()).thenReturn(true)
+    fun `when isInputScreenUserSettingEnabled called, then get from data store`() = runTest {
+        whenever(mockDataStore.isInputScreenUserSettingEnabled()).thenReturn(true)
+        assertTrue(testee.isInputScreenUserSettingEnabled())
+    }
+
+    @Test
+    fun whenRegisterDuckChatOpenedThenDataStoreCalled() = runTest {
+        testee.registerOpened()
+
+        verify(mockDataStore).registerOpened()
+    }
+
+    @Test
+    fun whenWasOpenedBeforeCheckedThenReturnDataFromTheStore() = runTest {
+        whenever(mockDataStore.wasOpenedBefore()).thenReturn(true)
 
         val result = testee.wasOpenedBefore()
 

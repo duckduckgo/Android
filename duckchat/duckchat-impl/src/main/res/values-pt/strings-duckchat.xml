@@ -18,9 +18,30 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">O Duck.ai é uma funcionalidade opcional que te permite conversar anonimamente com modelos de chat de IA populares de terceiros. As tuas conversas não são utilizadas para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
-    <string name="duck_chat_visibility_setting">Mostrar Duck.ai no menu do navegador</string>
-
     <string name="duck_chat_download_finished_action_name">Abrir</string>
     <string name="duck_chat_cannot_open_file_error_message">Não é possível abrir o ficheiro. Verificar se a aplicação é compatível.</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Não foi possível aceder à câmara</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Carrega uma imagem</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Escolher ficheiro</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Tirar fotografia</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Permitir que o DuckDuckGo peça acesso à câmara neste dispositivo</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Os sites só podem utilizar a tua câmara se autorizares o DuckDuckGo a pedir acesso.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Abrir Definições</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Cancelar</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Não foi possível aceder ao gravador de som</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Permitir que o DuckDuckGo peça acesso ao gravador de som neste dispositivo</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Os sites só podem utilizar o gravador de som se autorizares o DuckDuckGo a pedir acesso.</string>
+
+    <!-- Settings -->
+    <string name="duck_chat_settings_activity_description">O Duck.ai é uma funcionalidade opcional que te permite conversar anonimamente com modelos de chat de IA populares de terceiros. As tuas conversas não são utilizadas para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Ativar Duck.ai</string>
+    <string name="duck_chat_show_in_heading">Atalhos</string>
+    <string name="duck_chat_visibility_setting">Menu do navegador</string>
+    <string name="duck_chat_address_bar_visibility_setting">Barra de endereço</string>
+    <string name="duck_chat_assist_settings_title">Definições do Assist</string>
+    <string name="duck_chat_assist_settings_description">Escolhe a frequência com que queres que as respostas assistidas por IA apareçam nas suas pesquisas</string>
 </resources>

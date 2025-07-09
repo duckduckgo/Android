@@ -82,6 +82,8 @@ sealed class Content(val messageType: MessageType) {
         APP_UPDATE("AppUpdate"),
         MAC_AND_WINDOWS("NewForMacAndWindows"),
         PRIVACY_SHIELD("PrivacyShield"),
+        DUCK_AI("Duck.ai"),
+        VISUAL_DESIGN_UPDATE("VisualDesignUpdate"),
         ;
 
         companion object {

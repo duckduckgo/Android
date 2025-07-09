@@ -18,9 +18,19 @@ package com.duckduckgo.mobile.android.vpn.pixels
 
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.mobile.android.vpn.feature.AppTpTDSPixelsPlugin
+import com.duckduckgo.mobile.android.vpn.feature.didFailToDownloadTDS
+import com.duckduckgo.mobile.android.vpn.feature.getDisabledProtectionForApp
+import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromAll
+import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromDetail
+import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableAppProtection
+import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableProtection
+import com.duckduckgo.mobile.android.vpn.feature.getSelectedRemoveAppTP
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.time.Instant
@@ -31,6 +41,8 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.absoluteValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 interface DeviceShieldPixels {
     /** This pixel will be unique on a given day, no matter how many times we call this fun */
@@ -307,6 +319,8 @@ interface DeviceShieldPixels {
     fun reportAnylocalDnsError()
     fun reportGeneralDnsError()
 
+    fun reportBlocklistStats(payload: Map<String, String>)
+
     /**
      * Will fire when the user is interacting with the Promote Always On Dialog
      */
@@ -352,6 +366,8 @@ interface DeviceShieldPixels {
 
     fun reportTunnelThreadStopTimeout()
 
+    fun reportTunnelThreadAbnormalCrash()
+
     fun reportVpnAlwaysOnTriggered()
 
     fun notifyStartFailed()
@@ -379,6 +395,13 @@ interface DeviceShieldPixels {
 
     fun reportPproUpsellRevokedInfoShown()
     fun reportPproUpsellRevokedInfoLinkClicked()
+
+    /** Fires when the AppTP experiment blocklist fails to download. */
+    fun appTPBlocklistExperimentDownloadFailure(
+        statusCode: Int,
+        experimentName: String,
+        experimentCohort: String,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -386,6 +409,9 @@ interface DeviceShieldPixels {
 class RealDeviceShieldPixels @Inject constructor(
     private val pixel: Pixel,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
+    private val appTpTDSPixelsPlugin: AppTpTDSPixelsPlugin,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : DeviceShieldPixels {
 
     private val preferences: SharedPreferences by lazy {
@@ -646,10 +672,20 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didChooseToDisableTrackingProtectionFromDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_TRACKING_PROTECTION_DIALOG)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.getSelectedDisableProtection()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     override fun didChooseToDisableOneAppFromDialog() {
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_DISABLE_ONE_APP_PROTECTION_DIALOG)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.getSelectedDisableAppProtection()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     override fun didChooseToCancelTrackingProtectionDialog() {
@@ -722,12 +758,24 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_REPORT_DNS_SET_ERROR)
     }
 
+    override fun reportBlocklistStats(payload: Map<String, String>) {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY, payload)
+    }
+
     override fun didEnableAppProtectionFromDetail() {
         firePixel(DeviceShieldPixelNames.ATP_DID_ENABLE_APP_PROTECTION_FROM_DETAIL)
     }
 
     override fun didDisableAppProtectionFromDetail() {
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_DETAIL)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.getProtectionDisabledAppFromDetail()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     override fun didEnableAppProtectionFromApps() {
@@ -736,6 +784,14 @@ class RealDeviceShieldPixels @Inject constructor(
 
     override fun didDisableAppProtectionFromApps() {
         firePixel(DeviceShieldPixelNames.ATP_DID_DISABLE_APP_PROTECTION_FROM_ALL)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.getProtectionDisabledAppFromAll()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+            appTpTDSPixelsPlugin.getDisabledProtectionForApp()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     override fun didShowRemoveTrackingProtectionFeatureDialog() {
@@ -747,6 +803,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun didChooseToRemoveTrackingProtectionFeature() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_DID_CHOOSE_REMOVE_TRACKING_PROTECTION_DIALOG)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.getSelectedRemoveAppTP()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     override fun didChooseToCancelRemoveTrakcingProtectionDialog() {
@@ -830,6 +891,11 @@ class RealDeviceShieldPixels @Inject constructor(
         firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT)
     }
 
+    override fun reportTunnelThreadAbnormalCrash() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_CRASH_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_CRASH)
+    }
+
     override fun reportVpnAlwaysOnTriggered() {
         tryToFireDailyPixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED_DAILY)
         firePixel(DeviceShieldPixelNames.REPORT_VPN_ALWAYS_ON_TRIGGERED)
@@ -890,6 +956,22 @@ class RealDeviceShieldPixels @Inject constructor(
         tryToFireUniquePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_UNIQUE)
         tryToFireDailyPixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED_DAILY)
         firePixel(DeviceShieldPixelNames.APPTP_PPRO_UPSELL_REVOKED_INFO_LINK_CLICKED)
+    }
+
+    override fun appTPBlocklistExperimentDownloadFailure(statusCode: Int, experimentName: String, experimentCohort: String) {
+        firePixel(
+            DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED,
+            mapOf(
+                "code" to statusCode.toString(),
+                "experimentName" to experimentName,
+                "experimentCohort" to experimentCohort,
+            ),
+        )
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            appTpTDSPixelsPlugin.didFailToDownloadTDS()?.getPixelDefinitions()?.forEach {
+                firePixel(it.pixelName, it.params)
+            }
+        }
     }
 
     private fun firePixel(

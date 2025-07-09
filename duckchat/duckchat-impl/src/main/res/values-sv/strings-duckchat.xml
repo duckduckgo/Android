@@ -18,9 +18,30 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="duck_chat_title">Duck.ai</string>
-    <string name="duck_chat_settings_activity_description">Duck.ai är en valfri funktion som låter dig chatta anonymt med populära AI-chattmodeller från tredje part. Dina chattar används inte för att träna AI.\n<annotation type="learn_more_link">Läs mer</annotation></string>
-    <string name="duck_chat_visibility_setting">Visa Duck.ai i webbläsarmenyn</string>
-
     <string name="duck_chat_download_finished_action_name">Öppna</string>
     <string name="duck_chat_cannot_open_file_error_message">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Det gick inte att komma åt kameran</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Ladda upp en bild</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Välj fil</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ta foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillåt DuckDuckGo att be om kameraåtkomst på den här enheten</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Webbplatser kan endast använda din kamera om du tillåter DuckDuckGo att be om åtkomst.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Öppna inställningar</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Det gick inte att komma åt ljudinspelaren</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Tillåt DuckDuckGo att be om åtkomst till ljudinspelaren på den här enheten</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Webbplatser kan endast använda ljudinspelaren om du tillåter DuckDuckGo att be om åtkomst.</string>
+
+    <!-- Settings -->
+    <string name="duck_chat_settings_activity_description">Duck.ai är en valfri funktion som låter dig chatta anonymt med populära AI-chattmodeller från tredje part. Dina chattar används inte för att träna AI.\n<annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting">Aktivera Duck.ai</string>
+    <string name="duck_chat_show_in_heading">Genvägar</string>
+    <string name="duck_chat_visibility_setting">Webbläsarmeny</string>
+    <string name="duck_chat_address_bar_visibility_setting">Adressfält</string>
+    <string name="duck_chat_assist_settings_title">Assist-inställningar</string>
+    <string name="duck_chat_assist_settings_description">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
 </resources>

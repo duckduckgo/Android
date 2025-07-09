@@ -21,14 +21,13 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.experiments.visual.AppPersonalityFeature
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -37,16 +36,16 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
 class VisualDesignExperimentViewModel @Inject constructor(
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
+    private val visualUpdatesDesignExperimentConflictChecker: VisualUpdatesDesignExperimentConflictChecker,
     private val themingDataStore: ThemingDataStore,
-    private val appPersonalityFeature: AppPersonalityFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
         val isBrowserThemingFeatureAvailable: Boolean = false,
+        val isBrowserThemingFeatureChangeable: Boolean = false,
         val isBrowserThemingFeatureEnabled: Boolean = false,
-        val isNavigationBarAvailable: Boolean = false,
-        val isNavigationBarEnabled: Boolean = false,
+        val experimentConflictAlertVisible: Boolean = false,
         val selectedTheme: String = "",
     )
 
@@ -59,36 +58,16 @@ class VisualDesignExperimentViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            visualDesignExperimentDataStore.experimentState.collect { state ->
+            visualUpdatesDesignExperimentConflictChecker.anyConflictingExperimentEnabled.collectLatest { anyConflictingExperimentEnabled ->
                 _viewState.update {
                     it.copy(
-                        isBrowserThemingFeatureAvailable = state.isAvailable,
-                        isBrowserThemingFeatureEnabled = state.isEnabled,
+                        isBrowserThemingFeatureAvailable = false,
+                        isBrowserThemingFeatureEnabled = false,
+                        isBrowserThemingFeatureChangeable = !anyConflictingExperimentEnabled,
+                        experimentConflictAlertVisible = anyConflictingExperimentEnabled,
                     )
                 }
             }
-        }
-
-        viewModelScope.launch {
-            visualDesignExperimentDataStore.navigationBarState.collect { state ->
-                _viewState.update {
-                    it.copy(
-                        isNavigationBarAvailable = state.isAvailable,
-                        isNavigationBarEnabled = state.isEnabled,
-                    )
-                }
-            }
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onExperimentalUIModeChanged(checked: Boolean) {
-        visualDesignExperimentDataStore.setExperimentStateUserPreference(checked)
-        if (checked) {
-            appPersonalityFeature.self().setRawStoredState(State(false))
-            appPersonalityFeature.variant1().setRawStoredState(State(false))
-            appPersonalityFeature.variant2().setRawStoredState(State(false))
-            appPersonalityFeature.variant3().setRawStoredState(State(false))
         }
     }
 }

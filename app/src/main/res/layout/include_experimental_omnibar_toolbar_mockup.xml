@@ -48,18 +48,29 @@
             android:importantForAccessibility="no"
             android:paddingVertical="6dp"
             android:paddingHorizontal="10dp"
-            android:src="@drawable/ic_find_search_24" />
+            android:src="@drawable/ic_find_search_small_24" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/omnibarTextInputMockup"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="start|center"
             android:maxLines="1"
             android:paddingStart="3dp"
             android:paddingEnd="8dp"
             android:text="@string/omnibarInputHint"
             android:textColor="?attr/daxColorSecondaryText" />
+
+        <ImageView
+            android:id="@+id/aiChatIconMockup"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:importantForAccessibility="no"
+            android:paddingVertical="6dp"
+            android:paddingHorizontal="10dp"
+            android:src="@drawable/ic_ai_chat_24" />
 
     </LinearLayout>
 

@@ -40,7 +40,9 @@ import com.duckduckgo.windows.impl.ui.WindowsViewModel.Command.ShareLink
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(WindowsScreenWithEmptyParams::class)
@@ -101,7 +103,7 @@ class WindowsActivity : DuckDuckGoActivity() {
         try {
             startActivity(Intent.createChooser(share, getString(R.string.windows_share_title), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

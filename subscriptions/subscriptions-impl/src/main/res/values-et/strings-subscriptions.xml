@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust Privacy Pro klienditoega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
     <string name="subscriptionStatusSubscribed">Tellitud</string>
     <string name="privacyPolicyAndTermsOfService">Privaatsuspoliitika ja teenusetingimused</string>
+    <string name="subscriptionStatusFreeTrial">Tasuta prooviperiood aktiveeritud</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt tasuliseks kuutellimuseks.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt tasuliseks aastatellimuseks.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ega muutu tasuliseks tellimuseks.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tellimuse seaded</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Sisaldab meie VPN-i, rakendusi Personal Information Removal ja Identity Theft Restoration.</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Sisaldab meie VPN-i ja teenust Identity Theft Restoration.</string>
     <string name="subscriptionSettingGet">Hangi Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Proovi Privacy Pro\'d tasuta</string>
     <string name="subscriptionSettingRestore">Mul on tellimus</string>
     <string name="subscriptionSettingExpired">Sinu Privacy Pro tellimus on aegunud</string>
     <string name="subscriptionSettingExpiredViewPlans">Kuva plaane</string>

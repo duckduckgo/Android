@@ -30,7 +30,7 @@
         android:layout_height="40dp"
         android:padding="8dp"
         android:background="@drawable/autofill_rounded_report_breakage_icon_background"
-        app:srcCompat="@drawable/ic_alert_24"
+        app:srcCompat="@drawable/ic_exclamation_24"
         android:importantForAccessibility="no"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

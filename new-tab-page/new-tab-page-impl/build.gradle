@@ -59,7 +59,6 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
-    implementation JakeWharton.timber
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -82,6 +81,7 @@ android {
     }
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

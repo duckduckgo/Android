@@ -13,8 +13,7 @@ tags:
       - inputText: "https://www.search-company.site/#ad-id-6" # scroll until the ad-id-6 instead of ad-id-7 (context: https://app.asana.com/0/0/1204397066248823/1204415854211764/f)
       - pressKey: Enter
 
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/fireIconMenu"
+      - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
       - tapOn:
           text: "Cancel"
       - assertVisible:
@@ -23,8 +22,7 @@ tags:
           id: "ad-id-7"
       - assertVisible:
           text: "Publisher site"
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/omnibarIconContainer"
+      - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
       - assertVisible:
           text: "View Tracker Companies"
       - tapOn:

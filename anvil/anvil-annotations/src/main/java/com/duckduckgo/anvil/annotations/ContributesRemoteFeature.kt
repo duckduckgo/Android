@@ -58,9 +58,6 @@ annotation class ContributesRemoteFeature(
     @Deprecated("Not needed anymore. Settings is now supported in top-level and sub-features and Toggle#getSettings returns it")
     val settingsStore: KClass<*> = Unit::class,
 
-    /** The class that implements the [FeatureExceptions.Store] interface */
-    val exceptionsStore: KClass<*> = Unit::class,
-
     /** The class that implements the [Toggle.Store] interface */
     val toggleStore: KClass<*> = Unit::class,
 )

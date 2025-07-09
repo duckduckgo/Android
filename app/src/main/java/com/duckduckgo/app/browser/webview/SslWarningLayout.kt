@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.browser.webview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.View
 import android.webkit.SslErrorHandler
 import android.widget.FrameLayout
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SSLErrorType
 import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
@@ -29,18 +32,26 @@ import com.duckduckgo.app.browser.databinding.ViewSslWarningBinding
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.Advance
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.Proceed
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.di.scopes.ViewScope
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 
+@InjectWith(ViewScope::class)
 class SslWarningLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : FrameLayout(context, attrs, defStyle) {
+
+    @Inject
+    lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     sealed class Action {
 
@@ -64,6 +75,20 @@ class SslWarningLayout @JvmOverloads constructor(
             configureCopy(errorResponse)
             setListeners(handler, actionHandler)
         }
+    }
+
+    override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
+        super.onAttachedToWindow()
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+        if (swipingTabsFeature.isEnabled) {
+            // disable tab swiping on this view
+            parent.requestDisallowInterceptTouchEvent(true)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     private fun resetViewState() {

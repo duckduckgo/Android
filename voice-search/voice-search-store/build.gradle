@@ -39,6 +39,7 @@ dependencies {
 android {
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     defaultConfig {
         javaCompileOptions {

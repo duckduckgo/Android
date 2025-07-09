@@ -23,15 +23,18 @@
     <dimen name="bottomNavIcon">24dp</dimen>
     <dimen name="experimentalToolbarSize">60dp</dimen>
     <dimen name="experimentalToolbarContainerPaddingTopWhenAtBottom">8dp</dimen>
+    <dimen name="experimentalToolbarContainerPaddingHorizontalWhenAtBottom">2dp</dimen>
     <dimen name="experimentalOmnibarCardMarginHorizontal">16dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginEnd">8dp</dimen>
+    <dimen name="experimentalOmnibarCardExtendedMarginEnd">4dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginEnd">16dp</dimen>
     <dimen name="experimentalOmnibarCardMarginTop">4dp</dimen>
     <dimen name="experimentalOmnibarCardMarginBottom">12dp</dimen>
-    <dimen name="experimentalOmnibarCardFocusedMarginHorizontal">12dp</dimen>
-    <dimen name="experimentalOmnibarCardFocusedMarginTop">0dp</dimen>
-    <dimen name="experimentalOmnibarCardFocusedMarginBottom">8dp</dimen>
-    <dimen name="experimentalOmnibarContentPadding">0dp</dimen>
-    <dimen name="experimentalOmnibarContentFocusedPaddingHorizontal">4dp</dimen>
-    <dimen name="experimentalOmnibarContentFocusedPaddingVertical">@dimen/experimentalOmnibarOutlineFocusedWidth</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginHorizontal">14dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginTop">2dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginBottom">10dp</dimen>
     <dimen name="experimentalOmnibarOutlineWidth">0dp</dimen>
     <dimen name="experimentalOmnibarOutlineFocusedWidth">2dp</dimen>
+    <dimen name="experimentalCookiesAnimationHeight">34dp</dimen>
+    <dimen name="experimentalCookiesAnimationRadius">14dp</dimen>
 </resources>

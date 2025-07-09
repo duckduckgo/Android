@@ -16,6 +16,7 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -39,6 +40,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RealAutofillRuntimeConfigProviderTest {
 
@@ -93,6 +95,7 @@ class RealAutofillRuntimeConfigProviderTest {
                 showInlineKeyIcon = any(),
                 showInContextEmailProtectionSignup = any(),
                 unknownUsernameCategorization = any(),
+                canCategorizePasswordVariant = any(),
                 partialFormSaves = any(),
             ),
         ).thenReturn("")
@@ -120,6 +123,22 @@ class RealAutofillRuntimeConfigProviderTest {
         configureNoShareableLogins()
         testee.getRuntimeConfiguration("", EXAMPLE_URL)
         verifyKeyIconRequestedToShow()
+    }
+
+    @Test
+    fun whenCanCategorizePasswordVariantEnabledThenConfigurationUserPrefsReflectsThat() = runTest {
+        configureAutofillCapabilities(enabled = false)
+        autofillFeature.passwordVariantCategorization().setRawStoredState(State(enable = true))
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
+        verifyCanCategorizePasswordVariant(true)
+    }
+
+    @Test
+    fun whenCanCategorizePasswordVariantDisabledThenConfigurationUserPrefsReflectsThat() = runTest {
+        configureAutofillCapabilities(enabled = false)
+        autofillFeature.passwordVariantCategorization().setRawStoredState(State(enable = false))
+        testee.getRuntimeConfiguration("", EXAMPLE_URL)
+        verifyCanCategorizePasswordVariant(false)
     }
 
     @Test
@@ -404,6 +423,7 @@ class RealAutofillRuntimeConfigProviderTest {
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
             unknownUsernameCategorization = any(),
+            canCategorizePasswordVariant = any(),
             partialFormSaves = any(),
         )
     }
@@ -416,6 +436,20 @@ class RealAutofillRuntimeConfigProviderTest {
             showInlineKeyIcon = any(),
             showInContextEmailProtectionSignup = any(),
             unknownUsernameCategorization = any(),
+            canCategorizePasswordVariant = any(),
+            partialFormSaves = any(),
+        )
+    }
+
+    private fun verifyCanCategorizePasswordVariant(expected: Boolean) {
+        verify(runtimeConfigurationWriter).generateUserPreferences(
+            autofillCredentials = any(),
+            credentialSaving = any(),
+            passwordGeneration = any(),
+            showInlineKeyIcon = any(),
+            showInContextEmailProtectionSignup = any(),
+            unknownUsernameCategorization = any(),
+            canCategorizePasswordVariant = eq(expected),
             partialFormSaves = any(),
         )
     }
@@ -432,6 +466,7 @@ class RealAutofillRuntimeConfigProviderTest {
             showInlineKeyIcon = eq(true),
             showInContextEmailProtectionSignup = any(),
             unknownUsernameCategorization = any(),
+            canCategorizePasswordVariant = any(),
             partialFormSaves = any(),
         )
     }

@@ -29,13 +29,13 @@ android {
     namespace 'com.duckduckgo.autofill.internal'
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
 }
 
 dependencies {
     implementation project(path: ':autofill-api')
     implementation project(':autofill-impl')
-    implementation project(':autofill-store')
     implementation project(':internal-features-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')

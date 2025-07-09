@@ -34,6 +34,7 @@ import com.duckduckgo.app.fakes.FakeMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -46,7 +47,9 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
@@ -99,7 +102,8 @@ class WebViewRequestInterceptorTest {
         fakeToggle,
         fakeUserAllowListRepository,
     )
-    private val mockMaliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration()
+    private var fakeMaliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration(true)
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     private var webView: WebView = mock()
 
@@ -120,7 +124,11 @@ class WebViewRequestInterceptorTest {
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
             duckPlayer = mockDuckPlayer,
-            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteBlockerWebViewIntegration,
+            maliciousSiteBlockerWebViewIntegration = fakeMaliciousSiteBlockerWebViewIntegration,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutinesTestRule.testScope,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            isMainProcess = true,
         )
     }
 
@@ -149,6 +157,53 @@ class WebViewRequestInterceptorTest {
         )
 
         verify(mockHttpsUpgrader).upgrade(any())
+    }
+
+    @Test
+    fun whenUrlShouldBeUpgradedSiteIsMaliciousAndUpgradeBeforeMaliciousEnabledThenUpgrade() = runTest {
+        configureShouldUpgrade()
+        fakeMaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration(false)
+        fakeAndroidBrowserConfigFeature.checkMaliciousAfterHttpsUpgrade().setRawStoredState(State(true))
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        verify(mockHttpsUpgrader).upgrade(any())
+    }
+
+    @Test
+    fun whenUrlShouldBeUpgradedSiteIsMaliciousAndUpgradeBeforeMaliciousDisabledThenDontUpgrade() = runTest {
+        configureShouldUpgrade()
+        fakeMaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration(false)
+        fakeAndroidBrowserConfigFeature.checkMaliciousAfterHttpsUpgrade().setRawStoredState(State(false))
+        testee = WebViewRequestInterceptor(
+            trackerDetector = mockTrackerDetector,
+            httpsUpgrader = mockHttpsUpgrader,
+            resourceSurrogates = mockResourceSurrogates,
+            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
+            gpc = mockGpc,
+            userAgentProvider = userAgentProvider,
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = mockCloakedCnameDetector,
+            requestFilterer = mockRequestFilterer,
+            duckPlayer = mockDuckPlayer,
+            maliciousSiteBlockerWebViewIntegration = fakeMaliciousSiteBlockerWebViewIntegration,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutinesTestRule.testScope,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            isMainProcess = true,
+        )
+        testee.shouldIntercept(
+            request = mockRequest,
+            documentUri = null,
+            webView = webView,
+            webViewClientListener = null,
+        )
+
+        verify(mockHttpsUpgrader, never()).upgrade(any())
     }
 
     @Test

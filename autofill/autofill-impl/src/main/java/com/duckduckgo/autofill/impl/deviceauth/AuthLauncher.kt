@@ -24,15 +24,19 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface AuthLauncher {
     fun launch(
@@ -51,10 +55,11 @@ interface AuthLauncher {
 }
 
 @ContributesBinding(AppScope::class)
-class RealAuthLauncher @Inject constructor(
+class f @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val autofillAuthorizationGracePeriod: AutofillAuthorizationGracePeriod,
+    private val pixel: Pixel,
 ) : AuthLauncher {
 
     override fun launch(
@@ -95,25 +100,41 @@ class RealAuthLauncher @Inject constructor(
             errString: CharSequence,
         ) {
             super.onAuthenticationError(errorCode, errString)
-            Timber.d("onAuthenticationError: (%d) %s", errorCode, errString)
+            logcat { "onAuthenticationError: ($errorCode) $errString" }
 
             if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                 onResult(UserCancelled)
             } else {
                 onResult(Error(String.format("(%d) %s", errorCode, errString)))
+                sendErrorPixel(errorCode)
             }
         }
 
         override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
             super.onAuthenticationSucceeded(result)
-            Timber.d("onAuthenticationSucceeded ${result.authenticationType}")
+            logcat { "onAuthenticationSucceeded ${result.authenticationType}" }
             autofillAuthorizationGracePeriod.recordSuccessfulAuthorization()
             onResult(Success)
         }
 
         override fun onAuthenticationFailed() {
             super.onAuthenticationFailed()
-            Timber.v("onAuthenticationFailed")
+            logcat(VERBOSE) { "onAuthenticationFailed" }
+        }
+
+        private fun sendErrorPixel(errorCode: Int) {
+            when (errorCode) {
+                BiometricPrompt.ERROR_HW_NOT_PRESENT -> {
+                    val params = mapOf(
+                        "manufacturer" to appBuildConfig.manufacturer,
+                        "model" to appBuildConfig.model,
+                    )
+                    pixel.fire(AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE, parameters = params, type = PixelType.Unique())
+                }
+                else -> {
+                    // no-op
+                }
+            }
         }
     }
 

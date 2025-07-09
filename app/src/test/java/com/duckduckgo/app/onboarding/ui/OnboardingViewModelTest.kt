@@ -80,6 +80,12 @@ class OnboardingViewModelTest {
         verify(onboardingSkipper).privacyConfigDownloaded
     }
 
+    @Test
+    fun whenOnOnboardingSkippedCalledThenMarkOnboardingAsCompleted() = runTest {
+        testee.onOnboardingSkipped()
+        verify(onboardingSkipper).markOnboardingAsCompleted()
+    }
+
     private fun configureSkipperFlow() = runTest {
         val flow = MutableSharedFlow<ViewState>()
         flow.emit(ViewState(skipOnboardingPossible = true))

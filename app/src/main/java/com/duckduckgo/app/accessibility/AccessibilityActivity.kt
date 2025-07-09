@@ -40,7 +40,9 @@ import com.google.android.material.slider.Slider
 import java.text.NumberFormat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(Default::class, screenName = "accessibility")
@@ -116,7 +118,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
-                Timber.i("AccessibilityActSettings: newViewState $viewState")
+                logcat(INFO) { "AccessibilityActSettings: newViewState $viewState" }
                 renderFontSize(viewState.appFontSize, viewState.overrideSystemFontSize)
                 binding.appFontSizeToggle.quietlySetIsChecked(viewState.overrideSystemFontSize, systemFontSizeChangeListener)
                 binding.forceZoomToggle.quietlySetIsChecked(viewState.forceZoom, forceZoomChangeListener)
@@ -131,7 +133,7 @@ class AccessibilityActivity : DuckDuckGoActivity() {
         fontSize: Float,
         overrideSystemFontSize: Boolean,
     ) {
-        Timber.v("AccessibilityActSettings: renderFontSize $fontSize")
+        logcat(VERBOSE) { "AccessibilityActSettings: renderFontSize $fontSize" }
 
         binding.accessibilitySlider.quietlySetValue(fontSize, fontSizeChangeListener)
         val newValue = fontSize / 100

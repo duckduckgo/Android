@@ -16,11 +16,14 @@
 
 package com.duckduckgo.sync.impl.ui.setup
 
-interface SetupFlowListener {
+interface SyncSetupFlowFinishedListener {
+    fun launchGetAppOnOtherPlatformsScreen()
+    fun finishSetup()
+}
+
+interface SyncSetupNavigationFlowListener {
     fun launchRecoveryCodeScreen()
     fun launchCreateAccountScreen()
     fun launchRecoverAccountScreen()
     fun launchDeviceConnectedScreen()
-    fun launchGetAppOnOtherPlatformsScreen()
-    fun finishSetup()
 }

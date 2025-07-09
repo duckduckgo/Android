@@ -209,7 +209,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Možeš uvesti spremljene lozinke iz drugog preglednika u DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Uvezi lozinke</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sinkroniziraj lozinke za radnu površinu</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Kako uvesti lozinke</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Kako sinkronizirati lozinke za računalo</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Uvezi lozinke u stolnu verziju preglednika DuckDuckGo, a zatim sinkroniziraj preko uređaja.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Nabavi preglednik za PC</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Poveznica je kopirana</string>
@@ -257,8 +259,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Uvezi lozinke s Googlea</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Uvezi lozinke s Googlea</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinkroniziraj DuckDuckGo lozinke</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinkroniziraj DuckDuckGo lozinke</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinkroniziraj lozinke za radnu površinu</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sinkroniziraj lozinke za radnu površinu</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Uvezi svoje Google lozinke</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
@@ -272,5 +274,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Uvoz lozinke nije uspio</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Preskočeno (duplicirano ili nevažeće): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Uvezene lozinke: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Otvori lozinke</string>
+    <string name="autofill_service_select_password_activity">Odaberi spremljenu lozinku</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Lozinke i automatsko popunjavanje</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Resetiraj isključene web lokacije?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Ako resetiraš isključene web lokacije, od tebe će se zatražiti da spremiš svoju lozinku sljedeći put kad se prijaviš na bilo koju od ovih lokacija.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Resetiraj</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Odustani</string>
+    <string name="autofillSettingsPasswordsEntry">Lozinke</string>
+    <string name="autofillSettingsAutofillToggleLabel">Zatraži spremanje i automatsko popunjavanje</string>
+    <string name="autofillSettingsAutofillSubtitle">Lozinke su šifrirane. Nitko osim tebe ne može ih vidjeti, čak ni mi. <annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Uvezi lozinke</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Uvezi lozinke s Googlea</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sinkroniziraj lozinke za radnu površinu</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Resetiraj isključene web lokacije</string>
 
 </resources>

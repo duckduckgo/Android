@@ -54,10 +54,9 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
     implementation Google.dagger
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation "com.airbnb.android:lottie:_"
-    implementation "com.squareup.logcat:logcat:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
@@ -79,6 +78,7 @@ android {
     namespace "com.duckduckgo.duckplayer.impl"
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     anvil {
         generateDaggerFactories = true // default is false

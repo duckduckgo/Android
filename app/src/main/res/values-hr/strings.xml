@@ -121,7 +121,7 @@
     <string name="tabSwitcherGridViewMenu">Tablični prikaz</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s alata za praćenje blokirano &lt;/b&gt; u posljednjih 7 dana</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s alata za praćenje blokirano &lt;/b&gt; u posljednjih 7 dana</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s alata za praćenje blokirano &lt;/b&gt;</string>
     <string name="inTheLast7Days">u posljednjih 7 dana</string>
 
@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izgled</string>
+    <string name="settingsShowFullUrlTitle">Pokaži cijelu adresu web-mjesta</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Spremi</string>
@@ -737,10 +738,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d Privatna kartica</item>
-        <item quantity="few">%1$d Privatne kartice</item>
-        <item quantity="many">%1$d Privatnih kartica</item>
-        <item quantity="other">%1$d Privatnih kartica</item>
+        <item quantity="one">1 kartica</item>
+        <item quantity="few">%1$d kartice</item>
+        <item quantity="many">%1$d kartica</item>
+        <item quantity="other">%1$d kartice</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Pretražuj privatno po zadanim postavkama</string>
     <string name="preOnboardingComparisonChartItem2">Blokiraj alate za praćenje trećih strana</string>
     <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
-    <string name="preOnboardingComparisonChartItem4">Blokiraj reklame za praćenje</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiraj ciljane oglase</string>
     <string name="preOnboardingComparisonChartItem5">Izbriši podatke o pregledavanju jednim gumbom</string>
     <string name="preOnboardingDaxDialog3Title">Odlično! Dobrodošli na našu stranu!</string>
     <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
@@ -855,6 +856,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Daj pet!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Isprobaj ga</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Preskoči</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Već sam bio ovdje</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Shvaćam! Preskočit ću ostale savjete.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Zapamti: pomoću <b>Fire Buttona</b> 🔥 u samo dva dodira možeš izbrisati sve svoje kartice, povijest i podatke pregledavanja.]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Prikaži vodič</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresna traka</string>
@@ -870,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Hvala! Tvoje prijave pomažu nam poboljšati DuckDuckGo za sve!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nova opcija AI čavrljanja</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Neka DuckDuckGo zaštiti više onoga što radiš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Postavi nas kao svoj zadani preglednik kako bi se sve poveznice otvorile u DuckDuckGou.</string>
@@ -884,10 +885,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Brisanjem svojih kartica i podataka izbrisat ćeš povijest blokiranja alata za praćenje i vratiti ovaj broj na nulu.\n\nSakrij ovaj baner ako ga ne želiš vidjeti u prikazu kartica.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Sakrij baner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Upozorenje: ova web lokacija može predstavljati sigurnosni rizik</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo je blokirao ovu stranicu jer možda širi zlonamjerni softver izrađen da ugrozi tvoj uređaj ili ukrade tvoje osobne podatke.\n<a href=\"\">Saznaj više</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ovo web-mjesto može se lažno predstavljati kao legitimno web-mjesto kako bi te prevarilo da uneseš svoje osobne podatke, kao što su lozinke ili brojevi kreditnih kartica.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo je blokirao ovu stranicu jer te možda pokušava prevariti ili manipulirati da preneseš novac, kupiš krivotvorenu robu ili instaliraš zlonamjerni softver pod lažnim izgovorom.\n<a href=\"\">Saznaj više</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Napusti ovo web-mjesto</string>
     <string name="maliciousSiteAdvancedCTA">Napredno</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Ako vjeruješ da je ovo web-mjesto sigurno, možeš <a href=\"\">prijaviti pogrešku</a>. Još uvijek možeš posjetiti web-mjesto na vlastitu odgovornost.]]></string>
@@ -898,5 +900,21 @@
     <string name="maliciousSiteToggleHint">Upozori me na web-mjestima označenim zbog krađe identiteta ili zlonamjernog softvera.</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="maliciousSiteSettingDisabled">Onemogućavanje ove značajke može ugroziti tvoje podatke.</string>
+    <string name="threatProtectionTitle">Zaštita od prijetnji</string>
+    <string name="threatProtectionDescription">Poboljšane zaštite DuckDuckGoa zaustavljaju uobičajene prijetnje, dok istovremeno održavaju tvoju vezu sigurnom.</string>
+    <string name="smarterEncryptionTitle">Pametnije šifriranje - Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatski nadograđuje poveznice na HTTPS kad god je to moguće.<br><a href=\"\">Saznaj više</a>]]></string>
+    <string name="scamBlockerTitle">Blokiranje prevara</string>
+    <string name="scamBlockerDescription">Upozori na mrežnim lokacijama označenim zbog prijevara, krađe identiteta i zlonamjernog softvera.</string>
+    <string name="threatProtectionLearnMoreTitle">Saznajte više</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probaj naš widget za početni zaslon!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj naš widget za pretraživanje na početni zaslon za brz i jednostavan pristup.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne sad</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Pretraži DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget za početni zaslon</string>
 </resources>

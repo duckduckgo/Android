@@ -47,7 +47,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithoutImage"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item"
         app:secondaryText="With Leading Image" />
 
@@ -179,7 +179,7 @@
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithTrailingIcon"
         app:primaryText="Two Line Item"
         app:secondaryText="With Small Trailing Image"
-        app:trailingIcon="@drawable/ic_exclamation_red_16"
+        app:trailingIcon="@drawable/ic_exclamation_recolorable_16"
         app:trailingIconSize="small" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -191,7 +191,7 @@
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithSmallTrailingIcon"
         app:primaryText="Two Line Item"
         app:secondaryText="With Medium (default) Trailing Image"
-        app:trailingIcon="@drawable/ic_exclamation_red_16"
+        app:trailingIcon="@drawable/ic_exclamation_recolorable_16"
         app:trailingIconSize="medium" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -212,7 +212,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithBetaPill"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:leadingIconBackground="circular"
         app:primaryText="Two Line Item"
         app:secondaryText="With Leading Image over Circular Background"
@@ -225,7 +225,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineListItemWithCircularImage"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:leadingIconBackground="rounded"
         app:primaryText="Two Line Item"
         app:secondaryText="With Leading Image over Rounded Background"
@@ -249,7 +249,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItem"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item"
         app:secondaryText="With Leading Image and Switch"
         app:showSwitch="true" />
@@ -273,7 +273,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPill"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
         app:primaryTextTruncated="true"
         app:secondaryText="In disabled state"
@@ -287,7 +287,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithTruncatedText"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two Line Item Two Line Item Two Line Item "
         app:secondaryText="In disabled state"
         app:showBetaPill="true"
@@ -300,7 +300,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithDisabledSwitch"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two"
         app:secondaryText="Checked in disabled state"
         app:showBetaPill="true"
@@ -313,7 +313,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithDisabledSwitchEnabled"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item Two"
         app:secondaryText="Checked with switch in disabled state"
         app:showBetaPill="true"
@@ -327,7 +327,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithSwitchDisabledChecked"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item"
         app:primaryTextColorOverlay="@color/destructive_text_color_selector"
         app:secondaryText="With custom Primary Text color" />
@@ -339,7 +339,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/twoLineSwitchListItemWithPrimaryTextColorOverlay"
-        app:leadingIcon="@drawable/ic_globe_gray_16dp"
+        app:leadingIcon="@drawable/ic_globe_16"
         app:primaryText="Two Line Item"
         app:secondaryText="With custom Secondary Text color"
         app:secondaryTextColorOverlay="@color/destructive_text_color_selector" />

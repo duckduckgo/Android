@@ -24,6 +24,17 @@ import retrofit2.http.GET
 
 @ContributesServiceApi(AppScope::class)
 interface AppTrackerListService {
-    @GET("https://staticcdn.duckduckgo.com/trackerblocking/appTP/2.1/android-tds.json")
+    @GET("$APPTP_TDS_BASE_URL$APPTP_TDS_PATH")
+    @AppTPTdsRequired
     fun appTrackerBlocklist(): Call<JsonAppBlockingList>
 }
+
+/**
+ * This annotation is used in interceptors to be able to intercept the annotated service calls
+ */
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+annotation class AppTPTdsRequired
+
+const val APPTP_TDS_BASE_URL = "https://staticcdn.duckduckgo.com/trackerblocking/appTP/"
+const val APPTP_TDS_PATH = "2.1/android-tds.json"

@@ -27,6 +27,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewCompat.NestedScrollType
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.webview.BottomOmnibarBrowserContainerLayoutBehavior
 import com.google.android.material.snackbar.Snackbar
 import kotlin.math.max
 import kotlin.math.min
@@ -45,13 +46,28 @@ class BottomAppBarBehavior<V : View>(
     private var lastStartedType: Int = 0
     private var offsetAnimator: ValueAnimator? = null
 
+    /**
+     * We don't want any offset when in full screen.
+     *
+     * The browser, new tab page, etc padding management, to avoid omnibar overlapping with the content, is handled in [BottomOmnibarBrowserContainerLayoutBehavior].
+     */
+    private val viewIDsExemptedFromForceOffset = setOf(
+        R.id.webViewFullScreenContainer,
+        R.id.browserLayout,
+        R.id.includeNewBrowserTab,
+    )
+
     @SuppressLint("RestrictedApi")
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
+    override fun layoutDependsOn(
+        parent: CoordinatorLayout,
+        child: V,
+        dependency: View,
+    ): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
         }
 
-        if (dependency.id != R.id.webViewFullScreenContainer) {
+        if (!viewIDsExemptedFromForceOffset.contains(dependency.id)) {
             offsetBottomByToolbar(dependency)
         }
 
@@ -106,7 +122,12 @@ class BottomAppBarBehavior<V : View>(
         }
     }
 
-    override fun onStopNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, type: Int) {
+    override fun onStopNestedScroll(
+        coordinatorLayout: CoordinatorLayout,
+        child: V,
+        target: View,
+        type: Int,
+    ) {
         if (lastStartedType == ViewCompat.TYPE_TOUCH || type == ViewCompat.TYPE_NON_TOUCH) {
             val dY = child.translationY
             val threshold = child.height * 0.5f
@@ -120,7 +141,10 @@ class BottomAppBarBehavior<V : View>(
         }
     }
 
-    fun setExpanded(expanded: Boolean, animate: Boolean = true) {
+    fun setExpanded(
+        expanded: Boolean,
+        animate: Boolean = true,
+    ) {
         if (animate) {
             animateToolbarVisibility(expanded)
         } else {
@@ -150,7 +174,10 @@ class BottomAppBarBehavior<V : View>(
     }
 
     @SuppressLint("RestrictedApi")
-    private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
+    private fun updateSnackbar(
+        child: View,
+        snackbarLayout: Snackbar.SnackbarLayout,
+    ) {
         if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
             val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
 

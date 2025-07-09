@@ -22,10 +22,16 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 sealed interface AutofillScreens {
 
     /**
+     * Launch the Autofill Settings activity, which will show autofill settings and other actions (import passwords, enable autofill, etc)
+     * @param source is used to indicate from where in the app Autofill Settings activity was launched
+     */
+    data class AutofillSettingsScreen(val source: AutofillScreenLaunchSource) : ActivityParams
+
+    /**
      * Launch the Autofill management activity, which will show the full list of available credentials
      * @param source is used to indicate from where in the app Autofill management activity was launched
      */
-    data class AutofillSettingsScreen(val source: AutofillSettingsLaunchSource) : ActivityParams
+    data class AutofillPasswordsManagementScreen(val source: AutofillScreenLaunchSource) : ActivityParams
 
     /**
      * Launch the Autofill management activity, which will show suggestions for the current url and the full list of available credentials
@@ -33,9 +39,9 @@ sealed interface AutofillScreens {
      * @param source is used to indicate from where in the app Autofill management activity was launched
      * @param privacyProtectionEnabled whether privacy protection is enabled for the current web site
      */
-    data class AutofillSettingsScreenShowSuggestionsForSiteParams(
+    data class AutofillPasswordsManagementScreenWithSuggestions(
         val currentUrl: String?,
-        val source: AutofillSettingsLaunchSource,
+        val source: AutofillScreenLaunchSource,
         val privacyProtectionEnabled: Boolean,
     ) : ActivityParams
 
@@ -44,13 +50,13 @@ sealed interface AutofillScreens {
      * @param loginCredentials jump directly into viewing mode for these credentials
      * @param source is used to indicate from where in the app Autofill management activity was launched
      */
-    data class AutofillSettingsScreenDirectlyViewCredentialsParams(
+    data class AutofillPasswordsManagementViewCredential(
         val loginCredentials: LoginCredentials,
-        val source: AutofillSettingsLaunchSource,
+        val source: AutofillScreenLaunchSource,
     ) : ActivityParams
 }
 
-enum class AutofillSettingsLaunchSource {
+enum class AutofillScreenLaunchSource {
     SettingsActivity,
     BrowserOverflow,
     Sync,
@@ -59,4 +65,5 @@ enum class AutofillSettingsLaunchSource {
     Unknown,
     NewTabShortcut,
     DisableInSettingsPrompt,
+    AutofillSettings,
 }

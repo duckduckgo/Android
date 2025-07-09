@@ -40,6 +40,9 @@ import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.AskRemoveDevice
@@ -53,6 +56,7 @@ import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowDeviceUnsup
 import com.duckduckgo.sync.impl.ui.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.LoadingItem
 import com.duckduckgo.sync.impl.ui.SyncDeviceListItem.SyncedDevice
+import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -68,6 +72,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncActivityViewModel @Inject constructor(
@@ -173,19 +178,26 @@ class SyncActivityViewModel @Inject constructor(
     sealed class Command {
         object SyncWithAnotherDevice : Command()
         object AddAnotherDevice : Command()
+        data class DeepLinkIntoSetup(val barcodeSyncUrl: SyncBarcodeUrl) : Command()
+        data class AskSetupSyncDeepLink(val syncBarcodeUrl: SyncBarcodeUrl) : Command()
         object IntroCreateAccount : Command()
         object IntroRecoverSyncData : Command()
         object ShowRecoveryCode : Command()
+        object ShowDeviceConnected : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
         object AskDeleteAccount : Command()
         object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
-        data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
+        data class ShowError(
+            @StringRes val message: Int,
+            val reason: String = "",
+        ) : Command()
+
         object ShowDeviceUnsupported : Command()
         object RequestSetupAuthentication : Command()
-        data class LaunchSyncGetOnOtherPlatforms(val source: String) : Command()
+        data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
     }
 
     fun onSyncWithAnotherDevice() {
@@ -310,9 +322,9 @@ class SyncActivityViewModel @Inject constructor(
 
     fun generateRecoveryCode(viewContext: Context) {
         viewModelScope.launch(dispatchers.io()) {
-            syncAccountRepository.getRecoveryCode().onSuccess { recoveryCodeB64 ->
+            syncAccountRepository.getRecoveryCode().onSuccess { authCode ->
                 kotlin.runCatching {
-                    recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, recoveryCodeB64)
+                    recoveryCodePDF.generateAndStoreRecoveryCodePDF(viewContext, authCode.rawCode)
                 }.onSuccess { generateRecoveryCodePDF ->
                     command.send(RecoveryCodePDFSuccess(generateRecoveryCodePDF))
                 }.onFailure {
@@ -413,6 +425,7 @@ class SyncActivityViewModel @Inject constructor(
             action()
         }
     }
+
     private fun ViewState.setDevices(devices: List<SyncDeviceListItem>) = copy(syncedDevices = devices)
     private fun ViewState.hideDeviceListItemLoading() = copy(syncedDevices = syncedDevices.filterNot { it is LoadingItem })
     private fun ViewState.showDeviceListItemLoading() = copy(syncedDevices = syncedDevices + LoadingItem)
@@ -431,9 +444,29 @@ class SyncActivityViewModel @Inject constructor(
     private fun ViewState.showAccount() = copy(showAccount = true)
     private fun ViewState.hideAccount() = copy(showAccount = false)
 
+    fun processSetupDeepLink(setupUrl: String) {
+        logcat { "Sync-setup: got setup deep link $setupUrl" }
+        viewModelScope.launch(dispatchers.io()) {
+            // parse here to test validity before asking user to use it
+            val parsed = SyncBarcodeUrl.parseUrl(setupUrl)
+
+            if (parsed == null) {
+                logcat { "Sync-setup: failed to parse setup URL $setupUrl" }
+            } else {
+                command.send(Command.AskSetupSyncDeepLink(parsed))
+            }
+        }
+    }
+
+    fun onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl: SyncBarcodeUrl) {
+        viewModelScope.launch(dispatchers.io()) {
+            requiresSetupAuthentication {
+                command.send(Command.DeepLinkIntoSetup(barcodeSyncUrl))
+            }
+        }
+    }
+
     companion object {
-        private const val SOURCE_SYNC_DISABLED = "not_activated"
-        private const val SOURCE_SYNC_ENABLED = "activated"
         private const val SETTINGS_REFRESH_RATE_MS = 5_000L
     }
 }

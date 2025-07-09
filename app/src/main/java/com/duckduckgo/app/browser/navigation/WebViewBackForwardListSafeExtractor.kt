@@ -18,7 +18,9 @@ package com.duckduckgo.app.browser.navigation
 
 import android.webkit.WebBackForwardList
 import android.webkit.WebView
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 /**
  * There is a bug in WebView whereby `webView.copyBackForwardList()` can internally throw a NPE
@@ -32,7 +34,7 @@ fun WebView.safeCopyBackForwardList(): WebBackForwardList? {
     return try {
         copyBackForwardList()
     } catch (e: NullPointerException) {
-        Timber.e(e, "Failed to extract WebView back forward list")
+        logcat(ERROR) { "Failed to extract WebView back forward list: ${e.asLog()}" }
         null
     }
 }

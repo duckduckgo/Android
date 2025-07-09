@@ -84,9 +84,9 @@ jobs:
       - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
         id: create-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: Update reference tests to version ${{ steps.extract-release-version.outputs._1}}
@@ -100,9 +100,9 @@ jobs:
 
       - name: Add Asana task to Release Board project
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_RELEASE_BOARD_PR_SECTION_ID }}
           asana-task-id: ${{ steps.create-task.outputs.taskId }}
@@ -110,7 +110,7 @@ jobs:
 
       - name: Update PR description with Asana task
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           github-pat: ${{ secrets.GT_DAXMOBILE }}
           github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
@@ -122,9 +122,9 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Update reference tests

@@ -22,7 +22,6 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
@@ -36,8 +35,8 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
-private var enables = 1
-private var disables = 1
+private var enables = 0
+private var disables = 0
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
 class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val testCase: TestCase) {
@@ -63,12 +62,19 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
 
     @Test
     fun `test probability`() {
-        fun isWithinRange(): Boolean {
-            if (testCase.run < 9000) return true // small sample sizes will have high variance
+        fun assertWithinRange() {
+            if (testCase.run < 9000) return // small sample sizes will have high variance
             val allowableDeviation = (enables + disables) / 2 * 6.0f / 100 // allowable deviation of 6%
 
             // Check if the absolute difference between the two numbers is within the allowable deviation
-            return abs(enables - disables) <= allowableDeviation
+            val difference = abs(enables - disables)
+            assertTrue(
+                "Given sample size of ${enables + disables}, the allowable deviation (6%) is: $allowableDeviation, " +
+                    "but actual difference was $difference " +
+                    "(enables=$enables" +
+                    ", disables=$disables)",
+                difference <= allowableDeviation,
+            )
         }
 
         val feature = generatedFeatureNewInstance()
@@ -104,7 +110,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
         } else {
             disables++
         }
-        assertTrue(isWithinRange())
+        assertWithinRange()
     }
 
     data class TestCase(val rollout: Int, val run: Int)
@@ -113,7 +119,7 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
         @ParameterizedRobolectricTestRunner.Parameters()
         fun parameters(): List<TestCase> {
             val l = mutableListOf<TestCase>()
-            repeat(10000) {
+            repeat(10_000) {
                 l.add(TestCase(run = it, rollout = 50))
             }
 
@@ -125,14 +131,12 @@ class ContributesRemoteFeatureCodeGeneratorBucketAssignmentTest(private val test
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .getConstructor(
-                FeatureExceptions.Store::class.java,
                 FeatureSettings.Store::class.java,
                 dagger.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
                 VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
-                FeatureExceptions.EMPTY_STORE,
                 FeatureSettings.EMPTY_STORE,
                 Lazy { testFeature },
                 appBuildConfig,

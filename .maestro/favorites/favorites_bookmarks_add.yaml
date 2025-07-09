@@ -13,16 +13,14 @@ tags:
       - runFlow: ../shared/skip_all_onboarding.yaml
 
       - tapOn:
-          text: "search or type URL"
+          id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:
           text: "add bookmark"
       # Navigate to bookmarks screen
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - tapOn:
           text: "bookmarks"
       # Add favorite from bookmarks screen

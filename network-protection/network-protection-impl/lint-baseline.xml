@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.7.3" type="baseline" client="gradle" dependencies="false" name="AGP (8.7.3)" variant="all" version="8.7.3">
 
     <issue
         id="DefaultLocale"
@@ -30,7 +30,7 @@
         errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/wireguard/android/backend/GoBackend.kt"
-            line="122"
+            line="128"
             column="18"/>
     </issue>
 
@@ -70,39 +70,6 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/notification/NetPDisabledNotificationSchedulerTest.kt"
-            line="75"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/notification/NetPDisabledNotificationSchedulerTest.kt"
-            line="86"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/notification/NetPDisabledNotificationSchedulerTest.kt"
-            line="98"
-            column="9"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
         errorLine1="            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(enable = enabled))"
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -124,35 +91,13 @@
 
     <issue
         id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().setRawStoredState(Toggle.State(remoteEnableState = true))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="first() will throw if flow is empty, firstOrNull() it&apos;s a safer option."
+        errorLine1="    override suspend fun getVpnStatus(): VpnStatus = vpnStatusFlow.first()"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/settings/NetPVpnSettingsViewModelTest.kt"
-            line="94"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="            netPSettingsLocalConfig.vpnNotificationAlerts().setRawStoredState(Toggle.State(remoteEnableState = false))"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/test/java/com/duckduckgo/networkprotection/impl/settings/NetPVpnSettingsViewModelTest.kt"
-            line="95"
-            column="13"/>
-    </issue>
-
-    <issue
-        id="DenyListedApi"
-        message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        localConfig.permanentRemoveExcludeAppPrompt().setRawStoredState(State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/duckduckgo/networkprotection/impl/management/NetworkProtectionManagementViewModel.kt"
-            line="413"
-            column="9"/>
+            file="src/test/java/com/duckduckgo/networkprotection/impl/subscription/settings/NetworkProtectionSettingsStateImplTest.kt"
+            line="28"
+            column="54"/>
     </issue>
 
     <issue
@@ -213,12 +158,23 @@
     <issue
         id="DenyListedApi"
         message="If you find yourself using this API in production, you&apos;re doing something wrong!!"
-        errorLine1="        netPSettingsLocalConfig.blockMalware().setRawStoredState(Toggle.State(enable = true))"
-        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        vpnRemoteFeatures.allowDnsBlockMalware().setRawStoredState(Toggle.State(enable = false))"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/test/java/com/duckduckgo/networkprotection/impl/WgVpnNetworkStackTest.kt"
-            line="152"
+            line="140"
             column="9"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
+        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
+        errorLine1="            val installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA).map { it.packageName }"
+        errorLine2="                                               ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/impl/autoexclude/AutoExcludeAppsRepository.kt"
+            line="136"
+            column="48"/>
     </issue>
 
     <issue
@@ -228,8 +184,19 @@
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/ui/NetpAppExclusionListViewModel.kt"
-            line="174"
+            line="219"
             column="40"/>
+    </issue>
+
+    <issue
+        id="QueryPermissionsNeeded"
+        message="As of Android 11, this method no longer returns information about all apps; see https://g.co/dev/packagevisibility for details"
+        errorLine1="            packageManager.getInstalledApplications(PackageManager.GET_META_DATA).asSequence()"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/duckduckgo/networkprotection/impl/exclusion/NetpExclusionListRepository.kt"
+            line="55"
+            column="28"/>
     </issue>
 
     <issue
@@ -244,13 +211,1784 @@
     </issue>
 
     <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpManagementManageItemExclusionSubtitleAppCount&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;netpManagementManageItemExclusionSubtitleAppCount&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpManagementManageItemExclusionSubtitleAppCount&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpManagementManageItemExclusionSubtitleAppCount&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="244"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="244"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="244"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="244"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;es&quot; (Spanish) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAllAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="250"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;fr&quot; (French) the following quantity should also be defined: `many` (e.g. &quot;1000000 de jours&quot;)"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAllAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="250"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;it&quot; (Italian) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAllAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="250"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="MissingQuantity"
+        message="For locale &quot;pt&quot; (Portuguese) the following quantity should also be defined: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAllAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="250"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="Repeated word &quot;nem&quot; in message: possible typo"
+        errorLine1="    &lt;string name=&quot;netpFaqAnswerOne&quot;>A VPN a nyílt forráskódú WireGuard protokollt használja, hogy virtuális magánhálózatot (VPN) állítson be az eszközödön. Ha engedélyezve van, az eszközöd teljes internetes forgalma először titkosításra kerül, majd átirányításra kerül a legközelebbi VPN-szerveren keresztül. Az internetszolgáltatók így nem tudják nyomon követni a böngészési tevékenységedet, az alkalmazások és az általad meglátogatott webhelyek pedig nem nem láthatják a tartózkodási helyedet.&lt;/string>"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ^">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="170"
+            column="454"/>
+    </issue>
+
+    <issue
+        id="Typos"
+        message="Repeated word &quot;er&quot; in message: possible typo"
+        errorLine1="    &lt;string name=&quot;netpFaqAnswerEight&quot;>Ja, både VPN og App Tracking Protection kan være på samtidig. Ingen andre VPN-er er kompatible med DuckDuckGos App Tracking Protection.&lt;/string>"
+        errorLine2="                                                                                                                    ^">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="182"
+            column="117"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netp_name&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;netp_name&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="20"
+            column="30"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementTitle&quot; translatable=&quot;false&quot;>DuckDuckGo VPN&lt;/string>"
+        errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="21"
+            column="40"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpManagementToggleTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="26"
+            column="46"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="218"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-netp.xml"
+            line="219"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="219"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSubscriptionSettingsTitle&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;netpSubscriptionSettingsTitle&quot; translatable=&quot;false&quot;>VPN&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="220"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="221"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-netp.xml"
+            line="222"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="222"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpSetttingDnsHeader&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;netpSetttingDnsHeader&quot; translatable=&quot;false&quot;>DNS&lt;/string>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="223"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;bg&quot; (Bulgarian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-bg/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;da&quot; (Danish) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;de&quot; (German) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;el&quot; (Greek) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;es&quot; (Spanish) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;et&quot; (Estonian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fi&quot; (Finnish) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fi/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;fr&quot; (French) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-fr/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hu&quot; (Hungarian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hu/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;it&quot; (Italian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nb&quot; (Norwegian Bokmål) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nb/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;nl&quot; (Dutch) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pt&quot; (Portuguese) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pt/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sv&quot; (Swedish) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;tr&quot; (Turkish) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="224"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lv&quot; (Latvian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lv/strings-netp.xml"
+            line="225"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ro&quot; (Romanian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="225"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;cs&quot; (Czech) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;hr&quot; (Croatian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;lt&quot; (Lithuanian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;pl&quot; (Polish) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;ru&quot; (Russian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sk&quot; (Slovak) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
+        id="Untranslatable"
+        message="The resource string &quot;netpCustomDnsDefault&quot; is marked as translatable=&quot;false&quot;, but is translated to &quot;sl&quot; (Slovenian) here"
+        errorLine1="    &lt;string name=&quot;netpCustomDnsDefault&quot; translatable=&quot;false&quot;>DuckDuckGo&lt;/string>"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="226"
+            column="41"/>
+    </issue>
+
+    <issue
         id="PluralsCandidate"
         message="Formatting %d followed by words (&quot;cities&quot;): This should probably be a plural rather than a string"
         errorLine1="    &lt;string name=&quot;netpGeoswitchingHeaderCountrySubtitle&quot; instruction=&quot;Placeholder is a number greater than 1&quot;>%1$d cities&lt;/string>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
-            file="src/main/res/values/donottranslate.xml"
-            line="201"
+            file="src/main/res/values/strings-netp.xml"
+            line="202"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpManagementManageItemExclusionSubtitleAppCount&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="91"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="246"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedQuantity"
+        message="For language &quot;hr&quot; (Croatian) the following quantities are not relevant: `many`"
+        errorLine1="    &lt;plurals name=&quot;netpAutoExcludeAllAppLabel&quot;>"
+        errorLine2="    ^">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="254"
             column="5"/>
     </issue>
 
@@ -333,6 +2071,28 @@
 
     <issue
         id="VectorPath"
+        message="Very long vector path (998 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M12,1.917c-5.523,0 -10,4.477 -10,10 0,4.773 3.345,8.766 7.819,9.76 0.249,0.056 0.44,-0.231 0.352,-0.47A2.744,2.744 0,0 1,10 20.25v-1.502a7.894,7.894 0,0 1,-0.313 -0.606c-0.672,-1.45 -1.122,-3.459 -1.18,-5.726h4.003c0.308,-0.588 0.743,-1.1 1.268,-1.5L8.526,10.916c0.107,-2.061 0.539,-3.883 1.161,-5.225 0.747,-1.608 1.627,-2.268 2.344,-2.274h0.035c0.714,0.014 1.588,0.676 2.33,2.274 0.54,1.164 0.937,2.69 1.102,4.42a4.515,4.515 0,0 1,1.499 -0.084c-0.175,-1.896 -0.612,-3.612 -1.24,-4.967 -0.166,-0.356 -0.35,-0.7 -0.554,-1.02a8.509,8.509 0,0 1,5.239 6.876h-1.22A4.493,4.493 0,0 1,21 14.5v0.418c0,0.11 0.074,0.205 0.177,0.242 0.136,0.049 0.292,-0.015 0.336,-0.153a9.993,9.993 0,0 0,0.487 -3.09c0,-5.494 -4.43,-9.952 -9.91,-10a2.88,2.88 0,0 0,-0.063 0L12,1.917ZM8.91,3.996a8.509,8.509 0,0 0,-5.352 6.92h3.466C7.132,8.67 7.6,6.624 8.327,5.06c0.173,-0.373 0.367,-0.731 0.582,-1.064ZM8.91,19.837a8.505,8.505 0,0 1,-5.396 -7.42h3.492c0.058,2.443 0.541,4.676 1.32,6.356 0.174,0.373 0.368,0.731 0.583,1.064Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_vpn_color_24.xml"
+            line="43"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (998 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M12,1.917c-5.523,0 -10,4.477 -10,10 0,4.773 3.345,8.766 7.819,9.76 0.249,0.056 0.44,-0.231 0.352,-0.47A2.744,2.744 0,0 1,10 20.25v-1.502a7.894,7.894 0,0 1,-0.313 -0.606c-0.672,-1.45 -1.122,-3.459 -1.18,-5.726h4.003c0.308,-0.588 0.743,-1.1 1.268,-1.5L8.526,10.916c0.107,-2.061 0.539,-3.883 1.161,-5.225 0.747,-1.608 1.627,-2.268 2.344,-2.274h0.035c0.714,0.014 1.588,0.676 2.33,2.274 0.54,1.164 0.937,2.69 1.102,4.42a4.515,4.515 0,0 1,1.499 -0.084c-0.175,-1.896 -0.612,-3.612 -1.24,-4.967 -0.166,-0.356 -0.35,-0.7 -0.554,-1.02a8.509,8.509 0,0 1,5.239 6.876h-1.22A4.493,4.493 0,0 1,21 14.5v0.418c0,0.11 0.074,0.205 0.177,0.242 0.136,0.049 0.292,-0.015 0.336,-0.153a9.993,9.993 0,0 0,0.487 -3.09c0,-5.494 -4.43,-9.952 -9.91,-10a2.88,2.88 0,0 0,-0.063 0L12,1.917ZM8.91,3.996a8.509,8.509 0,0 0,-5.352 6.92h3.466C7.132,8.67 7.6,6.624 8.327,5.06c0.173,-0.373 0.367,-0.731 0.582,-1.064ZM8.91,19.837a8.505,8.505 0,0 1,-5.396 -7.42h3.492c0.058,2.443 0.541,4.676 1.32,6.356 0.174,0.373 0.368,0.731 0.583,1.064Z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_vpn_grayscale_color_24.xml"
+            line="43"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
         message="Very long vector path (2632 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
         errorLine1="      android:pathData=&quot;M84.63,51.14C81.53,46.16 77.56,41.77 72.93,38.2C72.98,37.97 73,37.74 73,37.5C73,36.1 72.18,34.9 71,34.33C70.99,33.57 70.96,32.8 70.91,32.05C71.6,32.02 72.3,32 73,32C80.57,32 87.71,33.79 94.05,36.96C93.7,36.02 93.31,35.1 92.88,34.2C86.8,31.5 80.08,30 73,30C72.25,30 71.5,30.02 70.75,30.05C70.26,25.18 69.06,20.51 67.25,16.16C66.51,16.09 65.76,16.04 65.01,16.02C66.96,20.42 68.25,25.19 68.76,30.18C66.14,30.41 63.59,30.84 61.11,31.45C57.54,30.03 53.77,29.02 49.85,28.47C49.63,27.76 49.19,27.15 48.61,26.71C50.48,23.24 52.78,20.04 55.43,17.16C54.14,17.52 52.89,17.95 51.68,18.46C49.81,20.81 48.14,23.33 46.72,26.01C46.65,26 46.57,26 46.5,26C45.1,26 43.9,26.82 43.34,28C43.22,28 43.11,28 43,28C41.61,28 40.24,28.06 38.88,28.17C38.33,28.87 37.8,29.59 37.31,30.34C39.17,30.12 41.07,30 43,30L43.04,30C43.15,30.77 43.51,31.46 44.03,31.98C42.92,34.99 42.09,38.14 41.59,41.39C38.02,44.38 34.88,47.86 32.28,51.74L32.21,51.67C32.33,52.76 32.51,53.83 32.74,54.89C35.74,57.51 39.06,59.77 42.64,61.61C43.83,66.09 45.63,70.31 47.96,74.19C47.56,74.45 47.16,74.71 46.75,74.96C47.38,75.36 48.03,75.74 48.68,76.1C48.8,76.03 48.91,75.96 49.02,75.88C49.16,76.09 49.3,76.3 49.44,76.5C50.61,77.1 51.83,77.63 53.08,78.09C52.23,77.01 51.42,75.89 50.67,74.74C53.22,72.9 55.59,70.81 57.74,68.52C58.25,68.83 58.86,69 59.5,69C60.92,69 62.14,68.16 62.69,66.95C63.45,66.98 64.22,67 65,67C65.81,67 66.61,66.98 67.41,66.94C67.55,66.25 67.73,65.57 67.94,64.91C66.97,64.97 65.99,65 65,65C64.32,65 63.63,64.99 62.96,64.96C62.85,64.27 62.55,63.65 62.1,63.16C66.66,56.69 69.69,49.06 70.66,40.8C71.16,40.63 71.6,40.35 71.97,39.98C76.08,43.21 79.65,47.11 82.49,51.51C83.19,51.35 83.9,51.22 84.63,51.14ZM49.86,30.5C49.43,31.94 48.09,33 46.5,33C46.27,33 46.04,32.98 45.82,32.93C45.04,35.07 44.42,37.27 43.95,39.53C48.13,36.46 52.8,34.03 57.84,32.39C55.27,31.54 52.6,30.9 49.86,30.5ZM33.76,53.12C35.88,49.91 38.39,46.97 41.22,44.38C41.07,45.9 41,47.44 41,49C41,52.43 41.35,55.78 42.02,59.01C39.06,57.34 36.29,55.37 33.76,53.12ZM43.45,42.45C48.53,38.34 54.47,35.27 60.96,33.56C62.79,34.31 64.56,35.18 66.27,36.15C66.1,36.57 66,37.02 66,37.5C66,39.13 67.12,40.51 68.63,40.89C67.65,48.73 64.74,55.97 60.39,62.12C60.11,62.04 59.81,62 59.5,62C58.03,62 56.77,62.9 56.25,64.19C52.06,63.4 48.07,62.05 44.35,60.23C43.47,56.63 43,52.87 43,49C43,46.78 43.15,44.59 43.45,42.45ZM56.07,66.19C52.22,65.48 48.53,64.32 45.05,62.77C46.16,66.4 47.7,69.84 49.61,73.04C52.05,71.27 54.31,69.26 56.37,67.06C56.23,66.79 56.13,66.5 56.07,66.19ZM64.22,32.82C65.36,33.37 66.47,33.96 67.56,34.59C67.98,34.31 68.47,34.11 68.99,34.04C68.98,33.41 68.95,32.79 68.92,32.17C67.33,32.31 65.76,32.53 64.22,32.82Z&quot;"
         errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -387,6 +2147,17 @@
     </issue>
 
     <issue
+        id="MergeRootFrame"
+        message="This `&lt;FrameLayout>` can be replaced with a `&lt;merge>` tag"
+        errorLine1="&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/layout/item_exclusion_list_app_warning.xml"
+            line="17"
+            column="1"/>
+    </issue>
+
+    <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `?attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
         errorLine1="    android:background=&quot;?attr/selectableItemBackground&quot;"
@@ -395,6 +2166,281 @@
             file="src/main/res/layout/view_vpn_toggle.xml"
             line="23"
             column="5"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Připojování...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-cs/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Forbinder ...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-da/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Verbinden ...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-de/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Σύνδεση...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Conectando...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-es/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Ühendamine ...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-et/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Povezivanje u tijeku...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Jungiamasi...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-lt/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Er wordt verbinding gemaakt ...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-nl/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Łączenie...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Выполняется подключение...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Pripája sa...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Povezovanje ...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpManagementToggleSubtitleConnecting&quot;>Bağlantı kuruluyor...&lt;/string>"
+        errorLine2="                                                          ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-tr/strings-netp.xml"
+            line="27"
+            column="59"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpNotificationDisabled&quot;>VPN отключен. Продолжить защиту трафика...&lt;/string>"
+        errorLine2="                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="191"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpNotificationDisabledByVpn&quot;>VPN-приложение на вашем устройстве отключило VPN DuckDuckGo. Подключиться заново...&lt;/string>"
+        errorLine2="                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="192"
+            column="50"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Περιμένετε μέχρι να επαληθεύσουμε τη συνδρομή σας...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-el/strings-netp.xml"
+            line="213"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Attendi mentre verifico l\&apos;abbonamento...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-it/strings-netp.xml"
+            line="213"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Vänta medan vi bekräftar ditt abonnemang ...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sv/strings-netp.xml"
+            line="213"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Te rugăm să aștepți până verificăm abonamentul tău...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ro/strings-netp.xml"
+            line="214"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Pričekaj dok provjeravamo tvoju pretplatu...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-hr/strings-netp.xml"
+            line="215"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Poczekaj, aż zweryfikujemy Twoją subskrypcję...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-pl/strings-netp.xml"
+            line="215"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Идет проверка подписки. Подождите...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-ru/strings-netp.xml"
+            line="215"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Počkaj, prosím, kým overíme tvoje predplatné...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sk/strings-netp.xml"
+            line="215"
+            column="53"/>
+    </issue>
+
+    <issue
+        id="TypographyEllipsis"
+        message="Replace &quot;...&quot; with ellipsis character (…, &amp;#8230;) ?"
+        errorLine1="    &lt;string name=&quot;netpVerifySubscriptionInProgress&quot;>Počakajte, da preverimo vašo naročnino ...&lt;/string>"
+        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values-sl/strings-netp.xml"
+            line="215"
+            column="53"/>
     </issue>
 
     <issue

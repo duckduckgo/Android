@@ -19,7 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="?attr/colorPrimaryDark">
+    android:background="?attr/daxColorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -56,7 +56,7 @@
             android:layout_marginHorizontal="@dimen/keyline_4"
             app:editable="false"
             app:type="single_line"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyUsername" />
 
         <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -92,7 +92,7 @@
             android:hint="@string/credentialManagementEditPasswordHint"
             android:layout_marginHorizontal="@dimen/keyline_4"
             app:editable="false"
-            app:endIcon="@drawable/ic_copy"
+            app:endIcon="@drawable/ic_copy_24"
             app:endIconContentDescription="@string/credentialManagementEditButtonCopyPassword"
             app:type="password" />
 

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.cookies.impl.features
 
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 
 data class CookiesFeature(
     val state: String,

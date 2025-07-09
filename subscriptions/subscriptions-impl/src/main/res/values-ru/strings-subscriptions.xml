@@ -61,6 +61,10 @@
     <string name="privacyProFaqSecondary">На страницах справки вы найдете ответы на распространенные вопросы, а также контакты поддержки Privacy Pro. Доступность функций зависит от страны.</string>
     <string name="subscriptionStatusSubscribed">Подписка оформлена</string>
     <string name="privacyPolicyAndTermsOfService">Политика конфиденциальности и условия обслуживания</string>
+    <string name="subscriptionStatusFreeTrial">Бесплатный пробный доступ активирован</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s. В тот же день вы автоматически перейдете на платную ежемесячную подписку.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s. В тот же день вы автоматически перейдете на платную годовую подписку.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s без перехода на платную подписку.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Настройки подписки</string>
@@ -68,6 +72,7 @@
     <string name="subscriptionSettingSubscribeSubtitle">Включает услуги: VPN, Personal Information Removal (удаление личной информации) и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
     <string name="subscriptionSettingSubscribeSubtitleRow">Включает услуги: VPN и и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
     <string name="subscriptionSettingGet">Перейти на Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Попробуйте Privacy Pro бесплатно</string>
     <string name="subscriptionSettingRestore">У меня уже есть подписка</string>
     <string name="subscriptionSettingExpired">Срок действия вашей подписки Privacy Pro истек</string>
     <string name="subscriptionSettingExpiredViewPlans">Просмотреть тарифы</string>

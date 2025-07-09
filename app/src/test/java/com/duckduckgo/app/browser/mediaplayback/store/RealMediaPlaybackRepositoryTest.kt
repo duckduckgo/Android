@@ -1,81 +1,56 @@
 package com.duckduckgo.app.browser.mediaplayback.store
 
+import com.duckduckgo.app.browser.mediaplayback.MediaPlaybackFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FeatureException
+import com.duckduckgo.feature.toggles.api.Toggle
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers.anyList
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.reset
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 class RealMediaPlaybackRepositoryTest {
     @get:Rule
     var coroutineRule = CoroutineTestRule()
 
-    lateinit var testee: RealMediaPlaybackRepository
-
-    private val mockMediaPlaybackDatabase: MediaPlaybackDatabase = mock()
-    private val mockMediaPlaybackDao: MediaPlaybackDao = mock()
+    private val mediaPlaybackFeature = FakeFeatureToggleFactory.create(MediaPlaybackFeature::class.java)
 
     @Before
     fun before() {
-        whenever(mockMediaPlaybackDatabase.mediaPlaybackDao()).thenReturn(mockMediaPlaybackDao)
-        initRepository()
+        mediaPlaybackFeature.self().setRawStoredState(Toggle.State(exceptions = exceptions))
     }
 
     @Test
     fun whenRepositoryIsCreatedThenValuesLoadedIntoMemory() {
-        givenMediaPlaybackDaoContainsEntities()
-
-        initRepository()
-
-        assertEquals(mediaPlaybackExceptionEntity.toFeatureException(), testee.exceptions.first())
-    }
-
-    @Test
-    fun whenUpdateAllThenUpdateAllCalled() = runTest {
-        initRepository()
-
-        testee.updateAll(listOf())
-
-        verify(mockMediaPlaybackDao).updateAll(anyList())
-    }
-
-    @Test
-    fun whenUpdateAllThenPreviousValuesAreClearedAndNewValuesUpdated() = runTest {
-        givenMediaPlaybackDaoContainsEntities()
-
-        initRepository()
-        assertEquals(1, testee.exceptions.size)
-
-        reset(mockMediaPlaybackDao)
-
-        testee.updateAll(listOf())
-
-        assertEquals(0, testee.exceptions.size)
-    }
-
-    private fun initRepository() {
-        testee = RealMediaPlaybackRepository(
-            mockMediaPlaybackDao,
+        val repository = RealMediaPlaybackRepository(
+            mediaPlaybackFeature,
             TestScope(),
             coroutineRule.testDispatcherProvider,
             isMainProcess = true,
         )
+
+        assertEquals(exceptions, repository.exceptions)
     }
 
-    private fun givenMediaPlaybackDaoContainsEntities() {
-        whenever(mockMediaPlaybackDao.getAll()).thenReturn(listOf(mediaPlaybackExceptionEntity))
+    @Test
+    fun whenRemoteConfigUpdateThenExceptionsUpdated() = runTest {
+        val repository = RealMediaPlaybackRepository(
+            mediaPlaybackFeature,
+            TestScope(),
+            coroutineRule.testDispatcherProvider,
+            isMainProcess = true,
+        )
+
+        assertEquals(exceptions, repository.exceptions)
+        mediaPlaybackFeature.self().setRawStoredState(Toggle.State(exceptions = emptyList()))
+        repository.onPrivacyConfigDownloaded()
+        assertEquals(emptyList<FeatureException>(), repository.exceptions)
     }
 
     companion object {
-        val mediaPlaybackExceptionEntity = MediaPlaybackExceptionEntity(
-            domain = "example.com",
-        )
+        val exceptions = listOf(FeatureException("example.com", "reason"))
     }
 }

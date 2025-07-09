@@ -27,6 +27,7 @@ android {
 
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
 }
 
@@ -58,6 +59,7 @@ dependencies {
     implementation project(':remote-messaging-api') // remote feature flag
     implementation project(':survey-api')
     implementation project(':vpn-api')
+    implementation project(':content-scope-scripts-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core

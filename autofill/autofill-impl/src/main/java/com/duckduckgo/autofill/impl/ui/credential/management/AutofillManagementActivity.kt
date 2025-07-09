@@ -16,10 +16,7 @@
 
 package com.duckduckgo.autofill.impl.ui.credential.management
 
-import android.graphics.Insets.add
 import android.os.Bundle
-import android.system.Os.remove
-import android.text.TextUtils.replace
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -30,40 +27,40 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.R
-import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
+import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsLegacyBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Error
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.UserCancelled
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitDisabledMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ExitLockedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.InitialiseViewAfterUnlock
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.LaunchDeviceAuth
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.OfferUserUndoMassDeletion
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowCredentialMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDeviceUnsupportedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowDisabledMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowListModeLegacy
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowLockedMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserPasswordCopied
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.Command.ShowUserUsernameCopied
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Disabled
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingExisting
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.EditingNewEntry
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.ListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Locked
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.CredentialMode.Viewing
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitLockedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.InitialiseViewAfterUnlock
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.LaunchDeviceAuth
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.OfferUserUndoDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.OfferUserUndoMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowCredentialMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDeviceUnsupportedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDisabledMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListModeLegacy
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowLockedMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserPasswordCopied
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserUsernameCopied
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Disabled
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingExisting
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.EditingNewEntry
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.ListMode
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Locked
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.CredentialMode.Viewing
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementCredentialsMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
@@ -82,16 +79,17 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillSettingsScreen::class)
-@ContributeToActivityStarter(AutofillSettingsScreenShowSuggestionsForSiteParams::class)
-@ContributeToActivityStarter(AutofillSettingsScreenDirectlyViewCredentialsParams::class)
+@ContributeToActivityStarter(AutofillPasswordsManagementScreen::class)
+@ContributeToActivityStarter(AutofillPasswordsManagementScreenWithSuggestions::class)
+@ContributeToActivityStarter(AutofillPasswordsManagementViewCredential::class)
 class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotionPlugin.Callback {
 
-    val binding: ActivityAutofillSettingsBinding by viewBinding()
-    private val viewModel: AutofillSettingsViewModel by bindViewModel()
+    val binding: ActivityAutofillSettingsLegacyBinding by viewBinding()
+    private val viewModel: AutofillPasswordsManagementViewModel by bindViewModel()
 
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
@@ -118,21 +116,21 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         }
     }
 
-    private fun extractLaunchSource(): AutofillSettingsLaunchSource {
-        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+    private fun extractLaunchSource(): AutofillScreenLaunchSource {
+        intent.getActivityParams(AutofillPasswordsManagementScreenWithSuggestions::class.java)?.let {
             return it.source
         }
 
-        intent.getActivityParams(AutofillSettingsScreenDirectlyViewCredentialsParams::class.java)?.let {
+        intent.getActivityParams(AutofillPasswordsManagementViewCredential::class.java)?.let {
             return it.source
         }
 
-        intent.getActivityParams(AutofillSettingsScreen::class.java)?.let {
+        intent.getActivityParams(AutofillPasswordsManagementScreen::class.java)?.let {
             return it.source
         }
 
         // default if nothing else matches
-        return AutofillSettingsLaunchSource.Unknown
+        return AutofillScreenLaunchSource.Unknown
     }
 
     override fun onStart() {
@@ -192,7 +190,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         }
     }
 
-    private fun processCommand(command: AutofillSettingsViewModel.Command) {
+    private fun processCommand(command: AutofillPasswordsManagementViewModel.Command) {
         var processed = true
         when (command) {
             is ShowCredentialMode -> showCredentialMode()
@@ -214,7 +212,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
             else -> processed = false
         }
         if (processed) {
-            Timber.v("Processed command $command")
+            logcat(VERBOSE) { "Processed command $command" }
             viewModel.commandProcessed(command)
         }
     }
@@ -257,7 +255,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
         val currentUrl = extractSuggestionsUrl()
         val privacyProtectionStatus = extractPrivacyProtectionEnabled()
         val launchSource = extractLaunchSource()
-        Timber.v("showListMode (isLegacy = %s). currentUrl is %s", legacyList, currentUrl)
+        logcat(VERBOSE) { "showListMode (isLegacy = $legacyList). currentUrl is $currentUrl" }
 
         supportFragmentManager.commitNow {
             val fragment = if (legacyList) {
@@ -334,7 +332,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private fun resetToolbar() {
-        setTitle(R.string.autofillManagementScreenTitleNew)
+        setTitle(R.string.autofillManagementScreenTitle)
         binding.toolbar.menu.clear()
         hideSearchBar()
         supportActionBar?.setHomeAsUpIndicator(com.duckduckgo.mobile.android.R.drawable.ic_arrow_left_24)
@@ -385,11 +383,11 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private fun extractViewMode(): ViewMode {
-        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+        intent.getActivityParams(AutofillPasswordsManagementScreenWithSuggestions::class.java)?.let {
             return ViewMode.ListModeWithSuggestions(it.currentUrl)
         }
 
-        intent.getActivityParams(AutofillSettingsScreenDirectlyViewCredentialsParams::class.java)?.let {
+        intent.getActivityParams(AutofillPasswordsManagementViewCredential::class.java)?.let {
             return ViewMode.CredentialMode(it.loginCredentials)
         }
 
@@ -406,7 +404,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private fun extractPrivacyProtectionEnabled(): Boolean? {
-        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+        intent.getActivityParams(AutofillPasswordsManagementScreenWithSuggestions::class.java)?.let {
             return it.privacyProtectionEnabled
         } ?: return null
     }

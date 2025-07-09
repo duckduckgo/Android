@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class PermissionsPerWebsiteViewModel @Inject constructor(
@@ -60,8 +60,8 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
         viewModelScope.launch {
             val websitePermissionsSettings = sitePermissionsRepository.getSitePermissionsForWebsite(url)
             val websitePermissions = convertToWebsitePermissionSettings(websitePermissionsSettings)
-            Timber.d("Permissions: websitePermissionsSettings for $url $websitePermissionsSettings")
-            Timber.d("Permissions: websitePermissions for $url $websitePermissions")
+            logcat { "Permissions: websitePermissionsSettings for $url $websitePermissionsSettings" }
+            logcat { "Permissions: websitePermissions for $url $websitePermissions" }
 
             _viewState.value = _viewState.value.copy(websitePermissions = websitePermissions)
         }
@@ -101,22 +101,22 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
     ): List<WebsitePermissionSetting> {
         return listOf(
             WebsitePermissionSetting(
-                R.drawable.ic_location_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_location_24,
                 R.string.sitePermissionsSettingsLocation,
                 locationSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_video_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_video_24,
                 R.string.sitePermissionsSettingsCamera,
                 cameraSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_microphone_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_microphone_24,
                 R.string.sitePermissionsSettingsMicrophone,
                 micSetting,
             ),
             WebsitePermissionSetting(
-                R.drawable.ic_video_player_24,
+                com.duckduckgo.mobile.android.R.drawable.ic_video_player_24,
                 R.string.sitePermissionsSettingsDRM,
                 drmSetting,
             ),

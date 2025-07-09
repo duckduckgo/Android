@@ -26,10 +26,11 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert.*
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,7 +50,12 @@ class SharedPreferencesDuckChatDataStoreTest {
         )
 
     private val testee: DuckChatDataStore =
-        SharedPreferencesDuckChatDataStore(testDataStore, coroutineRule.testScope)
+        SharedPreferencesDuckChatDataStore(
+            testDataStore,
+            coroutineRule.testDispatcherProvider,
+            true,
+            coroutineRule.testScope,
+        )
 
     companion object {
         val DUCK_CHAT_USER_PREFERENCES = stringPreferencesKey("DUCK_CHAT_USER_PREFERENCES")
@@ -92,5 +98,124 @@ class SharedPreferencesDuckChatDataStoreTest {
         testee.updateUserPreferences(null)
 
         assertFalse(testDataStore.data.first().contains(DUCK_CHAT_USER_PREFERENCES))
+    }
+
+    @Test
+    fun whenIsDuckChatUserEnabledDefaultThenReturnTrue() = runTest {
+        assertTrue(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenGetShowInBrowserMenuDefaultThenReturnTrue() = runTest {
+        assertTrue(testee.getShowInBrowserMenu())
+    }
+
+    @Test
+    fun whenGetShowInAddressBarDefaultThenFollowMenuDefault() = runTest {
+        assertTrue(testee.getShowInBrowserMenu())
+        assertTrue(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun `when isInputScreenUserSettingEnabled then return default value`() = runTest {
+        assertFalse(testee.isInputScreenUserSettingEnabled())
+    }
+
+    @Test
+    fun whenMenuFlagChangesLaterThenAddressBarRemainsUnchanged() = runTest {
+        assertTrue(testee.getShowInBrowserMenu())
+        assertTrue(testee.getShowInAddressBar())
+
+        testee.setShowInBrowserMenu(false)
+
+        assertFalse(testee.getShowInBrowserMenu())
+        assertTrue(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun whenSetDuckChatUserEnabledThenIsDuckChatUserEnabledThenReturnValue() = runTest {
+        testee.setDuckChatUserEnabled(false)
+        assertFalse(testee.isDuckChatUserEnabled())
+    }
+
+    @Test
+    fun whenSetShowInBrowserMenuThenGetShowInBrowserMenuThenReturnValue() = runTest {
+        testee.setShowInBrowserMenu(false)
+        assertFalse(testee.getShowInBrowserMenu())
+    }
+
+    @Test
+    fun whenSetShowInAddressBarThenGetShowInAddressBarThenReturnValue() = runTest {
+        testee.setShowInAddressBar(false)
+        assertFalse(testee.getShowInAddressBar())
+    }
+
+    @Test
+    fun `when setInputScreenUserSetting then return value`() = runTest {
+        testee.setInputScreenUserSetting(false)
+        assertFalse(testee.isInputScreenUserSettingEnabled())
+    }
+
+    @Test
+    fun whenObserveDuckChatUserEnabledThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeDuckChatUserEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setDuckChatUserEnabled(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun whenObserveShowInBrowserMenuThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeShowInBrowserMenu()
+                .take(2)
+                .toList(results)
+        }
+        testee.setShowInBrowserMenu(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun whenObserveShowInAddressBarThenReceiveUpdates() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeShowInAddressBar()
+                .take(2)
+                .toList(results)
+        }
+        testee.setShowInAddressBar(false)
+        job.join()
+
+        assertEquals(listOf(true, false), results)
+    }
+
+    @Test
+    fun `when observeInputScreenUserSettingEnabled then receive updates`() = runTest {
+        val results = mutableListOf<Boolean>()
+        val job = launch {
+            testee.observeInputScreenUserSettingEnabled()
+                .take(2)
+                .toList(results)
+        }
+        testee.setInputScreenUserSetting(true)
+        job.join()
+
+        assertEquals(listOf(false, true), results)
+    }
+
+    @Test
+    fun whenRegisterOpenedThenWasOpenedBeforeThenReturnTrue() = runTest {
+        assertFalse(testee.wasOpenedBefore())
+        testee.registerOpened()
+        assertTrue(testee.wasOpenedBefore())
     }
 }

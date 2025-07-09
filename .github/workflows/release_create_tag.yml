@@ -9,7 +9,7 @@ on:
         default: 'PLACEHOLDER'
 
 env:
-  ASANA_PAT: ${{ secrets.GH_ASANA_SECRET }}
+  ASANA_PAT: ${{ secrets.ASANA_ACCESS_TOKEN }}
   GH_TOKEN: ${{ secrets.GT_DAXMOBILE }}
   emoji_info: ":information_source:" # ℹ️
 
@@ -49,20 +49,20 @@ jobs:
 
       - name: Notify Mattermost
         id: send-mm-message
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
-          mattermost-message: ${{env.emoji_start}} Release ${{ github.event.inputs.app-version }}. Tag created.
+          mattermost-message: ${{env.emoji_info}} Release ${{ github.event.inputs.app-version }}. Tag created https://github.com/duckduckgo/Android/releases/tag/${{ github.event.inputs.app-version }}
           action: 'send-mattermost-message'
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
-          asana-pat: ${{ secrets.GH_ASANA_SECRET }}
+          asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           asana-task-name: GH Workflow Failure - Tag Android Release
@@ -72,7 +72,7 @@ jobs:
       - name: Notify Mattermost when workflow failed
         if: ${{ failure() }}
         id: send-mm-message-error
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           mattermost-token: ${{ secrets.MM_AUTH_TOKEN }}
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}

@@ -51,7 +51,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.moshi
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.airbnb.android:lottie:_"
@@ -89,6 +89,7 @@ android {
     }
     lintOptions {
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests {

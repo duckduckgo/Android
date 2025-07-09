@@ -34,6 +34,7 @@ import com.duckduckgo.sync.impl.RecoveryCodePDF
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -451,7 +452,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
         givenUserHasDeviceAuthentication(true)
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
@@ -463,7 +465,8 @@ class SyncActivityViewModelTest {
     @Test
     fun whenUserClicksOnSaveRecoveryCodeWithoutDeviceAuthenticationThenEmitCommandRequestSetupAuthentication() = runTest {
         givenUserHasDeviceAuthentication(false)
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         testee.commands().test {
             testee.onSaveRecoveryCodeClicked()
             val command = awaitItem()
@@ -474,8 +477,9 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
-        whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(jsonRecoveryKeyEncoded))).thenReturn(TestSyncFixtures.pdfFile())
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
+        whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(authCodeToUse.rawCode))).thenReturn(TestSyncFixtures.pdfFile())
 
         testee.commands().test {
             testee.generateRecoveryCode(mock())
@@ -612,7 +616,7 @@ class SyncActivityViewModelTest {
         testee.onGetOnOtherPlatformsClickedWhenSyncEnabled()
         testee.commands().test {
             awaitItem().also {
-                assertEquals("activated", (it as LaunchSyncGetOnOtherPlatforms).source)
+                assertEquals("activated", (it as LaunchSyncGetOnOtherPlatforms).source.value)
             }
             cancelAndIgnoreRemainingEvents()
         }
@@ -623,7 +627,7 @@ class SyncActivityViewModelTest {
         testee.onGetOnOtherPlatformsClickedWhenSyncDisabled()
         testee.commands().test {
             awaitItem().also {
-                assertEquals("not_activated", (it as LaunchSyncGetOnOtherPlatforms).source)
+                assertEquals("not_activated", (it as LaunchSyncGetOnOtherPlatforms).source.value)
             }
             cancelAndIgnoreRemainingEvents()
         }
@@ -636,7 +640,8 @@ class SyncActivityViewModelTest {
     private fun givenAuthenticatedUser() {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
         whenever(syncStateMonitor.syncState()).thenReturn(stateFlow.asStateFlow())
-        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(jsonRecoveryKeyEncoded))
+        val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
+        whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
     }

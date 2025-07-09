@@ -22,7 +22,10 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.worker.WorkerInjectorPlugin
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.asLog
+import logcat.logcat
 
 class DaggerWorkerFactory(
     private val workerInjectorPluginPoint: PluginPoint<WorkerInjectorPlugin>,
@@ -40,15 +43,15 @@ class DaggerWorkerFactory(
 
             workerInjectorPluginPoint.getPlugins().forEach { plugin ->
                 if (plugin.inject(instance)) {
-                    Timber.i("Injected using plugin $workerClassName")
+                    logcat(INFO) { "Injected using plugin $workerClassName" }
                     return@forEach
                 }
-                Timber.i("No injection required for worker $workerClassName")
+                logcat(INFO) { "No injection required for worker $workerClassName" }
             }
 
             return instance
         } catch (exception: Exception) {
-            Timber.e(exception, "Worker $workerClassName could not be created")
+            logcat(ERROR) { "Worker $workerClassName could not be created: ${exception.asLog()}" }
             return null
         }
     }

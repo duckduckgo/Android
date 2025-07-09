@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Võrgustikuvaade</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt; viimase 7 päeva jooksul</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt; viimase 7 päeva jooksul</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s jälgijat blokeeritud &lt;/b&gt;</string>
     <string name="inTheLast7Days">viimase 7 päeva jooksul</string>
 
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Välimus</string>
+    <string name="settingsShowFullUrlTitle">Näita kogu saidi aadressi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvesta</string>
@@ -711,8 +712,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d privaatne vahekaart</item>
-        <item quantity="other">%1$d privaatset vahekaarti</item>
+        <item quantity="one">1 vahekaart</item>
+        <item quantity="other">%1$d vahekaarti</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Otsi vaikimisi privaatselt</string>
     <string name="preOnboardingComparisonChartItem2">Blokeeri kolmanda poole jälgurid</string>
     <string name="preOnboardingComparisonChartItem3">Blokeeri küpsiste hüpikaknad</string>
-    <string name="preOnboardingComparisonChartItem4">Blokeeri jälgivad reklaamid</string>
+    <string name="preOnboardingComparisonChartItem4">Blokeeri suunatud reklaamid</string>
     <string name="preOnboardingComparisonChartItem5">Kustuta sirvimisandmed ühe nupuga</string>
     <string name="preOnboardingDaxDialog3Title">Suurepärane! Tere tulemast pardi poolele.</string>
     <string name="preOnboardingDaxDialog3Button">Alusta sirvimist</string>
@@ -823,6 +824,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Viska viis!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Proovi seda</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Jäta vahele</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Olen siin varem olnud</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Sain aru! Jätan muud näpunäited vahele.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Tuletame meelde, et nupu <b>Fire Button</b> 🔥 abil saate kustutada kõik oma vahekaardid, ajaloo ja sirvimisandmed kahe puudutusega]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Näita õpetust</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Aadressiriba</string>
@@ -838,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Aitäh! Sinu aruanne aitab muuta DuckDuckGo kõigi jaoks paremaks!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Uus AI vestlus</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Muutke meid oma vaikebrauseriks, et kõik saidilingid avaneksid DuckDuckGos.</string>
@@ -852,10 +853,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vahekaartide ja andmete kustutamine kustutab sinu jälguri blokeerimise ajaloo ja lähtestab selle numbri nulli.\n\nPeida see ribareklaam, kui sa ei soovi seda vahekaartide vaates näha.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Peida ribareklaam</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Hoiatus: see sait võib olla turvaoht</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blokeeris selle saidi, kuna see võib levitada pahavara, mis on loodud teie seadme kahjustamiseks või teie isikuandmete varastamiseks.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[See veebisait võib imiteerida seaduslikku veebisaiti, et sinult välja petta isiklikke andmeid, näiteks paroole või krediitkaardi numbreid.\n<a href=\"\">Vaata lähemalt</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo blokeeris selle lehe, kuna see võib püüda teid petta või manipuleerida tegema rahaülekandeid, ostma võltsitud kaupu või installima pahavara valel ettekäändel.\n<a href=\"\">Vaata lähemalt</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Lahku sellelt saidilt</string>
     <string name="maliciousSiteAdvancedCTA">Täiustatud</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Kui arvate, et see veebisait on turvaline, võite <a href=\"\">teatada veast</a>. Võite siiski külastada veebisaiti omal vastutusel.]]></string>
@@ -866,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Hoiata mind andmepüügi või pahavara tõttu märgistatud saitidel</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="maliciousSiteSettingDisabled">Selle funktsiooni keelamine võib teie andmed ohtu seada.</string>
+    <string name="threatProtectionTitle">Kaitse ohtude eest</string>
+    <string name="threatProtectionDescription">DuckDuckGo täiustatud kaitsed peatavad levinud ohud, hoides samal ajal su ühenduse turvalisena.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Võimaluse korral uuendab lingid automaatselt HTTPS-ile.<br><a href=\"\">Loe edasi</a>]]></string>
+    <string name="scamBlockerTitle">Pettuste blokeerija</string>
+    <string name="scamBlockerDescription">Hoiata mind pettuste, andmepüügi ja pahavara tõttu märgistatud saitidel.</string>
+    <string name="threatProtectionLearnMoreTitle">Loe edasi</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Proovige meie avakuva vidinat!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Kiire ja hõlpsa juurdepääsu tagamiseks lisage meie meie otsinguvidin avakuvale.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisage vidin</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo otsing</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>
 </resources>

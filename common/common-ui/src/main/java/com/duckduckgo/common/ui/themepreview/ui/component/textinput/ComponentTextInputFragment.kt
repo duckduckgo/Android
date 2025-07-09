@@ -47,7 +47,7 @@ class ComponentTextInputFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         binding.outlinedinputtext4.apply {
-            setEndIcon(R.drawable.ic_copy)
+            setEndIcon(R.drawable.ic_copy_24)
             onAction { toastOnClick(it) }
         }
         binding.outlinedinputtext6.onAction { toastOnClick(it) }

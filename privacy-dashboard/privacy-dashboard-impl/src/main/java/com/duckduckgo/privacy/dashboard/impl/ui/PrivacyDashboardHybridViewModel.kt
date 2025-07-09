@@ -35,7 +35,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.privacy.dashboard.api.PrivacyDashboardExternalPixelParams
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
@@ -78,7 +77,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ActivityScope::class)
@@ -98,7 +98,6 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
     private val brokenSiteSender: BrokenSiteSender,
     private val moshi: Moshi,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
-    private val privacyDashboardExternalPixelParams: PrivacyDashboardExternalPixelParams,
 ) : ViewModel() {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -235,9 +234,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams() + privacyDashboardExternalPixelParams.getPixelParams()
+            val pixelParams = privacyProtectionsPopupExperimentExternalPixels.getPixelParams()
             pixel.fire(PRIVACY_DASHBOARD_OPENED, pixelParams, type = Count)
-            privacyDashboardExternalPixelParams.clearPixelParams()
             pixel.fire(
                 pixel = PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
                 parameters = mapOf("daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(), "from_onboarding" to "false"),
@@ -310,7 +308,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         payload: String,
         dashboardOpenedFromCustomTab: Boolean = false,
     ) {
-        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $payload")
+        logcat(INFO) { "PrivacyDashboard: onPrivacyProtectionsClicked $payload" }
 
         viewModelScope.launch(dispatcher.io()) {
             val event = privacyDashboardPayloadAdapter.onPrivacyProtectionsClicked(payload) ?: return@launch
@@ -449,6 +447,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                contentScopeExperiments = site.activeContentScopeExperiments,
+                debugFlags = site.debugFlags,
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
@@ -544,6 +544,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                contentScopeExperiments = site.activeContentScopeExperiments,
+                debugFlags = site.debugFlags,
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = true)

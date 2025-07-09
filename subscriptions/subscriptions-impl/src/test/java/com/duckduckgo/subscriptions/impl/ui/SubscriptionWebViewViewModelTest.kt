@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl.ui
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -20,10 +21,11 @@ import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
@@ -51,6 +53,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SubscriptionWebViewViewModelTest {
     @get:Rule
@@ -63,7 +66,6 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
-    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -77,7 +79,6 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState,
             pixelSender,
             privacyProFeature,
-            freeTrialExperimentDataStore,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -291,6 +292,112 @@ class SubscriptionWebViewViewModelTest {
             val params = jsonAdapter.fromJson(response.params.toString())!!
             assertEquals(0, params.options.size)
             assertEquals(0, params.features.size)
+        }
+    }
+
+    @Test
+    fun givenFreeTrialAvailableWhenGetSubscriptionOptionsThenSendCommandWithFreeTrialOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$1", billingPeriod = "P1M"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = jsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+            assertEquals(MONTHLY_FREE_TRIAL_OFFER_US, params?.options?.last()?.offer?.id)
+            assertEquals(YEARLY_FREE_TRIAL_OFFER_US, params?.options?.first()?.offer?.id)
+        }
+    }
+
+    @Test
+    fun givenFreeTrialAvailableWhenGetSubscriptionOptionsAndUserIsNotFreeTrialEligibleThenSendCommandWithoutFreeTrialOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$1", billingPeriod = "P1M"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = jsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+            assertEquals(null, params?.options?.last()?.offer)
+            assertEquals(null, params?.options?.first()?.offer)
         }
     }
 

@@ -19,7 +19,7 @@ package com.duckduckgo.request.filterer.impl
 import android.webkit.WebResourceRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName

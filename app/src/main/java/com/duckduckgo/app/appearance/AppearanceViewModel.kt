@@ -39,6 +39,7 @@ import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlin.to
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +49,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AppearanceViewModel @Inject constructor(
@@ -67,6 +68,7 @@ class AppearanceViewModel @Inject constructor(
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
         val isOmnibarPositionFeatureEnabled: Boolean = true,
+        val isFullUrlEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -90,6 +92,7 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
                 )
             }
         }
@@ -119,9 +122,9 @@ class AppearanceViewModel @Inject constructor(
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
-        Timber.d("User toggled theme, theme to set: $selectedTheme")
+        logcat { "User toggled theme, theme to set: $selectedTheme" }
         if (themingDataStore.isCurrentlySelected(selectedTheme)) {
-            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
+            logcat { "User selected same theme they've already set: $selectedTheme; no need to do anything else" }
             return
         }
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -167,6 +170,16 @@ class AppearanceViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
             }
             settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
+    }
+
+    fun onFullUrlSettingChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.isFullUrlEnabled = checked
+            viewState.update { it.copy(isFullUrlEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
         }
     }
 }

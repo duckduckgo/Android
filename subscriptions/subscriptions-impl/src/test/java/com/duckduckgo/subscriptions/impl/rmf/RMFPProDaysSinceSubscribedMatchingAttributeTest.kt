@@ -81,6 +81,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = 10000L,
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -111,6 +112,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -131,6 +133,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -151,6 +154,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -171,6 +175,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -191,6 +196,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -211,6 +217,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,
@@ -231,6 +238,7 @@ class RMFPProDaysSinceSubscribedMatchingAttributeTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(
             Subscription(
                 productId = "productId",
+                billingPeriod = "Monthly",
                 startedAt = TimeUnit.DAYS.toMillis(1),
                 expiresOrRenewsAt = 10000L,
                 status = AUTO_RENEWABLE,

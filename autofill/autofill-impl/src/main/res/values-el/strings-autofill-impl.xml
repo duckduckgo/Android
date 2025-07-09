@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Μπορείτε να εισαγάγετε αποθηκευμένους κωδικούς πρόσβασης από άλλο πρόγραμμα περιήγησης στο DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Εισαγωγή κωδικών πρόσβασης</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Τρόπος εισαγωγής κωδικών πρόσβασης</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Πώς να συγχρονίσετε τους κωδικούς πρόσβασης υπολογιστών</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Εισαγάγετε κωδικούς πρόσβασης στην έκδοση του προγράμματος περιήγησης DuckDuckGo για υπολογιστές και έπειτα συγχρονίστε τους σε όλες τις συσκευές.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Αποκτήστε το πρόγραμμα περιήγησης για υπολογιστές</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Ο σύνδεσμος αντιγράφηκε</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Συγχρονισμός κωδικών πρόσβασης DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Συγχρονισμός κωδικών πρόσβασης DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης Google που διαθέτετε</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Η εισαγωγή κωδικού πρόσβασης απέτυχε</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Παραλείφθηκε (διπλότυπο ή μη έγκυρο): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Κωδικοί πρόσβασης που εισήχθησαν: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Άνοιγμα κωδικών πρόσβασης</string>
+    <string name="autofill_service_select_password_activity">Επίλεξε έναν αποθηκευμένο κωδικό πρόσβασης</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Κωδικοί πρόσβασης και Αυτόματη συμπλήρωση</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Επαναφορά αποκλεισμένων ιστότοπων;</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Εάν κάνετε επαναφορά των αποκλεισμένων ιστότοπων, θα σας ζητηθεί να αποθηκεύσετε τον κωδικό πρόσβασής σας την επόμενη φορά που θα συνδεθείτε σε οποιονδήποτε από τους ιστότοπους αυτούς.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Επαναφορά</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Ακύρωση</string>
+    <string name="autofillSettingsPasswordsEntry">Κωδικοί πρόσβασης</string>
+    <string name="autofillSettingsAutofillToggleLabel">Ζητήστε αποθήκευση και αυτόματη συμπλήρωση</string>
+    <string name="autofillSettingsAutofillSubtitle">Οι κωδικοί πρόσβασης είναι κρυπτογραφημένοι. Κανείς άλλος εκτός από εσάς δεν μπορεί να τους βλέπει, ούτε καν εμείς. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Εισαγωγή κωδικών πρόσβασης</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Επαναφορά αποκλεισμένων ιστότοπων</string>
 
 </resources>

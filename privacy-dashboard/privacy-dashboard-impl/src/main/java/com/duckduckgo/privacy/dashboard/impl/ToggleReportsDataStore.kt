@@ -32,7 +32,7 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 
 interface ToggleReportsDataStore {
@@ -142,9 +142,9 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
     }
 
     override suspend fun getPromptsDismissed(): List<String> {
-        return store.data.first().let { prefs ->
-            prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]?.toList() ?: emptyList()
-        }
+        return store.data.firstOrNull()?.let { prefs ->
+            prefs[TOGGLE_REPORTS_PROMPTS_DISMISSED]
+        }?.toList() ?: emptyList()
     }
 
     override suspend fun insertTogglePromptSend() {
@@ -165,9 +165,9 @@ class SharedPreferencesToggleReportsDataStore @Inject constructor(
     }
 
     override suspend fun getReportsSent(): List<String> {
-        return store.data.first().let { prefs ->
-            prefs[TOGGLE_REPORTS_SENT]?.toList() ?: emptyList()
-        }
+        return store.data.firstOrNull()?.let { prefs ->
+            prefs[TOGGLE_REPORTS_SENT]
+        }?.toList() ?: emptyList()
     }
 
     override suspend fun canPrompt(): Boolean =

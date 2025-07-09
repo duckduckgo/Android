@@ -32,7 +32,7 @@
             android:layout_width="@dimen/listItemImageLargeSize"
             android:layout_height="@dimen/listItemImageLargeSize"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_globe_gray_16dp"
+            android:src="@drawable/ic_globe_16"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -44,7 +44,7 @@
             android:layout_marginEnd="-8dp"
             android:layout_marginBottom="-4dp"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_alert"
+            android:src="@drawable/ic_exclamation_yellow_24"
             app:layout_constraintBottom_toBottomOf="@id/incompatibleAppIcon"
             app:layout_constraintEnd_toEndOf="@id/incompatibleAppIcon" />
 

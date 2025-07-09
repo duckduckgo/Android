@@ -27,8 +27,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.DisableInSettingsPrompt
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
-import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.CredentialSavePickerDialog
 import com.duckduckgo.autofill.impl.AutofillFireproofDialogSuppressor
 import com.duckduckgo.autofill.impl.R
@@ -47,7 +48,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
@@ -65,7 +67,7 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
     ) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         autofillFireproofDialogSuppressor.autofillSaveOrUpdateDialogVisibilityChanged(visible = false)
 
@@ -112,7 +114,7 @@ class BehaviorFactory @Inject constructor(
             AskToDisableDialog(context, pixel, dispatchers, declineCounter, autofillStore, autofillCallback, appCoroutineScope)
         } else {
             val view: View = fragment.view ?: return null
-            DisableInSettingsSnackbar(context, pixel, view, globalActivityStarter)
+            DisableInSettingsSnackbar(context, pixel, view, globalActivityStarter, autofillFeature)
         }
     }
 }
@@ -126,13 +128,18 @@ class DisableInSettingsSnackbar(
     private val pixel: Pixel,
     private val view: View,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val autofillFeature: AutofillFeature,
 ) : DisableAutofillPromptBehavior {
     override fun showPrompt() {
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_SHOWN)
         Snackbar.make(view, R.string.autofillDisableInSettingsSnackbarText, 4_000)
             .setAction(R.string.autofillDisableInSettingsSnackbarAction) { _ ->
                 pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_SNACKBAR_OPEN_SETTINGS)
-                globalActivityStarter.start(context, AutofillSettingsScreen(AutofillSettingsLaunchSource.DisableInSettingsPrompt))
+                if (autofillFeature.settingsScreen().isEnabled()) {
+                    globalActivityStarter.start(context, AutofillSettingsScreen(DisableInSettingsPrompt))
+                } else {
+                    globalActivityStarter.start(context, AutofillPasswordsManagementScreen(DisableInSettingsPrompt))
+                }
             }.show()
     }
 }
@@ -167,7 +174,7 @@ class AskToDisableDialog(
 
     @VisibleForTesting
     fun onKeepUsingAutofill() {
-        Timber.i("User selected to keep using autofill; will not prompt to disable again")
+        logcat(INFO) { "User selected to keep using autofill; will not prompt to disable again" }
         appCoroutineScope.launch(dispatchers.io()) {
             declineCounter.disableDeclineCounter()
         }
@@ -184,7 +191,7 @@ class AskToDisableDialog(
                 callback.onAutofillStateChange()
             }
 
-            Timber.i("Autofill disabled at user request")
+            logcat(INFO) { "Autofill disabled at user request" }
         }
         pixel.fire(AutofillPixelNames.AUTOFILL_DECLINE_PROMPT_TO_DISABLE_AUTOFILL_DISABLE)
     }

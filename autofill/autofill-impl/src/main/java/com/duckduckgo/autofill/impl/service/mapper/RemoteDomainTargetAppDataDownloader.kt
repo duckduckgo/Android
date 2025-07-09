@@ -31,7 +31,9 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -48,9 +50,10 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
-        if (autofillServiceFeature.canUpdateAppToDomainDataset().isEnabled().not()) return
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            Timber.d("Autofill-mapping: Attempting to download")
+            if (autofillServiceFeature.canUpdateAppToDomainDataset().isEnabled().not()) return@launch
+
+            logcat { "Autofill-mapping: Attempting to download" }
             download()
             removeExpiredCachedData()
         }
@@ -59,19 +62,19 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
     private suspend fun download() {
         runCatching {
             remoteDomainTargetAppService.fetchDataset().run {
-                Timber.d("Autofill-mapping: Downloaded targets dataset version: ${this.version}")
+                logcat { "Autofill-mapping: Downloaded targets dataset version: ${this.version}" }
                 if (autofillPrefsStore.domainTargetDatasetVersion != this.version) {
                     persistData(this)
                     autofillPrefsStore.domainTargetDatasetVersion = this.version
                 }
             }
         }.onFailure {
-            Timber.e(it, "Autofill-mapping: Dataset download failed")
+            logcat(ERROR) { "Autofill-mapping: Dataset download failed: ${it.asLog()}" }
         }
     }
 
     private fun persistData(dataset: RemoteDomainTargetDataSet) {
-        Timber.d("Autofill-mapping: Persisting targets dataset")
+        logcat { "Autofill-mapping: Persisting targets dataset" }
         val toPersist = mutableListOf<DomainTargetAppEntity>()
         dataset.targets.forEach { target ->
             target.apps.forEach { app ->
@@ -89,13 +92,13 @@ class RemoteDomainTargetAppDataDownloader @Inject constructor(
                 }
             }
         }
-        Timber.d("Autofill-mapping: Attempting to persist ${toPersist.size} entries")
+        logcat { "Autofill-mapping: Attempting to persist ${toPersist.size} entries" }
         domainTargetAppDao.updateRemote(toPersist)
-        Timber.d("Autofill-mapping: Persist complete")
+        logcat { "Autofill-mapping: Persist complete" }
     }
 
     private fun removeExpiredCachedData() {
-        Timber.d("Autofill-mapping: Removing expired cached data")
+        logcat { "Autofill-mapping: Removing expired cached data" }
         domainTargetAppDao.deleteAllExpired(currentTimeProvider.currentTimeMillis())
     }
 }

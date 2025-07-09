@@ -28,6 +28,9 @@ import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegra
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Safe
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.WaitForConfirmation
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.model.TrustedSites
 import com.duckduckgo.app.surrogates.ResourceSurrogates
@@ -47,8 +50,10 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 interface RequestInterceptor {
 
@@ -92,7 +97,24 @@ class WebViewRequestInterceptor(
     private val duckPlayer: DuckPlayer,
     private val maliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    @IsMainProcess private val isMainProcess: Boolean,
 ) : RequestInterceptor {
+
+    private var checkMaliciousAfterHttpsUpgrade = false
+
+    init {
+        if (isMainProcess) {
+            loadToMemory()
+        }
+    }
+
+    private fun loadToMemory() {
+        appCoroutineScope.launch(dispatchers.io()) {
+            checkMaliciousAfterHttpsUpgrade = androidBrowserConfigFeature.checkMaliciousAfterHttpsUpgrade().isEnabled()
+        }
+    }
 
     override fun onPageStarted(url: String) {
         requestFilterer.registerOnPageCreated(url)
@@ -117,10 +139,12 @@ class WebViewRequestInterceptor(
     ): WebResourceResponse? {
         val url: Uri = request.url
 
-        maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
-            handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
-        }.let {
-            if (shouldBlock(it, webViewClientListener, url, documentUri, request.isForMainFrame)) return WebResourceResponse(null, null, null)
+        if (!checkMaliciousAfterHttpsUpgrade) {
+            maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+                handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
+            }.let {
+                if (shouldBlock(it, webViewClientListener, url, documentUri, request.isForMainFrame)) return WebResourceResponse(null, null, null)
+            }
         }
 
         if (requestFilterer.shouldFilterOutRequest(request, documentUri.toString())) return WebResourceResponse(null, null, null)
@@ -147,6 +171,14 @@ class WebViewRequestInterceptor(
             webViewClientListener?.upgradedToHttps()
             privacyProtectionCountDao.incrementUpgradeCount()
             return WebResourceResponse(null, null, null)
+        }
+
+        if (checkMaliciousAfterHttpsUpgrade) {
+            maliciousSiteBlockerWebViewIntegration.shouldIntercept(request, documentUri) { isMalicious ->
+                handleConfirmationCallback(isMalicious, webViewClientListener, url, documentUri, request.isForMainFrame)
+            }.let {
+                if (shouldBlock(it, webViewClientListener, url, documentUri, request.isForMainFrame)) return WebResourceResponse(null, null, null)
+            }
         }
 
         if (url != null) {
@@ -320,13 +352,13 @@ class WebViewRequestInterceptor(
         trackingEvent.surrogateId?.let { surrogateId ->
             val surrogate = resourceSurrogates.get(surrogateId)
             if (surrogate.responseAvailable) {
-                Timber.d("Surrogate found for ${request.url}")
+                logcat { "Surrogate found for ${request.url}" }
                 webViewClientListener?.surrogateDetected(surrogate)
                 return WebResourceResponse(surrogate.mimeType, "UTF-8", surrogate.jsFunction.byteInputStream())
             }
         }
 
-        Timber.d("Blocking request ${request.url}")
+        logcat { "Blocking request ${request.url}" }
         privacyProtectionCountDao.incrementBlockedTrackerCount()
         return WebResourceResponse(null, null, null)
     }

@@ -174,6 +174,7 @@ android {
         abortOnError true
         ignoreTestSources false
         baseline file("lint-baseline.xml")
+        abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     testOptions {
         unitTests.returnDefaultValues = true
@@ -200,7 +201,6 @@ fladle {
     configs {
         privacyTests {
             async.set(false)
-            variant.set("playDebug")
             flankVersion.set("21.+")
             useOrchestrator.set(true)
             environmentVariables.set([
@@ -210,7 +210,7 @@ fladle {
                     "annotation com.duckduckgo.espresso.PrivacyTest"
             ])
             devices.set([
-                    ["model": "redfin", "version": "30"]
+                    ["model": "MediumPhone.arm", "version": "34"],
             ])
             localResultsDir.set("fladleResults")
             flakyTestAttempts.set(2)
@@ -249,7 +249,6 @@ dependencies {
 
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
-    implementation project(':autofill-store')
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
@@ -401,6 +400,9 @@ dependencies {
 
     implementation project(':breakage-reporting-impl')
 
+    implementation project(':dax-prompts-api')
+    implementation project(':dax-prompts-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -431,7 +433,7 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation 'nl.dionsegijn:konfetti:1.2.5'
     implementation("io.github.pcmind:leveldb:_") {
         exclude group: 'com.google.guava', module: 'guava'

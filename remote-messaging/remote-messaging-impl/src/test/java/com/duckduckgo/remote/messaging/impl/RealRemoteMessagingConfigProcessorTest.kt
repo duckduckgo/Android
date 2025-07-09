@@ -16,8 +16,11 @@
 
 package com.duckduckgo.remote.messaging.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.remote.messaging.api.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.fixtures.JsonRemoteMessageOM.aJsonRemoteMessagingConfig
 import com.duckduckgo.remote.messaging.fixtures.RemoteMessagingConfigOM.aRemoteMessagingConfig
@@ -39,6 +42,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class RealRemoteMessagingConfigProcessorTest {
 
     @get:Rule var coroutineRule = CoroutineTestRule()
@@ -53,12 +57,16 @@ class RealRemoteMessagingConfigProcessorTest {
     private val remoteMessagingRepository = mock<RemoteMessagingRepository>()
     private val remoteMessagingCohortStore = mock<RemoteMessagingCohortStore>()
     private val remoteMessagingConfigMatcher = RemoteMessagingConfigMatcher(setOf(mock(), mock(), mock()), mock(), remoteMessagingCohortStore)
+    private var remoteMessagingFeatureToggles: RemoteMessagingFeatureToggles = FakeFeatureToggleFactory.create(
+        RemoteMessagingFeatureToggles::class.java,
+    )
 
     private val testee = RealRemoteMessagingConfigProcessor(
         remoteMessagingConfigJsonMapper,
         remoteMessagingConfigRepository,
         remoteMessagingRepository,
         remoteMessagingConfigMatcher,
+        remoteMessagingFeatureToggles,
     )
 
     @Before
@@ -78,7 +86,8 @@ class RealRemoteMessagingConfigProcessorTest {
     }
 
     @Test
-    fun whenSameVersionThenDoNothing() = runTest {
+    fun whenSameVersionThenDoNothingIfAlwaysProcessFFDisabled() = runTest {
+        remoteMessagingFeatureToggles.alwaysProcessRemoteConfig().setRawStoredState(State(false))
         val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
         whenever(remoteMessagingConfigRepository.get()).thenReturn(
             aRemoteMessagingConfig(
@@ -90,6 +99,22 @@ class RealRemoteMessagingConfigProcessorTest {
         testee.process(aJsonRemoteMessagingConfig(version = 1L))
 
         verify(remoteMessagingConfigRepository, times(0)).insert(any())
+    }
+
+    @Test
+    fun whenSameVersionThenProcessIfAlwaysProcessFFEnabled() = runTest {
+        remoteMessagingFeatureToggles.alwaysProcessRemoteConfig().setRawStoredState(State(true))
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss")
+        whenever(remoteMessagingConfigRepository.get()).thenReturn(
+            aRemoteMessagingConfig(
+                version = 1L,
+                evaluationTimestamp = dateTimeFormatter.format(LocalDateTime.now()),
+            ),
+        )
+
+        testee.process(aJsonRemoteMessagingConfig(version = 1L))
+
+        verify(remoteMessagingConfigRepository).insert(any())
     }
 
     @Test

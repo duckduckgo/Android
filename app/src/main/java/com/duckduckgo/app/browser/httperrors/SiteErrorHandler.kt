@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.BrowserTabViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
 
 interface SiteErrorHandler<T> {
@@ -90,6 +91,6 @@ class HttpCodeSiteErrorHandlerImpl @Inject constructor() : HttpCodeSiteErrorHand
 )
 interface SiteErrorHandlerKillSwitch {
 
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }

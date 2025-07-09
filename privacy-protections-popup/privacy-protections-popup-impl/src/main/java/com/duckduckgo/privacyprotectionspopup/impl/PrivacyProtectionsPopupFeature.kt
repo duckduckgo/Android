@@ -19,6 +19,7 @@ package com.duckduckgo.privacyprotectionspopup.impl
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 
 @ContributesRemoteFeature(
@@ -26,7 +27,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
     featureName = "privacyProtectionsPopup",
 )
 interface PrivacyProtectionsPopupFeature {
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 }
 

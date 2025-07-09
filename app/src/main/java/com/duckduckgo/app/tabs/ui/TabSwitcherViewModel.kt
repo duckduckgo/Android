@@ -21,17 +21,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.SwipingTabsFeatureProvider
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
+import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
@@ -56,11 +56,12 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -82,6 +83,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -92,13 +94,14 @@ class TabSwitcherViewModel @Inject constructor(
     private val pixel: Pixel,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val duckChat: DuckChat,
+    private val duckAiFeatureState: DuckAiFeatureState,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-    private val tabSwitcherAnimationFeature: TabSwitcherAnimationFeature,
+    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
-    visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
+    experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -128,13 +131,14 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-        visualDesignExperimentDataStore.experimentState,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, experimentState ->
+        experimentalThemingDataStore.isSingleOmnibarEnabled,
+        duckAiFeatureState.showPopupMenuShortcut,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, isSingleOmnibarEnabled, showInBrowserMenu ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
-            isNewVisualDesignEnabled = experimentState.isEnabled,
-            isDuckChatEnabled = duckChat.isEnabled() && duckChat.showInBrowserMenu(),
+            isNewVisualDesignEnabled = isSingleOmnibarEnabled,
+            isDuckChatEnabled = showInBrowserMenu,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState())
 
@@ -547,7 +551,8 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onDuckChatFabClicked() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
             duckChat.openDuckChat()
         }
@@ -555,10 +560,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN)
-
-            val wasUsedBefore = duckChat.wasOpenedBefore()
-            val params = mapOf("was_used_before" to wasUsedBefore.toBinaryString())
+            val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
 
             duckChat.openDuckChat()
@@ -566,7 +568,10 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTrackerAnimationInfoPanelClicked() {
-        pixel.fire(TAB_MANAGER_INFO_PANEL_TAPPED)
+        pixel.fire(
+            pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
+            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
+        )
         command.value = ShowAnimatedTileDismissalDialog
     }
 
@@ -580,12 +585,19 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-            pixel.fire(pixel = TAB_MANAGER_INFO_PANEL_DISMISSED, parameters = mapOf("trackerCount" to trackerCount.toString()))
+            pixel.fire(
+                pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
+                parameters = mapOf("trackerCount" to trackerCount.toString()) +
+                    senseOfProtectionExperiment.getTabManagerPixelParams(),
+            )
         }
     }
 
     fun onTrackerAnimationInfoPanelVisible() {
-        pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+        pixel.fire(
+            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
+            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
+        )
     }
 
     private suspend fun getTabItems(
@@ -599,7 +611,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (tabSwitcherAnimationFeature.self().isEnabled()) {
+            return if (senseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()) {
                 if (!isAnimationTileDismissed) {
                     val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 

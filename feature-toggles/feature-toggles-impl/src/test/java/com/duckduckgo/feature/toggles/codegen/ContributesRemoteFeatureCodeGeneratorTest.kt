@@ -16,6 +16,7 @@
 
 package com.duckduckgo.feature.toggles.codegen
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -24,8 +25,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor.*
 import com.duckduckgo.experiments.api.VariantConfig
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
-import com.duckduckgo.feature.toggles.api.FeatureExceptions
-import com.duckduckgo.feature.toggles.api.FeatureExceptions.FeatureException
+import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -46,6 +46,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.Locale
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
@@ -60,6 +61,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class ContributesRemoteFeatureCodeGeneratorTest {
 
     private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
@@ -95,14 +97,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the class is generated`() {
+    fun `the class is generated`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
         assertNotNull(generatedClass)
     }
 
     @Test
-    fun `the class is generated implements Toggle Store and PrivacyFeaturePlugin`() {
+    fun `the class is generated implements Toggle Store and PrivacyFeaturePlugin`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .kotlin
@@ -113,14 +115,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the class factory is generated`() {
+    fun `the class factory is generated`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature_Factory")
         assertNotNull(generatedClass)
     }
 
     @Test
-    fun `the generated class is singleInstance annotated in the right scope`() {
+    fun `the generated class is singleInstance annotated in the right scope`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .kotlin
@@ -130,7 +132,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the generated class is RemoteFeatureStoreNamed annotated in the right scope`() {
+    fun `the generated class is RemoteFeatureStoreNamed annotated in the right scope`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .kotlin
@@ -141,7 +143,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     @Ignore("ContributesBinding is only present in kotlin metadata now, we need to fix")
-    fun `the generated class contributes the toggle store binding`() {
+    fun `the generated class contributes the toggle store binding`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .kotlin
@@ -153,7 +155,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     @Ignore("ContributesMultibinding is only present in kotlin metadata now, we need to fix")
-    fun `the generated class contributes the privacy plugin multibinding`() {
+    fun `the generated class contributes the privacy plugin multibinding`() = runTest {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .kotlin
@@ -165,7 +167,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `re-evaluate feature state when feature hash is null`() {
+    fun `re-evaluate feature state when feature hash is null`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -214,7 +216,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `do not re-evaluate feature state if hash hasn't changed`() {
+    fun `do not re-evaluate feature state if hash hasn't changed`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -265,7 +267,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `re-evaluate feature state if hash changed`() {
+    fun `re-evaluate feature state if hash changed`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -316,19 +318,17 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `re-evaluate feature when already preset in remote config but just added to client`() {
+    fun `re-evaluate feature when already preset in remote config but just added to client`() = runTest {
         fun createAnotherFooFeature(): Any {
             return Class
                 .forName("com.duckduckgo.feature.toggles.codegen.AnotherTestTriggerFeature_RemoteFeature")
                 .getConstructor(
-                    FeatureExceptions.Store::class.java,
                     FeatureSettings.Store::class.java,
                     dagger.Lazy::class.java as Class<*>,
                     AppBuildConfig::class.java,
                     VariantManager::class.java,
                     Context::class.java,
                 ).newInstance(
-                    FeatureExceptions.EMPTY_STORE,
                     FeatureSettings.EMPTY_STORE,
                     Lazy { anotherTestFeature },
                     appBuildConfig,
@@ -386,7 +386,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `when sub-feature is present remotely but missing locally continue without error`() {
+    fun `when sub-feature is present remotely but missing locally continue without error`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -414,7 +414,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `fresh install and later update returns correct feature values`() {
+    fun `fresh install and later update returns correct feature values`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -458,7 +458,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test internal always enabled annotation`() {
+    fun `test internal always enabled annotation`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -495,7 +495,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test // see https://app.asana.com/0/0/1205806409373059/1205806409373112/f
-    fun `test internal always enabled truth table`() {
+    fun `test internal always enabled truth table`() = runTest {
         val feature = generatedFeatureNewInstance()
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
 
@@ -512,6 +512,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertFalse(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -519,6 +520,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        // the default value doesn't get re-evaluated, it's assigned when toggle is first created. That's why this returns FALSE
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         jsonString = """
                 {
@@ -534,6 +537,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                             "state": "enabled"
                         }, 
                         "defaultFalse": {
+                            "state": "enabled"
+                        }, 
+                        "defaultValueInternal": {
                             "state": "enabled"
                         }
                     }
@@ -546,6 +552,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -553,6 +560,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
 
         jsonString = """
                 {
@@ -569,39 +577,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                         }, 
                         "defaultFalse": {
                             "state": "disabled"
-                        }
-                    }
-                }
-        """.trimIndent()
-        whenever(appBuildConfig.flavor).thenReturn(PLAY)
-        assertTrue(privacyPlugin.store("testFeature", jsonString))
-        assertFalse(testFeature.internalDefaultTrue().isEnabled())
-        assertFalse(testFeature.defaultTrue().isEnabled())
-        assertFalse(testFeature.internalDefaultFalse().isEnabled())
-        assertFalse(testFeature.defaultFalse().isEnabled())
-
-        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
-        assertTrue(privacyPlugin.store("testFeature", jsonString))
-        assertTrue(testFeature.internalDefaultTrue().isEnabled())
-        assertFalse(testFeature.defaultTrue().isEnabled())
-        assertTrue(testFeature.internalDefaultFalse().isEnabled())
-        assertFalse(testFeature.defaultFalse().isEnabled())
-
-        jsonString = """
-                {
-                    "state": "disabled",
-                    "features": {
-                        "internalDefaultTrue": {
-                            "state": "internal"
                         }, 
-                        "defaultTrue": {
-                            "state": "internal"
-                        },
-                        "internalDefaultFalse": {
-                            "state": "internal"
-                        }, 
-                        "defaultFalse": {
-                            "state": "internal"
+                        "defaultValueInternal": {
+                            "state": "disabled"
                         }
                     }
                 }
@@ -612,6 +590,45 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.defaultTrue().isEnabled())
         assertFalse(testFeature.internalDefaultFalse().isEnabled())
         assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertTrue(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "internalDefaultTrue": {
+                            "state": "internal"
+                        }, 
+                        "defaultTrue": {
+                            "state": "internal"
+                        },
+                        "internalDefaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultFalse": {
+                            "state": "internal"
+                        }, 
+                        "defaultValueInternal": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        whenever(appBuildConfig.flavor).thenReturn(PLAY)
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.internalDefaultTrue().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+        assertFalse(testFeature.internalDefaultFalse().isEnabled())
+        assertFalse(testFeature.defaultFalse().isEnabled())
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
 
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
         assertTrue(privacyPlugin.store("testFeature", jsonString))
@@ -619,10 +636,68 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.defaultTrue().isEnabled())
         assertTrue(testFeature.internalDefaultFalse().isEnabled())
         assertTrue(testFeature.defaultFalse().isEnabled())
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
     }
 
     @Test
-    fun `test staged rollout for default-enabled feature flag`() {
+    fun `test default value set to internal`() = runTest {
+        val feature = generatedFeatureNewInstance()
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        // Order matters, we need to start with the config that does not have any features
+        var jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {}
+                }
+        """.trimIndent()
+
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "enabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "disabled"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertFalse(testFeature.defaultValueInternal().isEnabled())
+
+        jsonString = """
+                {
+                    "state": "disabled",
+                    "features": {
+                        "defaultValueInternal": {
+                            "state": "internal"
+                        }
+                    }
+                }
+        """.trimIndent()
+        assertTrue(privacyPlugin.store("testFeature", jsonString))
+        assertTrue(testFeature.defaultValueInternal().isEnabled())
+    }
+
+    @Test
+    fun `test staged rollout for default-enabled feature flag`() = runTest {
         val feature = generatedFeatureNewInstance()
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
 
@@ -653,7 +728,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the disable state of the feature always wins`() {
+    fun `the disable state of the feature always wins`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -710,7 +785,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the rollout step set to 0 disables the feature`() {
+    fun `the rollout step set to 0 disables the feature`() = runTest {
         val jsonFeature = """
         {
             "state": "enabled",
@@ -738,7 +813,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the parent feature disabled doesn't interfer with the sub-feature state`() {
+    fun `the parent feature disabled doesn't interfer with the sub-feature state`() = runTest {
         val jsonFeature = """
         {
             "state": "disabled",
@@ -766,7 +841,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the features have the right state for internal builds`() {
+    fun `the features have the right state for internal builds`() = runTest {
         whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
 
         val jsonFeature = """
@@ -797,7 +872,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the feature incremental steps are ignored when feature disabled`() {
+    fun `the feature incremental steps are ignored when feature disabled`() = runTest {
         val jsonFeature = """
         {
             "state": "enabled",
@@ -832,7 +907,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the feature incremental steps are executed when feature is enabled`() {
+    fun `the feature incremental steps are executed when feature is enabled`() = runTest {
         val jsonFeature = """
         {
             "state": "enabled",
@@ -870,7 +945,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `the invalid rollout steps are ignored and not executed`() {
+    fun `the invalid rollout steps are ignored and not executed`() = runTest {
         val jsonFeature = """
         {
             "state": "enabled",
@@ -905,7 +980,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `disable a previously enabled incremental rollout`() {
+    fun `disable a previously enabled incremental rollout`() = runTest {
         val jsonFeature = """
         {
             "state": "enabled",
@@ -956,7 +1031,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `re-enable a previously disabled incremental rollout`() {
+    fun `re-enable a previously disabled incremental rollout`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1042,7 +1117,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `feature was enabled remains enabled and rollout threshold is set`() {
+    fun `feature was enabled remains enabled and rollout threshold is set`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1085,7 +1160,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     // see https://app.asana.com/0/488551667048375/1206413338208929
-    fun `backwards compatibility test - feature was disabled set rollout threshold`() {
+    fun `backwards compatibility test - feature was disabled set rollout threshold`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1130,7 +1205,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
     @Test
     // see https://app.asana.com/0/488551667048375/1206413338208929
-    fun `backwards compatibility test - feature was null set rollout threshold`() {
+    fun `backwards compatibility test - feature was null set rollout threshold`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1166,7 +1241,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `full feature lifecycle`() {
+    fun `full feature lifecycle`() = runTest {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1521,7 +1596,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple targets matching`() {
+    fun `test feature with multiple targets matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1560,7 +1635,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test multiple languages`() {
+    fun `test multiple languages`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1627,7 +1702,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple targets not matching`() {
+    fun `test feature with multiple targets not matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1666,7 +1741,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets matching`() {
+    fun `test feature with multiple separate targets matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1713,7 +1788,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets not matching`() {
+    fun `test feature with multiple separate targets not matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1760,7 +1835,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets not matching and minSdkVersion not matching as sdkVersion is lower than minSdkVersion`() {
+    fun `test feature with multiple separate targets not matching and minSdkVersion not matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1807,7 +1882,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is the same as minSdkVersion`() {
+    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is the same as minSdkVersion`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1854,7 +1929,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is higher than minSdkVersion`() {
+    fun `test feature with multiple separate targets not matching and minSdkVersion matching as sdkVersion is higher than minSdkVersion`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1901,7 +1976,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature with multiple separate targets matching and minSdkVersion matching`() {
+    fun `test feature with multiple separate targets matching and minSdkVersion matching`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1948,7 +2023,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test variant parsing when no remote variant provided`() {
+    fun `test variant parsing when no remote variant provided`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -1976,7 +2051,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test variant parsing`() {
+    fun `test variant parsing`() = runTest {
         variantManager.variant = "mc"
         val feature = generatedFeatureNewInstance()
 
@@ -2056,7 +2131,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test variant when assigned variant key is null`() {
+    fun `test variant when assigned variant key is null`() = runTest {
         variantManager.variant = null
         val feature = generatedFeatureNewInstance()
 
@@ -2124,7 +2199,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test variant when assigned variant key is not null`() {
+    fun `test variant when assigned variant key is not null`() = runTest {
         variantManager.variant = "na"
         val feature = generatedFeatureNewInstance()
 
@@ -2189,7 +2264,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature disabled and forces variant when variant is null`() {
+    fun `test feature disabled and forces variant when variant is null`() = runTest {
         variantManager.variant = null
         val feature = generatedFeatureNewInstance()
 
@@ -2230,7 +2305,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature enabled and forces variant when variant is null`() {
+    fun `test feature enabled and forces variant when variant is null`() = runTest {
         variantManager.variant = null
         val feature = generatedFeatureNewInstance()
 
@@ -2271,7 +2346,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test feature does not force variant when already assigned`() {
+    fun `test feature does not force variant when already assigned`() = runTest {
         variantManager.variant = "mc"
         val feature = generatedFeatureNewInstance()
 
@@ -2312,7 +2387,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test experiment feature with ignored targets`() {
+    fun `test experiment feature with ignored targets`() = runTest {
         variantManager.variant = "mc"
         val feature = generatedFeatureNewInstance()
 
@@ -2444,7 +2519,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test experiment feature with targets matching`() {
+    fun `test experiment feature with targets matching`() = runTest {
         variantManager.variant = "mc"
         val feature = generatedFeatureNewInstance()
 
@@ -2486,7 +2561,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test rollout roll back`() {
+    fun `test rollout roll back`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -2718,7 +2793,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test cohorts json parsing`() {
+    fun `test cohorts json parsing`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -2769,11 +2844,11 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test cohort only assigned when calling isEnabled(cohort)`() {
+    fun `test cohort only assigned when calling isEnabled(cohort)`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
-        whenever(appBuildConfig.versionCode).thenReturn(1)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
 
         assertTrue(
             privacyPlugin.store(
@@ -2829,18 +2904,933 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // we call isEnabled(cohort), then we should assign cohort
-        testFeature.fooFeature().isEnabled(BLUE)
+        assertTrue(testFeature.fooFeature().enroll())
         rawState = testFeature.fooFeature().getRawStoredState()
         assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
         assertNotNull(rawState?.assignedCohort)
         assertNotNull(testFeature.fooFeature().getCohort())
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+    }
+
+    @Test
+    fun `test cohort not assigned when remote feature is enabled and minSupportedVersion not matching`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(1)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should NOT assign cohort
+        assertFalse(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort not assigned when remote feature is disabled and minSupportedVersion is matching`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should NOT assign cohort
+        assertFalse(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is assigned when remote feature is enabled and minSupportedVersion is matching`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        assertTrue(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is not assigned when flavor not matching is enabled and minSupportedVersion is matching`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "internal",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should NOT assign cohort
+        assertFalse(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is assigned when flavor is matching is enabled and minSupportedVersion is matching`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        whenever(appBuildConfig.flavor).thenReturn(INTERNAL)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "internal",
+                            "minSupportedVersion": 2,
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        assertTrue(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is assigned when feature is rolled-out`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        // This is just force setting rolloutThreshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+
+        // roll back just above the threshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold + 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        assertTrue(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should be enrolled
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        // user in rollout, variant enabled, overall enabled
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
-    fun `test remove all cohorts remotely removes assigned cohort`() {
+    fun `test cohort is not unassigned when feature is rolled-out and then rolled back`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        // This is just force setting rolloutThreshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+
+        // roll back just above the threshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold + 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled(cohort), then we should assign cohort
+        assertTrue(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should be enrolled
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        // user in rollout, variant enabled, overall enabled
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // rolling back the rollout should not re-enroll or undo the experiment enrollment
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold - 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+    }
+
+    @Test
+    fun `test cohort is not assigned when feature is not rolled-out`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+
+        // This is just force setting rolloutThreshold
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+
+        // roll back just below the threshold, aka user doesn't enter rollout
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": ${rolloutThreshold - 1}
+                                    }                    
+                                ]
+                            },
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // test the user has not entered rollout
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        // parent feature remains disabled
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we call isEnabled(cohort), then we should NOT assign cohort
+        assertFalse(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test cohort is only assigned when targets match`() = runTest {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+        whenever(appBuildConfig.versionCode).thenReturn(2)
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.FRANCE.country)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeLanguage": "${Locale.FRANCE.language}",
+                                    "localeCountry": "${Locale.FRANCE.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        // targets don't match, feature disabled
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we haven't called isEnabled yet, so cohorts should not be yet assigned
+        var rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        assertNull(rawState?.assignedCohort)
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+
+        // we call isEnabled() without cohort, cohort should not be assigned either
+        testFeature.fooFeature().isEnabled()
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        // parent feature remains disabled
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // we call isEnabled(cohort), but targets don't match, cohort should NOT be assigned either
+        assertFalse(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertNotEquals(emptyList<Cohort>(), rawState?.cohorts)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.FRANCE.country)
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeLanguage": "${Locale.US.language}",
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        assertFalse(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertEquals(2, rawState?.cohorts?.size)
+        // should NOT be enrolled
+        assertNull(rawState?.assignedCohort)
+        assertNull(testFeature.fooFeature().getCohort())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        // user not in rollout, all false
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        featureTogglesCallback.locale = Locale(Locale.US.language, Locale.US.country)
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "minSupportedVersion": 2,
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            },
+                            "targets": [
+                                {
+                                    "localeLanguage": "${Locale.US.language}",
+                                    "localeCountry": "${Locale.US.country}"
+                                }
+                            ],
+                            "cohorts": [
+                                {
+                                    "name": "control",
+                                    "weight": 1
+                                },
+                                {
+                                    "name": "blue",
+                                    "weight": 0
+                                }
+                            ]
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.fooFeature().enroll())
+        rawState = testFeature.fooFeature().getRawStoredState()
+        assertEquals(2, rawState?.cohorts?.size)
+        // targets match, should be enrolled
+        assertNotNull(rawState?.assignedCohort)
+        assertNotNull(testFeature.fooFeature().getCohort())
+        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
+    @Test
+    fun `test remove all cohorts remotely removes assigned cohort`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -2879,8 +3869,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().enroll())
         assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
         assertNotNull(testFeature.fooFeature().getCohort())
         assertTrue(testFeature.fooFeature().isEnrolled())
@@ -2917,8 +3906,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertNotNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
         assertNotNull(testFeature.fooFeature().getCohort())
 
@@ -2946,8 +3935,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
         assertNull(testFeature.fooFeature().getCohort())
         assertTrue(testFeature.fooFeature().isEnabled())
@@ -2957,13 +3946,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test disabling feature disables cohort`() {
+    fun `test disabling feature disables cohort`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertFalse(testFeature.fooFeature().isEnrolled())
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
@@ -3002,8 +3991,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().enroll())
         assertTrue(testFeature.fooFeature().isEnrolled())
         assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
@@ -3042,8 +4030,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         assertTrue(
             privacyPlugin.store(
@@ -3078,8 +4066,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         assertTrue(
             privacyPlugin.store(
@@ -3115,15 +4103,15 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertTrue(testFeature.fooFeature().isEnrolled())
         assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
-    fun `test cohort targets`() {
+    fun `test cohort targets`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3170,20 +4158,24 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         featureTogglesCallback.locale = Locale(Locale.US.language, Locale.FRANCE.country)
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         featureTogglesCallback.locale = Locale.US
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         featureTogglesCallback.locale = Locale.FRANCE
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().enroll())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // once cohort is assigned, changing targets shall not affect feature state
         assertTrue(
@@ -3225,8 +4217,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // remove all cohorts to clean state
         assertTrue(
@@ -3258,8 +4251,17 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.FRANCE.country)
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
 
         // re-populate experiment to re-assign new cohort, should not be assigned as it has wrong targets
@@ -3301,13 +4303,28 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.US.country)
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertTrue(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        featureTogglesCallback.locale = Locale(Locale.FRANCE.language, Locale.FRANCE.country)
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolled())
+        assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
+
+        assertTrue(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
     }
 
     @Test
-    fun `test change remote cohorts after assignment should noop`() {
+    fun `test change remote cohorts after assignment should noop`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3353,8 +4370,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().enroll())
         assertTrue(testFeature.fooFeature().isEnrolled())
         assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
@@ -3398,11 +4414,11 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
-        assertTrue(testFeature.fooFeature().isEnrolled())
-        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertEquals(CONTROL.cohortName, testFeature.fooFeature().getCohort()?.name)
+        // False because we check targets for isEnabled
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
 
         // changing cohort weight should not change current assignment
         assertTrue(
@@ -3443,8 +4459,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertEquals(CONTROL.cohortName, testFeature.fooFeature().getCohort()?.name)
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
 
         // adding cohorts should not change current assignment
         assertTrue(
@@ -3489,12 +4507,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 """.trimIndent(),
             ),
         )
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertEquals(CONTROL.cohortName, testFeature.fooFeature().getCohort()?.name)
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
     }
 
     @Test
-    fun `test enrollment date`() {
+    fun `test enrollment date`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3538,7 +4558,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertNull(testFeature.fooFeature().getRawStoredState()!!.assignedCohort)
 
         // call isEnabled(cohort) to force cohort assignment
-        testFeature.fooFeature().isEnabled(CONTROL)
+        assertTrue(testFeature.fooFeature().enroll())
 
         val date = testFeature.fooFeature().getRawStoredState()!!.assignedCohort?.enrollmentDateET
         val parsedDate = ZonedDateTime.parse(date).truncatedTo(ChronoUnit.DAYS)
@@ -3547,7 +4567,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    fun `test calling is enrolled and enabled does not enroll`() {
+    fun `test calling is enrolled and enabled does not enroll`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3589,13 +4609,14 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertFalse(testFeature.fooFeature().isEnrolled())
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().enroll())
         assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
     }
 
     @Test
-    fun `test rollback cohort experiments`() {
+    fun `test rollback cohort experiments`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3635,11 +4656,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
 
         val rolloutThreshold = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
-        assertTrue(testFeature.fooFeature().isEnrolled())
+        assertTrue(testFeature.fooFeature().enroll())
         assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolled())
 
         assertTrue(
             privacyPlugin.store(
@@ -3675,15 +4695,16 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
         assertTrue(testFeature.fooFeature().isEnrolled())
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
         assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
-    fun `test cohort enabled and stop enrollment and then roll-back`() {
+    fun `test cohort enabled and stop enrollment and then roll-back`() = runTest {
         val feature = generatedFeatureNewInstance()
 
         val privacyPlugin = (feature as PrivacyFeaturePlugin)
@@ -3728,8 +4749,9 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(Cohort("blue", 0), cohorts[1])
 
         assertTrue(testFeature.fooFeature().isEnabled())
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().enroll())
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // Stop enrollment, should keep assigned cohorts
         assertTrue(
@@ -3772,9 +4794,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(Cohort("blue", 1), cohorts[1])
 
         assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().enroll())
         // when weight of assigned cohort goes down to "0" we just stop the enrollment, but keep the cohort assignment
-        assertTrue(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // remove control, should re-allocate to blue
         assertTrue(
@@ -3812,9 +4835,10 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(Cohort("blue", 1), cohorts[0])
 
         assertTrue(testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.fooFeature().enroll())
         // when weight of assigned cohort goes down to "0" we just stop the enrollment, but keep the cohort assignment
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertTrue(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertTrue(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
 
         // roll-back
         assertTrue(
@@ -3857,12 +4881,13 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertEquals(Cohort("blue", 1), cohorts[1])
 
         assertFalse(testFeature.fooFeature().isEnabled())
-        assertFalse(testFeature.fooFeature().isEnabled(CONTROL))
-        assertFalse(testFeature.fooFeature().isEnabled(BLUE))
+        assertFalse(testFeature.fooFeature().enroll())
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(CONTROL))
+        assertFalse(testFeature.fooFeature().isEnrolledAndEnabled(BLUE))
     }
 
     @Test
-    fun `test config parsed correctly`() {
+    fun `test config parsed correctly`() = runTest {
         val moshi = Moshi.Builder().build()
         val adapter = moshi.adapter<Map<String, Any>>(
             Types.newParameterizedType(Map::class.java, String::class.java, Any::class.java),
@@ -4131,14 +5156,12 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
             .getConstructor(
-                FeatureExceptions.Store::class.java,
                 FeatureSettings.Store::class.java,
                 dagger.Lazy::class.java as Class<*>,
                 AppBuildConfig::class.java,
                 VariantManager::class.java,
                 Context::class.java,
             ).newInstance(
-                FeatureExceptions.EMPTY_STORE,
                 FeatureSettings.EMPTY_STORE,
                 Lazy { testFeature },
                 appBuildConfig,

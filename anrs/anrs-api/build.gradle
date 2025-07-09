@@ -28,4 +28,8 @@ dependencies {
 
 android {
   namespace 'com.duckduckgo.anrs.api'
+  lint {
+    baseline = file("lint-baseline.xml")
+      abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
+  }
 }

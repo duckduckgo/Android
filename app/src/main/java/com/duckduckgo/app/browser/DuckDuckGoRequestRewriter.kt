@@ -22,7 +22,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
 import com.duckduckgo.experiments.api.VariantManager
-import timber.log.Timber
+import logcat.logcat
 
 interface RequestRewriter {
     fun shouldRewriteRequest(uri: Uri): Boolean
@@ -51,7 +51,7 @@ class DuckDuckGoRequestRewriter(
         addCustomQueryParams(builder)
         val newUri = builder.build()
 
-        Timber.d("Rewriting request\n$request [original]\n$newUri [rewritten]")
+        logcat { "Rewriting request\n$request [original]\n$newUri [rewritten]" }
         return newUri
     }
 

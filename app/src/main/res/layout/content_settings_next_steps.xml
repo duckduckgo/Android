@@ -44,7 +44,7 @@
         android:id="@+id/addressBarPositionSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_address_bar_position_bottom_color_24"
+        app:leadingIcon="@drawable/ic_address_bar_bottom_color_24"
         app:primaryText="@string/settingsAddressBarPosition" />
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem

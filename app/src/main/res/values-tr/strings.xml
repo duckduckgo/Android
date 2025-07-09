@@ -119,7 +119,7 @@
     <string name="tabSwitcherGridViewMenu">Izgara görünümü</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Son 7 günde &lt;/b&gt;%1$s izleyici engellendi</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;Son 7 günde &lt;/b&gt;%1$s izleyici engellendi</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;%1$s izleyici engellendi &lt;/b&gt;</string>
     <string name="inTheLast7Days">son 7 günde</string>
 
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
+    <string name="settingsShowFullUrlTitle">Tam Site Adresini Göster</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -711,8 +712,8 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d Gizli Sekme</item>
-        <item quantity="other">%1$d Gizli Sekme</item>
+        <item quantity="one">1 Sekme</item>
+        <item quantity="other">%1$d Sekme</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
     <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
-    <string name="preOnboardingComparisonChartItem4">İzleme reklamlarını engelleyin</string>
+    <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
     <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
@@ -823,6 +824,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Çak Bir Beşlik!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Deneyin</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Atla</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Daha önce buradaydım</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Anladım! Diğer ipuçlarını atlayacağım.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Unutmayın: <b>Fire Button</b> 🔥 ile tüm sekmelerinizi, geçmişinizi ve tarama verilerinizi iki dokunuşla silebilirsiniz]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Eğitimi Göster</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adres Çubuğu</string>
@@ -838,10 +843,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Yeni Yapay Zeka Sohbeti</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">DuckDuckGo\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tüm site bağlantılarının DuckDuckGo\'da açılması için bizi varsayılan tarayıcınız yapın.</string>
@@ -852,10 +853,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Sekmelerinizi ve verilerinizi temizlemek, izleyici engelleme geçmişinizi silecek ve bu sayıyı sıfırlayacaktır.\n\nSekmeler görünümünde görmemeyi tercih ediyorsanız bu başlığı gizleyin.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner\'ı Gizle</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Uyarı: Bu site bir güvenlik riski oluşturabilir</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, DuckDuckGo bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Bu web sitesi, şifre veya kredi kartı numarası gibi kişisel bilgilerinizi vermeniz için sizi kandırmak amacıyla meşru bir siteyi taklit ediyor olabilir.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[DuckDuckGo, sizi yanlış iddialarla para transfer etmeye, sahte ürünler satın almaya veya kötü amaçlı yazılım yüklemenizi sağlamaya çalışıyor olabileceği için bu sayfayı engelledi.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Bu Siteden Ayrılın</string>
     <string name="maliciousSiteAdvancedCTA">Gelişmiş</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Bu web sitesinin güvenli olduğuna inanıyorsanız <a href=\"\">bir hata bildirebilirsiniz</a>. Riski göze alabiliyorsanız web sitesini yine de ziyaret edebilirsiniz.]]></string>
@@ -866,5 +868,21 @@
     <string name="maliciousSiteToggleHint">Kimlik avı veya kötü amaçlı yazılım için işaretlenen siteler olduğunda beni uyar</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="maliciousSiteSettingDisabled">Bu özelliği devre dışı bırakmak bilgilerinizi riske atabilir.</string>
+    <string name="threatProtectionTitle">Tehdit Koruması</string>
+    <string name="threatProtectionDescription">DuckDuckGo\'nun gelişmiş korumaları, bağlantıyı güvende tutarken yaygın tehditleri durdurur.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Mümkün olduğunda bağlantıları otomatik olarak HTTPS\'ye yükseltir.<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="scamBlockerTitle">Dolandırıcılık Engelleyici</string>
+    <string name="scamBlockerDescription">Dolandırıcılık, kimlik avı ve kötü amaçlı yazılım için işaretlenen siteler olduğunda uyarı göster.</string>
+    <string name="threatProtectionLearnMoreTitle">Daha fazla bilgi</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Ana ekran widget\'ımızı deneyin!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Hızlı ve kolay erişim için arama widget\'ımızı ana ekranınıza ekleyin.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget Ekle</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Şimdi Değil</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo\'da Ara</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
 </resources>

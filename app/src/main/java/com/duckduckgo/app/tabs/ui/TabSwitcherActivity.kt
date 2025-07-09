@@ -48,8 +48,10 @@ import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
+import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -75,7 +77,7 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -90,6 +92,7 @@ import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import java.util.ArrayList
 import javax.inject.Inject
@@ -100,7 +103,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -149,6 +154,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var duckChat: DuckChat
 
     @Inject
+    lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    @Inject
     lateinit var tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
 
     @Inject
@@ -158,13 +166,19 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
-    lateinit var visualDesignExperimentDataStore: VisualDesignExperimentDataStore
+    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+
+    @Inject
+    lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
     private val tabsAdapter: TabSwitcherAdapter by lazy {
         TabSwitcherAdapter(
-            isVisualExperimentEnabled = visualDesignExperimentDataStore.experimentState.value.isEnabled,
+            isVisualExperimentEnabled = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             itemClickListener = this,
             webViewPreviewPersister = webViewPreviewPersister,
             lifecycleOwner = this,
@@ -275,7 +289,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, visualDesignExperimentDataStore)
+        tabItemDecorator = TabItemDecorator(this, experimentalThemingDataStore)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)
@@ -520,7 +534,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showGridLayoutButton() {
         layoutTypeMenuItem?.let { viewModeMenuItem ->
-            viewModeMenuItem.setIcon(R.drawable.ic_grid_view_24)
+            viewModeMenuItem.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_grid_24)
             viewModeMenuItem.title = getString(R.string.tabSwitcherGridViewMenu)
             viewModeMenuItem.setVisible(true)
         }
@@ -528,7 +542,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showListLayoutButton() {
         layoutTypeMenuItem?.let { viewModeMenuItem ->
-            viewModeMenuItem.setIcon(R.drawable.ic_list_view_24)
+            viewModeMenuItem.setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_list_24)
             viewModeMenuItem.title = getString(R.string.tabSwitcherListViewMenu)
             viewModeMenuItem.setVisible(true)
         }
@@ -671,7 +685,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
         val duckChatMenuItem = menu?.findItem(R.id.duckChat)
-        duckChatMenuItem?.isVisible = duckChat.showInBrowserMenu()
+        duckChatMenuItem?.isVisible = duckAiFeatureState.showPopupMenuShortcut.value
 
         return super.onPrepareOptionsMenu(menu)
     }
@@ -695,6 +709,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             dispatcherProvider = dispatcherProvider,
             fireButtonStore = fireButtonStore,
             appBuildConfig = appBuildConfig,
+            onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
+            onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
         )
         dialog.show()
     }
@@ -802,7 +818,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         try {
             startActivity(Intent.createChooser(intent, null))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 
@@ -819,7 +835,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         try {
             startActivity(Intent.createChooser(intent, null))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

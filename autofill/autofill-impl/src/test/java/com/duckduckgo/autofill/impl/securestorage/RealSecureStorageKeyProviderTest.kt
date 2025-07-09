@@ -16,17 +16,19 @@
 
 package com.duckduckgo.securestorage
 
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.securestorage.RealSecureStorageKeyProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.securestorage.impl.encryption.RandomBytesGenerator
 import java.security.Key
+import kotlinx.coroutines.test.runTest
 import okio.ByteString.Companion.toByteString
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.mockito.Mockito.mock
 import org.mockito.kotlin.whenever
 
 class RealSecureStorageKeyProviderTest {
@@ -35,42 +37,45 @@ class RealSecureStorageKeyProviderTest {
     private lateinit var encryptionHelper: FakeEncryptionHelper
     private lateinit var secureStorageKeyGenerator: FakeSecureStorageKeyGenerator
 
-    @Mock
-    private lateinit var randomBytesGenerator: RandomBytesGenerator
-
-    @Mock
-    private lateinit var mockKey: Key
+    private val randomBytesGenerator: RandomBytesGenerator = mock()
+    private val mockKey: Key = mock()
+    private val fakeAutofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
 
     private val testRandomBytes = "Zm9vYmFy".toByteArray()
 
     @Before
-    fun setUp() {
-        MockitoAnnotations.openMocks(this)
+    fun setUp() = runTest {
         secureStorageKeyRepository = FakeSecureStorageKeyRepository(true)
         encryptionHelper = FakeEncryptionHelper(expectedEncryptedData, expectedEncryptedIv, expectedDecryptedData)
         secureStorageKeyGenerator = FakeSecureStorageKeyGenerator(mockKey)
-        testee = RealSecureStorageKeyProvider(randomBytesGenerator, secureStorageKeyRepository, encryptionHelper, secureStorageKeyGenerator)
+        testee = RealSecureStorageKeyProvider(
+            randomBytesGenerator,
+            secureStorageKeyRepository,
+            encryptionHelper,
+            secureStorageKeyGenerator,
+            fakeAutofillFeature,
+        )
     }
 
     @Test
-    fun whenCanAccessKeyStoreIsCheckedThenReturnRepositoryCanUseEncryption() {
+    fun whenCanAccessKeyStoreIsCheckedThenReturnRepositoryCanUseEncryption() = runTest {
         assertTrue(testee.canAccessKeyStore())
     }
 
     @Test
-    fun whenNoL1KeySetThenGenerateAndStoreL1Key() {
+    fun whenNoL1KeySetThenGenerateAndStoreL1Key() = runTest {
         whenever(randomBytesGenerator.generateBytes(32)).thenReturn(testRandomBytes)
-        assertNull("Initial state is incorrect since L1key is not null", secureStorageKeyRepository.l1Key)
+        assertNull("Initial state is incorrect since L1key is not null", secureStorageKeyRepository.getL1Key())
 
         val result = testee.getl1Key()
 
-        assertEquals(testRandomBytes, secureStorageKeyRepository.l1Key) // key is stored
+        assertEquals(testRandomBytes, secureStorageKeyRepository.getL1Key()) // key is stored
         assertEquals(testRandomBytes, result) // returned value is correct
     }
 
     @Test
-    fun whenL1KeySetThenReturnStoredL1Key() {
-        secureStorageKeyRepository.l1Key = testRandomBytes
+    fun whenL1KeySetThenReturnStoredL1Key() = runTest {
+        secureStorageKeyRepository.setL1Key(testRandomBytes)
 
         val result = testee.getl1Key()
 
@@ -78,29 +83,29 @@ class RealSecureStorageKeyProviderTest {
     }
 
     @Test
-    fun whenNoValueStoredInKeyRepositoryThenReturnKeyAndGenerateAndStoreKeyValues() {
+    fun whenNoValueStoredInKeyRepositoryThenReturnKeyAndGenerateAndStoreKeyValues() = runTest {
         whenever(mockKey.encoded).thenReturn(testRandomBytes)
         whenever(randomBytesGenerator.generateBytes(32)).thenReturn(testRandomBytes)
-        assertNull("Initial state is incorrect since password is not null", secureStorageKeyRepository.password)
-        assertNull("Initial state is incorrect since passwordSalt is not null", secureStorageKeyRepository.passwordSalt)
-        assertNull("Initial state is incorrect since encryptedL2Key is not null", secureStorageKeyRepository.encryptedL2Key)
-        assertNull("Initial state is incorrect since encryptedL2KeyIV is not null", secureStorageKeyRepository.encryptedL2KeyIV)
+        assertNull("Initial state is incorrect since password is not null", secureStorageKeyRepository.getPassword())
+        assertNull("Initial state is incorrect since passwordSalt is not null", secureStorageKeyRepository.getPasswordSalt())
+        assertNull("Initial state is incorrect since encryptedL2Key is not null", secureStorageKeyRepository.getEncryptedL2Key())
+        assertNull("Initial state is incorrect since encryptedL2KeyIV is not null", secureStorageKeyRepository.getEncryptedL2KeyIV())
 
         val result = testee.getl2Key()
 
-        assertEquals(testRandomBytes, secureStorageKeyRepository.password) // key is stored
-        assertEquals(testRandomBytes, secureStorageKeyRepository.passwordSalt) // key is stored
-        assertEquals(expectedEncryptedData, secureStorageKeyRepository.encryptedL2Key!!.toByteString().base64()) // key is stored
-        assertEquals(expectedEncryptedIv, secureStorageKeyRepository.encryptedL2KeyIV!!.toByteString().base64()) // key is stored
+        assertEquals(testRandomBytes, secureStorageKeyRepository.getPassword()) // key is stored
+        assertEquals(testRandomBytes, secureStorageKeyRepository.getPasswordSalt()) // key is stored
+        assertEquals(expectedEncryptedData, secureStorageKeyRepository.getEncryptedL2Key()!!.toByteString().base64()) // key is stored
+        assertEquals(expectedEncryptedIv, secureStorageKeyRepository.getEncryptedL2KeyIV()!!.toByteString().base64()) // key is stored
         assertEquals(mockKey, result)
     }
 
     @Test
-    fun whenAllKeysStoredInKeyRepositoryThenUseKeysWhenConstructingL2Key() {
-        secureStorageKeyRepository.password = testRandomBytes
-        secureStorageKeyRepository.passwordSalt = testRandomBytes
-        secureStorageKeyRepository.encryptedL2Key = testRandomBytes
-        secureStorageKeyRepository.encryptedL2KeyIV = testRandomBytes
+    fun whenAllKeysStoredInKeyRepositoryThenUseKeysWhenConstructingL2Key() = runTest {
+        secureStorageKeyRepository.setPassword(testRandomBytes)
+        secureStorageKeyRepository.setPasswordSalt(testRandomBytes)
+        secureStorageKeyRepository.setEncryptedL2Key(testRandomBytes)
+        secureStorageKeyRepository.setEncryptedL2KeyIV(testRandomBytes)
 
         val result = testee.getl2Key()
 

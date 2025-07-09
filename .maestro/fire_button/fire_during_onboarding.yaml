@@ -13,7 +13,7 @@ tags:
       - runFlow: ../shared/pre_onboarding.yaml
 
       - tapOn:
-          text: "search or type URL"
+          id: "omnibarTextInput"
       - inputText: "https://privacy-test-pages.site"
       - pressKey: Enter
       - assertVisible:
@@ -22,11 +22,9 @@ tags:
           text: "got it"
       - assertVisible:
             text: ".*browsing activity with the fire button.*"
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
       - tapOn: "Cancel"
       - assertNotVisible: ".*browsing activity with the Fire Button.*"
-      - tapOn:
-            id: "com.duckduckgo.mobile.android:id/fireIconImageView"
+      - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
       - tapOn: "Clear All Tabs And Data"
       - assertVisible: "You've got this!.*"

@@ -121,7 +121,7 @@
     <string name="tabSwitcherGridViewMenu">Zobrazení mřížky</string>
 
     <!--Tab Switcher Animation-->
-    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Zablokovaných trackerů: %1$s&lt;/b&gt; za posledních 7 dní</string>
+    <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked &gt; 1">&lt;b&gt;Zablokovaných trackerů: %1$s&lt;/b&gt; za posledních 7 dní</string>
     <string name="trackersBlocked" instruction="Placeholder is the number of trackers blocked">&lt;b&gt;Zablokovaných trackerů: %1$s&lt;/b&gt;</string>
     <string name="inTheLast7Days">za posledních 7 dní</string>
 
@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhled</string>
+    <string name="settingsShowFullUrlTitle">Zobrazovat celou adresu webu</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -737,10 +738,10 @@
     </plurals>
 
     <plurals name="tabSwitcherTitle" tools:ignore="ImpliedQuantity,MissingInstruction">
-        <item quantity="one">%1$d soukromá karta</item>
-        <item quantity="few">%1$d soukromé karty</item>
-        <item quantity="many">%1$d soukromých karet</item>
-        <item quantity="other">%1$d soukromých karet</item>
+        <item quantity="one">1 karta</item>
+        <item quantity="few">%1$d karty</item>
+        <item quantity="many">%1$d karty</item>
+        <item quantity="other">%1$d karet</item>
     </plurals>
 
     <!-- Private voice search -->
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Soukromé vyhledávání ve výchozím nastavení</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj trackery třetích stran</string>
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Blokuj reklamy, které tě sledují</string>
+    <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
     <string name="preOnboardingDaxDialog3Title">Bezva! Vítej v Kačerově.</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
@@ -855,6 +856,10 @@
     <string name="highlightsOnboardingEndDaxDialogButton">Plácnutí!</string>
     <string name="onboardingFireButtonDaxDialogOkButton">Vyzkoušejte ho</string>
     <string name="onboardingFireButtonDaxDialogCancelButton">Přeskočit</string>
+    <string name="preOnboardingDaxDialog1SecondaryButton">Tohle už znám</string>
+    <string name="highlightsPreOnboardingDaxDialog3Title"><![CDATA[Jasně! Ostatní tipy přeskočím.]]></string>
+    <string name="highlightsPreOnboardingDaxDialog3Text"><![CDATA[Pamatuj: všechny karty, historii a údaje o prohlížení můžeš smazat dvěma klepnutími na <b>Fire Button</b> 🔥]]></string>
+    <string name="preOnboardingDaxDialog3SecondaryButton">Zobrazit návod</string>
 
     <!-- Appearance settings -->
     <string name="settingsAddressBarPositionTitle">Adresní řádek</string>
@@ -870,10 +875,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Děkujeme! Podrobnosti od tebe pomůžou zlepšit DuckDuckGo pro všechny!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nový AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Používej DuckDuckGo a získej větší ochranu při prohlížení internetu</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás jako výchozí prohlížeč, aby se všechny odkazy na stránky otevíraly v DuckDuckGo.</string>
@@ -884,10 +885,11 @@
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazáním panelů a dat smažeš historii blokování trackerů a resetuješ údaj o nich na nulu.\n\nPokud tenhle banner v zobrazení panelů už nechceš vidět, můžeš ho skrýt.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrýt banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Pozor: Tahle stránka může představovat bezpečnostní riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Služba DuckDuckGo tuhle stránku zablokovala, protože může šířit malware, jehož cílem je narušit zabezpečení zařízení nebo odcizit osobní údaje.\n<a href=\"\">Přečti si víc</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tahle webová stránka se může vydávat za legitimní web, aby tě přiměla k poskytnutí osobních údajů, jako jsou hesla nebo čísla kreditních karet.\n<a href=\"\">Přečti si víc</a>]]></string>
+    <string name="maliciousSiteScamHeadline"><![CDATA[Služba DuckDuckGo zablokovala tuto stránku, protože se tě může pokoušet pod falešnými záminkami přimět k převodu peněz, nákupu padělaného zboží nebo instalaci malwaru.\n<a href=\"\">Přečti si víc</a>]]></string>
     <string name="maliciousSiteLeaveCTA">Opustit tuhle stránku</string>
     <string name="maliciousSiteAdvancedCTA">Pokročilé</string>
     <string name="maliciousSiteExpandedHeadline"><![CDATA[Pokud věříš, že je tahle stránka bezpečná, můžeš <a href=\"\">nahlásit chybu</a>. Můžeš taky stránku navštívit na vlastní nebezpečí.]]></string>
@@ -898,5 +900,21 @@
     <string name="maliciousSiteToggleHint">Chci upozornit na weby nahlášené kvůli phishingu nebo malwaru</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Další informace</annotation></string>
     <string name="maliciousSiteSettingDisabled">Vypnutím téhle funkce můžeš svoje údaje vystavit riziku.</string>
+    <string name="threatProtectionTitle">Ochrana proti hrozbám</string>
+    <string name="threatProtectionDescription">Vylepšená ochrana DuckDuckGo zastavuje běžné hrozby a zároveň chrání tvoje připojení.</string>
+    <string name="smarterEncryptionTitle">Chytřejší šifrování</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automaticky převede odkazy na HTTPS, pokud to jde.<br><a href=\"\">Další informace</a>]]></string>
+    <string name="scamBlockerTitle">Blokování podvodů</string>
+    <string name="scamBlockerDescription">Upozorní na weby nahlášené kvůli podvodům, phishingu a malwaru.</string>
+    <string name="threatProtectionLearnMoreTitle">Více informací</string>
 
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyzkoušej náš widget na domovskou obrazovku!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Přidejte náš vyhledávací widget na domovskou obrazovku a získejte rychlý a snadný přístup.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Přidat widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teď ne</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hledat DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget na plochu</string>
 </resources>

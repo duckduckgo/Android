@@ -20,7 +20,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 /**
  * A grace period for local device authorization.
@@ -55,19 +56,19 @@ class TimeBasedDeviceAuthorizationGracePeriod @Inject constructor(
 
     override fun recordSuccessfulAuthorization() {
         lastSuccessfulAuthTime = timeProvider.currentTimeMillis()
-        Timber.v("Recording timestamp of successful auth")
+        logcat(VERBOSE) { "Recording timestamp of successful auth" }
     }
 
     override fun isAuthRequired(): Boolean {
         lastSuccessfulAuthTime?.let { lastAuthTime ->
             val timeSinceLastAuth = timeProvider.currentTimeMillis() - lastAuthTime
-            Timber.v("Last authentication was $timeSinceLastAuth ms ago")
+            logcat(VERBOSE) { "Last authentication was $timeSinceLastAuth ms ago" }
             if (timeSinceLastAuth <= AUTH_GRACE_PERIOD_MS) {
-                Timber.v("Within grace period; auth not required")
+                logcat(VERBOSE) { "Within grace period; auth not required" }
                 return false
             }
         }
-        Timber.v("No last auth time recorded or outside grace period; auth required")
+        logcat(VERBOSE) { "No last auth time recorded or outside grace period; auth required" }
 
         return true
     }

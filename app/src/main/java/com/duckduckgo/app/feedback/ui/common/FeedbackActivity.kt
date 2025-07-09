@@ -40,10 +40,11 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(FeedbackActivityWithEmptyParams::class)
+@ContributeToActivityStarter(FeedbackActivityWithEmptyParams::class, screenName = "feedback")
 class FeedbackActivity :
     DuckDuckGoActivity(),
     InitialFeedbackFragment.InitialFeedbackListener,
@@ -85,7 +86,7 @@ class FeedbackActivity :
     }
 
     private fun processCommand(command: Command) {
-        Timber.v("Processing command: $command")
+        logcat(VERBOSE) { "Processing command: $command" }
 
         when (command) {
             is Command.Exit -> animateFinish(command.feedbackSubmitted)
@@ -94,7 +95,7 @@ class FeedbackActivity :
     }
 
     private fun render(viewState: UpdateViewCommand) {
-        Timber.v("ViewState is: $viewState")
+        logcat(VERBOSE) { "ViewState is: $viewState" }
 
         when (val state = viewState.fragmentViewState) {
             is FragmentState.InitialAppEnjoymentClarifier -> showInitialFeedbackView(state.forwardDirection)

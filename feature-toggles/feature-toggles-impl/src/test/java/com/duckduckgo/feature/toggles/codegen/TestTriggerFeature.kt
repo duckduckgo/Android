@@ -18,6 +18,7 @@ package com.duckduckgo.feature.toggles.codegen
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
@@ -29,34 +30,37 @@ abstract class TriggerTestScope private constructor()
     featureName = "testFeature",
 )
 interface TestTriggerFeature {
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun fooFeature(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     @Experiment
     fun experimentFooFeature(): Toggle
 
-    @DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.TRUE)
     @InternalAlwaysEnabled
     fun internalDefaultTrue(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     @InternalAlwaysEnabled
     fun internalDefaultFalse(): Toggle
 
-    @DefaultValue(true)
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun defaultValueInternal(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
     fun defaultTrue(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun defaultFalse(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun variantFeature(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     @Experiment
     fun experimentDisabledByDefault(): Toggle
 }
@@ -66,12 +70,12 @@ interface TestTriggerFeature {
     featureName = "testFeature",
 )
 interface AnotherTestTriggerFeature {
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun fooFeature(): Toggle
 
-    @DefaultValue(false)
+    @DefaultValue(DefaultFeatureValue.FALSE)
     fun newFooFeature(): Toggle
 }

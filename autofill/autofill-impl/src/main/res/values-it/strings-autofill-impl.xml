@@ -197,7 +197,9 @@
     <string name="credentialManagementNoLoginsSavedSubtitle">Puoi importare le password salvate da un altro browser in DuckDuckGo.</string>
 
     <string name="autofillManagementImportPasswords">Importa password</string>
+    <string name="autofillManagementHowToSyncDesktopPasswords">Sincronizza le password del desktop</string>
     <string name="autofillManagementImportPasswordsHowToTitle">Come importare le password</string>
+    <string name="autofillManagementHowToSyncDesktopPasswordsTitle">Come sincronizzare le password del desktop</string>
     <string name="autofillManagementImportPasswordsHowToInstruction">Importa le password nella versione desktop del browser DuckDuckGo, quindi sincronizza su tutti i dispositivi.</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserButtonText">Scarica il browser per desktop</string>
     <string name="autofillManagementImportPasswordsGetDesktopBrowserLinkCopied">Link copiato</string>
@@ -245,8 +247,8 @@
     <string name="autofillImportGooglePasswordEmptyStateButtonTitle">Importa le password da Google</string>
     <string name="autofillImportGooglePasswordsPasswordsMenuTitle">Importa le password da Google</string>
 
-    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizza le password di DuckDuckGo</string>
-    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizza le password di DuckDuckGo</string>
+    <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizza le password del desktop</string>
+    <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizza le password del desktop</string>
 
     <string name="importPasswordsChooseMethodDialogTitle">Importa le password di Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
@@ -260,5 +262,23 @@
     <string name="importPasswordsProcessingResultDialogResultImportFailed">Importazione password non riuscita</string>
     <string name="importPasswordsProcessingResultDialogResultDuplicatesSkipped"><![CDATA[Ignorato (duplicato o non valido): <b>%1$d</b>]]></string>
     <string name="importPasswordsProcessingResultDialogResultPasswordsImported"><![CDATA[Password importate: <b>%1$d</b>]]></string>
+
+    <string name="serviceName" translatable="false">DuckDuckGo</string>
+    <string name="autofill_service_suggestion_open_passwords">Apri le password</string>
+    <string name="autofill_service_select_password_activity">Seleziona una password salvata</string>
+
+    <!-- New autofill Settings screen -->
+    <string name="autofillSettingsActivityTitle">Password e compilazione automatica</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogTitle">Ripristinare i siti esclusi?</string>
+    <string name="autofillSettingsInstructionNeverForThisSite">Se ripristini i siti esclusi, ti verrà richiesto di salvare la password la prossima volta che accederai a uno di questi siti.</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogPositiveButton">Ripristina</string>
+    <string name="autofillSettingsClearNeverForThisSiteDialogNegativeButton">Annulla</string>
+    <string name="autofillSettingsPasswordsEntry">Password</string>
+    <string name="autofillSettingsAutofillToggleLabel">Chiedi di salvare e compilare automaticamente</string>
+    <string name="autofillSettingsAutofillSubtitle">Le password sono crittografate. Nessuno tranne te può vederle, nemmeno noi. <annotation type="learn_more_link">Ulteriori informazioni</annotation></string>
+    <string name="autofillSettingsImportSectionLabel">Importa password</string>
+    <string name="autofillSettingsImportFromGoogleLabel">Importa le password da Google</string>
+    <string name="autofillSettingsImportFromDesktopSync">Sincronizza le password del desktop</string>
+    <string name="autofillSettingsResetExcludedSitesTitle">Ripristina siti esclusi</string>
 
 </resources>

@@ -16,25 +16,31 @@
 
 package com.duckduckgo.autofill.impl.securestorage
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.impl.securestorage.SecureStorageException.InternalSecureStorageException
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedBytes
 import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.EncryptedString
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.security.Key
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
 import okio.ByteString.Companion.decodeBase64
 import okio.ByteString.Companion.toByteString
 
 interface L2DataTransformer {
-    fun canProcessData(): Boolean
+    suspend fun canProcessData(): Boolean
 
     @Throws(SecureStorageException::class)
-    fun encrypt(data: String): EncryptedString
+    suspend fun encrypt(data: String): EncryptedString
 
     @Throws(SecureStorageException::class)
-    fun decrypt(
+    suspend fun decrypt(
         data: String,
         iv: String,
     ): String
@@ -45,15 +51,21 @@ interface L2DataTransformer {
 class RealL2DataTransformer @Inject constructor(
     private val encryptionHelper: EncryptionHelper,
     private val secureStorageKeyProvider: SecureStorageKeyProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : L2DataTransformer {
-    private val l2Key by lazy {
-        secureStorageKeyProvider.getl2Key()
+    private val l2KeyDeferred: Deferred<Key> by lazy {
+        appCoroutineScope.async(dispatcherProvider.io()) {
+            secureStorageKeyProvider.getl2Key()
+        }
     }
 
-    override fun canProcessData(): Boolean = secureStorageKeyProvider.canAccessKeyStore()
+    suspend fun getL2Key(): Key = l2KeyDeferred.await()
+
+    override suspend fun canProcessData(): Boolean = secureStorageKeyProvider.canAccessKeyStore()
 
     // get ByteArray -> encrypt -> encode to String
-    override fun encrypt(data: String): EncryptedString = encryptionHelper.encrypt(data.toByteArray(), l2Key).run {
+    override suspend fun encrypt(data: String): EncryptedString = encryptionHelper.encrypt(data.toByteArray(), getL2Key()).run {
         EncryptedString(
             this.data.transformToString(),
             this.iv.transformToString(),
@@ -61,7 +73,7 @@ class RealL2DataTransformer @Inject constructor(
     }
 
     // decode to ByteArray -> decrypt -> get String
-    override fun decrypt(
+    override suspend fun decrypt(
         data: String,
         iv: String,
     ): String = encryptionHelper.decrypt(
@@ -69,7 +81,7 @@ class RealL2DataTransformer @Inject constructor(
             data = data.transformToByteArray(),
             iv = iv.transformToByteArray(),
         ),
-        l2Key,
+        getL2Key(),
     ).run { String(this) }
 
     private fun ByteArray.transformToString(): String = this.toByteString().base64()

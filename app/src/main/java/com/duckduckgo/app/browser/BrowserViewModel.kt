@@ -26,6 +26,7 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
@@ -34,6 +35,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
+import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchOptionHandler
@@ -60,11 +62,14 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
@@ -77,7 +82,9 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import kotlinx.coroutines.withContext
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
@@ -95,6 +102,7 @@ class BrowserViewModel @Inject constructor(
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val duckChat: DuckChat,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -102,8 +110,11 @@ class BrowserViewModel @Inject constructor(
 
     data class ViewState(
         val hideWebContent: Boolean = true,
-        val isTabSwipingEnabled: Boolean = false,
-    )
+        private val isInEditMode: Boolean = false,
+        private val isInFullScreenMode: Boolean = false,
+    ) {
+        val isTabSwipingEnabled: Boolean = !isInEditMode && !isInFullScreenMode
+    }
 
     sealed class Command {
         data class Query(val query: String) : Command()
@@ -121,6 +132,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -140,22 +152,22 @@ class BrowserViewModel @Inject constructor(
         .distinctUntilChanged()
         .debounce(100)
 
-    val tabsFlow: Flow<List<String>> = tabRepository.flowTabs
-        .map { tabs -> tabs.map { tab -> tab.tabId } }
+    val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
+        .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome) } }
         .distinctUntilChanged()
 
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
-        tabs.indexOf(selectedTab)
+        tabs.indexOfFirst { it.tabId == selectedTab }
     }.filterNot { it == -1 }
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
             ApplicationClearDataState.INITIALIZING -> {
-                Timber.i("App clear state initializing")
+                logcat(INFO) { "App clear state initializing" }
                 viewState.value = currentViewState.copy(hideWebContent = true)
             }
             ApplicationClearDataState.FINISHED -> {
-                Timber.i("App clear state finished")
+                logcat(INFO) { "App clear state finished" }
                 viewState.value = currentViewState.copy(hideWebContent = false)
             }
         }
@@ -249,7 +261,7 @@ class BrowserViewModel @Inject constructor(
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {
         if (tabs.isNullOrEmpty()) {
-            Timber.i("Tabs list is null or empty; adding default tab")
+            logcat(INFO) { "Tabs list is null or empty; adding default tab" }
             tabRepository.addDefaultTab()
             return
         }
@@ -352,7 +364,7 @@ class BrowserViewModel @Inject constructor(
             launch {
                 val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
                 if (existingTab == null) {
-                    command.value = Command.OpenInNewTab(url)
+                    command.value = Command.OpenSavedSite(url)
                 } else {
                     command.value = Command.SwitchToTab(existingTab.tabId)
                 }
@@ -422,7 +434,11 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onOmnibarEditModeChanged(isInEditMode: Boolean) {
-        viewState.value = currentViewState.copy(isTabSwipingEnabled = !isInEditMode)
+        viewState.value = currentViewState.copy(isInEditMode = isInEditMode)
+    }
+
+    fun onFullScreenModeChanged(isFullScreen: Boolean) {
+        viewState.value = currentViewState.copy(isInFullScreenMode = isFullScreen)
     }
 
     // user has not tapped the Undo action -> purge the deletable tabs and remove all data
@@ -443,6 +459,15 @@ class BrowserViewModel @Inject constructor(
     fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
         command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
+
+    fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean) {
+        logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
+        viewModelScope.launch(dispatchers.io()) {
+            withContext(dispatchers.main()) {
+                command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive)
+            }
+        }
+    }
 }
 
 /**
@@ -456,6 +481,6 @@ class BrowserViewModel @Inject constructor(
     featureName = "androidSkipUrlConversionOnNewTab",
 )
 interface SkipUrlConversionOnNewTabFeature {
-    @Toggle.DefaultValue(true)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 }
