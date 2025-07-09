@@ -2,6 +2,10 @@ package com.duckduckgo.subscriptions.impl.auth2
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalDateTime
 import kotlinx.coroutines.test.runTest
 import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -10,6 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.times
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doReturn
@@ -26,7 +31,8 @@ class AuthClientImplTest {
     private val appBuildConfig: AppBuildConfig = mock { config ->
         whenever(config.applicationId).thenReturn("com.duckduckgo.android")
     }
-    private val authClient = AuthClientImpl(authService, appBuildConfig)
+    private val timeProvider = FakeTimeProvider()
+    private val authClient = AuthClientImpl(authService, appBuildConfig, timeProvider)
 
     @Test
     fun `when authorize success then returns sessionId parsed from Set-Cookie header`() = runTest {
@@ -263,5 +269,70 @@ class AuthClientImplTest {
         whenever(authService.logout(any())).thenThrow(HttpException(errorResponse))
 
         authClient.tryLogout("fake v2 access token")
+    }
+
+    @Test
+    fun `when JWKS not cached then fetches from network`() = runTest {
+        val jwksJson = """{"keys": [{"kty": "RSA", "kid": "networkKey"}]}"""
+        val responseBody = jwksJson.toResponseBody("application/json".toMediaTypeOrNull())
+
+        whenever(authService.jwks()).thenReturn(responseBody)
+
+        val result = authClient.getJwks()
+
+        assertEquals(jwksJson, result)
+        verify(authService).jwks()
+    }
+
+    @Test
+    fun `when JWKS is cached and not expired then returns cached value`() = runTest {
+        val jwksJson = """{"keys": [{"kty": "RSA", "kid": "cachedKey"}]}"""
+        val responseBody = jwksJson.toResponseBody("application/json".toMediaTypeOrNull())
+
+        whenever(authService.jwks()).thenReturn(responseBody)
+
+        // Initial request
+        val first = authClient.getJwks()
+        assertEquals(jwksJson, first)
+
+        // Advance time just before expiration
+        timeProvider.currentTime += Duration.ofMinutes(59)
+
+        val second = authClient.getJwks()
+        assertEquals(jwksJson, second)
+
+        // Verify network call happened only once
+        verify(authService).jwks()
+    }
+
+    @Test
+    fun `when JWKS cache is expired then fetches new value`() = runTest {
+        val oldJwks = """{"keys": [{"kty": "RSA", "kid": "oldKey"}]}"""
+        val newJwks = """{"keys": [{"kty": "RSA", "kid": "newKey"}]}"""
+
+        whenever(authService.jwks())
+            .thenReturn(oldJwks.toResponseBody("application/json".toMediaTypeOrNull()))
+            .thenReturn(newJwks.toResponseBody("application/json".toMediaTypeOrNull()))
+
+        // Initial call → old value cached
+        val first = authClient.getJwks()
+        assertEquals(oldJwks, first)
+
+        // Advance time past expiration
+        timeProvider.currentTime += Duration.ofMinutes(61)
+
+        // Call again → should return new JWKS
+        val second = authClient.getJwks()
+        assertEquals(newJwks, second)
+
+        verify(authService, times(2)).jwks()
+    }
+
+    private class FakeTimeProvider : CurrentTimeProvider {
+        var currentTime: Instant = Instant.parse("2024-10-28T00:00:00Z")
+
+        override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+        override fun currentTimeMillis(): Long = currentTime.toEpochMilli()
+        override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
     }
 }
