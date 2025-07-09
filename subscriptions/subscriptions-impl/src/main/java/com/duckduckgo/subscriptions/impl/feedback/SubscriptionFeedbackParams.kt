@@ -22,10 +22,14 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeed
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.UNKNOWN
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.VPN
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackDuckAiSubCategory.OTHER
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackItrSubCategory.ACCESS_CODE_ISSUE
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackItrSubCategory.CANT_CONTACT_ADVISOR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackItrSubCategory.UNHELPFUL
@@ -54,6 +58,7 @@ enum class SubscriptionFeedbackCategory {
     VPN,
     PIR,
     ITR,
+    DUCK_AI,
 }
 
 interface SubscriptionFeedbackSubCategory
@@ -86,6 +91,12 @@ enum class SubscriptionFeedbackItrSubCategory : SubscriptionFeedbackSubCategory 
     OTHER,
 }
 
+enum class SubscriptionFeedbackDuckAiSubCategory : SubscriptionFeedbackSubCategory {
+    ACCESS_SUBSCRIPTION_MODELS,
+    LOGIN_THIRD_PARTY_BROWSER,
+    OTHER,
+}
+
 internal fun PrivacyProFeedbackSource.asParams(): String {
     return when (this) {
         DDG_SETTINGS -> "settings"
@@ -110,6 +121,7 @@ internal fun SubscriptionFeedbackCategory.asParams(): String {
         VPN -> "vpn"
         PIR -> "pir"
         ITR -> "itr"
+        DUCK_AI -> "duckAi"
     }
 }
 
@@ -119,6 +131,7 @@ internal fun SubscriptionFeedbackSubCategory.asParams(): String {
         is SubscriptionFeedbackSubsSubCategory -> this.asParams()
         is SubscriptionFeedbackPirSubCategory -> this.asParams()
         is SubscriptionFeedbackItrSubCategory -> this.asParams()
+        is SubscriptionFeedbackDuckAiSubCategory -> this.asParams()
         else -> "unknown"
     }
 }
@@ -157,5 +170,13 @@ internal fun SubscriptionFeedbackItrSubCategory.asParams(): String {
         CANT_CONTACT_ADVISOR -> "cantContactAdvisor"
         UNHELPFUL -> "advisorUnhelpful"
         SubscriptionFeedbackItrSubCategory.OTHER -> "somethingElse"
+    }
+}
+
+internal fun SubscriptionFeedbackDuckAiSubCategory.asParams(): String {
+    return when (this) {
+        ACCESS_SUBSCRIPTION_MODELS -> "accessSubscriptionModels"
+        LOGIN_THIRD_PARTY_BROWSER -> "loginThirdPartyBrowser"
+        OTHER -> "somethingElse"
     }
 }
