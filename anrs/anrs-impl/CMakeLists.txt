@@ -30,4 +30,6 @@ target_link_libraries(
 
 target_link_options(
        crash-ndk
-       PRIVATE "-Wl,-z,max-page-size=16384")
+       PRIVATE
+       "-Wl,-z,common-page-size=16384"
+       "-Wl,-z,max-page-size=16384")

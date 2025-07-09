@@ -39,4 +39,6 @@ find_library( # Sets the name of the path variable.
 
 target_link_options(
        https-bloom-lib
-       PRIVATE "-Wl,-z,max-page-size=16384")
+       PRIVATE
+       "-Wl,-z,common-page-size=16384"
+       "-Wl,-z,max-page-size=16384")
