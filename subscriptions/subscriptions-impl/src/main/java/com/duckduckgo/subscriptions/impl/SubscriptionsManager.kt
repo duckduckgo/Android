@@ -211,6 +211,11 @@ interface SubscriptionsManager {
     suspend fun signInV1(authToken: String)
 
     /**
+     * Signs the user in using the provided v2 access and refresh tokens
+     */
+    suspend fun signInV2(accessToken: String, refreshToken: String)
+
+    /**
      * Signs the user out and deletes all the data from the device
      */
     suspend fun signOut()
@@ -379,6 +384,21 @@ class RealSubscriptionsManager @Inject constructor(
             }
         } else {
             fetchAndStoreAllData()
+        }
+    }
+
+    override suspend fun signInV2(
+        accessToken: String,
+        refreshToken: String,
+    ) {
+        val tokens = TokenPair(accessToken, refreshToken)
+        val jwks = authClient.getJwks()
+        saveTokens(validateTokens(tokens, jwks))
+        authRepository.purchaseToWaitingStatus()
+        try {
+            refreshSubscriptionData()
+        } catch (e: Exception) {
+            logcat { "Subs: error when refreshing subscription on v2 sign in" }
         }
     }
 

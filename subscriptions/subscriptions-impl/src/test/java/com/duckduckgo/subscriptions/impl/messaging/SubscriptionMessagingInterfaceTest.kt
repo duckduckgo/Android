@@ -404,6 +404,37 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and setAuthTokens message then authenticate`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val params = """{"accessToken":"accessToken","refreshToken":"refreshToken"}"""
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"setAuthTokens","params":$params}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(subscriptionsManager).signInV2(accessToken = "accessToken", refreshToken = "refreshToken")
+        verify(pixelSender).reportRestoreUsingEmailSuccess()
+        verify(pixelSender).reportSubscriptionActivated()
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun `when process and setAuthTokens message and no tokens then do nothing`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"setAuthTokens","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verifyNoInteractions(subscriptionsManager)
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
     fun `when process and get subscription options message if feature name does not match do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
