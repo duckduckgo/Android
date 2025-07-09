@@ -740,17 +740,17 @@
         <item name="cornerRadius">10dp</item>
         <item name="android:textAppearance">@style/Typography.DuckDuckGo.BBButton.Option</item>
         <item name="android:paddingLeft">10dp</item>
-        <item name="android:paddingRight">10dp</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
         <item name="android:insetTop">4dp</item>
         <item name="android:insetBottom">4dp</item>
         <item name="android:textColor">@color/bbColorButtonOptionText</item>
         <item name="backgroundTint">@color/bbColorButtonOptionContainer</item>
         <item name="iconTint">@color/bbColorButtonOptionText</item>
         <item name="android:includeFontPadding">false</item>
-        <item name="iconSize">24dp</item>
-        <item name="iconPadding">8dp</item>
+        <item name="iconSize">20dp</item>
+        <item name="iconPadding">10dp</item>
         <item name="rippleColor">@color/bbColorButtonOptionPressed</item>
     </style>
 
