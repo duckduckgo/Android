@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.feedback
 
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
@@ -37,6 +38,7 @@ class RealFeedbackSubCategoryProvider @Inject constructor() : FeedbackSubCategor
             SUBS_AND_PAYMENTS -> getSubsSubCategories()
             PIR -> getPirSubCategories()
             ITR -> getItrSubCategories()
+            DUCK_AI -> getDuckAiSubCategories()
         }
     }
 
@@ -74,6 +76,14 @@ class RealFeedbackSubCategoryProvider @Inject constructor() : FeedbackSubCategor
             R.string.feedbackSubCategoryItrCantContactAdvisor to SubscriptionFeedbackItrSubCategory.CANT_CONTACT_ADVISOR,
             R.string.feedbackSubCategoryItrAdvisorUnhelpful to SubscriptionFeedbackItrSubCategory.UNHELPFUL,
             R.string.feedbackSubCategoryItrOther to SubscriptionFeedbackItrSubCategory.OTHER,
+        )
+    }
+
+    private fun getDuckAiSubCategories(): Map<Int, SubscriptionFeedbackSubCategory> {
+        return mapOf(
+            R.string.feedbackSubCategoryDuckAiSubscriberModels to SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS,
+            R.string.feedbackSubCategoryDuckAiLoginThirdPartyBrowser to SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER,
+            R.string.feedbackSubCategoryDuckAiOther to SubscriptionFeedbackDuckAiSubCategory.OTHER,
         )
     }
 }
