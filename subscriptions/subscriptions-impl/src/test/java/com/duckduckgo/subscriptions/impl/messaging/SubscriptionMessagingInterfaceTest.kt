@@ -790,13 +790,14 @@ class SubscriptionMessagingInterfaceTest {
         givenInterfaceIsRegistered()
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
+        givenDuckAiPlus(enabled = true)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":true}"""),
         )
 
         val message = """
@@ -818,13 +819,43 @@ class SubscriptionMessagingInterfaceTest {
         givenInterfaceIsRegistered()
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = false)
+        givenDuckAiPlus(enabled = true)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":false}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":false,"usePaidDuckAi":true}"""),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getFeatureConfig","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
+    fun `when process and get feature config and messaging enabled but duck ai plus disabled then return response with duck ai false`() = runTest {
+        givenInterfaceIsRegistered()
+        givenSubscriptionMessaging(enabled = true)
+        givenAuthV2(enabled = true)
+        givenDuckAiPlus(enabled = false)
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getFeatureConfig",
+            id = "myId",
+            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":false}"""),
         )
 
         val message = """
@@ -918,6 +949,12 @@ class SubscriptionMessagingInterfaceTest {
         val v2SubscriptionFlow = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(v2SubscriptionFlow.isEnabled()).thenReturn(enabled)
         whenever(privacyProFeature.enableSubscriptionFlowsV2()).thenReturn(v2SubscriptionFlow)
+    }
+
+    private fun givenDuckAiPlus(enabled: Boolean) {
+        val duckAiPlusToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
+        whenever(duckAiPlusToggle.isEnabled()).thenReturn(enabled)
+        whenever(privacyProFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {
