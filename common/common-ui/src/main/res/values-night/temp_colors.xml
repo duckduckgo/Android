@@ -59,4 +59,8 @@
 
     <color name="bbColorButtonFAB">#272727</color>
 
+    <color name="bbFeatherOutline">#EDEDEC</color>
+    <color name="bbFeatherFill">#5D6167</color>
+    <color name="bbFeatherWhisps">#656871</color>
+
 </resources>

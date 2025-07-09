@@ -18,6 +18,7 @@ package com.duckduckgo.app.cta.ui
 
 import android.content.Context
 import android.net.Uri
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
@@ -1123,6 +1124,12 @@ sealed class DaxBubbleCta(
             binding.daxDialogOption3,
         )
 
+        if (configuration is DaxEndCta) {
+            binding.headerImage.show()
+            binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
+            binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+        }
+
         primaryCta?.let { primaryCtaRes ->
             with(binding.primaryCta) {
                 show()
@@ -1189,6 +1196,7 @@ sealed class DaxBubbleCta(
             }
 
             root.fadeIn().setStartDelay(600).withEndAction {
+                headerImage.fadeIn()
                 daxBubbleDialogTitle.fadeIn()
                     .withEndAction {
                         dialogTextCta.startTypingAnimation(daxText, true) {

@@ -87,6 +87,10 @@
     <color name="bbColorButtonOptionText">#27251F</color>
 
     <color name="bbColorButtonFAB">@color/white</color>
+    
+    <color name="bbFeatherOutline">#000000</color>
+    <color name="bbFeatherFill">#FFFFFF</color>
+    <color name="bbFeatherWhisps">#000000</color>
 
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
