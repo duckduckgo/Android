@@ -195,6 +195,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             transition.doOnEnd {
                 binding.viewPager.isVisible = true
             }
+            transition.duration = 200L
             TransitionManager.beginDelayedTransition(
                 binding.root,
                 transition,
@@ -215,6 +216,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             transition.doOnStart {
                 binding.viewPager.isVisible = false
             }
+            transition.duration = 200L
             TransitionManager.beginDelayedTransition(
                 binding.root,
                 transition,

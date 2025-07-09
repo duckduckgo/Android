@@ -40,8 +40,10 @@ import androidx.core.view.marginEnd
 import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.toDp
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
@@ -134,7 +136,6 @@ class InputModeWidget @JvmOverloads constructor(
     }
 
     private fun configureInputBehavior() = with(inputField) {
-        maxLines = MAX_LINES
         setHorizontallyScrolling(false)
         setRawInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
 
@@ -190,10 +191,14 @@ class InputModeWidget @JvmOverloads constructor(
     private fun applyModeSpecificInputBehaviour(isSearchTab: Boolean) {
         inputField.apply {
             if (isSearchTab) {
+                updatePadding(bottom = 0.toDp(context))
+                maxLines = MAX_LINES
                 minLines = SEARCH_MIN_LINES
                 hint = context.getString(R.string.duck_chat_search_or_type_url)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
             } else {
+                updatePadding(bottom = 40.toDp(context))
+                maxLines = Int.MAX_VALUE
                 minLines = DUCK_CHAT_MIN_LINES
                 hint = context.getString(R.string.duck_chat_ask_anything)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
