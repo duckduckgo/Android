@@ -89,4 +89,4 @@ class DuckAiPaidSettingsViewModelTest {
         assertEquals(customUrl, command.url)
         assertEquals(customTitleId, command.titleId)
     }
-} 
+}
