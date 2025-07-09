@@ -30,6 +30,7 @@ import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.FrameLayout
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.addListener
@@ -41,11 +42,13 @@ import androidx.core.view.marginTop
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.duckchat.impl.databinding.ViewInputModeSwitchLayoutBinding
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class InputModeWidget @JvmOverloads constructor(
@@ -72,9 +75,9 @@ class InputModeWidget @JvmOverloads constructor(
     private val omnibarContent: View by lazy { findViewById(R.id.inputModeWidgetCardContent) }
 
     val inputField: EditText
-    val inputFieldClearText: View
-    val inputModeWidgetBack: View
-    val inputModeSwitch: TabLayout
+    private val inputFieldClearText: View
+    private val inputModeWidgetBack: View
+    private val inputModeSwitch: TabLayout
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -197,6 +200,31 @@ class InputModeWidget @JvmOverloads constructor(
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
+
+        if (isSearchTab) {
+            omnibarCard.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                height = ViewGroup.LayoutParams.WRAP_CONTENT
+                bottomToBottom = LayoutParams.UNSET
+            }
+            omnibarContent.updateLayoutParams<ViewGroup.LayoutParams> {
+                height = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+            inputField.updateLayoutParams<ViewGroup.LayoutParams> {
+                height = ViewGroup.LayoutParams.WRAP_CONTENT
+            }
+        } else {
+            omnibarCard.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                height = 0
+                bottomToBottom = LayoutParams.PARENT_ID
+            }
+            omnibarContent.updateLayoutParams<ViewGroup.LayoutParams> {
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+            inputField.updateLayoutParams<ViewGroup.LayoutParams> {
+                height = ViewGroup.LayoutParams.MATCH_PARENT
+            }
+        }
+        // beginChangeBoundsTransition()
     }
 
     private fun beginChangeBoundsTransition() {
@@ -321,7 +349,7 @@ class InputModeWidget @JvmOverloads constructor(
         private const val DEFAULT_ANIMATION_DURATION = 300L
         private const val FADE_DURATION = 150L
         private const val MAX_LINES = 8
-        private const val SEARCH_MIN_LINES = 2
-        private const val DUCK_CHAT_MIN_LINES = 2
+        private const val SEARCH_MIN_LINES = 1
+        private const val DUCK_CHAT_MIN_LINES = 1
     }
 }

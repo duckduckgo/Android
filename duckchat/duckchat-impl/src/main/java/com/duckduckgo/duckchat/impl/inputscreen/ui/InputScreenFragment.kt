@@ -19,11 +19,19 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+import androidx.core.transition.addListener
+import androidx.core.transition.doOnEnd
+import androidx.core.transition.doOnStart
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -52,9 +60,11 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceRecognitionSuccess
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source.BROWSER
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
@@ -176,12 +186,40 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             requireActivity().onBackPressed()
         }
         onSearchSelected = {
+            binding.inputModeWidget.updateLayoutParams<LayoutParams> {
+                height = ViewGroup.LayoutParams.WRAP_CONTENT
+                bottomToBottom = LayoutParams.UNSET
+            }
+
+            val transition = ChangeBounds()
+            transition.doOnEnd {
+                binding.viewPager.isVisible = true
+            }
+            TransitionManager.beginDelayedTransition(
+                binding.root,
+                transition,
+            )
+
             binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
         }
         onChatSelected = {
+            binding.inputModeWidget.updateLayoutParams<LayoutParams> {
+                height = 0
+                bottomToBottom = LayoutParams.PARENT_ID
+            }
+
+            val transition = ChangeBounds()
+            transition.doOnStart {
+                binding.viewPager.isVisible = false
+            }
+            TransitionManager.beginDelayedTransition(
+                binding.root,
+                transition,
+            )
+
             binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
