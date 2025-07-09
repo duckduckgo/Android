@@ -281,4 +281,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Synchroniser les mots de passe de bureau</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Réinitialiser les sites exclus</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Transférez vos mots de passe de Google vers DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importez rapidement et en toute sécurité vos mots de passe dans DuckDuckGo. Google peut vous demander de saisir votre mot de passe.</string>
+    <string name="passwords_import_promo_action">Importer depuis Google</string>
+
 </resources>

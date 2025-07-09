@@ -281,4 +281,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Asztali jelszavak szinkronizálása</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Kizárt webhelyek visszaállítása</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Hozd át a jelszavaidat a&lt;br /&gt;Google-ból a DuckDuckGóba</string>
+    <string name="passwords_import_promo_subtitle">Gyorsan és biztonságosan importáld jelszavaidat a DuckDuckGóba. A Google megkérhet, hogy add meg a jelszavad.</string>
+    <string name="passwords_import_promo_action">Importálás a Google-ból</string>
+
 </resources>

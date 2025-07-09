@@ -281,4 +281,8 @@
     <string name="autofillSettingsImportFromDesktopSync">Wachtwoorden bureaublad synchroniseren</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Uitgesloten sites opnieuw instellen</string>
 
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Breng je wachtwoorden van&lt;br /&gt;Google over naar DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importeer snel en veilig je wachtwoorden naar DuckDuckGo. Google kan je vragen om je wachtwoord in te voeren.</string>
+    <string name="passwords_import_promo_action">Importeren van Google</string>
+
 </resources>
