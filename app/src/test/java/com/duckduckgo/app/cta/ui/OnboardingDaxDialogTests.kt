@@ -41,7 +41,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
-import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -82,7 +81,6 @@ class OnboardingDaxDialogTests {
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
     private val mockRefreshPixelSender: RefreshPixelSender = mock()
-    private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockSubscriptions: Subscriptions = mock()
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
@@ -112,7 +110,6 @@ class OnboardingDaxDialogTests {
             mockSubscriptions,
             mockDuckPlayer,
             mockBrokenSitePrompt,
-            mockUserBrowserProperties,
             mockSenseOfProtectionExperiment,
             mockOnboardingHomeScreenWidgetExperiment,
         )
