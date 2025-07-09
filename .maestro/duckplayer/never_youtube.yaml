@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Load video with Duck Player set to never"
+name: "DuckPlayer: Never > YouTube"
 tags:
   - duckplayer
 ---
@@ -12,7 +12,6 @@ tags:
       - runFlow: ../shared/skip_all_onboarding.yaml
       - runFlow: common/enable_duck_player_never.yaml
       - runFlow: common/load_youtube_video.yaml
-      - runFlow: common/handle_youtube_cookies.yaml
 
       - runFlow:
           when:
