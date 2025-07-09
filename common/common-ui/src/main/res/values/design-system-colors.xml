@@ -65,7 +65,6 @@
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
     <attr name="daxOmnibarTextColorHighlight" format="color"/>
-    <attr name="daxColorBackdrop" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorToolbar" format="color"/>
@@ -122,6 +121,9 @@
     <attr name="daxColorTextInputEnabledOutline" format="color"/>
 
     <attr name="daxColorWebViewScrollbarTrack" format="color"/>
+
+    <attr name="daxColorInputModeIndicatorShadow" format="color"/>
+    <attr name="daxColorBackdrop" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
