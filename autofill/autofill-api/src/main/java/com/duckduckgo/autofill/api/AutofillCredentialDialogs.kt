@@ -249,11 +249,6 @@ interface CredentialAutofillDialogFactory {
      * Creates a dialog which prompts the user to sign up for Email Protection
      */
     fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment
-
-    /**
-     * Creates a dialog which prompts the user to import passwords from Google Passwords
-     */
-    fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment
 }
 
 private fun prefix(

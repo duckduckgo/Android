@@ -16,9 +16,12 @@
 
 package com.duckduckgo.autofill.impl.importing
 
+import androidx.fragment.app.DialogFragment
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,6 +34,11 @@ interface InBrowserImportPromo {
         credentialsAvailableForCurrentPage: Boolean,
         url: String?,
     ): Boolean
+
+    /**
+     * Creates a dialog which prompts the user to import passwords from Google Passwords
+     */
+    fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment
 }
 
 @ContributesBinding(AppScope::class)
@@ -76,6 +84,14 @@ class RealInBrowserImportPromo @Inject constructor(
 
             return@withContext true
         }
+    }
+
+    override fun autofillImportPasswordsPromoDialog(
+        importSource: AutofillImportLaunchSource,
+        tabId: String,
+        url: String,
+    ): DialogFragment {
+        return ImportFromGooglePasswordsDialog.instance(importSource = importSource, tabId = tabId, originalUrl = url)
     }
 
     companion object {

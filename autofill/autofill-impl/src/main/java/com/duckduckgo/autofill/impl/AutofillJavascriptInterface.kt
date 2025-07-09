@@ -20,7 +20,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
+import com.duckduckgo.autofill.api.AutofillPrompt.UrlMatchType.ExactUrl
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
@@ -196,8 +198,15 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     private fun handlePromoteImport(url: String) {
-        coroutineScope.launch {
-            callback?.promptUserTo(ImportPasswords(url))
+        tabId?.let {
+            coroutineScope.launch(dispatcherProvider.io()) {
+                val dialog = inBrowserImportPromo.autofillImportPasswordsPromoDialog(
+                    importSource = InBrowserPromo,
+                    tabId = it,
+                    url = url,
+                )
+                callback?.showAutofillPrompt(ImportPasswords(dialog, ExactUrl(url)))
+            }
         }
     }
 

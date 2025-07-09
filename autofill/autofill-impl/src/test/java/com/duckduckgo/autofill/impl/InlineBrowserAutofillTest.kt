@@ -73,7 +73,7 @@ class InlineBrowserAutofillTest {
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
         }
 
-        override suspend fun promptUserTo(event: AutofillPrompt) {
+        override suspend fun showAutofillDialgo(event: AutofillPrompt) {
         }
     }
 
