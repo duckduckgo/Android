@@ -10,6 +10,7 @@ import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.Companion.SUBS
 import com.duckduckgo.subscriptions.impl.RealSubscriptionsManager.RecoverSubscriptionResult
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.auth2.AuthClient
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
@@ -37,6 +38,7 @@ class RestoreSubscriptionViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
+    private val authClient: AuthClient = mock()
     private lateinit var viewModel: RestoreSubscriptionViewModel
 
     @Before
@@ -46,6 +48,8 @@ class RestoreSubscriptionViewModelTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             pixelSender = pixelSender,
             subscriptionsChecker = subscriptionsChecker,
+            authClient = authClient,
+            appCoroutineScope = coroutineTestRule.testScope,
         )
     }
 
@@ -188,6 +192,24 @@ class RestoreSubscriptionViewModelTest {
             assertTrue(result is SubscriptionNotFound)
             verify(subscriptionsManager).signOut()
         }
+    }
+
+    @Test
+    fun whenRestoreFromEmailThenJwksCacheIsWarmedUp() = runTest {
+        viewModel.restoreFromEmail()
+        verify(authClient).getJwks()
+    }
+
+    @Test
+    fun whenWarmUpJwksFailsThenNoCrashOccurs() = runTest {
+        whenever(authClient.getJwks()).thenThrow(RuntimeException("Network error"))
+
+        viewModel.restoreFromEmail()
+
+        viewModel.commands().test {
+            assertTrue(awaitItem() is RestoreFromEmail)
+        }
+        verify(pixelSender).reportActivateSubscriptionEnterEmailClick()
     }
 
     private fun subscriptionActive(): Subscription {
