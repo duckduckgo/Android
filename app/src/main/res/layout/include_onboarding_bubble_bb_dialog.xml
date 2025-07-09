@@ -78,6 +78,18 @@
                 android:orientation="vertical"
                 android:padding="@dimen/keyline_6">
 
+                <ImageView
+                    android:id="@+id/headerImage"
+                    android:layout_width="60dp"
+                    android:layout_height="78dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="@dimen/keyline_4"
+                    android:alpha="0"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/experiment_feather"
+                    tools:alpha="1"
+                    tools:visibility="visible" />
+
                 <TextView
                     android:id="@+id/daxBubbleDialogTitle"
                     style="@style/Typography.BB.H1"

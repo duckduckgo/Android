@@ -1,0 +1,98 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="60dp"
+    android:height="79dp"
+    android:viewportWidth="60"
+    android:viewportHeight="79">
+    <group>
+        <clip-path android:pathData="M0.5,0.958h59v78h-59z" />
+        <path
+            android:pathData="M15.535,67.882L9.909,67.808"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherWhisps"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M13.341,53.568L11.255,53.212"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherWhisps"
+            android:strokeLineCap="round" />
+        <path
+            android:pathData="M19.02,75.327L16.42,77.725"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherWhisps"
+            android:strokeLineCap="round" />
+        <path
+            android:fillColor="#000000"
+            android:pathData="M14.967,49.472C15.196,52.57 15.976,57.296 18.564,61.747C21.89,67.469 30.934,74.62 39.283,76.754C48.631,79.143 54.296,77.064 56.684,74.421C59.914,70.757 59.331,65.815 56.159,63.006C53.477,64.424 27.685,59.498 23.937,57.378C20.286,55.312 15.401,46.869 15.401,46.869L14.967,49.472Z" />
+        <path
+            android:fillColor="@color/bbFeatherFill"
+            android:pathData="M17.128,38.142C16.404,36.375 15.392,35.632 14.523,37.531C13.653,39.43 14.822,47.884 15.821,52.908C16.817,57.934 20.223,62.554 24.411,65.897C28.601,69.238 36.639,73.733 45.372,74.847C54.105,75.961 58.772,71.476 58.671,66.439C58.569,61.402 53.129,56.932 37.841,55.725C36.987,54.408 36.857,53.791 34.775,53.077C32.694,52.363 27.056,49.414 23.837,46.925C20.618,44.435 17.898,40.022 17.129,38.147L17.128,38.142Z"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M1.764,29.235C4.328,33.651 13.647,47.68 25.943,55.978"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M3.197,9.298C1.748,16.636 6.006,27.508 12.71,32.128"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherWhisps"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M9.811,1.779C6.368,5.312 2.925,15.458 8.452,24.971"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherWhisps"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M29.619,58.123C35.674,62.367 43.149,66.19 53.133,66.048"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M28.54,58.855L28.51,63.596"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M31.6,62.797L31.582,67.512"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M30.626,54.275L35.565,53.531"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M35.149,57.385L40.702,56.15"
+            android:strokeWidth="0.9"
+            android:strokeColor="@color/bbFeatherOutline"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>
