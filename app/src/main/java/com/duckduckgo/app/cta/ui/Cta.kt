@@ -277,7 +277,7 @@ sealed class OnboardingDaxDialogCta(
 
     internal fun setBBOnboardingDialogView(
         title: String? = null,
-        message: String,
+        description: String,
         primaryCtaText: String?,
         binding: FragmentBrowserTabBinding,
         onPrimaryCtaClicked: () -> Unit,
@@ -290,14 +290,15 @@ sealed class OnboardingDaxDialogCta(
             root.show()
             primaryCta.setOnClickListener(null)
 
-            val parsedMessage = message.html(binding.root.context)
+            val parsedTitle = title?.html(binding.root.context)
+            val parsedDescription = description.html(binding.root.context)
             dialogTextCta.text = ""
-            hiddenTextCta.text = parsedMessage
+            hiddenTextCta.text = parsedDescription
 
             title?.let {
                 with(onboardingDialogTitle) {
                     show()
-                    text = title
+                    text = parsedTitle
                 }
             } ?: onboardingDialogTitle.gone()
 
@@ -323,7 +324,7 @@ sealed class OnboardingDaxDialogCta(
                 onTypingAnimationFinished.invoke()
             }
 
-            dialogTextCta.startTypingAnimation(message, true) { afterAnimation() }
+            dialogTextCta.startTypingAnimation(description, true) { afterAnimation() }
             onboardingDaxDialogBackground.setOnClickListener { afterAnimation() }
             onboardingDialogContent.setOnClickListener { afterAnimation() }
             onboardingDialogSuggestionsContent.setOnClickListener { afterAnimation() }
@@ -368,7 +369,7 @@ sealed class OnboardingDaxDialogCta(
                 }
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
+                        description = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onPrimaryCtaClicked = onPrimaryCtaClicked,
@@ -431,7 +432,8 @@ sealed class OnboardingDaxDialogCta(
                 }
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
-                        message = getTrackersDescription(context, trackers),
+                        title = getTrackersDescription(context, trackers),
+                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
@@ -467,13 +469,27 @@ sealed class OnboardingDaxDialogCta(
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
-                        .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                        context.resources.getQuantityString(R.plurals.bbOnboardingTrackersBlockedZeroDialogTitle, trackersFiltered.size)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                    } else {
+                        context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedZeroDialogDescription, trackersFiltered.size)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                    }
                 } else {
-                    context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
-                        .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                        context.resources.getQuantityString(R.plurals.bbOnboardingTrackersBlockedDialogTitle, size, size)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                    } else {
+                        context.resources.getQuantityString(R.plurals.onboardingTrackersBlockedDialogDescription, size, size)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
+                    }
                 }
-            return "<b>$trackersText</b>$quantityString"
+            return if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                "$trackersText$quantityString"
+            } else {
+                "<b>$trackersText</b>$quantityString"
+            }
         }
     }
 
@@ -517,7 +533,7 @@ sealed class OnboardingDaxDialogCta(
                 }
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
-                        message = getTrackersDescription(context),
+                        description = getTrackersDescription(context),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onPrimaryCtaClicked = onPrimaryCtaClicked,
@@ -598,7 +614,7 @@ sealed class OnboardingDaxDialogCta(
                 }
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
+                        description = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onPrimaryCtaClicked = onPrimaryCtaClicked,
@@ -658,7 +674,8 @@ sealed class OnboardingDaxDialogCta(
                 }
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
+                        title = context.getString(R.string.bbOnboardingFireButtonDaxDialogTitle),
+                        description = context.getString(R.string.bbOnboardingFireButtonDaxDialogDescription),
                         primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
                         binding = binding,
                         onPrimaryCtaClicked = onPrimaryCtaClicked,
@@ -930,7 +947,7 @@ sealed class OnboardingDaxDialogCta(
                 }
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
+                        description = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onPrimaryCtaClicked = onPrimaryCtaClicked,
