@@ -6,7 +6,7 @@ appId: com.duckduckgo.mobile.android
 - extendedWaitUntil:
     visible:
         text: "Videos"
-    timeout: 15000
+    timeout: 5000
 
 - tapOn:
     text: "Videos"

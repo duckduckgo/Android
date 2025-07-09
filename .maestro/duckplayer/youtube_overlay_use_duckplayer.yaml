@@ -26,7 +26,7 @@ tags:
       - extendedWaitUntil:
           visible:
               text: "duck://player/.*"
-          timeout: 15000
+          timeout: 5000
       
       # Core assertion: Duck Player is now active (confirmed by extendedWaitUntil above)
       # Overlay not shown
