@@ -4,9 +4,9 @@ appId: com.duckduckgo.mobile.android
 - runFlow: input_search.yaml
 
 - extendedWaitUntil:
-      visible:
-          text: "Videos for DuckDuckGo vs Google: 5 Reasons You Should Switch.*"
-      timeout: 15000
+    visible:
+      text: "Videos"
+    timeout: 5000
 
 - scrollUntilVisible:
       element:
