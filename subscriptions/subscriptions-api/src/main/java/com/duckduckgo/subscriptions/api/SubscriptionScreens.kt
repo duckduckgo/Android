@@ -19,5 +19,7 @@ package com.duckduckgo.subscriptions.api
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
 sealed class SubscriptionScreens {
+    data object SubscriptionsSettingsScreenWithEmptyParams : ActivityParams
     data object SubscriptionScreenNoParams : ActivityParams
+    data class RestoreSubscriptionScreenWithParams(val isOriginWeb: Boolean = true) : ActivityParams
 }
