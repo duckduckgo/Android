@@ -27,6 +27,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeed
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
@@ -103,11 +104,6 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                 REPORT_PROBLEM -> {
                     val source = newMetadata.source
                     when (source) {
-                        SUBSCRIPTION_SETTINGS -> {
-                            newMetadata = newMetadata.copy(category = SUBS_AND_PAYMENTS)
-                            FeedbackSubCategory(newMetadata.category!!.asTitle())
-                        }
-
                         VPN_MANAGEMENT, VPN_EXCLUDED_APPS -> {
                             newMetadata = newMetadata.copy(category = VPN)
                             FeedbackSubCategory(newMetadata.category!!.asTitle())
@@ -427,6 +423,7 @@ class SubscriptionFeedbackViewModel @Inject constructor(
             VPN -> R.string.feedbackCategoryVpn
             PIR -> R.string.feedbackCategoryPir
             ITR -> R.string.feedbackCategoryItr
+            DUCK_AI -> R.string.feedbackCategoryDuckAi
         }
     }
 
@@ -474,6 +471,14 @@ class SubscriptionFeedbackViewModel @Inject constructor(
                     SubscriptionFeedbackItrSubCategory.CANT_CONTACT_ADVISOR -> R.string.feedbackSubCategoryItrCantContactAdvisor
                     SubscriptionFeedbackItrSubCategory.UNHELPFUL -> R.string.feedbackSubCategoryItrAdvisorUnhelpful
                     SubscriptionFeedbackItrSubCategory.OTHER -> R.string.feedbackSubCategoryItrOther
+                }
+            }
+
+            is SubscriptionFeedbackDuckAiSubCategory -> {
+                when (this) {
+                    SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS -> R.string.feedbackSubCategoryDuckAiSubscriberModels
+                    SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER -> R.string.feedbackSubCategoryDuckAiLoginThirdPartyBrowser
+                    SubscriptionFeedbackDuckAiSubCategory.OTHER -> R.string.feedbackSubCategoryDuckAiOther
                 }
             }
 
