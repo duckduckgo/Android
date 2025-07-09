@@ -30,12 +30,13 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.WELCOME_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivityRestoreSubscriptionBinding
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
@@ -43,7 +44,6 @@ import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.RestoreFromEmail
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.SubscriptionNotFound
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Success
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -192,8 +192,5 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
             is FinishAndGoToOnboarding -> finishAndGoToOnboarding()
             is FinishAndGoToSubscriptionSettings -> finishAndGoToSubscriptionSettings()
         }
-    }
-    companion object {
-        data class RestoreSubscriptionScreenWithParams(val isOriginWeb: Boolean = true) : GlobalActivityStarter.ActivityParams
     }
 }

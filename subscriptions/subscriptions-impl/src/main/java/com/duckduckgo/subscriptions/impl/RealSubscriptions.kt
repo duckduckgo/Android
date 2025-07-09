@@ -187,6 +187,14 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun enableSubscriptionFlowsV2(): Toggle
+
+    /**
+     * As part of Duck.ai we are adding new supported JS messages.
+     * This is enabled by default, but can be disabled if necessary.
+     * FF only controls native messaging (enabled/disabled).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun duckAISubscriptionMessaging(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
