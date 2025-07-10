@@ -5,6 +5,9 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
+# Define the project
+project(https_bloom_lib)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -33,3 +36,9 @@ find_library( # Sets the name of the path variable.
         # Specifies the name of the NDK library that
         # you want CMake to locate.
         log)
+
+target_link_options(
+       https-bloom-lib
+       PRIVATE
+       "-Wl,-z,common-page-size=16384"
+       "-Wl,-z,max-page-size=16384")
