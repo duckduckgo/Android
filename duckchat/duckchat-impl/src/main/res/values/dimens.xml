@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <dimen name="inputModeSwitchHeight">38dp</dimen>
     <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
     <dimen name="inputModeTabIndicatorHorizontalPadding">2dp</dimen>
     <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
