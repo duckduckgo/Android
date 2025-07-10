@@ -1061,13 +1061,9 @@ sealed class DaxBubbleCta(
 
     fun hideDaxBubbleCta(
         binding: FragmentBrowserTabBinding,
-        onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
     ) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble.root.gone()
-        } else {
-            binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.root.gone()
-        }
+        binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble.root.gone()
+        binding.includeNewBrowserTab.includeOnboardingDaxDialogBubble.root.gone()
     }
 
     override val markAsReadOnShow: Boolean = true

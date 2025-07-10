@@ -3103,7 +3103,7 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
-        daxBubbleCta.hideDaxBubbleCta(binding, onboardingDesignExperimentToggles)
+        daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
