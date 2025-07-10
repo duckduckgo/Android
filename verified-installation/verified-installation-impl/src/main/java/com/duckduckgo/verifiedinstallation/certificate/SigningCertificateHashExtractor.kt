@@ -65,15 +65,13 @@ class SigningCertificateHashExtractorImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.P)
     private fun getSigningCertHashesModern(): String? {
         val info: PackageInfo? = context.packageManager.getPackageInfo(appBuildConfig.applicationId, PackageManager.GET_SIGNING_CERTIFICATES)
-        if (info?.signingInfo == null) {
+        val signingInfo = info?.signingInfo ?: return null
+
+        if (signingInfo.signingCertificateHistory.size != 1) {
             return null
         }
 
-        if (info.signingInfo.signingCertificateHistory.size != 1) {
-            return null
-        }
-
-        return info.signingInfo.signingCertificateHistory?.lastOrNull()?.sha256()
+        return signingInfo.signingCertificateHistory?.lastOrNull()?.sha256()
     }
 
     private fun Signature.sha256(): String {
