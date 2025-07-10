@@ -1,5 +1,5 @@
 appId: com.duckduckgo.mobile.android
-name: "DuckPlayer: Decline to use Duck Player from YouTube overlay"
+name: "DuckPlayer: Ask > Direct YouTube > YouTube"
 tags:
   - duckplayerlocal
 ---
