@@ -210,9 +210,10 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
-import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.AutofillPrompt
 import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
+import com.duckduckgo.autofill.api.AutofillPrompt.UrlMatchType.AnyUrl
+import com.duckduckgo.autofill.api.AutofillPrompt.UrlMatchType.ExactUrl
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
@@ -764,18 +765,22 @@ class BrowserTabFragment :
             viewModel.onShowUserCredentialsSaved(savedCredentials)
         }
 
-        override suspend fun promptUserTo(event: AutofillPrompt) {
+        override suspend fun showAutofillPrompt(event: AutofillPrompt) {
+            logcat { "showAutofillPrompt called: ${event.javaClass.simpleName}" }
+
+            // some prompts requiring the guard that we're still on the same URL before showing the dialog
+            val requiredUrl = when (val matchType = event.urlMatchType) {
+                is AnyUrl -> null
+                is ExactUrl -> matchType.requiredUrl
+            }
+
             withContext(dispatchers.main()) {
                 when (event) {
                     is ImportPasswords -> {
                         showDialogHidingPrevious(
-                            credentialAutofillDialogFactory.autofillImportPasswordsPromoDialog(
-                                importSource = InBrowserPromo,
-                                tabId = tabId,
-                                url = event.currentUrl,
-                            ),
-                            AUTOFILL_DIALOG_TAB,
-                            event.currentUrl,
+                            dialog = event.prompt,
+                            tag = AUTOFILL_DIALOG_TAB,
+                            requiredUrl = requiredUrl,
                         )
                     }
                 }

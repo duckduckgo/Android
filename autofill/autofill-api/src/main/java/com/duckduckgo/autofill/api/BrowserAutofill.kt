@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.api
 
 import android.webkit.WebView
+import androidx.fragment.app.DialogFragment
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 
@@ -159,9 +160,21 @@ interface Callback {
      */
     fun onCredentialsSaved(savedCredentials: LoginCredentials)
 
-    suspend fun promptUserTo(event: AutofillPrompt)
+    /**
+     * Called when the user should be shown an autofill prompt
+     */
+    suspend fun showAutofillPrompt(event: AutofillPrompt)
 }
 
-sealed interface AutofillPrompt {
-    data class ImportPasswords(val currentUrl: String) : AutofillPrompt
+sealed class AutofillPrompt(open val urlMatchType: UrlMatchType) {
+
+    data class ImportPasswords(
+        val prompt: DialogFragment,
+        override val urlMatchType: UrlMatchType,
+    ) : AutofillPrompt(urlMatchType)
+
+    sealed interface UrlMatchType {
+        data object AnyUrl : UrlMatchType
+        data class ExactUrl(val requiredUrl: String) : UrlMatchType
+    }
 }

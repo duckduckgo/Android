@@ -614,7 +614,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             onCredentialsSavedCalled = true
         }
 
-        override suspend fun promptUserTo(event: AutofillPrompt) {
+        override suspend fun showAutofillDialgo(event: AutofillPrompt) {
         }
     }
 

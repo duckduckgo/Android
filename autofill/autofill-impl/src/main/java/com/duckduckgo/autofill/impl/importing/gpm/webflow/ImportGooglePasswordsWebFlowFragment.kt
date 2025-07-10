@@ -325,7 +325,7 @@ class ImportGooglePasswordsWebFlowFragment :
         }
     }
 
-    override suspend fun promptUserTo(event: AutofillPrompt) {
+    override suspend fun showAutofillPrompt(event: AutofillPrompt) {
         // no-op, we don't prompt the user for anything in this flow
     }
 
