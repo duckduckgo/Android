@@ -20,6 +20,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
+import com.duckduckgo.autofill.api.AutofillPrompt.ImportPasswords
 import com.duckduckgo.autofill.api.Callback
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.EmailProtectionInContextSignupFlowListener
@@ -29,10 +30,12 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
+import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesProvider
 import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
@@ -46,6 +49,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.CREDENTIALS_IMPORT
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
@@ -72,6 +76,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.DEBUG
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -110,6 +115,7 @@ interface AutofillJavascriptInterface {
 
     @JavascriptInterface
     fun closeEmailProtectionTab(data: String)
+    fun onNewAutofillDataAvailable(url: String?)
 }
 
 @ContributesBinding(AppScope::class)
@@ -133,6 +139,8 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val partialCredentialSaveStore: PartialCredentialSaveStore,
     private val usernameBackFiller: UsernameBackFiller,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
+    private val inBrowserImportPromo: InBrowserImportPromo,
+    private val autofillAvailableInputTypesProvider: AutofillAvailableInputTypesProvider,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -147,10 +155,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val storeFormDataJob = ConflatedJob()
     private val injectCredentialsJob = ConflatedJob()
     private val emailProtectionInContextSignupJob = ConflatedJob()
+    private val autofillReloadJob = ConflatedJob()
 
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
-        logcat(VERBOSE) { "BrowserAutofill: getAutofillData called:\n$requestString" }
+        logcat(DEBUG) { "BrowserAutofill: getAutofillData called:\n$requestString" }
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.io()) {
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
@@ -186,6 +195,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         }
     }
 
+    private fun handlePromoteImport(url: String) {
+        coroutineScope.launch {
+            callback?.promptUserTo(ImportPasswords(url))
+        }
+    }
+
     @JavascriptInterface
     override fun getIncontextSignupDismissedAt(data: String) {
         emailProtectionInContextSignupJob += coroutineScope.launch(dispatcherProvider.io()) {
@@ -199,6 +214,15 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     @JavascriptInterface
     override fun closeEmailProtectionTab(data: String) {
         emailProtectionInContextSignupFlowCallback?.closeInContextSignup()
+    }
+
+    override fun onNewAutofillDataAvailable(url: String?) {
+        autofillReloadJob += coroutineScope.launch(dispatcherProvider.io()) {
+            val availableInputTypes = autofillAvailableInputTypesProvider.getTypes(url)
+            val json = autofillResponseWriter.generateResponseNewAutofillDataAvailable(availableInputTypes)
+            logcat { "import completed; refresh request: $json" }
+            autofillMessagePoster.postMessage(webView, json)
+        }
     }
 
     @Suppress("UNUSED_PARAMETER")
@@ -246,7 +270,12 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         val finalCredentialList = ensureUsernamesNotNull(dedupedCredentials)
 
         if (finalCredentialList.isEmpty()) {
-            callback?.noCredentialsAvailable(url)
+            val canShowImport = inBrowserImportPromo.canShowPromo(credentialsAvailableForCurrentPage = false, url = url)
+            if (canShowImport) {
+                handlePromoteImport(url)
+            } else {
+                callback?.noCredentialsAvailable(url)
+            }
         } else {
             callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
         }
@@ -265,6 +294,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         return when (trigger) {
             USER_INITIATED -> LoginTriggerType.USER_INITIATED
             AUTOPROMPT -> LoginTriggerType.AUTOPROMPT
+            CREDENTIALS_IMPORT -> LoginTriggerType.AUTOPROMPT
         }
     }
 

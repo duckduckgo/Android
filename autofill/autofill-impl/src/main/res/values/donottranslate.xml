@@ -15,5 +15,6 @@
   -->
 
 <resources>
-
+    <string name="passwords_import_promo_in_browser_title">Bring your passwords from Google to DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Set Up Later in Settings</string>
 </resources>

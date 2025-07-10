@@ -90,4 +90,10 @@ interface AutofillEventListener {
      * Called when a change was detected in the autofill state, such that reloading the page may be necessary.
      */
     fun onAutofillStateChange()
+
+    /**
+     * Called when new passwords are imported.
+     * This can be used to trigger the autofill js flow to re-fetch credentials.
+     */
+    fun onNewPasswordsImported()
 }

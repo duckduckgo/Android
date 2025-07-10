@@ -26,6 +26,7 @@ import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.BrowserOverflow
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.BrowserSnackbar
@@ -38,7 +39,6 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementEmptyState
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME

@@ -17,8 +17,8 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.importpassword
 
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementBucketing
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED

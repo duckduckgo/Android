@@ -19,11 +19,14 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
+import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.Importing
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
@@ -40,6 +43,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val credentialImporter: CredentialImporter,
     private val dispatchers: DispatcherProvider,
     private val importPasswordsPixelSender: ImportPasswordsPixelSender,
+    private val autofillStore: InternalAutofillStore,
 ) : ViewModel() {
 
     fun onImportFlowFinishedSuccessfully(importSource: AutofillImportLaunchSource) {
@@ -91,8 +95,27 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     }
 
     fun shouldShowInitialInstructionalPrompt(importSource: AutofillImportLaunchSource) {
+        val viewMode = if (importSource == AutofillImportLaunchSource.InBrowserPromo) {
+            logcat { "ImportFromGooglePasswordsDialogViewModel: InBrowserPromo scenario" }
+            BrowserPromoPreImport
+        } else {
+            logcat { "ImportFromGooglePasswordsDialogViewModel: PreImport scenario" }
+            PreImport
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
+            autofillStore.inBrowserImportPromoShownCount += 1
+        }
         importPasswordsPixelSender.onImportPasswordsDialogDisplayed(importSource)
-        _viewState.value = viewState.value.copy(viewMode = PreImport)
+        _viewState.value = viewState.value.copy(viewMode = viewMode)
+    }
+
+    fun onInBrowserPromoDismissed() {
+        viewModelScope.launch(dispatchers.io()) {
+            autofillStore.hasDeclinedInBrowserPasswordImportPromo = true
+            importPasswordsPixelSender.onUserCancelledImportPasswordsDialog(InBrowserPromo)
+        }
+        _viewState.value = viewState.value.copy(viewMode = ViewMode.FlowTerminated)
     }
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -103,6 +126,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     sealed interface ViewMode {
         data object DeterminingFirstView : ViewMode
         data object PreImport : ViewMode
+        data object BrowserPromoPreImport : ViewMode
         data object Importing : ViewMode
         data class ImportSuccess(val importResult: ImportResult.Finished) : ViewMode
         data object ImportError : ViewMode

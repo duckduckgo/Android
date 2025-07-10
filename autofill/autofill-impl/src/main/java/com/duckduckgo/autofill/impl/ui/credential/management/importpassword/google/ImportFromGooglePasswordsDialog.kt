@@ -28,6 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -35,17 +36,21 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ContentImportFromGooglePasswordDialogBinding
 import com.duckduckgo.autofill.impl.deviceauth.AutofillAuthorizationGracePeriod
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.PasswordManagementPromo
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordsPixelSender
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_IMPORT_SUCCESS
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_TAB_ID
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog.ImportPasswordsDialog.Companion.KEY_URL
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.BrowserPromoPreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.DeterminingFirstView
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.FlowTerminated
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.ImportError
@@ -54,6 +59,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goog
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewMode.PreImport
 import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialogViewModel.ViewState
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
@@ -102,6 +108,10 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
     private val viewModel by bindViewModel<ImportFromGooglePasswordsDialogViewModel>()
 
+    private var successImport = false
+
+    private fun getTabId(): String? = arguments?.getString(KEY_TAB_ID)
+
     private val importGooglePasswordsFlowLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
         if (activityResult.resultCode == Activity.RESULT_OK) {
             lifecycleScope.launch {
@@ -144,11 +154,33 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun switchDialogShowPreImportView() {
+        with(binding.preflow) {
+            dialogTitle.text = getString(R.string.importPasswordsChooseMethodDialogTitle)
+            onboardingSubtitle.text = getString(R.string.importPasswordsChooseMethodDialogSubtitle)
+            declineButton.gone()
+            topIllustrationAnimated.gone()
+            appIcon.show()
+        }
+        showDialogContent()
+        binding.prePostViewSwitcher.displayedChild = 0
+    }
+
+    private fun switchDialogShowInBrowserPromoPreImportView() {
+        with(binding.preflow) {
+            dialogTitle.text = getString(R.string.passwords_import_promo_in_browser_title)
+            onboardingSubtitle.text = binding.root.context.prependIconToText(R.string.passwords_import_promo_subtitle, R.drawable.ic_lock_solid_12)
+            declineButton.show()
+            topIllustrationAnimated.setAnimation(R.raw.anim_password_keys)
+            topIllustrationAnimated.show()
+            topIllustrationAnimated.playAnimation()
+            appIcon.gone()
+        }
         showDialogContent()
         binding.prePostViewSwitcher.displayedChild = 0
     }
 
     private fun processSuccessResult(result: CredentialImporter.ImportResult.Finished) {
+        successImport = true
         showDialogContent()
 
         binding.postflow.importFinished.errorNotImported.visibility = View.GONE
@@ -214,7 +246,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
             return
         }
 
-        // check if we should show the initial instructional prompt
+        // check if we should show the initial instructional prompt, and if so, which variant of it. if not, start the import flow directly
         val launchSource = getLaunchSource()
         if (canShowPreImportDialog(launchSource)) {
             viewModel.shouldShowInitialInstructionalPrompt(launchSource)
@@ -238,6 +270,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         _binding = ContentImportFromGooglePasswordDialogBinding.inflate(inflater, container, false)
         configureViews(binding)
         observeViewModel()
+        logcat { "Creating ImportFromGooglePasswordsDialog with launch source: ${getLaunchSource()}" }
         return binding.root
     }
 
@@ -250,11 +283,30 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     private fun renderViewState(viewState: ViewState) {
         when (viewState.viewMode) {
             is PreImport -> switchDialogShowPreImportView()
+            is BrowserPromoPreImport -> switchDialogShowInBrowserPromoPreImportView()
             is ImportError -> processErrorResult()
             is ImportSuccess -> processSuccessResult(viewState.viewMode.importResult)
             is Importing -> switchDialogShowImportInProgressView()
             is DeterminingFirstView -> hideDialogContent()
             is FlowTerminated -> dismiss()
+        }
+    }
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        logcat { "Dismissing ImportFromGooglePasswordsDialog, successful import? $successImport" }
+        setResult(successImport)
+    }
+
+    private fun setResult(successImport: Boolean) {
+        logcat { "Setting result for ImportFromGooglePasswordsDialog, successful import? $successImport" }
+
+        getTabId()?.let { tabId ->
+            val result = Bundle().also {
+                it.putBoolean(KEY_IMPORT_SUCCESS, successImport)
+                it.putString(KEY_URL, getOriginalUrl())
+            }
+            parentFragment?.setFragmentResult(ImportPasswordsDialog.resultKey(tabId), result)
         }
     }
 
@@ -277,6 +329,10 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
                 dismiss()
             }
         }
+
+        binding.preflow.declineButton.setOnClickListener {
+            viewModel.onInBrowserPromoDismissed()
+        }
     }
 
     private fun onImportGcmButtonClicked() {
@@ -298,19 +354,25 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     override fun onCancel(dialog: DialogInterface) {
+        logcat {
+            "Cancelling ImportFromGooglePasswordsDialog, " +
+                "successful import? $successImport. " +
+                "ignore cancellation events: $ignoreCancellationEvents"
+        }
+
         if (ignoreCancellationEvents) {
             logcat(VERBOSE) { "onCancel: Ignoring cancellation event" }
             return
         }
 
         importPasswordsPixelSender.onUserCancelledImportPasswordsDialog(getLaunchSource())
-
-        dismiss()
     }
 
     private fun configureCloseButton(binding: ContentImportFromGooglePasswordDialogBinding) {
         binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
     }
+
+    private fun getOriginalUrl() = arguments?.getString(KEY_URL)!!
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory)[V::class.java] }
 
@@ -318,12 +380,31 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
 
         private const val KEY_LAUNCH_SOURCE = "launchSource"
 
-        fun instance(importSource: AutofillImportLaunchSource): ImportFromGooglePasswordsDialog {
+        fun instance(importSource: AutofillImportLaunchSource, tabId: String? = null, originalUrl: String? = null): ImportFromGooglePasswordsDialog {
             val fragment = ImportFromGooglePasswordsDialog()
             fragment.arguments = Bundle().apply {
                 putParcelable(KEY_LAUNCH_SOURCE, importSource)
+                putString(KEY_TAB_ID, tabId)
+                putString(KEY_URL, originalUrl)
             }
             return fragment
+        }
+    }
+
+    interface ImportPasswordsDialog {
+
+        companion object {
+
+            fun resultKey(tabId: String) = "${prefix(tabId, TAG)}/Result"
+
+            const val TAG = "ImportPasswordsDialog"
+            const val KEY_URL = "url"
+            const val KEY_IMPORT_SUCCESS = "importSuccess"
+            const val KEY_TAB_ID = "tabId"
+
+            private fun prefix(tabId: String, tag: String): String {
+                return "$tabId/$tag"
+            }
         }
     }
 }
