@@ -35,9 +35,13 @@ class InputModeTabLayout @JvmOverloads constructor(
 ) : TabLayout(context, attrs, defStyleAttr) {
 
     init {
-        val indicatorHeightPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorHeight)
         setSelectedTabIndicator(
-            buildShadowedTabIndicator(context, indicatorHeightPx, resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorHorizontalPadding)),
+            buildShadowedTabIndicator(
+                context = context,
+                heightPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorHeight),
+                horizontalInsetPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorHorizontalInset),
+                elevationPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorElevation),
+            ),
         )
         outlineProvider = ViewOutlineProvider.BACKGROUND
         clipToOutline = true
@@ -46,7 +50,8 @@ class InputModeTabLayout @JvmOverloads constructor(
     private fun buildShadowedTabIndicator(
         context: Context,
         heightPx: Int,
-        horizontalPaddingPx: Int,
+        horizontalInsetPx: Int,
+        elevationPx: Int,
     ): InsetDrawable {
         val cornerRadius = heightPx / 2f
         val pill = ShapeAppearanceModel.builder()
@@ -64,11 +69,9 @@ class InputModeTabLayout @JvmOverloads constructor(
                 Color.BLACK,
             )
             setShadowColor(shadowColor)
-            elevation = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorElevation).toFloat()
+            elevation = elevationPx.toFloat()
         }
 
-        return object : InsetDrawable(shadowedPill, horizontalPaddingPx, 0, horizontalPaddingPx, 0) {
-            override fun getIntrinsicHeight(): Int = heightPx
-        }
+        return InsetDrawable(shadowedPill, horizontalInsetPx, 0, horizontalInsetPx, 0)
     }
 }

@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:text="@string/duck_chat_ai_tab"
         android:layout_marginStart="@dimen/keyline_1"
+        app:typography="h4"
         app:layout_constraintStart_toEndOf="@id/tab_icon"
         app:layout_constraintBaseline_toBaselineOf="@id/tab_icon"/>
 
