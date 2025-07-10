@@ -45,6 +45,7 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
     private val vpnDetector: ExternalVpnDetector,
     private val browserNav: BrowserNav,
     private val deviceShieldPixels: DeviceShieldPixels,
+    private val appTPStateMessageToggle: AppTPStateMessageToggle,
 ) : AppTPStateMessagePlugin {
     override fun getView(
         context: Context,
@@ -53,10 +54,17 @@ class PproUpsellDisabledMessagePlugin @Inject constructor(
     ): View? {
         val isEligible = runBlocking { vpnDetector.isExternalVpnDetected() && subscriptions.isUpsellEligible() }
         return if (vpnState.state == DISABLED && vpnState.stopReason is SELF_STOP && isEligible) {
+            val messageRes = runBlocking {
+                if (subscriptions.isFreeTrialEligible() && appTPStateMessageToggle.freeTrialCopy().isEnabled()) {
+                    R.string.apptp_PproUpsellInfoDisabled_freeTrial
+                } else {
+                    R.string.apptp_PproUpsellInfoDisabled
+                }
+            }
             AppTpDisabledInfoPanel(context).apply {
                 setClickableLink(
                     PPRO_UPSELL_ANNOTATION,
-                    context.getText(R.string.apptp_PproUpsellInfoDisabled),
+                    context.getText(messageRes),
                 ) { context.launchPPro() }
                 doOnAttach {
                     deviceShieldPixels.reportPproUpsellDisabledInfoShown()
