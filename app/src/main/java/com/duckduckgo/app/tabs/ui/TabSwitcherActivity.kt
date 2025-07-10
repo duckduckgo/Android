@@ -239,7 +239,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureViewReferences()
         setupToolbar(toolbar)
         configureRecycler()
-        configureFabs()
+
+        if (!viewModel.isNewDesignEnabled) {
+            configureFabs()
+        }
+
         configureObservers()
         configureOnBackPressedListener()
 
@@ -306,7 +310,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.setHasFixedSize(true)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            handleFabStateUpdates()
+            if (viewModel.isNewDesignEnabled) {
+                handleFabStateUpdates()
+            }
+
             handleSelectionModeCancellation()
         }
 
