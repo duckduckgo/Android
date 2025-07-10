@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.cta.ui
 
+import android.app.ProgressDialog.show
 import android.content.Context
 import android.net.Uri
 import android.view.Gravity
@@ -27,6 +28,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.core.content.ContextCompat
+import androidx.core.os.HandlerCompat.postDelayed
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -279,6 +281,7 @@ sealed class OnboardingDaxDialogCta(
 
     internal fun setBBOnboardingDialogView(
         title: String? = null,
+        @DrawableRes leadingDescriptionIconRes: Int? = null,
         description: String,
         primaryCtaText: String?,
         binding: FragmentBrowserTabBinding,
@@ -308,6 +311,13 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDialogTitle.gone()
                 dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorPrimaryText))
             }
+
+            leadingDescriptionIconRes?.let { leadingDescriptionIconRes ->
+                with(leadingDescriptionIcon) {
+                    setImageResource(leadingDescriptionIconRes)
+                    show()
+                }
+            } ?: leadingDescriptionIcon.gone()
 
             primaryCtaText?.let {
                 with(primaryCta) {
@@ -682,6 +692,7 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
                         title = context.getString(R.string.bbOnboardingFireButtonDaxDialogTitle),
+                        leadingDescriptionIconRes = CommonR.drawable.ic_fire_24,
                         description = context.getString(R.string.bbOnboardingFireButtonDaxDialogDescription),
                         primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
                         binding = binding,

@@ -99,33 +99,48 @@
                         android:textColor="@color/bbColorPrimaryText"
                         tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
-                    <FrameLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
                         android:layout_marginTop="@dimen/keyline_2">
 
-                        <TextView
-                            android:id="@+id/hiddenTextCta"
-                            style="@style/Typography.BB.Body1"
+                        <ImageView
+                            android:id="@+id/leadingDescriptionIcon"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="@dimen/keyline_2"
+                            tools:srcCompat="@drawable/ic_fire_24"
+                            android:visibility="gone"
+                            tools:visibility="visible" />
+
+                        <FrameLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:includeFontPadding="false"
-                            android:visibility="invisible"
-                            tools:ignore="DeprecatedWidgetInXml" />
+                            android:layout_gravity="center_vertical">
 
-                        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-                            android:id="@+id/dialogTextCta"
-                            style="@style/Typography.BB.Body1"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:includeFontPadding="false"
-                            android:textColor="@color/bbColorSecondaryText"
-                            tools:ignore="InvalidColorAttribute"
-                            tools:text="That’s private search. Fast, clean results. No trackers. Fewer ads.
-                                    👆 Next, try visiting a site! I’ll block trackers so they can’t spy on you." />
-                    </FrameLayout>
+                            <TextView
+                                android:id="@+id/hiddenTextCta"
+                                style="@style/Typography.BB.Body1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:includeFontPadding="false"
+                                android:visibility="invisible"
+                                tools:ignore="DeprecatedWidgetInXml" />
+
+                            <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                                android:id="@+id/dialogTextCta"
+                                style="@style/Typography.BB.Body1"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:includeFontPadding="false"
+                                android:textColor="@color/bbColorSecondaryText"
+                                tools:ignore="InvalidColorAttribute"
+                                tools:text="Give it a try!" />
+                        </FrameLayout>
+                    </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/primaryCta"
