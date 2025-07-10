@@ -1,8 +1,13 @@
 package com.duckduckgo.subscriptions.impl.auth2
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDateTime
@@ -12,6 +17,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.times
@@ -27,12 +33,23 @@ import retrofit2.Response
 @RunWith(AndroidJUnit4::class)
 class AuthClientImplTest {
 
+    @get:Rule
+    var coroutinesTestRule = CoroutineTestRule()
+
     private val authService: AuthService = mock()
     private val appBuildConfig: AppBuildConfig = mock { config ->
         whenever(config.applicationId).thenReturn("com.duckduckgo.android")
     }
     private val timeProvider = FakeTimeProvider()
-    private val authClient = AuthClientImpl(authService, appBuildConfig, timeProvider)
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
+
+    private val authClient = AuthClientImpl(
+        authService = authService,
+        appBuildConfig = appBuildConfig,
+        timeProvider = timeProvider,
+        privacyProFeature = { privacyProFeature },
+        dispatchers = coroutinesTestRule.testDispatcherProvider,
+    )
 
     @Test
     fun `when authorize success then returns sessionId parsed from Set-Cookie header`() = runTest {
@@ -324,6 +341,27 @@ class AuthClientImplTest {
         // Call again → should return new JWKS
         val second = authClient.getJwks()
         assertEquals(newJwks, second)
+
+        verify(authService, times(2)).jwks()
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when JWKS cache is disabled then always fetches from network`() = runTest {
+        privacyProFeature.authApiV2JwksCache().setRawStoredState(State(false))
+
+        val jwks1 = """{"keys": [{"kty": "RSA", "kid": "key1"}]}"""
+        val jwks2 = """{"keys": [{"kty": "RSA", "kid": "key2"}]}"""
+
+        whenever(authService.jwks())
+            .thenReturn(jwks1.toResponseBody("application/json".toMediaTypeOrNull()))
+            .thenReturn(jwks2.toResponseBody("application/json".toMediaTypeOrNull()))
+
+        val first = authClient.getJwks()
+        val second = authClient.getJwks()
+
+        assertEquals(jwks1, first)
+        assertEquals(jwks2, second)
 
         verify(authService, times(2)).jwks()
     }

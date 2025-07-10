@@ -184,6 +184,12 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun enableSubscriptionFlowsV2(): Toggle
+
+    /**
+     * Kill-switch for in-memory caching of auth v2 JWKs.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun authApiV2JwksCache(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

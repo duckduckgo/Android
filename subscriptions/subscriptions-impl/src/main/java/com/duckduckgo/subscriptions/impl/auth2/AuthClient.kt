@@ -19,12 +19,16 @@ package com.duckduckgo.subscriptions.impl.auth2
 import android.net.Uri
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException
 import retrofit2.Response
@@ -121,6 +125,8 @@ class AuthClientImpl @Inject constructor(
     private val authService: AuthService,
     private val appBuildConfig: AppBuildConfig,
     private val timeProvider: CurrentTimeProvider,
+    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val dispatchers: DispatcherProvider,
 ) : AuthClient {
 
     private var cachedJwks: CachedJwks? = null
@@ -192,10 +198,18 @@ class AuthClientImpl @Inject constructor(
     }
 
     override suspend fun getJwks(): String {
-        val cachedResult = cachedJwks?.takeIf { it.timestamp + JWKS_CACHE_DURATION > getCurrentTime() }?.jwks
+        val useCache = withContext(dispatchers.io()) {
+            privacyProFeature.get().authApiV2JwksCache().isEnabled()
+        }
 
-        return cachedResult ?: authService.jwks().string()
-            .also { cachedJwks = CachedJwks(jwks = it, timestamp = getCurrentTime()) }
+        return if (useCache) {
+            val cachedResult = cachedJwks?.takeIf { it.timestamp + JWKS_CACHE_DURATION > getCurrentTime() }?.jwks
+
+            cachedResult ?: authService.jwks().string()
+                .also { cachedJwks = CachedJwks(jwks = it, timestamp = getCurrentTime()) }
+        } else {
+            authService.jwks().string()
+        }
     }
 
     override suspend fun storeLogin(
