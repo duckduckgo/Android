@@ -39,5 +39,5 @@ interface ExtendedOnboardingFeatureToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     @Experiment
-    fun highlights(): Toggle
+    fun freeTrialCopy(): Toggle
 }
