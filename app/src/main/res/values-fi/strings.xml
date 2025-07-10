@@ -798,6 +798,7 @@
     <string name="onboardingEndDaxDialogButton">Valmista!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ai niin...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös sisäänrakennettu <b>VPN</b>!<br/><br/>Aktivoi se <b>maksullisella Privacy Pro -tilauksella.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGolla on myös tilaus, joka sisältää turvallisen <b>VPN:n</b> + 2 muuta premium-suojausta.<b>Kokeile ilmaiseksi!</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
 

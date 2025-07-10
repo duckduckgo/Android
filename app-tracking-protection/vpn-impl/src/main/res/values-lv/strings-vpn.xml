@@ -433,9 +433,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Nevari izmantot App Tracking Protection sava VPN dēļ? Pārslēdzies uz DuckDuckGo VPN — vienīgo saderīgo VPN. <annotation type="ppro_upsell_link">Uzzini vairāk</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Nevari izmantot App Tracking Protection sava VPN dēļ? Pārslēdzies uz DuckDuckGo VPN — vienīgo saderīgo VPN. <annotation type="ppro_upsell_link">Izmēģini bez maksas!</annotation>.</string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection ir atspējota</b>\nVai jūsu VPN atspējoja App Tracking Protection? Izmanto augstāk redzamo slēdzi, lai to no jauna iespējotu.\n\nIegūsti DuckDuckGo VPN — vienīgais VPN, kas darbojas ar App Tracking Protection. <annotation type="ppro_upsell_link">Uzzini vairāk</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>App Tracking Protection ir atspējota</b>\nVai tavs VPN atspējoja App Tracking Protection? Izmanto augstāk redzamo slēdzi, lai to no jauna iespējotu.\n\nPārslēdzies uz DuckDuckGo VPN — vienīgo VPN, kas darbojas ar App Tracking Protection. <annotation type="ppro_upsell_link">Izmēģini bez maksas!</annotation>.</string>
     <string name="apptp_PproUpsellBannerTitle">Pacel savu privātumu nākamajā līmenī</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo ir vienīgais VPN, kas ir saderīgs ar App Tracking Protection. Aktivizē ar apmaksātu Privacy Pro abonementu.</string>
     <string name="apptp_PproUpsellBannerAction">Uzzināt vairāk</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Abonē DuckDuckGo un iegūsti vienīgo VPN, kas ir saderīgs ar App Tracking Protection.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Izmēģini bez maksas!</string>
 
 </resources>

@@ -830,6 +830,7 @@
     <string name="onboardingEndDaxDialogButton">Viskas!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi integruotą <b>VPN</b>!<br/><br/>Aktyvuokite jį su <b>mokama „Privacy Pro“ prenumerata.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[„DuckDuckGo“ taip pat turi prenumeratą su saugiu <b>VPN</b> ir dar 2 aukščiausios kokybės apsaugomis.<b>Išbandyk nemokamai!</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
 
