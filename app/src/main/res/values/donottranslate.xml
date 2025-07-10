@@ -90,6 +90,6 @@
         <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
     </plurals>
 
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Tap the shield for more info.️</string>
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tap the shield for more info.️</string>
 
 </resources>
