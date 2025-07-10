@@ -3116,14 +3116,14 @@ class BrowserTabFragment :
 
     private fun hideDaxBubbleCta() {
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            buckDialogIntroBubble.root.gone()
             newBrowserTab.newTabLayout.setBackgroundColor(
                 requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
         } else {
             newBrowserTab.browserBackground.setImageResource(0)
-            daxDialogIntroBubble.root.gone()
         }
+        buckDialogIntroBubble.root.gone()
+        daxDialogIntroBubble.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
