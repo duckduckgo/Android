@@ -247,6 +247,9 @@
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorDark</item>
 
+        <!-- Input Screen -->
+        <item name="daxColorBackdrop">@color/daxColorBackdropDark</item>
+        <item name="daxColorInputModeIndicatorShadow">@color/black</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -351,6 +354,9 @@
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
+        <!-- Input Screen -->
+        <item name="daxColorBackdrop">@color/daxColorBackdropLight</item>
+        <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">

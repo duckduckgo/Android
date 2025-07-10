@@ -102,7 +102,7 @@ class InputModeWidget @JvmOverloads constructor(
     private var hasTextChangedFromOriginal = false
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_layout, this, true)
+        LayoutInflater.from(context).inflate(R.layout.view_input_mode_switch_widget, this, true)
 
         inputField = findViewById(R.id.inputField)
         inputFieldClearText = findViewById(R.id.inputFieldClearText)

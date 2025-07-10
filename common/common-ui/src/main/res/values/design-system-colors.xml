@@ -122,6 +122,9 @@
 
     <attr name="daxColorWebViewScrollbarTrack" format="color"/>
 
+    <attr name="daxColorInputModeIndicatorShadow" format="color"/>
+    <attr name="daxColorBackdrop" format="color"/>
+
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
     <color name="alertGreen">#21C000</color>

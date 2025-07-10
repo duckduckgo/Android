@@ -14,7 +14,9 @@
   ~ limitations under the License.
   -->
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <corners android:radius="20dp" />
-</shape>
+<resources>
+    <dimen name="inputModeSwitchHeight">38dp</dimen>
+    <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
+    <dimen name="inputModeTabIndicatorHorizontalInset">2dp</dimen>
+    <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
+</resources>

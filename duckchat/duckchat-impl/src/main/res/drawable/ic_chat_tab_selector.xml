@@ -16,8 +16,8 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:color="?attr/daxColorPrimaryText"
-        android:state_selected="true" />
+        android:state_selected="true"
+        android:drawable="@drawable/ic_ai_chat_gradient_color_16" />
     <item
-        android:color="?attr/daxColorSecondaryText" />
+        android:drawable="@drawable/ic_ai_chat_16" />
 </selector>
