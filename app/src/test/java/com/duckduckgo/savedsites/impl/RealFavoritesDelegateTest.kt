@@ -393,19 +393,20 @@ class RealFavoritesDelegateTest {
     }
 
     @Test
-    fun whenDataSourceChangesThenNewListReceived() {
+    fun whenDataSourceChangesThenNewListReceived() = runTest {
         givenFavoriteDelegate(syncDisabledFavoritesSettings)
         givenNoFavoritesStored()
 
         testee.insertFavorite(id = "Favorite1", title = "Favorite", url = "http://favexample.com", lastModified = "timestamp")
 
-        val testObserver = testee.getFavoritesObservable().test()
-        val lastState = testObserver.assertNoErrors().values().last()
-
-        Assert.assertEquals(1, lastState.size)
-        Assert.assertEquals("Favorite", lastState.first().title)
-        Assert.assertEquals("http://favexample.com", lastState.first().url)
-        Assert.assertEquals(0, lastState.first().position)
+        testee.getFavorites().test {
+            val lastState = awaitItem()
+            assertEquals(1, lastState.size)
+            assertEquals("Favorite", lastState.first().title)
+            assertEquals("http://favexample.com", lastState.first().url)
+            assertEquals(0, lastState.first().position)
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     private fun givenFavoriteDelegate(displayModeSettingsRepository: FavoritesDisplayModeSettingsRepository) {
