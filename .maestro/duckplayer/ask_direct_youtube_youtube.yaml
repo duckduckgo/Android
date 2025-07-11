@@ -1,0 +1,31 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Ask > Direct YouTube > YouTube"
+tags:
+  - duckplayerlocal
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: common/load_youtube_video.yaml
+      
+      # Close the DuckPlayer prompt using "No Thanks" button
+      - tapOn:
+          text: "No Thanks"
+      
+      # Wait for prompt to disappear
+      - extendedWaitUntil:
+          notVisible:
+              text: "Turn on Duck Player to watch without targeted ads"
+          timeout: 5000
+      
+      # Core assertion: Verify we're still on regular YouTube (not Duck Player)
+      - assertNotVisible:
+          text: "duck://player/.*"
+      
+      # Verify we're still on YouTube mobile URL
+      - assertVisible:
+          text: ".*youtube.*" 

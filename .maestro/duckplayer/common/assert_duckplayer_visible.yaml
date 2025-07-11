@@ -1,0 +1,10 @@
+appId: com.duckduckgo.mobile.android
+---
+- extendedWaitUntil:
+    visible:
+      text: "duck://player/3ml7yeKBUhc"
+    timeout: 5000
+    optional: true
+
+- assertNotVisible:
+    text: ".*youtube.com/watch.*"
