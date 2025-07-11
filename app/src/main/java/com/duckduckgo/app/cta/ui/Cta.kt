@@ -16,23 +16,26 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.app.ProgressDialog.show
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.net.Uri
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
+import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
-import androidx.core.os.HandlerCompat.postDelayed
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
 import com.duckduckgo.app.browser.R
@@ -57,6 +60,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
+import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -1038,7 +1042,7 @@ sealed class DaxBubbleCta(
     override val appInstallStore: AppInstallStore,
 ) : Cta, ViewCta, DaxCta {
 
-    private var ctaView: View? = null
+    protected var ctaView: View? = null
 
     override fun showCta(
         view: View,
@@ -1462,7 +1466,20 @@ sealed class DaxBubbleCta(
         ctaPixelParam = Pixel.PixelValues.DAX_END_CTA,
         onboardingStore = onboardingStore,
         appInstallStore = appInstallStore,
-    )
+    ) {
+
+        // Only used by BB onboarding experiment
+        fun hideBBEndCta(onAnimationEnd: () -> Unit) {
+            val binding = IncludeOnboardingBubbleBbDialogBinding.bind(ctaView!!)
+
+            binding.root.animate()
+                .alpha(0f)
+                .setInterpolator(FastOutSlowInInterpolator())
+                .withEndAction {
+                    onAnimationEnd()
+                }
+        }
+    }
 
     data class DaxPrivacyProCta(
         override val onboardingStore: OnboardingStore,
