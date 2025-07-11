@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.vpn.network.ExternalVpnDetector
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.DISABLED
@@ -18,6 +19,7 @@ import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -28,11 +30,16 @@ class PproUpsellDisabledMessagePluginTest {
     private val subscriptions: Subscriptions = mock()
     private val deviceShieldPixels: DeviceShieldPixels = mock()
     private val vpnDetector: ExternalVpnDetector = mock()
+    private val appTPStateMessageToggle: AppTPStateMessageToggle = mock()
     private lateinit var plugin: PproUpsellDisabledMessagePlugin
 
+    private val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+
     @Before
-    fun setUp() {
-        plugin = PproUpsellDisabledMessagePlugin(subscriptions, vpnDetector, browserNav, deviceShieldPixels)
+    fun setUp() = runTest {
+        whenever(subscriptions.isFreeTrialEligible()).thenReturn(false)
+        whenever(appTPStateMessageToggle.freeTrialCopy()).thenReturn(mockDisabledToggle)
+        plugin = PproUpsellDisabledMessagePlugin(subscriptions, vpnDetector, browserNav, deviceShieldPixels, appTPStateMessageToggle)
     }
 
     @Test
