@@ -552,6 +552,7 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
+    private val mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
@@ -673,6 +674,7 @@ class BrowserTabViewModelTest {
             userBrowserProperties = mockUserBrowserProperties,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -2751,7 +2753,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxMainNetworkCtaOKButtonAndMaliciousSiteBlockedThenCtaIsNull() {
-        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "")
+        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "", mockOnboardingDesignExperimentToggles)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -5495,7 +5497,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackersBlockedCtaShownWithBrowserShowingThenPrivacyShieldIsHighlighted() = runTest {
-        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+        )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
 
@@ -5506,7 +5514,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackersBlockedCtaShownWithMaliciousSiteBlockedThenPrivacyShieldIsNotHighlighted() = runTest {
-        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+        )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
         testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
 
@@ -5517,7 +5531,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenTrackersBlockedCtaShownWhenLaunchingTabSwitcherThenCtaIsDismissed() = runTest {
-        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+        )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.userLaunchingTabSwitcher()
@@ -5527,7 +5547,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenTrackersBlockedCtaShownWhenUserRequestOpeningNewTabThenCtaIsDismissed() = runTest {
-        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+        )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onNewTabMenuItemClicked()
@@ -5537,7 +5563,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
-        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+        )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
         testee.onPrivacyShieldSelected()
@@ -5556,7 +5588,13 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
-        val cta = DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, emptyList(), mockSettingsDataStore)
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+        )
         setCta(cta)
 
         testee.onUserDismissedCta(cta)
@@ -5566,7 +5604,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -6364,7 +6402,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClicksDaxSerpCtaDismissButtonThenHideOnboardingDaxDialogCommandIssuedAndPixelFired() = runTest {
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
 
         testee.onUserClickCtaDismissButton(cta)
 
