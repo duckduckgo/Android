@@ -206,6 +206,9 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun duckAISubscriptionMessaging(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionRebranding(): Toggle
 }
 
 @ContributesBinding(AppScope::class)
