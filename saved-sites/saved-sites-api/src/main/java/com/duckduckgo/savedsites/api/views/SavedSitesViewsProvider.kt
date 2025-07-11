@@ -35,14 +35,12 @@ interface SavedSitesViewsProvider {
  *
  * @property isExpandable If true and there are two or more rows, the favorites are collapsed and can be expanded.
  * If false, the favorites are always expanded.
- * @property showPlaceholders Whether to show placeholder with onboarding if favorites list is empty. Takes precedent over [showDaxWhenEmpty].
- * @property showDaxWhenEmpty Whether to show Dax icon if favorites list is empty.
+ * @property showPlaceholders Whether to show placeholder with onboarding if favorites list is empty.
  * @property placement The screen on which favorites are displayed.
  */
 data class FavoritesGridConfig(
     val isExpandable: Boolean,
     val showPlaceholders: Boolean,
-    val showDaxWhenEmpty: Boolean,
     val placement: FavoritesPlacement,
 )
 

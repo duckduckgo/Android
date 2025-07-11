@@ -28,7 +28,6 @@ import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
 import androidx.core.text.toSpannable
-import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
@@ -113,7 +112,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
 
     private var isExpandable = true
     private var showPlaceholders = false
-    private var showDaxWhenEmpty = false
     private var placement: FavoritesPlacement = FavoritesPlacement.NEW_TAB_PAGE
 
     private val binding: ViewNewTabFavouritesSectionBinding by viewBinding()
@@ -154,7 +152,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
         config?.let {
             isExpandable = it.isExpandable
             showPlaceholders = it.showPlaceholders
-            showDaxWhenEmpty = it.showDaxWhenEmpty
             placement = it.placement
         }
     }
@@ -357,7 +354,6 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
             }
             viewModel.onNewTabFavouritesShown()
         }
-        binding.ddgLogo.isVisible = showDaxWhenEmpty && viewState.favourites.isEmpty()
     }
 
     private fun processCommands(command: Command) {
