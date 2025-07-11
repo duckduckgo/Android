@@ -1,3 +1,19 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:aapt="http://schemas.android.com/aapt"
     android:width="128dp"
@@ -67,7 +83,7 @@
   <path
       android:pathData="M87,51C75.95,51 67,59.95 67,71V71.82C67,72.7 66.41,73.49 65.56,73.73C58.15,75.84 49.75,77.81 43.63,79.16C43.31,79.24 43,79.25 42.7,79.23H38V75H40.38C40.49,74.78 40.64,74.56 40.82,74.35L48.1,66.03C41.34,60.9 37,52.94 37,44C37,30.52 46.86,19.27 60,16.6V16H67V16.02C82.55,16.53 95,28.86 95,44C95,44.83 94.96,45.65 94.89,46.47C94.64,49.17 92.19,51 89.48,51H87Z">
     <aapt:attr name="android:fillColor">
-      <gradient 
+      <gradient
           android:startX="66"
           android:startY="16"
           android:endX="66"
@@ -81,7 +97,7 @@
   <path
       android:pathData="M87,51C75.95,51 67,59.95 67,71V71.76C58.5,74.58 46.62,77.4 38.63,79.16C35.84,79.78 33.93,76.51 35.82,74.35L40.98,68.45C42.13,67.14 41.91,65.15 40.65,63.95C35.31,58.87 32,51.81 32,44C32,28.54 44.98,16 61,16C77.02,16 90,28.54 90,44C90,46.42 89.68,48.76 89.09,51H87Z">
     <aapt:attr name="android:fillColor">
-      <gradient 
+      <gradient
           android:startX="61"
           android:startY="16"
           android:endX="61"
