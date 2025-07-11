@@ -12,10 +12,10 @@ appId: com.duckduckgo.mobile.android
     commands:
       - scrollUntilVisible:
           element:
-            text: "Reject the use of cookies and other data for the purposes described"
+            text: "More options"
             optional: true
           direction: DOWN
 
       - tapOn:
-          text: "Reject the use of cookies and other data for the purposes described"
+          text: "Reject.*"
           optional: true
