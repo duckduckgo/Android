@@ -22,7 +22,6 @@ import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.StatusIndicatorView.Status
 import com.duckduckgo.common.ui.view.defaultSelectableItemBackground
@@ -68,12 +67,30 @@ class SettingsListItem @JvmOverloads constructor(
                 leadingIcon.gone()
             }
 
-            betaPill.isVisible = getBoolean(R.styleable.SettingsListItem_showBetaPill, false)
+            val pillIcon = getInt(R.styleable.SettingsListItem_pillIcon, 0)
+            if (pillIcon != 0) {
+                getPillResource(pillIcon)?.let { resId ->
+                    betaPill.setImageResource(resId)
+                    betaPill.show()
+                } ?: run {
+                    betaPill.gone()
+                }
+            } else {
+                betaPill.gone()
+            }
 
             val indicatorStatus = Status.from(getInt(R.styleable.SettingsListItem_indicatorStatus, 2))
             statusIndicator.setStatus(indicatorStatus)
 
             recycle()
+        }
+    }
+
+    private fun getPillResource(enumValue: Int): Int? {
+        return when (enumValue) {
+            1 -> R.drawable.ic_beta_pill
+            2 -> R.drawable.ic_new_pill
+            else -> null
         }
     }
 
