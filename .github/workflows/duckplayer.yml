@@ -10,7 +10,7 @@ on:
       - 'node_modules/@duckduckgo/content-scope-scripts/**'
 
   schedule:
-    - cron: '0 3 * * *' # run at 3 AM UTC
+    - cron: '0 4 * * *' # run at 4 AM UTC
 
   workflow_dispatch:
 
@@ -71,7 +71,7 @@ jobs:
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: internalPrivacyTest_${{ github.sha }}
+          name: duckPlayerTest_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           app-file: apk/internal.apk
           android-api-level: 34

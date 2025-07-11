@@ -129,20 +129,6 @@ jobs:
           workspace: .maestro
           include-tags: securityTest
 
-      - name: Duck Player Tests
-        if: always()
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
-        timeout-minutes: 120
-        with:
-          api-key: ${{ secrets.ROBIN_API_KEY }}
-          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: duckPlayerTest_${{ github.sha }}
-          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
-          app-file: apk/internal.apk
-          android-api-level: 34
-          workspace: .maestro
-          include-tags: duckplayer
-
       - name: Release Tests
         if: always()
         uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
@@ -180,4 +166,4 @@ jobs:
           asana-project-id: ${{ secrets.GH_ASANA_AOR_PROJECT_ID }}
           asana-section-id: ${{ secrets.GH_ASANA_INCOMING_ID }}
           asana-task-name: GH Workflow Failure - End to end tests (Robin)
-          asana-task-description: The end to end workflow has failed. If Duck Player tests failed, add this task to https://app.asana.com/1/137249556945/project/10125252356626/task/1210626686444959?focus=true. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-description: The end to end workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
