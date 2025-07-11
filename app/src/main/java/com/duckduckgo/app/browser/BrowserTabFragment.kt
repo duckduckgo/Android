@@ -352,7 +352,6 @@ import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @InjectWith(FragmentScope::class)
@@ -2131,6 +2130,7 @@ class BrowserTabFragment :
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
+            is Command.SetBubbleDialogBackground -> setBubbleDialogBackground(it.backgroundRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2184,6 +2184,10 @@ class BrowserTabFragment :
 
     private fun setNewTabBackgroundColor(@ColorRes colorRes: Int) {
         newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
+    }
+
+    private fun setBubbleDialogBackground(backgroundRes: Int) {
+        newBrowserTab.includeOnboardingBBDialogBubble.root.setBackgroundResource(backgroundRes)
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
@@ -4401,7 +4405,15 @@ class BrowserTabFragment :
                 }
 
                 setOnPrimaryCtaClicked {
-                    viewModel.onUserClickCtaOkButton(configuration)
+                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                        configuration.hideBBEndCta(
+                            onAnimationEnd = {
+                                viewModel.onUserClickCtaOkButton(configuration)
+                            }
+                        )
+                    } else {
+                        viewModel.onUserClickCtaOkButton(configuration)
+                    }
                 }
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)
