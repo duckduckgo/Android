@@ -96,7 +96,6 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import java.util.ArrayList
 import javax.inject.Inject
@@ -156,9 +155,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var duckChat: DuckChat
-
-    @Inject
-    lateinit var duckAiFeatureState: DuckAiFeatureState
 
     @Inject
     lateinit var tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
@@ -658,7 +654,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             )
         } else {
             menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
-            layoutTypeMenuItem = menu.findItem(R.id.layoutTypeMenuItem)
+            layoutTypeMenuItem = menu.findItem(R.id.layoutTypeToolbarButton)
 
             when (viewModel.layoutType.value) {
                 LayoutType.GRID -> showListLayoutButton()
@@ -672,7 +668,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun initMenuClickListeners() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
-        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.duckChatMenuItem)) { viewModel.onDuckChatMenuClicked() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.duckAIMenuItem)) { viewModel.onDuckAIMenuClicked() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.deselectAllMenuItem)) { viewModel.onDeselectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
@@ -689,17 +685,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.layoutTypeMenuItem -> onLayoutTypeToggled()
-            R.id.fireMenuItem -> onFire()
-            R.id.popupMenuItem -> showPopupMenu(item.itemId)
-            R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
-            R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
-            R.id.duckChat -> {
-                viewModel.onDuckChatMenuClicked()
-            }
-            R.id.closeAllTabs -> closeAllTabs()
-            R.id.downloads -> showDownloads()
-            R.id.settings -> showSettings()
+            R.id.layoutTypeToolbarButton -> onLayoutTypeToggled()
+            R.id.fireToolbarButton -> onFireButtonClicked()
+            R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
+            R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
+            R.id.duckAIToolbarButton -> viewModel.onDuckAIMenuClicked()
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true
@@ -714,13 +704,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         viewModel.onMenuOpened()
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val duckChatMenuItem = menu?.findItem(R.id.duckChat)
-        duckChatMenuItem?.isVisible = duckAiFeatureState.showPopupMenuShortcut.value
-
-        return super.onPrepareOptionsMenu(menu)
-    }
-
     override fun onMenuOpened(featureId: Int, menu: Menu): Boolean {
         if (featureId == FEATURE_SUPPORT_ACTION_BAR) {
             viewModel.onMenuOpened()
@@ -728,7 +711,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         return super.onMenuOpened(featureId, menu)
     }
 
-    private fun onFire() {
+    private fun onFireButtonClicked() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_TABSWITCHING)
         val dialog = FireDialog(
             context = this,
