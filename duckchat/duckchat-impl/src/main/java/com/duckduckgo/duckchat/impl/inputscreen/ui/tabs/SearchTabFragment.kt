@@ -91,7 +91,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         val favoritesGridConfig = FavoritesGridConfig(
             isExpandable = false,
             showPlaceholders = false,
-            showDaxWhenEmpty = true,
             placement = FavoritesPlacement.FOCUSED_STATE,
         )
         favoritesView = savedSitesViewsProvider.getFavoritesGridView(requireContext(), config = favoritesGridConfig)
