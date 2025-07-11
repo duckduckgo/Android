@@ -141,6 +141,11 @@ enum class SubscriptionPixel(
         type = Unique(),
         includedParameters = setOf(ATB, APP_VERSION),
     ),
+    ONBOARDING_DUCK_AI_CLICK(
+        baseName = "m_privacy-pro_welcome_paid-ai-chat_click",
+        type = Unique(),
+        includedParameters = setOf(ATB, APP_VERSION),
+    ),
     SUBSCRIPTION_SETTINGS_SHOWN(
         baseName = "m_privacy-pro_settings_screen_impression",
         type = Count,

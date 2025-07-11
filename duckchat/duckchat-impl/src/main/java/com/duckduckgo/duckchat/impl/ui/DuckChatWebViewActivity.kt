@@ -72,6 +72,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -100,6 +101,9 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var subscriptionsHandler: SubscriptionsHandler
 
     @Inject
     @AppCoroutineScope
@@ -240,6 +244,19 @@ open class DuckChatWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                                     }
                                 }
                             }
+
+                            SUBSCRIPTIONS_FEATURE_NAME -> {
+                                subscriptionsHandler.handleSubscriptionsFeature(
+                                    featureName,
+                                    method,
+                                    id,
+                                    data,
+                                    this@DuckChatWebViewActivity,
+                                    appCoroutineScope,
+                                    contentScopeScripts,
+                                )
+                            }
+
                             else -> {}
                         }
                     }

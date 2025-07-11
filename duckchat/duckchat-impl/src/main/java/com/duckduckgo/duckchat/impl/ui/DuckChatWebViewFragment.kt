@@ -72,6 +72,7 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -95,6 +96,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var subscriptionsHandler: SubscriptionsHandler
 
     @Inject
     @AppCoroutineScope
@@ -234,6 +238,18 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                         }
                                     }
                                 }
+                            }
+
+                            SUBSCRIPTIONS_FEATURE_NAME -> {
+                                subscriptionsHandler.handleSubscriptionsFeature(
+                                    featureName,
+                                    method,
+                                    id,
+                                    data,
+                                    requireActivity(),
+                                    appCoroutineScope,
+                                    contentScopeScripts,
+                                )
                             }
 
                             else -> {}

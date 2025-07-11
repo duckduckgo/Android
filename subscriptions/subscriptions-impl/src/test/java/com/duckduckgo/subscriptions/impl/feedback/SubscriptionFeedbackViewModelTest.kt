@@ -7,6 +7,7 @@ import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeed
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_EXCLUDED_APPS
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.VPN_MANAGEMENT
 import com.duckduckgo.subscriptions.impl.R
+import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.DUCK_AI
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.ITR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
@@ -90,7 +91,29 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
-    fun whenFeedbackIsOpenedFromPproThenShowActionScreenAndEmitImpression() = runTest {
+    fun whenFeedbackIsOpenedFromSettingsThenShowActionScreenAndEmitImpression() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = DDG_SETTINGS)
+
+            expectMostRecentItem().assertViewStateMoveForward(
+                expectedPreviousFragmentState = null,
+                expectedCurrentFragmentState = FeedbackAction,
+                FeedbackMetadata(
+                    source = DDG_SETTINGS,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+            verify(pixelSender).reportPproFeedbackActionsScreenShown(
+                mapOf(
+                    "source" to "settings",
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenFeedbackIsOpenedFromSubscriptionsThenShowActionScreenAndEmitImpression() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS)
 
@@ -270,7 +293,7 @@ class SubscriptionFeedbackViewModelTest {
         }
 
     @Test
-    fun whenReportProblemIsSelectedViaPproThenShowSubsSubCategoryScreenAndEmitImpression() =
+    fun whenReportProblemIsSelectedViaSubscriptionsThenShowCategoryScreenAndEmitImpression() =
         runTest {
             viewModel.viewState().test {
                 viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS)
@@ -278,20 +301,19 @@ class SubscriptionFeedbackViewModelTest {
 
                 expectMostRecentItem().assertViewStateMoveForward(
                     expectedPreviousFragmentState = FeedbackAction,
-                    expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategorySubscription),
+                    expectedCurrentFragmentState = FeedbackCategory(R.string.feedbackActionReportIssue),
                     FeedbackMetadata(
                         source = SUBSCRIPTION_SETTINGS,
                         reportType = REPORT_PROBLEM,
-                        category = SUBS_AND_PAYMENTS, // Automatically set category
+                        category = null,
                     ),
                 )
 
                 cancelAndConsumeRemainingEvents()
-                verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+                verify(pixelSender).reportPproFeedbackCategoryScreenShown(
                     mapOf(
                         "source" to "ppro",
                         "reportType" to "reportIssue",
-                        "category" to "subscription",
                     ),
                 )
             }
@@ -358,6 +380,7 @@ class SubscriptionFeedbackViewModelTest {
         assertEquals("vpn", VPN.asParams())
         assertEquals("pir", PIR.asParams())
         assertEquals("itr", ITR.asParams())
+        assertEquals("duckAi", DUCK_AI.asParams())
     }
 
     @Test
@@ -400,6 +423,10 @@ class SubscriptionFeedbackViewModelTest {
         )
         assertEquals("advisorUnhelpful", SubscriptionFeedbackItrSubCategory.UNHELPFUL.asParams())
         assertEquals("somethingElse", SubscriptionFeedbackItrSubCategory.OTHER.asParams())
+
+        assertEquals("accessSubscriptionModels", SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS.asParams())
+        assertEquals("loginThirdPartyBrowser", SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER.asParams())
+        assertEquals("somethingElse", SubscriptionFeedbackDuckAiSubCategory.OTHER.asParams())
     }
 
     @Test
@@ -437,6 +464,7 @@ class SubscriptionFeedbackViewModelTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS)
             viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
+            viewModel.onCategorySelected(category = SUBS_AND_PAYMENTS)
             viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD)
 
             expectMostRecentItem().assertViewStateMoveForward(
@@ -479,6 +507,34 @@ class SubscriptionFeedbackViewModelTest {
             verify(pixelSender).reportPproFeedbackActionsScreenShown(
                 mapOf(
                     "source" to "settings",
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenCategorySelectedIsDuckAithenShowDuckAiSubcategoriesScreenAndImpression() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseReportType(source = DDG_SETTINGS)
+            viewModel.onReportTypeSelected(reportType = REPORT_PROBLEM)
+            viewModel.onCategorySelected(category = DUCK_AI)
+
+            expectMostRecentItem().assertViewStateMoveForward(
+                expectedPreviousFragmentState = FeedbackCategory(R.string.feedbackActionReportIssue),
+                expectedCurrentFragmentState = FeedbackSubCategory(R.string.feedbackCategoryDuckAi),
+                FeedbackMetadata(
+                    source = DDG_SETTINGS,
+                    reportType = REPORT_PROBLEM,
+                    category = DUCK_AI,
+                ),
+            )
+
+            cancelAndConsumeRemainingEvents()
+            verify(pixelSender).reportPproFeedbackSubcategoryScreenShown(
+                mapOf(
+                    "source" to "settings",
+                    "reportType" to "reportIssue",
+                    "category" to "duckAi",
                 ),
             )
         }
@@ -615,19 +671,22 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
-    fun whenMoveBackFromSubCategoryActionViaPproThenUpdateViewState() = runTest {
+    fun whenMoveBackFromSubCategoryActionViaSubscriptionsThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
-            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show categories
+            viewModel.onCategorySelected(category = SUBS_AND_PAYMENTS) // Show subcategories
 
             viewModel.handleBackPress()
 
-            expectMostRecentItem().assertViewStateMoveBack(
-                expectedPreviousFragmentState = null,
-                expectedCurrentFragmentState = FeedbackAction, // Back to action
+            val expectMostRecentItem = expectMostRecentItem()
+            expectMostRecentItem.assertViewStateMoveBack(
+                expectedPreviousFragmentState = FeedbackAction,
+                expectedCurrentFragmentState = FeedbackCategory(R.string.feedbackActionReportIssue), // Back to category
                 FeedbackMetadata(
                     source = SUBSCRIPTION_SETTINGS,
-                    category = SUBS_AND_PAYMENTS, // Retain category
+                    reportType = REPORT_PROBLEM,
+                    category = null, // Retain category
                 ),
             )
         }
@@ -666,6 +725,27 @@ class SubscriptionFeedbackViewModelTest {
                 expectedCurrentFragmentState = FeedbackAction, // Back to action
                 FeedbackMetadata(
                     source = DDG_SETTINGS,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun whenMoveBackFromSubCategoryActionDuckAiCategoryThenUpdateViewState() = runTest {
+        viewModel.viewState().test {
+            viewModel.allowUserToChooseFeedbackType() // Show general
+            viewModel.onProFeedbackSelected() // show action
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
+            viewModel.onCategorySelected(DUCK_AI) // Show subcategory
+
+            viewModel.handleBackPress()
+
+            expectMostRecentItem().assertViewStateMoveBack(
+                expectedPreviousFragmentState = FeedbackAction,
+                expectedCurrentFragmentState = FeedbackCategory(R.string.feedbackActionReportIssue), // Back to category
+                FeedbackMetadata(
+                    source = DDG_SETTINGS,
+                    reportType = REPORT_PROBLEM,
                 ),
             )
         }
@@ -800,10 +880,11 @@ class SubscriptionFeedbackViewModelTest {
     }
 
     @Test
-    fun whenMoveBackFromSubmitActionViaPproThenUpdateViewState() = runTest {
+    fun whenMoveBackFromSubmitActionViaSubscriptionsThenUpdateViewState() = runTest {
         viewModel.viewState().test {
             viewModel.allowUserToChooseReportType(source = SUBSCRIPTION_SETTINGS) // Show action
-            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show subcategory
+            viewModel.onReportTypeSelected(REPORT_PROBLEM) // Show category
+            viewModel.onCategorySelected(category = SUBS_AND_PAYMENTS) // Show subcategories
             viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.ONE_TIME_PASSWORD) // Show submit
 
             viewModel.handleBackPress()
@@ -814,7 +895,7 @@ class SubscriptionFeedbackViewModelTest {
                 FeedbackMetadata(
                     source = SUBSCRIPTION_SETTINGS,
                     reportType = REPORT_PROBLEM,
-                    category = SUBS_AND_PAYMENTS, // Retain category
+                    category = SUBS_AND_PAYMENTS,
                 ),
             )
         }
@@ -865,6 +946,7 @@ class SubscriptionFeedbackViewModelTest {
     fun whenSubsIssueSubmittedTheSendReportIssuePixel() = runTest {
         viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onCategorySelected(category = SUBS_AND_PAYMENTS)
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
         viewModel.onSubmitFeedback("Test")
 
@@ -965,6 +1047,7 @@ class SubscriptionFeedbackViewModelTest {
     fun whenSubscriptionFeedbackWithEmailSucceedsThenSendBothToSupportInboxAndPixel() = runTest {
         viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onCategorySelected(category = SUBS_AND_PAYMENTS)
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
         viewModel.onSubmitFeedback("Test", "test@mail.com")
 
@@ -1005,6 +1088,7 @@ class SubscriptionFeedbackViewModelTest {
         supportInbox.setSendFeedbackResult(false)
         viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onCategorySelected(SUBS_AND_PAYMENTS)
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
         viewModel.onSubmitFeedback("Test", "test@mail.com")
 
@@ -1029,6 +1113,7 @@ class SubscriptionFeedbackViewModelTest {
     fun whenSubscriptionFeedbackWithBlankEmailThenSendPixelOnly() = runTest {
         viewModel.allowUserToChooseReportType(SUBSCRIPTION_SETTINGS)
         viewModel.onReportTypeSelected(REPORT_PROBLEM)
+        viewModel.onCategorySelected(SUBS_AND_PAYMENTS)
         viewModel.onSubcategorySelected(SubscriptionFeedbackSubsSubCategory.OTHER)
         viewModel.onSubmitFeedback("Test", "     ")
 

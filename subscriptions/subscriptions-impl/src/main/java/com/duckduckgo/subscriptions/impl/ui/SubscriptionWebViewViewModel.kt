@@ -32,6 +32,7 @@ import com.duckduckgo.subscriptions.impl.JSONObjectAdapter
 import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.DUCK_AI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LEGACY_FE_NETP
@@ -193,6 +194,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 NETP, LEGACY_FE_NETP -> networkProtectionAccessState.getScreenForCurrentState()?.let { GoToNetP(it) }
                 ITR, LEGACY_FE_ITR, ROW_ITR -> GoToITR
                 PIR, LEGACY_FE_PIR -> GoToPIR
+                DUCK_AI -> GoToDuckAI
                 else -> null
             }
             if (hasPurchasedSubscription()) {
@@ -200,6 +202,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     GoToITR -> pixelSender.reportOnboardingIdtrClick()
                     is GoToNetP -> pixelSender.reportOnboardingVpnClick()
                     GoToPIR -> pixelSender.reportOnboardingPirClick()
+                    GoToDuckAI -> pixelSender.reportOnboardingDuckAiClick()
                     else -> {} // no-op
                 }
             }
@@ -428,6 +431,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data class GoToNetP(val activityParams: ActivityParams) : Command()
+        data object GoToDuckAI : Command()
         data object Reload : Command()
     }
 
