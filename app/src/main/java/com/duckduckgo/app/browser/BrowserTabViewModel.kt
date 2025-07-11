@@ -4128,7 +4128,8 @@ class BrowserTabViewModel @Inject constructor(
                 command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
             onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                command.value = SetBrowserBackground(getBBBackgroundResource(lightModeEnabled))
+                // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
+                command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
             else -> {
                 command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
