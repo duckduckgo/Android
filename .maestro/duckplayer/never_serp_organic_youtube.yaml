@@ -4,7 +4,7 @@ tags:
   - duckplayer
 ---
 - retry:
-    maxRetries: 0
+    maxRetries: 3
     commands:
       - launchApp:
           clearState: true
