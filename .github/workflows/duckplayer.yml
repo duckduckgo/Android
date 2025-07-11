@@ -1,4 +1,4 @@
-name: Privacy Tests
+name: Duck Player Tests
 
 on:
   pull_request:
