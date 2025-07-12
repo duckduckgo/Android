@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 
@@ -30,7 +31,7 @@ class WebCompatContentScopeJsMessageHandler @Inject constructor() : ContentScope
     override fun getJsMessageHandler(): JsMessageHandler = object : JsMessageHandler {
         override fun process(
             jsMessage: JsMessage,
-            secret: String,
+            jsMessaging: JsMessaging,
             jsMessageCallback: JsMessageCallback?,
         ) {
             if (jsMessage.id == null) return
