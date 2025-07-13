@@ -910,7 +910,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     @Test
     fun `if message dialog shown, then send a pixel`() = runTest {
         val expectedParams = mapOf(
-            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_VARIANT to "variant2",
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
@@ -931,7 +931,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     @Test
     fun `if message dialog canceled, then send a pixel`() = runTest {
         val expectedParams = mapOf(
-            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_VARIANT to "variant2",
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
@@ -952,7 +952,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     @Test
     fun `if message dialog not now clicked, then send a pixel`() = runTest {
         val expectedParams = mapOf(
-            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_VARIANT to "variant2",
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
@@ -973,7 +973,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     @Test
     fun `if message dialog confirmation clicked, then send a pixel`() = runTest {
         val expectedParams = mapOf(
-            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_VARIANT to "variant2",
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
@@ -994,7 +994,7 @@ class DefaultBrowserPromptsExperimentImplTest {
     @Test
     fun `if menu item clicked, then send a pixel`() = runTest {
         val expectedParams = mapOf(
-            PIXEL_PARAM_KEY_VARIANT to "variant_2",
+            PIXEL_PARAM_KEY_VARIANT to "variant2",
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
@@ -1065,7 +1065,7 @@ class DefaultBrowserPromptsExperimentImplTest {
 
     private suspend fun mockActiveCohort(cohortName: AdditionalPromptsCohortName): Cohort {
         val cohort = Cohort(
-            name = cohortName.name,
+            name = cohortName.cohortName,
             weight = 1,
             enrollmentDateET = fakeEnrollmentDateETString,
         )
