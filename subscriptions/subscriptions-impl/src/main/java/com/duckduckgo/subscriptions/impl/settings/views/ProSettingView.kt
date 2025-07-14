@@ -167,20 +167,37 @@ class ProSettingView @JvmOverloads constructor(
             }
             else -> {
                 with(binding) {
-                    subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                    if (viewState.duckAiEnabled) {
+                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeSecure))
+                    } else {
+                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                    }
                     subscriptionBuy.setSecondaryText(getSubscriptionSecondaryText(viewState))
-                    subscriptionGet.setText(
-                        when (viewState.freeTrialEligible) {
-                            true -> R.string.subscriptionSettingTryFreeTrial
-                            false -> R.string.subscriptionSettingGet
-                        },
-                    )
+                    subscriptionGet.setText(getActionButtonText(viewState))
 
                     subscriptionBuyContainer.isVisible = true
                     subscriptionRestoreContainer.isVisible = true
 
                     subscriptionSettingContainer.isGone = true
                 }
+            }
+        }
+    }
+
+    private fun getActionButtonText(viewState: ViewState) = when (viewState.freeTrialEligible) {
+        true -> {
+            if (viewState.rebrandingEnabled) {
+                R.string.subscriptionSettingTryFreeTrialRebranding
+            } else {
+                R.string.subscriptionSettingTryFreeTrial
+            }
+        }
+
+        false -> {
+            if (viewState.rebrandingEnabled) {
+                R.string.subscriptionSettingGetRebranding
+            } else {
+                R.string.subscriptionSettingGet
             }
         }
     }
