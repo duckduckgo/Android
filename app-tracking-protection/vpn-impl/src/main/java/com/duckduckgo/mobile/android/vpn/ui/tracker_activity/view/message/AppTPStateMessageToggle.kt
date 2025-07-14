@@ -29,6 +29,6 @@ interface AppTPStateMessageToggle {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun freeTrialCopy(): Toggle
 }

@@ -280,8 +280,13 @@ class CtaViewModel @Inject constructor(
                 } else {
                     R.string.onboardingPrivacyProDaxDialogDescription
                 }
+                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
+                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogOkButton
+                }
 
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
             }
 
             // Add Widget
