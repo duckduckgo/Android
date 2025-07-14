@@ -799,6 +799,7 @@
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo also has a secure <b>VPN + 2 more premium protections</b>, available with an <b>optional paid subscription</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
 
     <!-- Highlight Onboarding Experiment-->
