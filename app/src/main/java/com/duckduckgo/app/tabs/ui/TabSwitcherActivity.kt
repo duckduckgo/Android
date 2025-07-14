@@ -216,7 +216,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
-        PopupMenu(layoutInflater, R.layout.popup_tabs_menu)
+        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM && viewModel.isNewDesignEnabled) {
+            PopupMenu(layoutInflater, R.layout.popup_tabs_menu_bottom)
+        } else {
+            PopupMenu(layoutInflater, R.layout.popup_tabs_menu)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
