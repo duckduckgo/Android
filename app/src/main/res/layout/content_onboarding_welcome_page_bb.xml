@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/longDescriptionContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:tag="onboardingDefaultBrowser"
+        tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+    <ImageView
+            android:id="@+id/sceneBg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            tools:srcCompat="@drawable/onboarding_background_small_light"/>
+
+    <LinearLayout
+            android:id="@+id/welcomeContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/daxLogo"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="80dp"
+                app:srcCompat="@drawable/ic_dax_icon"/>
+
+        <com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView
+                android:id="@+id/welcomeDialog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_5"
+                android:layout_marginHorizontal="@dimen/keyline_6"
+                android:orientation="vertical"
+                android:padding="@dimen/keyline_4">
+
+            <TextView
+                    android:id="@+id/welcomeTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/keyline_5"
+                    android:gravity="start"
+                    android:text="@string/onboardingWelcomeTitle"
+                    android:fontFamily="@font/pangea_semibold"
+                    android:includeFontPadding="false"
+                    android:textColor="@color/buckColorPrimaryText"
+                    android:textSize="40sp"
+                    android:lineSpacingExtra="-10sp"/>
+
+        </com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView>
+
+    </LinearLayout>
+
+    <include
+            android:id="@+id/daxDialogCta"
+            layout="@layout/pre_onboarding_dax_dialog_cta_bb"
+            android:visibility="gone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintWidth_max="600dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
