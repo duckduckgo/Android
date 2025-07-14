@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonnemangsinställningar</string>
     <string name="subscriptionSettingSubscribe">Skydda din anslutning och identitet med Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Det inkluderar vårt VPN, Personal Information Removal och Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Inkluderar vårt VPN och Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Abonnenter får vårt VPN, Personal Information Removal och Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Abonnenter får vårt VPN och Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Skaffa Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Prova Privacy Pro gratis</string>
     <string name="subscriptionSettingRestore">Jag har ett abonnemang</string>

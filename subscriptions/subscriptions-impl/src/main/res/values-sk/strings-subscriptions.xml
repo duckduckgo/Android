@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavenia predplatného</string>
     <string name="subscriptionSettingSubscribe">Chráň si pripojenie a totožnosť pomocou Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Zahŕňa naše služby VPN, Personal Information Removal a Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Zahŕňa našu VPN a Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Predplatitelia získajú našu sieť VPN, Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Predplatitelia získajú našu VPN a Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Získaj Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Vyskúšaj Privacy Pro zadarmo</string>
     <string name="subscriptionSettingRestore">Mám predplatné</string>
