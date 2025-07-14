@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui
 
+import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.BuckWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
@@ -23,12 +24,14 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 interface OnboardingPageBuilder {
     fun buildWelcomePage(): WelcomePage
     fun buildBuckWelcomePage(): BuckWelcomePage
+    fun buildBbWelcomePage(): BbWelcomePage
     fun buildDefaultBrowserPage(): DefaultBrowserPage
 
     sealed class OnboardingPageBlueprint {
         data object DefaultBrowserBlueprint : OnboardingPageBlueprint()
         data object WelcomePageBlueprint : OnboardingPageBlueprint()
         data object BuckWelcomePageBlueprint : OnboardingPageBlueprint()
+        data object BbWelcomePageBlueprint : OnboardingPageBlueprint()
     }
 }
 
@@ -36,5 +39,6 @@ class OnboardingFragmentPageBuilder : OnboardingPageBuilder {
 
     override fun buildWelcomePage() = WelcomePage()
     override fun buildBuckWelcomePage() = BuckWelcomePage()
+    override fun buildBbWelcomePage() = BbWelcomePage()
     override fun buildDefaultBrowserPage() = DefaultBrowserPage()
 }
