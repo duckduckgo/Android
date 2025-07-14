@@ -65,7 +65,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -174,8 +173,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.hide()
         }
-
-        omniBarClickCatcher.isVisible = viewState.showClickCatcher
     }
 
     private fun animateOmnibarFocusedState(focused: Boolean) {

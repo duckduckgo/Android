@@ -158,6 +158,12 @@ class Omnibar(
         fun onTrackersCountFinished()
     }
 
+    fun interface InputScreenLaunchListener {
+        fun launchInputScreen(
+            query: String,
+        )
+    }
+
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
@@ -231,13 +237,6 @@ class Omnibar(
         newOmnibar.omniBarContainer
     }
 
-    val omniBarClickCatcher: View? by lazy {
-        when (omnibarType) {
-            SINGLE -> (newOmnibar as? SingleOmnibarLayout)?.omniBarClickCatcher
-            else -> null
-        }
-    }
-
     val toolbar: Toolbar by lazy {
         newOmnibar.toolbar
     }
@@ -303,6 +302,10 @@ class Omnibar(
         } else if (omnibar is SingleOmnibarLayout) {
             omnibar.setSingleOmnibarItemPressedListener(listener)
         }
+    }
+
+    fun configureInputScreenLaunchListener(listener: InputScreenLaunchListener) {
+        newOmnibar.setInputScreenLaunchListener(listener)
     }
 
     fun addTextListener(listener: TextListener) {

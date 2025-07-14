@@ -1050,14 +1050,14 @@ class BrowserTabFragment :
         configureItemPressedListener()
         configureCustomTab()
         configureEditModeChangeDetection()
-        configureClickCatcher()
+        configureInputScreenLauncher()
     }
 
-    private fun configureClickCatcher() {
-        omnibar.omniBarClickCatcher?.setOnClickListener {
+    private fun configureInputScreenLauncher() {
+        omnibar.configureInputScreenLaunchListener { query ->
             val intent = globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = omnibar.getText()),
+                InputScreenActivityParams(query = query),
             )
             val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
                 requireActivity(),
