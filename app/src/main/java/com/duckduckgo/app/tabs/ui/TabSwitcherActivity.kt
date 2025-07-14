@@ -256,7 +256,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         binding.aiChatFab.setOnClickListener {
-            viewModel.onDuckChatFabClicked()
+            viewModel.onDuckAIFabClicked()
         }
     }
 
@@ -668,7 +668,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun initMenuClickListeners() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
-        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.duckAIMenuItem)) { viewModel.onDuckAIMenuClicked() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.deselectAllMenuItem)) { viewModel.onDeselectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }
@@ -689,7 +688,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             R.id.fireToolbarButton -> onFireButtonClicked()
             R.id.popupMenuToolbarButton -> showPopupMenu(item.itemId)
             R.id.newTabToolbarButton -> onNewTabRequested(fromOverflowMenu = false)
-            R.id.duckAIToolbarButton -> viewModel.onDuckAIMenuClicked()
+            R.id.duckAIToolbarButton -> viewModel.onDuckAIButtonClicked()
             android.R.id.home -> {
                 viewModel.onUpButtonPressed()
                 return true

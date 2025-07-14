@@ -28,12 +28,6 @@
         app:primaryText="@string/newTabMenuItem" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/duckAIMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/duckChatMenuItem" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/selectAllMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

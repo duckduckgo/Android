@@ -573,7 +573,7 @@ class TabSwitcherViewModel @Inject constructor(
         return@withContext null
     }
 
-    fun onDuckChatFabClicked() {
+    fun onDuckAIFabClicked() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
@@ -582,7 +582,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
     }
 
-    fun onDuckAIMenuClicked() {
+    fun onDuckAIButtonClicked() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
@@ -675,7 +675,6 @@ class TabSwitcherViewModel @Inject constructor(
                     isNewTabButtonVisible = isNewToolbarEnabled,
                     isNewTabMenuVisible = !isNewToolbarEnabled,
                     isDuckAIButtonVisible = isDuckAIButtonVisible && isNewToolbarEnabled,
-                    isDuckAIMenuVisible = isDuckAIButtonVisible && !isNewToolbarEnabled,
                     isSelectAllVisible = false,
                     isDeselectAllVisible = false,
                     isSelectionActionsDividerVisible = false,
@@ -716,7 +715,6 @@ class TabSwitcherViewModel @Inject constructor(
                     isNewTabButtonVisible = false,
                     isNewTabMenuVisible = false,
                     isDuckAIButtonVisible = false,
-                    isDuckAIMenuVisible = false,
                     isSelectAllVisible = !areAllTabsSelected,
                     isDeselectAllVisible = areAllTabsSelected,
                     isSelectionActionsDividerVisible = isSelectionActionable,
@@ -744,7 +742,6 @@ class TabSwitcherViewModel @Inject constructor(
             val isNewTabButtonVisible: Boolean,
             val isNewTabMenuVisible: Boolean,
             val isDuckAIButtonVisible: Boolean,
-            val isDuckAIMenuVisible: Boolean,
             val isSelectAllVisible: Boolean,
             val isDeselectAllVisible: Boolean,
             val isSelectionActionsDividerVisible: Boolean,
