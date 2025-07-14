@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 name: "DuckPlayer: Ask > Direct YouTube > Duck Player"
 tags:
-  - duckplayer
+  - duckplayerlocal
 ---
 - retry:
     maxRetries: 3
@@ -10,22 +10,9 @@ tags:
           clearState: true
 
       - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: common/load_youtube_video.yaml
 
       - tapOn:
-          id: "omnibarTextInput"
-      - inputText: "duck://player/3ml7yeKBUhc"
-      - pressKey: Enter
+          text: "Turn On Duck Player"
 
-      - extendedWaitUntil:
-          visible:
-            text: "duck://player/3ml7yeKBUhc.*"
-          timeout: 5000
-
-      - tapOn:
-          id: app
-
-      - tapOn:
-          text: "Watch on YouTube"
-
-      - runFlow: common/assert_youtube_visible.yaml
-      - runFlow: common/assert_overlay_not_shown.yaml
+      - runFlow: common/assert_duckplayer_visible.yaml

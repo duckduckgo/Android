@@ -16,10 +16,4 @@ tags:
       - inputText: "duck://player/3ml7yeKBUhc"
       - pressKey: Enter
 
-      - extendedWaitUntil:
-          visible:
-            text: "duck://player/3ml7yeKBUhc"
-          timeout: 5000
-
-      - assertNotVisible:
-          text: ".*youtube.com/watch.*"
+      - runFlow: common/assert_duckplayer_visible.yaml

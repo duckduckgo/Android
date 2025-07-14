@@ -28,8 +28,4 @@ tags:
       - assertNotVisible:
           text: "duck://player/.*"
 
-      # Verify we're still on YouTube mobile URL
-      - assertVisible:
-          text: ".*youtube.*"
-
-      - runFlow: common/assert_overlay_not_shown.yaml
+      - runFlow: common/assert_youtube_visible.yaml
