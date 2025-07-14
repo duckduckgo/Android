@@ -333,6 +333,7 @@ import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Provider
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -352,7 +353,6 @@ import logcat.asLog
 import logcat.logcat
 import okio.ByteString.Companion.encode
 import org.json.JSONObject
-import kotlin.time.Duration.Companion.seconds
 
 @InjectWith(FragmentScope::class)
 class BrowserTabFragment :
@@ -3116,7 +3116,7 @@ class BrowserTabFragment :
     private fun hideDaxBubbleCta() {
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             newBrowserTab.newTabLayout.setBackgroundColor(
-                    requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
+                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
         } else {
             newBrowserTab.browserBackground.setImageResource(0)
@@ -4409,7 +4409,7 @@ class BrowserTabFragment :
                         configuration.hideBBEndCta(
                             onAnimationEnd = {
                                 viewModel.onUserClickCtaOkButton(configuration)
-                            }
+                            },
                         )
                     } else {
                         viewModel.onUserClickCtaOkButton(configuration)
@@ -4427,13 +4427,13 @@ class BrowserTabFragment :
             if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
                 if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
                     lifecycleScope.launch {
-                    with(newBrowserTab.wingAnimation) {
-                        delay(2.5.seconds)
-                        show()
-                        playAnimation()
+                        with(newBrowserTab.wingAnimation) {
+                            delay(2.5.seconds)
+                            show()
+                            playAnimation()
+                        }
                     }
                 }
-            }
 
                 if (configuration is DaxBubbleCta.DaxEndCta) {
                     lifecycleScope.launch {
