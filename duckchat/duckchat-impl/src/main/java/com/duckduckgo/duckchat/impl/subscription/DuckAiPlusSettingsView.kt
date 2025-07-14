@@ -105,8 +105,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
                     isClickable = false
                     setStatus(isOn = false)
                     setClickListener(null)
-                    // TODO: we need a disabled state icon
-                    setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24)
+                    setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_grayscale_color_24)
                 }
                 SettingState.Hidden -> isGone = true
             }
@@ -116,7 +115,7 @@ class DuckAiPlusSettingsView @JvmOverloads constructor(
     private fun processCommands(command: Command) {
         when (command) {
             is OpenDuckAiPlusSettings -> {
-                // TODO: navigate to Duck Ai Plus settings
+                globalActivityStarter.start(context, DuckAiPaidSettingsNoParams)
             }
         }
     }
