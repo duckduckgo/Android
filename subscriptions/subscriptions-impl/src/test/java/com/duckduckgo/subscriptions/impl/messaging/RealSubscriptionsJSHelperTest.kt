@@ -78,6 +78,7 @@ class RealSubscriptionsJSHelperTest {
                     put("subscriptionDetails")
                     put("getAuthAccessToken")
                     put("getFeatureConfig")
+                    put("authUpdate")
                 },
             )
             put("platform", "android")
