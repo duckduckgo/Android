@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/titleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:fontFamily="@font/pangea"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-10sp"
+            tools:text="Protections activated!"
+            android:textColor="@color/buckColorPrimaryText" />
+
+        <TextView
+            android:id="@+id/titleInvisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:fontFamily="@font/pangea"
+            android:textSize="40sp"
+            android:lineSpacingExtra="-10sp"
+            android:textColor="@color/buckColorPrimaryText"
+            android:visibility="invisible" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:padding="@dimen/keyline_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleContainer"
+        app:srcCompat="@drawable/ic_dax_icon" />
+
+    <ImageView
+        android:id="@+id/chromeLogo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="@dimen/keyline_2"
+        android:padding="@dimen/keyline_1"
+        app:layout_constraintEnd_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/ddgLogo"
+        app:srcCompat="@drawable/ic_chrome" />
+
+    <!-- Row 1 -->
+    <LinearLayout
+        android:id="@+id/row1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_1"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/keyline_1"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_buck_preonboarding_comparison_chart_item"
+        app:layout_constraintTop_toBottomOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/featureIcon1"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_3"
+            app:srcCompat="@drawable/ic_find_search_buck"
+            app:tint="@color/buckColorComparisonChartSearchIcon"/>
+
+        <TextView
+            android:id="@+id/feature1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_3"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem1"
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+
+        <ImageView
+            android:id="@+id/cross1"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_6"
+            app:srcCompat="@drawable/ic_cross_gray_buck" />
+
+        <ImageView
+            android:id="@+id/check1"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_3"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
+    </LinearLayout>
+
+    <!-- Row 2 -->
+    <LinearLayout
+        android:id="@+id/row2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/keyline_1"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/row1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/featureIcon2"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_3"
+            app:srcCompat="@drawable/ic_shield_buck"
+            app:tint="@color/buckColorComparisonChartShieldIcon" />
+
+        <TextView
+            android:id="@+id/feature2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_3"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem2"
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+
+        <ImageView
+            android:id="@+id/cross2"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_6"
+            app:srcCompat="@drawable/ic_cross_gray_buck" />
+
+        <ImageView
+            android:id="@+id/check2"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_3"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
+    </LinearLayout>
+
+    <!-- Row 3 -->
+    <LinearLayout
+        android:id="@+id/row3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/keyline_1"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_buck_preonboarding_comparison_chart_item"
+        app:layout_constraintTop_toBottomOf="@id/row2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/featureIcon3"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_3"
+            app:srcCompat="@drawable/ic_cookie_blocked_buck"
+            app:tint="@color/buckColorComparisonChartCookieIcon" />
+
+        <TextView
+            android:id="@+id/feature3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_3"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem3"
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+
+        <ImageView
+            android:id="@+id/cross3"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_6"
+            app:srcCompat="@drawable/ic_cross_gray_buck" />
+
+        <ImageView
+            android:id="@+id/check3"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_3"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
+    </LinearLayout>
+
+    <!-- Row 4 -->
+    <LinearLayout
+        android:id="@+id/row4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/keyline_1"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/row3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/featureIcon4"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_3"
+            app:srcCompat="@drawable/ic_ads_blocked_buck"
+            app:tint="@color/buckColorComparisonChartBlockIcon" />
+
+        <TextView
+            android:id="@+id/feature4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_3"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem4"
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+
+        <ImageView
+            android:id="@+id/cross4"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_6"
+            app:srcCompat="@drawable/ic_cross_gray_buck" />
+
+        <ImageView
+            android:id="@+id/check4"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_3"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
+    </LinearLayout>
+
+    <!-- Row 5 -->
+    <LinearLayout
+        android:id="@+id/row5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:orientation="horizontal"
+        android:paddingVertical="@dimen/keyline_1"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_buck_preonboarding_comparison_chart_item"
+        app:layout_constraintTop_toBottomOf="@id/row4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/featureIcon5"
+            android:layout_width="@dimen/keyline_4"
+            android:layout_height="@dimen/keyline_4"
+            android:layout_marginStart="@dimen/keyline_3"
+            app:srcCompat="@drawable/ic_fire_buck"
+            app:tint="@color/buckColorComparisonChartFireIcon" />
+
+        <TextView
+            android:id="@+id/feature5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_3"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem5"
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"/>
+
+        <ImageView
+            android:id="@+id/cross5"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_6"
+            app:srcCompat="@drawable/ic_cross_gray_buck" />
+
+        <ImageView
+            android:id="@+id/check5"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_3"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_buck" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
