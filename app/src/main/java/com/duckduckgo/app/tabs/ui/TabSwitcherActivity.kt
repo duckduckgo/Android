@@ -668,6 +668,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun initMenuClickListeners() {
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.newTabMenuItem)) { onNewTabRequested(fromOverflowMenu = true) }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.gridLayoutMenuItem)) { viewModel.onGridLayoutSelected() }
+        popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.listLayoutMenuItem)) { viewModel.onListLayoutSelected() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.selectAllMenuItem)) { viewModel.onSelectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.deselectAllMenuItem)) { viewModel.onDeselectAllTabs() }
         popupMenu.onMenuItemClicked(popupMenu.contentView.findViewById(R.id.shareSelectedLinksMenuItem)) { viewModel.onShareSelectedTabs() }

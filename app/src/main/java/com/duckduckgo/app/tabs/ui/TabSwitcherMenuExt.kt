@@ -66,6 +66,34 @@ fun Menu.createDynamicInterface(
         setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
     }
 
+    popupMenu.gridLayoutMenuItem.apply {
+        when (dynamicMenu.layoutMenuMode) {
+            GRID -> {
+                setTrailingIconVisibility(false)
+                isVisible = true
+            }
+            LIST -> {
+                setTrailingIconVisibility(true)
+                isVisible = true
+            }
+            HIDDEN -> isVisible = false
+        }
+    }
+
+    popupMenu.listLayoutMenuItem.apply {
+        when (dynamicMenu.layoutMenuMode) {
+            GRID -> {
+                setTrailingIconVisibility(true)
+                isVisible = true
+            }
+            LIST -> {
+                setTrailingIconVisibility(false)
+                isVisible = true
+            }
+            HIDDEN -> isVisible = false
+        }
+    }
+
     mainFab.apply {
         if (dynamicMenu.isMainFabVisible) {
             when (dynamicMenu.mainFabType) {

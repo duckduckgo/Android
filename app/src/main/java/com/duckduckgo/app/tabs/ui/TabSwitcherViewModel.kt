@@ -534,19 +534,27 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onLayoutTypeToggled() {
+        when (layoutType.value) {
+            GRID -> onListLayoutSelected()
+            LIST -> onGridLayoutSelected()
+            else -> Unit
+        }
+    }
+
+    fun onListLayoutSelected() {
         viewModelScope.launch(dispatcherProvider.io()) {
-            when (layoutType.value) {
-                GRID -> {
-                    pixel.fire(TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
-                    tabRepository.setTabLayoutType(LIST)
-                }
+            if (layoutType.value != LIST) {
+                pixel.fire(TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED)
+                tabRepository.setTabLayoutType(LIST)
+            }
+        }
+    }
 
-                LIST -> {
-                    pixel.fire(TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
-                    tabRepository.setTabLayoutType(GRID)
-                }
-
-                else -> Unit
+    fun onGridLayoutSelected() {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (layoutType.value != GRID) {
+                pixel.fire(TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED)
+                tabRepository.setTabLayoutType(GRID)
             }
         }
     }
