@@ -49,6 +49,8 @@ interface Subscriptions {
      */
     suspend fun isEligible(): Boolean
 
+    fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus>
+
     /**
      * @return `SubscriptionStatus` with the current subscription status
      */
