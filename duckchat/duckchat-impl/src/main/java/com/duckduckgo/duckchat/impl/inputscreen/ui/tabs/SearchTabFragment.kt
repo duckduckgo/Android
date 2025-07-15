@@ -18,11 +18,9 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
 import android.os.Build.VERSION
 import android.os.Bundle
-import android.transition.Transition
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewTreeObserver
-import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -66,7 +64,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private lateinit var autoCompleteSuggestionsAdapter: BrowserAutoCompleteSuggestionsAdapter
 
     private val binding: FragmentSearchTabBinding by viewBinding()
-    private lateinit var favoritesView: View
 
     override fun onViewCreated(
         view: View,
@@ -74,22 +71,10 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireActivity().window.sharedElementEnterTransition?.addListener(
-            object : Transition.TransitionListener {
-                override fun onTransitionEnd(transition: Transition) {
-                    configureFavorites()
-                    configureAutoComplete()
-                    configureObservers()
-                    configureBottomBlur()
-                    transition.removeListener(this)
-                }
-
-                override fun onTransitionStart(transition: Transition) {}
-                override fun onTransitionCancel(transition: Transition) {}
-                override fun onTransitionPause(transition: Transition) {}
-                override fun onTransitionResume(transition: Transition) {}
-            },
-        )
+        configureFavorites()
+        configureAutoComplete()
+        configureObservers()
+        configureBottomBlur()
     }
 
     private fun configureBottomBlur() {
@@ -116,25 +101,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             showPlaceholders = false,
             placement = FavoritesPlacement.FOCUSED_STATE,
         )
-        favoritesView = savedSitesViewsProvider.getFavoritesGridView(requireContext(), config = favoritesGridConfig)
-        favoritesView.alpha = 0f
-
-        val displayMetrics = requireContext().resources.displayMetrics
-        val slideDistance = displayMetrics.heightPixels * CONTENT_SLIDE_DISTANCE
-        favoritesView.translationY = -slideDistance
-
+        val favoritesView = savedSitesViewsProvider.getFavoritesGridView(requireContext(), config = favoritesGridConfig)
         binding.contentContainer.addView(favoritesView)
-
-        favoritesView.animate()
-            .alpha(1f)
-            .setDuration(CONTENT_ANIMATION_DURATION)
-            .start()
-
-        favoritesView.animate()
-            .translationY(0f)
-            .setInterpolator(OvershootInterpolator(CONTENT_INTERPOLATOR_TENSION))
-            .setDuration(CONTENT_ANIMATION_DURATION)
-            .start()
     }
 
     private fun configureAutoComplete() {
@@ -181,11 +149,5 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.autoCompleteSuggestionResults.onEach {
             autoCompleteSuggestionsAdapter.updateData(it.query, it.suggestions)
         }.launchIn(lifecycleScope)
-    }
-
-    companion object {
-        private const val CONTENT_ANIMATION_DURATION = 500L
-        private const val CONTENT_INTERPOLATOR_TENSION = 1F
-        private const val CONTENT_SLIDE_DISTANCE = 0.05F
     }
 }

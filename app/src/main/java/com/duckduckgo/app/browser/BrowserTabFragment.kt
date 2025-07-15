@@ -1059,10 +1059,10 @@ class BrowserTabFragment :
                 requireContext(),
                 InputScreenActivityParams(query = query),
             )
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            val options = ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
-                omnibar.omniBarContainer,
-                "omnibar_transition",
+                CommonR.anim.slide_in_from_top_fade_in,
+                CommonR.anim.slide_out_to_bottom_fade_out,
             )
             searchInterstitialLauncher.launch(intent, options)
         }

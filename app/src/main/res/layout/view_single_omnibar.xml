@@ -65,7 +65,6 @@
                         style="@style/Widget.DuckDuckGo.OmnibarCardView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:transitionName="omnibar_transition"
                         app:cardElevation="0dp"
                         app:strokeColor="?daxColorAccentBlue"
                         app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
