@@ -49,6 +49,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
                         put(SUBSCRIPTION_DETAILS)
                         put(GET_AUTH_ACCESS_TOKEN)
                         put(GET_FEATURE_CONFIG)
+                        put(AUTH_UPDATE)
                     }
                 } else {
                     JSONArray().apply {
@@ -140,6 +141,7 @@ class RealSubscriptionsJSHelper @Inject constructor(
         private const val AVAILABLE_MESSAGES = "availableMessages"
         private const val SUBSCRIPTION_DETAILS = "subscriptionDetails"
         private const val GET_AUTH_ACCESS_TOKEN = "getAuthAccessToken"
+        private const val AUTH_UPDATE = "authUpdate"
         private const val GET_FEATURE_CONFIG = "getFeatureConfig"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"

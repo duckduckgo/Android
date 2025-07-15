@@ -82,6 +82,10 @@ class RealSubscriptions @Inject constructor(
         return isActive || (isEligible && supportsEncryption)
     }
 
+    override fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus> {
+        return subscriptionsManager.subscriptionStatus
+    }
+
     override suspend fun getSubscriptionStatus(): SubscriptionStatus {
         return subscriptionsManager.subscriptionStatus()
     }
