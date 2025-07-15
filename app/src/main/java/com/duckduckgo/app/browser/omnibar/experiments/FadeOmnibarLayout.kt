@@ -75,7 +75,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -224,18 +223,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
             duckPlayerIcon.gone()
         } else {
             backIcon.gone()
-        }
-
-        enableClickCatcher(viewState.showClickCatcher)
-    }
-
-    private fun enableClickCatcher(enabled: Boolean) {
-        omniBarClickCatcher.isVisible = enabled
-
-        omnibarTextInput.apply {
-            isEnabled = !enabled
-            isFocusable = !enabled
-            isFocusableInTouchMode = !enabled
         }
     }
 

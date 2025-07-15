@@ -317,7 +317,7 @@
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <View
-                            android:id="@+id/omnibarClickCatcher"
+                            android:id="@+id/omnibarTextInputClickCatcher"
                             android:layout_width="0dp"
                             android:layout_height="0dp"
                             android:background="@android:color/transparent"

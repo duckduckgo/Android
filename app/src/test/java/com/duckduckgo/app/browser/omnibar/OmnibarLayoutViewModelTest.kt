@@ -13,6 +13,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
@@ -1338,7 +1339,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.showClickCatcher)
+            assertTrue(viewState.showTextInputClickCatcher)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1349,7 +1350,55 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertFalse(viewState.showClickCatcher)
+            assertFalse(viewState.showTextInputClickCatcher)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when input text click catcher clicked and no URL then input screen launched with draft query`() = runTest {
+        testee.onInputStateChanged(query = "draft", hasFocus = false, clearQuery = false, deleteLastCharacter = false)
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchInputScreen)
+            assertEquals("draft", (command as LaunchInputScreen).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when input text click catcher clicked and DDG URL then input screen launched with search query`() = runTest {
+        givenSiteLoaded(SERP_URL)
+        val omnibarViewState = OmnibarViewState(omnibarText = "test", queryOrFullUrl = "test", isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchInputScreen)
+            assertEquals("test", (command as LaunchInputScreen).query)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when input text click catcher clicked and random URL then input screen launched with full URL`() = runTest {
+        whenever(settingsDataStore.isFullUrlEnabled).thenReturn(false)
+        initializeViewModel()
+        val omnibarViewState = OmnibarViewState(omnibarText = "test", queryOrFullUrl = "test", isEditing = false)
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+        givenSiteLoaded(RANDOM_URL)
+
+        testee.onTextInputClickCatcherClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is LaunchInputScreen)
+            assertEquals(RANDOM_URL, (command as LaunchInputScreen).query)
             cancelAndIgnoreRemainingEvents()
         }
     }
