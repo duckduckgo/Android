@@ -129,6 +129,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             "openSettings",
             "openInfo",
             "setUserValues",
+            "reportMetric",
             "reportPageException",
             "reportInitException",
             "reportYouTubeError",

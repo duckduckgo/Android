@@ -27,6 +27,7 @@ import com.duckduckgo.app.browser.commands.Command.SendResponseToJs
 import com.duckduckgo.app.browser.commands.Command.SendSubscriptions
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_JS_ERROR
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_SERP
@@ -290,6 +291,19 @@ class DuckPlayerJSHelper @Inject constructor(
 
                 pixel.fire(impressionPixelName)
                 pixel.fire(dailyPixelName, emptyMap(), emptyMap(), Daily())
+            }
+            "reportMetric" -> {
+                try {
+                    val params = data?.getJSONObject("params") ?: return null
+                    val message = params.getString("message") ?: return null
+                    val kind = params.getString("kind") ?: return null
+                    pixel.fire(
+                        DUCK_PLAYER_JS_ERROR,
+                        mapOf("message" to message, "kind" to kind, "origin" to featureName),
+                    )
+                } catch (e: Exception) {
+                    logcat { "Error reporting metric: $e" }
+                }
             }
             else -> {
                 return null
