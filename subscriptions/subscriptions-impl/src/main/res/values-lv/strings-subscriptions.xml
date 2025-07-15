@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonementa iestatījumi</string>
     <string name="subscriptionSettingSubscribe">Aizsargā savu savienojumu un identitāti ar Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Ietver mūsu VPN, Personal Information Removal un Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Ietver mūsu VPN un Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Abonenti saņem mūsu VPN, Personal Information Removal un Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Abonenti saņem mūsu VPN un Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Iegūsti Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Izmēģināt Privacy Pro bez maksas</string>
     <string name="subscriptionSettingRestore">Man ir abonements</string>

@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Prenumeratos nustatymai</string>
     <string name="subscriptionSettingSubscribe">Apsaugokite savo ryšį ir tapatybę su „Privacy Pro“.</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Apima mūsų VPN, Asmens duomenų pašalinimą ir Tapatybės vagystės atkūrimą.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Apima mūsų VPN ir Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Prenumeratoriai gauna mūsų VPN, asmeninės informacijos pašalinimo ir tapatybės vagystės atkūrimo paslaugas.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Prenumeratoriai gauna mūsų VPN ir tapatybės vagystės atkūrimą.</string>
+
     <string name="subscriptionSettingGet">Gaukite „Privacy Pro“</string>
     <string name="subscriptionSettingTryFreeTrial">Išbandyk „Privacy Pro“ nemokamai</string>
     <string name="subscriptionSettingRestore">Turiu prenumeratą</string>

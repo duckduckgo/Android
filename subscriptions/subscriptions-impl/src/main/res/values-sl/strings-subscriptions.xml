@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Nastavitve naročnine</string>
     <string name="subscriptionSettingSubscribe">Zaščite svojo povezavo in identiteto s Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Vključuje naše storitve VPN, Personal Information Removal in Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Vključuje naš VPN in Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Naročnikom so na voljo naš VPN ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Naročnikom je sta voljo naš VPN in zaščita Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Pridobite Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Preizkusite Privacy Pro brezplačno</string>
     <string name="subscriptionSettingRestore">Imam naročnino</string>

@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tilauksen asetukset</string>
     <string name="subscriptionSettingSubscribe">Suojaa yhteytesi ja identiteettisi Privacy Prolla</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Seuraavat sisältyvät: VPN, Personal Information Removal ja Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Sisältää: VPN ja Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Tilaajat saavat VPN:n, Personal Information Removalin ja Identity Theft Restorationin.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Tilaajat saavat VPN:n ja Identity Theft Restorationin.</string>
+
     <string name="subscriptionSettingGet">Hanki Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Kokeile Privacy Pro -tilausta ilmaiseksi</string>
     <string name="subscriptionSettingRestore">Minulla on tilaus</string>
