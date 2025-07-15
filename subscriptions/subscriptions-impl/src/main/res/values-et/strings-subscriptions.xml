@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tellimuse seaded</string>
     <string name="subscriptionSettingSubscribe">Kaitse oma ühendust ja identiteeti rakendusega Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Sisaldab meie VPN-i, rakendusi Personal Information Removal ja Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Sisaldab meie VPN-i ja teenust Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Tellijad saavad meie VPN-i ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Tellijad saavad meie VPN-i ja teenuse Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Hangi Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Proovi Privacy Pro\'d tasuta</string>
     <string name="subscriptionSettingRestore">Mul on tellimus</string>

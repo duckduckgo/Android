@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Impostazioni dell\'abbonamento</string>
     <string name="subscriptionSettingSubscribe">Proteggi la tua connessione e la tua identità con Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Includi VPN, Personal Information Removal e Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Include i nostri servizi di VPN e Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Gli abbonati ricevono la nostra VPN, Personal Information Removal e Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Gli abbonati ricevono i nostri servizi di VPN e Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Ottieni Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Prova Privacy Pro gratis</string>
     <string name="subscriptionSettingRestore">Ho un abbonamento</string>

@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Előfizetési beállítások</string>
     <string name="subscriptionSettingSubscribe">Kapcsolat és a személyazonosság védelme a Privacy Pro segítségével</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Tartalmazza a VPN-megoldásunkat, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Tartalmazza a VPN-megoldásunkat és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Az előfizetők megkapják a VPN-megoldásunkat, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Az előfizetők megkapják a VPN-megoldásunkat és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+
     <string name="subscriptionSettingGet">Privacy Pro előfizetése</string>
     <string name="subscriptionSettingTryFreeTrial">Próbáld ki a Privacy Prót ingyen</string>
     <string name="subscriptionSettingRestore">Van előfizetésem</string>
