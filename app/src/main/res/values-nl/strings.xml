@@ -798,8 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, voordat ik het vergeet...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een ingebouwde <b>VPN</b>!<br/><br/>Activeer deze met een <b>betaald Privacy Pro-abonnement.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo heeft ook een abonnement, met een veilige <b>VPN</b> en 2 extra premium beveiligingen. <b>Probeer het gratis!</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo biedt ook beveiligde <b>VPN + nog 2 premiumbeveiligingen</b>, beschikbaar met een <b>optioneel betaald abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
 
     <!-- Highlight Onboarding Experiment-->
