@@ -275,9 +275,18 @@ class CtaViewModel @Inject constructor(
             // Privacy Pro
             canShowPrivacyProCta() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescription
+                val descriptionRes: Int = if (freeTrialCopyAvailable()) {
+                    R.string.onboardingPrivacyProDaxDialogFreeTrialDescription
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogDescription
+                }
+                val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
+                    R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogOkButton
+                }
 
-                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes)
+                DaxBubbleCta.DaxPrivacyProCta(onboardingStore, appInstallStore, titleRes, descriptionRes, primaryCtaRes)
             }
 
             // Add Widget
@@ -319,6 +328,9 @@ class CtaViewModel @Inject constructor(
     private fun canShowWidgetCta(): Boolean {
         return !widgetCapabilities.hasInstalledWidgets && !dismissedCtaDao.exists(CtaId.ADD_WIDGET)
     }
+
+    private suspend fun freeTrialCopyAvailable(): Boolean =
+        extendedOnboardingFeatureToggles.freeTrialCopy().isEnabled() && subscriptions.isFreeTrialEligible()
 
     @WorkerThread
     private suspend fun getBrowserCta(site: Site?, detectedRefreshPatterns: Set<RefreshPattern>): Cta? {

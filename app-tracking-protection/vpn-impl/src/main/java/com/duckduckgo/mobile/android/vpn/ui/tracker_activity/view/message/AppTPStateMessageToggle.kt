@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.onboarding.ui.page.extendedonboarding
+package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.Experiment
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "extendedOnboarding",
+    featureName = "freeTrialInPProUpsell",
 )
-interface ExtendedOnboardingFeatureToggles {
-
+interface AppTPStateMessageToggle {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun noBrowserCtas(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun privacyProCta(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    @Experiment
     fun freeTrialCopy(): Toggle
 }
