@@ -22,10 +22,4 @@ tags:
               text: "Turn on Duck Player to watch without targeted ads"
           timeout: 5000
       
-      # Core assertion: Verify we're still on regular YouTube (not Duck Player)
-      - assertNotVisible:
-          text: "duck://player/.*"
-      
-      # Verify we're still on YouTube mobile URL
-      - assertVisible:
-          text: ".*youtube.*" 
+      - runFlow: common/assert_youtube_visible.yaml
