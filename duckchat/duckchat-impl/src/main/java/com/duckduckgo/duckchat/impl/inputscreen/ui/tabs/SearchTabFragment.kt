@@ -16,9 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
+import android.os.Build.VERSION
 import android.os.Bundle
 import android.transition.Transition
 import android.view.View
+import android.view.View.OVER_SCROLL_NEVER
+import android.view.ViewTreeObserver
 import android.view.animation.OvershootInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -36,6 +39,7 @@ import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration
+import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
@@ -76,6 +80,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                     configureFavorites()
                     configureAutoComplete()
                     configureObservers()
+                    configureBottomBlur()
                     transition.removeListener(this)
                 }
 
@@ -85,6 +90,24 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 override fun onTransitionResume(transition: Transition) {}
             },
         )
+    }
+
+    private fun configureBottomBlur() {
+        if (VERSION.SDK_INT >= 33) {
+            // TODO: Handle overscroll when blurring
+            binding.autoCompleteSuggestionsList.overScrollMode = OVER_SCROLL_NEVER
+
+            val bottomBlurView = BottomBlurView(requireContext())
+            bottomBlurView.setTargetView(binding.autoCompleteSuggestionsList)
+            binding.bottomFadeContainer.addView(bottomBlurView)
+
+            ViewTreeObserver.OnPreDrawListener {
+                bottomBlurView.invalidate()
+                true
+            }.also { listener ->
+                bottomBlurView.viewTreeObserver.addOnPreDrawListener(listener)
+            }
+        }
     }
 
     private fun configureFavorites() {
@@ -148,6 +171,8 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun configureObservers() {
         viewModel.visibilityState.onEach {
             binding.autoCompleteSuggestionsList.isVisible = it.autoCompleteSuggestionsVisible
+            binding.bottomFadeContainer.isVisible = it.autoCompleteSuggestionsVisible
+
             if (!it.autoCompleteSuggestionsVisible) {
                 viewModel.autoCompleteSuggestionsGone()
             }
