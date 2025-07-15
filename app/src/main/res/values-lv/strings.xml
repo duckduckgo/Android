@@ -814,8 +814,9 @@
     <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ak, pirms es aizmirsu...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ir arī iebūvēts <b>VPN</b>!<br/><br/>Aktivizējiet to, izmantojot <b>maksas Privacy Pro abonementu.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo piedāvā arī abonementu, kurā ir drošs <b>VPN</b> un vēl 2 premium aizsardzības līdzekļi.<b>Izmēģini to bez maksas!</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
 
     <!-- Highlight Onboarding Experiment-->
