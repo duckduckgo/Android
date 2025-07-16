@@ -24,9 +24,11 @@ import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface AutofillAvailableInputTypesProvider {
     suspend fun getTypes(url: String?): AvailableInputTypes
@@ -46,20 +48,23 @@ class RealAutofillAvailableInputTypesProvider @Inject constructor(
     private val shareableCredentials: ShareableCredentials,
     private val autofillCapabilityChecker: AutofillCapabilityChecker,
     private val inBrowserPromo: InBrowserImportPromo,
+    private val dispatchers: DispatcherProvider,
 ) : AutofillAvailableInputTypesProvider {
 
     override suspend fun getTypes(url: String?): AvailableInputTypes {
-        val availableInputTypeCredentials = determineIfCredentialsAvailable(url)
-        val credentialsAvailableOnThisPage = availableInputTypeCredentials.username || availableInputTypeCredentials.password
-        val emailAvailable = determineIfEmailAvailable()
-        val importPromoAvailable = inBrowserPromo.canShowPromo(credentialsAvailableOnThisPage, url)
+        return withContext(dispatchers.io()) {
+            val availableInputTypeCredentials = determineIfCredentialsAvailable(url)
+            val credentialsAvailableOnThisPage = availableInputTypeCredentials.username || availableInputTypeCredentials.password
+            val emailAvailable = determineIfEmailAvailable()
+            val importPromoAvailable = inBrowserPromo.canShowPromo(credentialsAvailableOnThisPage, url)
 
-        return AvailableInputTypes(
-            username = availableInputTypeCredentials.username,
-            password = availableInputTypeCredentials.password,
-            email = emailAvailable,
-            credentialsImport = importPromoAvailable,
-        )
+            AvailableInputTypes(
+                username = availableInputTypeCredentials.username,
+                password = availableInputTypeCredentials.password,
+                email = emailAvailable,
+                credentialsImport = importPromoAvailable,
+            )
+        }
     }
 
     private suspend fun determineIfCredentialsAvailable(url: String?): AvailableInputTypeCredentials {
