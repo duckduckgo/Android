@@ -1,5 +1,4 @@
 apply plugin: 'com.diffplug.spotless'
-apply plugin: 'org.jmailen.kotlinter'
 
 spotless {
     java {
@@ -15,12 +14,4 @@ spotless {
         leadingTabsToSpaces()
         trimTrailingWhitespace()
     }
-}
-
-kotlinter {
-    disabledRules = ['no-wildcard-imports', 'filename', 'package-name', 'annotation-spacing']
-}
-
-tasks.register('code_format_checks') {
-    dependsOn 'spotlessCheck', 'lintKotlin'
 }
