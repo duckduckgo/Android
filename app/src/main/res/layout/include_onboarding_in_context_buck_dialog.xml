@@ -84,7 +84,7 @@
                     android:layout_marginBottom="@dimen/keyline_4"
                     android:text="@string/onboardingEndDaxDialogTitle"
                     android:textColor="@color/buckColorPrimaryText"
-                    tools:ignore="InvalidColorAttribute" />
+                    tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -142,7 +142,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/onboardingSitesSuggestionsDaxDialogTitle"
                     android:textColor="@color/buckColorPrimaryText"
-                    tools:ignore="InvalidColorAttribute" />
+                    tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
                 <FrameLayout
                     android:id="@+id/cardContainer"
