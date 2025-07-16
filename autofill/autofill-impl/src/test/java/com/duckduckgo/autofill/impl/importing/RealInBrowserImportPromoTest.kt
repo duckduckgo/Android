@@ -20,6 +20,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.Mockito.mock
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
@@ -35,6 +36,7 @@ class RealInBrowserImportPromoParameterizedTest(
     private val autofillStore: InternalAutofillStore = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
     private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val inBrowserPromoPreviousPromptsStore: InBrowserPromoPreviousPromptsStore = mock()
 
     private val testee = RealInBrowserImportPromo(
         autofillStore = autofillStore,
@@ -42,6 +44,7 @@ class RealInBrowserImportPromoParameterizedTest(
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillFeature = autofillFeature,
         webViewCapabilityChecker = webViewCapabilityChecker,
+        inBrowserPromoPreviousPromptsStore = inBrowserPromoPreviousPromptsStore,
     )
 
     @Before
@@ -56,6 +59,7 @@ class RealInBrowserImportPromoParameterizedTest(
         autofillFeature.self().setRawStoredState(State(enable = testCase.autofillFeatureEnabled))
         whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(testCase.webViewWebMessageSupport)
         whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(testCase.webViewDocumentStartJavascript)
+        whenever(inBrowserPromoPreviousPromptsStore.hasPromoBeenDisplayed(anyOrNull())).thenReturn(testCase.promoPreviouslyShownForUrl)
     }
 
     @Test
@@ -235,8 +239,8 @@ class RealInBrowserImportPromoParameterizedTest(
                     hasDeclinedPromo = false,
                     credentialCount = 0,
                     promoShownCount = 0,
-                    expected = true,
-                    description = "eligible: url is null, all other conditions met",
+                    expected = false,
+                    description = "ineligible: url is null",
                 ),
                 CanShowPromoTestCase(
                     credentialsAvailableForCurrentPage = true,
@@ -278,6 +282,36 @@ class RealInBrowserImportPromoParameterizedTest(
                     expected = false,
                     description = "ineligible: webview does not support DocumentStartJavaScript",
                 ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = 0,
+                    promoShownCount = 0,
+                    webViewWebMessageSupport = true,
+                    webViewDocumentStartJavascript = true,
+                    promoPreviouslyShownForUrl = true,
+                    expected = false,
+                    description = "ineligible: promo previously shown for url",
+                ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = 0,
+                    promoShownCount = 0,
+                    webViewWebMessageSupport = true,
+                    webViewDocumentStartJavascript = true,
+                    promoPreviouslyShownForUrl = false,
+                    expected = true,
+                    description = "eligible: promo not previously shown for url",
+                ),
             )
         }
 
@@ -301,6 +335,7 @@ data class CanShowPromoTestCase(
     val promoShownCount: Int,
     val webViewWebMessageSupport: Boolean = true,
     val webViewDocumentStartJavascript: Boolean = true,
+    val promoPreviouslyShownForUrl: Boolean = false,
     val expected: Boolean,
     val description: String,
 ) {

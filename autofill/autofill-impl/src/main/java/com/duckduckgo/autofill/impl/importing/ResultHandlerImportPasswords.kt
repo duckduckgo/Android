@@ -39,6 +39,7 @@ class ResultHandlerImportPasswords @Inject constructor(
     private val autofillAvailableInputTypesProvider: AutofillAvailableInputTypesProvider,
     private val dispatchers: DispatcherProvider,
     private val autofillMessagePoster: AutofillMessagePoster,
+    private val previousPromoPrompts: InBrowserPromoPreviousPromptsStore,
 ) : AutofillFragmentResultsPlugin {
 
     override suspend fun processResult(
@@ -49,20 +50,25 @@ class ResultHandlerImportPasswords @Inject constructor(
         autofillCallback: AutofillEventListener,
         webView: WebView?,
     ) {
-        logcat { "Autofill: processing import passwords result for tab $tabId" }
+        val originalUrl = result.getString(ImportPasswordsDialog.KEY_URL) ?: return
+        storeUrlForPromptToAvoidAskingAgain(originalUrl)
+
+        logcat { "Autofill: processing import passwords result for url=$originalUrl, tab=$tabId" }
         if (result.getBoolean(ImportPasswordsDialog.KEY_IMPORT_SUCCESS)) {
             logcat { "Autofill: refresh after import passwords success" }
-            val originalUrl = result.getString(ImportPasswordsDialog.KEY_URL)
-            if (originalUrl != null && webView != null) {
+            if (webView != null) {
                 refreshAvailableInputTypes(webView, originalUrl)
             } else {
-                logcat { "Autofill: cannot refresh available input types for url=$originalUrl (webView is null: ${webView == null})" }
+                logcat { "Autofill: cannot refresh available input types for url=$originalUrl, webView is null" }
             }
         } else {
             logcat { "Autofill: import didn't succeed; returning a 'no credential' response" }
-            val originalUrl = result.getString(ImportPasswordsDialog.KEY_URL) ?: return
             autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
         }
+    }
+
+    private suspend fun storeUrlForPromptToAvoidAskingAgain(originalUrl: String) {
+        previousPromoPrompts.recordPromoDisplayed(originalUrl)
     }
 
     private suspend fun refreshAvailableInputTypes(
