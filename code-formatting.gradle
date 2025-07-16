@@ -6,7 +6,7 @@ spotless {
         target 'src/*/kotlin/**/*.kt', 'src/*/java/**/*.kt'
         ktlint()
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
     }
     java {
         target 'src/*/java/**/*.java'
