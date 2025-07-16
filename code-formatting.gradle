@@ -6,7 +6,7 @@ spotless {
         target("src/**/*.kt")
         ktlint("1.7.0")
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
     }
     java {
         target 'src/*/java/**/*.java'
@@ -14,11 +14,11 @@ spotless {
         targetExclude("**/FragmentStateAdapter.java") // temporary
         removeUnusedImports()
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
     }
     format 'xml', {
         target '**/*.xml'
-        indentWithSpaces()
+        leadingTabsToSpaces()
         trimTrailingWhitespace()
     }
 }
