@@ -16,6 +16,9 @@
 
 package com.duckduckgo.autofill.impl.importing
 
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
@@ -39,6 +42,7 @@ class RealInBrowserImportPromo @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillFeature: AutofillFeature,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : InBrowserImportPromo {
 
     override suspend fun canShowPromo(
@@ -50,7 +54,7 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
-            if (!autofillFeature.canPromoteImportGooglePasswordsInBrowser().isEnabled()) {
+            if (featureEnabled().not()) {
                 return@withContext false
             }
 
@@ -74,8 +78,24 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
+            if (webViewCapableOfImporting().not()) {
+                return@withContext false
+            }
+
             return@withContext true
         }
+    }
+
+    private suspend fun webViewCapableOfImporting(): Boolean {
+        val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
+        val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
+        return webViewWebMessageSupport && webViewDocumentStartJavascript
+    }
+
+    private fun featureEnabled(): Boolean {
+        if (autofillFeature.self().isEnabled().not()) return false
+        if (autofillFeature.canPromoteImportGooglePasswordsInBrowser().isEnabled().not()) return false
+        return true
     }
 
     companion object {

@@ -1,6 +1,9 @@
 package com.duckduckgo.autofill.impl.importing
 
 import android.annotation.SuppressLint
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.RealInBrowserImportPromo.Companion.MAX_PROMO_SHOWN_COUNT
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -28,13 +31,17 @@ class RealInBrowserImportPromoParameterizedTest(
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
+
     private val autofillStore: InternalAutofillStore = mock()
     private val neverSavedSiteRepository: NeverSavedSiteRepository = mock()
+    private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+
     private val testee = RealInBrowserImportPromo(
         autofillStore = autofillStore,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         neverSavedSiteRepository = neverSavedSiteRepository,
         autofillFeature = autofillFeature,
+        webViewCapabilityChecker = webViewCapabilityChecker,
     )
 
     @Before
@@ -46,6 +53,9 @@ class RealInBrowserImportPromoParameterizedTest(
         whenever(neverSavedSiteRepository.isInNeverSaveList(EXAMPLE_URL)).thenReturn(false)
         whenever(neverSavedSiteRepository.isInNeverSaveList(NEVER_SAVE_URL)).thenReturn(true)
         autofillFeature.canPromoteImportGooglePasswordsInBrowser().setRawStoredState(State(enable = testCase.inBrowserPromoFeatureEnabled))
+        autofillFeature.self().setRawStoredState(State(enable = testCase.autofillFeatureEnabled))
+        whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(testCase.webViewWebMessageSupport)
+        whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(testCase.webViewDocumentStartJavascript)
     }
 
     @Test
@@ -64,6 +74,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -75,6 +86,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = true,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -86,17 +98,31 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = false,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
                     promoShownCount = 0,
                     expected = false,
-                    description = "ineligible: feature disabled",
+                    description = "ineligible: can import password feature disabled",
                 ),
                 CanShowPromoTestCase(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = false,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = 0,
+                    promoShownCount = 0,
+                    expected = false,
+                    description = "ineligible: autofill feature disabled",
+                ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = true,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -108,6 +134,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = true,
                     credentialCount = 0,
@@ -119,6 +146,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO - 1,
@@ -130,6 +158,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO,
@@ -141,6 +170,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO + 1,
@@ -152,6 +182,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -163,6 +194,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -174,6 +206,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -185,6 +218,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = NEVER_SAVE_URL,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -196,6 +230,7 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = false,
                     url = null,
                     inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = false,
                     hasDeclinedPromo = false,
                     credentialCount = 0,
@@ -207,12 +242,41 @@ class RealInBrowserImportPromoParameterizedTest(
                     credentialsAvailableForCurrentPage = true,
                     url = EXAMPLE_URL,
                     inBrowserPromoFeatureEnabled = false,
+                    autofillFeatureEnabled = true,
                     hasEverImportedPasswords = true,
                     hasDeclinedPromo = true,
                     credentialCount = RealInBrowserImportPromo.MAX_CREDENTIALS_FOR_PROMO,
                     promoShownCount = MAX_PROMO_SHOWN_COUNT,
                     expected = false,
                     description = "ineligible: multiple disqualifying conditions",
+                ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = 0,
+                    promoShownCount = 0,
+                    webViewWebMessageSupport = false,
+                    webViewDocumentStartJavascript = true,
+                    expected = false,
+                    description = "ineligible: webview does not support WebMessageListener",
+                ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = EXAMPLE_URL,
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = 0,
+                    promoShownCount = 0,
+                    webViewWebMessageSupport = true,
+                    webViewDocumentStartJavascript = false,
+                    expected = false,
+                    description = "ineligible: webview does not support DocumentStartJavaScript",
                 ),
             )
         }
@@ -230,10 +294,13 @@ data class CanShowPromoTestCase(
     val credentialsAvailableForCurrentPage: Boolean,
     val url: String?,
     val inBrowserPromoFeatureEnabled: Boolean,
+    val autofillFeatureEnabled: Boolean,
     val hasEverImportedPasswords: Boolean,
     val hasDeclinedPromo: Boolean,
     val credentialCount: Int,
     val promoShownCount: Int,
+    val webViewWebMessageSupport: Boolean = true,
+    val webViewDocumentStartJavascript: Boolean = true,
     val expected: Boolean,
     val description: String,
 ) {
