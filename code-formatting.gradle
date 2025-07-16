@@ -1,6 +1,13 @@
 apply plugin: 'com.diffplug.spotless'
 
 spotless {
+    ratchetFrom 'origin/develop'
+    kotlin {
+        target 'src/*/kotlin/**/*.kt', 'src/*/java/**/*.kt'
+        ktlint()
+        trimTrailingWhitespace()
+        indentWithSpaces()
+    }
     java {
         target 'src/*/java/**/*.java'
         googleJavaFormat('1.22.0').aosp()
