@@ -142,6 +142,8 @@
 
         <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
         <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
+
+        <item name="toolbarExtraPadding">@dimen/keyline_empty</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->

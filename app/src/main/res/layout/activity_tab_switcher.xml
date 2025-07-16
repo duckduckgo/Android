@@ -22,6 +22,12 @@
     android:layout_height="match_parent">
 
     <include
+        android:id="@+id/tabSwitcherExperimentToolbarTop"
+        layout="@layout/include_tab_switcher_toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include
         android:id="@+id/tabSwitcherToolbarTop"
         layout="@layout/include_default_toolbar"
         android:layout_width="match_parent"
@@ -72,7 +78,7 @@
 
     <include
         android:id="@+id/tabSwitcherToolbarBottom"
-        layout="@layout/include_default_toolbar"
+        layout="@layout/include_tab_switcher_toolbar_bottom"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
