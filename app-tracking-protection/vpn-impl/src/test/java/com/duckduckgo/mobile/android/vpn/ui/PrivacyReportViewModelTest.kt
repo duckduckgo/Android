@@ -32,7 +32,7 @@ import com.duckduckgo.mobile.android.vpn.stats.RealAppTrackerBlockingStatsReposi
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
 import com.duckduckgo.mobile.android.vpn.trackers.AppTrackerEntity
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel
 import java.time.LocalDateTime
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.runBlocking
