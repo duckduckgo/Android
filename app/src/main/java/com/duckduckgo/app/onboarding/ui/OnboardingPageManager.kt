@@ -49,7 +49,7 @@ class OnboardingPageManagerWithTrackerBlocking(
         pages.clear()
 
         // TODO: check experiment variant
-        pages.add(BuckWelcomePageBlueprint)
+        pages.add(BbWelcomePageBlueprint)
 
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint))
