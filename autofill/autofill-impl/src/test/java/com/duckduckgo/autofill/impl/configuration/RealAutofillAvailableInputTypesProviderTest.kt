@@ -23,10 +23,12 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.MockitoAnnotations
@@ -37,6 +39,9 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealAutofillAvailableInputTypesProviderTest {
+
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var testee: RealAutofillAvailableInputTypesProvider
 
@@ -55,6 +60,7 @@ class RealAutofillAvailableInputTypesProviderTest {
             shareableCredentials = shareableCredentials,
             autofillCapabilityChecker = autofillCapabilityChecker,
             inBrowserPromo = inBrowserPromo,
+            dispatchers = coroutineTestRule.testDispatcherProvider,
         )
 
         // Default setup

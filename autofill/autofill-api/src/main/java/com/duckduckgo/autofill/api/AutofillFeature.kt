@@ -155,6 +155,6 @@ interface AutofillFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canPromoteImportPasswordsInPasswordManagement(): Toggle
 
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canPromoteImportGooglePasswordsInBrowser(): Toggle
 }
