@@ -25,6 +25,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.OnboardingStore
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -61,6 +62,9 @@ class CtaTest {
 
     @Mock
     private lateinit var mockSettingsDataStore: SettingsDataStore
+
+    @Mock
+    private lateinit var mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
     @Before
     fun before() {
@@ -234,7 +238,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsDialogTypeReturnCorrectCancelParameters() {
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
 
         val value = testee.pixelCancelParameters()
         assertEquals(1, value.size)
@@ -244,7 +248,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsDialogTypeReturnCorrectOkParameters() {
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
 
         val value = testee.pixelOkParameters()
         assertEquals(1, value.size)
@@ -256,7 +260,7 @@ class CtaTest {
     fun whenCtaIsDialogTypeReturnCorrectShownParameters() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
         val expectedValue = "${testee.ctaPixelParam}:0"
 
         val value = testee.pixelShownParameters()
@@ -270,7 +274,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()
@@ -285,7 +289,13 @@ class CtaTest {
             TestingEntity("Amazon", "Amazon", 9.0),
         )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, mockSettingsDataStore)
+        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            trackers,
+            mockSettingsDataStore,
+            mockOnboardingDesignExperimentToggles,
+        )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook, Other</b>withMultiple", value)
@@ -298,7 +308,13 @@ class CtaTest {
             TestingEntity("Other", "Other", 9.0),
         )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, mockSettingsDataStore)
+        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            trackers,
+            mockSettingsDataStore,
+            mockOnboardingDesignExperimentToggles,
+        )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook, Other</b>withZero", value)
@@ -334,6 +350,7 @@ class CtaTest {
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
                 mockSettingsDataStore,
+                mockOnboardingDesignExperimentToggles,
             )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -369,6 +386,7 @@ class CtaTest {
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
             mockSettingsDataStore,
+            mockOnboardingDesignExperimentToggles,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -404,6 +422,7 @@ class CtaTest {
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
             mockSettingsDataStore,
+            mockOnboardingDesignExperimentToggles,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -418,7 +437,13 @@ class CtaTest {
             TestingEntity("Facebook", "Facebook", 9.0),
         )
 
-        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(mockOnboardingStore, mockAppInstallStore, trackers, mockSettingsDataStore)
+        val testee = OnboardingDaxDialogCta.DaxTrackersBlockedCta(
+            mockOnboardingStore,
+            mockAppInstallStore,
+            trackers,
+            mockSettingsDataStore,
+            mockOnboardingDesignExperimentToggles,
+        )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
         assertEquals("<b>Facebook</b>withZero", value)
@@ -429,7 +454,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore)
+        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()
