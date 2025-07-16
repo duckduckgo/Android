@@ -5502,7 +5502,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
@@ -5519,7 +5519,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
         testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
@@ -5536,7 +5536,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -5552,7 +5552,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -5568,7 +5568,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -5593,7 +5593,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles
+            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
         )
         setCta(cta)
 
