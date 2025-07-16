@@ -16,9 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel
 
+import android.util.Patterns
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -33,7 +35,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
-import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
 import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenMode
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -44,10 +45,13 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -55,11 +59,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -67,8 +75,8 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
-@ContributesViewModel(FragmentScope::class)
-class InputScreenViewModel @Inject constructor(
+class InputScreenViewModel @AssistedInject constructor(
+    @Assisted currentOmnibarText: String,
     private val autoComplete: AutoComplete,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
@@ -91,12 +99,73 @@ class InputScreenViewModel @Inject constructor(
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
 
-    private val searchInputTextState = MutableStateFlow("")
+    private val initialSearchInputText = currentOmnibarText.trim()
+    private val searchInputTextState = MutableStateFlow(initialSearchInputText)
 
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    val autoCompleteSuggestionResults: StateFlow<AutoCompleteResult> = searchInputTextState
-        .debounce(300)
-        .flatMapLatest { autoComplete.autoComplete(it) }
+    /**
+     * Tracks whether we should show autocomplete suggestions based on the initial input state.
+     *
+     * This becomes true when either:
+     * 1. The user has modified the input text from its initial state, OR
+     * 2. The initial text was not a URL (e.g., search query from SERP)
+     *
+     * We suppress autocomplete when the user is on a webpage and the input still shows
+     * that page's URL unchanged, since autocomplete suggestions would then obfuscate favorites.
+     */
+    private var hasMovedBeyondInitialUrl = false
+
+    /**
+     * Caches the feature flag and user preference state.
+     */
+    private val autoCompleteSuggestionsEnabled = MutableStateFlow(autoCompleteSettings.autoCompleteSuggestionsEnabled)
+
+    /**
+     * Monitors conditions to determine if auto-complete suggestions should be shown.
+     *
+     * We only want to show auto-complete suggestions if:
+     * - The feature is enabled
+     * - The search input text is not empty
+     * - Either the user has modified the input OR the initial text wasn't a URL
+     *
+     * The initial text comes from the address bar. If it's a URL that hasn't been modified,
+     * it represents the current webpage, so we suppress autocomplete. If the user is on SERP,
+     * the initial text will be the search query (not URL), so we show autocomplete immediately.
+     */
+    private val shouldShowAutoComplete = combine(
+        autoCompleteSuggestionsEnabled,
+        searchInputTextState,
+    ) { autoCompleteEnabled, searchInput ->
+        val shouldShowBasedOnInput = if (hasMovedBeyondInitialUrl) {
+            // once user has interacted or initial text wasn't a URL, allow autocomplete (if the rest of the conditions are met as well)
+            true
+        } else {
+            // check if user modified input or initial text wasn't a webpage URL
+            val userHasModifiedInput = initialSearchInputText != searchInput
+            val initialTextWasNotWebUrl = !searchInput.isWebUrl() && searchInput.toUri().scheme != "duck"
+
+            val shouldShow = userHasModifiedInput || initialTextWasNotWebUrl
+            if (shouldShow) {
+                hasMovedBeyondInitialUrl = true
+            }
+            shouldShow
+        }
+
+        autoCompleteEnabled &&
+            searchInput.isNotEmpty() &&
+            shouldShowBasedOnInput
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val autoCompleteSuggestionResults: StateFlow<AutoCompleteResult> = shouldShowAutoComplete
+        .flatMapLatest { shouldShow ->
+            if (shouldShow) {
+                searchInputTextState
+                    .debounceExceptFirst(300)
+                    .flatMapLatest { autoComplete.autoComplete(it) }
+            } else {
+                flowOf(AutoCompleteResult("", emptyList()))
+            }
+        }
         .flowOn(dispatchers.io())
         .onEach { result ->
             if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
@@ -130,14 +199,19 @@ class InputScreenViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+
+        shouldShowAutoComplete.onEach { showAutoComplete ->
+            _visibilityState.update {
+                it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onActivityResume() {
-        val showAutoCompleteSuggestions = shouldShowAutoCompleteSuggestions()
+        autoCompleteSuggestionsEnabled.value = autoCompleteSettings.autoCompleteSuggestionsEnabled
         _visibilityState.update {
             it.copy(
                 voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
-                autoCompleteSuggestionsVisible = showAutoCompleteSuggestions,
             )
         }
     }
@@ -213,13 +287,7 @@ class InputScreenViewModel @Inject constructor(
     }
 
     fun onSearchInputTextChanged(query: String) {
-        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
-            searchInputTextState.value = query.trim()
-        }
-        val showAutoCompleteSuggestions = shouldShowAutoCompleteSuggestions()
-        _visibilityState.update {
-            it.copy(autoCompleteSuggestionsVisible = showAutoCompleteSuggestions)
-        }
+        searchInputTextState.value = query.trim()
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
@@ -267,7 +335,33 @@ class InputScreenViewModel @Inject constructor(
         voiceInputAllowed.value = allowed
     }
 
-    private fun shouldShowAutoCompleteSuggestions(): Boolean {
-        return autoCompleteSettings.autoCompleteSuggestionsEnabled && searchInputTextState.value.isNotBlank()
+    class InputScreenViewModelProviderFactory(
+        private val assistedFactory: InputScreenViewModelFactory,
+        private val currentOmnibarText: String,
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return assistedFactory.create(currentOmnibarText) as T
+        }
     }
+
+    @AssistedFactory
+    interface InputScreenViewModelFactory {
+        fun create(
+            currentOmnibarText: String,
+        ): InputScreenViewModel
+    }
+}
+
+@OptIn(FlowPreview::class)
+private fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> {
+    return merge(
+        take(1),
+        drop(1).debounce(timeoutMillis),
+    )
+}
+
+private fun String.isWebUrl(): Boolean {
+    return Patterns.WEB_URL.matcher(this).matches()
 }

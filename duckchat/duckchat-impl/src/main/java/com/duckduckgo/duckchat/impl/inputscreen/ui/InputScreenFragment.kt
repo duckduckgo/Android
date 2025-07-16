@@ -30,7 +30,6 @@ import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
@@ -45,6 +44,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -69,10 +70,13 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     lateinit var voiceSearchAvailability: VoiceSearchAvailability
 
     @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
+    lateinit var viewModelFactory: InputScreenViewModelFactory
 
     private val viewModel: InputScreenViewModel by lazy {
-        ViewModelProvider(this, viewModelFactory)[InputScreenViewModel::class.java]
+        val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
+        val currentOmnibarText = params?.query ?: ""
+        val providerFactory = InputScreenViewModelProviderFactory(viewModelFactory, currentOmnibarText = currentOmnibarText)
+        ViewModelProvider(owner = this, factory = providerFactory)[InputScreenViewModel::class.java]
     }
 
     private val binding: FragmentInputScreenBinding by viewBinding()
