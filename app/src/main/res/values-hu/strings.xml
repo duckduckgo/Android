@@ -798,8 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Minden kész!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo beépített <b>VPN</b>-nel is rendelkezik!<br/><br/>Az aktiválásához <b>fizess elő a Privacy Pro csomagra.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[A DuckDuckGóhoz egy biztonságos <b>VPN</b>-t és további két prémium védelmet tartalmazó előfizetés is igénybe vehető. <b>Próbáld ki ingyen!</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[A DuckDuckGo funkciói között <b>opcionális előfizetés</b> mellett igénybe vehető biztonságos <b>VPN és további két prémium védelem</b> is szerepel.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
 
     <!-- Highlight Onboarding Experiment-->
