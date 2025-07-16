@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.report
+package com.duckduckgo.mobile.android.vpn.ui.privacyreport
 
 import android.app.ActivityOptions
 import android.os.Bundle
@@ -38,7 +38,8 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -139,7 +140,7 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_warning)
     }
 
-    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
+    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {
         val trackersBlocked = trackerBlocked.trackers
         val lastTrackingApp = trackerBlocked.latestApp
         val otherApps = trackerBlocked.otherAppsSize
