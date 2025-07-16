@@ -57,4 +57,11 @@ interface DuckPlayerFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun customError(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "addCustomEmbedReferer" feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun addCustomEmbedReferer(): Toggle
 }
