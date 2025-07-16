@@ -35,6 +35,7 @@
     <dimen name="experimentalOmnibarCardFocusedMarginBottom">10dp</dimen>
     <dimen name="experimentalOmnibarOutlineWidth">0dp</dimen>
     <dimen name="experimentalOmnibarOutlineFocusedWidth">2dp</dimen>
+    <dimen name="expreimentalTabSwitcherToolbarTopSize">56dp</dimen>
     <dimen name="experimentalCookiesAnimationHeight">34dp</dimen>
     <dimen name="experimentalCookiesAnimationRadius">14dp</dimen>
 </resources>
