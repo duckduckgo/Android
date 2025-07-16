@@ -265,9 +265,13 @@ class RealDuckPlayer @Inject constructor(
         return uri.host?.removePrefix("www.") == embedUrl
     }
 
-    private fun isYouTubeNoCookieEmbedUri(uri: Uri): Boolean {
-        // TODO (cbarreiro) check video ID against webView URL
-        return isYouTubeNoCookieUri(uri) && uri.pathSegments.firstOrNull() == "embed"
+    private fun isYouTubeNoCookieEmbedUri(
+        uri: Uri,
+        webViewUrl: String?,
+    ): Boolean {
+        webViewUrl ?: return false
+        if (!isYouTubeNoCookieUri(uri) || uri.pathSegments.firstOrNull() != "embed") return false
+        return webViewUrl.toUri().getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == uri.pathSegments.getOrNull(1)
     }
 
     override fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean {
@@ -319,11 +323,12 @@ class RealDuckPlayer @Inject constructor(
             return processDuckPlayerUri(url, webView)
         } else {
             if (!isFeatureEnabled) return null
+            val webViewUrl = withContext(dispatchers.main()) { webView.url }
             if (isYoutubeWatchUrl(url)) {
                 return processYouTubeWatchUri(request, url, webView)
             } else if (isSimulatedYoutubeNoCookie(url)) {
                 return processSimulatedYouTubeNoCookieUri(url, webView)
-            } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url)) {
+            } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
                 return try {
                     WebResourceResponse("text/html", "UTF-8", getEmbedWithReferer(request))
                 } catch (e: IOException) {
@@ -337,7 +342,7 @@ class RealDuckPlayer @Inject constructor(
     private suspend fun getEmbedWithReferer(request: WebResourceRequest): InputStream? {
         val headers = request.requestHeaders
             .filterNot { it.key.lowercase() == "referer" }
-            .plus("referer" to "file:///android_asset/duckplayer/")
+            .plus("referer" to "http://android.mobile.duckduckgo.com")
             .toHeaders()
         val okHttpRequest = Request.Builder().url(request.url.toString()).headers(headers).build()
         return withContext(dispatchers.io()) { okHttpClient.newCall(okHttpRequest).execute().body?.byteStream() }
