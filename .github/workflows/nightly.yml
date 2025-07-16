@@ -18,6 +18,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          fetch-depth: 0 # required due to setting Spotless ratchetFrom
           submodules: recursive
 
       - name: Set up JDK version
@@ -30,7 +31,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run Code Formatting Checks
-        run: ./gradlew code_format_checks
+        run: ./gradlew spotlessCheck
 
   unit_tests:
     name: Unit tests
