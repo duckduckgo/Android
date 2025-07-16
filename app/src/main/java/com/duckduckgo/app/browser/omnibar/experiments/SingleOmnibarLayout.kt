@@ -37,8 +37,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.extensions.addBottomShadow
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show

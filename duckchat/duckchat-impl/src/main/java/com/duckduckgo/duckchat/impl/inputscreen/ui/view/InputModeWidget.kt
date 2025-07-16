@@ -16,8 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
-import android.animation.ValueAnimator
 import android.content.Context
+import android.os.Build
 import android.text.InputType
 import android.transition.ChangeBounds
 import android.transition.Fade
@@ -26,21 +26,15 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.animation.addListener
 import androidx.core.view.isVisible
-import androidx.core.view.marginBottom
-import androidx.core.view.marginEnd
-import androidx.core.view.marginStart
-import androidx.core.view.marginTop
-import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.mobile.android.R as CommonR
@@ -54,27 +48,11 @@ class InputModeWidget @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
-    private val omnibarCardMarginHorizontal by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginHorizontal) }
-    private val omnibarCardMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop) }
-    private val omnibarCardMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom) }
-    private val omnibarCardFocusedMarginHorizontal by lazy {
-        resources.getDimensionPixelSize(
-            CommonR.dimen.experimentalOmnibarCardFocusedMarginHorizontal,
-        )
-    }
-    private val omnibarCardFocusedMarginTop by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginTop) }
-    private val omnibarCardFocusedMarginBottom by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardFocusedMarginBottom) }
-
-    private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
-    private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
-
-    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.inputModeWidgetCard) }
-    private val omnibarContent: View by lazy { findViewById(R.id.inputModeWidgetCardContent) }
-
     val inputField: EditText
-    val inputFieldClearText: View
-    val inputModeWidgetBack: View
-    val inputModeSwitch: TabLayout
+    private val inputFieldClearText: View
+    private val inputModeWidgetBack: View
+    private val inputModeSwitch: TabLayout
+    private val inputModeWidgetCard: MaterialCardView
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -97,7 +75,6 @@ class InputModeWidget @JvmOverloads constructor(
 
     @IdRes
     private var contentId: Int = View.NO_ID
-    private var focusAnimator: ValueAnimator? = null
     private var originalText: String? = null
     private var hasTextChangedFromOriginal = false
 
@@ -108,11 +85,13 @@ class InputModeWidget @JvmOverloads constructor(
         inputFieldClearText = findViewById(R.id.inputFieldClearText)
         inputModeWidgetBack = findViewById(R.id.InputModeWidgetBack)
         inputModeSwitch = findViewById(R.id.inputModeSwitch)
+        inputModeWidgetCard = findViewById(R.id.inputModeWidgetCard)
 
         configureClickListeners()
         configureInputBehavior()
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
+        configureShadow()
     }
 
     fun provideInitialText(text: String) {
@@ -134,10 +113,6 @@ class InputModeWidget @JvmOverloads constructor(
         maxLines = MAX_LINES
         setHorizontallyScrolling(false)
         setRawInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
-
-        setOnFocusChangeListener { _, hasFocus ->
-            animateOmnibarFocusedState(hasFocus)
-        }
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -251,58 +226,6 @@ class InputModeWidget @JvmOverloads constructor(
         contentId = id
     }
 
-    fun animateOmnibarFocusedState(focused: Boolean) {
-        focusAnimator?.cancel()
-
-        val startTop = omnibarCard.marginTop
-        val startBottom = omnibarCard.marginBottom
-        val startStart = omnibarCard.marginStart
-        val startEnd = omnibarCard.marginEnd
-        val startStroke = omnibarCard.strokeWidth
-
-        val endTop = if (focused) omnibarCardFocusedMarginTop else omnibarCardMarginTop
-        val endBottom = if (focused) omnibarCardFocusedMarginBottom else omnibarCardMarginBottom
-        val endStart = if (focused) omnibarCardFocusedMarginHorizontal else omnibarCardMarginHorizontal
-        val endEnd = if (focused) omnibarCardFocusedMarginHorizontal else omnibarCardMarginHorizontal
-        val endStroke = if (focused) omnibarOutlineFocusedWidth else omnibarOutlineWidth
-
-        ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = DEFAULT_ANIMATION_DURATION
-            interpolator = DecelerateInterpolator()
-            addUpdateListener { valueAnimator ->
-                val fraction = valueAnimator.animatedFraction
-                (omnibarCard.layoutParams as MarginLayoutParams).apply {
-                    leftMargin = (startStart + (endStart - startStart) * fraction).toInt()
-                    topMargin = (startTop + (endTop - startTop) * fraction).toInt()
-                    rightMargin = (startEnd + (endEnd - startEnd) * fraction).toInt()
-                    bottomMargin = (startBottom + (endBottom - startBottom) * fraction).toInt()
-                }.also { omnibarCard.layoutParams = it }
-                omnibarCard.strokeWidth = (startStroke + (endStroke - startStroke) * fraction).toInt()
-            }
-            addListener(
-                onStart = { lockContentDimensions() },
-                onEnd = { if (!focused) unlockContentDimensions() },
-                onCancel = { removeAllListeners() },
-            )
-            start()
-            focusAnimator = this
-        }
-    }
-
-    private fun lockContentDimensions() {
-        omnibarContent.updateLayoutParams {
-            width = omnibarContent.measuredWidth
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
-        }
-    }
-
-    private fun unlockContentDimensions() {
-        omnibarContent.updateLayoutParams {
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            height = ViewGroup.LayoutParams.WRAP_CONTENT
-        }
-    }
-
     fun printNewLine() {
         val currentText = inputField.text.toString()
         val selectionStart = inputField.selectionStart
@@ -317,8 +240,18 @@ class InputModeWidget @JvmOverloads constructor(
         return text.ifBlank { null }
     }
 
+    private fun configureShadow() {
+        if (Build.VERSION.SDK_INT >= 28) {
+            inputModeWidgetCard.addBottomShadow(
+                shadowSizeDp = 12f,
+                offsetYDp = 3f,
+                insetDp = 3f,
+                shadowColor = context.getColor(CommonR.color.background_omnibar_shadow),
+            )
+        }
+    }
+
     companion object {
-        private const val DEFAULT_ANIMATION_DURATION = 300L
         private const val FADE_DURATION = 150L
         private const val MAX_LINES = 8
         private const val SEARCH_MIN_LINES = 1

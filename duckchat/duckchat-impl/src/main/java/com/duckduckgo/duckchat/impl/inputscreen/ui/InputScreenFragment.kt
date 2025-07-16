@@ -220,7 +220,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     private fun exitInterstitial() {
         hideKeyboard(binding.inputModeWidget.inputField)
-        binding.inputModeWidget.animateOmnibarFocusedState(false)
         requireActivity().supportFinishAfterTransition()
     }
 
