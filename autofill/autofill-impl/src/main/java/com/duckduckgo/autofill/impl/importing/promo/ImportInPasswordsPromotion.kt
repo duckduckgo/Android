@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.core.text.toSpanned
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -35,11 +36,13 @@ import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionVi
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
+import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -119,13 +122,21 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
 
     private fun showPromo() {
         with(binding.importPromo) {
+            val formattedSubtitle = context.prependIconToText(
+                R.string.passwords_import_promo_subtitle,
+                R.drawable.ic_lock_solid_12,
+            )
+
+            val title = context.getString(R.string.passwords_import_promo_title).html(context)
+
             setMessage(
                 Message(
                     topAnimation = R.raw.anim_password_keys,
-                    title = context.getString(R.string.passwords_import_promo_title),
-                    subtitle = context.getString(R.string.passwords_import_promo_subtitle),
+                    title = title,
+                    subtitle = formattedSubtitle,
                     action = context.getString(R.string.passwords_import_promo_action),
                     messageType = REMOTE_MESSAGE,
+                    autoConvertToHtml = false,
                 ),
             )
             onTopAnimationConfigured { view ->

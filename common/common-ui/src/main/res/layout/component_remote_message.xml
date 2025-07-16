@@ -70,6 +70,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+  <com.duckduckgo.common.ui.view.MessageCta
+            android:id="@+id/promo_single_remote_message_bold_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

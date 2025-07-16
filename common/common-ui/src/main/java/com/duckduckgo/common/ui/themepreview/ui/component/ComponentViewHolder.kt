@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.core.text.HtmlCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
@@ -108,6 +109,13 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                 promoAction = "Promo Link",
                 messageType = REMOTE_PROMO_MESSAGE,
             )
+            val promoSingleMessageBoldTitle = Message(
+                middleIllustration = R.drawable.desktop_promo_artwork,
+                title = "Promo Single Action Message <b>this should be bold</b>",
+                subtitle = "Body text goes here. This component has one promo button and supports <b>bold</b> text",
+                promoAction = "Promo Link",
+                messageType = REMOTE_PROMO_MESSAGE,
+            )
 
             view.findViewById<MessageCta>(R.id.small_remote_message).apply {
                 setMessage(smallMessage)
@@ -131,6 +139,10 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
                 setMessage(promoSingleMessage)
+            }
+
+            view.findViewById<MessageCta>(R.id.promo_single_remote_message_bold_title).apply {
+                setMessage(promoSingleMessageBoldTitle)
             }
         }
     }

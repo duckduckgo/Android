@@ -79,8 +79,16 @@ class MessageCta : FrameLayout {
             animationRes = message.topAnimation,
         )
 
-        remoteMessageBinding.messageTitle.text = HtmlCompat.fromHtml(message.title, HtmlCompat.FROM_HTML_MODE_LEGACY)
-        remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        remoteMessageBinding.messageTitle.text = if(message.autoConvertToHtml) {
+            HtmlCompat.fromHtml(message.title.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        } else {
+            message.title
+        }
+        remoteMessageBinding.messageSubtitle.text = if(message.autoConvertToHtml) {
+            HtmlCompat.fromHtml(message.subtitle.toString(), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        } else {
+            message.subtitle
+        }
 
         if (message.action2.isEmpty()) {
             remoteMessageBinding.secondaryActionButton.gone()
@@ -133,8 +141,17 @@ class MessageCta : FrameLayout {
         binding.promoRemoteMessage.root.show()
         binding.remoteMessage.root.gone()
 
-        promoMessageBinding.messageTitle.text = message.title
-        promoMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
+        promoMessageBinding.messageTitle.text = if(message.autoConvertToHtml) {
+            HtmlCompat.fromHtml(message.title.toString(), 0)
+        } else {
+            message.title
+        }
+        promoMessageBinding.messageSubtitle.text = if(message.autoConvertToHtml) {
+            HtmlCompat.fromHtml(message.subtitle.toString(), 0)
+        } else {
+            message.subtitle
+        }
+
         promoMessageBinding.actionButton.text = message.promoAction
 
         if (message.middleIllustration == null) {
@@ -181,13 +198,14 @@ class MessageCta : FrameLayout {
         @DrawableRes val topIllustration: Int? = null,
         @DrawableRes val middleIllustration: Int? = null,
         @RawRes val topAnimation: Int? = null,
-        val title: String = "",
-        val subtitle: String = "",
+        val title: CharSequence = "",
+        val subtitle: CharSequence = "",
         val action: String = "",
         val actionIcon: Int? = null,
         val action2: String = "",
         val promoAction: String = "",
         val messageType: MessageType = REMOTE_MESSAGE,
+        val autoConvertToHtml: Boolean = true,
     )
 
     enum class MessageType {
