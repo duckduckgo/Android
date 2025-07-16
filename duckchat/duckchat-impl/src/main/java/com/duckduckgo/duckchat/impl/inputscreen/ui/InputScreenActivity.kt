@@ -21,9 +21,9 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.anim.AnimationResourceProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 data class InputScreenActivityParams(
@@ -45,16 +45,18 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
+        val enterTransition = AnimationResourceProvider.getSlideInFromBottomFadeIn()
+        val exitTransition = AnimationResourceProvider.getSlideOutToTopFadeOut()
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(
                 OVERRIDE_TRANSITION_CLOSE,
-                CommonR.anim.slide_in_from_bottom_fade_in,
-                CommonR.anim.slide_out_to_top_fade_out,
+                enterTransition,
+                exitTransition,
             )
         } else {
             overridePendingTransition(
-                CommonR.anim.slide_in_from_bottom_fade_in,
-                CommonR.anim.slide_out_to_top_fade_out,
+                enterTransition,
+                exitTransition,
             )
         }
     }
