@@ -41,13 +41,12 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REV
 import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
 import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DeviceShieldFragment : DuckDuckGoFragment() {
-
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -58,8 +57,7 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaImageView: ImageView
 
-    private inline fun <reified V : ViewModel> bindViewModel() =
-        lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
@@ -145,45 +143,52 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
         val lastTrackingApp = trackerBlocked.latestApp
         val otherApps = trackerBlocked.otherAppsSize
 
-        val textToStyle = if (trackersBlocked == 1) {
-            when (otherApps) {
-                0 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                1 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                else -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                    otherApps,
-                )
+        val textToStyle =
+            if (trackersBlocked == 1) {
+                when (otherApps) {
+                    0 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    1 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    else ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                            otherApps,
+                        )
+                }
+            } else {
+                when (otherApps) {
+                    0 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    1 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    else ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                            otherApps,
+                        )
+                }
             }
-        } else {
-            when (otherApps) {
-                0 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                1 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                else -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                    otherApps,
-                )
-            }
-        }
 
         deviceShieldCtaHeaderTextView.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_default)

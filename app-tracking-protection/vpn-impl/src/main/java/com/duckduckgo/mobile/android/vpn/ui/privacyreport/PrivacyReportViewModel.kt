@@ -30,11 +30,11 @@ import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
 import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
 import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.ViewState
-import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
 class PrivacyReportViewModel @Inject constructor(
@@ -44,14 +44,14 @@ class PrivacyReportViewModel @Inject constructor(
     vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
-
-    val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
-        ViewState(vpnState, trackersBlocked, shouldShowCTA())
-    }
+    val viewStateFlow =
+        vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
+            ViewState(vpnState, trackersBlocked, shouldShowCTA())
+        }
 
     @VisibleForTesting
-    fun getReport(): Flow<TrackersBlocked> {
-        return repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
+    fun getReport(): Flow<TrackersBlocked> =
+        repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
             if (trackers.isEmpty()) {
                 TrackersBlocked("", 0, 0)
             } else {
@@ -62,23 +62,21 @@ class PrivacyReportViewModel @Inject constructor(
                 TrackersBlocked(latestApp, otherAppsSize, trackers.sumOf { it.count })
             }
         }
-    }
 
-    private suspend fun shouldShowCTA(): Boolean {
-        return withContext(dispatchers.io()) {
+    private suspend fun shouldShowCTA(): Boolean =
+        withContext(dispatchers.io()) {
             if (vpnFeatureRemover.isFeatureRemoved()) {
                 false
             } else {
                 vpnStore.didShowOnboarding()
             }
         }
-    }
 
     object PrivacyReportView {
         data class ViewState(
-                val vpnState: VpnState,
-                val trackersBlocked: TrackersBlocked,
-                val isFeatureEnabled: Boolean,
+            val vpnState: VpnState,
+            val trackersBlocked: TrackersBlocked,
+            val isFeatureEnabled: Boolean,
         )
 
         data class TrackersBlocked(

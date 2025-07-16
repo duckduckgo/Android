@@ -29,7 +29,6 @@ import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
-
     @Inject
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
@@ -55,9 +54,6 @@ class DeviceShieldAppTrackersInfo : DuckDuckGoActivity() {
     }
 
     companion object {
-
-        internal fun intent(context: Context): Intent {
-            return Intent(context, DeviceShieldAppTrackersInfo::class.java)
-        }
+        internal fun intent(context: Context): Intent = Intent(context, DeviceShieldAppTrackersInfo::class.java)
     }
 }
