@@ -8,6 +8,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
@@ -435,5 +437,35 @@ class InputScreenViewModelTest {
         val viewModel = createViewModel()
         viewModel.onSearchInputTextChanged("example")
         assertEquals(SubmitButtonIcon.SEARCH, viewModel.submitButtonIconState.value.icon)
+    }
+
+    @Test
+    fun `when onSearchSubmitted then emit SubmitSearch Command`() {
+        val viewModel = createViewModel()
+        val query = "example"
+
+        viewModel.onSearchSubmitted(query)
+
+        assertEquals(SubmitSearch(query), viewModel.command.value)
+    }
+
+    @Test
+    fun `when onChatSubmitted with web url then emit SubmitSearch Command`() {
+        val viewModel = createViewModel()
+        val url = "https://example.com"
+
+        viewModel.onChatSubmitted(url)
+
+        assertEquals(SubmitSearch(url), viewModel.command.value)
+    }
+
+    @Test
+    fun `when onChatSubmitted with query then emit SubmitChat Command`() {
+        val viewModel = createViewModel()
+        val query = "example"
+
+        viewModel.onChatSubmitted(query)
+
+        assertEquals(SubmitChat(query), viewModel.command.value)
     }
 }

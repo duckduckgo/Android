@@ -28,7 +28,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -153,6 +152,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 requireActivity().setResult(Activity.RESULT_OK, data)
                 exitInterstitial()
             }
+            is Command.SubmitSearch -> {
+                submitSearchQuery(command.query)
+            }
+            is Command.SubmitChat -> {
+                submitChatQuery(command.query)
+            }
             else -> {
                 // TODO handle other commands
             }
@@ -169,14 +174,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         setContentId(R.id.viewPager)
 
         onSearchSent = { query ->
-            submitSearchQuery(query)
+            viewModel.onSearchSubmitted(query)
         }
         onChatSent = { query ->
-            if (isWebUrl(query)) {
-                submitSearchQuery(query)
-            } else {
-                submitChatQuery(query)
-            }
+            viewModel.onChatSubmitted(query)
         }
         onBack = {
             requireActivity().onBackPressed()

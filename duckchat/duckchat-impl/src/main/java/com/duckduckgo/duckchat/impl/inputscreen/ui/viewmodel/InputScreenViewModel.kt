@@ -290,6 +290,18 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
+    fun onSearchSubmitted(query: String) {
+        command.value = Command.SubmitSearch(query)
+    }
+
+    fun onChatSubmitted(query: String) {
+        if (isWebUrl(query)) {
+            command.value = Command.SubmitSearch(query)
+        } else {
+            command.value = Command.SubmitChat(query)
+        }
+    }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()
