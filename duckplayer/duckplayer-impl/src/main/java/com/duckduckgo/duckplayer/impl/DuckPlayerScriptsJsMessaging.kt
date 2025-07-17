@@ -19,9 +19,11 @@ package com.duckduckgo.duckplayer.impl
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import androidx.core.net.toUri
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.impl.DuckPlayerPixelName.DUCK_PLAYER_JS_ERROR
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -44,6 +46,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
     private val dispatcherProvider: DispatcherProvider,
     private val duckPlayer: DuckPlayerInternal,
+    pixel: Pixel,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -52,6 +55,8 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
 
     private val handlers = listOf(
         DuckPlayerPageHandler(),
+        DuckPlayerReportMetricHandler(pixel),
+        DuckPlayerPageReportMetricHandler(pixel),
     )
 
     @JavascriptInterface
@@ -129,10 +134,37 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
             "openSettings",
             "openInfo",
             "setUserValues",
-            "reportMetric",
             "reportPageException",
             "reportInitException",
             "reportYouTubeError",
         )
+    }
+
+    internal interface GenericDuckPlayerReportMetricHandler : JsMessageHandler {
+        val pixel: Pixel
+
+        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+            try {
+                val params = jsMessage.params.getJSONObject("params")
+                val message = params.getString("message") ?: return
+                val kind = params.getString("kind") ?: return
+                pixel.fire(DUCK_PLAYER_JS_ERROR, mapOf("message" to message, "kind" to kind, "origin" to featureName))
+            } catch (e: Exception) {
+                logcat { "Error reporting metric: $e" }
+            }
+        }
+    }
+
+    inner class DuckPlayerReportMetricHandler(override val pixel: Pixel) : GenericDuckPlayerReportMetricHandler {
+
+        override val allowedDomains: List<String> = listOf(runBlocking { duckPlayer.getYouTubeEmbedUrl() })
+        override val featureName: String = "duckPlayer"
+        override val methods: List<String> = listOf("reportMetric")
+    }
+
+    inner class DuckPlayerPageReportMetricHandler(override val pixel: Pixel) : GenericDuckPlayerReportMetricHandler {
+        override val allowedDomains: List<String> = listOf(runBlocking { duckPlayer.getYouTubeEmbedUrl() })
+        override val featureName: String = "duckPlayerPage"
+        override val methods: List<String> = listOf("reportMetric")
     }
 }

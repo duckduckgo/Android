@@ -408,7 +408,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_PLAYER_YOUTUBE_ERROR_AGE_RESTRICTED_DAILY_UNIQUE("duckplayer_youtube-age-restricted-error_daily-unique"),
     DUCK_PLAYER_YOUTUBE_ERROR_NO_EMBED_DAILY_UNIQUE("duckplayer_youtube-no-embed-error_daily-unique"),
     DUCK_PLAYER_YOUTUBE_ERROR_UNKNOWN_DAILY_UNIQUE("duckplayer_youtube-unknown-error_daily-unique"),
-    DUCK_PLAYER_JS_ERROR("duckplayer_js-error"),
 
     MALICIOUS_SITE_PROTECTION_SETTING_TOGGLED("m_malicious-site-protection_feature-toggled"),
     MALICIOUS_SITE_PROTECTION_VISIT_SITE("m_malicious-site-protection_visit-site"),
