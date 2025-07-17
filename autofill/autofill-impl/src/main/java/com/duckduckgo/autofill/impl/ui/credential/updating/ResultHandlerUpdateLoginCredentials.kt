@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -50,12 +51,13 @@ class ResultHandlerUpdateLoginCredentials @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AutofillFragmentResultsPlugin {
 
-    override fun processResult(
+    override suspend fun processResult(
         result: Bundle,
         context: Context,
         tabId: String,
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
+        webView: WebView?,
     ) {
         logcat { "${this::class.java.simpleName}: processing result" }
 

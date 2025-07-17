@@ -29,9 +29,11 @@ import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.api.passwordgeneration.AutomaticSavedLoginsMonitor
 import com.duckduckgo.autofill.impl.AutofillStoredBackJavascriptInterface.UrlProvider
+import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesProvider
 import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
@@ -105,6 +107,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
     private val partialCredentialSaveStore: PartialCredentialSaveStore = mock()
     private val usernameBackFiller: UsernameBackFiller = mock()
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
+    private val inBrowserImportPromo: InBrowserImportPromo = mock()
+    private val autofillAvailableInputTypesProvider: AutofillAvailableInputTypesProvider = mock()
     private lateinit var testee: AutofillStoredBackJavascriptInterface
 
     private val testCallback = TestCallback()
@@ -136,6 +140,7 @@ class AutofillStoredBackJavascriptInterfaceTest {
             partialCredentialSaveStore = partialCredentialSaveStore,
             usernameBackFiller = usernameBackFiller,
             existingCredentialMatchDetector = existingCredentialMatchDetector,
+            inBrowserImportPromo = inBrowserImportPromo,
         )
         testee.callback = testCallback
         testee.webView = testWebView
@@ -150,6 +155,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
         )
         whenever(autofillResponseWriter.generateEmptyResponseGetAutofillData()).thenReturn("")
         whenever(autofillResponseWriter.generateResponseGetAutofillData(any())).thenReturn("")
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(false)
+        whenever(autofillStore.getCredentials(any())).thenReturn(emptyList())
     }
 
     @Test
@@ -480,6 +487,29 @@ class AutofillStoredBackJavascriptInterfaceTest {
         assertFalse(testCallback.onCredentialsSavedCalled)
     }
 
+    @Test
+    fun whenUserShouldBePromptedToImportPasswordsCallbackIsInvoked() = runTest {
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(true)
+        initiateGetAutofillDataRequest()
+        assertImportPasswordPrompted()
+    }
+
+    @Test
+    fun whenUserShouldNotBePromptedToImportPasswordsBecauseImportRulesExcludeItThenCallbackIsNotInvoked() = runTest {
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(false)
+        initiateGetAutofillDataRequest()
+        assertImportPasswordNotPrompted()
+    }
+
+    @Test
+    fun whenUserShouldBeNotPromptedToImportPasswordsBecauseThereArePageCredentialsCallbackIsNotInvoked() = runTest {
+        whenever(inBrowserImportPromo.canShowPromo(any(), anyOrNull())).thenReturn(true)
+        whenever(autofillStore.getCredentials(any())).thenReturn(listOf(LoginCredentials(0, "example.com", "username", "password")))
+        initiateGetAutofillDataRequest()
+        assertImportPasswordNotPrompted()
+        assertCredentialsAvailable()
+    }
+
     private suspend fun configureActionsToBeProcessed(actions: List<Actions>) {
         whenever(
             passwordEventResolver.decideActions(
@@ -552,6 +582,14 @@ class AutofillStoredBackJavascriptInterfaceTest {
         assertTrue(testCallback.credentialsAvailableToInject!!)
     }
 
+    private fun assertImportPasswordPrompted() {
+        assertTrue(testCallback.onPromptedToImportPassword)
+    }
+
+    private fun assertImportPasswordNotPrompted() {
+        assertFalse(testCallback.onPromptedToImportPassword)
+    }
+
     private fun initiateGetAutofillDataRequest() {
         testee.getAutofillData("")
     }
@@ -573,6 +611,8 @@ class AutofillStoredBackJavascriptInterfaceTest {
         var offeredToGeneratePassword: Boolean = false
 
         var onCredentialsSavedCalled: Boolean = false
+
+        var onPromptedToImportPassword: Boolean = false
 
         override suspend fun onCredentialsAvailableToInject(
             originalUrl: String,
@@ -604,6 +644,10 @@ class AutofillStoredBackJavascriptInterfaceTest {
 
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
             onCredentialsSavedCalled = true
+        }
+
+        override suspend fun promptUserToImportPassword(originalUrl: String) {
+            onPromptedToImportPassword = true
         }
     }
 
