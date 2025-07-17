@@ -43,6 +43,7 @@ class RealInBrowserImportPromo @Inject constructor(
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillFeature: AutofillFeature,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val inBrowserPromoPreviousPromptsStore: InBrowserPromoPreviousPromptsStore,
 ) : InBrowserImportPromo {
 
     override suspend fun canShowPromo(
@@ -51,6 +52,14 @@ class RealInBrowserImportPromo @Inject constructor(
     ): Boolean {
         return withContext(dispatchers.io()) {
             if (credentialsAvailableForCurrentPage) {
+                return@withContext false
+            }
+
+            if (url == null) {
+                return@withContext false
+            }
+
+            if (inBrowserPromoPreviousPromptsStore.hasPromoBeenDisplayed(url)) {
                 return@withContext false
             }
 
@@ -74,7 +83,7 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
-            if (url != null && neverSavedSiteRepository.isInNeverSaveList(url)) {
+            if (neverSavedSiteRepository.isInNeverSaveList(url)) {
                 return@withContext false
             }
 
