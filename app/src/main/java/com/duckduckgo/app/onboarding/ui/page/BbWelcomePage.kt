@@ -24,15 +24,14 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
+import android.view.animation.PathInterpolator
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -51,6 +50,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.*
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
@@ -125,10 +125,9 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.daxDialogCta.root) { v, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.statusBarGuideline) { _, insets ->
             val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            val margin = v.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
-            v.updateLayoutParams<MarginLayoutParams> { topMargin = statusBarHeight + margin }
+            binding.statusBarGuideline.setGuidelineBegin(statusBarHeight)
             insets
         }
 
@@ -381,16 +380,29 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private fun startWelcomeAnimation() {
-        binding.welcomeDialog.animateEntrance(
-            onAnimationEnd = { startDaxDialogAnimation() },
-        )
+        binding.daxLogo.setMaxProgress(0.9f)
+        binding.daxLogo.playAnimation()
+
+        // https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#7e37d374-0c1b-4007-8187-6f29bb1fb3e7
+        val standardEasingInterpolator = PathInterpolator(0.2f, 0f, 0f, 1f)
+
+        binding.welcomeTitle.translationY = 32f.toPx()
+        binding.welcomeTitle.animate()
+            .alpha(MAX_ALPHA)
+            .translationY(0f)
+            .setDuration(800)
+            .setStartDelay(100)
+            .setInterpolator(standardEasingInterpolator)
+            .withEndAction {
+                startDaxDialogAnimation()
+            }
     }
 
     private fun startDaxDialogAnimation() {
         if (daxDialogAnimaationStarted) return
         daxDialogAnimaationStarted = true
 
-        ViewCompat.animate(binding.welcomeContent as View)
+        ViewCompat.animate(binding.welcomeTitle as View)
             .alpha(MIN_ALPHA)
             .setDuration(ANIMATION_DURATION)
             .setStartDelay(1000)
