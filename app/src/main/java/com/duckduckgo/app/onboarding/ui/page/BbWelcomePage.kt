@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
@@ -24,14 +25,17 @@ import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.view.animation.PathInterpolator
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
@@ -56,6 +60,8 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -383,16 +389,13 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         binding.daxLogo.setMaxProgress(0.9f)
         binding.daxLogo.playAnimation()
 
-        // https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#7e37d374-0c1b-4007-8187-6f29bb1fb3e7
-        val standardEasingInterpolator = PathInterpolator(0.2f, 0f, 0f, 1f)
-
         binding.welcomeTitle.translationY = 32f.toPx()
         binding.welcomeTitle.animate()
             .alpha(MAX_ALPHA)
             .translationY(0f)
             .setDuration(800)
             .setStartDelay(100)
-            .setInterpolator(standardEasingInterpolator)
+            .setInterpolator(STANDARD_EASING_INTERPOLATOR)
             .withEndAction {
                 startDaxDialogAnimation()
             }
@@ -402,10 +405,63 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         if (daxDialogAnimaationStarted) return
         daxDialogAnimaationStarted = true
 
-        ViewCompat.animate(binding.welcomeTitle as View)
+        val animationDelay = 1.seconds
+        val animationDuration = 400.milliseconds
+
+        ConstraintSet().apply {
+            clone(binding.longDescriptionContainer)
+            // update dax logo constraints to set it up for transition using its start+top margins
+            clear(R.id.daxLogo, ConstraintSet.END)
+            connect(
+                R.id.daxLogo,
+                ConstraintSet.START,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.START,
+                binding.daxLogo.x.toInt(), // adjust start margin to maintain current position
+            )
+
+            // update title text constraints to disconnect it from dax logo
+            clear(R.id.welcomeTitle, ConstraintSet.TOP)
+            connect(
+                R.id.welcomeTitle,
+                ConstraintSet.TOP,
+                R.id.statusBarGuideline,
+                ConstraintSet.BOTTOM,
+                (binding.welcomeTitle.y - binding.statusBarGuideline.y).toInt(),
+            )
+
+            applyTo(binding.longDescriptionContainer)
+        }
+
+        ValueAnimator.ofFloat(0f, 1f)
+            .apply {
+                duration = animationDuration.inWholeMilliseconds
+                startDelay = animationDelay.inWholeMilliseconds
+                interpolator = STANDARD_EASING_INTERPOLATOR
+
+                val daxLogoLayoutParams = binding.daxLogo.layoutParams as MarginLayoutParams
+                val initialMarginStart = daxLogoLayoutParams.marginStart
+                val initialMarginTop = daxLogoLayoutParams.topMargin
+                val targetMarginStart = 16f.toPx()
+                val targetMarginTop = 16f.toPx()
+
+                addUpdateListener { animator ->
+                    val progress = animator.animatedValue as Float
+
+                    binding.daxLogo.updateLayoutParams<MarginLayoutParams> {
+                        marginStart =
+                            (initialMarginStart + (targetMarginStart - initialMarginStart) * progress).toInt()
+                        topMargin =
+                            (initialMarginTop + (targetMarginTop - initialMarginTop) * progress).toInt()
+                    }
+                }
+            }
+            .start()
+
+        binding.welcomeTitle.animate()
             .alpha(MIN_ALPHA)
-            .setDuration(ANIMATION_DURATION)
-            .setStartDelay(1000)
+            .setDuration(animationDuration.inWholeMilliseconds)
+            .setStartDelay(animationDelay.inWholeMilliseconds)
             .withEndAction {
                 viewModel.loadDaxDialog()
             }
@@ -442,5 +498,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         private const val ANIMATION_DURATION = 400L
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
+
+        // https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#7e37d374-0c1b-4007-8187-6f29bb1fb3e7
+        private val STANDARD_EASING_INTERPOLATOR = PathInterpolator(0.2f, 0f, 0f, 1f)
     }
 }
