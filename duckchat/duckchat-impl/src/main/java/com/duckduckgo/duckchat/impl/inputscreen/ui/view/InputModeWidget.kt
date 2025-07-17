@@ -66,6 +66,7 @@ class InputModeWidget @JvmOverloads constructor(
         }
     var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
+    var onChatTextChanged: ((String) -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -135,8 +136,9 @@ class InputModeWidget @JvmOverloads constructor(
             val textToSubmit = inputField.text.getTextToSubmit()
             onSubmitMessageAvailable?.invoke(textToSubmit != null)
 
-            if (inputModeSwitch.selectedTabPosition == 0) {
-                onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+            when (inputModeSwitch.selectedTabPosition) {
+                0 -> onSearchTextChanged?.invoke(textToSubmit?.toString().orEmpty())
+                1 -> onChatTextChanged?.invoke(textToSubmit?.toString().orEmpty())
             }
 
             val isNullOrEmpty = text.isNullOrEmpty()

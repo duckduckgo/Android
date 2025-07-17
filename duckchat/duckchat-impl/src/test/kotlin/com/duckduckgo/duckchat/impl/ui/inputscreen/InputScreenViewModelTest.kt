@@ -410,9 +410,16 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onChatSelected then submitButtonIcon is SEND`() {
+    fun `when chat text is web url then submitButtonIcon is GLOBE`() {
         val viewModel = createViewModel()
-        viewModel.onChatSelected()
+        viewModel.onChatInputTextChanged("https://example.com")
+        assertEquals(SubmitButtonIcon.GLOBE, viewModel.submitButtonIconState.value.icon)
+    }
+
+    @Test
+    fun `when chat text is not web url then submitButtonIcon is SEND`() {
+        val viewModel = createViewModel()
+        viewModel.onChatInputTextChanged("example")
         assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 

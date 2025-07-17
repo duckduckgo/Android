@@ -284,6 +284,12 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
+    fun onChatInputTextChanged(query: String) {
+        _submitButtonIconState.update {
+            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEND)
+        }
+    }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()

@@ -28,6 +28,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
@@ -168,15 +169,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         setContentId(R.id.viewPager)
 
         onSearchSent = { query ->
-            val data = Intent().putExtra(InputScreenActivity.QUERY, query)
-            requireActivity().setResult(Activity.RESULT_OK, data)
-            exitInterstitial()
+            submitSearchQuery(query)
         }
         onChatSent = { query ->
-            val data = Intent().putExtra(InputScreenActivity.QUERY, query)
-            requireActivity().setResult(Activity.RESULT_CANCELED, data)
-            requireActivity().finish()
-            duckChat.openDuckChatWithAutoPrompt(query)
+            if (isWebUrl(query)) {
+                submitSearchQuery(query)
+            } else {
+                submitChatQuery(query)
+            }
         }
         onBack = {
             requireActivity().onBackPressed()
@@ -189,6 +189,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
         }
         onSubmitMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
@@ -199,6 +200,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onSearchTextChanged = { text ->
             viewModel.onSearchInputTextChanged(text)
         }
+        onChatTextChanged = { text ->
+            viewModel.onChatInputTextChanged(text)
+        }
+    }
+
+    private fun submitChatQuery(query: String) {
+        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        requireActivity().setResult(Activity.RESULT_CANCELED, data)
+        requireActivity().finish()
+        duckChat.openDuckChatWithAutoPrompt(query)
+    }
+
+    private fun submitSearchQuery(query: String) {
+        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        requireActivity().setResult(Activity.RESULT_OK, data)
+        exitInterstitial()
     }
 
     private fun configureVoice() {
