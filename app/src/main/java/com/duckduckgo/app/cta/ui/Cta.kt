@@ -311,7 +311,7 @@ sealed class OnboardingDaxDialogCta(
                     text = parsedTitle
                 }
                 dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorSecondaryText))
-            } ?: {
+            } ?: run {
                 onboardingDialogTitle.gone()
                 dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorPrimaryText))
             }
