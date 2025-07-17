@@ -9,6 +9,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -409,5 +410,26 @@ class InputScreenViewModelTest {
 
         // Should retain last value since the flow stops emitting when shouldShowAutoComplete becomes false
         assertEquals(clearedResult, viewModel.autoCompleteSuggestionResults.value)
+    }
+
+    @Test
+    fun `when onChatSelected then submitButtonIcon is SEND`() {
+        val viewModel = createViewModel()
+        viewModel.onChatSelected()
+        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
+    }
+
+    @Test
+    fun `when search text is web url then submitButtonIcon is GLOBE`() {
+        val viewModel = createViewModel()
+        viewModel.onSearchInputTextChanged("https://example.com")
+        assertEquals(SubmitButtonIcon.GLOBE, viewModel.submitButtonIconState.value.icon)
+    }
+
+    @Test
+    fun `when search text is not web url then submitButtonIcon is SEARCH`() {
+        val viewModel = createViewModel()
+        viewModel.onSearchInputTextChanged("example")
+        assertEquals(SubmitButtonIcon.SEARCH, viewModel.submitButtonIconState.value.icon)
     }
 }
