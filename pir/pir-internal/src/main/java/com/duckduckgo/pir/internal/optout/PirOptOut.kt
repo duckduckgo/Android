@@ -136,6 +136,23 @@ class RealPirOptOut @Inject constructor(
             age = 35,
             deprecated = false,
         ),
+        ProfileQuery(
+            id = -3,
+            firstName = "Alicia",
+            lastName = "West",
+            city = "Los Angeles",
+            state = "CA",
+            addresses = listOf(
+                Address(
+                    city = "Los Angeles",
+                    state = "CA",
+                ),
+            ),
+            birthYear = 1985,
+            fullName = "Alicia West",
+            age = 40,
+            deprecated = false,
+        ),
     )
 
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
