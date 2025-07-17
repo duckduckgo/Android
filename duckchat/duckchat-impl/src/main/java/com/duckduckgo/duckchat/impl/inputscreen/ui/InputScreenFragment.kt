@@ -38,8 +38,6 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToChat
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
@@ -154,14 +152,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 requireActivity().setResult(Activity.RESULT_OK, data)
                 exitInterstitial()
             }
-            SwitchModeToSearch -> {
-                binding.viewPager.setCurrentItem(0, false)
-            }
-
-            SwitchModeToChat -> {
-                binding.viewPager.setCurrentItem(1, false)
-            }
-
             else -> {
                 // TODO handle other commands
             }

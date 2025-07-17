@@ -35,8 +35,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
-import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
-import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenMode
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteItemRemoved
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
@@ -83,7 +81,6 @@ class InputScreenViewModel @AssistedInject constructor(
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val inputScreenDataStore: InputScreenDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
 ) : ViewModel() {
@@ -184,17 +181,6 @@ class InputScreenViewModel @AssistedInject constructor(
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
     init {
-        viewModelScope.launch {
-            inputScreenDataStore.getLastUsedMode().let { mode ->
-                command.value = when (mode) {
-                    null,
-                    InputScreenMode.SEARCH,
-                    -> Command.SwitchModeToSearch
-                    InputScreenMode.CHAT -> Command.SwitchModeToChat
-                }
-            }
-        }
-
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
             serviceAvailable && inputAllowed
         }.onEach { voiceInputPossible ->
@@ -315,7 +301,6 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onSearchSelected() {
         viewModelScope.launch {
-            inputScreenDataStore.setLastUsedMode(InputScreenMode.SEARCH)
             _visibilityState.update {
                 it.copy(
                     forceWebSearchButtonVisible = false,
@@ -326,7 +311,6 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onChatSelected() {
         viewModelScope.launch {
-            inputScreenDataStore.setLastUsedMode(InputScreenMode.CHAT)
             _visibilityState.update {
                 it.copy(
                     forceWebSearchButtonVisible = true,
