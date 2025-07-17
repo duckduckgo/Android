@@ -43,6 +43,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelec
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
@@ -101,6 +103,9 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val initialSearchInputText = currentOmnibarText.trim()
     private val searchInputTextState = MutableStateFlow(initialSearchInputText)
+
+    private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
+    val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
 
     /**
      * Tracks whether we should show autocomplete suggestions based on the initial input state.
@@ -288,6 +293,9 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onSearchInputTextChanged(query: String) {
         searchInputTextState.value = query.trim()
+        _submitButtonIconState.update {
+            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEARCH)
+        }
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
@@ -323,6 +331,9 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(
                     forceWebSearchButtonVisible = true,
                 )
+            }
+            _submitButtonIconState.update {
+                it.copy(icon = SubmitButtonIcon.SEND)
             }
         }
     }

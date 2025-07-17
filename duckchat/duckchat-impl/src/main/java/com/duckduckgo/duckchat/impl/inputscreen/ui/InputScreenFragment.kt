@@ -42,6 +42,9 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToC
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchModeToSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
@@ -131,6 +134,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         ) {
             processCommand(it)
         }
+
+        viewModel.submitButtonIconState.onEach { iconState ->
+            val iconResource = when (iconState.icon) {
+                GLOBE -> com.duckduckgo.mobile.android.R.drawable.ic_globe_24
+                SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
+                SEND -> R.drawable.ic_arrow_up_24
+            }
+            binding.actionSend.icon = AppCompatResources.getDrawable(requireContext(), iconResource)
+        }.launchIn(lifecycleScope)
     }
 
     private fun processCommand(command: Command) {
@@ -180,24 +192,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             requireActivity().onBackPressed()
         }
         onSearchSelected = {
-            binding.actionSend.icon = AppCompatResources.getDrawable(context, com.duckduckgo.mobile.android.R.drawable.ic_find_search_24)
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
         }
         onChatSelected = {
-            binding.actionSend.icon = AppCompatResources.getDrawable(context, R.drawable.ic_arrow_up_24)
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
         }
-        onSendMessageAvailable = { isAvailable ->
+        onSubmitMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
-            if (binding.viewPager.currentItem == 0) {
-                viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
-            }
         }
         onVoiceInputAllowed = { isAllowed ->
             viewModel.onVoiceInputAllowedChange(isAllowed)
+        }
+        onSearchTextChanged = { text ->
+            viewModel.onSearchInputTextChanged(text)
         }
     }
 
