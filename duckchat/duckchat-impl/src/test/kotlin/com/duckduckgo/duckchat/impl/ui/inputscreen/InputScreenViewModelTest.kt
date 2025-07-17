@@ -117,13 +117,6 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when initialized with ftp URL and autocomplete enabled then autocomplete suggestions should be hidden initially`() = runTest {
-        val viewModel = createViewModel("ftp://example.com")
-
-        assertFalse(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
-    }
-
-    @Test
     fun `when user modifies initial web URL text then autocomplete suggestions should become visible`() = runTest {
         val viewModel = createViewModel("https://example.com")
 

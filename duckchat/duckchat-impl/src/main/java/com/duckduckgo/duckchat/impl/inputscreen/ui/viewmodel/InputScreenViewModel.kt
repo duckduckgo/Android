@@ -16,11 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel
 
-import android.util.Patterns
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -141,7 +141,7 @@ class InputScreenViewModel @AssistedInject constructor(
         } else {
             // check if user modified input or initial text wasn't a webpage URL
             val userHasModifiedInput = initialSearchInputText != searchInput
-            val initialTextWasNotWebUrl = !searchInput.isWebUrl() && searchInput.toUri().scheme != "duck"
+            val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != "duck"
 
             val shouldShow = userHasModifiedInput || initialTextWasNotWebUrl
             if (shouldShow) {
@@ -360,8 +360,4 @@ private fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> {
         take(1),
         drop(1).debounce(timeoutMillis),
     )
-}
-
-private fun String.isWebUrl(): Boolean {
-    return Patterns.WEB_URL.matcher(this).matches()
 }
