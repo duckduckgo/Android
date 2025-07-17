@@ -8,7 +8,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
@@ -43,7 +42,6 @@ class InputScreenViewModelTest {
     private val autoComplete: AutoComplete = mock()
     private val history: NavigationHistory = mock()
     private val appCoroutineScope: CoroutineScope = mock()
-    private val inputScreenDataStore: InputScreenDataStore = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -62,7 +60,6 @@ class InputScreenViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
             appCoroutineScope = appCoroutineScope,
-            inputScreenDataStore = inputScreenDataStore,
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
         )
