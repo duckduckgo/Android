@@ -1330,6 +1330,7 @@
       "breakageReporting",
       "autofillPasswordImport",
       "favicon",
+      "webTelemetry",
       "scriptlets"
     ]
   );
@@ -1350,6 +1351,7 @@
     windows: [
       "cookie",
       ...baseFeatures,
+      "webTelemetry",
       "windowsPermissionUsage",
       "duckPlayer",
       "brokerProtection",
