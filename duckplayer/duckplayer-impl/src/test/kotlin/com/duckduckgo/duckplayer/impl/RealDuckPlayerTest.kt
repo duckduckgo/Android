@@ -53,6 +53,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
+import okhttp3.OkHttpClient
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -80,6 +81,7 @@ class RealDuckPlayerTest {
     private val mockDuckPlayerLocalFilesPath: DuckPlayerLocalFilesPath = mock()
     private val mimeType: MimeTypeMap = mock()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
+    private val mockOkHttpClient: OkHttpClient = mock()
 
     private val testee = RealDuckPlayer(
         mockDuckPlayerFeatureRepository,
@@ -90,6 +92,7 @@ class RealDuckPlayerTest {
         dispatcherProvider,
         true,
         coroutineRule.testScope,
+        mockOkHttpClient,
     )
 
     @Before
