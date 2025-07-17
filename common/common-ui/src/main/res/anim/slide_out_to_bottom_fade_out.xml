@@ -16,15 +16,16 @@
   -->
 
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="300"
-    android:interpolator="@android:anim/decelerate_interpolator">
+    android:duration="2000">
 
     <translate
         android:fromYDelta="0dp"
-        android:toYDelta="56dp" />
+        android:toYDelta="56dp"
+        android:interpolator="@anim/overshoot_interpolator_tension_1" />
 
     <alpha
         android:fromAlpha="1.0"
-        android:toAlpha="0.0" />
+        android:toAlpha="0.0"
+        android:interpolator="@android:anim/decelerate_interpolator"/>
 
 </set>

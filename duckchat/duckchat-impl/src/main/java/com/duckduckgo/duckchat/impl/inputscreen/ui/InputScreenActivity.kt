@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.os.Build.VERSION
 import android.os.Bundle
+import android.util.Log
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -45,19 +46,23 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = AnimationResourceProvider.getSlideInFromBottomFadeIn()
-        val exitTransition = AnimationResourceProvider.getSlideOutToTopFadeOut()
-        if (VERSION.SDK_INT >= 34) {
-            overrideActivityTransition(
-                OVERRIDE_TRANSITION_CLOSE,
-                enterTransition,
-                exitTransition,
-            )
-        } else {
-            overridePendingTransition(
-                enterTransition,
-                exitTransition,
-            )
+        if (VERSION.SDK_INT >= 33) {
+            Log.e("lp_test", "applyExitTransition")
+            // no automatic enter transition, manual transition handled directly in the BrowserTabFragment
+            val enterTransition = 0
+            val exitTransition = AnimationResourceProvider.getSlideOutToTopFadeOut()
+            if (VERSION.SDK_INT >= 34) {
+                overrideActivityTransition(
+                    OVERRIDE_TRANSITION_CLOSE,
+                    enterTransition,
+                    exitTransition,
+                )
+            } else {
+                overridePendingTransition(
+                    enterTransition,
+                    exitTransition,
+                )
+            }
         }
     }
 

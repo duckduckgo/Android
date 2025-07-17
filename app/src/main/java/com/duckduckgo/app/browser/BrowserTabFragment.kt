@@ -34,6 +34,7 @@ import android.content.res.Configuration
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
@@ -46,6 +47,7 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -53,6 +55,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.WindowManager
+import android.view.animation.BounceInterpolator
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
 import android.webkit.URLUtil
@@ -888,6 +893,9 @@ class BrowserTabFragment :
 
     private val searchInterstitialLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
+            // Restore content views first
+            restoreContentAfterInputScreen()
+
             val data = result.data ?: return@registerForActivityResult
 
             when (result.resultCode) {
@@ -905,6 +913,22 @@ class BrowserTabFragment :
                 }
             }
         }
+
+    private fun restoreContentAfterInputScreen() {
+        if (VERSION.SDK_INT >= 33) {
+            Log.e("lp_test", "restoreContentAfterInputScreen")
+            binding.root.animate()
+                .translationY(0f)
+                .setDuration(2000)
+                .setInterpolator(OvershootInterpolator(1f))
+                .start()
+            binding.root.animate()
+                .alpha(1f)
+                .setDuration(2000)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1071,19 +1095,37 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
-            val intent = globalActivityStarter.startIntent(
-                requireContext(),
-                InputScreenActivityParams(query = query),
-            )
+            animateContentOutAndLaunchInputScreen(query)
+        }
+    }
+
+    private fun animateContentOutAndLaunchInputScreen(query: String) {
+        val launchOptions = if (VERSION.SDK_INT >= 33) {
+            binding.root.animate()
+                .translationY(56.toPx().toFloat())
+                .setDuration(2000)
+                .setInterpolator(OvershootInterpolator(1f))
+                .start()
+            binding.root.animate()
+                .alpha(0f)
+                .setDuration(2000)
+                .setInterpolator(DecelerateInterpolator())
+                .start()
+
             val enterTransition = AnimationResourceProvider.getSlideInFromTopFadeIn()
-            val exitTransition = AnimationResourceProvider.getSlideOutToBottomFadeOut()
-            val options = ActivityOptionsCompat.makeCustomAnimation(
+            ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
                 enterTransition,
-                exitTransition,
+                0,  // no automatic exit animation, we're animating content manually
             )
-            searchInterstitialLauncher.launch(intent, options)
+        } else {
+            null
         }
+        val intent = globalActivityStarter.startIntent(
+            requireContext(),
+            InputScreenActivityParams(query = query),
+        )
+        searchInterstitialLauncher.launch(intent, launchOptions)
     }
 
     private fun configureNavigationBar() {
