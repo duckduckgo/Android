@@ -145,8 +145,8 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
 
         withContext(dispatcherProvider.main()) {
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokerSteps" }
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokerSteps.size}" }
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} profile=$profileQuery Brokers to execute $brokerSteps" }
+            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} profile=$profileQuery Brokers size: ${brokerSteps.size}" }
             detachedWebView = pirDetachedWebViewProvider.createInstance(
                 context,
                 pirScriptToLoad,
