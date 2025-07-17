@@ -39,7 +39,7 @@ import com.duckduckgo.app.global.events.db.UserEventKey
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.AnimationFinished
 import com.duckduckgo.app.global.view.FireDialog.FireDialogClearAllEvent.ClearAllDataFinished
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_ANIMATION
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CLEAR_PRESSED
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
@@ -73,7 +73,7 @@ class FireDialog(
     private val dispatcherProvider: DispatcherProvider,
     private val fireButtonStore: FireButtonStore,
     private val appBuildConfig: AppBuildConfig,
-    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper,
 ) : BottomSheetDialog(context, CommonR.style.Widget_DuckDuckGo_FireDialog) {
 
@@ -142,7 +142,7 @@ class FireDialog(
     }
 
     private fun configureFireAnimationView() {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isAnyExperimentEnabled()) {
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
             val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)
 
