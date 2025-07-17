@@ -21,7 +21,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -139,7 +138,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
                 SEND -> R.drawable.ic_arrow_up_24
             }
-            binding.actionSend.icon = AppCompatResources.getDrawable(requireContext(), iconResource)
+            binding.actionSend.setImageResource(iconResource)
         }.launchIn(lifecycleScope)
     }
 
