@@ -307,7 +307,6 @@ sealed class OnboardingDaxDialogCta(
 
             title?.let {
                 with(onboardingDialogTitle) {
-                    show()
                     text = parsedTitle
                 }
                 dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorSecondaryText))
@@ -319,23 +318,36 @@ sealed class OnboardingDaxDialogCta(
             leadingDescriptionIconRes?.let { leadingDescriptionIconRes ->
                 with(leadingDescriptionIcon) {
                     setImageResource(leadingDescriptionIconRes)
-                    show()
+                    isInvisible = true
                 }
             } ?: leadingDescriptionIcon.gone()
 
             primaryCtaText?.let {
                 with(primaryCta) {
                     alpha = MIN_ALPHA
-                    show()
                     text = primaryCtaText
                 }
             } ?: primaryCta.gone()
+
+            if (onboardingDialogSuggestionsContent.isVisible || onboardingDialogContent.isVisible) {
+                TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+            }
 
             onboardingDialogSuggestionsContent.gone()
             onboardingDialogContent.show()
             root.alpha = MAX_ALPHA
 
-            TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+            title?.let {
+                onboardingDialogTitle.show()
+            }
+
+            primaryCtaText?.let {
+                primaryCta.show()
+            }
+
+            leadingDescriptionIconRes?.let {
+                leadingDescriptionIcon.show()
+            }
 
             val afterAnimation = {
                 dialogTextCta.finishAnimation()
@@ -755,7 +767,15 @@ sealed class OnboardingDaxDialogCta(
                     showBBOnboardingCta(
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = onSuggestedOptionClicked,
+                        onSuggestedOptionClicked = { option ->
+                            onSuggestedOptionClicked?.invoke(option)
+                            with(binding.includeOnboardingInContextBBDialog) {
+                                dialogTextCta.text = ""
+                                hiddenTextCta.text = ""
+                                onboardingDialogContent.gone()
+                                onboardingDialogSuggestionsContent.gone()
+                            }
+                        },
                     )
                 }
                 else -> {
@@ -890,11 +910,13 @@ sealed class OnboardingDaxDialogCta(
 
             with(binding) {
                 onboardingDialogContent.gone()
-                onboardingDialogSuggestionsContent.show()
+
+                TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+
                 suggestionsDialogTextCta.text = ""
                 suggestionsHiddenTextCta.text = daxText.html(context)
 
-                TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+                onboardingDialogSuggestionsContent.show()
 
                 val afterAnimation = {
                     onTypingAnimationFinished()
@@ -1200,11 +1222,12 @@ sealed class DaxBubbleCta(
                 onTypingAnimationFinished()
             }
 
+            dialogTextCta.text = ""
+            hiddenTextCta.text = daxText.html(context)
+
             TransitionManager.beginDelayedTransition(cardView, AutoTransition())
             root.show()
 
-            dialogTextCta.text = ""
-            hiddenTextCta.text = daxText.html(context)
             daxBubbleDialogTitle.apply {
                 alpha = 0f
                 text = daxTitle.html(context)
