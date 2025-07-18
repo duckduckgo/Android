@@ -26,14 +26,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingTop="@dimen/keyline_4"
         android:paddingBottom="20dp">
+
+        <include
+            android:id="@+id/contentSettingsCompleteSetup"
+            layout="@layout/content_settings_complete_setup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
 
         <include
             android:id="@+id/contentSettingsPrivacy"
             layout="@layout/content_settings_protections"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4" />
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:id="@+id/contentSettingsPrivacyPro"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.settings.impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 
-dependencies {
-    /* Temporary while developing new settings screen */
-    implementation project(':feature-toggles-api')
-
-    implementation project(':navigation-api')
-    implementation Google.dagger
-    implementation AndroidX.core.ktx
-    implementation AndroidX.appCompat
-}
-
-android {
-    namespace 'com.duckduckgo.settings.api'
-}
-
+@ContributesPluginPoint(
+    scope = ActivityScope::class,
+    boundType = CompleteSetupSettingsPlugin::class,
+)
+private interface CompleteSetupSettingsPluginTrigger

@@ -48,10 +48,15 @@ class InMemoryInBrowserPromoPreviousPromptsStore @Inject constructor(
             eTldPlusOne.equals(previousETldPlusOneOffered, ignoreCase = true)
         }
     }
+
+    override suspend fun clearPreviousPrompts() {
+        previousETldPlusOneOffered = null
+    }
 }
 
 interface InBrowserPromoPreviousPromptsStore {
 
     suspend fun recordPromoDisplayed(originalUrl: String)
     suspend fun hasPromoBeenDisplayed(originalUrl: String): Boolean
+    suspend fun clearPreviousPrompts()
 }
