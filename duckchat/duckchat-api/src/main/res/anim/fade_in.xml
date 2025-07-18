@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,15 +15,11 @@
   -->
 
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="300"
-    android:interpolator="@android:anim/decelerate_interpolator">
-
-    <translate
-        android:fromYDelta="0dp"
-        android:toYDelta="-56dp" />
+    android:duration="@integer/slide_animation_duration_ms">
 
     <alpha
-        android:fromAlpha="1.0"
-        android:toAlpha="0.0" />
+        android:fromAlpha="0.0"
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:toAlpha="1.0" />
 
 </set>
