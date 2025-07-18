@@ -54,6 +54,9 @@
 
         <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
         <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+
+        <item name="toolbarExtraPadding">@dimen/keyline_1</item>
+        <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light.Experiment" parent="Theme.DuckDuckGo.Light">
@@ -95,6 +98,17 @@
 
         <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
         <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+
+        <item name="toolbarExtraPadding">@dimen/keyline_1</item>
+        <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
     </style>
 
+    <style name="TabSwitcher.Widget.Toolbar.Experimental" parent="Widget.DuckDuckGo.ToolbarTheme">
+        <item name="actionButtonStyle">@style/TabSwitcher.ActionButton</item>
+        <item name="android:actionButtonStyle">@style/TabSwitcher.ActionButton</item>
+    </style>
+
+    <style name="TabSwitcher.ActionButton" parent="Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">44dp</item>
+    </style>
 </resources>

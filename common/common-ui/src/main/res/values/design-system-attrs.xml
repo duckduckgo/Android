@@ -29,4 +29,6 @@
     <attr name="cookiesAnimationRadius" format="dimension"/>
     <attr name="cookiesAnimationHeight" format="dimension"/>
 
+    <attr name="toolbarExtraPadding" format="dimension"/>
+
 </resources>

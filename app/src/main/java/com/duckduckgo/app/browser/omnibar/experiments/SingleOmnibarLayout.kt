@@ -27,7 +27,7 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
+import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.IncludeFadeOmnibarFindInPageBinding
@@ -62,6 +62,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
+    private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
+    private val shieldIconPulseAnimationContainer: View by lazy { findViewById(R.id.shieldIconPulseAnimationContainer) }
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
@@ -82,9 +84,14 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private val toolbarContainerPaddingTopWhenAtBottom by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.experimentalToolbarContainerPaddingTopWhenAtBottom)
+    private val experimentalOmnibarCardMarginTop by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop)
     }
+
+    private val experimentalOmnibarCardMarginBottom by lazy {
+        resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom)
+    }
+
     private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
     private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
 
@@ -117,9 +124,26 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             }
             OmnibarPosition.BOTTOM -> {
                 // When omnibar is at the bottom, we're adding an additional space at the top
-                toolbarContainer.updatePadding(
-                    top = toolbarContainerPaddingTopWhenAtBottom,
-                )
+                omnibarCardShadow.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginTop
+                    }
+                }
+
+                iconsContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginTop
+                    }
+                }
+
+                shieldIconPulseAnimationContainer.updateLayoutParams {
+                    (this as MarginLayoutParams).apply {
+                        topMargin = experimentalOmnibarCardMarginBottom
+                        bottomMargin = experimentalOmnibarCardMarginTop
+                    }
+                }
 
                 // Try to reduce the bottom omnibar material shadow when not using the custom shadow
                 if (Build.VERSION.SDK_INT < 28) {
