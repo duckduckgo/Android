@@ -106,12 +106,13 @@
 
                     <TextView
                         android:id="@+id/hiddenTextCta"
+                        style="@style/Typography.BB.Body1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="invisible"
-                        app:typography="body1"
                         tools:text="@string/onboardingSearchDaxDialogDescription"
-                        tools:visibility="visible" />
+                        tools:visibility="visible"
+                        tools:ignore="DeprecatedWidgetInXml" />
 
                     <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogTextCta"
