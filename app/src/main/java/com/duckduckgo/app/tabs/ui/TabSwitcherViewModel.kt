@@ -167,10 +167,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val selectionMode: Selection
         get() = requireNotNull(selectionViewState.value.mode as Selection)
 
-    val isNewDesignEnabled: Boolean by lazy {
-        tabManagerFeatureFlags.newToolbarFeature().isEnabled()
-    }
-
     sealed class Command {
         data object Close : Command()
         data class CloseAndShowUndoMessage(val deletedTabIds: List<String>) : Command()
