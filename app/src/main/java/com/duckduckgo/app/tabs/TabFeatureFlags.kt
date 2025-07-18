@@ -36,5 +36,7 @@ interface TabManagerFeatureFlags {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun tabInsertionFixes(): Toggle
 
-    // There will be a new feature for the new design of tab manager
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun newToolbarFeature(): Toggle
 }
