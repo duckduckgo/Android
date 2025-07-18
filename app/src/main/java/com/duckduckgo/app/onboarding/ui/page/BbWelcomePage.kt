@@ -198,8 +198,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                     showDaxDialogCardView(
                         onAnimationEnd = {
-                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBuck)
-                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBuck)
+                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
+                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBb)
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
@@ -238,8 +238,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                     showDaxDialogCardView(
                         onAnimationEnd = {
-                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBuck)
-                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBuck)
+                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
+                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBb)
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
