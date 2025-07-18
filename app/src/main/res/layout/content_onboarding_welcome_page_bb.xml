@@ -25,11 +25,17 @@
         tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <ImageView
-            android:id="@+id/sceneBg"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            tools:srcCompat="@drawable/onboarding_background_small_light"/>
+        android:id="@+id/background1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@drawable/onboarding_background_small_light" />
+
+    <ImageView
+        android:id="@+id/background2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/statusBarGuideline"

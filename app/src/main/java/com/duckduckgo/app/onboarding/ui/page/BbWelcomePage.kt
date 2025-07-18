@@ -29,7 +29,9 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
 import android.view.animation.PathInterpolator
+import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
@@ -48,6 +50,8 @@ import androidx.transition.TransitionManager
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBbBinding
+import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage.BbOnboardingBackgroundSceneManager.BackgroundTile
+import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage.BbOnboardingBackgroundSceneManager.BackgroundTile.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
@@ -87,6 +91,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var daxDialogAnimaationStarted = false
+    private var backgroundSceneManager: BbOnboardingBackgroundSceneManager? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onAttach(context: Context) {
@@ -140,13 +145,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             insets
         }
 
-        setBackgroundRes(
-            if (appTheme.isLightModeEnabled()) {
-                R.drawable.buck_onboarding_background_small_light
-            } else {
-                R.drawable.buck_onboarding_background_small_dark
-            },
-        )
+        backgroundSceneManager = BbOnboardingBackgroundSceneManager(
+            view1 = binding.background1,
+            view2 = binding.background2,
+            lightModeEnabled = appTheme.isLightModeEnabled(),
+        ).also { it.initializeView() }
 
         startWelcomeAnimation()
     }
@@ -291,6 +294,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     }
 
                     scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) { afterTypingAnimation() }
+                    backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_03)
                 }
 
                 SKIP_ONBOARDING_OPTION -> {
@@ -375,9 +379,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     }
 
                     scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) { afterTypingAnimation() }
+                    backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_04)
                 }
             }
-            binding.sceneBg.setOnClickListener { afterTypingAnimation() }
+            backgroundSceneManager?.setBackgroundClickListener(afterTypingAnimation)
             binding.daxDialogCta.cardContainer.setOnClickListener { afterTypingAnimation() }
         }
     }
@@ -402,6 +407,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             .withEndAction {
                 startDaxDialogAnimation()
             }
+
+        backgroundSceneManager?.startWelcomeAnimation()
     }
 
     private fun startDaxDialogAnimation() {
@@ -409,7 +416,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         daxDialogAnimaationStarted = true
 
         val animationDelay = 1.seconds
-        val animationDuration = 400.milliseconds
+        val animationDuration = SCENE_TRANSITION_DURATION
 
         ConstraintSet().apply {
             clone(binding.longDescriptionContainer)
@@ -465,6 +472,9 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             .alpha(MIN_ALPHA)
             .setDuration(animationDuration.inWholeMilliseconds)
             .setStartDelay(animationDelay.inWholeMilliseconds)
+            .withStartAction {
+                backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_02)
+            }
             .withEndAction {
                 viewModel.loadDaxDialog()
             }
@@ -520,18 +530,147 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
     }
 
-    private fun setBackgroundRes(backgroundRes: Int) {
-        binding.sceneBg.setImageResource(backgroundRes)
-    }
-
     companion object {
         private const val MIN_ALPHA = 0f
         private const val MAX_ALPHA = 1f
         private const val ANIMATION_DURATION = 400L
+        private val SCENE_TRANSITION_DURATION = 800.milliseconds
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
 
         // https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#7e37d374-0c1b-4007-8187-6f29bb1fb3e7
         private val STANDARD_EASING_INTERPOLATOR = PathInterpolator(0.2f, 0f, 0f, 1f)
+    }
+
+    private class BbOnboardingBackgroundSceneManager(
+        view1: View,
+        view2: View,
+        val lightModeEnabled: Boolean,
+    ) {
+        private val screenWidth = view1.context.resources.displayMetrics.widthPixels.toFloat()
+        private var currentBackgroundView = view1
+        private var nextBackgroundView = view2
+        private var transitionInProgress = false
+        private var currentTile = TILE_01
+
+        private val nextTile: BackgroundTile?
+            get() {
+                return with(BackgroundTile.entries) {
+                    val nextTileIndex = indexOf(currentTile) + 1
+                    if (nextTileIndex in indices) get(nextTileIndex) else null
+                }
+            }
+
+        fun initializeView() {
+            currentBackgroundView.setBackgroundResource(getBackgroundResource(currentTile))
+            currentBackgroundView.scaleX = 1.0f
+            currentBackgroundView.scaleY = 1.0f
+            currentBackgroundView.isVisible = true
+            nextTile?.let { nextBackgroundView.setBackgroundResource(getBackgroundResource(it)) }
+            nextBackgroundView.translationX = screenWidth
+            nextBackgroundView.isVisible = false
+        }
+
+        fun startWelcomeAnimation() {
+            if (transitionInProgress) return
+            transitionInProgress = true
+
+            currentBackgroundView.animate()
+                .scaleX(BACKGROUND_TARGET_SCALE)
+                .scaleY(BACKGROUND_TARGET_SCALE)
+                .setDuration(SCENE_TRANSITION_DURATION.inWholeMilliseconds)
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    transitionInProgress = false
+                }
+
+            nextBackgroundView.scaleX = BACKGROUND_TARGET_SCALE
+            nextBackgroundView.scaleY = BACKGROUND_TARGET_SCALE
+            nextBackgroundView.translationX = screenWidth * BACKGROUND_TARGET_SCALE
+        }
+
+        fun transitionToNextTile(expectedTile: BackgroundTile) {
+            if (transitionInProgress || nextTile != expectedTile) return
+
+            currentTile = expectedTile
+            transitionInProgress = true
+            nextBackgroundView.isVisible = true
+
+            val currentSlideOut = ObjectAnimator.ofFloat(
+                currentBackgroundView,
+                "translationX",
+                0f,
+                -screenWidth * BACKGROUND_TARGET_SCALE,
+            )
+
+            val nextSlideIn = ObjectAnimator.ofFloat(
+                nextBackgroundView,
+                "translationX",
+                screenWidth * BACKGROUND_TARGET_SCALE,
+                0f,
+            )
+
+            // Execute animation
+            AnimatorSet().apply {
+                playTogether(currentSlideOut, nextSlideIn)
+                duration = SCENE_TRANSITION_DURATION.inWholeMilliseconds
+
+                doOnEnd { completeTransition() }
+            }.start()
+        }
+
+        fun setBackgroundClickListener(onClick: () -> Unit) {
+            currentBackgroundView.setOnClickListener { onClick() }
+            nextBackgroundView.setOnClickListener { onClick() }
+        }
+
+        private fun completeTransition() {
+            val temp = currentBackgroundView
+            currentBackgroundView = nextBackgroundView
+            nextBackgroundView = temp
+
+            // Hide the off-screen view
+            nextBackgroundView.isVisible = false
+
+            // Prepare next tile if available
+            nextTile?.let { tile ->
+                nextBackgroundView.setBackgroundResource(getBackgroundResource(tile))
+                nextBackgroundView.translationX = screenWidth * BACKGROUND_TARGET_SCALE
+            }
+
+            transitionInProgress = false
+        }
+
+        @DrawableRes
+        private fun getBackgroundResource(tile: BackgroundTile): Int {
+            return if (lightModeEnabled) tile.drawableLight else tile.drawableDark
+        }
+
+        enum class BackgroundTile(
+            @DrawableRes val drawableLight: Int,
+            @DrawableRes val drawableDark: Int,
+        ) {
+            TILE_01(
+                drawableLight = R.drawable.bb_onboarding_background_01_light,
+                drawableDark = R.drawable.bb_onboarding_background_01_dark,
+            ),
+            TILE_02(
+                drawableLight = R.drawable.bb_onboarding_background_02_light,
+                drawableDark = R.drawable.bb_onboarding_background_02_dark,
+            ),
+            TILE_03(
+                drawableLight = R.drawable.bb_onboarding_background_03_light,
+                drawableDark = R.drawable.bb_onboarding_background_03_dark,
+            ),
+            TILE_04(
+                drawableLight = R.drawable.bb_onboarding_background_04_light,
+                drawableDark = R.drawable.bb_onboarding_background_04_dark,
+            ),
+            ;
+        }
+
+        private companion object {
+            const val BACKGROUND_TARGET_SCALE = 1.15f
+        }
     }
 }
