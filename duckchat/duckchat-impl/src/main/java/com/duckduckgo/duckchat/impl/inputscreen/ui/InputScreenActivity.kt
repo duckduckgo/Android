@@ -21,10 +21,12 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.anim.AnimationResourceProvider
+import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.InputScreenAnimationResourceProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 
 data class InputScreenActivityParams(
     val query: String,
@@ -33,6 +35,9 @@ data class InputScreenActivityParams(
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(InputScreenActivityParams::class)
 class InputScreenActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var appTheme: BrowserAppTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +50,9 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = AnimationResourceProvider.getSlideInFromBottomFadeIn()
-        val exitTransition = AnimationResourceProvider.getSlideOutToTopFadeOut()
+        val enterTransition = InputScreenAnimationResourceProvider.getBrowserEnterAnimation(appTheme.isLightModeEnabled())
+        val exitTransition = InputScreenAnimationResourceProvider.getInputScreenExitAnimation()
+
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(
                 OVERRIDE_TRANSITION_CLOSE,

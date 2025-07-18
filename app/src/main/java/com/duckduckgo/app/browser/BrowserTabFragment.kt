@@ -246,7 +246,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.anim.AnimationResourceProvider
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -288,6 +287,7 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.InputScreenAnimationResourceProvider
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.TAB_ID
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
@@ -1075,8 +1075,8 @@ class BrowserTabFragment :
                 requireContext(),
                 InputScreenActivityParams(query = query),
             )
-            val enterTransition = AnimationResourceProvider.getSlideInFromTopFadeIn()
-            val exitTransition = AnimationResourceProvider.getSlideOutToBottomFadeOut()
+            val enterTransition = InputScreenAnimationResourceProvider.getInputScreenEnterAnimation()
+            val exitTransition = InputScreenAnimationResourceProvider.getBrowserExitAnimation(appTheme.isLightModeEnabled())
             val options = ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
                 enterTransition,
