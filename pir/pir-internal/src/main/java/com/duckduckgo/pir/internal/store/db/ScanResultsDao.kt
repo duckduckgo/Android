@@ -57,11 +57,32 @@ interface ScanResultsDao {
     @Query("SELECT * FROM pir_scan_extracted_profile WHERE brokerName = :brokerName ORDER BY completionTimeInMillis")
     fun getExtractProfileResultForBroker(brokerName: String): List<ExtractProfileResult>
 
+    @Query("SELECT * FROM pir_extracted_profiles WHERE profileUrl = :profileUrl ORDER BY dateAddedInMillis")
+    fun getExtractedProfile(profileUrl: String): StoredExtractedProfile
+
+    @Query("SELECT * FROM pir_extracted_profiles WHERE profileQueryId = :profileQueryId ORDER BY dateAddedInMillis")
+    fun getExtractedProfilesForProfile(profileQueryId: Long): List<StoredExtractedProfile>
+
+    @Query("SELECT * FROM pir_extracted_profiles WHERE brokerName = :brokerName ORDER BY dateAddedInMillis")
+    fun getExtractedProfilesForBroker(brokerName: String): List<StoredExtractedProfile>
+
+    @Query("SELECT * FROM pir_extracted_profiles WHERE brokerName = :brokerName AND profileQueryId = :profileQueryId ORDER BY dateAddedInMillis")
+    fun getExtractedProfilesForBrokerAndProfile(brokerName: String, profileQueryId: Long): List<StoredExtractedProfile>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertExtractedProfile(extractedProfile: StoredExtractedProfile)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertExtractProfileResult(extractProfileResult: ExtractProfileResult)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertScanCompletedBroker(scanCompletedBroker: ScanCompletedBroker)
+
+    @Query("DELETE from pir_extracted_profiles")
+    fun deleteAllExtractedProfiles()
 
     @Query("DELETE from pir_scan_navigate_results")
     fun deleteAllNavigateResults()

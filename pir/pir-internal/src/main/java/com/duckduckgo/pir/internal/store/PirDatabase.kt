@@ -39,6 +39,7 @@ import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.JsonAdapter
@@ -47,7 +48,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 4,
     entities = [
         BrokerJsonEtag::class,
         Broker::class,
@@ -63,6 +64,7 @@ import com.squareup.moshi.Types
         ScanCompletedBroker::class,
         OptOutCompletedBroker::class,
         OptOutActionLog::class,
+        StoredExtractedProfile::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)

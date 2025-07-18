@@ -18,8 +18,8 @@ package com.duckduckgo.pir.internal.store
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
+import com.duckduckgo.pir.internal.models.ExtractedProfile
+import com.duckduckgo.pir.internal.scripts.models.AddressCityState
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.service.DbpService
@@ -27,7 +27,6 @@ import com.duckduckgo.pir.internal.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus
 import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -37,7 +36,6 @@ import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
-import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
 import com.duckduckgo.pir.internal.store.db.OptOutActionLog
 import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
@@ -48,6 +46,7 @@ import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
@@ -99,9 +98,10 @@ interface PirRepository {
         message: String,
     )
 
-    suspend fun saveExtractProfileResult(
+    suspend fun saveExtractedProfile(
         brokerName: String,
-        response: ExtractedResponse,
+        profileQueryId: Long,
+        extractedProfiles: List<ExtractedProfile>,
     )
 
     /**
@@ -109,9 +109,10 @@ interface PirRepository {
      *
      * @param brokerName - Name of the broker
      */
-    suspend fun getExtractProfileResultsForBroker(
+    suspend fun getExtractedProfiles(
         brokerName: String,
-    ): List<ExtractedProfileResult>
+        profileQueryId: Long,
+    ): List<ExtractedProfile>
 
     fun getAllScanResultsFlow(): Flow<List<ScanResult>>
 
@@ -227,6 +228,7 @@ class RealPirRepository(
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
+    private val addressCityStateAdapter by lazy { moshi.adapter(AddressCityState::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -363,38 +365,59 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun saveExtractProfileResult(
+    override suspend fun saveExtractedProfile(
         brokerName: String,
-        response: ExtractedResponse,
+        profileQueryId: Long,
+        extractedProfiles: List<ExtractedProfile>,
     ) {
         withContext(dispatcherProvider.io()) {
-            scanResultsDao.insertExtractProfileResult(
-                ExtractProfileResult(
+            extractedProfiles.map {
+                StoredExtractedProfile(
+                    profileUrl = it.profileUrl,
+                    profileQueryId = profileQueryId,
                     brokerName = brokerName,
-                    actionType = response.actionType,
-                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                    userData = profileQueryAdapter.toJson(response.meta?.userData),
-                    extractResults = response.response.map {
-                        extractedProfileAdapter.toJson(it)
-                    },
-                ),
-            )
+                    name = it.name,
+                    alternativeNames = it.alternativeNames,
+                    age = it.age,
+                    addresses = it.addresses?.mapNotNull { item -> addressCityStateAdapter.toJson(item) },
+                    phoneNumbers = it.phoneNumbers,
+                    relatives = it.relatives,
+                    identifier = it.identifier,
+                    reportId = it.reportId,
+                    email = it.email,
+                    fullName = it.fullName,
+                    dateAddedInMillis = it.dateAddedInMillis,
+                    deprecated = it.deprecated,
+                )
+            }.also {
+                scanResultsDao.insertExtractedProfiles(it)
+            }
         }
     }
 
-    override suspend fun getExtractProfileResultsForBroker(brokerName: String): List<ExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        return@withContext scanResultsDao.getExtractProfileResultForBroker(brokerName)
-            .map { extractProfileResult ->
-                ExtractedProfileResult(
-                    brokerName = extractProfileResult.brokerName,
-                    completionTimeInMillis = extractProfileResult.completionTimeInMillis,
-                    actionType = extractProfileResult.actionType,
-                    extractResults = extractProfileResult.extractResults.mapNotNull {
-                        extractedProfileAdapter.fromJson(it)
-                    },
-                    profileQuery = profileQueryAdapter.fromJson(extractProfileResult.userData),
-                )
-            }
+    override suspend fun getExtractedProfiles(
+        brokerName: String,
+        profileQueryId: Long,
+    ): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
+        return@withContext scanResultsDao.getExtractedProfilesForBrokerAndProfile(brokerName, profileQueryId).map {
+            ExtractedProfile(
+                profileUrl = it.profileUrl,
+                profileQueryId = it.profileQueryId,
+                brokerName = it.brokerName,
+                name = it.name,
+                alternativeNames = it.alternativeNames,
+                age = it.age,
+                addresses = it.addresses?.mapNotNull { item -> addressCityStateAdapter.fromJson(item) },
+                phoneNumbers = it.phoneNumbers,
+                relatives = it.relatives,
+                identifier = it.identifier,
+                reportId = it.reportId,
+                email = it.email,
+                fullName = it.fullName,
+                dateAddedInMillis = it.dateAddedInMillis,
+                deprecated = it.deprecated,
+            )
+        }
     }
 
     override fun getAllScanResultsFlow(): Flow<List<ScanResult>> {

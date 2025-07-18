@@ -30,9 +30,28 @@ data class ScanCompletedBroker(
     val endTimeInMillis: Long,
 )
 
+@Entity(tableName = "pir_extracted_profiles")
+data class StoredExtractedProfile(
+    @PrimaryKey val profileUrl: String, // Unique identifier for the extracted profile
+    val profileQueryId: Long, // Unique identifier for the profileQuery
+    val brokerName: String, // Unique identifier for broker in which the profile was found
+    val name: String? = null,
+    val alternativeNames: List<String>? = emptyList(),
+    val age: String? = null,
+    val addresses: List<String>? = emptyList(),
+    val phoneNumbers: List<String>? = emptyList(),
+    val relatives: List<String>? = emptyList(),
+    val identifier: String? = null,
+    val reportId: String? = null,
+    val email: String? = null,
+    val fullName: String? = null,
+    val dateAddedInMillis: Long = 0L, // Tells us when the extracted profile has been found
+    val deprecated: Boolean = false, // This should tell us if the profile is irrelevant for PIR (this is not me, profile edits)
+)
+
 /**
  * Contains all the extracted profile result from a scan run.
- * To know if an extracted profile exists for a broker, we need to check the extractResults and should not be empty.
+ * This is now mostly for logging.
  */
 @Entity(tableName = "pir_scan_extracted_profile")
 data class ExtractProfileResult(
