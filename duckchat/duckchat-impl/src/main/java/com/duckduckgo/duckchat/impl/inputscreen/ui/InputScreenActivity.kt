@@ -18,7 +18,12 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.os.Build.VERSION
 import android.os.Bundle
+import android.transition.Explode
+import android.transition.Fade
+import android.transition.TransitionInflater
 import android.util.Log
+import android.view.Window
+import androidx.transition.Slide
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -37,12 +42,20 @@ class InputScreenActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        with(window) {
+            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+
+            val slide = TransitionInflater.from(this@InputScreenActivity).inflateTransition(R.transition.slide_in_from_top_fade_in)
+            window.enterTransition = slide
+        }
+
         setContentView(R.layout.activity_input_screen)
+
     }
 
     override fun finish() {
         super.finish()
-        applyExitTransition()
+        // applyExitTransition()
     }
 
     private fun applyExitTransition() {

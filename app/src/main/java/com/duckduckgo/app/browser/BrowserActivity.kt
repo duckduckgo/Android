@@ -29,6 +29,7 @@ import android.os.SystemClock
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.Window
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
@@ -331,6 +332,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         bindMockupToolbars()
 
+        // Enable activity transitions in the calling activity
+        with(window) {
+            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
+        }
         setContentView(binding.root)
 
         initializeTabs(savedInstanceState)

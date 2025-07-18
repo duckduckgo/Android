@@ -54,6 +54,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
+import android.view.Window
 import android.view.WindowManager
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
@@ -1096,28 +1097,30 @@ class BrowserTabFragment :
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
             animateContentOutAndLaunchInputScreen(query)
+            // animateContentOutAndLaunchInputScreen2(query)
+            // animateContentOutAndLaunchInputScreen3(query)
+        }
+    }
+
+    private fun animateContentOutAndLaunchInputScreen3(query: String) {
+        val intent = globalActivityStarter.startIntent(
+            requireContext(),
+            InputScreenActivityParams(query = query),
+        )
+        searchInterstitialLauncher.launch(intent)
+    }
+
+    private fun animateContentOutAndLaunchInputScreen2(query: String) {
+        with(requireActivity().window) {
+            requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS)
         }
     }
 
     private fun animateContentOutAndLaunchInputScreen(query: String) {
-        val launchOptions = if (VERSION.SDK_INT >= 33) {
-            binding.root.animate()
-                .translationY(56.toPx().toFloat())
-                .setDuration(2000)
-                .setInterpolator(OvershootInterpolator(1f))
-                .start()
-            binding.root.animate()
-                .alpha(0f)
-                .setDuration(2000)
-                .setInterpolator(DecelerateInterpolator())
-                .start()
-
-            val enterTransition = AnimationResourceProvider.getSlideInFromTopFadeIn()
-            ActivityOptionsCompat.makeCustomAnimation(
-                requireActivity(),
-                enterTransition,
-                0,  // no automatic exit animation, we're animating content manually
-            )
+        
+        val launchOptions = if (VERSION.SDK_INT >= 21) {
+            // Use makeSceneTransitionAnimation for XML transitions to work
+            ActivityOptionsCompat.makeSceneTransitionAnimation(requireActivity())
         } else {
             null
         }
