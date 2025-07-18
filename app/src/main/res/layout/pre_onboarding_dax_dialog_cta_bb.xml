@@ -34,7 +34,8 @@
         <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fadeScrollbars="false">
+                android:fadeScrollbars="false"
+                android:fillViewport="true">
 
             <LinearLayout
                     android:id="@+id/cardContainer"
@@ -45,24 +46,36 @@
                     android:paddingVertical="@dimen/keyline_6">
 
                 <include
-                        android:id="@+id/initial"
-                        layout="@layout/pre_onboarding_initial_bb"
-                        android:visibility="gone"/>
+                    android:id="@+id/initial"
+                    layout="@layout/pre_onboarding_initial_bb"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
 
                 <include
-                        android:id="@+id/skip_onboarding"
-                        layout="@layout/pre_onboarding_skip_onboarding_bb"
-                        android:visibility="gone"/>
+                    android:id="@+id/skip_onboarding"
+                    layout="@layout/pre_onboarding_skip_onboarding_bb"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
 
                 <include
-                        android:id="@+id/comparison_chart"
-                        layout="@layout/pre_onboarding_comparison_chart_bb"
-                        android:visibility="gone" />
+                    android:id="@+id/comparison_chart"
+                    layout="@layout/pre_onboarding_comparison_chart_bb"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
 
                 <include
-                        android:id="@+id/address_bar_position"
-                        layout="@layout/pre_onboarding_address_bar_position_bb"
-                        android:visibility="gone" />
+                    android:id="@+id/address_bar_position"
+                    layout="@layout/pre_onboarding_address_bar_position_bb"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
 
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/primaryCta"
