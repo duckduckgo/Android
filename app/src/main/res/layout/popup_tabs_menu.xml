@@ -28,12 +28,6 @@
         app:primaryText="@string/newTabMenuItem" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/duckChatMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/duckChatMenuItem" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/selectAllMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,7 +68,7 @@
         app:primaryText="@string/selectTabsMenuItem" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/close_all_tabs_divider"
+        android:id="@+id/closeAllTabsDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:defaultPadding="false" />

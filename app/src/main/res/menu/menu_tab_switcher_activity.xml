@@ -20,47 +20,21 @@
     tools:ignore="AlwaysShowAction">
 
     <item
-        android:id="@+id/layoutTypeMenuItem"
+        android:id="@+id/layoutTypeToolbarButton"
         android:icon="@drawable/ic_view_list_24"
         android:title="@string/tabSwitcherListViewMenu"
-        android:visible="false"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/fireMenuItem"
+        android:id="@+id/fireToolbarButton"
         android:icon="@drawable/ic_fire_24"
         android:title="@string/fireMenu"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/newTab"
+        android:id="@+id/newTabToolbarButton"
         android:icon="@drawable/ic_add_24"
         android:title="@string/newTabMenuItem"
         app:showAsAction="always" />
-
-    <item
-        android:id="@+id/newTabOverflow"
-        android:title="@string/newTabMenuItem"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/duckChat"
-        android:title="@string/duckChatMenuItem"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/closeAllTabs"
-        android:title="@string/closeAllTabsMenuItem"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/downloads"
-        android:title="@string/downloadsMenuItemTitle"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/settings"
-        android:title="@string/settingsMenuItemTitle"
-        app:showAsAction="never" />
 
 </menu>
