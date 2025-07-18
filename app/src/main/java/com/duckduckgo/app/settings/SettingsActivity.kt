@@ -63,6 +63,7 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPproUnifiedFe
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
+import com.duckduckgo.app.settings.SettingsViewModel.CompleteYourSetupState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -170,6 +171,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     private val viewsPro
         get() = binding.includeSettings.contentSettingsPrivacyPro
+
+    private val viewsCompleteSetup
+        get() = binding.includeSettings.contentSettingsCompleteSetup
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -288,6 +292,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
+                    updateCompleteSetupSettings(it.completeYourSetupState)
                 }
             }.launchIn(lifecycleScope)
 
@@ -340,6 +345,22 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
         viewsPrivacy.widgetPromptSetting.isVisible = isVisible
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
+    }
+
+    private fun updateCompleteSetupSettings(state: CompleteYourSetupState) {
+        if (!state.canShowSection) {
+            viewsCompleteSetup.settingsSectionCompleteSetup.gone()
+            return
+        }
+
+        val viewsToInclude = state.settingsPlugins.map { plugin ->
+            plugin.getView(this@SettingsActivity, { viewModel.refreshViewStates() })
+        }
+        with(viewsCompleteSetup.settingsCompleteFeaturesContainer) {
+            removeAllViews()
+            viewsToInclude.forEach { addView(it) }
+        }
+        viewsCompleteSetup.settingsSectionCompleteSetup.show()
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {

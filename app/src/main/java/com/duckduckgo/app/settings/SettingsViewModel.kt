@@ -17,7 +17,6 @@
 package com.duckduckgo.app.settings
 
 import android.annotation.SuppressLint
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -72,6 +71,7 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
@@ -79,6 +79,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.DISABLED_WIH_HELP_LINK
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
+import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
@@ -124,6 +125,7 @@ class SettingsViewModel @Inject constructor(
     private val settingsPageFeature: SettingsPageFeature,
     private val widgetCapabilities: WidgetCapabilities,
     private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
+    private val completeSetupSettingsPlugin: PluginPoint<CompleteSetupSettingsPlugin>,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -141,6 +143,12 @@ class SettingsViewModel @Inject constructor(
         val isVoiceSearchVisible: Boolean = false,
         val isAddWidgetInProtectionsVisible: Boolean = false,
         val widgetsInstalled: Boolean = false,
+        val completeYourSetupState: CompleteYourSetupState = CompleteYourSetupState(),
+    )
+
+    data class CompleteYourSetupState(
+        val canShowSection: Boolean = false,
+        val settingsPlugins: List<CompleteSetupSettingsPlugin> = emptyList(),
     )
 
     sealed class Command {
@@ -185,7 +193,7 @@ class SettingsViewModel @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
-        start()
+        refreshViewStates()
         startPollingAppTPState()
     }
 
@@ -194,8 +202,7 @@ class SettingsViewModel @Inject constructor(
         appTPPollJob.cancel()
     }
 
-    @VisibleForTesting
-    internal fun start() {
+    fun refreshViewStates() {
         val defaultBrowserAlready = defaultWebBrowserCapability.isDefaultBrowser()
 
         viewModelScope.launch {
@@ -218,9 +225,15 @@ class SettingsViewModel @Inject constructor(
                     widgetsInstalled = withContext(dispatcherProvider.io()) {
                         widgetCapabilities.hasInstalledWidgets
                     },
+                    completeYourSetupState = getCompleteYourSetupState(),
                 ),
             )
         }
+    }
+
+    private suspend fun getCompleteYourSetupState(): CompleteYourSetupState {
+        val viablePlugins = completeSetupSettingsPlugin.getPlugins().filter { it.canShow() }
+        return CompleteYourSetupState(canShowSection = viablePlugins.isNotEmpty(), settingsPlugins = viablePlugins)
     }
 
     // FIXME

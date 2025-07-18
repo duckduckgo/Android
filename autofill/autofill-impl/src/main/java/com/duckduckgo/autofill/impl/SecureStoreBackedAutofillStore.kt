@@ -94,6 +94,12 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         return autofillPrefsStore.hasEverImportedPasswordsFlow()
     }
 
+    override var hasDismissedMainAppSettingsPromo: Boolean
+        get() = autofillPrefsStore.hasDismissedMainAppSettingsPromo
+        set(value) {
+            autofillPrefsStore.hasDismissedMainAppSettingsPromo = value
+        }
+
     override var hasDeclinedPasswordManagementImportPromo: Boolean
         get() = autofillPrefsStore.hasDeclinedPasswordManagementImportPromo
         set(value) {
