@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.onboarding.ui.page
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -29,6 +31,7 @@ import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.view.animation.PathInterpolator
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
@@ -189,7 +192,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     binding.daxDialogCta.secondaryCta.isVisible = true
                     binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
 
-                    binding.daxDialogCta.cardView.animateEntrance(
+                    showDaxDialogCardView(
                         onAnimationEnd = {
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBuck)
                             val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBuck)
@@ -229,7 +232,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.secondaryCta.isVisible = false
 
-                    binding.daxDialogCta.cardView.animateEntrance(
+                    showDaxDialogCardView(
                         onAnimationEnd = {
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBuck)
                             val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBuck)
@@ -465,6 +468,35 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             .withEndAction {
                 viewModel.loadDaxDialog()
             }
+    }
+
+    private fun showDaxDialogCardView(onAnimationEnd: () -> Unit) {
+        val animationDuration = 600.milliseconds
+        val rotationDelay = 67.milliseconds
+        val scaleValues = floatArrayOf(0.14f, 1.03f, 0.99f, 1.0f)
+        val rotationValues = floatArrayOf(5f, -1f, 0.5f, 0f)
+
+        val dialogCardView = binding.daxDialogCta.cardView
+            .apply {
+                pivotX = 0f
+                pivotY = 0f
+                scaleX = scaleValues.first()
+                scaleY = scaleValues.first()
+                rotation = rotationValues.first()
+            }
+
+        val scaleXAnimator = ObjectAnimator.ofFloat(dialogCardView, "scaleX", *scaleValues)
+        val scaleYAnimator = ObjectAnimator.ofFloat(dialogCardView, "scaleY", *scaleValues)
+
+        val rotationAnimator = ObjectAnimator.ofFloat(dialogCardView, "rotation", *rotationValues)
+            .apply { startDelay = rotationDelay.inWholeMilliseconds }
+
+        AnimatorSet().run {
+            playTogether(scaleXAnimator, scaleYAnimator, rotationAnimator)
+            setDuration(animationDuration.inWholeMilliseconds)
+            doOnEnd { onAnimationEnd() }
+            start()
+        }
     }
 
     private fun scheduleTypingAnimation(textView: TypeAnimationTextView, text: String, afterAnimation: () -> Unit = {}) {
