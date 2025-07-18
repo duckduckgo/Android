@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importer dine Google-adgangskoder</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Åbn Google-adgangskoder</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importer fra Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vælg en CSV-fil</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importer fra browseren på computeren</string>
 

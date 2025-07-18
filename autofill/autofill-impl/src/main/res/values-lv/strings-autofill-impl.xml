@@ -258,7 +258,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importē savas Google paroles</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Atvērt Google paroles</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importēt no Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Izvēlies CSV failu</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importēt no galddatora pārlūka</string>
 

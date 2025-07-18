@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης Google που διαθέτετε</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Άνοιγμα κωδικών πρόσβασης Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Εισαγωγή από το Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Εισαγωγή από πρόγραμμα περιήγησης για υπολογιστές</string>
 

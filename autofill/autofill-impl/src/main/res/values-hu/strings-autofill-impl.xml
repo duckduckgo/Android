@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Google-jelszavaid importálása</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Nyisd meg a Google Jelszókezelőt</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importálás a Google-ból</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Válassz egy CSV-fájlt</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importálás asztali böngészőből</string>
 

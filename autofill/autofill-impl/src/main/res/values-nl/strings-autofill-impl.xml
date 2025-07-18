@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importeer je Google-wachtwoorden</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Google wachtwoorden openen</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importeren van Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Kies een CSV-bestand</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importeren vanuit de desktopbrowser</string>
 

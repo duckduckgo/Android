@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Google Şifrelerinizi İçe Aktarın</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Google Şifrelerini Aç</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Google\'dan İçe Aktar</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Bir CSV dosyası seç</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Masaüstü Tarayıcısından İçe Aktar</string>
 

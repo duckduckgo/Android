@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Tuo Google-salasanasi</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Avaa Google Salasanat</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Tuo Googlesta</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Valitse CSV-tiedosto</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Tuo tietokoneen selaimesta</string>
 

@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importa as tuas palavras-passe do Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Abrir palavras-passe do Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importar do Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Escolher um ficheiro CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importar do navegador para computadores</string>
 

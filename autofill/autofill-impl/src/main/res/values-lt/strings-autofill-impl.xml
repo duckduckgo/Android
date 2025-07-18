@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuok savo slaptažodžius iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Atidaryk „Google“ slaptažodžius</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importuok iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Pasirink CSV failą</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuoti iš darbalaukio naršyklės</string>
 
