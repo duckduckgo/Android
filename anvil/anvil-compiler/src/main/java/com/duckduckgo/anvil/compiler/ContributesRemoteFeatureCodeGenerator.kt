@@ -51,7 +51,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         projectFiles: Collection<KtFile>,
-    ): Collection<GeneratedFile> {
+    ): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributesRemoteFeature::class.fqName) }
@@ -72,7 +72,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         customStorePresence: CustomStorePresence,
-    ): GeneratedFile {
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_ProxyModule"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -187,7 +187,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun generateRemoteFeature(
@@ -195,7 +195,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
         codeGenDir: File,
         module: ModuleDescriptor,
         customStorePresence: CustomStorePresence,
-    ): GeneratedFile {
+    ): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val generatedClassName = "${vmClass.shortName}_RemoteFeature"
         val annotation = vmClass.annotations.first { it.fqName == ContributesRemoteFeature::class.fqName }
@@ -319,7 +319,7 @@ class ContributesRemoteFeatureCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, generatedClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun generateOptionalBindings(
