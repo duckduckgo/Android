@@ -47,10 +47,10 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.AutoTransition
 import androidx.transition.TransitionManager
+import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBbBinding
-import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage.BbOnboardingBackgroundSceneManager.BackgroundTile
 import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage.BbOnboardingBackgroundSceneManager.BackgroundTile.*
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
 import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
@@ -146,8 +146,9 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         }
 
         backgroundSceneManager = BbOnboardingBackgroundSceneManager(
-            view1 = binding.background1,
-            view2 = binding.background2,
+            backgroundView1 = binding.background1,
+            backgroundView2 = binding.background2,
+            windStrokesAnimationView = binding.windStrokesAnimation,
             lightModeEnabled = appTheme.isLightModeEnabled(),
         ).also { it.initializeView() }
 
@@ -544,13 +545,16 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private class BbOnboardingBackgroundSceneManager(
-        view1: View,
-        view2: View,
+        backgroundView1: View,
+        backgroundView2: View,
+        val windStrokesAnimationView: LottieAnimationView,
         val lightModeEnabled: Boolean,
     ) {
-        private val screenWidth = view1.context.resources.displayMetrics.widthPixels.toFloat()
-        private var currentBackgroundView = view1
-        private var nextBackgroundView = view2
+        private val screenWidth =
+            backgroundView1.context.resources.displayMetrics.widthPixels.toFloat()
+
+        private var currentBackgroundView = backgroundView1
+        private var nextBackgroundView = backgroundView2
         private var transitionInProgress = false
         private var currentTile = TILE_01
 
@@ -618,6 +622,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                 doOnEnd { completeTransition() }
             }.start()
+
+            if (currentTile == TILE_02) {
+                windStrokesAnimationView.alpha = if (lightModeEnabled) 1.0f else 0.4f
+                windStrokesAnimationView.playAnimation()
+            }
         }
 
         fun setBackgroundClickListener(onClick: () -> Unit) {
