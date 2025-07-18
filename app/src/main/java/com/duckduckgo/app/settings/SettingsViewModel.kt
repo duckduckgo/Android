@@ -398,10 +398,6 @@ class SettingsViewModel @Inject constructor(
         pixel.fire(SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED)
     }
 
-    fun onLaunchedFromNotification(pixelName: String) {
-        pixel.fire(pixelName)
-    }
-
     fun onDdgOnOtherPlatformsClicked() {
         viewModelScope.launch { command.send(LaunchOtherPlatforms) }
     }
