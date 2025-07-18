@@ -469,13 +469,14 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             .start()
 
         binding.welcomeTitle.animate()
-            .alpha(MIN_ALPHA)
+            .translationX(-resources.displayMetrics.widthPixels.toFloat())
             .setDuration(animationDuration.inWholeMilliseconds)
             .setStartDelay(animationDelay.inWholeMilliseconds)
             .withStartAction {
                 backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_02)
             }
             .withEndAction {
+                binding.welcomeTitle.isVisible = false
                 viewModel.loadDaxDialog()
             }
     }
