@@ -27,6 +27,8 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +43,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityTabSwitcherBinding
 import com.duckduckgo.app.browser.databinding.PopupTabsMenuBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
@@ -89,6 +92,7 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toDp
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -268,6 +272,13 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
+
+        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM && viewModel.isNewDesignEnabled) {
+            binding.root.removeView(binding.tabSwitcherToolbarTop.root)
+        } else {
+            binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+        }
+
         toolbar = findViewById(R.id.toolbar)
     }
 
@@ -297,6 +308,19 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
             handleFabStateUpdates()
             handleSelectionModeCancellation()
+        }
+
+        if (viewModel.isNewDesignEnabled) {
+            // Set the layout params for the tabs recycler view based on omnibar position
+            tabsRecycler.updateLayoutParams {
+                this as CoordinatorLayout.LayoutParams
+                this.behavior = null
+                if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {
+                    this.topMargin = 56.toPx()
+                } else {
+                    this.bottomMargin = 56.toPx()
+                }
+            }
         }
     }
 
