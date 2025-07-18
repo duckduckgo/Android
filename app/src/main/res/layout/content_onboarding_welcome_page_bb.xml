@@ -59,6 +59,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/navigationBarGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_end="0dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/daxLogo"
         android:layout_width="64dp"
@@ -92,15 +102,17 @@
         android:alpha="0" />
 
     <include
-            android:id="@+id/daxDialogCta"
-            layout="@layout/pre_onboarding_dax_dialog_cta_bb"
-            android:visibility="gone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_max="600dp"/>
+        android:id="@+id/daxDialogCta"
+        layout="@layout/pre_onboarding_dax_dialog_cta_bb"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="72dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/navigationBarGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
+        app:layout_constraintWidth_max="600dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

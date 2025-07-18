@@ -139,9 +139,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.statusBarGuideline) { _, insets ->
-            val statusBarHeight = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-            binding.statusBarGuideline.setGuidelineBegin(statusBarHeight)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.longDescriptionContainer) { _, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.statusBarGuideline.setGuidelineBegin(systemBarsInsets.top)
+            binding.navigationBarGuideline.setGuidelineEnd(systemBarsInsets.bottom)
             insets
         }
 
@@ -454,7 +455,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 val initialMarginStart = daxLogoLayoutParams.marginStart
                 val initialMarginTop = daxLogoLayoutParams.topMargin
                 val targetMarginStart = 16f.toPx()
-                val targetMarginTop = 16f.toPx()
+                val targetMarginTop = 0f
 
                 addUpdateListener { animator ->
                     val progress = animator.animatedValue as Float
