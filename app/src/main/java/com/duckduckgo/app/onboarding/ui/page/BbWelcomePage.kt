@@ -216,15 +216,20 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                 binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                             }
 
-                            binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
-                                titleText,
-                                afterAnimation = {
-                                    binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
-                                        descriptionText,
-                                        afterAnimation = { afterTypingAnimation() },
+                            binding.daxDialogCta.initial.shieldImage.animate()
+                                .alpha(1.0f)
+                                .setDuration(ANIMATION_DURATION)
+                                .withEndAction {
+                                    binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
+                                        titleText,
+                                        afterAnimation = {
+                                            binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
+                                                descriptionText,
+                                                afterAnimation = { afterTypingAnimation() },
+                                            )
+                                        },
                                     )
-                                },
-                            )
+                                }
                         },
                     )
                 }
@@ -254,15 +259,20 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                 binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                             }
 
-                            binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
-                                titleText,
-                                afterAnimation = {
-                                    binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
-                                        descriptionText,
-                                        afterAnimation = { afterTypingAnimation() },
+                            binding.daxDialogCta.initial.shieldImage.animate()
+                                .alpha(1.0f)
+                                .setDuration(ANIMATION_DURATION)
+                                .withEndAction {
+                                    binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
+                                        titleText,
+                                        afterAnimation = {
+                                            binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
+                                                descriptionText,
+                                                afterAnimation = { afterTypingAnimation() },
+                                            )
+                                        },
                                     )
-                                },
-                            )
+                                }
                         },
                     )
                 }
