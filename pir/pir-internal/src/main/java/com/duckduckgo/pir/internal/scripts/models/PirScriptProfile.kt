@@ -20,7 +20,7 @@ package com.duckduckgo.pir.internal.scripts.models
  * This profile represents the data we can get from the web UI / from the user
  */
 data class ProfileQuery(
-    val id: Int? = null,
+    val id: Long? = null,
     val firstName: String,
     val lastName: String,
     val middleName: String? = null,
