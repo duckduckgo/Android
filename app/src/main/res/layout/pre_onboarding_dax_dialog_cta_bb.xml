@@ -18,7 +18,7 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/daxCtaContainer"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="match_parent"
               android:clipChildren="false"
               android:clipToPadding="false"
               android:orientation="vertical"
@@ -27,20 +27,19 @@
     <com.duckduckgo.common.ui.view.shape.BBCardView
             android:id="@+id/cardView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/keyline_4"
-            android:layout_marginBottom="@dimen/keyline_4"
             android:layout_marginTop="@dimen/keyline_5">
 
         <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:fadeScrollbars="false">
 
             <LinearLayout
                     android:id="@+id/cardContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:paddingHorizontal="@dimen/keyline_5"
                     android:paddingVertical="@dimen/keyline_6">
