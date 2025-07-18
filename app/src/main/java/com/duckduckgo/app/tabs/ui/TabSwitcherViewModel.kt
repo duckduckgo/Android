@@ -134,12 +134,12 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-        duckAiFeatureState.showPopupMenuShortcut,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, showInBrowserMenu ->
+        duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
-            isDuckAIButtonVisible = showInBrowserMenu,
+            isDuckAIButtonVisible = showDuckAiButton,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
 
