@@ -258,7 +258,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importă parolele tale Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Deschide parolele Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importă din Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Alege un fișier CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importă din browserul pentru desktop</string>
 

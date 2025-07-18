@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuj swoje hasła Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Otwórz hasła Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importuj z Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Wybierz plik CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuj z przeglądarki komputerowej</string>
 

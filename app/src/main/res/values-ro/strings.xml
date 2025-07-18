@@ -814,8 +814,9 @@
     <string name="onboardingEndDaxDialogButton">Gata!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo are și un abonament, cu un <b>VPN</b> securizat + încă 2 protecții premium.<b>Încearcă gratuit!</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
     <!-- Highlight Onboarding Experiment-->

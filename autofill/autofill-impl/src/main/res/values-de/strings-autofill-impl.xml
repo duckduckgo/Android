@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Google-Passwörter importieren</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Google-Passwörter öffnen</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Von Google importieren</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">CSV-Datei wählen</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Aus Desktop-Browser importieren</string>
 

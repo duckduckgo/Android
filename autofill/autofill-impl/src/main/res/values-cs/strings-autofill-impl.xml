@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuj si hesla z Googlu</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Otevřít hesla na Googlu</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Import z Googlu</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vybrat soubor CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importovat z prohlížeče na počítači</string>
 

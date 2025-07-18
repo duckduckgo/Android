@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Uvezi svoje Google lozinke</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Otvori Google lozinke</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Uvezi s Googlea</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Odaberi CSV datoteku</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Uvoz iz preglednika na radnoj površini</string>
 

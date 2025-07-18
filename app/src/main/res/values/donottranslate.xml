@@ -62,7 +62,4 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
-
-    <!-- Free Trial -->
-    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
 </resources>

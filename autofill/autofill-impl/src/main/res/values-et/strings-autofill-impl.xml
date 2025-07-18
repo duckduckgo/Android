@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Impordi oma Google\'i paroolid</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Ava Google\'i paroolid</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Impordi Google\'ist</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vali CSV-fail</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Impordi töölaua brauserist</string>
 

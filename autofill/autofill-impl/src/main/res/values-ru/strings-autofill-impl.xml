@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Импорт паролей из Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Открыть пароли Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Импортировать из Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Выбрать CSV-файл</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортировать из настольного браузера</string>
 
