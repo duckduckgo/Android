@@ -235,7 +235,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         viewModel.visibilityState.onEach {
             binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
-            binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
+            // TODO: Uncomment when button is implemented
+            // binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
         }.launchIn(lifecycleScope)
     }
 
