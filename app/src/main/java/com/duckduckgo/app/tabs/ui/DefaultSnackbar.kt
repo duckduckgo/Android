@@ -22,9 +22,10 @@ import com.google.android.material.R as materialR
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 
-class TabSwitcherSnackbar(
-    anchorView: View,
+class DefaultSnackbar(
+    parentView: View,
     message: String,
+    private val anchor: View? = null,
     private val action: String? = null,
     private val showAction: Boolean = false,
     private val onAction: () -> Unit = {},
@@ -34,7 +35,7 @@ class TabSwitcherSnackbar(
         private const val SNACKBAR_DISPLAY_TIME_MS = 3500
     }
 
-    private val snackbar = Snackbar.make(anchorView, message, Snackbar.LENGTH_LONG)
+    private val snackbar = Snackbar.make(parentView, message, Snackbar.LENGTH_LONG)
         .setDuration(SNACKBAR_DISPLAY_TIME_MS)
         .apply {
             if (showAction) {
@@ -62,6 +63,11 @@ class TabSwitcherSnackbar(
                 }
             },
         )
+        .apply {
+            if (anchor != null) {
+                setAnchorView(anchor)
+            }
+        }
         .setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE)
         .apply { view.findViewById<TextView>(materialR.id.snackbar_text).maxLines = 1 }
 

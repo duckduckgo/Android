@@ -223,6 +223,14 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
+    private val snackbarAnchorView by lazy {
+        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM) {
+            toolbar
+        } else {
+            null
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -635,9 +643,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showBookmarkSnackbarWithUndo(numBookmarks: Int) {
         val message = resources.getQuantityString(R.plurals.tabSwitcherBookmarkToast, numBookmarks, numBookmarks)
-        TabSwitcherSnackbar(
-            anchorView = toolbar,
+        DefaultSnackbar(
+            parentView = binding.root,
             message = message,
+            anchor = snackbarAnchorView,
             action = getString(R.string.undoSnackbarAction),
             showAction = numBookmarks > 0,
             onAction = viewModel::undoBookmarkAction,
@@ -809,9 +818,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun showTabDeletedSnackbar(tab: TabEntity) {
-        TabSwitcherSnackbar(
-            anchorView = toolbar,
+        DefaultSnackbar(
+            parentView = binding.root,
             message = getString(R.string.tabClosed),
+            anchor = snackbarAnchorView,
             action = getString(R.string.tabClosedUndo),
             showAction = true,
             onAction = { launch { viewModel.onUndoDeleteTab(tab) } },
@@ -820,9 +830,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun showTabsDeletedSnackbar(tabIds: List<String>) {
-        TabSwitcherSnackbar(
-            anchorView = toolbar,
+        DefaultSnackbar(
+            parentView = binding.root,
             message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+            anchor = snackbarAnchorView,
             action = getString(R.string.tabClosedUndo),
             showAction = true,
             onAction = { launch { viewModel.onUndoDeleteTabs(tabIds) } },
