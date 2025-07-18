@@ -134,12 +134,12 @@ class TabSwitcherViewModel @Inject constructor(
         _selectionViewState,
         tabSwitcherItemsFlow,
         tabRepository.tabSwitcherData,
-        duckAiFeatureState.showPopupMenuShortcut,
-    ) { viewState, tabSwitcherItems, tabSwitcherData, showInBrowserMenu ->
+        duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus,
+    ) { viewState, tabSwitcherItems, tabSwitcherData, showDuckAiButton ->
         viewState.copy(
             tabSwitcherItems = tabSwitcherItems,
             layoutType = tabSwitcherData.layoutType,
-            isDuckAIButtonVisible = showInBrowserMenu,
+            isDuckAIButtonVisible = showDuckAiButton,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
 
@@ -166,10 +166,6 @@ class TabSwitcherViewModel @Inject constructor(
     // to be used in places where selection mode is required
     private val selectionMode: Selection
         get() = requireNotNull(selectionViewState.value.mode as Selection)
-
-    val isNewDesignEnabled: Boolean by lazy {
-        tabManagerFeatureFlags.newToolbarFeature().isEnabled()
-    }
 
     sealed class Command {
         data object Close : Command()

@@ -201,7 +201,7 @@ class TabSwitcherViewModelTest {
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
         whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(defaultVisualExperimentStateFlow)
-        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
             FakeToggleStore(),
@@ -1983,7 +1983,7 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when visual design enabled and show duck chat in browser menu false then AI fab not visible`() = runTest {
+    fun `when visual design enabled and show duck chat in address bar false then AI fab not visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
 
         initializeViewModel()
@@ -1995,9 +1995,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when visual design enabled and show duck chat in browser menu true then AI fab visible`() = runTest {
+    fun `when visual design enabled and show duck chat in address bar true then AI fab visible`() = runTest {
         defaultVisualExperimentStateFlow.value = true
-        whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(MutableStateFlow(true))
+        whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(true))
 
         initializeViewModel()
 
