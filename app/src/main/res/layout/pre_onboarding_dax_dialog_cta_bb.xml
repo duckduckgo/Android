@@ -67,7 +67,7 @@
 
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/primaryCta"
-                        style="@style/Widget.DuckDuckGo.BuckButton.TextButton.Primary"
+                        style="@style/Widget.DuckDuckGo.BBButton.TextButton.Primary"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_5"
@@ -75,8 +75,7 @@
 
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/secondaryCta"
-                        style="@style/Widget.DuckDuckGo.BuckButton.Secondary"
-                        android:textSize="16sp"
+                        style="@style/Widget.DuckDuckGo.BBButton.TextButton.Secondary"
                         android:gravity="center"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
