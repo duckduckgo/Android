@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
@@ -15,16 +14,5 @@
   ~ limitations under the License.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="300"
-    android:interpolator="@anim/overshoot_interpolator_tension_1">
-
-    <translate
-        android:fromYDelta="56dp"
-        android:toYDelta="0dp" />
-
-    <alpha
-        android:fromAlpha="0.0"
-        android:toAlpha="1.0" />
-
-</set>
+<overshootInterpolator xmlns:android="http://schemas.android.com/apk/res/android"
+    android:tension="1.0" />
