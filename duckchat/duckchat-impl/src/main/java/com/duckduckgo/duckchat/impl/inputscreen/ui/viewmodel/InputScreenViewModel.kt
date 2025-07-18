@@ -284,6 +284,24 @@ class InputScreenViewModel @AssistedInject constructor(
         }
     }
 
+    fun onChatInputTextChanged(query: String) {
+        _submitButtonIconState.update {
+            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEND)
+        }
+    }
+
+    fun onSearchSubmitted(query: String) {
+        command.value = Command.SubmitSearch(query)
+    }
+
+    fun onChatSubmitted(query: String) {
+        if (isWebUrl(query)) {
+            command.value = Command.SubmitSearch(query)
+        } else {
+            command.value = Command.SubmitChat(query)
+        }
+    }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()

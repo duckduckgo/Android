@@ -151,6 +151,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 requireActivity().setResult(Activity.RESULT_OK, data)
                 exitInterstitial()
             }
+            is Command.SubmitSearch -> {
+                submitSearchQuery(command.query)
+            }
+            is Command.SubmitChat -> {
+                submitChatQuery(command.query)
+            }
             else -> {
                 // TODO handle other commands
             }
@@ -167,15 +173,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         setContentId(R.id.viewPager)
 
         onSearchSent = { query ->
-            val data = Intent().putExtra(InputScreenActivity.QUERY, query)
-            requireActivity().setResult(Activity.RESULT_OK, data)
-            exitInterstitial()
+            viewModel.onSearchSubmitted(query)
         }
         onChatSent = { query ->
-            val data = Intent().putExtra(InputScreenActivity.QUERY, query)
-            requireActivity().setResult(Activity.RESULT_CANCELED, data)
-            requireActivity().finish()
-            duckChat.openDuckChatWithAutoPrompt(query)
+            viewModel.onChatSubmitted(query)
         }
         onBack = {
             requireActivity().onBackPressed()
@@ -188,6 +189,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
+            viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
         }
         onSubmitMessageAvailable = { isAvailable ->
             binding.actionSend.isVisible = isAvailable
@@ -198,6 +200,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onSearchTextChanged = { text ->
             viewModel.onSearchInputTextChanged(text)
         }
+        onChatTextChanged = { text ->
+            viewModel.onChatInputTextChanged(text)
+        }
+    }
+
+    private fun submitChatQuery(query: String) {
+        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        requireActivity().setResult(Activity.RESULT_CANCELED, data)
+        requireActivity().finish()
+        duckChat.openDuckChatWithAutoPrompt(query)
+    }
+
+    private fun submitSearchQuery(query: String) {
+        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        requireActivity().setResult(Activity.RESULT_OK, data)
+        exitInterstitial()
     }
 
     private fun configureVoice() {
