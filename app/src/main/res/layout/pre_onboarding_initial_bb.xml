@@ -29,18 +29,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/Typography.Buck.H1"
-            android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingDaxDialog1TitleBuck"
+            android:textAppearance="@style/Typography.BB.H1"
+            android:gravity="center"
+            android:text="@string/highlightsPreOnboardingDaxDialog1TitleBb"
             android:visibility="invisible" />
 
         <com.duckduckgo.common.ui.view.TypeAnimationTextView
             android:id="@+id/dialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/pangea_medium"
-            android:textSize="32sp"
-            android:textColor="@color/buckColorPrimaryText"/>
+            android:textAppearance="@style/Typography.BB.H1"
+            android:textColor="@color/buckColorPrimaryText"
+            android:gravity="center" />
 
     </FrameLayout>
 
@@ -51,20 +51,19 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:textAppearance="@style/Typography.Buck.Body1"
-            android:textColor="@color/buckColorPrimaryText"
-            android:text="@string/highlightsPreOnboardingDaxDialog1DescriptionBuck"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:textAppearance="@style/Typography.BB.Body1"
+            android:gravity="center"
+            android:text="@string/highlightsPreOnboardingDaxDialog1DescriptionBb"
             android:visibility="invisible" />
 
         <com.duckduckgo.common.ui.view.TypeAnimationTextView
             android:id="@+id/dialogBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:fontFamily="@font/pangea"
-            android:textSize="16sp"
-            android:textColor="@color/buckColorPrimaryText"/>
+            android:textAppearance="@style/Typography.BB.Body1"
+            android:textColor="@color/bbColorSecondaryText"
+            android:gravity="center" />
 
     </FrameLayout>
 
