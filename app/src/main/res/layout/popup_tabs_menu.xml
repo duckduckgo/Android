@@ -28,6 +28,20 @@
         app:primaryText="@string/newTabMenuItem" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/gridLayoutMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:trailingIcon="@drawable/ic_check_24"
+        app:primaryText="@string/tabSwitcherGridViewMenu" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/listLayoutMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:trailingIcon="@drawable/ic_check_24"
+        app:primaryText="@string/tabSwitcherListViewMenu" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/selectAllMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
