@@ -105,7 +105,7 @@ def create_asana_task(client: asana.ApiClient,
     task = tasks_api.create_task(
         {
             "data": {
-                "name": f"Android Nightly Release {release_tag}",
+                "name": f"Android Internal Release {release_tag}",
                 "html_notes": description,
                 "workspace": workspace_id
             }
@@ -127,11 +127,11 @@ def create_asana_task(client: asana.ApiClient,
     
     return task['gid']
 
-def get_latest_nightly_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
+def get_latest_internal_tag_before_commit(repo_path: str, current_tag: str) -> str | None:
     """
-    Return the previous *nightly* tag before `current_tag`, sorted by creation date (not version number).
+    Return the previous *internal* tag before `current_tag`, sorted by creation date (not version number).
     """
-    nightly_pattern = re.compile(r'^\d+\.\d+\.\d+(?:\.\d+)?-nightly$')
+    internal_pattern = re.compile(r'^\d+\.\d+\.\d+(?:\.\d+)?-internal$')
 
     try:
         result = subprocess.run(
@@ -142,14 +142,14 @@ def get_latest_nightly_tag_before_commit(repo_path: str, current_tag: str) -> st
         )
         tags = result.stdout.strip().splitlines()
 
-        # Filter to only nightly tags
-        nightly_tags = [tag for tag in tags if nightly_pattern.match(tag)]
+        # Filter to only internal tags
+        internal_tags = [tag for tag in tags if internal_pattern.match(tag)]
 
-        if current_tag not in nightly_tags:
+        if current_tag not in internal_tags:
             return None
 
-        idx = nightly_tags.index(current_tag)
-        return nightly_tags[idx - 1] if idx > 0 else None
+        idx = internal_tags.index(current_tag)
+        return internal_tags[idx - 1] if idx > 0 else None
     except subprocess.CalledProcessError:
         return None
 
@@ -181,7 +181,7 @@ def main():
         
         # Get the start tag (latest tag before the specified tag)
         # start_tag = get_latest_tag_before_commit(args.android_repo_path, args.tag)
-        start_tag = get_latest_nightly_tag_before_commit(args.android_repo_path, args.tag)
+        start_tag = get_latest_internal_tag_before_commit(args.android_repo_path, args.tag)
         if not start_tag:
             log(f"Error: No previous version tag found before {args.tag}")
             return 1
