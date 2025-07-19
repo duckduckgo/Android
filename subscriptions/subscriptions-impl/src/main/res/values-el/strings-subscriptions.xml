@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Ρυθμίσεις συνδρομής</string>
     <string name="subscriptionSettingSubscribe">Προστατέψτε τη σύνδεση και την ταυτότητά σας με το Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Περιλαμβάνει το VPN μας και τα Personal Information Removal και Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Περιλαμβάνει το VPN μας και τo Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Οι συνδρομητές αποκτούν το VPN, το Personal Information Removal και το Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Οι συνδρομητές λαμβάνουν το VPN μας και τo Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Απόκτησε το Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Δοκιμάστε το Privacy Pro δωρεάν</string>
     <string name="subscriptionSettingRestore">Έχω συνδρομή</string>

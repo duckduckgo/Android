@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_ADD_DEVICE_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_DUCK_AI_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_VPN_CLICK
@@ -89,6 +90,7 @@ interface SubscriptionPixelSender {
     fun reportOnboardingVpnClick()
     fun reportOnboardingPirClick()
     fun reportOnboardingIdtrClick()
+    fun reportOnboardingDuckAiClick()
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
@@ -196,6 +198,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportOnboardingIdtrClick() =
         fire(ONBOARDING_IDTR_CLICK)
+
+    override fun reportOnboardingDuckAiClick() =
+        fire(ONBOARDING_DUCK_AI_CLICK)
 
     override fun reportSubscriptionSettingsShown() =
         fire(SUBSCRIPTION_SETTINGS_SHOWN)

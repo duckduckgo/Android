@@ -1,8 +1,15 @@
 package com.duckduckgo.subscriptions.impl.settings.views
 
+import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
+import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
@@ -19,17 +26,26 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 class ProSettingViewModelTest {
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private lateinit var viewModel: ProSettingViewModel
+    private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
     @Before
     fun before() {
-        viewModel = ProSettingViewModel(subscriptionsManager, pixelSender)
+        viewModel = ProSettingViewModel(
+            subscriptionRebrandingFeatureToggle,
+            subscriptionsManager,
+            pixelSender,
+            privacyProFeature,
+            coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
@@ -96,4 +112,81 @@ class ProSettingViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenDuckAiPlusEnabledIfSubscriptionPlanHasDuckAiThenDuckAiPlusAvailable() = runTest {
+        privacyProFeature.duckAiPlus().setRawStoredState(State(true))
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.DuckAiPlus.value))))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertTrue(awaitItem().duckAiPlusAvailable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiPlusEnabledIfSubscriptionPlanDoesNotHaveDuckAiThenDuckAiPlusAvailable() = runTest {
+        privacyProFeature.duckAiPlus().setRawStoredState(State(true))
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.NetP.value))))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertFalse(awaitItem().duckAiPlusAvailable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDuckAiPlusDisabledIfSubscriptionPlanHasDuckAiThenDuckAiPlusAvailableFalse() = runTest {
+        privacyProFeature.duckAiPlus().setRawStoredState(State(false))
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(listOf(subscriptionOffer.copy(features = setOf(Product.DuckAiPlus.value))))
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertFalse(awaitItem().duckAiPlusAvailable)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRebrandingEnabledThenRebrandingEnabledViewStateTrue() = runTest {
+        whenever(subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()).thenReturn(true)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertTrue(awaitItem().rebrandingEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenRebrandingDisabledThenRebrandingEnabledViewStateFalse() = runTest {
+        whenever(subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()).thenReturn(false)
+        whenever(subscriptionsManager.subscriptionStatus).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+
+        viewModel.onCreate(mock())
+        viewModel.viewState.test {
+            assertFalse(awaitItem().rebrandingEnabled)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    private val subscriptionOffer = SubscriptionOffer(
+        planId = "test",
+        offerId = null,
+        pricingPhases = emptyList(),
+        features = emptySet(),
+    )
 }
