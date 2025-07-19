@@ -34,6 +34,9 @@
     <!-- Should be moved to theme if experiment is successful -->
     <color name="buckYellow">#FFE080</color>
     <color name="buckLightBlue">#4284F4</color>
+    <color name="buckPulseOrange">#F2643D</color>
+
+    <color name="buckColorPrimaryText">@color/black</color>
 
     <color name="buckColorButtonPrimaryContainer">#0267C1</color>
     <color name="buckColorButtonPrimaryContainerPressed">#002E5A</color>
@@ -42,6 +45,8 @@
     <color name="buckColorButtonSecondaryBorder">#0267C1</color>
     <color name="buckColorButtonSecondaryText">#0267C1</color>
     <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
+
+    <color name="buckColorButtonFAB">@color/white</color>
 
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>

@@ -87,6 +87,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -187,6 +188,9 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
     private var previousTransitionState: TransitionState? = null
 
@@ -810,9 +814,10 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
             doOnLayout {
                 pulseAnimation.playOn(
-                    targetView,
-                    isPrivacyShieldAnimation &&
+                    targetView = targetView,
+                    isSenseOfProtectionExperimentAndShieldView = isPrivacyShieldAnimation &&
                         runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() },
+                    isBuckOnboardingExperiment = onboardingDesignExperimentToggles.buckOnboarding().isEnabled(),
                 )
             }
         } else {

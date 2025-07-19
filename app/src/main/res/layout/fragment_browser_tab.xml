@@ -91,12 +91,16 @@
             android:id="@+id/daxDialogOnboardingCtaContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:elevation="@dimen/keyline_4">
 
             <include
                 android:id="@+id/includeOnboardingInContextDaxDialog"
                 layout="@layout/include_onboarding_in_context_dax_dialog"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/includeOnboardingInContextBuckDialog"
+                layout="@layout/include_onboarding_in_context_buck_dialog"
                 android:visibility="gone" />
 
             <include
