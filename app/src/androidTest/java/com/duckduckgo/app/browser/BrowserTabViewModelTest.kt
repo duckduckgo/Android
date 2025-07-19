@@ -670,7 +670,6 @@ class BrowserTabViewModelTest {
             subscriptions = subscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
-            userBrowserProperties = mockUserBrowserProperties,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
         )
