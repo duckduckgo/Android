@@ -66,13 +66,18 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
+import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.Headers.Companion.toHeaders
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
 const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
@@ -109,6 +114,7 @@ class RealDuckPlayer @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    @Named("api") private val okHttpClient: OkHttpClient,
 ) : DuckPlayerInternal, PrivacyConfigCallbackPlugin {
 
     private var shouldForceYTNavigation = false
@@ -254,12 +260,24 @@ class RealDuckPlayer @Inject constructor(
         return isDuckPlayerUri(uri.toUri())
     }
 
+    private fun isYouTubeNoCookieUri(uri: Uri): Boolean {
+        val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
+        return uri.host?.removePrefix("www.") == embedUrl
+    }
+
+    private fun isYouTubeNoCookieEmbedUri(
+        uri: Uri,
+        webViewUrl: String?,
+    ): Boolean {
+        webViewUrl ?: return false
+        if (!isYouTubeNoCookieUri(uri) || uri.pathSegments.firstOrNull() != "embed") return false
+        return webViewUrl.toUri().getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == uri.pathSegments.getOrNull(1)
+    }
+
     override fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean {
         val validPaths = duckPlayerLocalFilesPath.assetsPath()
-        val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
         return (
-            uri.host?.removePrefix("www.") ==
-                embedUrl && (
+            isYouTubeNoCookieUri(uri) && (
                 uri.pathSegments.firstOrNull() == null ||
                     validPaths.any { uri.path?.contains(it) == true } ||
                     (uri.pathSegments.firstOrNull() != "embed" && uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) != null)
@@ -305,13 +323,29 @@ class RealDuckPlayer @Inject constructor(
             return processDuckPlayerUri(url, webView)
         } else {
             if (!isFeatureEnabled) return null
+            val webViewUrl = withContext(dispatchers.main()) { webView.url }
             if (isYoutubeWatchUrl(url)) {
                 return processYouTubeWatchUri(request, url, webView)
             } else if (isSimulatedYoutubeNoCookie(url)) {
                 return processSimulatedYouTubeNoCookieUri(url, webView)
+            } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
+                return try {
+                    WebResourceResponse("text/html", "UTF-8", getEmbedWithReferer(request))
+                } catch (e: IOException) {
+                    null
+                }
             }
         }
         return null
+    }
+
+    private suspend fun getEmbedWithReferer(request: WebResourceRequest): InputStream? {
+        val headers = request.requestHeaders
+            .filterNot { it.key.lowercase() == "referer" }
+            .plus("referer" to "http://android.mobile.duckduckgo.com")
+            .toHeaders()
+        val okHttpRequest = Request.Builder().url(request.url.toString()).headers(headers).build()
+        return withContext(dispatchers.io()) { okHttpClient.newCall(okHttpRequest).execute().body?.byteStream() }
     }
 
     private fun processSimulatedYouTubeNoCookieUri(
