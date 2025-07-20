@@ -1,0 +1,26 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M10.068,2.78C10.577,2.266 11.285,1.998 11.998,2C12.71,2.002 13.417,2.273 13.924,2.79C14.753,3.635 15.472,4.074 16.194,4.298C16.919,4.522 17.797,4.577 19.034,4.419C19.737,4.33 20.467,4.507 21.039,4.936C21.616,5.37 21.992,6.037 21.998,6.784C22.038,11.484 21.354,14.567 19.858,16.803C18.278,19.166 15.744,20.446 13.567,21.546C13.464,21.598 13.36,21.651 13.258,21.702C12.475,22.099 11.525,22.099 10.742,21.702C10.64,21.65 10.536,21.598 10.432,21.546C8.256,20.446 5.722,19.166 4.142,16.803C2.646,14.567 1.962,11.484 2.002,6.784C2.008,6.038 2.383,5.371 2.96,4.938C3.531,4.508 4.26,4.331 4.963,4.419C6.207,4.576 7.087,4.512 7.812,4.28C8.533,4.05 9.246,3.607 10.068,2.78ZM13,4.673V19.59C15.113,18.514 17.007,17.468 18.196,15.691C19.362,13.947 20.037,11.345 19.998,6.801C19.998,6.735 19.965,6.631 19.838,6.535C19.705,6.436 19.502,6.376 19.286,6.403C17.883,6.582 16.694,6.546 15.602,6.208C14.677,5.921 13.834,5.421 13,4.673ZM11,19.59V4.652C10.176,5.388 9.341,5.891 8.421,6.185C7.329,6.534 6.134,6.583 4.713,6.403C4.497,6.376 4.295,6.436 4.162,6.536C4.035,6.632 4.002,6.735 4.002,6.801C3.963,11.345 4.638,13.947 5.804,15.691C6.993,17.468 8.887,18.514 11,19.59Z"
+      android:fillColor="#FFFFFF"
+      android:fillType="evenOdd"/>
+</vector>

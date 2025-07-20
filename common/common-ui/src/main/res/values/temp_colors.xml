@@ -92,6 +92,10 @@
     <color name="bbFeatherFill">#FFFFFF</color>
     <color name="bbFeatherWhisps">#000000</color>
 
+    <color name="bbColorComparisonChartItemBackground">#F1F1EE</color>
+    <color name="bbColorComparisonChartItemIcon">@color/bbColorPrimaryText</color>
+    <color name="bbColorComparisonChartDivider">#D7D5C9</color>
+
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
     <color name="daxColorBackdropLight">#E0E0E0</color>
