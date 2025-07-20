@@ -63,4 +63,8 @@
     <color name="bbFeatherFill">#5D6167</color>
     <color name="bbFeatherWhisps">#656871</color>
 
+    <color name="bbColorComparisonChartItemBackground">#242423</color>
+    <color name="bbColorComparisonChartDivider">#2E2E2B</color>
+
+
 </resources>

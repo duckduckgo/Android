@@ -80,6 +80,7 @@
     <!-- BB Onboarding Experiment -->
     <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hi there.<br/>Ready for a faster browser that keeps you protected?]]></string>
     <string name="highlightsPreOnboardingDaxDialog1DescriptionBb">We have 3 simple steps to get you on your way.</string>
+    <string name="highlightsPreOnboardingDaxDialog23DescriptionBb">Set it up just the way you like.</string>
 
     <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Instantly clear your browsing activity with the <font color="#F05C2B">Fire Button</font>]]></string>
     <string name="bbOnboardingFireButtonDaxDialogDescription">Give it a try!️</string>

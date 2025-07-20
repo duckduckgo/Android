@@ -38,7 +38,6 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
@@ -286,17 +285,24 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     )
                     binding.daxDialogCta.comparisonChart.root.isVisible = true
 
-                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2TitleBuck)
+                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
+                    val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog23DescriptionBb)
                     binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
+                    binding.daxDialogCta.comparisonChart.descriptionInvisible.text = descriptionText.html(context = it)
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
 
-                    val comparisonChartViews = binding.daxDialogCta.comparisonChart.root.children
-                        .filter { view -> view != binding.daxDialogCta.comparisonChart.titleContainer }
+                    val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
+                        listOf(ddgLogo, chromeLogo, row1, row2, row3, row4, row5)
+                    }
 
                     comparisonChartViews.forEach { view -> view.alpha = MIN_ALPHA }
 
                     afterTypingAnimation = {
+                        if (binding.daxDialogCta.comparisonChart.description.text.isEmpty()) {
+                            binding.daxDialogCta.comparisonChart.description.text = descriptionText
+                        }
+
                         comparisonChartViews.forEach { view ->
                             view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         }
@@ -305,7 +311,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                     }
 
-                    scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) { afterTypingAnimation() }
+                    scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) {
+                        binding.daxDialogCta.comparisonChart.description.startTypingAnimation(descriptionText) {
+                            afterTypingAnimation()
+                        }
+                    }
                     backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_03)
                 }
 
