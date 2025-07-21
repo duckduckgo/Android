@@ -1233,8 +1233,8 @@ sealed class DaxBubbleCta(
                 text = daxTitle.html(context)
             }
 
-            root.fadeIn().setStartDelay(600).withEndAction {
-                headerImage.fadeIn()
+            if (configuration is DaxEndCta) headerImage.fadeIn()
+            root.fadeIn().setStartDelay(500).withEndAction {
                 daxBubbleDialogTitle.fadeIn()
                     .withEndAction {
                         dialogTextCta.startTypingAnimation(daxText, true) {
