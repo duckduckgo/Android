@@ -1384,6 +1384,7 @@ class BrowserTabFragment :
         val activity = activity ?: return
         val intent = TabSwitcherActivity.intent(activity, tabId)
         tabSwitcherActivityResult.launch(intent)
+        hideKeyboard()
     }
 
     override fun onResume() {
