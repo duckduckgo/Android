@@ -16,22 +16,31 @@
 
 package com.duckduckgo.pir.internal.models
 
-import com.duckduckgo.pir.internal.scripts.models.AddressCityState
-
+/**
+ * This class represents an extracted profile from a specific broker [brokerName] for a use
+ * submitted profile [profileQueryId].
+ *
+ * [dbId] is the automatically generated id associated to the profile when stored locally.
+ * Majority of the attributes here came from the [PirSuccessResponse.ExtractedResponse]'s
+ * [ScriptExtractedProfile]. Note that all attributes from the script can be null so we don't use
+ * any as the local db id.
+ */
 data class ExtractedProfile(
-    val profileUrl: String,
-    val profileQueryId: Long, // Unique identifier for the profileQuery
+    val dbId: Long = 0L,
+    val profileQueryId: Long,
     val brokerName: String,
     val name: String? = null,
-    val alternativeNames: List<String>? = emptyList(),
+    val alternativeNames: List<String> = emptyList(),
     val age: String? = null,
-    val addresses: List<AddressCityState>? = emptyList(),
-    val phoneNumbers: List<String>? = emptyList(),
-    val relatives: List<String>? = emptyList(),
-    val identifier: String? = null,
+    val addresses: List<String> = emptyList(),
+    val phoneNumbers: List<String> = emptyList(),
+    val relatives: List<String> = emptyList(),
     val reportId: String? = null,
     val email: String? = null,
     val fullName: String? = null,
+    val profileUrl: String? = null,
+    val identifier: String? = null,
     val dateAddedInMillis: Long = 0L,
     val deprecated: Boolean = false,
+    val removedDate: String? = null,
 )

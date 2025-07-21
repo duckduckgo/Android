@@ -47,11 +47,32 @@ sealed class PirSuccessResponse(
     data class ExtractedResponse(
         override val actionID: String,
         override val actionType: String,
-        val response: List<ExtractedProfile>,
+        val response: List<ScriptExtractedProfile>,
         val meta: AdditionalData? = null,
     ) : PirSuccessResponse(actionID, actionType) {
         data class AdditionalData(
             val userData: ProfileQuery,
+        )
+
+        data class ScriptExtractedProfile(
+            val name: String? = null,
+            val alternativeNames: List<String> = emptyList(),
+            val age: String? = null,
+            val addresses: List<ScriptAddressCityState> = emptyList(),
+            val phoneNumbers: List<String> = emptyList(),
+            val relatives: List<String> = emptyList(),
+            val profileUrl: String?,
+            val identifier: String?,
+            val reportId: String? = null,
+            val email: String? = null,
+            val removedDate: String? = null,
+            val fullName: String? = null,
+        )
+
+        data class ScriptAddressCityState(
+            val city: String,
+            val state: String,
+            val fullAddress: String? = null,
         )
     }
 

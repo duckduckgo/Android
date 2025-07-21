@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "b18509d02c22ba68371245b50fc7dec0",
+    "identityHash": "8b4c5e8cf79479fcfe0342c08cc2bec4",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -640,12 +640,12 @@
       },
       {
         "tableName": "pir_extracted_profiles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`profileUrl` TEXT NOT NULL, `profileQueryId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `name` TEXT, `alternativeNames` TEXT, `age` TEXT, `addresses` TEXT, `phoneNumbers` TEXT, `relatives` TEXT, `identifier` TEXT, `reportId` TEXT, `email` TEXT, `fullName` TEXT, `dateAddedInMillis` INTEGER NOT NULL, `deprecated` INTEGER NOT NULL, PRIMARY KEY(`profileUrl`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileQueryId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `name` TEXT, `alternativeNames` TEXT NOT NULL, `age` TEXT, `addresses` TEXT NOT NULL, `phoneNumbers` TEXT NOT NULL, `relatives` TEXT NOT NULL, `profileUrl` TEXT, `identifier` TEXT, `reportId` TEXT, `email` TEXT, `fullName` TEXT, `dateAddedInMillis` INTEGER NOT NULL, `deprecated` INTEGER NOT NULL)",
         "fields": [
           {
-            "fieldPath": "profileUrl",
-            "columnName": "profileUrl",
-            "affinity": "TEXT",
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -670,7 +670,7 @@
             "fieldPath": "alternativeNames",
             "columnName": "alternativeNames",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "age",
@@ -682,17 +682,23 @@
             "fieldPath": "addresses",
             "columnName": "addresses",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "phoneNumbers",
             "columnName": "phoneNumbers",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "relatives",
             "columnName": "relatives",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileUrl",
+            "columnName": "profileUrl",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -734,9 +740,9 @@
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
-            "profileUrl"
+            "id"
           ]
         },
         "indices": [],
@@ -746,7 +752,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b18509d02c22ba68371245b50fc7dec0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8b4c5e8cf79479fcfe0342c08cc2bec4')"
     ]
   }
 }

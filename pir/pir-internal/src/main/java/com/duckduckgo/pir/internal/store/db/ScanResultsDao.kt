@@ -51,14 +51,14 @@ interface ScanResultsDao {
     @Query("SELECT * FROM pir_scan_extracted_profile ORDER BY completionTimeInMillis")
     fun getAllExtractProfileResultFlow(): Flow<List<ExtractProfileResult>>
 
-    @Query("SELECT * FROM pir_scan_extracted_profile ORDER BY completionTimeInMillis")
-    fun getAllExtractProfileResult(): List<ExtractProfileResult>
+    @Query("SELECT * FROM pir_extracted_profiles ORDER BY dateAddedInMillis")
+    fun getAllExtractedProfileFlow(): Flow<List<StoredExtractedProfile>>
 
-    @Query("SELECT * FROM pir_scan_extracted_profile WHERE brokerName = :brokerName ORDER BY completionTimeInMillis")
-    fun getExtractProfileResultForBroker(brokerName: String): List<ExtractProfileResult>
+    @Query("SELECT * FROM pir_extracted_profiles ORDER BY dateAddedInMillis")
+    fun getAllExtractedProfiles(): List<StoredExtractedProfile>
 
-    @Query("SELECT * FROM pir_extracted_profiles WHERE profileUrl = :profileUrl ORDER BY dateAddedInMillis")
-    fun getExtractedProfile(profileUrl: String): StoredExtractedProfile
+    @Query("SELECT * FROM pir_extracted_profiles WHERE id = :id ORDER BY dateAddedInMillis")
+    fun getExtractedProfile(id: Long): StoredExtractedProfile
 
     @Query("SELECT * FROM pir_extracted_profiles WHERE profileQueryId = :profileQueryId ORDER BY dateAddedInMillis")
     fun getExtractedProfilesForProfile(profileQueryId: Long): List<StoredExtractedProfile>
@@ -76,9 +76,6 @@ interface ScanResultsDao {
     fun insertExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertExtractProfileResult(extractProfileResult: ExtractProfileResult)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertScanCompletedBroker(scanCompletedBroker: ScanCompletedBroker)
 
     @Query("DELETE from pir_extracted_profiles")
@@ -89,9 +86,6 @@ interface ScanResultsDao {
 
     @Query("DELETE from pir_scan_error")
     fun deleteAllScanErrorResults()
-
-    @Query("DELETE from pir_scan_extracted_profile")
-    fun deleteAllExtractProfileResult()
 
     @Query("DELETE from pir_scan_complete_brokers")
     fun deleteAllScanCompletedBroker()

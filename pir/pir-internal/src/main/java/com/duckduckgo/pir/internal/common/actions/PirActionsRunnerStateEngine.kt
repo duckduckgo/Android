@@ -18,8 +18,8 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
+import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse

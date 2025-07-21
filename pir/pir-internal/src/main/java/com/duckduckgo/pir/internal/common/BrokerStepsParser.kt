@@ -21,8 +21,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -67,7 +67,7 @@ interface BrokerStepsParser {
             override val stepType: String,
             override val actions: List<BrokerAction>,
             val optOutType: String,
-            val profileToOptOut: ExtractedProfile = ExtractedProfile(), // this will be set later / not coming from json
+            val profileToOptOut: ExtractedProfile = ExtractedProfile(-1, -1, ""), // this will be set later / not coming from json
         ) : BrokerStep(brokerName, stepType, actions)
     }
 }
@@ -107,18 +107,13 @@ class RealBrokerStepsParser @Inject constructor(
     ): List<BrokerStep> = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
             adapter.fromJson(stepsJson)?.run {
-                if (this is OptOutStep) {
-                    repository.getExtractProfileResultsForBroker(brokerName)
-                        .filter { it.profileQuery != null && it.profileQuery.id == profileQueryId }
-                        .map {
-                            it.extractResults.map { extractedProfile ->
-                                this.copy(
-                                    brokerName = brokerName,
-                                    profileToOptOut = extractedProfile,
-                                )
-                            }
-                        }
-                        .flatten()
+                if (this is OptOutStep && profileQueryId != null) {
+                    repository.getExtractedProfiles(brokerName, profileQueryId).map {
+                        this.copy(
+                            brokerName = brokerName,
+                            profileToOptOut = it,
+                        )
+                    }
                 } else {
                     listOf((this as ScanStep).copy(brokerName = brokerName))
                 }

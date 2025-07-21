@@ -32,16 +32,17 @@ data class ScanCompletedBroker(
 
 @Entity(tableName = "pir_extracted_profiles")
 data class StoredExtractedProfile(
-    @PrimaryKey val profileUrl: String, // Unique identifier for the extracted profile
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val profileQueryId: Long, // Unique identifier for the profileQuery
     val brokerName: String, // Unique identifier for broker in which the profile was found
     val name: String? = null,
-    val alternativeNames: List<String>? = emptyList(),
+    val alternativeNames: List<String> = emptyList(),
     val age: String? = null,
-    val addresses: List<String>? = emptyList(),
-    val phoneNumbers: List<String>? = emptyList(),
-    val relatives: List<String>? = emptyList(),
-    val identifier: String? = null,
+    val addresses: List<String> = emptyList(),
+    val phoneNumbers: List<String> = emptyList(),
+    val relatives: List<String> = emptyList(),
+    val profileUrl: String? = null, // This can be null for some brokers
+    val identifier: String? = null, // This can be null for some brokers
     val reportId: String? = null,
     val email: String? = null,
     val fullName: String? = null,

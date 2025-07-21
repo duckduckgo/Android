@@ -19,7 +19,6 @@ package com.duckduckgo.pir.internal.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.internal.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.AddressCityState
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
 import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.service.DbpService
@@ -99,20 +98,21 @@ interface PirRepository {
     )
 
     suspend fun saveExtractedProfile(
-        brokerName: String,
-        profileQueryId: Long,
         extractedProfiles: List<ExtractedProfile>,
     )
 
     /**
-     * Returns a list of all [ExtractedProfileResult] found for this particular broker.
+     * Returns a list of all [ExtractedProfile] found for this particular broker.
      *
      * @param brokerName - Name of the broker
+     *  @param profileQueryId - Profile id of the user submitted profile
      */
     suspend fun getExtractedProfiles(
         brokerName: String,
         profileQueryId: Long,
     ): List<ExtractedProfile>
+
+    fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
 
     fun getAllScanResultsFlow(): Flow<List<ScanResult>>
 
@@ -228,7 +228,6 @@ class RealPirRepository(
 ) : PirRepository {
     private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
-    private val addressCityStateAdapter by lazy { moshi.adapter(AddressCityState::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -314,20 +313,17 @@ class RealPirRepository(
     }
 
     override suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String> = withContext(dispatcherProvider.io()) {
-        scanResultsDao.getAllExtractProfileResult().filter {
-            it.extractResults.isNotEmpty()
-        }.map {
+        scanResultsDao.getAllExtractedProfiles().map {
             it.brokerName
-        }.distinct()
-            .run {
-                if (formOptOutOnly) {
-                    this.filter {
-                        brokerDao.getOptOutJson(it)?.contains("\"optOutType\":\"formOptOut\"") == true
-                    }
-                } else {
-                    this
+        }.distinct().run {
+            if (formOptOutOnly) {
+                this.filter {
+                    brokerDao.getOptOutJson(it)?.contains("\"optOutType\":\"formOptOut\"") == true
                 }
+            } else {
+                this
             }
+        }
     }
 
     override suspend fun saveNavigateResult(
@@ -366,29 +362,11 @@ class RealPirRepository(
     }
 
     override suspend fun saveExtractedProfile(
-        brokerName: String,
-        profileQueryId: Long,
         extractedProfiles: List<ExtractedProfile>,
     ) {
         withContext(dispatcherProvider.io()) {
             extractedProfiles.map {
-                StoredExtractedProfile(
-                    profileUrl = it.profileUrl,
-                    profileQueryId = profileQueryId,
-                    brokerName = brokerName,
-                    name = it.name,
-                    alternativeNames = it.alternativeNames,
-                    age = it.age,
-                    addresses = it.addresses?.mapNotNull { item -> addressCityStateAdapter.toJson(item) },
-                    phoneNumbers = it.phoneNumbers,
-                    relatives = it.relatives,
-                    identifier = it.identifier,
-                    reportId = it.reportId,
-                    email = it.email,
-                    fullName = it.fullName,
-                    dateAddedInMillis = it.dateAddedInMillis,
-                    deprecated = it.deprecated,
-                )
+                it.toStoredExtractedProfile()
             }.also {
                 scanResultsDao.insertExtractedProfiles(it)
             }
@@ -400,23 +378,15 @@ class RealPirRepository(
         profileQueryId: Long,
     ): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
         return@withContext scanResultsDao.getExtractedProfilesForBrokerAndProfile(brokerName, profileQueryId).map {
-            ExtractedProfile(
-                profileUrl = it.profileUrl,
-                profileQueryId = it.profileQueryId,
-                brokerName = it.brokerName,
-                name = it.name,
-                alternativeNames = it.alternativeNames,
-                age = it.age,
-                addresses = it.addresses?.mapNotNull { item -> addressCityStateAdapter.fromJson(item) },
-                phoneNumbers = it.phoneNumbers,
-                relatives = it.relatives,
-                identifier = it.identifier,
-                reportId = it.reportId,
-                email = it.email,
-                fullName = it.fullName,
-                dateAddedInMillis = it.dateAddedInMillis,
-                deprecated = it.deprecated,
-            )
+            it.toExtractedProfile()
+        }
+    }
+
+    override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> {
+        return scanResultsDao.getAllExtractedProfileFlow().map { list ->
+            list.map {
+                it.toExtractedProfile()
+            }
         }
     }
 
@@ -464,7 +434,7 @@ class RealPirRepository(
         withContext(dispatcherProvider.io()) {
             scanResultsDao.deleteAllNavigateResults()
             scanResultsDao.deleteAllScanErrorResults()
-            scanResultsDao.deleteAllExtractProfileResult()
+            scanResultsDao.deleteAllExtractedProfiles()
             scanResultsDao.deleteAllScanCompletedBroker()
             scanLogDao.deleteAllBrokerScanEvents()
         }
@@ -612,5 +582,47 @@ class RealPirRepository(
     override suspend fun deleteAllOptOutData() = withContext(dispatcherProvider.io()) {
         optOutResultsDao.deleteAllOptOutActionLog()
         optOutResultsDao.deleteAllOptOutCompletedBroker()
+    }
+
+    private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile {
+        return ExtractedProfile(
+            dbId = this.id,
+            profileUrl = this.profileUrl,
+            profileQueryId = this.profileQueryId,
+            brokerName = this.brokerName,
+            name = this.name,
+            alternativeNames = this.alternativeNames,
+            age = this.age,
+            addresses = this.addresses,
+            phoneNumbers = this.phoneNumbers,
+            relatives = this.relatives,
+            identifier = this.identifier,
+            reportId = this.reportId,
+            email = this.email,
+            fullName = this.fullName,
+            dateAddedInMillis = this.dateAddedInMillis,
+            deprecated = this.deprecated,
+        )
+    }
+
+    private fun ExtractedProfile.toStoredExtractedProfile(): StoredExtractedProfile {
+        return StoredExtractedProfile(
+            id = this.dbId,
+            profileQueryId = this.profileQueryId,
+            brokerName = this.brokerName,
+            name = this.name,
+            alternativeNames = this.alternativeNames,
+            age = this.age,
+            addresses = this.addresses,
+            phoneNumbers = this.phoneNumbers,
+            relatives = this.relatives,
+            reportId = this.reportId,
+            email = this.email,
+            fullName = this.fullName,
+            profileUrl = this.profileUrl,
+            identifier = this.identifier,
+            dateAddedInMillis = currentTimeProvider.currentTimeMillis(),
+            deprecated = this.deprecated,
+        )
     }
 }
