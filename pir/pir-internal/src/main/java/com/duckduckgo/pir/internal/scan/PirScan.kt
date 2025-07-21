@@ -166,11 +166,8 @@ class RealPirScan @Inject constructor(
         cleanPreviousRun()
 
         val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
-            brokers.size
-        } else {
-            MAX_DETACHED_WEBVIEW_COUNT
-        }
+        maxWebViewCount = minOf(brokers.size * profileQueries.size, MAX_DETACHED_WEBVIEW_COUNT)
+
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
@@ -186,7 +183,7 @@ class RealPirScan @Inject constructor(
             createCount++
         }
 
-        // Split all the broker steps into parts that can be executed in parallel
+        // Prepare a list of all broker steps that need to be run
         val brokerScanSteps = brokers.mapNotNull { broker ->
             repository.getBrokerScanSteps(broker)?.run {
                 brokerStepsParser.parseStep(broker, this)
@@ -194,22 +191,27 @@ class RealPirScan @Inject constructor(
         }.filter {
             it.isNotEmpty()
         }.flatten()
+
+        // Combine the broker steps with each profile and split into equal parts
+        val stepsPerRunner = profileQueries.map { profileQuery ->
+            brokerScanSteps.map { scanStep ->
+                profileQuery to scanStep
+            }
+        }.flatten()
             .splitIntoParts(maxWebViewCount)
 
-        // Run the scan steps for all profiles one after another
-        profileQueries.forEach { profile ->
-            logcat { "PIR-SCAN: Start scan on profile=$profile" }
-
-            brokerScanSteps.mapIndexed { index, part ->
-                // We want to run the runners in parallel but wait for everything complete before we proceed
-                async {
-                    runners[index].start(profile, part)
+        // Execute the steps in parallel
+        stepsPerRunner.mapIndexed { index, partSteps ->
+            // We want to run the runners in parallel but wait for everything to complete before we proceed
+            async {
+                partSteps.forEach { (profile, step) ->
+                    logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
+                    runners[index].start(profile, listOf(step))
                     runners[index].stop()
+                    logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
                 }
-            }.awaitAll()
-
-            logcat { "PIR-SCAN: Finish scan on profile=$profile" }
-        }
+            }
+        }.awaitAll()
 
         logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
         emitScanCompletedPixel(

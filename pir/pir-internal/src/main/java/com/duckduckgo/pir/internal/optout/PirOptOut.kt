@@ -185,20 +185,27 @@ class RealPirOptOut @Inject constructor(
             repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
-        // Create a map of profiles that have opt-out steps for those brokers
-        val profileBrokerStepsMap = profileQueries.associateWith { profileQuery ->
+        // Map broker steps with their associated profile queries
+        val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
                 brokerStepsParser.parseStep(broker, stepsJson, profileQuery)
-            }.flatten()
-        }.filter { it.value.isNotEmpty() }
+            }.flatten().map { step -> profileQuery to step }
+        }.flatten()
 
-        // Start each runner on the profile with the broker steps
-        profileBrokerStepsMap.entries.map { (profileQuery, brokerSteps) ->
-            logcat { "PIR-OPT-OUT: Start opt-out for profile: $profileQuery on ${Thread.currentThread().name}" }
-            runners[0].startOn(webView, profileQuery, brokerSteps)
-            runners[0].stop()
-            logcat { "PIR-OPT-OUT: Finish opt-out for profile: $profileQuery on ${Thread.currentThread().name}" }
-        }
+        // Assign steps to runners based on the maximum number of WebViews we can use
+        val stepsPerRunner = allSteps.splitIntoParts(maxWebViewCount)
+
+        // Execute the steps on all runners in parallel
+        stepsPerRunner.mapIndexed { index, partSteps ->
+            async {
+                partSteps.map { (profileQuery, step) ->
+                    logcat { "PIR-OPT-OUT: Start on runner=$index, thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+                    runners[index].start(profileQuery, listOf(step))
+                    runners[index].stop()
+                    logcat { "PIR-OPT-OUT: Finish on runner=$index, thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+                }
+            }
+        }.awaitAll()
 
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
 
@@ -228,15 +235,17 @@ class RealPirOptOut @Inject constructor(
             repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
-        // Create a map of profiles that have opt-out steps for those brokers
-        val profileBrokerStepsMap = profileQueries.associateWith { profileQuery ->
+        // Map broker steps with their associated profile queries
+        val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
                 brokerStepsParser.parseStep(broker, stepsJson, profileQuery)
-            }.flatten()
-        }.filter { it.value.isNotEmpty() }
+            }.flatten().map { step -> profileQuery to step }
+        }.flatten()
 
-        val stepsCount = profileBrokerStepsMap.values.maxOf { it.size }
-        maxWebViewCount = minOf(stepsCount, MAX_DETACHED_WEBVIEW_COUNT)
+        maxWebViewCount = minOf(allSteps.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        // Assign steps to runners based on the maximum number of WebViews we can use
+        val stepsPerRunner = allSteps.splitIntoParts(maxWebViewCount)
 
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
@@ -253,18 +262,17 @@ class RealPirOptOut @Inject constructor(
             createCount++
         }
 
-        // Start each runner on the profile with the broker steps
-        profileBrokerStepsMap.entries.map { (profileQuery, brokerSteps) ->
-            logcat { "PIR-OPT-OUT: Start opt-out on profile: $profileQuery" }
-            brokerSteps.splitIntoParts(maxWebViewCount)
-                .mapIndexed { index, part ->
-                    async {
-                        runners[index].start(profileQuery, part)
-                        runners[index].stop()
-                    }
-                }.awaitAll()
-            logcat { "PIR-OPT-OUT: Finish opt-out on profile: $profileQuery" }
-        }
+        // Execute the steps on all runners in parallel
+        stepsPerRunner.mapIndexed { index, partSteps ->
+            async {
+                partSteps.map { (profileQuery, step) ->
+                    logcat { "PIR-OPT-OUT: Start opt-out on runner=$index, profile=$profileQuery and step=$step" }
+                    runners[index].start(profileQuery, listOf(step))
+                    runners[index].stop()
+                    logcat { "PIR-OPT-OUT: Finish opt-out on runner=$index, profile=$profileQuery and step=$step" }
+                }
+            }
+        }.awaitAll()
 
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
         emitCompletedPixel()
