@@ -28,6 +28,7 @@ data class ScanCompletedBroker(
     @PrimaryKey val brokerName: String,
     val startTimeInMillis: Long,
     val endTimeInMillis: Long,
+    val isSuccess: Boolean,
 )
 
 @Entity(tableName = "pir_extracted_profiles")
@@ -48,44 +49,4 @@ data class StoredExtractedProfile(
     val fullName: String? = null,
     val dateAddedInMillis: Long = 0L, // Tells us when the extracted profile has been found
     val deprecated: Boolean = false, // This should tell us if the profile is irrelevant for PIR (this is not me, profile edits)
-)
-
-/**
- * Contains all the extracted profile result from a scan run.
- * This is now mostly for logging.
- */
-@Entity(tableName = "pir_scan_extracted_profile")
-data class ExtractProfileResult(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val brokerName: String,
-    val completionTimeInMillis: Long,
-    val actionType: String,
-    val userData: String,
-    val extractResults: List<String>,
-)
-
-/**
- * This table contains any navigation result (both for scan and opt-out).
- * This is mostly for logging purpose.
- */
-@Entity(tableName = "pir_scan_navigate_results")
-data class ScanNavigateResult(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val brokerName: String,
-    val actionType: String,
-    val url: String,
-    val completionTimeInMillis: Long,
-)
-
-/**
- * This table contains ALL error result from any action (regardless if it is from scan and opt-out).
- * This is mostly for logging purpose.
- */
-@Entity(tableName = "pir_scan_error")
-data class ScanErrorResult(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val brokerName: String,
-    val completionTimeInMillis: Long,
-    val actionType: String,
-    val message: String,
 )

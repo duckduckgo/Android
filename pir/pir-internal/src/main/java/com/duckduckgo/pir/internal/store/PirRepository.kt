@@ -19,13 +19,10 @@ package com.duckduckgo.pir.internal.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.internal.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.service.DbpService
 import com.duckduckgo.pir.internal.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.internal.store.PirRepository.ConfirmationStatus
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -41,19 +38,15 @@ import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
 import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.duckduckgo.pir.internal.store.db.ScanCompletedBroker
-import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
-import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import logcat.logcat
 
 interface PirRepository {
     suspend fun getCurrentMainEtag(): String?
@@ -86,17 +79,6 @@ interface PirRepository {
      */
     suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String>
 
-    suspend fun saveNavigateResult(
-        brokerName: String,
-        navigateResponse: NavigateResponse,
-    )
-
-    suspend fun saveErrorResult(
-        brokerName: String,
-        actionType: String,
-        message: String,
-    )
-
     suspend fun saveExtractedProfile(
         extractedProfiles: List<ExtractedProfile>,
     )
@@ -113,8 +95,6 @@ interface PirRepository {
     ): List<ExtractedProfile>
 
     fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
-
-    fun getAllScanResultsFlow(): Flow<List<ScanResult>>
 
     suspend fun getScanErrorResultsCount(): Int
 
@@ -140,6 +120,8 @@ interface PirRepository {
 
     suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?>
 
+    fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>>
+
     fun getTotalScannedBrokersFlow(): Flow<Int>
 
     fun getTotalOptOutCompletedFlow(): Flow<Int>
@@ -152,6 +134,7 @@ interface PirRepository {
         brokerName: String,
         startTimeInMillis: Long,
         endTimeInMillis: Long,
+        isSuccess: Boolean,
     )
 
     suspend fun saveOptOutCompleted(
@@ -178,34 +161,6 @@ interface PirRepository {
         val etag: String,
     )
 
-    sealed class ScanResult(
-        open val brokerName: String,
-        open val completionTimeInMillis: Long,
-        open val actionType: String,
-    ) {
-        data class NavigateResult(
-            override val brokerName: String,
-            override val completionTimeInMillis: Long,
-            override val actionType: String,
-            val url: String,
-        ) : ScanResult(brokerName, completionTimeInMillis, actionType)
-
-        data class ExtractedProfileResult(
-            override val brokerName: String,
-            override val completionTimeInMillis: Long,
-            override val actionType: String,
-            val profileQuery: ProfileQuery?,
-            val extractResults: List<ExtractedProfile> = emptyList(),
-        ) : ScanResult(brokerName, completionTimeInMillis, actionType)
-
-        data class ErrorResult(
-            override val brokerName: String,
-            override val completionTimeInMillis: Long,
-            override val actionType: String,
-            val message: String,
-        ) : ScanResult(brokerName, completionTimeInMillis, actionType)
-    }
-
     sealed class ConfirmationStatus(open val statusName: String) {
         data object Ready : ConfirmationStatus("ready")
         data object Pending : ConfirmationStatus("pending")
@@ -226,7 +181,6 @@ class RealPirRepository(
     private val dbpService: DbpService,
     private val optOutResultsDao: OptOutResultsDao,
 ) : PirRepository {
-    private val profileQueryAdapter by lazy { moshi.adapter(ProfileQuery::class.java) }
     private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
@@ -326,41 +280,6 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun saveNavigateResult(
-        brokerName: String,
-        navigateResponse: NavigateResponse,
-    ) {
-        withContext(dispatcherProvider.io()) {
-            scanResultsDao.insertNavigateResult(
-                ScanNavigateResult(
-                    brokerName = brokerName,
-                    actionType = navigateResponse.actionType,
-                    url = navigateResponse.response.url,
-                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                ),
-            )
-
-            logcat { "PIR-SCAN: saveNavigateResult: $navigateResponse" }
-        }
-    }
-
-    override suspend fun saveErrorResult(
-        brokerName: String,
-        actionType: String,
-        message: String,
-    ) {
-        withContext(dispatcherProvider.io()) {
-            scanResultsDao.insertScanErrorResult(
-                ScanErrorResult(
-                    brokerName = brokerName,
-                    actionType = actionType,
-                    message = message,
-                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                ),
-            )
-        }
-    }
-
     override suspend fun saveExtractedProfile(
         extractedProfiles: List<ExtractedProfile>,
     ) {
@@ -390,50 +309,8 @@ class RealPirRepository(
         }
     }
 
-    override fun getAllScanResultsFlow(): Flow<List<ScanResult>> {
-        return combine(
-            scanResultsDao.getAllNavigateResultsFlow(),
-            scanResultsDao.getAllScanErrorResultsFlow(),
-            scanResultsDao.getAllExtractProfileResultFlow(),
-        ) { navigateResults, errorResults, profileResults ->
-            val navScanResult = navigateResults.map {
-                ScanResult.NavigateResult(
-                    brokerName = it.brokerName,
-                    completionTimeInMillis = it.completionTimeInMillis,
-                    actionType = it.actionType,
-                    url = it.url,
-                )
-            }
-            val errorScanResults = errorResults.map {
-                ScanResult.ErrorResult(
-                    brokerName = it.brokerName,
-                    completionTimeInMillis = it.completionTimeInMillis,
-                    actionType = it.actionType,
-                    message = it.message,
-                )
-            }
-            val profileScanResults = profileResults.map {
-                ScanResult.ExtractedProfileResult(
-                    brokerName = it.brokerName,
-                    completionTimeInMillis = it.completionTimeInMillis,
-                    actionType = it.actionType,
-                    profileQuery = profileQueryAdapter.fromJson(it.userData),
-                    extractResults = it.extractResults.mapNotNull { data ->
-                        extractedProfileAdapter.fromJson(data)
-                    },
-                )
-            }
-
-            return@combine (navScanResult + errorScanResults + profileScanResults).sortedBy {
-                it.completionTimeInMillis
-            }
-        }
-    }
-
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
-            scanResultsDao.deleteAllNavigateResults()
-            scanResultsDao.deleteAllScanErrorResults()
             scanResultsDao.deleteAllExtractedProfiles()
             scanResultsDao.deleteAllScanCompletedBroker()
             scanLogDao.deleteAllBrokerScanEvents()
@@ -505,6 +382,10 @@ class RealPirRepository(
         }
     }
 
+    override fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>> {
+        return scanResultsDao.getScanCompletedBrokerFlow()
+    }
+
     override fun getTotalScannedBrokersFlow(): Flow<Int> {
         return scanResultsDao.getScanCompletedBrokerFlow().map { it.size }
     }
@@ -531,12 +412,14 @@ class RealPirRepository(
         brokerName: String,
         startTimeInMillis: Long,
         endTimeInMillis: Long,
+        isSuccess: Boolean,
     ) = withContext(dispatcherProvider.io()) {
         scanResultsDao.insertScanCompletedBroker(
             ScanCompletedBroker(
                 brokerName = brokerName,
                 startTimeInMillis = startTimeInMillis,
                 endTimeInMillis = endTimeInMillis,
+                isSuccess = isSuccess,
             ),
         )
     }

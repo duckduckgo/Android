@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "8b4c5e8cf79479fcfe0342c08cc2bec4",
+    "identityHash": "59b575a14fa11f775eee7dbfe6640fd3",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -225,144 +225,6 @@
         ]
       },
       {
-        "tableName": "pir_scan_navigate_results",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `actionType` TEXT NOT NULL, `url` TEXT NOT NULL, `completionTimeInMillis` INTEGER NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "brokerName",
-            "columnName": "brokerName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "actionType",
-            "columnName": "actionType",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "url",
-            "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "completionTimeInMillis",
-            "columnName": "completionTimeInMillis",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "pir_scan_error",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `completionTimeInMillis` INTEGER NOT NULL, `actionType` TEXT NOT NULL, `message` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "brokerName",
-            "columnName": "brokerName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "completionTimeInMillis",
-            "columnName": "completionTimeInMillis",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "actionType",
-            "columnName": "actionType",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "message",
-            "columnName": "message",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "pir_scan_extracted_profile",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `completionTimeInMillis` INTEGER NOT NULL, `actionType` TEXT NOT NULL, `userData` TEXT NOT NULL, `extractResults` TEXT NOT NULL)",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "brokerName",
-            "columnName": "brokerName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "completionTimeInMillis",
-            "columnName": "completionTimeInMillis",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "actionType",
-            "columnName": "actionType",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "userData",
-            "columnName": "userData",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "extractResults",
-            "columnName": "extractResults",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
         "tableName": "pir_user_profile",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `birthYear` INTEGER NOT NULL, `phone` TEXT, `user_firstName` TEXT NOT NULL, `user_lastName` TEXT NOT NULL, `user_middleName` TEXT, `user_suffix` TEXT, `address_city` TEXT NOT NULL, `address_state` TEXT NOT NULL, `address_street` TEXT, `address_zip` TEXT)",
         "fields": [
@@ -502,7 +364,7 @@
       },
       {
         "tableName": "pir_scan_complete_brokers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, PRIMARY KEY(`brokerName`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, `isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`))",
         "fields": [
           {
             "fieldPath": "brokerName",
@@ -519,6 +381,12 @@
           {
             "fieldPath": "endTimeInMillis",
             "columnName": "endTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSuccess",
+            "columnName": "isSuccess",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -752,7 +620,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8b4c5e8cf79479fcfe0342c08cc2bec4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '59b575a14fa11f775eee7dbfe6640fd3')"
     ]
   }
 }

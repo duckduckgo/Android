@@ -30,27 +30,6 @@ interface ScanResultsDao {
     @Query("SELECT * FROM pir_scan_complete_brokers ORDER BY endTimeInMillis")
     suspend fun getAllScanCompletedBrokers(): List<ScanCompletedBroker>
 
-    @Query("SELECT * FROM pir_scan_navigate_results ORDER BY completionTimeInMillis")
-    fun getAllNavigateResultsFlow(): Flow<List<ScanNavigateResult>>
-
-    @Query("SELECT * FROM pir_scan_navigate_results ORDER BY completionTimeInMillis")
-    fun getAllNavigateResults(): List<ScanNavigateResult>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertNavigateResult(scanNavigateResult: ScanNavigateResult)
-
-    @Query("SELECT * FROM pir_scan_error ORDER BY completionTimeInMillis")
-    fun getAllScanErrorResultsFlow(): Flow<List<ScanErrorResult>>
-
-    @Query("SELECT * FROM pir_scan_error ORDER BY completionTimeInMillis")
-    fun getAllScanErrorResults(): List<ScanErrorResult>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertScanErrorResult(scanErrorResult: ScanErrorResult)
-
-    @Query("SELECT * FROM pir_scan_extracted_profile ORDER BY completionTimeInMillis")
-    fun getAllExtractProfileResultFlow(): Flow<List<ExtractProfileResult>>
-
     @Query("SELECT * FROM pir_extracted_profiles ORDER BY dateAddedInMillis")
     fun getAllExtractedProfileFlow(): Flow<List<StoredExtractedProfile>>
 
@@ -80,12 +59,6 @@ interface ScanResultsDao {
 
     @Query("DELETE from pir_extracted_profiles")
     fun deleteAllExtractedProfiles()
-
-    @Query("DELETE from pir_scan_navigate_results")
-    fun deleteAllNavigateResults()
-
-    @Query("DELETE from pir_scan_error")
-    fun deleteAllScanErrorResults()
 
     @Query("DELETE from pir_scan_complete_brokers")
     fun deleteAllScanCompletedBroker()

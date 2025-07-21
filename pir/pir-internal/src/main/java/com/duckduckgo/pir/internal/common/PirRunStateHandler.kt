@@ -194,6 +194,7 @@ class RealPirRunStateHandler @Inject constructor(
             brokerName = state.brokerName,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.eventTimeInMillis,
+            isSuccess = state.isSuccess,
         )
     }
 
@@ -225,16 +226,12 @@ class RealPirRunStateHandler @Inject constructor(
             brokerName = state.brokerName,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.eventTimeInMillis,
+            isSuccess = state.isSuccess,
         )
     }
 
     private suspend fun handleBrokerScanActionSucceeded(state: BrokerScanActionSucceeded) {
         when (state.pirSuccessResponse) {
-            is NavigateResponse -> repository.saveNavigateResult(
-                state.brokerName,
-                state.pirSuccessResponse,
-            )
-
             is ExtractedResponse -> state.pirSuccessResponse.response.map {
                 ExtractedProfile(
                     profileUrl = it.profileUrl,
@@ -243,9 +240,9 @@ class RealPirRunStateHandler @Inject constructor(
                     name = it.name,
                     alternativeNames = it.alternativeNames,
                     age = it.age,
-                    addresses = it.addresses?.map { item -> addressCityStateAdapter.toJson(item) } ?: emptyList(),
-                    phoneNumbers = it.phoneNumbers ?: emptyList(),
-                    relatives = it.relatives ?: emptyList(),
+                    addresses = it.addresses.map { item -> addressCityStateAdapter.toJson(item) },
+                    phoneNumbers = it.phoneNumbers,
+                    relatives = it.relatives,
                     identifier = it.identifier,
                     reportId = it.reportId,
                     email = it.email,
@@ -259,12 +256,8 @@ class RealPirRunStateHandler @Inject constructor(
         }
     }
 
-    private suspend fun handleBrokerScanActionFailed(state: BrokerScanActionFailed) {
-        repository.saveErrorResult(
-            brokerName = state.brokerName,
-            actionType = state.actionType,
-            message = state.message,
-        )
+    private fun handleBrokerScanActionFailed(state: BrokerScanActionFailed) {
+        // TODO: remove if not needed later, might be used for stages
     }
 
     private fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {

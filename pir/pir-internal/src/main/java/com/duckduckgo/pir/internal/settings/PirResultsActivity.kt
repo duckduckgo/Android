@@ -35,9 +35,6 @@ import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResu
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ErrorResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.NavigateResult
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -114,26 +111,14 @@ class PirResultsActivity : DuckDuckGoActivity() {
     }
 
     private fun showScanResults() {
-        repository.getAllScanResultsFlow()
+        repository.getScannedBrokersFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { scanResults ->
                 scanResults.map {
                     val stringBuilder = StringBuilder()
-                    stringBuilder.append("BROKER NAME: ${it.brokerName}\nACTION EXECUTED: ${it.actionType}\n")
-                    when (it) {
-                        is NavigateResult -> {
-                            stringBuilder.append("URL TO NAVIGATE: ${it.url}\n")
-                        }
-
-                        is ExtractedProfileResult -> {
-                            val records = it.extractResults.size
-                            stringBuilder.append("VALID RECORDS FOUND COUNT: $records\n")
-                        }
-
-                        is ErrorResult -> {
-                            stringBuilder.append("*ERROR ENCOUNTERED: ${it.message}\n")
-                        }
-                    }
+                    stringBuilder.append("BROKER NAME: ${it.brokerName}\n")
+                    stringBuilder.append("COMPLETED WITH NO ERROR: ${it.isSuccess}\n")
+                    stringBuilder.append("DURATION: ${it.endTimeInMillis - it.startTimeInMillis}\n")
                     stringBuilder.toString()
                 }.also {
                     render(it)
