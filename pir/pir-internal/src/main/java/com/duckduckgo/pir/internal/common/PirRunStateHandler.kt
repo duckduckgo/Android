@@ -63,6 +63,7 @@ interface PirRunStateHandler {
 
         data class BrokerManualScanCompleted(
             override val brokerName: String,
+            val profileQueryId: Long,
             val startTimeInMillis: Long,
             val eventTimeInMillis: Long,
             val totalTimeMillis: Long,
@@ -76,6 +77,7 @@ interface PirRunStateHandler {
 
         data class BrokerScheduledScanCompleted(
             override val brokerName: String,
+            val profileQueryId: Long,
             val startTimeInMillis: Long,
             val eventTimeInMillis: Long,
             val totalTimeMillis: Long,
@@ -192,6 +194,7 @@ class RealPirRunStateHandler @Inject constructor(
         )
         repository.saveScanCompletedBroker(
             brokerName = state.brokerName,
+            profileQueryId = state.profileQueryId,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.eventTimeInMillis,
             isSuccess = state.isSuccess,
@@ -224,6 +227,7 @@ class RealPirRunStateHandler @Inject constructor(
         )
         repository.saveScanCompletedBroker(
             brokerName = state.brokerName,
+            profileQueryId = state.profileQueryId,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.eventTimeInMillis,
             isSuccess = state.isSuccess,

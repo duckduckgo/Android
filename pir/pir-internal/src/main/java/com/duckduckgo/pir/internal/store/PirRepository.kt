@@ -132,6 +132,7 @@ interface PirRepository {
 
     suspend fun saveScanCompletedBroker(
         brokerName: String,
+        profileQueryId: Long,
         startTimeInMillis: Long,
         endTimeInMillis: Long,
         isSuccess: Boolean,
@@ -410,6 +411,7 @@ class RealPirRepository(
 
     override suspend fun saveScanCompletedBroker(
         brokerName: String,
+        profileQueryId: Long,
         startTimeInMillis: Long,
         endTimeInMillis: Long,
         isSuccess: Boolean,
@@ -417,6 +419,7 @@ class RealPirRepository(
         scanResultsDao.insertScanCompletedBroker(
             ScanCompletedBroker(
                 brokerName = brokerName,
+                profileQueryId = profileQueryId,
                 startTimeInMillis = startTimeInMillis,
                 endTimeInMillis = endTimeInMillis,
                 isSuccess = isSuccess,

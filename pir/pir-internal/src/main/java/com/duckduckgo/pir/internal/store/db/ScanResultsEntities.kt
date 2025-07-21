@@ -23,9 +23,13 @@ import androidx.room.PrimaryKey
  * Contains the sites that have been scanned.
  * Scanned means that the scan flow has been started and completed for the broker.
  */
-@Entity(tableName = "pir_scan_complete_brokers")
+@Entity(
+    tableName = "pir_scan_complete_brokers",
+    primaryKeys = ["brokerName", "profileQueryId"],
+)
 data class ScanCompletedBroker(
-    @PrimaryKey val brokerName: String,
+    val brokerName: String,
+    val profileQueryId: Long,
     val startTimeInMillis: Long,
     val endTimeInMillis: Long,
     val isSuccess: Boolean,

@@ -79,7 +79,12 @@ abstract class PirDatabase : RoomDatabase() {
 
         private val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE `pir_scan_complete_brokers` ADD COLUMN `isSuccess` INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("DROP TABLE IF EXISTS `pir_scan_complete_brokers`")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `pir_scan_complete_brokers` (`brokerName` TEXT NOT NULL, " +
+                        "`profileQueryId` INTEGER NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, " +
+                        "`isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`, `profileQueryId`))",
+                )
                 db.execSQL(
                     "CREATE TABLE IF NOT EXISTS `pir_extracted_profiles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         "`profileQueryId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `name` TEXT," +

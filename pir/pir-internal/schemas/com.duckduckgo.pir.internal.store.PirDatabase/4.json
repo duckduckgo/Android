@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "59b575a14fa11f775eee7dbfe6640fd3",
+    "identityHash": "d31a9d2a61441989ce40cebe900f27a6",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -364,12 +364,18 @@
       },
       {
         "tableName": "pir_scan_complete_brokers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, `isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `profileQueryId` INTEGER NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, `isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`, `profileQueryId`))",
         "fields": [
           {
             "fieldPath": "brokerName",
             "columnName": "brokerName",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileQueryId",
+            "columnName": "profileQueryId",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -394,7 +400,8 @@
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "brokerName"
+            "brokerName",
+            "profileQueryId"
           ]
         },
         "indices": [],
@@ -620,7 +627,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '59b575a14fa11f775eee7dbfe6640fd3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd31a9d2a61441989ce40cebe900f27a6')"
     ]
   }
 }

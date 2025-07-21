@@ -117,6 +117,7 @@ class PirResultsActivity : DuckDuckGoActivity() {
                 scanResults.map {
                     val stringBuilder = StringBuilder()
                     stringBuilder.append("BROKER NAME: ${it.brokerName}\n")
+                    stringBuilder.append("PROFILE ID: ${it.profileQueryId}\n")
                     stringBuilder.append("COMPLETED WITH NO ERROR: ${it.isSuccess}\n")
                     stringBuilder.append("DURATION: ${it.endTimeInMillis - it.startTimeInMillis}\n")
                     stringBuilder.toString()
