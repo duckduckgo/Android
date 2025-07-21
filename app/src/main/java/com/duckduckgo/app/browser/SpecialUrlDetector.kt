@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.content.ComponentName
 import android.content.Intent
 import android.content.Intent.URI_ANDROID_APP_SCHEME
+import android.content.Intent.URI_INTENT_SCHEME
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
@@ -62,6 +63,7 @@ class SpecialUrlDetectorImpl(
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME, BLOB_SCHEME -> UrlType.SearchQuery(uriString)
             FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
             DUCK_SCHEME -> UrlType.DuckScheme(uriString)
+            INTENT_SCHEME -> checkForIntent(scheme, uriString, URI_INTENT_SCHEME)
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchPrivacyProLink
@@ -71,7 +73,7 @@ class SpecialUrlDetectorImpl(
                     UrlType.SearchQuery(uriString)
                 }
             }
-            else -> checkForIntent(scheme, uriString)
+            else -> checkForIntent(scheme, uriString, URI_ANDROID_APP_SCHEME)
         }
     }
 
@@ -170,18 +172,19 @@ class SpecialUrlDetectorImpl(
     private fun checkForIntent(
         scheme: String,
         uriString: String,
+        intentFlags: Int,
     ): UrlType {
         val validUriSchemeRegex = Regex("[a-z][a-zA-Z\\d+.-]+")
         if (scheme.matches(validUriSchemeRegex)) {
-            return buildIntent(uriString)
+            return buildIntent(uriString, intentFlags)
         }
 
         return UrlType.SearchQuery(uriString)
     }
 
-    private fun buildIntent(uriString: String): UrlType {
+    private fun buildIntent(uriString: String, intentFlags: Int): UrlType {
         return try {
-            val intent = Intent.parseUri(uriString, URI_ANDROID_APP_SCHEME)
+            val intent = Intent.parseUri(uriString, intentFlags)
 
             if (externalAppIntentFlagsFeature.self().isEnabled()) {
                 intent.addCategory(Intent.CATEGORY_BROWSABLE)
@@ -231,6 +234,7 @@ class SpecialUrlDetectorImpl(
         private const val IN_TITLE_SCHEME = "intitle"
         private const val IN_URL_SCHEME = "inurl"
         private const val DUCK_SCHEME = "duck"
+        private const val INTENT_SCHEME = "intent"
         const val SMS_MAX_LENGTH = 400
         const val PHONE_MAX_LENGTH = 20
         const val EMAIL_MAX_LENGTH = 1000
