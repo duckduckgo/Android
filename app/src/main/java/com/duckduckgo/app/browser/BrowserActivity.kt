@@ -106,6 +106,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -807,6 +808,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         } ?: run {
             launchNewDuckChat(url)
+        }
+
+        currentTab?.omnibar?.newOmnibar?.omnibarTextInput?.let {
+            hideKeyboard(it)
         }
     }
 
