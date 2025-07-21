@@ -116,7 +116,6 @@ class InputModeWidget @JvmOverloads constructor(
     private fun configureInputBehavior() = with(inputField) {
         maxLines = MAX_LINES
         setHorizontallyScrolling(false)
-        setRawInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS)
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -175,10 +174,20 @@ class InputModeWidget @JvmOverloads constructor(
                 minLines = SEARCH_MIN_LINES
                 hint = context.getString(R.string.input_screen_search_hint)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
+                setRawInputType(
+                    InputType.TYPE_CLASS_TEXT or
+                        InputType.TYPE_TEXT_VARIATION_URI or
+                        InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS,
+                )
             } else {
                 minLines = DUCK_CHAT_MIN_LINES
                 hint = context.getString(R.string.input_screen_chat_hint)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
+                setRawInputType(
+                    InputType.TYPE_CLASS_TEXT or
+                        InputType.TYPE_TEXT_FLAG_AUTO_CORRECT or
+                        InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
+                )
             }
         }
         (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).restartInput(inputField)
