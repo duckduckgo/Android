@@ -34,12 +34,12 @@ import com.duckduckgo.savedsites.api.models.SavedSitesNames.BOOKMARKS_ROOT
 import com.duckduckgo.savedsites.api.service.SavedSitesManager
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarkItem
-import com.duckduckgo.savedsites.impl.bookmarks.BookmarksAdapter.BookmarksItemTypes
 import com.duckduckgo.savedsites.impl.store.BookmarksDataStore
 import com.duckduckgo.savedsites.impl.store.SortingMode.MANUAL
 import com.duckduckgo.savedsites.impl.store.SortingMode.NAME
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -91,6 +91,14 @@ class BookmarksViewModelTest {
     private val bookmarkFolder = BookmarkFolder(id = "folder1", name = "folder", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
     private val bookmarkFolderItem = BookmarkFolderItem(0, bookmarkFolder, true)
 
+    private val favoritesFlow = MutableStateFlow(listOf(favorite))
+    private val savedSitesFlow = MutableStateFlow(
+        SavedSites(
+            listOf(favorite),
+            listOf(bookmark, bookmarkFolder, bookmarkFolder, bookmarkFolder),
+        ),
+    )
+
     private val testee: BookmarksViewModel by lazy {
         val model = BookmarksViewModel(
             savedSitesRepository,
@@ -110,16 +118,9 @@ class BookmarksViewModelTest {
 
     @Before
     fun before() = runTest {
-        whenever(savedSitesRepository.getFavorites()).thenReturn(flowOf(listOf(favorite)))
+        whenever(savedSitesRepository.getFavorites()).thenReturn(favoritesFlow)
 
-        whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(
-            flowOf(
-                SavedSites(
-                    listOf(favorite),
-                    listOf(bookmark, bookmarkFolder, bookmarkFolder, bookmarkFolder),
-                ),
-            ),
-        )
+        whenever(savedSitesRepository.getSavedSites(anyString())).thenReturn(savedSitesFlow)
 
         whenever(bookmarksDataStore.getSortingMode()).thenReturn(NAME)
         testee.fetchBookmarksAndFolders(SavedSitesNames.BOOKMARKS_ROOT)
@@ -476,8 +477,7 @@ class BookmarksViewModelTest {
     }
 
     @Test
-    fun whenSortingByNameSelectedThenListIsSorted() {
-        val items = mutableListOf<BookmarksItemTypes>()
+    fun whenSortingByNameSelectedThenListIsSorted() = runTest {
         val folderNews = BookmarkFolder(id = "folderA", name = "News", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val folderSports = BookmarkFolder(id = "folderB", name = "Sports", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
         val bookmarkAs = Bookmark(id = "bookmarkA", title = "As", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
@@ -497,20 +497,59 @@ class BookmarksViewModelTest {
             "timestamp",
         )
 
-        items.add(BookmarkItem(bookmarkAs))
-        items.add(BookmarkItem(bookmarkReddit))
-        items.add(BookmarkItem(bookmarkCnn))
-        items.add(BookmarkItem(bookmarkTheGuardian))
-        items.add(BookmarksAdapter.BookmarkFolderItem(folderSports))
-        items.add(BookmarksAdapter.BookmarkFolderItem(folderNews))
+        savedSitesFlow.value = SavedSites(
+            emptyList(),
+            listOf(bookmarkAs, bookmarkReddit, bookmarkCnn, bookmarkTheGuardian, folderSports, folderNews),
+        )
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
 
-        val sortedElements = testee.sortElements(items, NAME)
+        testee.onSortingModeSelected(NAME)
+
+        val sortedElements = testee.itemsToDisplay.value
         assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
         assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkCnn)
         assertEquals((sortedElements[2] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderNews)
         assertEquals((sortedElements[3] as BookmarkItem).bookmark, bookmarkReddit)
         assertEquals((sortedElements[4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderSports)
         assertEquals((sortedElements[5] as BookmarkItem).bookmark, bookmarkTheGuardian)
+    }
+
+    @Test
+    fun whenSortingManualSelectedThenListIsSorted() = runTest {
+        val folderNews = BookmarkFolder(id = "folderA", name = "News", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val folderSports = BookmarkFolder(id = "folderB", name = "Sports", parentId = SavedSitesNames.BOOKMARKS_ROOT, 0, 0, "timestamp")
+        val bookmarkAs = Bookmark(id = "bookmarkA", title = "As", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+        val bookmarkCnn = Bookmark(id = "bookmarCnn", title = "Cnn", url = "www.example.com", parentId = SavedSitesNames.BOOKMARKS_ROOT, "timestamp")
+        val bookmarkReddit = Bookmark(
+            id = "bookmarReddit",
+            title = "Reddit",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+        )
+        val bookmarkTheGuardian = Bookmark(
+            id = "bookmarT",
+            title = "The Guardian",
+            url = "www.example.com",
+            parentId = SavedSitesNames.BOOKMARKS_ROOT,
+            "timestamp",
+        )
+
+        savedSitesFlow.value = SavedSites(
+            emptyList(),
+            listOf(bookmarkAs, bookmarkReddit, bookmarkCnn, bookmarkTheGuardian, folderSports, folderNews),
+        )
+        testee.fetchBookmarksAndFolders(BOOKMARKS_ROOT)
+
+        testee.onSortingModeSelected(MANUAL)
+
+        val sortedElements = testee.itemsToDisplay.value
+        assertEquals((sortedElements[0] as BookmarkItem).bookmark, bookmarkAs)
+        assertEquals((sortedElements[1] as BookmarkItem).bookmark, bookmarkReddit)
+        assertEquals((sortedElements[2] as BookmarkItem).bookmark, bookmarkCnn)
+        assertEquals((sortedElements[3] as BookmarkItem).bookmark, bookmarkTheGuardian)
+        assertEquals((sortedElements[4] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderSports)
+        assertEquals((sortedElements[5] as BookmarksAdapter.BookmarkFolderItem).bookmarkFolder, folderNews)
     }
 
     @Test

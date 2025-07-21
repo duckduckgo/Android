@@ -830,7 +830,9 @@
     <string name="onboardingEndDaxDialogButton">Wszystko gotowe!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Jeszcze jedno.</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ma także wbudowaną <b>sieć VPN</b>!<br/><br/>Aktywuj ją w <b>płatnej subskrypcji Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo obejmuje również bezpieczną <b>sieć VPN + 2 dodatkowe zabezpieczenia premium</b>, dostępne z <b>opcjonalną płatną subskrypcją</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
 
     <!-- Highlight Onboarding Experiment-->

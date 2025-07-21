@@ -798,7 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Όλα έτοιμα!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Πριν το ξεχάσω...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης ενσωματωμένο <b>VPN</b>!<br/><br/>Ενεργοποιήστε το με μια <b>επί πληρωμή συνδρομή Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[Το DuckDuckGo διαθέτει επίσης ένα ασφαλές <b>VPN + 2 ακόμη premium προστασίες</b>, διαθέσιμες με <b>προαιρετική συνδρομή επί πληρωμή</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Μάθετε περισσότερα</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Δοκίμασε δωρεάν!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Παράλειψη</string>
 
     <!-- Highlight Onboarding Experiment-->

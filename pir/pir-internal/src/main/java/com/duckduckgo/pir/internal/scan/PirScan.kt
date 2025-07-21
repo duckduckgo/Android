@@ -96,21 +96,58 @@ class RealPirScan @Inject constructor(
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
-    private var profileQuery: ProfileQuery = ProfileQuery(
-        firstName = "William",
-        lastName = "Smith",
-        city = "Chicago",
-        state = "IL",
-        addresses = listOf(
-            Address(
-                city = "Chicago",
-                state = "IL",
+    private var profileQueries: List<ProfileQuery> = listOf(
+        ProfileQuery(
+            id = -1,
+            firstName = "William",
+            lastName = "Smith",
+            city = "Chicago",
+            state = "IL",
+            addresses = listOf(
+                Address(
+                    city = "Chicago",
+                    state = "IL",
+                ),
             ),
+            birthYear = 1993,
+            fullName = "William Smith",
+            age = 32,
+            deprecated = false,
         ),
-        birthYear = 1993,
-        fullName = "William Smith",
-        age = 32,
-        deprecated = false,
+        ProfileQuery(
+            id = -2,
+            firstName = "Jane",
+            lastName = "Doe",
+            city = "New York",
+            state = "NY",
+            addresses = listOf(
+                Address(
+                    city = "New York",
+                    state = "NY",
+                ),
+            ),
+            birthYear = 1990,
+            fullName = "Jane Doe",
+            age = 35,
+            deprecated = false,
+        ),
+        ProfileQuery(
+            id = -3,
+            firstName = "Alicia",
+            lastName = "West",
+            city = "Los Angeles",
+            state = "CA",
+            addresses = listOf(
+                Address(
+                    city = "Los Angeles",
+                    state = "CA",
+                ),
+            ),
+            birthYear = 1985,
+            fullName = "Alicia West",
+            age = 40,
+            deprecated = false,
+        ),
     )
 
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
@@ -129,11 +166,8 @@ class RealPirScan @Inject constructor(
         cleanPreviousRun()
 
         val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
-            brokers.size
-        } else {
-            MAX_DETACHED_WEBVIEW_COUNT
-        }
+        maxWebViewCount = minOf(brokers.size * profileQueries.size, MAX_DETACHED_WEBVIEW_COUNT)
+
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
@@ -149,23 +183,37 @@ class RealPirScan @Inject constructor(
             createCount++
         }
 
-        // Start each runner on a subset of the broker steps.
-        brokers.mapNotNull { broker ->
+        // Prepare a list of all broker steps that need to be run
+        val brokerScanSteps = brokers.mapNotNull { broker ->
             repository.getBrokerScanSteps(broker)?.run {
                 brokerStepsParser.parseStep(broker, this)
             }
         }.filter {
             it.isNotEmpty()
-        }.flatten().splitIntoParts(maxWebViewCount)
-            .mapIndexed { index, part ->
-                // We want to run the runners in parallel but wait for everything complete before we proceed
-                async {
-                    runners[index].start(profileQuery, part)
-                    runners[index].stop()
-                }
-            }.awaitAll()
+        }.flatten()
 
-        logcat { "PIR-SCAN: Scan completed for all runners" }
+        // Combine the broker steps with each profile and split into equal parts
+        val stepsPerRunner = profileQueries.map { profileQuery ->
+            brokerScanSteps.map { scanStep ->
+                profileQuery to scanStep
+            }
+        }.flatten()
+            .splitIntoParts(maxWebViewCount)
+
+        // Execute the steps in parallel
+        stepsPerRunner.mapIndexed { index, partSteps ->
+            // We want to run the runners in parallel but wait for everything to complete before we proceed
+            async {
+                partSteps.forEach { (profile, step) ->
+                    logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
+                    runners[index].start(profile, listOf(step))
+                    runners[index].stop()
+                    logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
+                }
+            }
+        }.awaitAll()
+
+        logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
         emitScanCompletedPixel(
             runType,
             currentTimeProvider.currentTimeMillis() - startTimeMillis,
@@ -183,33 +231,34 @@ class RealPirScan @Inject constructor(
             runners.clear()
         }
         repository.deleteAllScanResults()
-        repository.getUserProfiles().also {
-            if (it.isNotEmpty()) {
-                // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
-                val storedProfile = it[0]
-                profileQuery = ProfileQuery(
-                    firstName = storedProfile.userName.firstName,
-                    lastName = storedProfile.userName.lastName,
-                    city = storedProfile.addresses.city,
-                    state = storedProfile.addresses.state,
-                    addresses = listOf(
-                        Address(
-                            city = storedProfile.addresses.city,
-                            state = storedProfile.addresses.state,
+        repository.getUserProfiles().also { profiles ->
+            if (profiles.isNotEmpty()) {
+                profileQueries = profiles.map { storedProfile ->
+                    ProfileQuery(
+                        id = storedProfile.id,
+                        firstName = storedProfile.userName.firstName,
+                        lastName = storedProfile.userName.lastName,
+                        city = storedProfile.addresses.city,
+                        state = storedProfile.addresses.state,
+                        addresses = listOf(
+                            Address(
+                                city = storedProfile.addresses.city,
+                                state = storedProfile.addresses.state,
+                            ),
                         ),
-                    ),
-                    birthYear = storedProfile.birthYear,
-                    fullName = storedProfile.userName.middleName?.run {
-                        "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
-                    }
-                        ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                    age = LocalDate.now().year - storedProfile.birthYear,
-                    deprecated = false,
-                )
+                        birthYear = storedProfile.birthYear,
+                        fullName = storedProfile.userName.middleName?.run {
+                            "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
+                        }
+                            ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
+                        age = LocalDate.now().year - storedProfile.birthYear,
+                        deprecated = false,
+                    )
+                }
             }
         }
 
-        logcat { "PIR-SCAN: Running scan on profile: $profileQuery on ${Thread.currentThread().name}" }
+        logcat { "PIR-SCAN: Running scan on profiles: $profileQueries on ${Thread.currentThread().name}" }
     }
 
     override suspend fun executeAllBrokers(

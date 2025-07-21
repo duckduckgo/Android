@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl.store
 
-import com.duckduckgo.autofill.impl.importing.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn

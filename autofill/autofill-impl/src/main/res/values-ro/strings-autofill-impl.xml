@@ -258,7 +258,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importă parolele tale Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Deschide parolele Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importă din Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Alege un fișier CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importă din browserul pentru desktop</string>
 
@@ -286,5 +286,9 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importă parole de la Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Sincronizează parolele de pe desktop</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Resetează site-urile excluse</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Importă parolele tale din&lt;br /&gt;Google în DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importă-ți parolele rapid și în siguranță în DuckDuckGo. Google îți poate cere să completezi parola.</string>
+    <string name="passwords_import_promo_action">Importă din Google</string>
 
 </resources>

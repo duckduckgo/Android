@@ -174,7 +174,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
-        val showClickCatcher: Boolean = false,
+        val showTextInputClickCatcher: Boolean = false,
         val showFindInPage: Boolean = false,
     ) {
         fun shouldUpdateOmnibarText(isFullUrlEnabled: Boolean): Boolean {
@@ -190,6 +190,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data object StartExperimentVariant1Animation : Command()
         data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
+        data class LaunchInputScreen(val query: String) : Command()
     }
 
     enum class LeadingIconState {
@@ -205,7 +206,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         duckAiFeatureState.showInputScreen.onEach { inputScreenEnabled ->
             _viewState.update {
                 it.copy(
-                    showClickCatcher = inputScreenEnabled,
+                    showTextInputClickCatcher = inputScreenEnabled,
                 )
             }
         }.launchIn(viewModelScope)
@@ -848,6 +849,20 @@ class OmnibarLayoutViewModel @Inject constructor(
                     updateOmnibarText = true,
                 )
             }
+        }
+    }
+
+    fun onTextInputClickCatcherClicked() {
+        viewModelScope.launch {
+            val omnibarText = viewState.value.omnibarText
+            val url = viewState.value.url
+            val isDuckDuckGoQueryUrl = duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)
+            val textToPreFill = if (omnibarText.isNotEmpty() && url.isNotEmpty() && !isDuckDuckGoQueryUrl) {
+                url
+            } else {
+                omnibarText
+            }
+            command.send(Command.LaunchInputScreen(query = textToPreFill))
         }
     }
 }

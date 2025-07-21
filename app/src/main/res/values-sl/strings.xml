@@ -830,7 +830,9 @@
     <string name="onboardingEndDaxDialogButton">Končano!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, preden pozabim ...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ima tudi vgrajen <b>VPN</b>!<br/><br/>Aktivirajte ga s <b>plačljivo naročnino Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo ima tudi varen <b>VPN in še 2 dodatni premium zaščiti</b>, ki so na voljo z <b>neobvezno plačljivo naročnino</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Več</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Poskusite brezplačno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
 
     <!-- Highlight Onboarding Experiment-->

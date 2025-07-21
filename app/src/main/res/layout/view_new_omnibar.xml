@@ -209,6 +209,20 @@
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
+                    <View
+                        android:id="@+id/omnibarTextInputClickCatcher"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toBottomOf="@id/omnibarTextInput"
+                        app:layout_constraintEnd_toEndOf="@id/omnibarTextInput"
+                        app:layout_constraintStart_toStartOf="@id/omnibarTextInput"
+                        app:layout_constraintTop_toTopOf="@id/omnibarTextInput" />
+
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:id="@+id/trackersBlockedTextView"
                         android:layout_width="0dp"

@@ -69,6 +69,7 @@ class SubscriptionMessagingInterface @Inject constructor(
         SubscriptionsHandler(),
         GetSubscriptionMessage(subscriptionsManager, dispatcherProvider),
         SetSubscriptionMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
+        SetAuthTokensMessage(subscriptionsManager, appCoroutineScope, dispatcherProvider, pixelSender, subscriptionsChecker),
         InformationalEventsMessage(subscriptionsManager, appCoroutineScope, pixelSender),
         GetAccessTokenMessage(subscriptionsManager),
         GetAuthAccessTokenMessage(subscriptionsManager),
@@ -220,6 +221,43 @@ class SubscriptionMessagingInterface @Inject constructor(
         override val allowedDomains: List<String> = emptyList()
         override val featureName: String = "useSubscription"
         override val methods: List<String> = listOf("setSubscription")
+    }
+
+    inner class SetAuthTokensMessage(
+        private val subscriptionsManager: SubscriptionsManager,
+        @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+        private val dispatcherProvider: DispatcherProvider,
+        private val pixelSender: SubscriptionPixelSender,
+        private val subscriptionsChecker: SubscriptionsChecker,
+    ) : JsMessageHandler {
+
+        override fun process(
+            jsMessage: JsMessage,
+            secret: String,
+            jsMessageCallback: JsMessageCallback?,
+        ) {
+            val (accessToken, refreshToken) = try {
+                with(jsMessage.params) { getString("accessToken") to getString("refreshToken") }
+            } catch (e: Exception) {
+                logcat { "Error parsing the tokens" }
+                return
+            }
+
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                try {
+                    subscriptionsManager.signInV2(accessToken, refreshToken)
+                    subscriptionsChecker.runChecker()
+                    pixelSender.reportRestoreUsingEmailSuccess()
+                    pixelSender.reportSubscriptionActivated()
+                } catch (e: Exception) {
+                    logcat { "Failed to set auth tokens" }
+                }
+            }
+        }
+
+        override val allowedDomains: List<String> = emptyList()
+        override val featureName: String = "useSubscription"
+        override val methods: List<String> = listOf("setAuthTokens")
     }
 
     private class InformationalEventsMessage(

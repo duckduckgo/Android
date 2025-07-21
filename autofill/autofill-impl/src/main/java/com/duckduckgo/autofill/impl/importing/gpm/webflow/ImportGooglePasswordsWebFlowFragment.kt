@@ -264,13 +264,16 @@ class ImportGooglePasswordsWebFlowFragment :
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(CUSTOM_FLOW_TAB_ID)) { _, result ->
                 context?.let { ctx ->
-                    plugin.processResult(
-                        result = result,
-                        context = ctx,
-                        tabId = CUSTOM_FLOW_TAB_ID,
-                        fragment = this@ImportGooglePasswordsWebFlowFragment,
-                        autofillCallback = this@ImportGooglePasswordsWebFlowFragment,
-                    )
+                    lifecycleScope.launch {
+                        plugin.processResult(
+                            result = result,
+                            context = ctx,
+                            tabId = CUSTOM_FLOW_TAB_ID,
+                            fragment = this@ImportGooglePasswordsWebFlowFragment,
+                            autofillCallback = this@ImportGooglePasswordsWebFlowFragment,
+                            webView = binding?.webView,
+                        )
+                    }
                 }
             }
         }
@@ -322,6 +325,10 @@ class ImportGooglePasswordsWebFlowFragment :
             )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
         }
+    }
+
+    override suspend fun promptUserToImportPassword(originalUrl: String) {
+        // no-op, we don't prompt the user for anything in this flow
     }
 
     override suspend fun onCsvAvailable(csv: String) {

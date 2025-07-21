@@ -37,8 +37,8 @@ import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.extensions.addBottomShadow
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
+import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -65,7 +65,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -149,6 +148,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         } else {
             animateOmnibarFocusedState(focused = false)
         }
+
+        omnibarCardShadow.isVisible = viewState.viewMode !is ViewMode.CustomTab
     }
 
     override fun renderButtons(viewState: ViewState) {
@@ -172,8 +173,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.hide()
         }
-
-        omniBarClickCatcher.isVisible = viewState.showClickCatcher
     }
 
     private fun animateOmnibarFocusedState(focused: Boolean) {

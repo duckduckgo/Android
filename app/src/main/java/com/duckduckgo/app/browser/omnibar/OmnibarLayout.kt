@@ -67,6 +67,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.NewTabScrolli
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
@@ -199,6 +200,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private var omnibarTextListener: Omnibar.TextListener? = null
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
+    private var omnibarInputScreenLaunchListener: Omnibar.InputScreenLaunchListener? = null
 
     private var decoration: Decoration? = null
     private var lastViewMode: Mode? = null
@@ -262,6 +264,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             )
         }
     }
+    private val omnibarTextInputClickCatcher: View by lazy { findViewById(R.id.omnibarTextInputClickCatcher) }
 
     internal fun omnibarViews(): List<View> = listOf(
         clearTextButton,
@@ -549,6 +552,10 @@ open class OmnibarLayout @JvmOverloads constructor(
             is StartExperimentVariant2OrVariant3Animation -> {
                 startExperimentVariant2OrVariant3Animation(command.entities)
             }
+
+            is LaunchInputScreen -> {
+                omnibarInputScreenLaunchListener?.launchInputScreen(query = command.query)
+            }
         }
     }
 
@@ -668,6 +675,8 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         previousTransitionState = newTransitionState
+
+        enableTextInputClickCatcher(viewState.showTextInputClickCatcher)
     }
 
     private fun renderBrowserMode(viewState: ViewState) {
@@ -899,7 +908,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 customTabToolbarContainer.customTabShieldIcon
             }
 
-            privacyShieldView.setAnimationView(shieldIconView, privacyShield)
+            privacyShieldView.setAnimationView(shieldIconView, privacyShield, viewMode)
         }
     }
 
@@ -1027,6 +1036,23 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     fun setDraftTextIfNtp(query: String) {
         viewModel.setDraftTextIfNtp(query)
+    }
+
+    private fun enableTextInputClickCatcher(enabled: Boolean) {
+        omnibarTextInputClickCatcher.isVisible = enabled
+
+        omnibarTextInput.apply {
+            isEnabled = !enabled
+            isFocusable = !enabled
+            isFocusableInTouchMode = !enabled
+        }
+    }
+
+    fun setInputScreenLaunchListener(listener: Omnibar.InputScreenLaunchListener) {
+        omnibarInputScreenLaunchListener = listener
+        omnibarTextInputClickCatcher.setOnClickListener {
+            viewModel.onTextInputClickCatcherClicked()
+        }
     }
 }
 

@@ -182,8 +182,14 @@ interface PrivacyProFeature {
      * This flag will be used to select FE subscription messaging mode.
      * The value is added into GetFeatureConfig to allow FE to select the mode.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun enableSubscriptionFlowsV2(): Toggle
+
+    /**
+     * Kill-switch for in-memory caching of auth v2 JWKs.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun authApiV2JwksCache(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

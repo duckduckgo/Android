@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -46,7 +47,14 @@ class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     private val dataStore: EmailProtectionInContextDataStore,
     private val appBuildConfig: AppBuildConfig,
 ) : AutofillFragmentResultsPlugin {
-    override fun processResult(result: Bundle, context: Context, tabId: String, fragment: Fragment, autofillCallback: AutofillEventListener) {
+    override suspend fun processResult(
+        result: Bundle,
+        context: Context,
+        tabId: String,
+        fragment: Fragment,
+        autofillCallback: AutofillEventListener,
+        webView: WebView?,
+    ) {
         logcat { "${this::class.java.simpleName}: processing result" }
 
         val userSelection = result.safeGetParcelable<EmailProtectionInContextSignUpResult>(EmailProtectionInContextSignUpDialog.KEY_RESULT) ?: return

@@ -71,6 +71,9 @@ class InlineBrowserAutofillTest {
 
         override fun onCredentialsSaved(savedCredentials: LoginCredentials) {
         }
+
+        override suspend fun promptUserToImportPassword(originalUrl: String) {
+        }
     }
 
     @Before

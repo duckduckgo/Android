@@ -35,6 +35,13 @@
     <attr name="trailingIcon" format="integer"/>
     <attr name="trailingIconTint" format="reference|color"/>
     <attr name="showBetaPill" format="boolean"/>
+    <attr name="pillIcon">
+        <enum name="none" value="0" />
+        <!-- Beta Pill -->
+        <enum name="betaPill" value="1" />
+        <!-- New Pill -->
+        <enum name="newPill" value="2" />
+    </attr>
     <attr name="showSwitch" format="boolean"/>
     <attr name="switchEnabled" format="boolean"/>
     <attr name="leadingIconBackground">

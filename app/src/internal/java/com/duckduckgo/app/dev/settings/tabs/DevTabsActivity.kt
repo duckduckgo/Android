@@ -51,11 +51,19 @@ class DevTabsActivity : DuckDuckGoActivity() {
         setupToolbar(binding.includeToolbar.toolbar)
 
         binding.addTabsButton.setOnClickListener {
-            viewModel.addTabs(binding.tabCount.text.toString().toInt())
+            viewModel.addTabs(binding.tabCount.text.toInt())
         }
 
         binding.clearTabsButton.setOnClickListener {
             viewModel.clearTabs()
+        }
+
+        binding.addBookmarksButton.setOnClickListener {
+            viewModel.addBookmarks(binding.bookmarksCount.text.toInt())
+        }
+
+        binding.clearBookmarksButton.setOnClickListener {
+            viewModel.clearBookmarks()
         }
 
         observeViewState()
@@ -68,6 +76,7 @@ class DevTabsActivity : DuckDuckGoActivity() {
 
     private fun render(viewState: ViewState) {
         binding.tabCountHeader.text = getString(R.string.devSettingsTabsScreenHeader, viewState.tabCount)
+        binding.bookmarksCountHeader.text = getString(R.string.devSettingsTabsBookmarksScreenHeader, viewState.bookmarkCount)
     }
 
     companion object {

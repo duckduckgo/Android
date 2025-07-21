@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Impordi oma Google\'i paroolid</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Ava Google\'i paroolid</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Impordi Google\'ist</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vali CSV-fail</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Impordi töölaua brauserist</string>
 
@@ -280,5 +280,9 @@
     <string name="autofillSettingsImportFromGoogleLabel">Impordi paroolid Google\'ist</string>
     <string name="autofillSettingsImportFromDesktopSync">Töölaua paroolide sünkroonimine</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Lähtesta välistatud saidid</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Too oma paroolid Google\'ist DuckDuckGo\'sse</string>
+    <string name="passwords_import_promo_subtitle">Impordi oma paroolid kiiresti ja turvaliselt DuckDuckGosse. Google võib paluda sul oma parooli sisestada.</string>
+    <string name="passwords_import_promo_action">Impordi Google\'ist</string>
 
 </resources>

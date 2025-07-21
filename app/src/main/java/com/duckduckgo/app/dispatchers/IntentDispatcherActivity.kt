@@ -28,6 +28,8 @@ import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.logcat
@@ -36,6 +38,9 @@ import logcat.logcat
 class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     private val viewModel: IntentDispatcherViewModel by bindViewModel()
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +56,9 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
     }
 
     private fun dispatch(viewState: ViewState) {
-        if (viewState.customTabRequested) {
+        if (viewState.activityParams != null) {
+            globalActivityStarter.start(this, viewState.activityParams)
+        } else if (viewState.customTabRequested) {
             showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)

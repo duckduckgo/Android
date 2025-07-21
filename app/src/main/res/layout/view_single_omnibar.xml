@@ -65,7 +65,6 @@
                         style="@style/Widget.DuckDuckGo.OmnibarCardView"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:transitionName="omnibar_transition"
                         app:cardElevation="0dp"
                         app:strokeColor="?daxColorAccentBlue"
                         app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
@@ -325,7 +324,7 @@
                             </androidx.constraintlayout.widget.ConstraintLayout>
 
                             <View
-                                android:id="@+id/omnibarClickCatcher"
+                                android:id="@+id/omnibarTextInputClickCatcher"
                                 android:layout_width="0dp"
                                 android:layout_height="0dp"
                                 android:background="@android:color/transparent"

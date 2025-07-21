@@ -16,12 +16,11 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel
 
-import android.annotation.SuppressLint
-import androidx.annotation.VisibleForTesting
-import androidx.lifecycle.MutableLiveData
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.UriString.Companion.isWebUrl
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -34,37 +33,41 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
-import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
-import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewState
-import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenDataStore
-import com.duckduckgo.duckchat.impl.inputscreen.store.InputScreenMode
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteItemRemoved
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
 import com.duckduckgo.history.api.NavigationHistory
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -72,20 +75,17 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
-@ContributesViewModel(FragmentScope::class)
-class InputScreenViewModel @Inject constructor(
+class InputScreenViewModel @AssistedInject constructor(
+    @Assisted currentOmnibarText: String,
     private val autoComplete: AutoComplete,
     private val dispatchers: DispatcherProvider,
     private val history: NavigationHistory,
-    savedSitesRepository: SavedSitesRepository,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val inputScreenDataStore: InputScreenDataStore,
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val autoCompleteSettings: AutoCompleteSettings,
 ) : ViewModel() {
 
     private var hasUserSeenHistoryIAM = false
-    private var lastAutoCompleteState: AutoCompleteViewState? = null
 
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
     private val voiceInputAllowed = MutableStateFlow(true)
@@ -93,52 +93,94 @@ class InputScreenViewModel @Inject constructor(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             forceWebSearchButtonVisible = false,
+            autoCompleteSuggestionsVisible = false,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
 
-    val autoCompleteViewState: MutableLiveData<AutoCompleteViewState> = MutableLiveData()
+    private val initialSearchInputText = currentOmnibarText.trim()
+    private val searchInputTextState = MutableStateFlow(initialSearchInputText)
 
-    val command: SingleLiveEvent<Command> = SingleLiveEvent()
-    val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
+    private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
+    val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
 
-    data class HiddenBookmarksIds(
-        val favorites: List<String> = emptyList(),
-        val bookmarks: List<String> = emptyList(),
-    )
+    /**
+     * Tracks whether we should show autocomplete suggestions based on the initial input state.
+     *
+     * This becomes true when either:
+     * 1. The user has modified the input text from its initial state, OR
+     * 2. The initial text was not a URL (e.g., search query from SERP)
+     *
+     * We suppress autocomplete when the user is on a webpage and the input still shows
+     * that page's URL unchanged, since autocomplete suggestions would then obfuscate favorites.
+     */
+    private var hasMovedBeyondInitialUrl = false
 
-    @VisibleForTesting
-    internal val autoCompleteStateFlow = MutableStateFlow("")
+    /**
+     * Caches the feature flag and user preference state.
+     */
+    private val autoCompleteSuggestionsEnabled = MutableStateFlow(autoCompleteSettings.autoCompleteSuggestionsEnabled)
 
-    private var autoCompleteJob = ConflatedJob()
+    /**
+     * Monitors conditions to determine if auto-complete suggestions should be shown.
+     *
+     * We only want to show auto-complete suggestions if:
+     * - The feature is enabled
+     * - The search input text is not empty
+     * - Either the user has modified the input OR the initial text wasn't a URL
+     *
+     * The initial text comes from the address bar. If it's a URL that hasn't been modified,
+     * it represents the current webpage, so we suppress autocomplete. If the user is on SERP,
+     * the initial text will be the search query (not URL), so we show autocomplete immediately.
+     */
+    private val shouldShowAutoComplete = combine(
+        autoCompleteSuggestionsEnabled,
+        searchInputTextState,
+    ) { autoCompleteEnabled, searchInput ->
+        val shouldShowBasedOnInput = if (hasMovedBeyondInitialUrl) {
+            // once user has interacted or initial text wasn't a URL, allow autocomplete (if the rest of the conditions are met as well)
+            true
+        } else {
+            // check if user modified input or initial text wasn't a webpage URL
+            val userHasModifiedInput = initialSearchInputText != searchInput
+            val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != "duck"
 
-    init {
-        initializeViewStates()
-
-        savedSitesRepository.getFavorites()
-            .combine(hiddenIds) { favorites, hiddenIds ->
-                favorites.filter { it.id !in hiddenIds.favorites }
+            val shouldShow = userHasModifiedInput || initialTextWasNotWebUrl
+            if (shouldShow) {
+                hasMovedBeyondInitialUrl = true
             }
-            .flowOn(dispatchers.io())
-            .onEach { filteredFavourites ->
-                withContext(dispatchers.main()) {
-                    val favorites = filteredFavourites.map { it }
-                    autoCompleteViewState.value = currentAutoCompleteViewState().copy(favorites = favorites)
-                }
-            }
-            .launchIn(viewModelScope)
-
-        viewModelScope.launch {
-            inputScreenDataStore.getLastUsedMode().let { mode ->
-                command.value = when (mode) {
-                    null,
-                    InputScreenMode.SEARCH,
-                    -> Command.SwitchModeToSearch
-                    InputScreenMode.CHAT -> Command.SwitchModeToChat
-                }
-            }
+            shouldShow
         }
 
+        autoCompleteEnabled &&
+            searchInput.isNotEmpty() &&
+            shouldShowBasedOnInput
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val autoCompleteSuggestionResults: StateFlow<AutoCompleteResult> = shouldShowAutoComplete
+        .flatMapLatest { shouldShow ->
+            if (shouldShow) {
+                searchInputTextState
+                    .debounceExceptFirst(300)
+                    .flatMapLatest { autoComplete.autoComplete(it) }
+            } else {
+                flowOf(AutoCompleteResult("", emptyList()))
+            }
+        }
+        .flowOn(dispatchers.io())
+        .onEach { result ->
+            if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
+                hasUserSeenHistoryIAM = true
+            }
+        }
+        .flowOn(dispatchers.main())
+        .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
+
+    val command: SingleLiveEvent<Command> = SingleLiveEvent()
+
+    init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
             serviceAvailable && inputAllowed
         }.onEach { voiceInputPossible ->
@@ -148,47 +190,21 @@ class InputScreenViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+
+        shouldShowAutoComplete.onEach { showAutoComplete ->
+            _visibilityState.update {
+                it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onActivityResume() {
+        autoCompleteSuggestionsEnabled.value = autoCompleteSettings.autoCompleteSuggestionsEnabled
         _visibilityState.update {
             it.copy(
                 voiceInputButtonVisible = voiceSearchAvailability.isVoiceSearchAvailable,
             )
         }
-    }
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    @SuppressLint("CheckResult")
-    private fun configureAutoComplete() {
-        autoCompleteJob += autoCompleteStateFlow
-            .debounce(300)
-            .distinctUntilChanged()
-            .flatMapLatest { autoComplete.autoComplete(it) }
-            .flowOn(dispatchers.io())
-            .onEach { result ->
-                if (result.suggestions.contains(AutoCompleteInAppMessageSuggestion)) {
-                    hasUserSeenHistoryIAM = true
-                }
-                onAutoCompleteResultReceived(result)
-            }
-            .flowOn(dispatchers.main())
-            .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
-            .launchIn(viewModelScope)
-    }
-
-    private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
-        val currentViewState = currentAutoCompleteViewState()
-        currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions)).also {
-            lastAutoCompleteState = it
-            autoCompleteViewState.value = it
-        }
-    }
-
-    @VisibleForTesting
-    public override fun onCleared() {
-        autoCompleteJob.cancel()
-        super.onCleared()
     }
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -208,7 +224,6 @@ class InputScreenViewModel @Inject constructor(
     }
 
     private fun onUserSwitchedToTab(tabId: String) {
-        // TODO: handle switch to tab
         command.value = SwitchToTab(tabId)
     }
 
@@ -234,8 +249,6 @@ class InputScreenViewModel @Inject constructor(
         suggestion: AutoCompleteSuggestion,
         omnibarText: String,
     ) {
-        configureAutoComplete()
-
         appCoroutineScope.launch(dispatchers.io()) {
             when (suggestion) {
                 is AutoCompleteHistorySuggestion -> {
@@ -249,7 +262,7 @@ class InputScreenViewModel @Inject constructor(
                 else -> {}
             }
             withContext(dispatchers.main()) {
-                autoCompleteStateFlow.value = omnibarText
+                searchInputTextState.value = omnibarText
                 command.value = AutocompleteItemRemoved
             }
         }
@@ -257,56 +270,36 @@ class InputScreenViewModel @Inject constructor(
 
     fun onUserSubmittedQuery(query: String) {
         command.value = Command.UserSubmittedQuery(query)
-        autoCompleteViewState.value =
-            currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
-    }
-
-    private fun currentAutoCompleteViewState(): AutoCompleteViewState = autoCompleteViewState.value!!
-
-    fun triggerAutocomplete(
-        query: String,
-        hasFocus: Boolean,
-        hasQueryChanged: Boolean,
-    ) {
-        configureAutoComplete()
-
-        // determine if empty list to be shown, or existing search results
-        val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
-            AutoCompleteResult(query, emptyList())
-        } else {
-            currentAutoCompleteViewState().searchResults
-        }
-
-        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
-        val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
-        val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
-            val urlFocused =
-                hasFocus && query.isNotBlank() && !hasQueryChanged && (com.duckduckgo.app.browser.UriString.isWebUrl(query))
-            val emptyQuery = query.isBlank()
-            val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
-            hasFocus && (urlFocused || emptyQuery) && favoritesAvailable
-        } else {
-            false
-        }
-
-        autoCompleteViewState.value = currentAutoCompleteViewState()
-            .copy(
-                showSuggestions = showAutoCompleteSuggestions,
-                showFavorites = showFavoritesAsSuggestions,
-                searchResults = autoCompleteSearchResults,
+        _visibilityState.update {
+            it.copy(
+                autoCompleteSuggestionsVisible = false,
             )
-
-        if (hasFocus && autoCompleteSuggestionsEnabled) {
-            autoCompleteStateFlow.value = query.trim()
         }
     }
 
-    private fun initializeViewStates() {
-        initializeDefaultViewStates()
+    fun onSearchInputTextChanged(query: String) {
+        searchInputTextState.value = query.trim()
+        _submitButtonIconState.update {
+            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEARCH)
+        }
     }
 
-    private fun initializeDefaultViewStates() {
-        autoCompleteViewState.value = AutoCompleteViewState()
+    fun onChatInputTextChanged(query: String) {
+        _submitButtonIconState.update {
+            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEND)
+        }
+    }
+
+    fun onSearchSubmitted(query: String) {
+        command.value = Command.SubmitSearch(query)
+    }
+
+    fun onChatSubmitted(query: String) {
+        if (isWebUrl(query)) {
+            command.value = Command.SubmitSearch(query)
+        } else {
+            command.value = Command.SubmitChat(query)
+        }
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
@@ -321,14 +314,11 @@ class InputScreenViewModel @Inject constructor(
                 autoComplete.submitUserSeenHistoryIAM()
             }
             hasUserSeenHistoryIAM = false
-            lastAutoCompleteState = null
-            autoCompleteJob.cancel()
         }
     }
 
     fun onSearchSelected() {
         viewModelScope.launch {
-            inputScreenDataStore.setLastUsedMode(InputScreenMode.SEARCH)
             _visibilityState.update {
                 it.copy(
                     forceWebSearchButtonVisible = false,
@@ -339,11 +329,13 @@ class InputScreenViewModel @Inject constructor(
 
     fun onChatSelected() {
         viewModelScope.launch {
-            inputScreenDataStore.setLastUsedMode(InputScreenMode.CHAT)
             _visibilityState.update {
                 it.copy(
                     forceWebSearchButtonVisible = true,
                 )
+            }
+            _submitButtonIconState.update {
+                it.copy(icon = SubmitButtonIcon.SEND)
             }
         }
     }
@@ -355,4 +347,30 @@ class InputScreenViewModel @Inject constructor(
     fun onVoiceInputAllowedChange(allowed: Boolean) {
         voiceInputAllowed.value = allowed
     }
+
+    class InputScreenViewModelProviderFactory(
+        private val assistedFactory: InputScreenViewModelFactory,
+        private val currentOmnibarText: String,
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return assistedFactory.create(currentOmnibarText) as T
+        }
+    }
+
+    @AssistedFactory
+    interface InputScreenViewModelFactory {
+        fun create(
+            currentOmnibarText: String,
+        ): InputScreenViewModel
+    }
+}
+
+@OptIn(FlowPreview::class)
+private fun <T> Flow<T>.debounceExceptFirst(timeoutMillis: Long): Flow<T> {
+    return merge(
+        take(1),
+        drop(1).debounce(timeoutMillis),
+    )
 }

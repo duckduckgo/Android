@@ -1,0 +1,16 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Never > SERP > Organic > YouTube"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: common/enable_duck_player_never.yaml
+      - runFlow: common/load_serp_videos_organic.yaml
+      - runFlow: common/handle_youtube_cookies.yaml
+      - runFlow: common/assert_youtube_visible.yaml

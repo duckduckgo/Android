@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importa as tuas palavras-passe do Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Abrir palavras-passe do Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importar do Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Escolher um ficheiro CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importar do navegador para computadores</string>
 
@@ -280,5 +280,9 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importar palavras-passe do Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Sincronizar palavras-passe com o computador</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Repor sites excluídos</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Traz as tuas palavras-passe do&lt;br /&gt;Google para o DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importa a tuas palavras-passe para o DuckDuckGo de forma rápida e segura. O Google pode pedir-te para introduzires a tua palavra-passe.</string>
+    <string name="passwords_import_promo_action">Importar do Google</string>
 
 </resources>

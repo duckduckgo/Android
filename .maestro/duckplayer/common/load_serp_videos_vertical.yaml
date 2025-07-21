@@ -1,0 +1,15 @@
+appId: com.duckduckgo.mobile.android
+---
+# Select a YouTube video from SERP videos vertical
+- runFlow: input_search.yaml
+
+- extendedWaitUntil:
+    visible:
+        text: "Videos"
+    timeout: 5000
+
+- tapOn:
+    text: "Videos"
+
+- tapOn:
+    text: "DuckDuckGo vs Google: 5 Reasons You Should Switch"

@@ -242,8 +242,8 @@ class InitMessageHandlerPluginTest {
 
     private fun jsonToInitResp(json: String): InitResp? {
         val trimmedJson = json
-            .removePrefix("javascript:(function() {\n    window.autoconsentMessageCallback(")
-            .removeSuffix(", window.origin);\n})();")
+            .removePrefix("javascript:(function() {window.autoconsentMessageCallback(")
+            .removeSuffix(", window.origin);})();")
         val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
         val jsonAdapter: JsonAdapter<InitResp> = moshi.adapter(InitResp::class.java)
         return jsonAdapter.fromJson(trimmedJson)

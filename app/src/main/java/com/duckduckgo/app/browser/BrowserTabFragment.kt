@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.Manifest
 import android.animation.LayoutTransition
 import android.annotation.SuppressLint
+import android.app.Activity.RESULT_CANCELED
 import android.app.Activity.RESULT_OK
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
@@ -209,6 +210,7 @@ import com.duckduckgo.autoconsent.api.AutoconsentCallback
 import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillEventListener
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreenWithSuggestions
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementViewCredential
@@ -244,6 +246,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.anim.AnimationResourceProvider
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
@@ -286,6 +289,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
+import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.TAB_ID
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
@@ -759,6 +763,20 @@ class BrowserTabFragment :
             viewModel.onShowUserCredentialsSaved(savedCredentials)
         }
 
+        override suspend fun promptUserToImportPassword(originalUrl: String) {
+            withContext(dispatchers.main()) {
+                showDialogHidingPrevious(
+                    credentialAutofillDialogFactory.autofillImportPasswordsPromoDialog(
+                        importSource = InBrowserPromo,
+                        tabId = tabId,
+                        url = originalUrl,
+                    ),
+                    tabId,
+                    requiredUrl = originalUrl,
+                )
+            }
+        }
+
         override suspend fun onCredentialsAvailableToSave(
             currentUrl: String,
             credentials: LoginCredentials,
@@ -870,11 +888,21 @@ class BrowserTabFragment :
 
     private val searchInterstitialLauncher =
         registerForActivityResult(StartActivityForResult()) { result ->
-            val query = result.data?.getStringExtra(QUERY) ?: return@registerForActivityResult
-            if (result.resultCode == RESULT_OK) {
-                submitQuery(query)
-            } else {
-                omnibar.setDraftTextIfNtp(query)
+            val data = result.data ?: return@registerForActivityResult
+
+            when (result.resultCode) {
+                RESULT_OK -> {
+                    data.getStringExtra(QUERY)?.let { query ->
+                        submitQuery(query)
+                    } ?: data.getStringExtra(TAB_ID)?.let { tabId ->
+                        browserActivity?.openExistingTab(tabId)
+                    }
+                }
+                RESULT_CANCELED -> {
+                    data.getStringExtra(QUERY)?.let { query ->
+                        omnibar.setDraftTextIfNtp(query)
+                    }
+                }
             }
         }
 
@@ -1038,19 +1066,21 @@ class BrowserTabFragment :
         configureItemPressedListener()
         configureCustomTab()
         configureEditModeChangeDetection()
-        configureClickCatcher()
+        configureInputScreenLauncher()
     }
 
-    private fun configureClickCatcher() {
-        omnibar.omniBarClickCatcher?.setOnClickListener {
+    private fun configureInputScreenLauncher() {
+        omnibar.configureInputScreenLaunchListener { query ->
             val intent = globalActivityStarter.startIntent(
                 requireContext(),
-                InputScreenActivityParams(query = omnibar.getText()),
+                InputScreenActivityParams(query = query),
             )
-            val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            val enterTransition = AnimationResourceProvider.getSlideInFromTopFadeIn()
+            val exitTransition = AnimationResourceProvider.getSlideOutToBottomFadeOut()
+            val options = ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
-                omnibar.omniBarContainer,
-                "omnibar_transition",
+                enterTransition,
+                exitTransition,
             )
             searchInterstitialLauncher.launch(intent, options)
         }
@@ -3166,13 +3196,16 @@ class BrowserTabFragment :
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(tabId)) { _, result ->
                 context?.let {
-                    plugin.processResult(
-                        result = result,
-                        context = it,
-                        tabId = tabId,
-                        fragment = this@BrowserTabFragment,
-                        autofillCallback = this@BrowserTabFragment,
-                    )
+                    lifecycleScope.launch {
+                        plugin.processResult(
+                            result = result,
+                            context = it,
+                            tabId = tabId,
+                            fragment = this@BrowserTabFragment,
+                            autofillCallback = this@BrowserTabFragment,
+                            webView = webView,
+                        )
+                    }
                 }
             }
         }

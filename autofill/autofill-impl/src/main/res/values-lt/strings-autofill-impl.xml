@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuok savo slaptažodžius iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Atidaryk „Google“ slaptažodžius</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importuok iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Pasirink CSV failą</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuoti iš darbalaukio naršyklės</string>
 
@@ -292,5 +292,9 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importuok slaptažodžius iš „Google“</string>
     <string name="autofillSettingsImportFromDesktopSync">Sinchronizuoti darbalaukio slaptažodžius</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Iš naujo nustatyti neįtrauktas svetaines</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Perkelk savo slaptažodžius iš&lt;br /&gt;Google“ į „DuckDuckGo“</string>
+    <string name="passwords_import_promo_subtitle">Greitai ir saugiai importuok savo slaptažodžius į „DuckDuckGo“. „Google“ gali paprašyti tavęs įvesti slaptažodį.</string>
+    <string name="passwords_import_promo_action">Importuok iš „Google“</string>
 
 </resources>

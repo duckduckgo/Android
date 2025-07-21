@@ -320,6 +320,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         binding.importPasswordsResetImportedFlagButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
                 autofillStore.hasEverImportedPasswords = false
+                autofillStore.hasDeclinedPasswordManagementImportPromo = false
+                autofillStore.hasDeclinedInBrowserPasswordImportPromo = false
+                autofillStore.inBrowserImportPromoShownCount = 0
             }
             Toast.makeText(
                 this@AutofillInternalSettingsActivity,

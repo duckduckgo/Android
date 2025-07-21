@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importuj swoje hasła Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Otwórz hasła Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importuj z Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Wybierz plik CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importuj z przeglądarki komputerowej</string>
 
@@ -292,5 +292,9 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importuj hasła z Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Synchronizuj hasła na komputerze</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Resetowanie wykluczonych witryn</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Przenieś swoje hasła z&lt;br /&gt;Google do DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Szybko i bezpiecznie importuj hasła do DuckDuckGo. Google może poprosić o wpisanie hasła.</string>
+    <string name="passwords_import_promo_action">Importuj z Google</string>
 
 </resources>

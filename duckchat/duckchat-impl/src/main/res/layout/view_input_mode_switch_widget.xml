@@ -2,11 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
-    <com.google.android.material.tabs.TabLayout
+    <com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout
         android:id="@+id/inputModeSwitch"
         style="@style/Widget.DuckChat.TabLayout.Rounded"
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="@dimen/inputModeSwitchHeight"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -16,17 +16,15 @@
             android:id="@+id/tabSearch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_find_search_24"
-            android:text="@string/duck_chat_search_tab" />
+            android:layout="@layout/view_search_tab_indicator"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/tabDuckAi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_ai_chat_24"
-            android:text="@string/duck_chat_ai_tab" />
+            android:layout="@layout/view_chat_tab_indicator"/>
 
-    </com.google.android.material.tabs.TabLayout>
+    </com.duckduckgo.duckchat.impl.inputscreen.ui.view.InputModeTabLayout>
 
     <ImageView
         android:id="@+id/InputModeWidgetBack"
@@ -63,7 +61,6 @@
         app:strokeColor="?attr/daxColorAccentBlue"
         app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth"
         app:cardElevation="0dp"
-        android:transitionName="omnibar_transition"
         app:layout_constraintTop_toBottomOf="@id/spacer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">

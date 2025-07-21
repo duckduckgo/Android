@@ -248,7 +248,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Import Your Google Passwords</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google may ask you to sign in or enter your password to confirm.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Open Google Passwords</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Import From Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Choose a CSV file</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Import from Desktop Browser</string>
 
@@ -276,5 +276,9 @@
     <string name="autofillSettingsImportFromGoogleLabel">Import Passwords from Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Sync Desktop Passwords</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Reset Excluded Sites</string>
+
+    <string name="passwords_import_promo_title" instruction="The 'br' is a forced line break for English. It does not need to be included in translations.">Bring your passwords from&lt;br /&gt;Google to DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Quickly and securely import your passwords to DuckDuckGo. Google may ask you to enter your password.</string>
+    <string name="passwords_import_promo_action">Import From Google</string>
 
 </resources>

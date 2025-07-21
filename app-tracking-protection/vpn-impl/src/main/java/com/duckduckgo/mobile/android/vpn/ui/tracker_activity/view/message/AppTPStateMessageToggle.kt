@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.importing
+package com.duckduckgo.mobile.android.vpn.ui.tracker_activity.view.message
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
-@Parcelize
-enum class AutofillImportLaunchSource(val value: String) : Parcelable {
-    PasswordManagementPromo("password_management_promo"),
-    PasswordManagementEmptyState("password_management_empty_state"),
-    PasswordManagementOverflow("password_management_overflow"),
-    AutofillSettings("autofill_settings_button"),
-    Unknown("unknown"),
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "freeTrialInPProUpsell",
+)
+interface AppTPStateMessageToggle {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun freeTrialCopy(): Toggle
 }

@@ -35,6 +35,7 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
@@ -49,7 +50,7 @@ class InitMessageHandlerPlugin @Inject constructor(
 
     override fun process(messageType: String, jsonString: String, webView: WebView, autoconsentCallback: AutoconsentCallback) {
         if (supportedTypes.contains(messageType)) {
-            appCoroutineScope.launch(dispatcherProvider.main()) {
+            appCoroutineScope.launch(dispatcherProvider.io()) {
                 try {
                     val message: InitMessage = parseMessage(jsonString) ?: return@launch
                     val url = message.url
@@ -82,7 +83,9 @@ class InitMessageHandlerPlugin @Inject constructor(
 
                     val response = ReplyHandler.constructReply(getMessage(initResp))
 
-                    webView.evaluateJavascript("javascript:$response", null)
+                    withContext(dispatcherProvider.main()) {
+                        webView.evaluateJavascript("javascript:$response", null)
+                    }
                 } catch (e: Exception) {
                     logcat { e.localizedMessage }
                 }

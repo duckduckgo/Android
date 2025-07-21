@@ -16,12 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.os.Build.VERSION
 import android.os.Bundle
-import android.transition.ChangeBounds
-import android.view.animation.OvershootInterpolator
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.anim.AnimationResourceProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -37,22 +37,33 @@ class InputScreenActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
+    }
 
-        val transition = ChangeBounds().apply {
-            duration = TRANSITION_DURATION
-            interpolator = OvershootInterpolator(TRANSITION_INTERPOLATOR_TENSION)
-        }
+    override fun finish() {
+        super.finish()
+        applyExitTransition()
+    }
 
-        window.apply {
-            sharedElementEnterTransition = transition
-            sharedElementReturnTransition = transition
+    private fun applyExitTransition() {
+        val enterTransition = AnimationResourceProvider.getSlideInFromBottomFadeIn()
+        val exitTransition = AnimationResourceProvider.getSlideOutToTopFadeOut()
+        if (VERSION.SDK_INT >= 34) {
+            overrideActivityTransition(
+                OVERRIDE_TRANSITION_CLOSE,
+                enterTransition,
+                exitTransition,
+            )
+        } else {
+            overridePendingTransition(
+                enterTransition,
+                exitTransition,
+            )
         }
     }
 
     companion object {
         // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
         const val QUERY = "query"
-        const val TRANSITION_DURATION = 300L
-        const val TRANSITION_INTERPOLATOR_TENSION = 1F
+        const val TAB_ID = "tab_id"
     }
 }

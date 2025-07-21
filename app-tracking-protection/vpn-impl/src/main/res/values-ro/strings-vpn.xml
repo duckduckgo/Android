@@ -433,9 +433,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Nu poți folosi App Tracking Protection din cauza VPN-ului tău? Treci la DuckDuckGo VPN ‑ singurul VPN compatibil. <annotation type="ppro_upsell_link">Află mai multe</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Nu poți folosi App Tracking Protection din cauza VPN-ului tău? Treci la DuckDuckGo VPN ‑ singurul VPN compatibil. <annotation type="ppro_upsell_link">Încearcă gratuit!</annotation>.</string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection dezactivată</b>\nVPN-ul tău a dezactivat App Tracking Protection? Folosește comutatorul de mai sus pentru a reactiva.\n\nDescarcă DuckDuckGo VPN – singurul VPN care funcționează cu App Tracking Protection. <annotation type="ppro_upsell_link">Află mai multe</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>App Tracking Protection dezactivată</b>\nVPN-ul tău a dezactivat App Tracking Protection? Folosește comutatorul de mai sus pentru a reactiva.\n\nTreci la DuckDuckGo VPN – singurul VPN care funcționează cu App Tracking Protection. <annotation type="ppro_upsell_link">Încearcă gratuit!</annotation>.</string>
     <string name="apptp_PproUpsellBannerTitle">Du-ți confidențialitatea la următorul nivel</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo pune la dispoziție singurul VPN care este compatibil cu App Tracking Protection. Activează cu un abonament Privacy Pro cu plată.</string>
     <string name="apptp_PproUpsellBannerAction">Află mai multe</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Abonează-te la DuckDuckGo și obține singurul VPN compatibil cu App Tracking Protection.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Încearcă gratuit!</string>
 
 </resources>

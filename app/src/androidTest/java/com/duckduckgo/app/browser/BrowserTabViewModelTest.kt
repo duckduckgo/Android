@@ -670,7 +670,6 @@ class BrowserTabViewModelTest {
             subscriptions = subscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
-            userBrowserProperties = mockUserBrowserProperties,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
         )
@@ -2782,6 +2781,7 @@ class BrowserTabViewModelTest {
             mockAppInstallStore,
             R.string.onboardingPrivacyProDaxDialogTitle,
             R.string.onboardingPrivacyProDaxDialogDescription,
+            R.string.onboardingPrivacyProDaxDialogOkButton,
         )
         setCta(cta)
         testee.onUserClickCtaOkButton(cta)

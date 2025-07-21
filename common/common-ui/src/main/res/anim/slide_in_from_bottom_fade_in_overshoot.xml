@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +15,16 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:color="?attr/daxColorPrimaryText"
-        android:state_selected="true" />
-    <item
-        android:color="?attr/daxColorSecondaryText" />
-</selector>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="300"
+    android:interpolator="@anim/overshoot_interpolator_tension_1">
+
+    <translate
+        android:fromYDelta="56dp"
+        android:toYDelta="0dp" />
+
+    <alpha
+        android:fromAlpha="0.0"
+        android:toAlpha="1.0" />
+
+</set>
