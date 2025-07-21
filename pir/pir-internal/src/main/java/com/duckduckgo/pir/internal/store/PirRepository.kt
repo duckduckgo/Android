@@ -81,6 +81,11 @@ interface PirRepository {
 
     suspend fun getBrokerOptOutSteps(name: String): String?
 
+    /**
+     * Returns a list of broker names for which an extract profile result is available.
+     *
+     * @param formOptOutOnly - True to only return the brokers with a form opt-out type.
+     */
     suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String>
 
     suspend fun saveNavigateResult(
@@ -99,9 +104,14 @@ interface PirRepository {
         response: ExtractedResponse,
     )
 
-    suspend fun getExtractProfileResultForBroker(
+    /**
+     * Returns a list of all [ExtractedProfileResult] found for this particular broker.
+     *
+     * @param brokerName - Name of the broker
+     */
+    suspend fun getExtractProfileResultsForBroker(
         brokerName: String,
-    ): ExtractedProfileResult?
+    ): List<ExtractedProfileResult>
 
     fun getAllScanResultsFlow(): Flow<List<ScanResult>>
 
@@ -306,15 +316,16 @@ class RealPirRepository(
             it.extractResults.isNotEmpty()
         }.map {
             it.brokerName
-        }.run {
-            if (formOptOutOnly) {
-                this.filter {
-                    brokerDao.getOptOutJson(it)?.contains("\"optOutType\":\"formOptOut\"") == true
+        }.distinct()
+            .run {
+                if (formOptOutOnly) {
+                    this.filter {
+                        brokerDao.getOptOutJson(it)?.contains("\"optOutType\":\"formOptOut\"") == true
+                    }
+                } else {
+                    this
                 }
-            } else {
-                this
             }
-        }
     }
 
     override suspend fun saveNavigateResult(
@@ -371,18 +382,19 @@ class RealPirRepository(
         }
     }
 
-    override suspend fun getExtractProfileResultForBroker(brokerName: String): ExtractedProfileResult? = withContext(dispatcherProvider.io()) {
-        return@withContext scanResultsDao.getExtractProfileResultForProfile(brokerName).firstOrNull()?.run {
-            ExtractedProfileResult(
-                brokerName = this.brokerName,
-                completionTimeInMillis = this.completionTimeInMillis,
-                actionType = this.actionType,
-                extractResults = this.extractResults.mapNotNull {
-                    extractedProfileAdapter.fromJson(it)
-                },
-                profileQuery = null,
-            )
-        }
+    override suspend fun getExtractProfileResultsForBroker(brokerName: String): List<ExtractedProfileResult> = withContext(dispatcherProvider.io()) {
+        return@withContext scanResultsDao.getExtractProfileResultForBroker(brokerName)
+            .map { extractProfileResult ->
+                ExtractedProfileResult(
+                    brokerName = extractProfileResult.brokerName,
+                    completionTimeInMillis = extractProfileResult.completionTimeInMillis,
+                    actionType = extractProfileResult.actionType,
+                    extractResults = extractProfileResult.extractResults.mapNotNull {
+                        extractedProfileAdapter.fromJson(it)
+                    },
+                    profileQuery = profileQueryAdapter.fromJson(extractProfileResult.userData),
+                )
+            }
     }
 
     override fun getAllScanResultsFlow(): Flow<List<ScanResult>> {

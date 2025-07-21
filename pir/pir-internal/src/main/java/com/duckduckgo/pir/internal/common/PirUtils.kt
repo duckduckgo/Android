@@ -17,10 +17,23 @@
 package com.duckduckgo.pir.internal.common
 
 internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
-    return if (this.isEmpty()) {
-        emptyList()
-    } else {
-        val chunkSize = (this.size + parts - 1) / parts // Ensure rounding up
-        this.chunked(chunkSize)
+    if (this.isEmpty()) {
+        return emptyList()
     }
+
+    val partSize = this.size / parts
+    val remainder = this.size % parts
+
+    val result = mutableListOf<List<T>>()
+    var startIndex = 0
+
+    for (i in 0 until parts) {
+        val currentPartSize = partSize + if (i < remainder) 1 else 0
+        val endIndex = startIndex + currentPartSize
+
+        result.add(this.subList(startIndex, endIndex))
+        startIndex = endIndex
+    }
+
+    return result
 }

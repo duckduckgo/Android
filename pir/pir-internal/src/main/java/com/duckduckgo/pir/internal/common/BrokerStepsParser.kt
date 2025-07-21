@@ -40,12 +40,14 @@ interface BrokerStepsParser {
      *
      * @param brokerName - name of the broker to which these steps belong to
      * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
+     * @param profileQueryId - profile query id associated with the step (used for the opt-out step)
      * @return list of broker steps resulting from the passed params. If the step is of type OptOut, it will return a list of
      *  OptOutSteps where an OptOut step is mapped to each of the profile for the broker.
      */
     suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
+        profileQueryId: Long? = null,
     ): List<BrokerStep>
 
     sealed class BrokerStep(
@@ -101,16 +103,22 @@ class RealBrokerStepsParser @Inject constructor(
     override suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
+        profileQueryId: Long?,
     ): List<BrokerStep> = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
             adapter.fromJson(stepsJson)?.run {
                 if (this is OptOutStep) {
-                    repository.getExtractProfileResultForBroker(brokerName)?.extractResults?.map {
-                        this.copy(
-                            brokerName = brokerName,
-                            profileToOptOut = it,
-                        )
-                    }
+                    repository.getExtractProfileResultsForBroker(brokerName)
+                        .filter { it.profileQuery != null && it.profileQuery.id == profileQueryId }
+                        .map {
+                            it.extractResults.map { extractedProfile ->
+                                this.copy(
+                                    brokerName = brokerName,
+                                    profileToOptOut = extractedProfile,
+                                )
+                            }
+                        }
+                        .flatten()
                 } else {
                     listOf((this as ScanStep).copy(brokerName = brokerName))
                 }
