@@ -18,6 +18,7 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
@@ -28,15 +29,19 @@ import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChatWithWebSearch
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
@@ -61,7 +66,7 @@ import kotlinx.coroutines.flow.onEach
 class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
     @Inject
-    lateinit var duckChat: DuckChat
+    lateinit var duckChat: DuckChatInternal
 
     @Inject
     lateinit var voiceSearchLauncher: VoiceSearchLauncher
@@ -95,6 +100,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         configureViewPager()
         configureOmnibar()
         configureVoice()
+        configureForceWebSearch()
         configureObservers()
 
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
@@ -151,12 +157,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
                 requireActivity().setResult(Activity.RESULT_OK, data)
                 exitInterstitial()
             }
-            is Command.SubmitSearch -> {
-                submitSearchQuery(command.query)
-            }
-            is Command.SubmitChat -> {
-                submitChatQuery(command.query)
-            }
+            is SubmitSearch -> submitSearchQuery(command.query)
+            is SubmitChat -> submitChatQuery(command.query)
+            is SubmitChatWithWebSearch -> submitChatQueryWithWebSearch(command.query)
             else -> {
                 // TODO handle other commands
             }
@@ -211,6 +214,12 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         requireActivity().finish()
         duckChat.openDuckChatWithAutoPrompt(query)
     }
+    private fun submitChatQueryWithWebSearch(query: String) {
+        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        requireActivity().setResult(Activity.RESULT_CANCELED, data)
+        requireActivity().finish()
+        duckChat.openDuckChatWithWebSearch(query)
+    }
 
     private fun submitSearchQuery(query: String) {
         val data = Intent().putExtra(InputScreenActivity.QUERY, query)
@@ -235,9 +244,24 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         viewModel.visibilityState.onEach {
             binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
-            // TODO: Uncomment when button is implemented
-            // binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
         }.launchIn(lifecycleScope)
+    }
+
+    private fun configureForceWebSearch() {
+        viewModel.forceWebSearchState.onEach {
+            binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
+            if (it.shouldForceWebSearch) {
+                binding.actionForceWebSearch.backgroundTintList =
+                    ColorStateList.valueOf(requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorButtonPrimaryContainer))
+            } else {
+                binding.actionForceWebSearch.backgroundTintList =
+                    ColorStateList.valueOf(requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorWindow))
+            }
+        }.launchIn(lifecycleScope)
+
+        binding.actionForceWebSearch.setOnClickListener {
+            viewModel.toggleForceWebSearch()
+        }
     }
 
     private fun exitInterstitial() {
