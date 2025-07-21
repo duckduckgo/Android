@@ -316,9 +316,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 this as CoordinatorLayout.LayoutParams
                 this.behavior = null
                 if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {
-                    this.topMargin = 56.toPx()
+                    this.topMargin = TABS_CONTENT_PADDING_DP.toPx()
                 } else {
-                    this.bottomMargin = 56.toPx()
+                    this.bottomMargin = TABS_CONTENT_PADDING_DP.toPx()
                 }
             }
         }
@@ -1030,5 +1030,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         private const val TAB_GRID_MAX_COLUMN_COUNT = 4
         private const val KEY_FIRST_TIME_LOADING = "FIRST_TIME_LOADING"
         private const val FAB_SCROLL_THRESHOLD = 7
+        private const val TABS_CONTENT_PADDING_DP = 56
     }
 }
