@@ -54,7 +54,7 @@
         android:background="@drawable/background_preonboarding_option_buck">
 
         <ImageView
-            android:id="@+id/option1Image"
+            android:id="@+id/option1Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
@@ -75,7 +75,7 @@
             android:includeFontPadding="false"
             android:textSize="14sp"
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
-            app:layout_constraintStart_toEndOf="@id/option1Image"
+            app:layout_constraintStart_toEndOf="@id/option1Icon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -90,7 +90,7 @@
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
             android:text="@string/highlightsPreOnboardingAddressBarOption1Description"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/option1Image"
+            app:layout_constraintStart_toEndOf="@id/option1Icon"
             app:layout_constraintTop_toBottomOf="@id/option1Title" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
@@ -117,7 +117,7 @@
         android:background="@drawable/background_preonboarding_option_buck">
 
         <ImageView
-            android:id="@+id/option2Image"
+            android:id="@+id/option2Icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_4"
@@ -138,7 +138,7 @@
             android:textSize="14sp"
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
             android:text="@string/highlightsPreOnboardingAddressBarOption2Title"
-            app:layout_constraintStart_toEndOf="@id/option2Image"
+            app:layout_constraintStart_toEndOf="@id/option2Icon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -153,7 +153,7 @@
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
             android:text="@string/highlightsPreOnboardingAddressBarOption2Description"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/option2Image"
+            app:layout_constraintStart_toEndOf="@id/option2Icon"
             app:layout_constraintTop_toBottomOf="@id/option2Title" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
