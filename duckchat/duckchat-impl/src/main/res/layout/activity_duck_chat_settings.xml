@@ -82,8 +82,8 @@
                 android:id="@+id/duckAiInputScreenEnabledToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/duck_ai_setting_input_screen_title"
-                app:secondaryText="@string/duck_ai_setting_input_screen_description"
+                app:primaryText="@string/input_screen_user_pref_title"
+                app:secondaryText="@string/input_screen_user_pref_description"
                 app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem

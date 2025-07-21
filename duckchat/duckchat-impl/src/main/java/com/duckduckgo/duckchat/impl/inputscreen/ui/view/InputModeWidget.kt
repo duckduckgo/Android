@@ -173,11 +173,11 @@ class InputModeWidget @JvmOverloads constructor(
         inputField.apply {
             if (isSearchTab) {
                 minLines = SEARCH_MIN_LINES
-                hint = context.getString(R.string.duck_chat_search_or_type_url)
+                hint = context.getString(R.string.input_screen_search_hint)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
             } else {
                 minLines = DUCK_CHAT_MIN_LINES
-                hint = context.getString(R.string.duck_chat_ask_anything)
+                hint = context.getString(R.string.input_screen_chat_hint)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
             }
         }
