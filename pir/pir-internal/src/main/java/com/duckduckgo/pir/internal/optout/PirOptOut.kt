@@ -188,7 +188,7 @@ class RealPirOptOut @Inject constructor(
         // Map broker steps with their associated profile queries
         val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
-                brokerStepsParser.parseStep(broker, stepsJson, profileQuery)
+                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
@@ -231,7 +231,7 @@ class RealPirOptOut @Inject constructor(
         // Map broker steps with their associated profile queries
         val allSteps = profileQueries.map { profileQuery ->
             brokerOptOutStepsJsons.map { (broker, stepsJson) ->
-                brokerStepsParser.parseStep(broker, stepsJson, profileQuery)
+                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 

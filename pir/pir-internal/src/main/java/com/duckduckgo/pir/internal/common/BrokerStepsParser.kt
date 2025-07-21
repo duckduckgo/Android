@@ -23,7 +23,6 @@ import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutSte
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -41,14 +40,14 @@ interface BrokerStepsParser {
      *
      * @param brokerName - name of the broker to which these steps belong to
      * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
-     * @param profileQuery - profile associated with the step (used for the opt-out step)
+     * @param profileQueryId - profile query id associated with the step (used for the opt-out step)
      * @return list of broker steps resulting from the passed params. If the step is of type OptOut, it will return a list of
      *  OptOutSteps where an OptOut step is mapped to each of the profile for the broker.
      */
     suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
-        profileQuery: ProfileQuery? = null,
+        profileQueryId: Long? = null,
     ): List<BrokerStep>
 
     sealed class BrokerStep(
@@ -104,13 +103,13 @@ class RealBrokerStepsParser @Inject constructor(
     override suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
-        profileQuery: ProfileQuery?,
+        profileQueryId: Long?,
     ): List<BrokerStep> = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
             adapter.fromJson(stepsJson)?.run {
                 if (this is OptOutStep) {
                     repository.getExtractProfileResultsForBroker(brokerName)
-                        .filter { it.profileQuery != null && it.profileQuery.id == profileQuery?.id }
+                        .filter { it.profileQuery != null && it.profileQuery.id == profileQueryId }
                         .map {
                             it.extractResults.map { extractedProfile ->
                                 this.copy(
