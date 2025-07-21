@@ -192,20 +192,13 @@ class RealPirOptOut @Inject constructor(
             }.flatten().map { step -> profileQuery to step }
         }.flatten()
 
-        // Assign steps to runners based on the maximum number of WebViews we can use
-        val stepsPerRunner = allSteps.splitIntoParts(maxWebViewCount)
-
-        // Execute the steps on all runners in parallel
-        stepsPerRunner.mapIndexed { index, partSteps ->
-            async {
-                partSteps.map { (profileQuery, step) ->
-                    logcat { "PIR-OPT-OUT: Start on runner=$index, thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
-                    runners[index].start(profileQuery, listOf(step))
-                    runners[index].stop()
-                    logcat { "PIR-OPT-OUT: Finish on runner=$index, thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
-                }
-            }
-        }.awaitAll()
+        // Execute each steps sequentially on the single runner
+        allSteps.forEach { (profileQuery, step) ->
+            logcat { "PIR-OPT-OUT: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+            runners[0].startOn(webView, profileQuery, listOf(step))
+            runners[0].stop()
+            logcat { "PIR-OPT-OUT: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+        }
 
         logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
 
