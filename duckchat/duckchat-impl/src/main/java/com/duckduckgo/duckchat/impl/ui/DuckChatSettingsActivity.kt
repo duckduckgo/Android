@@ -120,12 +120,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         binding.duckAiInputScreenEnabledToggle.apply {
             isVisible = viewState.shouldShowInputScreenToggle
             quietlySetIsChecked(viewState.isInputScreenEnabled, inputScreenToggleListener)
-            val description = if (viewState.isInputScreenEnabled) {
-                getString(R.string.duck_ai_setting_input_screen_description)
-            } else {
-                getString(R.string.duck_ai_setting_input_screen_description_when_disabled)
-            }
-            setSecondaryText(description)
         }
 
         binding.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
