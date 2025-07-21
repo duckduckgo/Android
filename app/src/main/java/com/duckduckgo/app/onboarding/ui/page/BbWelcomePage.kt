@@ -129,6 +129,15 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
             option1Body.isSelected = defaultOption
             option2Body.isSelected = !defaultOption
+
+            val (visibleImage, hiddenImage) = if (defaultOption) {
+                option1Image to option2Image
+            } else {
+                option2Image to option1Image
+            }
+
+            hiddenImage.animate().alpha(0f).setDuration(ANIMATION_DURATION / 2)
+                .withEndAction { visibleImage.animate().alpha(1f).setDuration(ANIMATION_DURATION / 2) }
         }
     }
 
@@ -376,7 +385,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     )
                     binding.daxDialogCta.addressBarPosition.root.isVisible = true
 
-                    setAddressBarPositionOptions(true)
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
 
@@ -384,7 +392,14 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     contentViews.forEach { view -> view.alpha = MIN_ALPHA }
                     val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle)
 
+                    val topImage = if (appTheme.isLightModeEnabled()) R.drawable.bb_address_bar_top_light else R.drawable.bb_address_bar_top_dark
+                    val bottomImage = if (appTheme.isLightModeEnabled()) R.drawable.bb_address_bar_bottom_light else R.drawable.bb_address_bar_bottom_dark
+                    binding.daxDialogCta.addressBarPosition.option1Image.setImageResource(topImage)
+                    binding.daxDialogCta.addressBarPosition.option2Image.setImageResource(bottomImage)
+
                     afterTypingAnimation = {
+                        setAddressBarPositionOptions(true)
+
                         binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
                             viewModel.onAddressBarPositionOptionSelected(true)
                         }
@@ -394,13 +409,20 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
 
+                        binding.daxDialogCta.addressBarPosition.option1Image.animate().alpha(1f).setDuration(ANIMATION_DURATION)
                         contentViews.forEach { view ->
                             view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                     }
 
-                    scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) { afterTypingAnimation() }
+                    scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) {
+                        val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog23DescriptionBb)
+
+                        binding.daxDialogCta.addressBarPosition.description.startTypingAnimation(descriptionText) {
+                            afterTypingAnimation()
+                        }
+                    }
                     backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_04)
                 }
             }
