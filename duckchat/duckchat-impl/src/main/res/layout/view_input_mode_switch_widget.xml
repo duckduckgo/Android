@@ -83,7 +83,6 @@
                 android:fontFamily="sans-serif"
                 android:gravity="start|top"
                 android:hint="@string/input_screen_search_hint"
-                android:inputType="textUri|textNoSuggestions|textMultiLine"
                 android:lineSpacingMultiplier="1.2"
                 android:minHeight="@dimen/toolbarIcon"
                 android:paddingVertical="@dimen/keyline_2"
