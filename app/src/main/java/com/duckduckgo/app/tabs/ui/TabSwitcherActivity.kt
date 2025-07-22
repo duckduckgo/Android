@@ -277,9 +277,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
 
-        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM && viewModel.isNewDesignEnabled) {
+        if (viewModel.isNewDesignEnabled) {
+            if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM) {
+                binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
+            } else {
+                binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
+            }
             binding.root.removeView(binding.tabSwitcherToolbarTop.root)
         } else {
+            binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
             binding.root.removeView(binding.tabSwitcherToolbarBottom.root)
         }
 
