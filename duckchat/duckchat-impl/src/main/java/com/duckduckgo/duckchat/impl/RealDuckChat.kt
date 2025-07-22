@@ -118,7 +118,7 @@ interface DuckChatInternal : DuckChat {
     fun openNewDuckChatSession()
 
     /**
-     * Opens DuckChat with WebSearch enabled.
+     * Opens DuckChat, starts a new session, and auto-prompts with WebSearch enabled.
      */
     fun openDuckChatWithWebSearch(query: String)
 
