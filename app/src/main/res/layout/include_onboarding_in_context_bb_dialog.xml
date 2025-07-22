@@ -95,6 +95,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:includeFontPadding="false"
+                        android:alpha="0"
                         android:text="@string/onboardingEndDaxDialogTitle"
                         android:textColor="@color/bbColorPrimaryText"
                         tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
@@ -112,6 +113,7 @@
                             android:layout_marginEnd="@dimen/keyline_2"
                             tools:srcCompat="@drawable/ic_fire_24"
                             android:visibility="gone"
+                            android:alpha="0"
                             tools:visibility="visible" />
 
                         <FrameLayout
