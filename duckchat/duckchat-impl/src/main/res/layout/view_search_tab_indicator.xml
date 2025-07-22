@@ -17,6 +17,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
@@ -24,18 +25,18 @@
         android:id="@+id/tab_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_search_tab_selector"
-        android:layout_marginStart="@dimen/keyline_1"
+        android:layout_marginStart="@dimen/keyline_0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        tools:src="@drawable/ic_search_tab_selector"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/tab_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/input_screen_search_tab"
-        android:layout_marginStart="@dimen/keyline_1"
+        android:layout_marginStart="6dp"
         app:typography="h4"
         app:layout_constraintStart_toEndOf="@id/tab_icon"
         app:layout_constraintBaseline_toBaselineOf="@id/tab_icon"/>

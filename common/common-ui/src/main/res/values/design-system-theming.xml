@@ -249,6 +249,7 @@
 
         <!-- Input Screen -->
         <item name="daxColorBackdrop">@color/daxColorBackdropDark</item>
+        <item name="daxColorInputModeIndicator">@color/white18</item>
         <item name="daxColorInputModeIndicatorShadow">@color/black</item>
     </style>
 
@@ -355,7 +356,8 @@
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
         <!-- Input Screen -->
-        <item name="daxColorBackdrop">@color/daxColorBackdropLight</item>
+        <item name="daxColorBackdrop">@color/controls_fill_primary_light</item>
+        <item name="daxColorInputModeIndicator">@color/white84</item>
         <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
     </style>
 
