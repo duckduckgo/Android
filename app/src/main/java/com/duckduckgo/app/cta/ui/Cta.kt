@@ -1254,14 +1254,23 @@ sealed class DaxBubbleCta(
                 text = daxTitle.html(context)
             }
 
-            if (configuration is DaxEndCta) headerImage.fadeIn()
-            root.fadeIn().setStartDelay(500).withEndAction {
+            fun fadeText() {
                 daxBubbleDialogTitle.fadeIn()
                     .withEndAction {
                         dialogTextCta.startTypingAnimation(daxText, true) {
                             afterAnimation()
                         }
                     }
+            }
+
+            root.fadeIn().setStartDelay(500).withEndAction {
+                if (configuration is DaxEndCta) {
+                    headerImage.fadeIn().withEndAction {
+                        fadeText()
+                    }
+                } else {
+                    fadeText()
+                }
             }
             cardContainer.setOnClickListener { afterAnimation() }
         }
