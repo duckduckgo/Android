@@ -81,7 +81,7 @@ data class BrokerOptOut(
         ),
     ],
 )
-data class BrokerSchedulingConfig(
+data class BrokerSchedulingConfigEntity(
     @PrimaryKey val brokerName: String,
     val retryError: Int,
     val confirmOptOutScan: Int,
