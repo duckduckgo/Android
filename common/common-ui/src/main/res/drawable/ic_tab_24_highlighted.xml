@@ -13,19 +13,18 @@
     ~ See the License for the specific language governing permissions and
     ~ limitations under the License.
   -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-  android:width="24dp"
-  android:height="24dp"
-  android:viewportWidth="24"
-  android:viewportHeight="24">
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
 
-  <path
-      android:pathData="M14.443,3c0.397,0 0.676,0.395 0.614,0.787a4.584,4.584 0,0 0,-0.02 0.14c-0.04,0.315 -0.294,0.573 -0.612,0.573H7A3.5,3.5 0,0 0,3.5 8v8A3.5,3.5 0,0 0,7 19.5h10a3.5,3.5 0,0 0,3.5 -3.5V9.348a0.63,0.63 0,0 1,0.442 -0.584l0.1,-0.035c0.432,-0.158 0.958,0.13 0.958,0.59V16a5,5 0,0 1,-5 5H7a5,5 0,0 1,-5 -5V8a5,5 0,0 1,5 -5h7.443Z"
-      android:fillColor="?attr/daxColorPrimaryIcon"/>
+    <path
+        android:pathData="M14.408,3c0.414,0 0.705,0.413 0.643,0.822a5.22,5.22 0,0 0,-0.011 0.08c-0.044,0.328 -0.308,0.598 -0.64,0.598H8A3.5,3.5 0,0 0,4.5 8v8A3.5,3.5 0,0 0,8 19.5h8a3.5,3.5 0,0 0,3.5 -3.5V9.6c0,-0.331 0.27,-0.596 0.599,-0.64l0.08,-0.01c0.409,-0.063 0.821,0.228 0.821,0.642V16a5,5 0,0 1,-5 5H8a5,5 0,0 1,-5 -5V8a5,5 0,0 1,5 -5h6.408Z"
+        android:fillColor="?attr/daxColorPrimaryIcon"/>
 
-  <path
-      android:pathData="M22.5,4.5a3,3 0,1 1,-6 0,3 3,0 0,1 6,0Z"
-      android:fillColor="?attr/daxColorAccentBlue"/>
+    <path
+        android:pathData="M22.5,4.5a3,3 0,1 1,-6 0,3 3,0 0,1 6,0Z"
+        android:fillColor="?attr/daxColorAccentBlue"/>
 
 </vector>
