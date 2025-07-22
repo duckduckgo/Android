@@ -46,10 +46,10 @@ interface PirActionsRunnerStateEngine {
     data class State(
         val runType: RunType,
         val brokerStepsToExecute: List<BrokerStep>,
+        val profileQuery: ProfileQuery,
         val currentBrokerStepIndex: Int = 0,
         val currentActionIndex: Int = 0,
         val brokerStepStartTime: Long = -1L,
-        val profileQuery: ProfileQuery? = null,
         val transactionID: String = "",
         val pendingUrl: String? = null,
         val actionRetryCount: Int = 0,
@@ -60,9 +60,7 @@ interface PirActionsRunnerStateEngine {
      */
     sealed class Event {
         data object Idle : Event()
-        data class Started(
-            val profileQuery: ProfileQuery,
-        ) : Event()
+        data object Started : Event()
 
         data class LoadUrlComplete(
             val url: String,

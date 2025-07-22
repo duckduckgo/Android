@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob
+import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 
@@ -28,6 +29,7 @@ interface PirActionsRunnerStateEngineFactory {
     fun create(
         runType: PirJob.RunType,
         brokerSteps: List<BrokerStep>,
+        profileQuery: ProfileQuery,
     ): PirActionsRunnerStateEngine
 }
 
@@ -39,6 +41,7 @@ class RealPirActionsRunnerStateEngineFactory @Inject constructor(
     override fun create(
         runType: PirJob.RunType,
         brokerSteps: List<BrokerStep>,
+        profileQuery: ProfileQuery,
     ): PirActionsRunnerStateEngine {
         return RealPirActionsRunnerStateEngine(
             eventHandlers = eventHandlers,
@@ -46,6 +49,7 @@ class RealPirActionsRunnerStateEngineFactory @Inject constructor(
             coroutineScope = coroutineScope,
             runType = runType,
             brokerSteps = brokerSteps,
+            profileQuery = profileQuery,
         )
     }
 }

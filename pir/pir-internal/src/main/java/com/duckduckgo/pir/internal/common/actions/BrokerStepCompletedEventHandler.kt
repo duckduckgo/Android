@@ -89,7 +89,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
                 pirRunStateHandler.handleState(
                     BrokerManualScanCompleted(
                         brokerName = currentBrokerStep.brokerName,
-                        profileQueryId = state.profileQuery!!.id,
+                        profileQueryId = state.profileQuery.id,
                         eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                         totalTimeMillis = totalTimeMillis,
                         isSuccess = isSuccess,
@@ -100,7 +100,7 @@ class BrokerStepCompletedEventHandler @Inject constructor(
             RunType.SCHEDULED -> pirRunStateHandler.handleState(
                 BrokerScheduledScanCompleted(
                     brokerName = currentBrokerStep.brokerName,
-                    profileQueryId = state.profileQuery!!.id,
+                    profileQueryId = state.profileQuery.id,
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     totalTimeMillis = totalTimeMillis,
                     isSuccess = isSuccess,
