@@ -16,20 +16,16 @@
 
 package com.duckduckgo.app.cta.ui
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.content.Context
 import android.net.Uri
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-import androidx.core.animation.doOnEnd
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -60,7 +56,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.DAX_FIRE_DIALOG_CT
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.ui.view.TypeAnimationTextView
 import com.duckduckgo.common.ui.view.button.DaxButton
-import com.duckduckgo.common.ui.view.fade
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
@@ -70,6 +65,8 @@ import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface ViewCta {
@@ -130,6 +127,8 @@ sealed class OnboardingDaxDialogCta(
     override val onboardingStore: OnboardingStore,
     override val appInstallStore: AppInstallStore,
 ) : Cta, DaxCta, OnboardingDaxCta {
+
+    private val leadingIconFadeIn: Duration = 100.milliseconds
 
     override fun pixelCancelParameters(): Map<String, String> = mapOf(Pixel.PixelParameter.CTA_SHOWN to ctaPixelParam)
 
@@ -297,6 +296,7 @@ sealed class OnboardingDaxDialogCta(
         val context = binding.root.context
 
         with(binding) {
+            val isContinuousDialog = onboardingDialogContent.isVisible || onboardingDialogSuggestionsContent.isVisible
             root.show()
             primaryCta.setOnClickListener(null)
 
@@ -329,15 +329,12 @@ sealed class OnboardingDaxDialogCta(
                 }
             } ?: primaryCta.gone()
 
-            if (onboardingDialogSuggestionsContent.isVisible || onboardingDialogContent.isVisible) {
-                TransitionManager.beginDelayedTransition(cardView, AutoTransition())
-            }
-
             onboardingDialogSuggestionsContent.gone()
             onboardingDialogContent.show()
             root.alpha = MAX_ALPHA
 
             title?.let {
+                onboardingDialogTitle.alpha = MIN_ALPHA
                 onboardingDialogTitle.show()
             }
 
@@ -349,6 +346,10 @@ sealed class OnboardingDaxDialogCta(
                 leadingDescriptionIcon.show()
             }
 
+            if (isContinuousDialog) {
+                TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+            }
+
             val afterAnimation = {
                 dialogTextCta.finishAnimation()
                 primaryCtaText?.let { primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
@@ -357,7 +358,25 @@ sealed class OnboardingDaxDialogCta(
                 onTypingAnimationFinished.invoke()
             }
 
-            dialogTextCta.startTypingAnimation(description, true) { afterAnimation() }
+            fun typingAnimation() = dialogTextCta.startTypingAnimation(description, true) { afterAnimation() }
+
+            fun runBodyAnimations() =
+                leadingDescriptionIconRes?.let {
+                    leadingDescriptionIcon.fadeIn(leadingIconFadeIn)
+                }?.withEndAction {
+                    typingAnimation()
+                } ?: run {
+                    typingAnimation()
+                }
+
+            if (title != null) {
+                onboardingDialogTitle.fadeIn().withEndAction {
+                    runBodyAnimations()
+                }
+            } else {
+                runBodyAnimations()
+            }
+
             onboardingDaxDialogBackground.setOnClickListener { afterAnimation() }
             onboardingDialogContent.setOnClickListener { afterAnimation() }
             onboardingDialogSuggestionsContent.setOnClickListener { afterAnimation() }
@@ -909,6 +928,7 @@ sealed class OnboardingDaxDialogCta(
             val daxText = description?.let { context.getString(it) }.orEmpty()
 
             with(binding) {
+                onboardingDialogTitle.alpha = MIN_ALPHA
                 onboardingDialogContent.gone()
 
                 TransitionManager.beginDelayedTransition(cardView, AutoTransition())
@@ -919,6 +939,8 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDialogSuggestionsContent.show()
 
                 val afterAnimation = {
+                    onboardingDialogTitle.alpha = MAX_ALPHA
+
                     onTypingAnimationFinished()
                     val optionsViews = listOf(
                         daxDialogOption1,
@@ -942,7 +964,10 @@ sealed class OnboardingDaxDialogCta(
                     }
                 }
 
-                suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+                onboardingDialogTitle.fadeIn().withEndAction {
+                    suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+                }
+
                 onboardingDialogContent.setOnClickListener {
                     dialogTextCta.finishAnimation()
                     afterAnimation()
@@ -1201,10 +1226,6 @@ sealed class DaxBubbleCta(
                     buttonView.gone()
                 }
             }
-        }
-
-        fun View.fadeIn(): ViewPropertyAnimator {
-            return animate().alpha(1f).setDuration(500)
         }
 
         with(binding) {
@@ -1647,3 +1668,8 @@ fun String.getStringForOmnibarPosition(position: OmnibarPosition): String {
         OmnibarPosition.BOTTOM -> replace("☝", "\uD83D\uDC47")
     }
 }
+
+private fun View.fadeIn(duration: Duration = 500.milliseconds): ViewPropertyAnimator {
+    return animate().alpha(1f).setDuration(duration.inWholeMilliseconds)
+}
+
