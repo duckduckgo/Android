@@ -40,6 +40,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteI
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.ForceWebSearchState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
@@ -92,7 +93,6 @@ class InputScreenViewModel @AssistedInject constructor(
     private val _visibilityState = MutableStateFlow(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
-            forceWebSearchButtonVisible = false,
             autoCompleteSuggestionsVisible = false,
         ),
     )
@@ -103,6 +103,14 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
+
+    private val _forceWebSearchState = MutableStateFlow(
+        ForceWebSearchState(
+            forceWebSearchButtonVisible = false,
+            forceWebSearchEnabled = false,
+        ),
+    )
+    val forceWebSearchState: StateFlow<ForceWebSearchState> = _forceWebSearchState.asStateFlow()
 
     /**
      * Tracks whether we should show autocomplete suggestions based on the initial input state.
@@ -298,7 +306,11 @@ class InputScreenViewModel @AssistedInject constructor(
         if (isWebUrl(query)) {
             command.value = Command.SubmitSearch(query)
         } else {
-            command.value = Command.SubmitChat(query)
+            if (forceWebSearchState.value.forceWebSearchEnabled) {
+                command.value = Command.SubmitChatWithWebSearch(query)
+            } else {
+                command.value = Command.SubmitChat(query)
+            }
         }
     }
 
@@ -319,7 +331,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onSearchSelected() {
         viewModelScope.launch {
-            _visibilityState.update {
+            _forceWebSearchState.update {
                 it.copy(
                     forceWebSearchButtonVisible = false,
                 )
@@ -329,13 +341,23 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onChatSelected() {
         viewModelScope.launch {
-            _visibilityState.update {
+            _forceWebSearchState.update {
                 it.copy(
                     forceWebSearchButtonVisible = true,
                 )
             }
             _submitButtonIconState.update {
                 it.copy(icon = SubmitButtonIcon.SEND)
+            }
+        }
+    }
+
+    fun toggleForceWebSearch() {
+        viewModelScope.launch {
+            _forceWebSearchState.update {
+                it.copy(
+                    forceWebSearchEnabled = !it.forceWebSearchEnabled,
+                )
             }
         }
     }
