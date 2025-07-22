@@ -49,7 +49,7 @@
         android:fontFamily="sans-serif-condensed"
         android:gravity="center"
         android:textColor="?attr/daxColorPrimaryIcon"
-        android:textSize="11dp"
+        android:textSize="12dp"
         android:textStyle="bold"
         tools:ignore="DeprecatedWidgetInXml,SpUsage"
         tools:text="99" />
