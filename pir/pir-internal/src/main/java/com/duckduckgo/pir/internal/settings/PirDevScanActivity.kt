@@ -44,6 +44,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalScanBinding
+import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scan.PirForegroundScanService
 import com.duckduckgo.pir.internal.scan.PirRemoteWorkerService
@@ -51,8 +52,6 @@ import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker
 import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult
-import com.duckduckgo.pir.internal.store.PirRepository.ScanResult.ExtractedProfileResult
 import com.duckduckgo.pir.internal.store.db.Address
 import com.duckduckgo.pir.internal.store.db.EventType
 import com.duckduckgo.pir.internal.store.db.PirEventLog
@@ -104,7 +103,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
     }
 
     private fun bindViews() {
-        repository.getAllScanResultsFlow()
+        repository.getAllExtractedProfilesFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach {
                 render(it)
@@ -119,28 +118,19 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
-    private fun render(results: List<ScanResult>) {
-        val allExtracted = results.filterIsInstance<ExtractedProfileResult>()
-        val brokersWithRecords = allExtracted.filter {
-            it.extractResults.isNotEmpty()
-        }
-        val brokersWithRecordsCount = brokersWithRecords.size
-
-        val totalRecordCount = brokersWithRecords.sumOf {
-            it.extractResults.size
-        }
+    private fun render(extractedProfiles: List<ExtractedProfile>) {
+        val totalBrokersWithProfile = extractedProfiles.map { it.brokerName }.distinct()
 
         with(binding) {
             this.statusTotalRecords.text =
-                getString(R.string.pirStatsStatusRecords, totalRecordCount)
+                getString(R.string.pirStatsStatusRecords, extractedProfiles.size)
             this.statusTotalBrokersFound.text =
-                getString(R.string.pirStatsStatusBrokerFound, brokersWithRecordsCount)
+                getString(R.string.pirStatsStatusBrokerFound, totalBrokersWithProfile.size)
             recordStringBuilder.clear()
 
             recordStringBuilder.append("\nRecords found:\n")
-            brokersWithRecords.forEach { broker ->
-                val recordCount = broker.extractResults.size
-                recordStringBuilder.append("${broker.brokerName} - records: $recordCount\n")
+            extractedProfiles.groupingBy { it.brokerName }.eachCount().forEach {
+                recordStringBuilder.append("${it.key} - records: ${it.value}\n")
             }
             this.records.text = recordStringBuilder.toString()
         }

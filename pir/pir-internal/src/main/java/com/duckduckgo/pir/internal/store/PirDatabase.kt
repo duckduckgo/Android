@@ -21,6 +21,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -28,17 +29,15 @@ import com.duckduckgo.pir.internal.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
-import com.duckduckgo.pir.internal.store.db.ExtractProfileResult
 import com.duckduckgo.pir.internal.store.db.OptOutActionLog
 import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
 import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.duckduckgo.pir.internal.store.db.ScanCompletedBroker
-import com.duckduckgo.pir.internal.store.db.ScanErrorResult
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
-import com.duckduckgo.pir.internal.store.db.ScanNavigateResult
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
+import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.JsonAdapter
@@ -47,22 +46,20 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 3,
+    version = 4,
     entities = [
         BrokerJsonEtag::class,
         Broker::class,
         BrokerOptOut::class,
         BrokerScan::class,
         BrokerSchedulingConfig::class,
-        ScanNavigateResult::class,
-        ScanErrorResult::class,
-        ExtractProfileResult::class,
         UserProfile::class,
         PirEventLog::class,
         PirBrokerScanLog::class,
         ScanCompletedBroker::class,
         OptOutCompletedBroker::class,
         OptOutActionLog::class,
+        StoredExtractedProfile::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -76,7 +73,31 @@ abstract class PirDatabase : RoomDatabase() {
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>
-            get() = emptyList()
+            get() = listOf(
+                MIGRATION_3_TO_4,
+            )
+
+        private val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("DROP TABLE IF EXISTS `pir_scan_complete_brokers`")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `pir_scan_complete_brokers` (`brokerName` TEXT NOT NULL, " +
+                        "`profileQueryId` INTEGER NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, " +
+                        "`isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`, `profileQueryId`))",
+                )
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `pir_extracted_profiles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                        "`profileQueryId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `name` TEXT," +
+                        " `alternativeNames` TEXT NOT NULL, `age` TEXT, `addresses` TEXT NOT NULL," +
+                        " `phoneNumbers` TEXT NOT NULL, `relatives` TEXT NOT NULL, `profileUrl` TEXT," +
+                        " `identifier` TEXT, `reportId` TEXT, `email` TEXT, `fullName` TEXT, `dateAddedInMillis` INTEGER NOT NULL," +
+                        " `deprecated` INTEGER NOT NULL)",
+                )
+                db.execSQL("DROP TABLE IF EXISTS `pir_scan_extracted_profile`")
+                db.execSQL("DROP TABLE IF EXISTS `pir_scan_navigate_results`")
+                db.execSQL("DROP TABLE IF EXISTS `pir_scan_error`")
+            }
+        }
     }
 }
 
