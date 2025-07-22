@@ -107,7 +107,10 @@ class RealBrokerStepsParser @Inject constructor(
     ): List<BrokerStep> = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
             adapter.fromJson(stepsJson)?.run {
-                if (this is OptOutStep && profileQueryId != null) {
+                if (this is OptOutStep) {
+                    if (profileQueryId == null) {
+                        throw IllegalStateException("The profileQueryId is required when attempting to parse the opt-out steps.")
+                    }
                     repository.getExtractedProfiles(brokerName, profileQueryId).map {
                         this.copy(
                             brokerName = brokerName,
