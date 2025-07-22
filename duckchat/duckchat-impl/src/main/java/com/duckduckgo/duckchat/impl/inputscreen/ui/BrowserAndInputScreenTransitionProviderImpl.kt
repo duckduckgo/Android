@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.api
+package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.os.Build.VERSION
+import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.R
+import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
+import com.squareup.anvil.annotations.ContributesBinding
+import javax.inject.Inject
 
 /**
- * Provides animation resources for activity transitions between input screens and browser.
+ * Provides animation resources for activity transitions between browser and input screen.
  *
  * ### API Level Behavior
  * - **API < 33**: Uses simple fade animations as slide animations don't seem to be supported (on tested devices).
@@ -38,11 +44,14 @@ import android.os.Build.VERSION
  * - Cannot use themeable attributes (`?attr`) as they cause crashes of the whole launcher (on tested devices).
  *   Instead, we use fixed color values and filter resources by current theme state.
  */
-object InputScreenAnimationResourceProvider {
+@ContributesBinding(scope = AppScope::class)
+class BrowserAndInputScreenTransitionProviderImpl @Inject constructor(
+    private val appTheme: AppTheme,
+) : BrowserAndInputScreenTransitionProvider {
 
-    fun getBrowserEnterAnimation(isLightModeEnabled: Boolean): Int {
+    override fun getBrowserEnterAnimation(): Int {
         return if (VERSION.SDK_INT >= 33) {
-            if (isLightModeEnabled) {
+            if (appTheme.isLightModeEnabled()) {
                 R.anim.slide_in_from_bottom_fade_in_light
             } else {
                 R.anim.slide_in_from_bottom_fade_in_dark
@@ -52,15 +61,19 @@ object InputScreenAnimationResourceProvider {
         }
     }
 
-    fun getInputScreenExitAnimation(): Int {
+    override fun getBrowserExitAnimation(): Int {
         return if (VERSION.SDK_INT >= 33) {
-            R.anim.slide_out_to_top_fade_out
+            if (appTheme.isLightModeEnabled()) {
+                R.anim.slide_out_to_bottom_fade_out_light
+            } else {
+                R.anim.slide_out_to_bottom_fade_out_dark
+            }
         } else {
             R.anim.fade_out
         }
     }
 
-    fun getInputScreenEnterAnimation(): Int {
+    override fun getInputScreenEnterAnimation(): Int {
         return if (VERSION.SDK_INT >= 33) {
             R.anim.slide_in_from_top_fade_in
         } else {
@@ -68,13 +81,9 @@ object InputScreenAnimationResourceProvider {
         }
     }
 
-    fun getBrowserExitAnimation(isLightModeEnabled: Boolean): Int {
+    override fun getInputScreenExitAnimation(): Int {
         return if (VERSION.SDK_INT >= 33) {
-            if (isLightModeEnabled) {
-                R.anim.slide_out_to_bottom_fade_out_light
-            } else {
-                R.anim.slide_out_to_bottom_fade_out_dark
-            }
+            R.anim.slide_out_to_top_fade_out
         } else {
             R.anim.fade_out
         }

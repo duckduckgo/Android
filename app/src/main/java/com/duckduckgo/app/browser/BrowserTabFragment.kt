@@ -287,7 +287,7 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.api.InputScreenAnimationResourceProvider
+import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.TAB_ID
 import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
@@ -573,6 +573,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var omnibarTypeResolver: OmnibarTypeResolver
+
+    @Inject
+    lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1075,8 +1078,8 @@ class BrowserTabFragment :
                 requireContext(),
                 InputScreenActivityParams(query = query),
             )
-            val enterTransition = InputScreenAnimationResourceProvider.getInputScreenEnterAnimation()
-            val exitTransition = InputScreenAnimationResourceProvider.getBrowserExitAnimation(appTheme.isLightModeEnabled())
+            val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
+            val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
             val options = ActivityOptionsCompat.makeCustomAnimation(
                 requireActivity(),
                 enterTransition,
