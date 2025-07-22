@@ -18,5 +18,5 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 
 data class ForceWebSearchState(
     val forceWebSearchButtonVisible: Boolean,
-    val shouldForceWebSearch: Boolean,
+    val forceWebSearchEnabled: Boolean,
 )

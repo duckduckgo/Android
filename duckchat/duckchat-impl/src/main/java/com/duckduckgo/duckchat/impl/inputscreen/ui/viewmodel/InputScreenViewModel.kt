@@ -107,7 +107,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private val _forceWebSearchState = MutableStateFlow(
         ForceWebSearchState(
             forceWebSearchButtonVisible = false,
-            shouldForceWebSearch = false,
+            forceWebSearchEnabled = false,
         ),
     )
     val forceWebSearchState: StateFlow<ForceWebSearchState> = _forceWebSearchState.asStateFlow()
@@ -306,7 +306,7 @@ class InputScreenViewModel @AssistedInject constructor(
         if (isWebUrl(query)) {
             command.value = Command.SubmitSearch(query)
         } else {
-            if (forceWebSearchState.value.shouldForceWebSearch) {
+            if (forceWebSearchState.value.forceWebSearchEnabled) {
                 command.value = Command.SubmitChatWithWebSearch(query)
             } else {
                 command.value = Command.SubmitChat(query)
@@ -356,7 +356,7 @@ class InputScreenViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _forceWebSearchState.update {
                 it.copy(
-                    shouldForceWebSearch = !it.shouldForceWebSearch,
+                    forceWebSearchEnabled = !it.forceWebSearchEnabled,
                 )
             }
         }

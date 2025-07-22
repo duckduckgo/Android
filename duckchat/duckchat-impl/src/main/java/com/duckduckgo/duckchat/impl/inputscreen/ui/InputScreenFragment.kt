@@ -250,7 +250,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     private fun configureForceWebSearch() {
         viewModel.forceWebSearchState.onEach {
             binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
-            if (it.shouldForceWebSearch) {
+            if (it.forceWebSearchEnabled) {
                 binding.actionForceWebSearch.backgroundTintList =
                     ColorStateList.valueOf(requireContext().getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorButtonPrimaryContainer))
             } else {
