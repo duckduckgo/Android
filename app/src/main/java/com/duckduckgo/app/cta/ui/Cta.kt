@@ -1219,6 +1219,7 @@ sealed class DaxBubbleCta(
                 }.toList()
 
             optionsViews.forEachIndexed { index, buttonView ->
+                buttonView.alpha = 0f
                 if (bbOptions.size > index) {
                     bbOptions[index].setOptionView(buttonView)
                     buttonView.show()
