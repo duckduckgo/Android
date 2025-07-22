@@ -33,14 +33,12 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -103,9 +101,6 @@ class SettingsViewModelTest {
 
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
-    private val completeSettingsPlugins = object : PluginPoint<CompleteSetupSettingsPlugin> {
-        override fun getPlugins(): Collection<CompleteSetupSettingsPlugin> = emptyList()
-    }
 
     @Before
     fun before() = runTest {
@@ -136,7 +131,6 @@ class SettingsViewModelTest {
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
             postCtaExperienceExperiment = mockPostCtaExperienceExperiment,
-            completeSetupSettingsPlugin = completeSettingsPlugins,
         )
     }
 
@@ -190,7 +184,7 @@ class SettingsViewModelTest {
     @Test
     fun `when new threat protection settings is available then show threat protection settings`() = runTest {
         fakeAndroidBrowserConfigFeature.newThreatProtectionSettings().setRawStoredState(State(true))
-        testee.refreshViewStates()
+        testee.start()
         assertTrue(testee.viewState().first().isNewThreatProtectionSettingsEnabled)
     }
 
@@ -198,7 +192,7 @@ class SettingsViewModelTest {
     fun whenWidgetAsProtectionFlagEnabledThenAddWidgetIsVisibleInProtectionsSection() = runTest {
         fakeSettingsPageFeature.self().setRawStoredState(State(true))
         fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
-        testee.refreshViewStates()
+        testee.start()
         assertTrue(testee.viewState().first().isAddWidgetInProtectionsVisible)
     }
 
@@ -206,7 +200,7 @@ class SettingsViewModelTest {
     fun whenWidgetAsProtectionFlagDisabledThenAddWidgetIsNotVisibleInProtectionsSection() = runTest {
         fakeSettingsPageFeature.self().setRawStoredState(State(true))
         fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(false))
-        testee.refreshViewStates()
+        testee.start()
         assertFalse(testee.viewState().first().isAddWidgetInProtectionsVisible)
     }
 
@@ -241,7 +235,7 @@ class SettingsViewModelTest {
             fakeSettingsPageFeature.self().setRawStoredState(State(true))
             fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(false) // Initial state for start()
-            testee.refreshViewStates()
+            testee.start()
             // Ensure initial state is as expected
             assertEquals(true, testee.viewState().value.isAddWidgetInProtectionsVisible)
             assertEquals(false, testee.viewState().value.widgetsInstalled)
@@ -259,7 +253,7 @@ class SettingsViewModelTest {
             fakeSettingsPageFeature.self().setRawStoredState(State(true))
             fakeSettingsPageFeature.widgetAsProtection().setRawStoredState(State(true))
             whenever(mockWidgetCapabilities.hasInstalledWidgets).thenReturn(true) // Initial state for start()
-            testee.refreshViewStates()
+            testee.start()
             // Ensure initial state is as expected
             assertEquals(true, testee.viewState().value.isAddWidgetInProtectionsVisible)
             assertEquals(true, testee.viewState().value.widgetsInstalled)

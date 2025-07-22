@@ -24,12 +24,20 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
+/**
+ * Interface to manage the state of whether the in-browser autofill promo has been displayed for a specific URL.
+ */
+interface InBrowserPromoPreviousPromptsStore {
+    suspend fun recordPromoDisplayed(originalUrl: String)
+    suspend fun hasPromoBeenDisplayed(originalUrl: String): Boolean
+}
+
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class InMemoryInBrowserPromoPreviousPromptsStore @Inject constructor(
+class IntInMemoryInBrowserPromoPreviousPromptsStore @Inject constructor(
     private val urlMatcher: AutofillUrlMatcher,
     private val dispatchers: DispatcherProvider,
-) : InBrowserPromoPreviousPromptsStore {
+) : InternalInBrowserPromoStore {
 
     private var previousETldPlusOneOffered: String? = null
 
@@ -49,14 +57,19 @@ class InMemoryInBrowserPromoPreviousPromptsStore @Inject constructor(
         }
     }
 
-    override suspend fun clearPreviousPrompts() {
+    override suspend fun clear() {
         previousETldPlusOneOffered = null
     }
 }
 
-interface InBrowserPromoPreviousPromptsStore {
-
-    suspend fun recordPromoDisplayed(originalUrl: String)
-    suspend fun hasPromoBeenDisplayed(originalUrl: String): Boolean
-    suspend fun clearPreviousPrompts()
+/**
+ * Additional interface for internal/testing use
+ */
+interface InternalInBrowserPromoStore : InBrowserPromoPreviousPromptsStore {
+    suspend fun clear()
 }
+
+@ContributesBinding(AppScope::class)
+class DefaultInBrowserPromoPreviousPromptsStore @Inject constructor(
+    private val internalStore: InternalInBrowserPromoStore,
+) : InBrowserPromoPreviousPromptsStore by internalStore

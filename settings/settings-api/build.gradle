@@ -28,7 +28,6 @@ dependencies {
     implementation project(':navigation-api')
     implementation Google.dagger
     implementation AndroidX.core.ktx
-    implementation AndroidX.appCompat
 }
 
 android {
