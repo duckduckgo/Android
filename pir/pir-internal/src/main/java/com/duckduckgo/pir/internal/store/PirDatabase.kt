@@ -28,7 +28,7 @@ import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
-import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
+import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfigEntity
 import com.duckduckgo.pir.internal.store.db.JobSchedulingDao
 import com.duckduckgo.pir.internal.store.db.OptOutActionLog
 import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
@@ -55,7 +55,7 @@ import com.squareup.moshi.Types
         Broker::class,
         BrokerOptOut::class,
         BrokerScan::class,
-        BrokerSchedulingConfig::class,
+        BrokerSchedulingConfigEntity::class,
         UserProfile::class,
         PirEventLog::class,
         PirBrokerScanLog::class,
