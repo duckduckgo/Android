@@ -114,8 +114,8 @@
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
-    <string name="tabSwitcherListViewMenu">List view</string>
-    <string name="tabSwitcherGridViewMenu">Grid view</string>
+    <string name="tabSwitcherListViewMenu">List View</string>
+    <string name="tabSwitcherGridViewMenu">Grid View</string>
 
     <!--Tab Switcher Animation-->
     <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked > 1">&lt;b&gt;%1$s trackers blocked &lt;/b&gt; in the last 7 days</string>
