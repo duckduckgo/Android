@@ -34,7 +34,7 @@ interface JobSchedulingDao {
     fun getScanJobRecord(
         brokerName: String,
         userProfileId: Long,
-    )
+    ): ScanJobRecordEntity?
 
     @Query("SELECT * FROM pir_optout_job_record ORDER BY attemptCount")
     fun getAllOptOutJobRecords(): List<OptOutJobRecordEntity>
@@ -43,7 +43,7 @@ interface JobSchedulingDao {
     fun getAllOptOutJobRecordsFlow(): Flow<List<OptOutJobRecordEntity>>
 
     @Query("SELECT * FROM pir_optout_job_record WHERE extractedProfileId = :extractedProfileId  ORDER BY attemptCount")
-    fun getOptOutJobRecord(extractedProfileId: Long)
+    fun getOptOutJobRecord(extractedProfileId: Long): OptOutJobRecordEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveOptOutJobRecord(optOutJobRecord: OptOutJobRecordEntity)

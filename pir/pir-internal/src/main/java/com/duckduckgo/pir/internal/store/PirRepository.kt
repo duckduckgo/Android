@@ -169,7 +169,7 @@ interface PirRepository {
     }
 }
 
-class RealPirRepository(
+internal class RealPirRepository(
     val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
     private val pirDataStore: PirDataStore,
