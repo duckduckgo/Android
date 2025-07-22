@@ -16,25 +16,10 @@
 
 package com.duckduckgo.settings.api
 
-import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-
 /**
  * This is the plugin for the complete setup settings
  * Complete your setup will not show up in the settings if the user has already completed all steps
  *
  * Each setting that needs to appear in the "Complete your setup" section should implement this interface.
  */
-interface CompleteSetupSettingsPlugin {
-    /**
-     * The settings plugin should determine if it can be shown or not.
-     */
-    suspend fun canShow(): Boolean
-
-    /**
-     * Instantiates the view for this particular setting.
-     * @param activity
-     * @param onStateChanged callback that can be invoked when the state of the setting changes suggesting the section should be re-evaluated.
-     */
-    fun getView(activity: AppCompatActivity, onStateChanged: () -> Unit): View?
-}
+interface CompleteSetupSettingsPlugin : SettingsPlugin

@@ -336,6 +336,17 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
                 Toast.LENGTH_SHORT,
             ).show()
         }
+
+        binding.markPasswordsAsPreviouslyImportedButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasEverImportedPasswords = true
+            }
+            Toast.makeText(
+                this@AutofillInternalSettingsActivity,
+                getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
     }
 
     private fun configureEngagementEventHandlers() {

@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -63,7 +64,6 @@ import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPproUnifiedFe
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchPrivateSearchWebPage
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchWebTrackingProtectionScreen
-import com.duckduckgo.app.settings.SettingsViewModel.CompleteYourSetupState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionScreenNoParams
@@ -89,6 +89,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
@@ -144,6 +145,12 @@ class SettingsActivity : DuckDuckGoActivity() {
         _threatProtectionSettingsPlugin.getPlugins()
     }
 
+    @Inject
+    lateinit var _completeSetupSettingsPlugin: PluginPoint<CompleteSetupSettingsPlugin>
+    private val completeSetupSettingsPlugin by lazy {
+        _completeSetupSettingsPlugin.getPlugins()
+    }
+
     private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
         if (resultOk) {
             Snackbar.make(
@@ -184,12 +191,18 @@ class SettingsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
         configureInternalFeatures()
         configureSettings()
+        configureCompleteSetupSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
 
         intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
             viewModel.onLaunchedFromNotification(it)
         }
+    }
+
+    private fun configureCompleteSetupSettings() {
+        watchForCompleteSetupSettingsChanges()
+        updateCompleteSetupSettings()
     }
 
     override fun onResume() {
@@ -292,7 +305,6 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateDuckChat(it.isDuckChatEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
-                    updateCompleteSetupSettings(it.completeYourSetupState)
                 }
             }.launchIn(lifecycleScope)
 
@@ -347,20 +359,25 @@ class SettingsActivity : DuckDuckGoActivity() {
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
     }
 
-    private fun updateCompleteSetupSettings(state: CompleteYourSetupState) {
-        if (!state.canShowSection) {
-            viewsCompleteSetup.settingsSectionCompleteSetup.gone()
-            return
+    private fun watchForCompleteSetupSettingsChanges() {
+        with(viewsCompleteSetup) {
+            settingsCompleteFeaturesContainer.viewTreeObserver.addOnGlobalLayoutListener {
+                if (settingsCompleteFeaturesContainer.children.any { it.isVisible }) {
+                    settingsSectionCompleteSetup.show()
+                } else {
+                    settingsSectionCompleteSetup.gone()
+                }
+            }
         }
+    }
 
-        val viewsToInclude = state.settingsPlugins.map { plugin ->
-            plugin.getView(this@SettingsActivity, { viewModel.refreshViewStates() })
-        }
+    private fun updateCompleteSetupSettings() {
+        val viewsToInclude = completeSetupSettingsPlugin.map { it.getView(this) }
+
         with(viewsCompleteSetup.settingsCompleteFeaturesContainer) {
             removeAllViews()
             viewsToInclude.forEach { addView(it) }
         }
-        viewsCompleteSetup.settingsSectionCompleteSetup.show()
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {
