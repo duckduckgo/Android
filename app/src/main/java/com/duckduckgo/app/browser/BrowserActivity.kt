@@ -92,7 +92,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
+import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -716,12 +716,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             delay(500)
 
             val anchorView = when (settingsDataStore.omnibarPosition) {
-                TOP -> binding.fragmentContainer
-                BOTTOM -> currentTab?.omnibar?.newOmnibar ?: binding.fragmentContainer
+                TOP -> null
+                BOTTOM -> currentTab?.omnibar?.newOmnibar?.toolbar ?: binding.fragmentContainer
             }
-            TabSwitcherSnackbar(
-                anchorView = anchorView,
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
                 message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+                anchor = anchorView,
                 action = getString(R.string.tabClosedUndo),
                 showAction = true,
                 onAction = { viewModel.undoDeletableTabs(tabIds) },
