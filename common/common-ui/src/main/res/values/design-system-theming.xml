@@ -287,7 +287,6 @@
         <item name="daxColorLines">@color/black9</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
-        <item name="daxColorAccentContentSecondary">@color/white84</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
