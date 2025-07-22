@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Настройки подписки</string>
     <string name="subscriptionSettingSubscribe">Тариф Privacy Pro для защиты соединения и личных данных</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Включает услуги: VPN, Personal Information Removal (удаление личной информации) и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Включает услуги: VPN и и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Подписка открывает доступ к VPN, а также функциям удаления личной информации и восстановления после кражи данных.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Подписка открывает доступ к VPN и функции восстановления после кражи данных.</string>
+
     <string name="subscriptionSettingGet">Перейти на Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Попробуйте Privacy Pro бесплатно</string>
     <string name="subscriptionSettingRestore">У меня уже есть подписка</string>

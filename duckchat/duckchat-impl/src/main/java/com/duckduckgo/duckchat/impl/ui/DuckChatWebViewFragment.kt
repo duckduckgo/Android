@@ -37,6 +37,7 @@ import android.webkit.WebView
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -48,6 +49,7 @@ import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -72,6 +74,8 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -79,12 +83,21 @@ import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 @InjectWith(FragmentScope::class)
 open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_chat_webview), DownloadConfirmationDialogListener {
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel: DuckChatWebViewViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[DuckChatWebViewViewModel::class.java]
+    }
 
     @Inject
     lateinit var webViewClient: DuckChatWebViewClient
@@ -95,6 +108,9 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
 
     @Inject
     lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var subscriptionsHandler: SubscriptionsHandler
 
     @Inject
     @AppCoroutineScope
@@ -236,6 +252,18 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
                                 }
                             }
 
+                            SUBSCRIPTIONS_FEATURE_NAME -> {
+                                subscriptionsHandler.handleSubscriptionsFeature(
+                                    featureName,
+                                    method,
+                                    id,
+                                    data,
+                                    requireActivity(),
+                                    appCoroutineScope,
+                                    contentScopeScripts,
+                                )
+                            }
+
                             else -> {}
                         }
                     }
@@ -263,6 +291,21 @@ open class DuckChatWebViewFragment : DuckDuckGoFragment(R.layout.activity_duck_c
             }
             pendingUploadTask = null
         }
+
+        // Observe ViewModel commands
+        viewModel.commands
+            .onEach { command ->
+                when (command) {
+                    is DuckChatWebViewViewModel.Command.SendSubscriptionAuthUpdateEvent -> {
+                        val authUpdateEvent = SubscriptionEventData(
+                            featureName = SUBSCRIPTIONS_FEATURE_NAME,
+                            subscriptionName = "authUpdate",
+                            params = JSONObject(),
+                        )
+                        contentScopeScripts.sendSubscriptionEvent(authUpdateEvent)
+                    }
+                }
+            }.launchIn(lifecycleScope)
     }
 
     data class FileChooserRequestedParams(

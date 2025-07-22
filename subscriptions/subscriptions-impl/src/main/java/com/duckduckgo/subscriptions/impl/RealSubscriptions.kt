@@ -82,6 +82,10 @@ class RealSubscriptions @Inject constructor(
         return isActive || (isEligible && supportsEncryption)
     }
 
+    override fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus> {
+        return subscriptionsManager.subscriptionStatus
+    }
+
     override suspend fun getSubscriptionStatus(): SubscriptionStatus {
         return subscriptionsManager.subscriptionStatus()
     }
@@ -169,6 +173,14 @@ interface PrivacyProFeature {
     fun privacyProFreeTrial(): Toggle
 
     /**
+     * Enables/Disables duckAi for subscribers (advanced models)
+     * This flag is used to hide the feature in the native client and FE.
+     * It will be used for the feature rollout and kill-switch if necessary.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlus(): Toggle
+
+    /**
      * Android supports v2 token, but still relies on old v1 subscription messaging.
      * We are introducing new JS messaging. Use this flag as kill-switch if necessary.
      * It doesn't control which version of messaging FE uses.
@@ -190,6 +202,17 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun authApiV2JwksCache(): Toggle
+
+    /**
+     * As part of Duck.ai we are adding new supported JS messages.
+     * This is enabled by default, but can be disabled if necessary.
+     * FF only controls native messaging (enabled/disabled).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun duckAISubscriptionMessaging(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionRebranding(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

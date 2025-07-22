@@ -488,6 +488,20 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToDuckAI)
+        }
+    }
+
+    @Test
     fun whenSubscriptionSelectedThenPixelIsSent() = runTest {
         viewModel.processJsCallbackMessage(
             featureName = "test",
@@ -618,6 +632,34 @@ class SubscriptionWebViewViewModelTest {
             method = "featureSelected",
             id = null,
             data = JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+        )
+        verify(pixelSender).reportOnboardingDuckAiClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
         )
         verifyNoInteractions(pixelSender)
     }

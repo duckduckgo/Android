@@ -40,9 +40,14 @@ class SubscriptionsContentScopeJsMessageHandlerTest {
     @Test
     fun `only contains valid methods`() = runTest {
         val methods = handler.methods
-        assertTrue(methods.size == 2)
-        assertTrue(methods.first() == "handshake")
-        assertTrue(methods.last() == "subscriptionDetails")
+        assertTrue(methods.size == 7)
+        assertTrue(methods.contains("handshake"))
+        assertTrue(methods.contains("subscriptionDetails"))
+        assertTrue(methods.contains("getAuthAccessToken"))
+        assertTrue(methods.contains("getFeatureConfig"))
+        assertTrue(methods.contains("backToSettings"))
+        assertTrue(methods.contains("openSubscriptionActivation"))
+        assertTrue(methods.contains("openSubscriptionPurchase"))
     }
 
     private val callback = object : JsMessageCallback() {
