@@ -22,7 +22,13 @@
     android:layout_height="match_parent">
 
     <include
-        android:id="@+id/toolbarInclude"
+        android:id="@+id/tabSwitcherExperimentToolbarTop"
+        layout="@layout/include_tab_switcher_toolbar_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/tabSwitcherToolbarTop"
         layout="@layout/include_default_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -32,9 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"
-        android:paddingHorizontal="@dimen/keyline_2"
-        android:paddingTop="@dimen/keyline_2"
-        android:paddingBottom="@dimen/keyline_2"
+        android:padding="@dimen/keyline_2"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="3"
@@ -71,5 +75,12 @@
         tools:text="Test"
         android:visibility="gone"
         app:icon="@drawable/ic_add_24_solid_color" />
+
+    <include
+        android:id="@+id/tabSwitcherToolbarBottom"
+        layout="@layout/include_tab_switcher_toolbar_bottom"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

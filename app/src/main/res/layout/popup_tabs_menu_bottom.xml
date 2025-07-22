@@ -18,59 +18,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/popup_menu_bg">
+    android:background="@drawable/popup_menu_bg"
+    android:orientation="vertical">
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/newTabMenuItem"
+        android:id="@+id/closeSelectedTabsMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/newTabMenuItem" />
+        app:primaryTextType="destructive" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/gridLayoutMenuItem"
+        android:id="@+id/closeOtherTabsMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:trailingIcon="@drawable/ic_check_24"
-        app:primaryText="@string/tabSwitcherGridViewMenu" />
+        app:primaryText="@string/closeOtherTabsMenuItem"
+        app:primaryTextType="destructive" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/listLayoutMenuItem"
+        android:id="@+id/closeAllTabsMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:trailingIcon="@drawable/ic_check_24"
-        app:primaryText="@string/tabSwitcherListViewMenu" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/selectAllMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/selectAllTabsMenuItem" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/deselectAllMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/deselectAllTabsMenuItem" />
+        app:primaryText="@string/closeAllTabsMenuItem"
+        app:primaryTextType="destructive" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/selectionActionsDivider"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:defaultPadding="false" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/bookmarkSelectedTabsMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/shareSelectedLinksMenuItem"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/selectTabsDivider"
+        android:id="@+id/closeAllTabsDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:defaultPadding="false" />
@@ -82,29 +54,57 @@
         app:primaryText="@string/selectTabsMenuItem" />
 
     <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-        android:id="@+id/closeAllTabsDivider"
+        android:id="@+id/selectTabsDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:defaultPadding="false" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/closeAllTabsMenuItem"
+        android:id="@+id/shareSelectedLinksMenuItem"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:primaryText="@string/closeAllTabsMenuItem"
-        app:primaryTextType="destructive" />
+        android:layout_height="wrap_content" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/closeOtherTabsMenuItem"
+        android:id="@+id/bookmarkSelectedTabsMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/selectionActionsDivider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/closeOtherTabsMenuItem"
-        app:primaryTextType="destructive" />
+        app:defaultPadding="false" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
-        android:id="@+id/closeSelectedTabsMenuItem"
+        android:id="@+id/deselectAllMenuItem"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryTextType="destructive" />
+        app:primaryText="@string/deselectAllTabsMenuItem" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/selectAllMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/selectAllTabsMenuItem" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/listLayoutMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/tabSwitcherListViewMenu"
+        app:trailingIcon="@drawable/ic_check_24" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/gridLayoutMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/tabSwitcherGridViewMenu"
+        app:trailingIcon="@drawable/ic_check_24" />
+
+    <com.duckduckgo.common.ui.view.PopupMenuItemView
+        android:id="@+id/newTabMenuItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/newTabMenuItem" />
 
 </LinearLayout>

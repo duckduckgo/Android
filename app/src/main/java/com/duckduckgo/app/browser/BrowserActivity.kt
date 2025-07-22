@@ -56,6 +56,7 @@ import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarM
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBinding
+import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
@@ -91,7 +92,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.ui.TabSwitcherSnackbar
+import com.duckduckgo.app.tabs.ui.DefaultSnackbar
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
@@ -106,6 +107,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -251,6 +253,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private lateinit var experimentalToolbarMockupBinding: IncludeExperimentalOmnibarToolbarMockupBinding
     private lateinit var experimentalToolbarMockupBottomBinding: IncludeExperimentalOmnibarToolbarMockupBottomBinding
     private lateinit var singleToolBarMockupBinding: IncludeSingleOmnibarToolbarMockupBinding
+    private lateinit var singleToolBarMockupBottomBinding: IncludeSingleOmnibarToolbarMockupBottomBinding
 
     private var openMessageInNewTabJob: Job? = null
 
@@ -713,12 +716,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
             delay(500)
 
             val anchorView = when (settingsDataStore.omnibarPosition) {
-                TOP -> binding.fragmentContainer
-                BOTTOM -> currentTab?.omnibar?.newOmnibar ?: binding.fragmentContainer
+                TOP -> null
+                BOTTOM -> currentTab?.omnibar?.newOmnibar?.toolbar ?: binding.fragmentContainer
             }
-            TabSwitcherSnackbar(
-                anchorView = anchorView,
+            DefaultSnackbar(
+                parentView = binding.fragmentContainer,
                 message = resources.getQuantityString(R.plurals.tabSwitcherCloseTabsSnackbar, tabIds.size, tabIds.size),
+                anchor = anchorView,
                 action = getString(R.string.tabClosedUndo),
                 showAction = true,
                 onAction = { viewModel.undoDeletableTabs(tabIds) },
@@ -807,6 +811,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         } ?: run {
             launchNewDuckChat(url)
+        }
+
+        currentTab?.omnibar?.newOmnibar?.omnibarTextInput?.let {
+            hideKeyboard(it)
         }
     }
 
@@ -904,6 +912,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 if (this::singleToolBarMockupBinding.isInitialized) {
                     singleToolBarMockupBinding.appBarLayoutMockup.visibility = View.GONE
+                }
+                if (this::singleToolBarMockupBottomBinding.isInitialized) {
+                    singleToolBarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
                 }
             },
             300,
@@ -1279,14 +1290,27 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckAiFeatureState.showOmnibarShortcutInAllStates.value
             }
             else -> {
-                singleToolBarMockupBinding = when (settingsDataStore.omnibarPosition) {
+                when (settingsDataStore.omnibarPosition) {
                     TOP -> {
                         if (Build.VERSION.SDK_INT < 28) {
                             binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
                         }
 
                         binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
-                        binding.topMockupSingleToolbar
+                        singleToolBarMockupBinding = binding.topMockupSingleToolbar
+
+                        if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                            singleToolBarMockupBinding.aiChatIconMockup.isVisible = false
+                        }
+
+                        if (Build.VERSION.SDK_INT >= 28) {
+                            singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
+                                shadowSizeDp = 12f,
+                                offsetYDp = 3f,
+                                insetDp = 3f,
+                                shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
+                            )
+                        }
                     }
                     BOTTOM -> {
                         if (Build.VERSION.SDK_INT < 28) {
@@ -1294,21 +1318,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
                         }
 
                         binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                        binding.bottomMockupSingleToolbar
+                        singleToolBarMockupBottomBinding = binding.bottomMockupSingleToolbar
+
+                        if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                            singleToolBarMockupBottomBinding.aiChatIconMockup.isVisible = false
+                        }
+
+                        if (Build.VERSION.SDK_INT >= 28) {
+                            singleToolBarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow(
+                                shadowSizeDp = 12f,
+                                offsetYDp = 3f,
+                                insetDp = 3f,
+                                shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
+                            )
+                        }
                     }
-                }
-
-                if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
-                    singleToolBarMockupBinding.aiChatIconMockup.isVisible = false
-                }
-
-                if (Build.VERSION.SDK_INT >= 28) {
-                    singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
-                        shadowSizeDp = 12f,
-                        offsetYDp = 3f,
-                        insetDp = 3f,
-                        shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-                    )
                 }
 
                 binding.bottomMockupToolbar.appBarLayoutMockup.gone()

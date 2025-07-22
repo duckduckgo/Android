@@ -27,9 +27,9 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackBu
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.BackButtonType.CLOSE
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.DynamicInterface
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.FabType
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.GRID
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.HIDDEN
-import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutButtonType.LIST
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.GRID
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.HIDDEN
+import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.LayoutMode.LIST
 import com.duckduckgo.mobile.android.R as commonR
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -43,8 +43,7 @@ fun Menu.createDynamicInterface(
     toolbar: Toolbar,
     dynamicMenu: DynamicInterface,
 ) {
-    popupMenu.newTabMenuItem.isVisible = dynamicMenu.isNewTabVisible
-    popupMenu.duckChatMenuItem.isVisible = dynamicMenu.isDuckChatVisible
+    popupMenu.newTabMenuItem.isVisible = dynamicMenu.isNewTabMenuVisible
     popupMenu.selectAllMenuItem.isVisible = dynamicMenu.isSelectAllVisible
     popupMenu.deselectAllMenuItem.isVisible = dynamicMenu.isDeselectAllVisible
     popupMenu.selectionActionsDivider.isVisible = dynamicMenu.isSelectionActionsDividerVisible
@@ -65,6 +64,34 @@ fun Menu.createDynamicInterface(
     }
     popupMenu.closeSelectedTabsMenuItem.apply {
         setPrimaryText(resources.getQuantityString(R.plurals.closeTabsMenuItem, numSelectedTabs, numSelectedTabs))
+    }
+
+    popupMenu.gridLayoutMenuItem.apply {
+        when (dynamicMenu.layoutMenuMode) {
+            GRID -> {
+                setTrailingIconVisibility(false)
+                isVisible = true
+            }
+            LIST -> {
+                setTrailingIconVisibility(true)
+                isVisible = true
+            }
+            HIDDEN -> isVisible = false
+        }
+    }
+
+    popupMenu.listLayoutMenuItem.apply {
+        when (dynamicMenu.layoutMenuMode) {
+            GRID -> {
+                setTrailingIconVisibility(true)
+                isVisible = true
+            }
+            LIST -> {
+                setTrailingIconVisibility(false)
+                isVisible = true
+            }
+            HIDDEN -> isVisible = false
+        }
     }
 
     mainFab.apply {
@@ -98,8 +125,8 @@ fun Menu.createDynamicInterface(
         CLOSE -> AppCompatResources.getDrawable(toolbar.context, commonR.drawable.ic_close_24)
     }
 
-    findItem(R.id.layoutTypeMenuItem).apply {
-        when (dynamicMenu.layoutButtonType) {
+    findItem(R.id.layoutTypeToolbarButton).apply {
+        when (dynamicMenu.layoutButtonMode) {
             GRID -> {
                 setIcon(com.duckduckgo.mobile.android.R.drawable.ic_view_grid_24)
                 title = toolbar.resources.getString(R.string.tabSwitcherGridViewMenu)
@@ -114,8 +141,10 @@ fun Menu.createDynamicInterface(
         }
     }
 
-    findItem(R.id.popupMenuItem).isEnabled = dynamicMenu.isMoreMenuItemEnabled
-    findItem(R.id.fireMenuItem).isVisible = dynamicMenu.isFireButtonVisible
+    findItem(R.id.popupMenuToolbarButton).isEnabled = dynamicMenu.isMenuButtonEnabled
+    findItem(R.id.fireToolbarButton).isVisible = dynamicMenu.isFireButtonVisible
+    findItem(R.id.duckAIToolbarButton).isVisible = dynamicMenu.isDuckAIButtonVisible
+    findItem(R.id.newTabToolbarButton).isVisible = dynamicMenu.isNewTabButtonVisible
 
     val bottomPadding = if (dynamicMenu.isAIFabVisible) {
         tabsRecycler.context.resources.getDimension(R.dimen.recyclerViewTwoFabsBottomPadding)
