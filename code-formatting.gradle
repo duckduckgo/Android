@@ -3,8 +3,8 @@ apply plugin: 'com.diffplug.spotless'
 spotless {
     ratchetFrom 'origin/develop'
     kotlin {
-        target("src/**/*.kt")
-        ktlint("1.7.0")
+        target 'src/*/kotlin/**/*.kt', 'src/*/java/**/*.kt'
+        ktlint("1.7.1")
         trimTrailingWhitespace()
         leadingTabsToSpaces()
     }
