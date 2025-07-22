@@ -50,6 +50,7 @@ class InputModeTabLayout @JvmOverloads constructor(
             buildShadowedTabIndicator(
                 context = context,
                 heightPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorHeight),
+                containerHeightPx = resources.getDimensionPixelSize(R.dimen.inputModeSwitchHeight),
                 horizontalInsetPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorHorizontalInset),
                 elevationPx = resources.getDimensionPixelSize(R.dimen.inputModeTabIndicatorElevation),
             ),
@@ -75,6 +76,7 @@ class InputModeTabLayout @JvmOverloads constructor(
     private fun buildShadowedTabIndicator(
         context: Context,
         heightPx: Int,
+        containerHeightPx: Int,
         horizontalInsetPx: Int,
         elevationPx: Int,
     ): InsetDrawable {
@@ -83,8 +85,12 @@ class InputModeTabLayout @JvmOverloads constructor(
             .setAllCorners(CornerFamily.ROUNDED, cornerRadius)
             .build()
 
+        // computing a pill height that will be perfectly centered in the container vertically, with equal top and bottom insets
+        val shadowPillHeight = listOf(heightPx, heightPx - 1).firstOrNull { candidate ->
+            (containerHeightPx - candidate) % 2 == 0
+        } ?: heightPx
         val shadowedPill = object : MaterialShapeDrawable(pill) {
-            override fun getIntrinsicHeight(): Int = heightPx
+            override fun getIntrinsicHeight(): Int = shadowPillHeight
         }.apply {
             shadowCompatibilityMode = MaterialShapeDrawable.SHADOW_COMPAT_MODE_ALWAYS
             initializeElevationOverlay(context)
