@@ -16,10 +16,10 @@
 
 package com.duckduckgo.pir.internal.models.scheduling
 
-class BrokerSchedulingConfig(
+data class BrokerSchedulingConfig(
     val brokerName: String,
-    val retryError: Int,
-    val confirmOptOutScan: Int,
-    val maintenanceScan: Int,
+    val retryErrorInMillis: Long,
+    val confirmOptOutScanInMillis: Long,
+    val maintenanceScanInMillis: Long,
     val maxAttempts: Int = -1,
 )
