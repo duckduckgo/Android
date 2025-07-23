@@ -296,5 +296,7 @@
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Przenieś swoje hasła z&lt;br /&gt;Google do DuckDuckGo</string>
     <string name="passwords_import_promo_subtitle">Szybko i bezpiecznie importuj hasła do DuckDuckGo. Google może poprosić o wpisanie hasła.</string>
     <string name="passwords_import_promo_action">Importuj z Google</string>
+    <string name="passwords_import_promo_in_browser_title">Przenieś hasła z Google do DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Nie pytaj ponownie</string>
 
 </resources>
