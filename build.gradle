@@ -167,6 +167,22 @@ subprojects {
                     .because("Use guava’s bundled ListenableFuture to avoid duplicate classes")
         }
     }
+
+    plugins.withId('com.google.devtools.ksp') {
+        afterEvaluate {
+            configurations.configureEach { config ->
+                if (config.name == 'ksp') {
+                    config.dependencies.matching {
+                        it.group == 'androidx.room' && it.name == 'room-compiler'
+                    }.configureEach {
+                        ksp {
+                            arg("room.generateKotlin", "true")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {
