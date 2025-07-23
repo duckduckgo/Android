@@ -85,10 +85,21 @@ class InputModeTabLayout @JvmOverloads constructor(
             .setAllCorners(CornerFamily.ROUNDED, cornerRadius)
             .build()
 
-        // computing a pill height that will be perfectly centered in the container vertically, with equal top and bottom insets
-        val shadowPillHeight = listOf(heightPx, heightPx - 1).firstOrNull { candidate ->
+        // Computing a pill height that will be perfectly centered in the container vertically, with equal top and bottom insets,
+        // and matching horizontal insets, if possible.
+        val shadowPillHeightCandidates = listOf(heightPx, heightPx - 1, heightPx + 1).filter { candidate ->
+            // only pick values that will result in even vertical insets
             (containerHeightPx - candidate) % 2 == 0
-        } ?: heightPx
+        }
+        val shadowPillHeight = shadowPillHeightCandidates
+            .firstOrNull { candidate ->
+                // prefer values that will result in equal horizontal and vertical insets
+                val verticalInsetsPx = (containerHeightPx - candidate) / 2
+                verticalInsetsPx == horizontalInsetPx
+            }
+            ?: shadowPillHeightCandidates.firstOrNull()
+            ?: heightPx
+
         val shadowedPill = object : MaterialShapeDrawable(pill) {
             override fun getIntrinsicHeight(): Int = shadowPillHeight
         }.apply {
