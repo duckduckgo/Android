@@ -212,8 +212,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
-                                binding.daxDialogCta.initial.dialogBody.finishAnimation()
-                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                                binding.daxDialogCta.primaryCta.setOnClickListener { view ->
+                                    // delay the action so that the button can show visual feedback before we hide it
+                                    view.postDelayed(200) { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                                    view.setOnClickListener(null)
+                                }
                                 binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
 
                                 if (binding.daxDialogCta.initial.dialogBody.text.isEmpty()) {
@@ -258,7 +261,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
                                 binding.daxDialogCta.initial.dialogBody.finishAnimation()
-                                binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                                binding.daxDialogCta.primaryCta.setOnClickListener { view ->
+                                    // delay the action so that the button can show visual feedback before we hide it
+                                    view.postDelayed(200) { viewModel.onPrimaryCtaClicked(INITIAL) }
+                                    view.setOnClickListener(null)
+                                }
 
                                 if (binding.daxDialogCta.initial.dialogBody.text.isEmpty()) {
                                     binding.daxDialogCta.initial.dialogBody.text = descriptionText
@@ -286,12 +293,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 }
 
                 COMPARISON_CHART -> {
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     resetDialogContentVisibility()
+                    binding.daxDialogCta.primaryCta.visibility = View.INVISIBLE
                     binding.daxDialogCta.secondaryCta.isVisible = false
-                    TransitionManager.beginDelayedTransition(
-                        binding.daxDialogCta.cardView,
-                        AutoTransition(),
-                    )
                     binding.daxDialogCta.comparisonChart.root.isVisible = true
 
                     val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
@@ -299,7 +304,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
                     binding.daxDialogCta.comparisonChart.descriptionInvisible.text = descriptionText.html(context = it)
                     binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
-                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
 
                     val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
                         listOf(ddgLogo, chromeLogo, row1, row2, row3, row4, row5)
@@ -316,6 +320,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                             view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         }
 
+                        binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                        binding.daxDialogCta.primaryCta.isVisible = true
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                     }
