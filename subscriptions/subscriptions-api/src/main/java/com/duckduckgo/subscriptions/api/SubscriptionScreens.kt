@@ -22,4 +22,5 @@ sealed class SubscriptionScreens {
     data object SubscriptionsSettingsScreenWithEmptyParams : ActivityParams
     data object SubscriptionScreenNoParams : ActivityParams
     data class RestoreSubscriptionScreenWithParams(val isOriginWeb: Boolean = true) : ActivityParams
+    data class SubscriptionPurchaseWithOrigin(val origin: String? = null) : ActivityParams
 }

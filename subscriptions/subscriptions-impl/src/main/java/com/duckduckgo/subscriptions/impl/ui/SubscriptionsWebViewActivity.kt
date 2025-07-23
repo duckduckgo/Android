@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -68,6 +69,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchaseWithOrigin
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
@@ -125,6 +127,7 @@ data class SubscriptionsWebViewActivityWithParams(
     delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
 @ContributeToActivityStarter(SubscriptionScreenNoParams::class)
+@ContributeToActivityStarter(SubscriptionPurchaseWithOrigin::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
@@ -182,8 +185,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-            ?: SubscriptionsWebViewActivityWithParams(BUY_URL)
+        params = convertIntoSubscriptionWebViewActivityParams(intent)
 
         setContentView(binding.root)
         setupInternalToolbar(toolbar)
@@ -273,6 +275,18 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     override fun cancelDownload() {
         // NOOP
+    }
+
+    private fun convertIntoSubscriptionWebViewActivityParams(intent: Intent): SubscriptionsWebViewActivityWithParams {
+        intent.getActivityParams(SubscriptionPurchaseWithOrigin::class.java)?.let {
+            return SubscriptionsWebViewActivityWithParams(
+                url = BUY_URL,
+                origin = it.origin,
+            )
+        }
+
+        return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
+            ?: SubscriptionsWebViewActivityWithParams(BUY_URL)
     }
 
     private fun launchDownloadMessagesJob() {

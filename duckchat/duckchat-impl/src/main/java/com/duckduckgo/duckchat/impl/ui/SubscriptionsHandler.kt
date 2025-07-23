@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
@@ -67,8 +68,15 @@ class SubscriptionsHandler @Inject constructor(
                 }
 
                 METHOD_OPEN_SUBSCRIPTION_PURCHASE -> {
+                    val subscriptionParams = runCatching {
+                        data?.getString(MESSAGE_PARAM_ORIGIN_KEY).takeUnless { it.isNullOrBlank() }
+                            ?.let { nonEmptyOrigin ->
+                                SubscriptionScreens.SubscriptionPurchaseWithOrigin(nonEmptyOrigin)
+                            } ?: SubscriptionScreenNoParams
+                    }.getOrDefault(SubscriptionScreenNoParams)
+
                     withContext(dispatcherProvider.main()) {
-                        globalActivityStarter.start(context, SubscriptionScreenNoParams)
+                        globalActivityStarter.start(context, subscriptionParams)
                     }
                 }
 
@@ -81,5 +89,6 @@ class SubscriptionsHandler @Inject constructor(
         private const val METHOD_BACK_TO_SETTINGS = "backToSettings"
         private const val METHOD_OPEN_SUBSCRIPTION_ACTIVATION = "openSubscriptionActivation"
         private const val METHOD_OPEN_SUBSCRIPTION_PURCHASE = "openSubscriptionPurchase"
+        private const val MESSAGE_PARAM_ORIGIN_KEY = "origin"
     }
 }
