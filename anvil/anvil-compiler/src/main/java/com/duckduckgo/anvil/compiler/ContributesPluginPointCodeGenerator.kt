@@ -30,11 +30,11 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import dagger.Binds
 import dagger.multibindings.Multibinds
+import java.io.File
+import javax.inject.Inject
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
-import javax.inject.Inject
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -107,7 +107,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
                                             .map { it.value }
                                             .toMutableList()
                                             .apply {
-                                                addAll(setPlugins.toList().sortedBy { it.javaClass.name })
+                                                addAll(setPlugins.toList().sortedBy { it.javaClass.name })                                            
                                             }
                                         """.trimIndent(),
                                     )
@@ -132,7 +132,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun generateBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
@@ -180,7 +180,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     companion object {

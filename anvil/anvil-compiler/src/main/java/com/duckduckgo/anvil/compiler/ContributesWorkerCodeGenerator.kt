@@ -22,6 +22,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.anvil.annotations.ExperimentalAnvilApi
 import com.squareup.anvil.compiler.api.AnvilContext
 import com.squareup.anvil.compiler.api.CodeGenerator
+import com.squareup.anvil.compiler.api.GeneratedFile
 import com.squareup.anvil.compiler.api.GeneratedFileWithSources
 import com.squareup.anvil.compiler.api.createGeneratedFile
 import com.squareup.anvil.compiler.internal.asClassName
@@ -40,12 +41,12 @@ import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.TypeVariableName
-import org.jetbrains.kotlin.descriptors.ModuleDescriptor
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
 import java.lang.StringBuilder
 import javax.inject.Inject
+import org.jetbrains.kotlin.descriptors.ModuleDescriptor
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.psi.KtFile
 
 /**
  * This Anvil code generator allows injection dependencies into the Workers (WorkerInjectorPlugin) without manually creating a WorkerInjectorPlugin
@@ -125,7 +126,7 @@ class ContributesWorkerCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, workerPluginName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, workerPluginName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun generateCode(

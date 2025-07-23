@@ -36,10 +36,10 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
+import java.io.File
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
 
 /**
  * This Anvil code generator allows inject ViewModel without manually creating the ViewModel factory
@@ -105,7 +105,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, activityInjectorInterfaceName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, activityInjectorInterfaceName, content, vmClass.containingFileAsJavaFile)
     }
     private fun generateSubcomponentFactory(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
@@ -159,7 +159,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, subcomponentFactoryClassName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, subcomponentFactoryClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun generateParentComponentInterface(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): TypeSpec {
@@ -184,11 +184,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             .build()
     }
 
-    private fun generateSubcomponentFactoryBindingModule(
-        vmClass: ClassReference.Psi,
-        codeGenDir: File,
-        module: ModuleDescriptor,
-    ): GeneratedFileWithSources {
+    private fun generateSubcomponentFactoryBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.subComponentName()}_Module"
         val scope = vmClass.annotations.first { it.fqName == InjectWith::class.fqName }.scopeOrNull(0)!!
@@ -223,7 +219,7 @@ class ContributesSubComponentCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun FqName.subComponentAnnotation(module: ModuleDescriptor, delayGeneration: Boolean): AnnotationSpec {

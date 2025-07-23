@@ -28,11 +28,11 @@ import com.squareup.anvil.compiler.internal.fqName
 import com.squareup.anvil.compiler.internal.reference.*
 import com.squareup.kotlinpoet.*
 import dagger.Provides
+import java.io.File
+import javax.inject.Named
 import org.jetbrains.kotlin.descriptors.ModuleDescriptor
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
-import java.io.File
-import javax.inject.Named
 
 /** This Anvil code generator allows generates a backend service API and its dagger bindings. */
 @OptIn(ExperimentalAnvilApi::class)
@@ -125,7 +125,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, setOf(vmClass.containingFileAsJavaFile))
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun ClassReference.Psi.serviceApiClassName(
