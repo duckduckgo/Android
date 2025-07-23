@@ -18,7 +18,13 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
 import android.content.Context
 import android.os.Build
+import android.text.Editable
 import android.text.InputType
+import android.text.Spanned
+import android.text.style.CharacterStyle
+import android.text.style.ImageSpan
+import android.text.style.ParagraphStyle
+import android.text.style.URLSpan
 import android.transition.ChangeBounds
 import android.transition.Fade
 import android.transition.TransitionManager
@@ -32,6 +38,7 @@ import android.widget.EditText
 import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -148,6 +155,29 @@ class InputModeWidget @JvmOverloads constructor(
                     inputField.minLines = if (inputModeSwitch.selectedTabPosition == 0) SEARCH_MIN_LINES else DUCK_CHAT_MIN_LINES
                 }
             }
+        }
+
+        doAfterTextChanged { text ->
+            text?.let {
+                removeFormatting(text)
+            }
+        }
+    }
+
+    private fun removeFormatting(text: Editable) {
+        val spans = buildList<Any> {
+            addAll(text.getSpans(0, text.length, CharacterStyle::class.java))
+            addAll(text.getSpans(0, text.length, ParagraphStyle::class.java))
+            addAll(text.getSpans(0, text.length, URLSpan::class.java))
+            addAll(text.getSpans(0, text.length, ImageSpan::class.java))
+        }.filter { span ->
+            (text.getSpanFlags(span) and Spanned.SPAN_COMPOSING) == 0
+        }
+
+        if (spans.isNotEmpty()) {
+            spans.forEach(text::removeSpan)
+            // Remove trailing newlines
+            text.delete(text.indexOfLast { it != '\n' } + 1, text.length)
         }
     }
 
