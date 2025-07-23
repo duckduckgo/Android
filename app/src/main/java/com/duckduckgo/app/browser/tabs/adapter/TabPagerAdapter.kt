@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.os.Message
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
@@ -91,13 +92,42 @@ class TabPagerAdapter(
         if (tabs.map { it.tabId } != newTabs.map { it.tabId }) {
             // we only want to notify the adapter if the tab IDs change
             val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabs, newTabs))
+
             tabs.clear()
             tabs.addAll(newTabs)
             diff.dispatchUpdatesTo(this)
+
+            cleanupIfTabsRemoved(diff)
         } else {
             // the state of tabs is managed separately, so we don't need to notify the adapter, but we need URL and skipHome to create new fragments
             tabs.clear()
             tabs.addAll(newTabs)
+        }
+    }
+
+    private fun cleanupIfTabsRemoved(diff: DiffUtil.DiffResult) {
+        var wereTabsRemoved = false
+        val updateCallback = object : ListUpdateCallback {
+            override fun onInserted(position: Int, count: Int) {
+                // Not needed for tracking removals
+            }
+
+            override fun onRemoved(position: Int, count: Int) {
+                wereTabsRemoved = true
+            }
+
+            override fun onMoved(fromPosition: Int, toPosition: Int) {
+                // Not needed for tracking removals
+            }
+
+            override fun onChanged(position: Int, count: Int, payload: Any?) {
+                // Not needed for tracking removals
+            }
+        }
+        diff.dispatchUpdatesTo(updateCallback)
+
+        if (wereTabsRemoved) {
+            cleanupRemovedItems()
         }
     }
 

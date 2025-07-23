@@ -459,6 +459,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
         }
     }
 
+    public void cleanupRemovedItems() {
+        mHasStaleFragments = true;
+        gcFragments();
+    }
+
     @Override
     public final boolean onFailedToRecycleView(@NonNull FragmentViewHolder holder) {
         /*
