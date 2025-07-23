@@ -1,11 +1,11 @@
 package com.duckduckgo.subscriptions.impl.survey
 
-import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.model.Subscription
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsConstants.BillingPeriod.MONTHLY
-import com.duckduckgo.subscriptions.impl.repository.SubscriptionsConstants.Status.AUTO_RENEWABLE
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY
+import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before

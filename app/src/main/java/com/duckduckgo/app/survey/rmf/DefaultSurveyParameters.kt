@@ -23,6 +23,7 @@ import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource.IN_APP
 import com.duckduckgo.app.usage.app.AppDaysUsedRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.survey.api.SurveyParameterPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -113,4 +114,24 @@ class LocaleSurveyParameterPlugin @Inject constructor(
     override fun matches(paramKey: String): Boolean = paramKey == "locale"
 
     override suspend fun evaluate(paramKey: String): String = "${appBuildConfig.deviceLocale.language}-${appBuildConfig.deviceLocale.country}"
+}
+
+@ContributesMultibinding(AppScope::class)
+class CohortSurveyParameterPlugin @Inject constructor(
+    private val featureTogglesInventory: FeatureTogglesInventory,
+) : SurveyParameterPlugin {
+    override fun matches(paramKey: String): Boolean = paramKey.contains("cohort_")
+
+    override suspend fun evaluate(paramKey: String): String {
+        val experimentName = paramKey.split("_").getOrNull(2)
+        if (experimentName.isNullOrBlank()) return ""
+
+        val matchingExperiment = featureTogglesInventory
+            .getAllActiveExperimentToggles()
+            .firstOrNull { it.featureName().name == experimentName }
+
+        return matchingExperiment?.let {
+            "${it.featureName().name}_${it.getCohort()?.name}"
+        }.orEmpty()
+    }
 }
