@@ -45,7 +45,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
-    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
+    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributesPluginPoint::class.fqName) }
@@ -58,7 +58,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generatePluginPoint(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generatePluginPoint(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val pluginPointClassName = "${vmClass.shortName}_PluginPoint"
         val scope = vmClass.annotations.first { it.fqName == ContributesPluginPoint::class.fqName }.scopeOrNull(0)!!
@@ -132,10 +132,10 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             )
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, pluginPointClassName, content, vmClass.containingFileAsJavaFile)
     }
 
-    private fun generateBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateBindingModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.shortName}_PluginPoint_Module"
         val scope = vmClass.annotations.first { it.fqName == ContributesPluginPoint::class.fqName }.scopeOrNull(0)!!
@@ -180,7 +180,7 @@ class ContributesPluginPointCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     companion object {
