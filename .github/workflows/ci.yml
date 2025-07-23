@@ -185,7 +185,7 @@ jobs:
         if: |
           failure() &&
           steps.check-alignment.outcome == 'success'
-        run: cat build/fladle/fladleResults/HtmlErrorReport.html | cut -d\`  -f2 >> results.json
+        run: cut -d\`  -f2 < build/fladle/fladleResults/HtmlErrorReport.html >> results.json
 
       - name: Print failure report
         if: |
