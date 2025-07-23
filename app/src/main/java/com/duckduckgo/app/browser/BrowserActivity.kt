@@ -59,6 +59,7 @@ import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupB
 import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
+import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
@@ -207,6 +208,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
+
+    @Inject
+    lateinit var omnibarEntryConverter: OmnibarEntryConverter
 
     @Inject
     lateinit var browserFeatures: AndroidBrowserConfigFeature
@@ -618,7 +622,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val sourceTabId = if (selectedText) currentTab?.tabId else null
                 val skipHome = !selectedText
                 if (swipingTabsFeature.isEnabled) {
-                    launchNewTab(query = sharedText, sourceTabId = sourceTabId, skipHome = skipHome)
+                    val query = if (isExternal) {
+                        omnibarEntryConverter.convertQueryToUrl(searchQuery = sharedText, extractUrlFromQuery = true)
+                    } else {
+                        sharedText
+                    }
+                    launchNewTab(query = query, sourceTabId = sourceTabId, skipHome = skipHome)
                 } else {
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(sourceTabId = sourceTabId, query = sharedText, skipHome = skipHome) }
                 }

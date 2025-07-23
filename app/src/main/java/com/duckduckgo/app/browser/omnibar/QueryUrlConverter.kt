@@ -35,10 +35,11 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         searchQuery: String,
         vertical: String?,
         queryOrigin: QueryOrigin,
+        extractUrlFromQuery: Boolean,
     ): String {
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
-            is QueryOrigin.FromUser, QueryOrigin.FromBookmark -> UriString.isWebUrl(searchQuery) || UriString.isDuckUri(searchQuery)
+            is QueryOrigin.FromUser, QueryOrigin.FromBookmark -> UriString.isWebUrl(searchQuery, extractUrlFromQuery) || UriString.isDuckUri(searchQuery)
         }
 
         if (isUrl == true) {
@@ -63,7 +64,8 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
     }
 
     private fun convertUri(input: String): String {
-        val uri = Uri.parse(input).withScheme()
+        val url = UriString.extractUrl(input) ?: input
+        val uri = Uri.parse(url).withScheme()
 
         if (requestRewriter.shouldRewriteRequest(uri)) {
             return requestRewriter.rewriteRequestWithCustomQueryParams(uri).toString()
