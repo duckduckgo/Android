@@ -26,7 +26,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
-        assertEquals("modifiedControl", plugin.evaluate())
+        assertEquals("modifiedControl", plugin.evaluate("senseProtectionCohort"))
     }
 
     @Test
@@ -40,7 +40,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
-        assertEquals("variant1", plugin.evaluate())
+        assertEquals("variant1", plugin.evaluate("senseProtectionCohort"))
     }
 
     @Test
@@ -54,7 +54,7 @@ class TemporaryDefaultSurveyParametersPluginTest {
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
-        assertEquals("variant2", plugin.evaluate())
+        assertEquals("variant2", plugin.evaluate("senseProtectionCohort"))
     }
 
     @Test
@@ -67,6 +67,6 @@ class TemporaryDefaultSurveyParametersPluginTest {
 
         val plugin = SenseOfProtectionCohortSurveyParameterPlugin(mockSenseOfProtectionToggles)
 
-        assertEquals("", plugin.evaluate())
+        assertEquals("", plugin.evaluate("senseProtectionCohort"))
     }
 }

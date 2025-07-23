@@ -27,7 +27,7 @@ import javax.inject.Inject
 class SenseOfProtectionCohortSurveyParameterPlugin @Inject constructor(
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
 ) : SurveyParameterPlugin {
-    override val surveyParamKey: String = "senseProtectionCohort"
+    override fun matches(paramKey: String): Boolean = paramKey == "senseProtectionCohort"
 
-    override suspend fun evaluate(): String = senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().getCohort()?.name.orEmpty()
+    override suspend fun evaluate(paramKey: String): String = senseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().getCohort()?.name.orEmpty()
 }
