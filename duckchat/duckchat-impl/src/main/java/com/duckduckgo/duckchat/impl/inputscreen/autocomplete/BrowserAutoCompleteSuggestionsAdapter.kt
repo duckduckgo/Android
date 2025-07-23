@@ -24,18 +24,23 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DIVIDER_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SWITCH_TO_TAB_TYPE
+
+// TODO: Should be moved to the API when we refactor the browser screen with the same logic.
+private object AutoCompleteDivider
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -61,10 +66,12 @@ class BrowserAutoCompleteSuggestionsAdapter(
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
         SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
+        DIVIDER_TYPE to DividerViewHolderFactory(),
     )
 
     private var phrase = ""
     private var suggestions: List<AutoCompleteSuggestion> = emptyList()
+    private var items: List<Any> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -74,14 +81,15 @@ class BrowserAutoCompleteSuggestionsAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when {
-            suggestions.isEmpty() -> EMPTY_TYPE
-            suggestions[position] is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
-            suggestions[position] is AutoCompleteHistorySuggestion -> HISTORY_TYPE
-            suggestions[position] is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
-            suggestions[position] is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
-            suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
-            suggestions[position] is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
-            suggestions[position] is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
+            items.isEmpty() -> EMPTY_TYPE
+            items[position] is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
+            items[position] is AutoCompleteHistorySuggestion -> HISTORY_TYPE
+            items[position] is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
+            items[position] is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
+            items[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
+            items[position] is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
+            items[position] is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
+            items[position] is AutoCompleteDivider -> DIVIDER_TYPE
             else -> SUGGESTION_TYPE
         }
     }
@@ -90,26 +98,27 @@ class BrowserAutoCompleteSuggestionsAdapter(
         holder: AutoCompleteViewHolder,
         position: Int,
     ) {
-        if (holder is EmptySuggestionViewHolder) {
-            // nothing required
-        } else {
-            viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
-                holder,
-                suggestions[position],
-                immediateSearchClickListener,
-                editableSearchClickListener,
-                deleteClickListener,
-                autoCompleteOpenSettingsClickListener,
-                autoCompleteLongPressClickListener,
-            )
-        }
+        if (holder is EmptySuggestionViewHolder) return
+
+        val item = items[position]
+        if (item is AutoCompleteDivider) return
+
+        viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
+            holder,
+            item as AutoCompleteSuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener,
+            deleteClickListener,
+            autoCompleteOpenSettingsClickListener,
+            autoCompleteLongPressClickListener,
+        )
     }
 
     override fun getItemCount(): Int {
-        if (suggestions.isEmpty() && phrase.isNotBlank()) {
+        if (items.isEmpty() && phrase.isNotBlank()) {
             return 1 // Empty ViewHolder
         }
-        return suggestions.size
+        return items.size
     }
 
     @UiThread
@@ -120,7 +129,30 @@ class BrowserAutoCompleteSuggestionsAdapter(
         if (phrase == newPhrase && suggestions == newSuggestions) return
         phrase = newPhrase
         suggestions = newSuggestions
+        items = createItemsWithDividers(newSuggestions)
         notifyDataSetChanged()
+    }
+
+    private fun createItemsWithDividers(suggestions: List<AutoCompleteSuggestion>): List<Any> = buildList {
+        suggestions.zipWithNext { current, next ->
+            add(current)
+            if (needsDivider(current, next)) add(AutoCompleteDivider)
+        }
+        if (suggestions.isNotEmpty()) add(suggestions.last())
+    }
+
+    private fun needsDivider(current: AutoCompleteSuggestion, next: AutoCompleteSuggestion): Boolean {
+        val currentType = getItemType(current)
+        val nextType = getItemType(next)
+
+        return (currentType == SEARCH_ITEM && nextType == OTHER_ITEM) || (currentType == OTHER_ITEM && nextType == SEARCH_ITEM)
+    }
+
+    private fun getItemType(suggestion: AutoCompleteSuggestion): String {
+        return when (suggestion) {
+            is AutoCompleteSearchSuggestion -> if (suggestion.isAllowedInTopHits) OTHER_ITEM else SEARCH_ITEM
+            else -> OTHER_ITEM
+        }
     }
 
     object Type {
@@ -132,5 +164,11 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val IN_APP_MESSAGE_TYPE = 6
         const val DEFAULT_TYPE = 7
         const val SWITCH_TO_TAB_TYPE = 8
+        const val DIVIDER_TYPE = 9
+    }
+
+    companion object {
+        const val SEARCH_ITEM = "SEARCH_ITEM"
+        const val OTHER_ITEM = "OTHER_ITEM"
     }
 }
