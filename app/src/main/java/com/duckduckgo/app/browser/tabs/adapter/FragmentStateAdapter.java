@@ -223,13 +223,13 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
         }
 
-        // Remove Fragments that are not bound anywhere -- pending a grace period
+        // Remove Fragments that are not bound anywhere and are not hidden -- pending a grace period
         if (!mIsInGracePeriod) {
             mHasStaleFragments = false; // we've executed all GC checks
 
             for (int ix = 0; ix < mFragments.size(); ix++) {
                 long itemId = mFragments.keyAt(ix);
-                if (!isFragmentViewBound(itemId)) {
+                if (!isFragmentViewBound(itemId) && !itemIdQueue.contains(itemId)) {
                     toRemove.add(itemId);
                 }
             }
