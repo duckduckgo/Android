@@ -35,9 +35,6 @@ interface DefaultBrowserPromptsFeatureToggles {
     fun defaultBrowserPrompts25(): Toggle
 
     enum class AdditionalPromptsCohortName(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        VARIANT_1("variant1"),
-        VARIANT_2("variant2"),
         VARIANT_3("variant3"),
     }
 }
