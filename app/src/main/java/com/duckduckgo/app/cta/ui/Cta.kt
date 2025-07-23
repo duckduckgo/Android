@@ -237,7 +237,7 @@ sealed class OnboardingDaxDialogCta(
             }
 
             fun setSkipTypingAnimationClickListeners() {
-                buckOnboardingDialogView.setOnClickListener { afterAnimation }
+                buckOnboardingDialogView.setOnClickListener { afterAnimation() }
                 onboardingDaxDialogContainer.setOnClickListener { afterAnimation() }
                 onboardingDialogContent.setOnClickListener { afterAnimation() }
                 dialogTextCta.setOnClickListener { afterAnimation() }
