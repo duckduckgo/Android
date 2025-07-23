@@ -132,7 +132,7 @@ jobs:
       - name: Decode secret
         env:
           FLANK: ${{ secrets.FLANK }}
-        run: echo $FLANK > flank.json
+        run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
