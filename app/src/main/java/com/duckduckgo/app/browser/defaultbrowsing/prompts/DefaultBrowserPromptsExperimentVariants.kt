@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.CONVERTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.ENROLLED
@@ -43,14 +42,11 @@ data class DefaultBrowserPromptsExperimentStageAction(
 }
 
 interface DefaultBrowserPromptsExperimentStageEvaluator {
-    val targetCohort: AdditionalPromptsCohortName
     suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction
 }
 
 @ContributesBinding(AppScope::class)
 class DefaultBrowserPromptsExperimentStageEvaluatorImpl @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
-
-    override val targetCohort = AdditionalPromptsCohortName.VARIANT_3
 
     override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
         when (newStage) {

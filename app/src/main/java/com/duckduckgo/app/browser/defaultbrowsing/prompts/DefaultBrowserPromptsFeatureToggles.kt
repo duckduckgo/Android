@@ -20,7 +20,6 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -33,8 +32,4 @@ interface DefaultBrowserPromptsFeatureToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun defaultBrowserPrompts25(): Toggle
-
-    enum class AdditionalPromptsCohortName(override val cohortName: String) : CohortName {
-        VARIANT_3("variant3"),
-    }
 }

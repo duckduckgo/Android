@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_STAGE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_VARIANT
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.FeatureSettingsConfigModel
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
@@ -934,17 +933,6 @@ class DefaultBrowserPromptsExperimentImplTest {
         )
         whenever(additionalPromptsToggleMock.getSettings()).thenReturn(additionalPromptsFeatureSettingsFake)
         whenever(featureSettingsJsonAdapterMock.fromJson(additionalPromptsFeatureSettingsFake)).thenReturn(settings)
-    }
-
-    private suspend fun mockStageEvaluator(
-        forNewStage: ExperimentStage,
-        forCohortName: AdditionalPromptsCohortName,
-        returnsAction: DefaultBrowserPromptsExperimentStageAction,
-    ): DefaultBrowserPromptsExperimentStageEvaluator {
-        val evaluatorMock: DefaultBrowserPromptsExperimentStageEvaluator = mock()
-        whenever(evaluatorMock.targetCohort).thenReturn(forCohortName)
-        whenever(evaluatorMock.evaluate(forNewStage)).thenReturn(returnsAction)
-        return evaluatorMock
     }
 
     private suspend fun mockMetrics() {
