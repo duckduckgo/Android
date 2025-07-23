@@ -45,6 +45,7 @@ import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -268,9 +269,9 @@ internal class RealPirRepository(
         return@withContext brokerDao.getSchedulingConfig(brokerName)?.run {
             BrokerSchedulingConfig(
                 brokerName = this.brokerName,
-                retryError = this.retryError,
-                confirmOptOutScan = this.confirmOptOutScan,
-                maintenanceScan = this.maintenanceScan,
+                retryErrorInMillis = TimeUnit.HOURS.toMillis(this.retryError.toLong()),
+                confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(this.confirmOptOutScan.toLong()),
+                maintenanceScanInMillis = TimeUnit.HOURS.toMillis(this.maintenanceScan.toLong()),
                 maxAttempts = this.maxAttempts ?: -1,
             )
         }
@@ -280,9 +281,9 @@ internal class RealPirRepository(
         return@withContext brokerDao.getAllSchedulingConfigs().map {
             BrokerSchedulingConfig(
                 brokerName = it.brokerName,
-                retryError = it.retryError,
-                confirmOptOutScan = it.confirmOptOutScan,
-                maintenanceScan = it.maintenanceScan,
+                retryErrorInMillis = TimeUnit.HOURS.toMillis(it.retryError.toLong()),
+                confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(it.confirmOptOutScan.toLong()),
+                maintenanceScanInMillis = TimeUnit.HOURS.toMillis(it.maintenanceScan.toLong()),
                 maxAttempts = it.maxAttempts ?: -1,
             )
         }

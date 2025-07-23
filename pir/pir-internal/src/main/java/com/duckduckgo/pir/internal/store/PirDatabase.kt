@@ -106,7 +106,7 @@ abstract class PirDatabase : RoomDatabase() {
             }
         }
 
-        private val MIGRATION_4_TO_5: Migration = object : Migration(3, 4) {
+        private val MIGRATION_4_TO_5: Migration = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     """
