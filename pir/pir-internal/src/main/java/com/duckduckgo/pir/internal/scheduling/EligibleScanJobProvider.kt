@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.models.scheduling.BrokerSchedulingConfig
 import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus.REMOVED
 import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus.REQUESTED
 import com.duckduckgo.pir.internal.models.scheduling.ScanJobRecord
 import com.duckduckgo.pir.internal.models.scheduling.ScanJobStatus
@@ -68,6 +69,8 @@ class RealEligibleScanJobProvider @Inject constructor(
                 record.isRequestedAndShouldBeConfirmedNow(schedulingConfig, timeInMillis) ||
                     record.isRemovedAndShouldBeMaintainedNow(schedulingConfig, timeInMillis)
                 )
+        }.sortedBy {
+            it.attemptCount
         }.mapNotNull {
             pirSchedulingRepository.getValidScanJobRecord(it.brokerName, it.userProfileId)
         }
@@ -78,15 +81,15 @@ class RealEligibleScanJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean {
         return this.status == REQUESTED &&
-            (this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScan) <= timeInMillis
+            (this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis) <= timeInMillis
     }
 
     private fun OptOutJobRecord.isRemovedAndShouldBeMaintainedNow(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == REQUESTED &&
-            (this.optOutRemovedDateInMillis + schedulingConfig.confirmOptOutScan) <= timeInMillis
+        return this.status == REMOVED &&
+            (this.optOutRemovedDateInMillis + schedulingConfig.confirmOptOutScanInMillis) <= timeInMillis
     }
 
     private suspend fun getValidScanJobsFromScanJobRecords(
@@ -103,6 +106,8 @@ class RealEligibleScanJobProvider @Inject constructor(
                     record.hasMatchAndShouldBeMaintained(schedulingConfig, timeInMillis) ||
                     record.isErrorAndShouldBeRetried(schedulingConfig, timeInMillis)
                 )
+        }.sortedBy {
+            it.lastScanDateInMillis
         }
     }
 
@@ -115,7 +120,7 @@ class RealEligibleScanJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean {
         return this.status == ScanJobStatus.NO_MATCH_FOUND && this.lastScanDateInMillis != null &&
-            (this.lastScanDateInMillis + schedulingConfig.maintenanceScan) <= timeInMillis
+            (this.lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
     }
 
     private fun ScanJobRecord.hasMatchAndShouldBeMaintained(
@@ -123,7 +128,7 @@ class RealEligibleScanJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean {
         return this.status == ScanJobStatus.MATCHES_FOUND && this.lastScanDateInMillis != null &&
-            (this.lastScanDateInMillis + schedulingConfig.maintenanceScan) <= timeInMillis
+            (this.lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
     }
 
     private fun ScanJobRecord.isErrorAndShouldBeRetried(
@@ -131,6 +136,6 @@ class RealEligibleScanJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean {
         return this.status == ScanJobStatus.ERROR && this.lastScanDateInMillis != null &&
-            (this.lastScanDateInMillis + schedulingConfig.retryError) <= timeInMillis
+            (this.lastScanDateInMillis + schedulingConfig.retryErrorInMillis) <= timeInMillis
     }
 }
