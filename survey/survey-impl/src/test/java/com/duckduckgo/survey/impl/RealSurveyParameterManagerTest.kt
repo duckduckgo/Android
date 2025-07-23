@@ -50,17 +50,24 @@ class RealSurveyParameterManagerTest {
     }
 
     @Test
-    fun whenRequestedParamsContainsUnsupportedParamThenBuildSurveyUrlStrictReturnsNull() = runTest {
-        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", listOf("atb", "unsupported"))
+    fun whenSomeRequestedParamsAreNotSupportedThenBuildSurveyUrlStrictReturnsNull() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", listOf("atb", "ppro"))
 
         assertNull(result)
     }
 
     @Test
-    fun whenRequestedParamsContainsUnsupportedParamThenBuildSurveyUrlReturnsUrlWithEmptyValueForUnsupportedParam() = runTest {
-        val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("atb", "unsupported"))
+    fun whenAllRequestedParamsAreNotSupportedThenBuildSurveyUrlStrictReturnsNull() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", listOf("hello", "ppro"))
 
-        assertEquals("http://example.com?atb=test_atb&unsupported=", result)
+        assertNull(result)
+    }
+
+    @Test
+    fun whenNoRequestedParamsThenBuildSurveyUrlStrictReturnsResolvedUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrlStrict("http://example.com", emptyList())
+
+        assertEquals("http://example.com", result)
     }
 
     @Test
@@ -68,5 +75,26 @@ class RealSurveyParameterManagerTest {
         val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("atb", "da"))
 
         assertEquals("http://example.com?atb=test_atb&da=test_da", result)
+    }
+
+    @Test
+    fun whenSomeRequestedParamsAreNotSupportedThenBuildSurveyUrlReturnsUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("atb", "ppro"))
+
+        assertEquals("http://example.com?atb=test_atb&ppro=", result)
+    }
+
+    @Test
+    fun whenAllRequestedParamsAreNotSupportedThenBuildSurveyUrlReturnsUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", listOf("hello", "ppro"))
+
+        assertEquals("http://example.com?hello=&ppro=", result)
+    }
+
+    @Test
+    fun whenNoRequestedParamsThenBuildSurveyUrlReturnsUrl() = runTest {
+        val result = surveyParameterManager.buildSurveyUrl("http://example.com", emptyList())
+
+        assertEquals("http://example.com", result)
     }
 }
