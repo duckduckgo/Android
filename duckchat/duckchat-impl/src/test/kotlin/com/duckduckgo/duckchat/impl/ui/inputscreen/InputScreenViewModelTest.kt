@@ -454,4 +454,51 @@ class InputScreenViewModelTest {
 
         assertEquals(SubmitChat(query), viewModel.command.value)
     }
+
+    @Test
+    fun `when onChatInputTextChanged with empty query then showChatLogo should be true`() {
+        val viewModel = createViewModel("initial text")
+
+        viewModel.onChatInputTextChanged("")
+
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with different text than initial then showChatLogo should be false`() {
+        val viewModel = createViewModel("initial text")
+
+        viewModel.onChatInputTextChanged("different text")
+
+        assertFalse(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with same initial text but autocomplete suggestions visible then showChatLogo should be false`() = runTest {
+        val initialText = "test query"
+        val viewModel = createViewModel(initialText)
+
+        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+
+        viewModel.onChatInputTextChanged(initialText)
+
+        assertFalse(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with web URL then showChatLogo logic still applies`() {
+        val viewModel = createViewModel("https://example.com")
+
+        // Initially true (same as initial text, no autocomplete suggestions for URL)
+        viewModel.onChatInputTextChanged("https://example.com")
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
+
+        // Change to different URL - should be false
+        viewModel.onChatInputTextChanged("https://different.com")
+        assertFalse(viewModel.visibilityState.value.showChatLogo)
+
+        // Change to empty - should be true
+        viewModel.onChatInputTextChanged("")
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
+    }
 }
