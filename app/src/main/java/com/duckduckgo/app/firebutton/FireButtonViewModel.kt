@@ -172,6 +172,10 @@ class FireButtonViewModel @Inject constructor(
         pixel.fire(AppPixelName.FIRE_ANIMATION_NEW_SELECTED, mapOf(Pixel.PixelParameter.FIRE_ANIMATION to selectedFireAnimation.getPixelValue()))
     }
 
+    fun onLaunchedFromNotification(pixelName: String) {
+        pixel.fire(pixelName)
+    }
+
     private fun ClearWhatOption.pixelEvent(): Pixel.PixelName {
         return when (this) {
             ClearWhatOption.CLEAR_NONE -> AppPixelName.AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE

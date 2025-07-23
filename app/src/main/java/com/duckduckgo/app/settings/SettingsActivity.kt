@@ -182,10 +182,6 @@ class SettingsActivity : DuckDuckGoActivity() {
         configureSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
-
-        intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
-            viewModel.onLaunchedFromNotification(it)
-        }
     }
 
     override fun onResume() {
@@ -435,8 +431,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
-
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
         }
