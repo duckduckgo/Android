@@ -64,15 +64,20 @@ class RealEligibleOptOutJobProvider @Inject constructor(
         timeInMillis: Long,
     ): Boolean =
         this.status == OptOutJobStatus.ERROR && this.lastOptOutAttemptDateInMillis != null &&
-            (this.lastOptOutAttemptDateInMillis + schedulingConfig.retryError) <= timeInMillis
+            (this.lastOptOutAttemptDateInMillis + schedulingConfig.retryErrorInMillis) <= timeInMillis
 
     private fun OptOutJobRecord.isRequestAndShouldReRequested(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
-    ): Boolean =
-        this.status == OptOutJobStatus.REQUESTED && this.lastOptOutAttemptDateInMillis != null &&
-            this.attemptCount <= schedulingConfig.maxAttempts &&
-            (this.optOutRequestedDateInMillis + RE_REQUEST_INTERVAL) <= timeInMillis
+    ): Boolean {
+        val hasMaxNoAttempts = schedulingConfig.maxAttempts <= 0
+        val attemptWithinLimit = this.attemptCount <= schedulingConfig.maxAttempts
+        val scheduledRun = this.optOutRequestedDateInMillis + RE_REQUEST_INTERVAL
+        val scheduledRunIsInThePast = scheduledRun <= timeInMillis
+
+        return this.status == OptOutJobStatus.REQUESTED && this.optOutRequestedDateInMillis != 0L &&
+            (hasMaxNoAttempts || attemptWithinLimit) && scheduledRunIsInThePast
+    }
 
     companion object {
         private val RE_REQUEST_INTERVAL = TimeUnit.DAYS.toMillis(28)
