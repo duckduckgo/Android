@@ -40,7 +40,7 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
-    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
+    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { it.isAnnotatedWith(ContributeToActivityStarter::class.fqName) }
@@ -52,7 +52,7 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generateParameterToActivityMapper(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateParameterToActivityMapper(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.shortName}_ActivityMapper"
 
@@ -73,7 +73,7 @@ class ContributeToActivityStarterCodeGenerator : CodeGenerator {
             }
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun createMapperClass(
