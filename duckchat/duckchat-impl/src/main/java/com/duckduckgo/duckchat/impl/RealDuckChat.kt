@@ -118,11 +118,6 @@ interface DuckChatInternal : DuckChat {
     fun openNewDuckChatSession()
 
     /**
-     * Opens DuckChat, starts a new session, and auto-prompts with WebSearch enabled.
-     */
-    fun openDuckChatWithWebSearch(query: String)
-
-    /**
      * Calls onClose when a close event is emitted.
      */
     fun observeCloseEvent(
@@ -434,11 +429,6 @@ class RealDuckChat @Inject constructor(
         openDuckChat(emptyMap(), forceNewSession = true)
     }
 
-    override fun openDuckChatWithWebSearch(query: String) {
-        val parameters = addChatParameters(query, autoPrompt = true) + (TOOL_CHOICE_NAME to WEB_SEARCH_VALUE)
-        openDuckChat(parameters, forceNewSession = true)
-    }
-
     private fun openDuckChat(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
@@ -602,8 +592,6 @@ class RealDuckChat @Inject constructor(
         private const val PROMPT_QUERY_VALUE = "1"
         private const val BANG_QUERY_NAME = "bang"
         private const val BANG_QUERY_VALUE = "true"
-        private const val TOOL_CHOICE_NAME = "toolChoice"
-        private const val WEB_SEARCH_VALUE = "WebSearch"
         private const val DEFAULT_SESSION_ALIVE = 60
     }
 }

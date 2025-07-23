@@ -26,5 +26,4 @@ sealed class Command {
     data class EditWithSelectedQuery(val query: String) : Command()
     data class SubmitSearch(val query: String) : Command()
     data class SubmitChat(val query: String) : Command()
-    data class SubmitChatWithWebSearch(val query: String) : Command()
 }
