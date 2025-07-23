@@ -101,9 +101,9 @@ class RealPirSchedulingRepositoryTest {
         userProfileId = 123L,
         status = OptOutJobStatus.NOT_EXECUTED,
         attemptCount = 0,
-        lastOptOutAttemptDate = 1000L,
-        optOutRequestedDate = 2000L,
-        optOutRemovedDate = 0L,
+        lastOptOutAttemptDateInMillis = 1000L,
+        optOutRequestedDateInMillis = 2000L,
+        optOutRemovedDateInMillis = 0L,
     )
 
     // ScanJobRecord tests
@@ -237,9 +237,9 @@ class RealPirSchedulingRepositoryTest {
         assertEquals(123L, result[0].userProfileId)
         assertEquals(OptOutJobStatus.NOT_EXECUTED, result[0].status)
         assertEquals(0, result[0].attemptCount)
-        assertEquals(1000L, result[0].lastOptOutAttemptDate)
-        assertEquals(2000L, result[0].optOutRequestedDate)
-        assertEquals(0L, result[0].optOutRemovedDate)
+        assertEquals(1000L, result[0].lastOptOutAttemptDateInMillis)
+        assertEquals(2000L, result[0].optOutRequestedDateInMillis)
+        assertEquals(0L, result[0].optOutRemovedDateInMillis)
     }
 
     @Test
@@ -288,9 +288,9 @@ class RealPirSchedulingRepositoryTest {
             userProfileId = 456L,
             status = OptOutJobStatus.REQUESTED,
             attemptCount = 2,
-            lastOptOutAttemptDate = 3000L,
-            optOutRequestedDate = 4000L,
-            optOutRemovedDate = 5000L,
+            lastOptOutAttemptDateInMillis = 3000L,
+            optOutRequestedDateInMillis = 4000L,
+            optOutRemovedDateInMillis = 5000L,
         )
         val optOutJobRecords = listOf(optOutJobRecord, optOutJobRecord2)
 
@@ -340,9 +340,9 @@ class RealPirSchedulingRepositoryTest {
         assertEquals(123L, result?.userProfileId)
         assertEquals(OptOutJobStatus.NOT_EXECUTED, result?.status)
         assertEquals(0, result?.attemptCount)
-        assertEquals(1000L, result?.lastOptOutAttemptDate)
-        assertEquals(2000L, result?.optOutRequestedDate)
-        assertEquals(0L, result?.optOutRemovedDate)
+        assertEquals(1000L, result?.lastOptOutAttemptDateInMillis)
+        assertEquals(2000L, result?.optOutRequestedDateInMillis)
+        assertEquals(0L, result?.optOutRemovedDateInMillis)
     }
 
     @Test

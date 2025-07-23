@@ -112,9 +112,9 @@ class RealPirSchedulingRepository @Inject constructor(
                 userProfileId = this.userProfileId,
                 status = OptOutJobStatus.valueOf(this.status),
                 attemptCount = this.attemptCount,
-                lastOptOutAttemptDate = this.lastOptOutAttemptDate,
-                optOutRequestedDate = this.optOutRequestedDate,
-                optOutRemovedDate = this.optOutRemovedDate,
+                lastOptOutAttemptDateInMillis = this.lastOptOutAttemptDate,
+                optOutRequestedDateInMillis = this.optOutRequestedDate,
+                optOutRemovedDateInMillis = this.optOutRemovedDate,
             )
         }?.takeIf {
             it.status != OptOutJobStatus.INVALID
@@ -129,9 +129,9 @@ class RealPirSchedulingRepository @Inject constructor(
                 userProfileId = it.userProfileId,
                 status = OptOutJobStatus.valueOf(it.status),
                 attemptCount = it.attemptCount,
-                lastOptOutAttemptDate = it.lastOptOutAttemptDate,
-                optOutRequestedDate = it.optOutRequestedDate,
-                optOutRemovedDate = it.optOutRemovedDate,
+                lastOptOutAttemptDateInMillis = it.lastOptOutAttemptDate,
+                optOutRequestedDateInMillis = it.optOutRequestedDate,
+                optOutRemovedDateInMillis = it.optOutRemovedDate,
             )
         }.filter {
             it.status != OptOutJobStatus.INVALID
@@ -174,9 +174,9 @@ class RealPirSchedulingRepository @Inject constructor(
                 userProfileId = optOutJobRecord.userProfileId,
                 status = optOutJobRecord.status.name,
                 attemptCount = optOutJobRecord.attemptCount,
-                lastOptOutAttemptDate = optOutJobRecord.lastOptOutAttemptDate,
-                optOutRequestedDate = optOutJobRecord.optOutRequestedDate,
-                optOutRemovedDate = optOutJobRecord.optOutRemovedDate,
+                lastOptOutAttemptDate = optOutJobRecord.lastOptOutAttemptDateInMillis,
+                optOutRequestedDate = optOutJobRecord.optOutRequestedDateInMillis,
+                optOutRemovedDate = optOutJobRecord.optOutRemovedDateInMillis,
             ).also {
                 jobSchedulingDao.saveOptOutJobRecord(it)
             }
@@ -192,9 +192,9 @@ class RealPirSchedulingRepository @Inject constructor(
                     userProfileId = it.userProfileId,
                     status = it.status.name,
                     attemptCount = it.attemptCount,
-                    lastOptOutAttemptDate = it.lastOptOutAttemptDate,
-                    optOutRequestedDate = it.optOutRequestedDate,
-                    optOutRemovedDate = it.optOutRemovedDate,
+                    lastOptOutAttemptDate = it.lastOptOutAttemptDateInMillis,
+                    optOutRequestedDate = it.optOutRequestedDateInMillis,
+                    optOutRemovedDate = it.optOutRemovedDateInMillis,
                 )
             }.also {
                 jobSchedulingDao.saveOptOutJobRecords(it)

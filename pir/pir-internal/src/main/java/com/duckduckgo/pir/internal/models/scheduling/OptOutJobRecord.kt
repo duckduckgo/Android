@@ -22,9 +22,9 @@ data class OptOutJobRecord(
     val userProfileId: Long,
     val status: OptOutJobStatus = OptOutJobStatus.NOT_EXECUTED,
     val attemptCount: Int = 0,
-    val lastOptOutAttemptDate: Long? = null,
-    val optOutRequestedDate: Long = 0L, // Date when the opt-out for the record has been successfully submitted.
-    val optOutRemovedDate: Long = 0L, // Date when we confirmed that the record has been successfully removed from the broker.
+    val lastOptOutAttemptDateInMillis: Long? = null,
+    val optOutRequestedDateInMillis: Long = 0L, // Date when the opt-out for the record has been successfully submitted.
+    val optOutRemovedDateInMillis: Long = 0L, // Date when we confirmed that the record has been successfully removed from the broker.
 )
 
 enum class OptOutJobStatus {
