@@ -36,7 +36,7 @@ class RealSurveyParameterManager @Inject constructor(
         val urlBuilder = baseUrl.toUri().buildUpon()
         requestedQueryParams.forEach { param ->
             surveyParameterPluginPoint.getProviderForSurveyParamKey(param)?.let {
-                urlBuilder.appendQueryParameter(param, it.evaluate())
+                urlBuilder.appendQueryParameter(param, it.evaluate(param))
             } ?: return null
         }
         return urlBuilder.build().toString()
@@ -48,7 +48,7 @@ class RealSurveyParameterManager @Inject constructor(
     ): String {
         val urlBuilder = baseUrl.toUri().buildUpon()
         requestedQueryParams.forEach {
-            urlBuilder.appendQueryParameter(it, surveyParameterPluginPoint.getProviderForSurveyParamKey(it)?.evaluate() ?: "")
+            urlBuilder.appendQueryParameter(it, surveyParameterPluginPoint.getProviderForSurveyParamKey(it)?.evaluate(it) ?: "")
         }
         return urlBuilder.build().toString()
     }
