@@ -39,6 +39,7 @@ import androidx.core.view.ViewPropertyAnimatorCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -67,7 +68,6 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -438,8 +438,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private fun startWelcomeAnimation() {
-        binding.daxLogo.setMaxProgress(0.9f)
-        binding.daxLogo.playAnimation()
+        binding.daxLogo.postDelayed(400) {
+            binding.daxLogo.setMaxFrame(13)
+            binding.daxLogo.playAnimation()
+        }
 
         binding.welcomeTitle.translationY = 32f.toPx()
         binding.welcomeTitle.animate()
@@ -459,8 +461,14 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         if (daxDialogAnimaationStarted) return
         daxDialogAnimaationStarted = true
 
-        val animationDelay = 1.seconds
-        val animationDuration = SCENE_TRANSITION_DURATION
+        val winkDelay = 300.milliseconds
+        val transitionDelay = 1300.milliseconds
+        val transitionDuration = SCENE_TRANSITION_DURATION
+
+        binding.daxLogo.postDelayed(winkDelay.inWholeMilliseconds) {
+            binding.daxLogo.setMaxFrame(42)
+            binding.daxLogo.resumeAnimation()
+        }
 
         ConstraintSet().apply {
             clone(binding.longDescriptionContainer)
@@ -489,8 +497,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
         ValueAnimator.ofFloat(0f, 1f)
             .apply {
-                duration = animationDuration.inWholeMilliseconds
-                startDelay = animationDelay.inWholeMilliseconds
+                duration = transitionDuration.inWholeMilliseconds
+                startDelay = transitionDelay.inWholeMilliseconds
                 interpolator = STANDARD_EASING_INTERPOLATOR
 
                 val daxLogoLayoutParams = binding.daxLogo.layoutParams as MarginLayoutParams
@@ -514,8 +522,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
         binding.welcomeTitle.animate()
             .translationX(-resources.displayMetrics.widthPixels.toFloat())
-            .setDuration(animationDuration.inWholeMilliseconds)
-            .setStartDelay(animationDelay.inWholeMilliseconds)
+            .setDuration(transitionDuration.inWholeMilliseconds)
+            .setStartDelay(transitionDelay.inWholeMilliseconds)
             .withStartAction {
                 backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_02)
             }
