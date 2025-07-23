@@ -29,42 +29,43 @@ import javax.inject.Inject
 class DefaultBrowserPromptsExperimentMetrics @Inject constructor(
     private val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles,
 ) : MetricsPixelPlugin {
+    // TODO ANA This will be removed
     override suspend fun getMetrics(): List<MetricsPixel> {
         return listOf(
             MetricsPixel(
                 metric = METRIC_DEFAULT_SET,
                 value = METRIC_VALUE_STAGE_1,
-                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25(),
                 conversionWindow = (20..60 step 20).map { ConversionWindow(lowerWindow = 1, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = METRIC_DEFAULT_SET,
                 value = METRIC_VALUE_STAGE_2,
-                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25(),
                 conversionWindow = (20..60 step 20).map { ConversionWindow(lowerWindow = 1, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = METRIC_DEFAULT_SET_VIA_CTA,
                 value = METRIC_VALUE_DIALOG,
-                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25(),
                 conversionWindow = (20..60 step 20).map { ConversionWindow(lowerWindow = 1, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = METRIC_DEFAULT_SET_VIA_CTA,
                 value = METRIC_VALUE_MENU,
-                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25(),
                 conversionWindow = (20..60 step 20).map { ConversionWindow(lowerWindow = 1, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = METRIC_STAGE_IMPRESSION,
                 value = METRIC_VALUE_STAGE_1,
-                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25(),
                 conversionWindow = (20..60 step 20).map { ConversionWindow(lowerWindow = 1, upperWindow = it) },
             ),
             MetricsPixel(
                 metric = METRIC_STAGE_IMPRESSION,
                 value = METRIC_VALUE_STAGE_2,
-                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
+                toggle = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25(),
                 conversionWindow = (20..60 step 20).map { ConversionWindow(lowerWindow = 1, upperWindow = it) },
             ),
         )

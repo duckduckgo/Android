@@ -144,7 +144,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private val featureSettingsJsonAdapter = moshi.adapter(FeatureSettingsConfigModel::class.java)
 
     /**
-     * Caches deserialized [Toggle.getSettings] for [DefaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501].
+     * Caches deserialized [Toggle.getSettings] for [DefaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25].
      *
      * Since we're re-evaluating the experiment on every process' resume,
      * this allows us to avoid constantly deserializing the same value.
@@ -176,7 +176,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appCoroutineScope.launch {
-            experimentAppUsageRepository.recordAppUsedNow()
+            // experimentAppUsageRepository.recordAppUsedNow()
             evaluate()
         }
     }
@@ -189,13 +189,22 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private suspend fun evaluate() = evaluationMutex.withLock {
+        // TODO ANA: handle here new users and existing users differently
         val isOnboardingComplete = userStageStore.getUserAppStage() == AppStage.ESTABLISHED
-        val isEnrolled = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501().getCohort() != null
-        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-        val isEligible = isOnboardingComplete && (isEnrolled || !isDefaultBrowser)
-        if (!isEligible) {
+
+        if (isOnboardingComplete) {
+            experimentAppUsageRepository.recordAppUsedNow()
+        } else {
             return
         }
+
+        val isEnabled =
+            defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
+        if (!isEnabled) {
+            return
+        }
+
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
 
         val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.first() == CONVERTED
         val isStopped = defaultBrowserPromptsDataStore.experimentStage.first() == STOPPED
@@ -203,22 +212,14 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             return
         }
 
-        val activeCohortName = defaultBrowserPromptsFeatureToggles.getOrAssignCohort()
+        // TODO ANA: use something different than enrolled / not enrolled
         val currentExperimentStage = defaultBrowserPromptsDataStore.experimentStage.first()
-        if (activeCohortName == null && currentExperimentStage == NOT_ENROLLED) {
-            // The user wasn't enrolled before and wasn't enrolled now either.
-            return
-        }
-
-        val newExperimentStage = if (activeCohortName == null) {
-            // If experiment was underway but we lost the cohort name, it means that the experiment was remotely disabled.
-            STOPPED
-        } else if (isDefaultBrowser) {
+        val newExperimentStage = if (isDefaultBrowser) {
             CONVERTED
+        } else if (currentExperimentStage == NOT_ENROLLED) {
+            ENROLLED
         } else {
-            val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment(
-                defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
-            ).getOrElse { throwable ->
+            val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
@@ -286,7 +287,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             }
 
             val action = experimentStageEvaluatorPluginPoint.getPlugins()
-                .firstOrNull { it.targetCohort == activeCohortName }?.evaluate(newExperimentStage)
+                .firstOrNull { it.targetCohort == AdditionalPromptsCohortName.VARIANT_3 }?.evaluate(newExperimentStage)
                 ?: DefaultBrowserPromptsExperimentStageAction.disableAll // if there's no matching evaluator, or cohort is null or disabled, clean up
 
             if (action.showMessageDialog) {
@@ -381,7 +382,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private suspend fun DefaultBrowserPromptsFeatureToggles.parseFeatureSettings(): FeatureSettings? = withContext(dispatchers.io()) {
-        defaultBrowserAdditionalPrompts202501().getSettings()?.let { settings ->
+        defaultBrowserPrompts25().getSettings()?.let { settings ->
             try {
                 featureSettingsJsonAdapter.fromJson(settings)?.toFeatureSettings()
             } catch (e: Exception) {
@@ -389,16 +390,6 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 null
             }
         }
-    }
-
-    private suspend fun DefaultBrowserPromptsFeatureToggles.getOrAssignCohort(): AdditionalPromptsCohortName? {
-        defaultBrowserAdditionalPrompts202501().enroll()
-        for (cohort in AdditionalPromptsCohortName.entries) {
-            if (defaultBrowserAdditionalPrompts202501().isEnrolledAndEnabled(cohort)) {
-                return cohort
-            }
-        }
-        return null
     }
 
     private suspend fun fireConversionPixels(currentExperimentStage: ExperimentStage) {
@@ -418,7 +409,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private fun fireInteractionPixel(pixelName: AppPixelName) = appCoroutineScope.launch {
-        val variant = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501().getCohort()?.name?.lowercase() ?: ""
+        val variant = defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().getCohort()?.name?.lowercase() ?: ""
         val stage = defaultBrowserPromptsDataStore.experimentStage.first().toString().lowercase()
         pixel.fire(
             pixel = pixelName,

@@ -32,9 +32,6 @@ interface DefaultBrowserPromptsFeatureToggles {
     fun self(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun defaultBrowserAdditionalPrompts202501(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun defaultBrowserPrompts25(): Toggle
 
     enum class AdditionalPromptsCohortName(override val cohortName: String) : CohortName {
