@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-apply plugin: 'java-library'
-apply plugin: 'kotlin'
+plugins {
+    id 'java-library'
+    id 'kotlin'
+}
 
 dependencies {
     compileOnly "com.android.tools.lint:lint-api:$lint_version"
