@@ -111,8 +111,9 @@ class UriString {
             }
 
             if (extractUrlQuery) {
-                extractUrl(inputQuery)?.let {
-                    return true
+                val extractedUrl = extractUrl(inputQuery)
+                if (extractedUrl != null) {
+                    return isWebUrl(extractedUrl)
                 }
             }
 
