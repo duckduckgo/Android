@@ -22,13 +22,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/contentContainer"
+    <ScrollView
+        android:id="@+id/newTabContainerScrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintTop_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/newTabContainerLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </ScrollView>
 
     <FrameLayout
         android:id="@+id/bottomFadeContainer"
