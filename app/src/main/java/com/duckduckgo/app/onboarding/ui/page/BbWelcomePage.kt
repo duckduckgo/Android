@@ -208,7 +208,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     showDaxDialogCardView(
                         onAnimationEnd = {
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
-                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBb)
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
@@ -218,10 +217,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                     view.setOnClickListener(null)
                                 }
                                 binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
-
-                                if (binding.daxDialogCta.initial.dialogBody.text.isEmpty()) {
-                                    binding.daxDialogCta.initial.dialogBody.text = descriptionText
-                                }
 
                                 binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                                 binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
@@ -233,12 +228,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                 .withEndAction {
                                     binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
                                         titleText,
-                                        afterAnimation = {
-                                            binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
-                                                descriptionText,
-                                                afterAnimation = { afterTypingAnimation() },
-                                            )
-                                        },
+                                        afterAnimation = { afterTypingAnimation() },
                                     )
                                 }
                         },
@@ -256,19 +246,13 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     showDaxDialogCardView(
                         onAnimationEnd = {
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
-                            val descriptionText = getString(R.string.highlightsPreOnboardingDaxDialog1DescriptionBb)
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
-                                binding.daxDialogCta.initial.dialogBody.finishAnimation()
                                 binding.daxDialogCta.primaryCta.setOnClickListener { view ->
                                     // delay the action so that the button can show visual feedback before we hide it
                                     view.postDelayed(200) { viewModel.onPrimaryCtaClicked(INITIAL) }
                                     view.setOnClickListener(null)
-                                }
-
-                                if (binding.daxDialogCta.initial.dialogBody.text.isEmpty()) {
-                                    binding.daxDialogCta.initial.dialogBody.text = descriptionText
                                 }
 
                                 binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
@@ -280,12 +264,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                 .withEndAction {
                                     binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
                                         titleText,
-                                        afterAnimation = {
-                                            binding.daxDialogCta.initial.dialogBody.startTypingAnimation(
-                                                descriptionText,
-                                                afterAnimation = { afterTypingAnimation() },
-                                            )
-                                        },
+                                        afterAnimation = { afterTypingAnimation() },
                                     )
                                 }
                         },
