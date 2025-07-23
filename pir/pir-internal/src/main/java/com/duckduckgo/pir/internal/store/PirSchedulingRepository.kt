@@ -37,9 +37,25 @@ interface PirSchedulingRepository {
     suspend fun getAllValidScanJobRecords(): List<ScanJobRecord>
 
     /**
+     * Returns a matching ScanJobRecord whose state is not INVALID
+     */
+    suspend fun getValidScanJobRecord(
+        brokerName: String,
+        userProfileId: Long,
+    ): ScanJobRecord?
+
+    /**
      * Returns all ScanJobRecord whose state is not INVALID
      */
     suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord>
+
+    /**
+     * Returns a matching [OptOutJobRecord] whose state is not INVALID
+     */
+    suspend fun getValidOptOutJobRecord(
+        extractedProfileId: Long,
+    ): OptOutJobRecord?
+
     suspend fun saveScanJobRecord(scanJobRecord: ScanJobRecord)
     suspend fun saveScanJobRecords(scanJobRecords: List<ScanJobRecord>)
     suspend fun saveOptOutJobRecord(optOutJobRecord: OptOutJobRecord)
@@ -69,6 +85,39 @@ class RealPirSchedulingRepository @Inject constructor(
             )
         }.filter {
             it.status != ScanJobStatus.INVALID
+        }
+    }
+
+    override suspend fun getValidScanJobRecord(
+        brokerName: String,
+        userProfileId: Long,
+    ): ScanJobRecord? = withContext(dispatcherProvider.io()) {
+        return@withContext jobSchedulingDao.getScanJobRecord(brokerName, userProfileId)?.run {
+            ScanJobRecord(
+                brokerName = this.brokerName,
+                userProfileId = this.userProfileId,
+                status = ScanJobStatus.valueOf(this.status),
+                lastScanDateInMillis = this.lastScanDateInMillis,
+            )
+        }?.takeIf {
+            it.status != ScanJobStatus.INVALID
+        }
+    }
+
+    override suspend fun getValidOptOutJobRecord(extractedProfileId: Long): OptOutJobRecord? = withContext(dispatcherProvider.io()) {
+        return@withContext jobSchedulingDao.getOptOutJobRecord(extractedProfileId)?.run {
+            OptOutJobRecord(
+                extractedProfileId = this.extractedProfileId,
+                brokerName = this.brokerName,
+                userProfileId = this.userProfileId,
+                status = OptOutJobStatus.valueOf(this.status),
+                attemptCount = this.attemptCount,
+                lastOptOutAttemptDate = this.lastOptOutAttemptDate,
+                optOutRequestedDate = this.optOutRequestedDate,
+                optOutRemovedDate = this.optOutRemovedDate,
+            )
+        }?.takeIf {
+            it.status != OptOutJobStatus.INVALID
         }
     }
 

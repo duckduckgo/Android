@@ -194,6 +194,36 @@ class RealPirSchedulingRepositoryTest {
     }
 
     @Test
+    fun whenGetValidScanJobRecordAndRecordExistsThenReturnRecord() = runTest {
+        whenever(mockJobSchedulingDao.getScanJobRecord("test-broker", 123L)).thenReturn(validScanJobEntity)
+
+        val result = testee.getValidScanJobRecord("test-broker", 123L)
+
+        assertEquals("test-broker", result?.brokerName)
+        assertEquals(123L, result?.userProfileId)
+        assertEquals(ScanJobStatus.NOT_EXECUTED, result?.status)
+        assertEquals(1000L, result?.lastScanDateInMillis)
+    }
+
+    @Test
+    fun whenGetValidScanJobRecordAndRecordIsInvalidThenReturnNull() = runTest {
+        whenever(mockJobSchedulingDao.getScanJobRecord("invalid-broker", 456L)).thenReturn(invalidScanJobEntity)
+
+        val result = testee.getValidScanJobRecord("invalid-broker", 456L)
+
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun whenGetValidScanJobRecordAndRecordNotFoundThenReturnNull() = runTest {
+        whenever(mockJobSchedulingDao.getScanJobRecord("nonexistent-broker", 999L)).thenReturn(null)
+
+        val result = testee.getValidScanJobRecord("nonexistent-broker", 999L)
+
+        assertEquals(null, result)
+    }
+
+    @Test
     fun whenGetAllValidOptOutJobRecordsThenReturnOnlyValidRecords() = runTest {
         whenever(mockJobSchedulingDao.getAllOptOutJobRecords()).thenReturn(
             listOf(validOptOutJobEntity, invalidOptOutJobEntity),
@@ -297,6 +327,40 @@ class RealPirSchedulingRepositoryTest {
         testee.deleteAllOptOutJobRecords()
 
         verify(mockJobSchedulingDao).deleteAllOptOutJobRecords()
+    }
+
+    @Test
+    fun whenGetValidOptOutJobRecordAndRecordExistsThenReturnRecord() = runTest {
+        whenever(mockJobSchedulingDao.getOptOutJobRecord(789L)).thenReturn(validOptOutJobEntity)
+
+        val result = testee.getValidOptOutJobRecord(789L)
+
+        assertEquals(789L, result?.extractedProfileId)
+        assertEquals("test-broker", result?.brokerName)
+        assertEquals(123L, result?.userProfileId)
+        assertEquals(OptOutJobStatus.NOT_EXECUTED, result?.status)
+        assertEquals(0, result?.attemptCount)
+        assertEquals(1000L, result?.lastOptOutAttemptDate)
+        assertEquals(2000L, result?.optOutRequestedDate)
+        assertEquals(0L, result?.optOutRemovedDate)
+    }
+
+    @Test
+    fun whenGetValidOptOutJobRecordAndRecordIsInvalidThenReturnNull() = runTest {
+        whenever(mockJobSchedulingDao.getOptOutJobRecord(999L)).thenReturn(invalidOptOutJobEntity)
+
+        val result = testee.getValidOptOutJobRecord(999L)
+
+        assertEquals(null, result)
+    }
+
+    @Test
+    fun whenGetValidOptOutJobRecordAndRecordNotFoundThenReturnNull() = runTest {
+        whenever(mockJobSchedulingDao.getOptOutJobRecord(8888L)).thenReturn(null)
+
+        val result = testee.getValidOptOutJobRecord(8888L)
+
+        assertEquals(null, result)
     }
 
     // Combined delete tests
