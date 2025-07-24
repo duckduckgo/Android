@@ -23,8 +23,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.PirInternalConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.models.ProfileQuery
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.internal.optout.PirOptOut
 import com.duckduckgo.pir.internal.scan.PirScan
 import com.duckduckgo.pir.internal.scheduling.PirExecutionType.MANUAL

@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.PirInternalConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.PirActionsRunner
@@ -30,7 +31,6 @@ import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
-import com.duckduckgo.pir.internal.models.Address
 import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.store.PirRepository
@@ -100,60 +100,6 @@ class RealPirOptOut @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
-    private var profileQueries: List<ProfileQuery> = listOf(
-        ProfileQuery(
-            id = -1,
-            firstName = "William",
-            lastName = "Smith",
-            city = "Chicago",
-            state = "IL",
-            addresses = listOf(
-                Address(
-                    city = "Chicago",
-                    state = "IL",
-                ),
-            ),
-            birthYear = 1993,
-            fullName = "William Smith",
-            age = 32,
-            deprecated = false,
-        ),
-        ProfileQuery(
-            id = -2,
-            firstName = "Jane",
-            lastName = "Doe",
-            city = "New York",
-            state = "NY",
-            addresses = listOf(
-                Address(
-                    city = "New York",
-                    state = "NY",
-                ),
-            ),
-            birthYear = 1990,
-            fullName = "Jane Doe",
-            age = 35,
-            deprecated = false,
-        ),
-        ProfileQuery(
-            id = -3,
-            firstName = "Alicia",
-            lastName = "West",
-            city = "Los Angeles",
-            state = "CA",
-            addresses = listOf(
-                Address(
-                    city = "Los Angeles",
-                    state = "CA",
-                ),
-            ),
-            birthYear = 1985,
-            fullName = "Alicia West",
-            age = 40,
-            deprecated = false,
-        ),
-    )
-
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
     private var maxWebViewCount = 1
 
@@ -167,7 +113,7 @@ class RealPirOptOut @Inject constructor(
             cleanRunners()
             runners.clear()
         }
-        obtainProfiles()
+        val profileQueries = obtainProfiles()
 
         logcat { "PIR-OPT-OUT: Running debug opt-out for $brokers on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
@@ -216,7 +162,7 @@ class RealPirOptOut @Inject constructor(
             cleanRunners()
             runners.clear()
         }
-        obtainProfiles()
+        val profileQueries = obtainProfiles()
 
         logcat { "PIR-OPT-OUT: Running opt-out on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
@@ -272,10 +218,10 @@ class RealPirOptOut @Inject constructor(
         return@withContext Result.success(Unit)
     }
 
-    private suspend fun obtainProfiles() {
+    private suspend fun obtainProfiles(): List<ProfileQuery> {
         repository.getUserProfileQueries().also { profiles ->
-            if (profiles.isNotEmpty()) {
-                profileQueries = profiles
+            return profiles.ifEmpty {
+                DEFAULT_PROFILE_QUERIES
             }
         }
     }

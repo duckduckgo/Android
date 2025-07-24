@@ -21,6 +21,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.PirInternalConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
 import com.duckduckgo.pir.internal.common.PirActionsRunner
@@ -29,7 +30,6 @@ import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
-import com.duckduckgo.pir.internal.models.Address
 import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
@@ -95,60 +95,6 @@ class RealPirScan @Inject constructor(
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirScan, PirJob(callbacks) {
 
-    private var profileQueries: List<ProfileQuery> = listOf(
-        ProfileQuery(
-            id = -1,
-            firstName = "William",
-            lastName = "Smith",
-            city = "Chicago",
-            state = "IL",
-            addresses = listOf(
-                Address(
-                    city = "Chicago",
-                    state = "IL",
-                ),
-            ),
-            birthYear = 1993,
-            fullName = "William Smith",
-            age = 32,
-            deprecated = false,
-        ),
-        ProfileQuery(
-            id = -2,
-            firstName = "Jane",
-            lastName = "Doe",
-            city = "New York",
-            state = "NY",
-            addresses = listOf(
-                Address(
-                    city = "New York",
-                    state = "NY",
-                ),
-            ),
-            birthYear = 1990,
-            fullName = "Jane Doe",
-            age = 35,
-            deprecated = false,
-        ),
-        ProfileQuery(
-            id = -3,
-            firstName = "Alicia",
-            lastName = "West",
-            city = "Los Angeles",
-            state = "CA",
-            addresses = listOf(
-                Address(
-                    city = "Los Angeles",
-                    state = "CA",
-                ),
-            ),
-            birthYear = 1985,
-            fullName = "Alicia West",
-            age = 40,
-            deprecated = false,
-        ),
-    )
-
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
     private var maxWebViewCount = 1
 
@@ -163,6 +109,10 @@ class RealPirScan @Inject constructor(
 
         emitScanStartPixel(runType)
         cleanPreviousRun()
+
+        val profileQueries = obtainProfiles()
+
+        logcat { "PIR-SCAN: Running scan on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
         val script = pirCssScriptLoader.getScript()
         maxWebViewCount = minOf(brokers.size * profileQueries.size, MAX_DETACHED_WEBVIEW_COUNT)
@@ -230,13 +180,14 @@ class RealPirScan @Inject constructor(
             runners.clear()
         }
         repository.deleteAllScanResults()
+    }
+
+    private suspend fun obtainProfiles(): List<ProfileQuery> {
         repository.getUserProfileQueries().also { profiles ->
-            if (profiles.isNotEmpty()) {
-                profileQueries = profiles
+            return profiles.ifEmpty {
+                DEFAULT_PROFILE_QUERIES
             }
         }
-
-        logcat { "PIR-SCAN: Running scan on profiles: $profileQueries on ${Thread.currentThread().name}" }
     }
 
     override suspend fun executeAllBrokers(

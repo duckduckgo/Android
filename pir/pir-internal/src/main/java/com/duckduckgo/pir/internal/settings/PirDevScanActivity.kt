@@ -168,7 +168,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             stopService(Intent(this, PirForegroundScanService::class.java))
             lifecycleScope.launch(dispatcherProvider.io()) {
                 repository.deleteAllScanResults()
-                repository.deleteAllUserProfiles()
+                repository.deleteAllUserProfilesQueries()
                 repository.deleteEventLogs()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
