@@ -107,7 +107,7 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginVertical="@dimen/keyline_1"
-            app:srcCompat="@drawable/ic_cross_gray_buck" />
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
 
         <View
             android:layout_width="1dp"
@@ -122,7 +122,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             android:padding="2dp"
-            app:srcCompat="@drawable/ic_check_green_buck" />
+            app:srcCompat="@drawable/ic_check_green_bb" />
 
     </LinearLayout>
 
@@ -166,7 +166,7 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginVertical="@dimen/keyline_1"
-            app:srcCompat="@drawable/ic_cross_gray_buck" />
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
 
         <View
             android:layout_width="1dp"
@@ -181,7 +181,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             android:padding="2dp"
-            app:srcCompat="@drawable/ic_check_green_buck" />
+            app:srcCompat="@drawable/ic_check_green_bb" />
 
     </LinearLayout>
 
@@ -226,7 +226,7 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginVertical="@dimen/keyline_1"
-            app:srcCompat="@drawable/ic_cross_gray_buck" />
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
 
         <View
             android:layout_width="1dp"
@@ -241,7 +241,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             android:padding="2dp"
-            app:srcCompat="@drawable/ic_check_green_buck" />
+            app:srcCompat="@drawable/ic_check_green_bb" />
 
     </LinearLayout>
 
@@ -285,7 +285,7 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginVertical="@dimen/keyline_1"
-            app:srcCompat="@drawable/ic_cross_gray_buck" />
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
 
         <View
             android:layout_width="1dp"
@@ -300,7 +300,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             android:padding="2dp"
-            app:srcCompat="@drawable/ic_check_green_buck" />
+            app:srcCompat="@drawable/ic_check_green_bb" />
 
     </LinearLayout>
 
@@ -345,7 +345,7 @@
             android:layout_width="@dimen/keyline_5"
             android:layout_height="@dimen/keyline_5"
             android:layout_marginVertical="@dimen/keyline_1"
-            app:srcCompat="@drawable/ic_cross_gray_buck" />
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
 
         <View
             android:layout_width="1dp"
@@ -361,7 +361,7 @@
             android:layout_marginEnd="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             android:padding="2dp"
-            app:srcCompat="@drawable/ic_check_green_buck" />
+            app:srcCompat="@drawable/ic_check_green_bb" />
 
     </LinearLayout>
 
