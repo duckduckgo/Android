@@ -95,6 +95,8 @@
     <color name="bbColorComparisonChartItemBackground">#F1F1EE</color>
     <color name="bbColorComparisonChartItemIcon">@color/bbColorPrimaryText</color>
     <color name="bbColorComparisonChartDivider">#D7D5C9</color>
+    <color name="bbColorComparisonChartCheckIcon">#399F29</color>
+    <color name="bbColorComparisonChartCrossIcon">#27251F</color>
 
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
