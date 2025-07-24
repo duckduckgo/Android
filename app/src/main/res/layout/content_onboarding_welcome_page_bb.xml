@@ -70,6 +70,17 @@
         app:layout_constraintGuide_end="0dp"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <com.duckduckgo.app.onboarding.ui.page.BbOnboardingProgressView
+        android:id="@+id/onboardingProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
+        android:alpha="0"
+        tools:alpha="1"/>
+
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/daxLogo"
         android:layout_width="64dp"
