@@ -50,11 +50,23 @@
         android:layout_marginBottom="@dimen/keyline_4"
         android:textColor="@color/black84"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/infoIcon"
         app:layout_constraintStart_toEndOf="@+id/infoPanelAnimatedImage"
         app:layout_constraintTop_toTopOf="parent"
         app:typography="body2"
-        tools:text="396 trackers blocked in the last 7 days"
-        tools:ignore="InvalidColorAttribute" />
+        tools:ignore="InvalidColorAttribute"
+        tools:text="396 trackers blocked in the last 7 days" />
+
+    <ImageView
+        android:id="@+id/infoIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_info_16"
+        app:tint="@color/black60" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
