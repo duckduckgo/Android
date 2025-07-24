@@ -44,29 +44,6 @@
 
     </FrameLayout>
 
-    <FrameLayout
-        android:id="@+id/descriptionContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/titleContainer">
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/Typography.BB.Body1"
-            tools:text="@string/highlightsPreOnboardingDaxDialog23DescriptionBb"
-            android:textColor="@color/bbColorSecondaryText" />
-
-        <TextView
-            android:id="@+id/descriptionInvisible"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/Typography.BB.Body1"
-            android:visibility="invisible" />
-
-    </FrameLayout>
-
     <ImageView
         android:id="@+id/ddgLogo"
         android:layout_width="48dp"
@@ -74,7 +51,7 @@
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginEnd="@dimen/keyline_1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/descriptionContainer"
+        app:layout_constraintTop_toBottomOf="@id/titleContainer"
         app:layout_constraintBottom_toTopOf="@id/row1"
         app:layout_constraintVertical_chainStyle="packed"
         app:srcCompat="@drawable/ic_ddg_comparison_chart" />
