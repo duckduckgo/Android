@@ -14,15 +14,15 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/longDescriptionContainer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:tag="onboardingDefaultBrowser"
-        tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/longDescriptionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:tag="onboardingDefaultBrowser"
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
 
     <ImageView
         android:id="@+id/background1"
@@ -81,20 +81,32 @@
         android:alpha="0"
         tools:alpha="1"/>
 
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/daxLogo"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:layout_marginTop="150dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
-        android:scaleX="2.15"
-        android:scaleY="2.15"
+    <!--
+        This FrameLayout is a workaround for an issue related to animating size+position of daxLogo
+        while also using scaleX/scaleY to deal with drawable's internal padding.
+     -->
+    <FrameLayout
+        android:id="@+id/daxLogoContainer"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="128dp"
+        android:clipChildren="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
-        app:lottie_loop="false"
-        app:lottie_rawRes="@raw/bb_dax_logo_wink" />
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/daxLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:scaleX="2.15"
+            android:scaleY="2.15"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/bb_dax_logo_wink" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/welcomeTitle"
@@ -110,7 +122,7 @@
         android:textSize="48sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/daxLogo"
+        app:layout_constraintTop_toBottomOf="@id/daxLogoContainer"
         android:alpha="0" />
 
     <include

@@ -467,13 +467,13 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         ConstraintSet().apply {
             clone(binding.longDescriptionContainer)
             // update dax logo constraints to set it up for transition using its start+top margins
-            clear(R.id.daxLogo, ConstraintSet.END)
+            clear(R.id.daxLogoContainer, ConstraintSet.END)
             connect(
-                R.id.daxLogo,
+                R.id.daxLogoContainer,
                 ConstraintSet.START,
                 ConstraintSet.PARENT_ID,
                 ConstraintSet.START,
-                binding.daxLogo.x.toInt(), // adjust start margin to maintain current position
+                binding.daxLogoContainer.x.toInt(), // adjust start margin to maintain current position
             )
 
             // update title text constraints to disconnect it from dax logo
@@ -495,20 +495,30 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 startDelay = transitionDelay.inWholeMilliseconds
                 interpolator = STANDARD_EASING_INTERPOLATOR
 
-                val daxLogoLayoutParams = binding.daxLogo.layoutParams as MarginLayoutParams
+                val daxLogoLayoutParams = binding.daxLogoContainer.layoutParams as MarginLayoutParams
+                val initialWidth = daxLogoLayoutParams.width
+                val initialHeight = daxLogoLayoutParams.height
                 val initialMarginStart = daxLogoLayoutParams.marginStart
                 val initialMarginTop = daxLogoLayoutParams.topMargin
-                val targetMarginStart = 16f.toPx()
-                val targetMarginTop = 0f
+                val targetMarginStart = 16.toPx()
+                val targetMarginTop = 0
+                val targetWidth = 64.toPx()
+                val targetHeight = 64.toPx()
+
+                fun calculateCurrentValue(
+                    initial: Int,
+                    target: Int,
+                    progress: Float,
+                ): Int = (initial + (target - initial) * progress).toInt()
 
                 addUpdateListener { animator ->
                     val progress = animator.animatedValue as Float
 
-                    binding.daxLogo.updateLayoutParams<MarginLayoutParams> {
-                        marginStart =
-                            (initialMarginStart + (targetMarginStart - initialMarginStart) * progress).toInt()
-                        topMargin =
-                            (initialMarginTop + (targetMarginTop - initialMarginTop) * progress).toInt()
+                    binding.daxLogoContainer.updateLayoutParams<MarginLayoutParams> {
+                        marginStart = calculateCurrentValue(initialMarginStart, targetMarginStart, progress)
+                        topMargin = calculateCurrentValue(initialMarginTop, targetMarginTop, progress)
+                        width = calculateCurrentValue(initialWidth, targetWidth, progress)
+                        height = calculateCurrentValue(initialHeight, targetHeight, progress)
                     }
                 }
             }
