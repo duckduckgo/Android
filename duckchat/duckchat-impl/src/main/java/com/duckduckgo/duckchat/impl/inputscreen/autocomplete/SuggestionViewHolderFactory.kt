@@ -38,8 +38,6 @@ import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteInAppMessageBind
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.OTHER_ITEM
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Companion.SEARCH_ITEM
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface SuggestionViewHolderFactory {
@@ -300,12 +298,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 editQueryImage.setImageResource(R.drawable.ic_arrow_circle_down_left_16)
             }
-
-            if (item.isAllowedInTopHits) {
-                root.tag = OTHER_ITEM
-            } else {
-                root.tag = SEARCH_ITEM
-            }
         }
     }
 
@@ -322,8 +314,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
                 longPressClickListener(item)
                 true
             }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -337,8 +327,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
             bookmarkIndicator.setImageResource(if (item.isFavorite) R.drawable.ic_bookmark_favorite_24 else CommonR.drawable.ic_bookmark_24)
             root.setOnClickListener { immediateSearchListener(item) }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -356,8 +344,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
                 longPressClickListener(item)
                 true
             }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -370,8 +356,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase)
 
             root.setOnClickListener { immediateSearchListener(item) }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -391,8 +375,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 binding.editQueryImage.setImageResource(R.drawable.ic_arrow_circle_down_left_16)
             }
-
-            binding.root.tag = OTHER_ITEM
         }
     }
 
@@ -411,8 +393,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             )
             binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
             binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
-
-            binding.root.tag = OTHER_ITEM
         }
     }
 }

@@ -42,6 +42,9 @@ import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoComplete
 // TODO: Should be moved to the API when we refactor the browser screen with the same logic.
 private object AutoCompleteDivider
 
+private val AutoCompleteSuggestion.isSearchItem: Boolean
+    get() = this is AutoCompleteSearchSuggestion && !this.isAllowedInTopHits
+
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -142,17 +145,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     }
 
     private fun needsDivider(current: AutoCompleteSuggestion, next: AutoCompleteSuggestion): Boolean {
-        val currentType = getItemType(current)
-        val nextType = getItemType(next)
-
-        return (currentType == SEARCH_ITEM && nextType == OTHER_ITEM) || (currentType == OTHER_ITEM && nextType == SEARCH_ITEM)
-    }
-
-    private fun getItemType(suggestion: AutoCompleteSuggestion): String {
-        return when (suggestion) {
-            is AutoCompleteSearchSuggestion -> if (suggestion.isAllowedInTopHits) OTHER_ITEM else SEARCH_ITEM
-            else -> OTHER_ITEM
-        }
+        return current.isSearchItem xor next.isSearchItem
     }
 
     object Type {
@@ -165,10 +158,5 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val DEFAULT_TYPE = 7
         const val SWITCH_TO_TAB_TYPE = 8
         const val DIVIDER_TYPE = 9
-    }
-
-    companion object {
-        const val SEARCH_ITEM = "SEARCH_ITEM"
-        const val OTHER_ITEM = "OTHER_ITEM"
     }
 }
