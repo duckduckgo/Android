@@ -174,7 +174,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
     }
 
     private fun needsDivider(current: AutoCompleteSuggestion, next: AutoCompleteSuggestion): Boolean {
-        return current.isSearchItem xor next.isSearchItem
+        return current.isSearchItem != next.isSearchItem
     }
 
     object Type {
