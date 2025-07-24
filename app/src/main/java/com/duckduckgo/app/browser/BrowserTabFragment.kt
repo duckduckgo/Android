@@ -288,9 +288,9 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.QUERY
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity.Companion.TAB_ID
-import com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -896,25 +896,29 @@ class BrowserTabFragment :
         )
     }
 
-    private val searchInterstitialLauncher =
-        registerForActivityResult(StartActivityForResult()) { result ->
-            val data = result.data ?: return@registerForActivityResult
+    private val inputScreenLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        val data = result.data ?: return@registerForActivityResult
 
-            when (result.resultCode) {
-                RESULT_OK -> {
-                    data.getStringExtra(QUERY)?.let { query ->
-                        submitQuery(query)
-                    } ?: data.getStringExtra(TAB_ID)?.let { tabId ->
-                        browserActivity?.openExistingTab(tabId)
-                    }
+        when (result.resultCode) {
+            InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED -> {
+                data.getStringExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM)?.let { query ->
+                    submitQuery(query)
                 }
-                RESULT_CANCELED -> {
-                    data.getStringExtra(QUERY)?.let { query ->
-                        omnibar.setDraftTextIfNtp(query)
-                    }
+            }
+
+            InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED -> {
+                data.getStringExtra(InputScreenActivityResultParams.TAB_ID_PARAM)?.let { tabId ->
+                    browserActivity?.openExistingTab(tabId)
+                }
+            }
+
+            RESULT_CANCELED -> {
+                data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
+                    omnibar.setDraftTextIfNtp(query)
                 }
             }
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1092,7 +1096,7 @@ class BrowserTabFragment :
                 enterTransition,
                 exitTransition,
             )
-            searchInterstitialLauncher.launch(intent, options)
+            inputScreenLauncher.launch(intent, options)
         }
     }
 
