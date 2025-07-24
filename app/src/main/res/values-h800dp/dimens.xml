@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2025 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,15 +15,5 @@
   -->
 
 <resources>
-    <color name="buckColorPrimaryText">@color/white</color>
-
-    <color name="buckColorButtonPrimaryContainer">#FFDF80</color>
-    <color name="buckColorButtonPrimaryContainerPressed">#CCAA00</color>
-    <color name="buckColorButtonPrimaryText">@color/black</color>
-
-    <color name="buckColorButtonSecondaryBorder">#074C89</color>
-    <color name="buckColorButtonSecondaryText">@color/white</color>
-    <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
-
-    <color name="buckColorButtonFAB">#042E50</color>
+    <bool name="show_wing_animation">true</bool>
 </resources>
