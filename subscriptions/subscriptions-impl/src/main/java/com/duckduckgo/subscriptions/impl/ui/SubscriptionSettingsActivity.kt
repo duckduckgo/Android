@@ -177,6 +177,19 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
 
+            // Privacy Pro Rebranding active
+            if (viewState.rebrandingEnabled) {
+                binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
+                binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
+                binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
+                binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
+            } else {
+                binding.subscriptionSettingsProductName.setText(string.privacyPro)
+                binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
+                binding.faq.setPrimaryText(getString(string.privacyProFaq))
+                binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
+            }
+
             // Free Trial active
             if (viewState.activeOffers.contains(ActiveOfferType.TRIAL)) {
                 binding.subscriptionActiveStatusTextView.text = getString(string.subscriptionStatusFreeTrial)
@@ -202,19 +215,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 val subscriptionsDataStringResId = when (viewState.duration) {
                     Monthly -> string.subscriptionsDataMonthly
                     Yearly -> string.subscriptionsDataYearly
-                }
-
-                // Privacy Pro Rebranding active
-                if (viewState.rebrandingEnabled) {
-                    binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
-                    binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
-                    binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
-                    binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
-                } else {
-                    binding.subscriptionSettingsProductName.setText(string.privacyPro)
-                    binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
-                    binding.faq.setPrimaryText(getString(string.privacyProFaq))
-                    binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
                 }
 
                 binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))

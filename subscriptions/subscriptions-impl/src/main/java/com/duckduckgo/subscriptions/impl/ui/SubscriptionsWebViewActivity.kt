@@ -188,6 +188,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
         setContentView(binding.root)
 
+        viewModel.viewState
+            .onEach { setupInternalToolbar(toolbar, it) }
+            .launchIn(lifecycleScope)
+
         binding.webview.let {
             subscriptionJsMessaging.register(
                 it,
@@ -265,10 +269,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         if (savedInstanceState == null && params.url == BUY_URL) {
             viewModel.paywallShown()
         }
-
-        viewModel.viewState
-            .onEach { setupInternalToolbar(toolbar, it) }
-            .launchIn(lifecycleScope)
     }
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
@@ -426,7 +426,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 supportActionBar?.setDisplayShowTitleEnabled(false)
                 binding.includeToolbar.logoToolbar.show()
                 binding.includeToolbar.titleToolbar.show()
-                title = if (viewState.rebrandingEnabled) {
+                title = null
+                binding.includeToolbar.titleToolbar.text = if (viewState.rebrandingEnabled) {
                     getString(string.privacyProRebranding)
                 } else {
                     getString(string.privacyPro)
