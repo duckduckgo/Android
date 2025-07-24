@@ -18,8 +18,8 @@ package com.duckduckgo.pir.internal.scheduling
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.internal.models.scheduling.BrokerSchedulingConfig
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirSchedulingRepository
 import java.util.concurrent.TimeUnit
@@ -77,7 +77,7 @@ class RealEligibleOptOutJobProviderTest {
         userProfileId = 123L,
         status = OptOutJobStatus.NOT_EXECUTED,
         attemptCount = 0,
-        lastOptOutAttemptDateInMillis = null,
+        lastOptOutAttemptDateInMillis = 0L,
         optOutRequestedDateInMillis = 0L,
         optOutRemovedDateInMillis = 0L,
     )
@@ -316,7 +316,7 @@ class RealEligibleOptOutJobProviderTest {
 
     @Test
     fun whenGetAllEligibleOptOutJobsWithErrorJobWithNullLastAttemptDateThenReturnEmpty() = runTest {
-        val errorRecordWithNullDate = optOutJobRecordError.copy(lastOptOutAttemptDateInMillis = null)
+        val errorRecordWithNullDate = optOutJobRecordError.copy(lastOptOutAttemptDateInMillis = 0L)
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(listOf(errorRecordWithNullDate))
 

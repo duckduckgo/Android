@@ -19,11 +19,10 @@ package com.duckduckgo.pir.internal.scheduling
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.models.scheduling.BrokerSchedulingConfig
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus.REMOVED
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus.REQUESTED
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -80,7 +79,7 @@ class RealEligibleScanJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == REQUESTED &&
+        return this.status == OptOutJobStatus.REQUESTED &&
             (this.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis) <= timeInMillis
     }
 
@@ -88,8 +87,8 @@ class RealEligibleScanJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == REMOVED &&
-            (this.optOutRemovedDateInMillis + schedulingConfig.confirmOptOutScanInMillis) <= timeInMillis
+        return this.status == OptOutJobStatus.REMOVED &&
+            (this.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
     }
 
     private suspend fun getValidScanJobsFromScanJobRecords(
@@ -112,14 +111,14 @@ class RealEligibleScanJobProvider @Inject constructor(
     }
 
     private fun ScanJobRecord.isNotYetExecuted(): Boolean {
-        return this.lastScanDateInMillis == null || this.status == ScanJobStatus.NOT_EXECUTED
+        return this.lastScanDateInMillis == 0L || this.status == ScanJobStatus.NOT_EXECUTED
     }
 
     private fun ScanJobRecord.isNoMatchAndShouldBeMaintained(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == ScanJobStatus.NO_MATCH_FOUND && this.lastScanDateInMillis != null &&
+        return this.status == ScanJobStatus.NO_MATCH_FOUND && this.lastScanDateInMillis != 0L &&
             (this.lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
     }
 
@@ -127,7 +126,7 @@ class RealEligibleScanJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == ScanJobStatus.MATCHES_FOUND && this.lastScanDateInMillis != null &&
+        return this.status == ScanJobStatus.MATCHES_FOUND && this.lastScanDateInMillis != 0L &&
             (this.lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis) <= timeInMillis
     }
 
@@ -135,7 +134,7 @@ class RealEligibleScanJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean {
-        return this.status == ScanJobStatus.ERROR && this.lastScanDateInMillis != null &&
+        return this.status == ScanJobStatus.ERROR && this.lastScanDateInMillis != 0L &&
             (this.lastScanDateInMillis + schedulingConfig.retryErrorInMillis) <= timeInMillis
     }
 }

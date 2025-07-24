@@ -18,10 +18,10 @@ package com.duckduckgo.pir.internal.scheduling
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pir.internal.models.scheduling.BrokerSchedulingConfig
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirSchedulingRepository
 import java.util.concurrent.TimeUnit
@@ -68,7 +68,7 @@ class RealEligibleScanJobProviderTest {
         brokerName = "test-broker",
         userProfileId = 123L,
         status = ScanJobStatus.NOT_EXECUTED,
-        lastScanDateInMillis = null,
+        lastScanDateInMillis = 0L,
     )
 
     private val scanJobRecordNoMatch = ScanJobRecord(
@@ -118,7 +118,7 @@ class RealEligibleScanJobProviderTest {
         attemptCount = 1,
         lastOptOutAttemptDateInMillis = currentTimeMillis - TimeUnit.HOURS.toMillis(1),
         optOutRequestedDateInMillis = currentTimeMillis - TimeUnit.HOURS.toMillis(1),
-        optOutRemovedDateInMillis = currentTimeMillis - TimeUnit.HOURS.toMillis(25), // 25 hours ago, should trigger maintain
+        optOutRemovedDateInMillis = currentTimeMillis - TimeUnit.DAYS.toMillis(7), // 7 days ago, should trigger maintain
     )
 
     @Test
@@ -146,7 +146,7 @@ class RealEligibleScanJobProviderTest {
 
     @Test
     fun whenGetAllEligibleScanJobsWithNotExecutedScanRecordWithNullLastScanDateThenReturnRecord() = runTest {
-        val scanRecord = scanJobRecordNotExecuted.copy(lastScanDateInMillis = null)
+        val scanRecord = scanJobRecordNotExecuted.copy(lastScanDateInMillis = 0L)
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(listOf(brokerSchedulingConfig))
         whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(listOf(scanRecord))
