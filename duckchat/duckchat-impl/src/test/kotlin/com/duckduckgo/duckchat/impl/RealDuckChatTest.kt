@@ -755,20 +755,6 @@ class RealDuckChatTest {
         assertTrue(testee.showSettings.value)
     }
 
-    @Test
-    fun `when openDuckChatWithWebSearch then activity started with query, auto prompt and WebSearch toolChoice`() = runTest {
-        testee.openDuckChatWithWebSearch(query = "example")
-
-        verify(mockGlobalActivityStarter).startIntent(
-            mockContext,
-            DuckChatWebViewActivityWithParams(
-                url = "https://duckduckgo.com/?q=example&prompt=1&toolChoice=WebSearch&ia=chat&duckai=5",
-            ),
-        )
-        verify(mockContext).startActivity(any())
-        verify(mockDuckChatFeatureRepository).registerOpened()
-    }
-
     companion object {
         val SETTINGS_JSON = """
         {

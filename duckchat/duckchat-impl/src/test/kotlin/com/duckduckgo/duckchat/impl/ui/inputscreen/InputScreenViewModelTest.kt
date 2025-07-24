@@ -9,7 +9,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChatWithWebSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -66,20 +65,6 @@ class InputScreenViewModelTest {
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
         )
-    }
-
-    @Test
-    fun `when onSearchSelected then set forceWebSearchButtonVisible to false`() {
-        val viewModel = createViewModel()
-        viewModel.onSearchSelected()
-        assertFalse(viewModel.forceWebSearchState.value.forceWebSearchButtonVisible)
-    }
-
-    @Test
-    fun `when onChatSelected then set forceWebSearchButtonVisible to true`() {
-        val viewModel = createViewModel()
-        viewModel.onChatSelected()
-        assertTrue(viewModel.forceWebSearchState.value.forceWebSearchButtonVisible)
     }
 
     @Test
@@ -468,16 +453,5 @@ class InputScreenViewModelTest {
         viewModel.onChatSubmitted(query)
 
         assertEquals(SubmitChat(query), viewModel.command.value)
-    }
-
-    @Test
-    fun `when onChatSubmitted and force web search is enabled then emit SubmitChatWithWebSearch Command`() {
-        val viewModel = createViewModel()
-        val query = "example"
-
-        viewModel.toggleForceWebSearch()
-        viewModel.onChatSubmitted(query)
-
-        assertEquals(SubmitChatWithWebSearch(query), viewModel.command.value)
     }
 }
