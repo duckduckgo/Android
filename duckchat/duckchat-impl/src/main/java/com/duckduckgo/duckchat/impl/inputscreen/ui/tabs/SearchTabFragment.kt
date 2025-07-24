@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewTreeObserver
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -37,7 +36,6 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -128,12 +126,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             omnibarPosition = TOP,
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
-        binding.autoCompleteSuggestionsList.addItemDecoration(
-            SuggestionItemDecoration(
-                divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = true,
-            ),
-        )
     }
 
     private fun configureObservers() {
