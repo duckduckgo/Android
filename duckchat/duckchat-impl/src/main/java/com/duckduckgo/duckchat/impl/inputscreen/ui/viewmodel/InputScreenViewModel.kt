@@ -93,6 +93,7 @@ class InputScreenViewModel @AssistedInject constructor(
         InputScreenVisibilityState(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             autoCompleteSuggestionsVisible = false,
+            showChatLogo = true,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -286,6 +287,9 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onChatInputTextChanged(query: String) {
         _submitButtonIconState.update {
             it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEND)
+        }
+        _visibilityState.update {
+            it.copy(showChatLogo = (query == initialSearchInputText && !it.autoCompleteSuggestionsVisible) || query.isEmpty())
         }
     }
 
