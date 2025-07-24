@@ -30,15 +30,14 @@ import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_COUNT
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
+import com.duckduckgo.pir.internal.models.Address
+import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
-import com.duckduckgo.pir.internal.scripts.models.Address
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.db.EventType
 import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import java.time.LocalDate
 import javax.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -274,30 +273,9 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun obtainProfiles() {
-        repository.getUserProfiles().also { profiles ->
+        repository.getUserProfileQueries().also { profiles ->
             if (profiles.isNotEmpty()) {
-                profileQueries = profiles.map { storedProfile ->
-                    ProfileQuery(
-                        id = storedProfile.id,
-                        firstName = storedProfile.userName.firstName,
-                        lastName = storedProfile.userName.lastName,
-                        city = storedProfile.addresses.city,
-                        state = storedProfile.addresses.state,
-                        addresses = listOf(
-                            Address(
-                                city = storedProfile.addresses.city,
-                                state = storedProfile.addresses.state,
-                            ),
-                        ),
-                        birthYear = storedProfile.birthYear,
-                        fullName = storedProfile.userName.middleName?.run {
-                            "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
-                        }
-                            ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                        age = LocalDate.now().year - storedProfile.birthYear,
-                        deprecated = false,
-                    )
-                }
+                profileQueries = profiles
             }
         }
     }

@@ -60,12 +60,12 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Si
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.None
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngineFactory
+import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.internal.scripts.BrokerActionProcessor.ActionResultListener
 import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
