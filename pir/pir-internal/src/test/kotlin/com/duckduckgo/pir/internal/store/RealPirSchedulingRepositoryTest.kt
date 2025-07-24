@@ -17,10 +17,10 @@
 package com.duckduckgo.pir.internal.store
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.internal.store.db.JobSchedulingDao
 import com.duckduckgo.pir.internal.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.internal.store.db.ScanJobRecordEntity

@@ -18,10 +18,10 @@ package com.duckduckgo.pir.internal.store
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.ScanJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.internal.store.db.JobSchedulingDao
 import com.duckduckgo.pir.internal.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.internal.store.db.ScanJobRecordEntity
@@ -76,12 +76,12 @@ class RealPirSchedulingRepository @Inject constructor(
 ) : PirSchedulingRepository {
 
     override suspend fun getAllValidScanJobRecords(): List<ScanJobRecord> = withContext(dispatcherProvider.io()) {
-        return@withContext jobSchedulingDao.getAllScanJobRecords().map {
+        return@withContext jobSchedulingDao.getAllScanJobRecords().map { record ->
             ScanJobRecord(
-                brokerName = it.brokerName,
-                userProfileId = it.userProfileId,
-                status = ScanJobStatus.valueOf(it.status),
-                lastScanDateInMillis = it.lastScanDateInMillis,
+                brokerName = record.brokerName,
+                userProfileId = record.userProfileId,
+                status = ScanJobStatus.entries.find { it.name == record.status } ?: ScanJobStatus.INVALID,
+                lastScanDateInMillis = record.lastScanDateInMillis ?: 0L,
             )
         }.filter {
             it.status != ScanJobStatus.INVALID
@@ -96,8 +96,8 @@ class RealPirSchedulingRepository @Inject constructor(
             ScanJobRecord(
                 brokerName = this.brokerName,
                 userProfileId = this.userProfileId,
-                status = ScanJobStatus.valueOf(this.status),
-                lastScanDateInMillis = this.lastScanDateInMillis,
+                status = ScanJobStatus.entries.find { it.name == this.status } ?: ScanJobStatus.INVALID,
+                lastScanDateInMillis = this.lastScanDateInMillis ?: 0L,
             )
         }?.takeIf {
             it.status != ScanJobStatus.INVALID
@@ -110,9 +110,9 @@ class RealPirSchedulingRepository @Inject constructor(
                 extractedProfileId = this.extractedProfileId,
                 brokerName = this.brokerName,
                 userProfileId = this.userProfileId,
-                status = OptOutJobStatus.valueOf(this.status),
+                status = OptOutJobStatus.entries.find { it.name == this.status } ?: OptOutJobStatus.INVALID,
                 attemptCount = this.attemptCount,
-                lastOptOutAttemptDateInMillis = this.lastOptOutAttemptDate,
+                lastOptOutAttemptDateInMillis = this.lastOptOutAttemptDate ?: 0L,
                 optOutRequestedDateInMillis = this.optOutRequestedDate,
                 optOutRemovedDateInMillis = this.optOutRemovedDate,
             )
@@ -122,16 +122,16 @@ class RealPirSchedulingRepository @Inject constructor(
     }
 
     override suspend fun getAllValidOptOutJobRecords(): List<OptOutJobRecord> = withContext(dispatcherProvider.io()) {
-        return@withContext jobSchedulingDao.getAllOptOutJobRecords().map {
+        return@withContext jobSchedulingDao.getAllOptOutJobRecords().map { record ->
             OptOutJobRecord(
-                extractedProfileId = it.extractedProfileId,
-                brokerName = it.brokerName,
-                userProfileId = it.userProfileId,
-                status = OptOutJobStatus.valueOf(it.status),
-                attemptCount = it.attemptCount,
-                lastOptOutAttemptDateInMillis = it.lastOptOutAttemptDate,
-                optOutRequestedDateInMillis = it.optOutRequestedDate,
-                optOutRemovedDateInMillis = it.optOutRemovedDate,
+                extractedProfileId = record.extractedProfileId,
+                brokerName = record.brokerName,
+                userProfileId = record.userProfileId,
+                status = OptOutJobStatus.entries.find { it.name == record.status } ?: OptOutJobStatus.INVALID,
+                attemptCount = record.attemptCount,
+                lastOptOutAttemptDateInMillis = record.lastOptOutAttemptDate ?: 0L,
+                optOutRequestedDateInMillis = record.optOutRequestedDate,
+                optOutRemovedDateInMillis = record.optOutRemovedDate,
             )
         }.filter {
             it.status != OptOutJobStatus.INVALID
