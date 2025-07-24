@@ -42,7 +42,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconStat
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.GLOBE
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -97,7 +96,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -730,16 +728,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 visualDesignExperiment -> {
                                     command.send(
                                         Command.StartVisualDesignTrackersAnimation(decoration.entities),
-                                    )
-                                }
-
-                                senseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled() -> {
-                                    command.send(Command.StartExperimentVariant1Animation)
-                                }
-
-                                senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() -> {
-                                    command.send(
-                                        Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
                                     )
                                 }
 

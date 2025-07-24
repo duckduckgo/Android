@@ -194,7 +194,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
@@ -471,7 +470,6 @@ class BrowserTabViewModel @Inject constructor(
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
     private val siteErrorHandler: StringSiteErrorHandler,
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
@@ -4249,11 +4247,11 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onAnimationFinished() {
-        viewModelScope.launch {
+/*        viewModelScope.launch {
             if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
                 command.value = StartTrackersExperimentShieldPopAnimation
             }
-        }
+        }*/
     }
 
     fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""
@@ -4263,7 +4261,6 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onOmnibarPrivacyShieldButtonPressed() {
-        senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
         if (currentCtaViewState().cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
             viewModelScope.launch {
                 onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()

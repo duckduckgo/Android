@@ -22,7 +22,6 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -86,7 +85,6 @@ class CtaViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
     private val duckPlayer: DuckPlayer,
     private val brokenSitePrompt: BrokenSitePrompt,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val rebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
@@ -252,7 +250,6 @@ class CtaViewModel @Inject constructor(
 
             // Search suggestions
             canShowDaxIntroCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                senseOfProtectionExperiment.enrolUserInNewExperimentIfEligible()
                 DaxBubbleCta.DaxIntroSearchOptionsCta(onboardingStore, appInstallStore)
             }
 

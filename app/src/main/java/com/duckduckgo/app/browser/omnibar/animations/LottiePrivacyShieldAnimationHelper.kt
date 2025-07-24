@@ -19,7 +19,6 @@ package com.duckduckgo.app.browser.omnibar.animations
 import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.omnibar.Omnibar
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.global.model.PrivacyShield
 import com.duckduckgo.app.global.model.PrivacyShield.MALICIOUS
 import com.duckduckgo.app.global.model.PrivacyShield.PROTECTED
@@ -38,7 +37,6 @@ import logcat.logcat
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : PrivacyShieldAnimationHelper {
 
@@ -51,12 +49,13 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
         val protectedShieldDark: Int
         val unprotectedShield: Int
         val unprotectedShieldDark: Int
-        if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
+        // TODO use when sense of protection experiment shield is enabled
+/*        if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
             protectedShield = R.raw.protected_shield_experiment
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment
             unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
-        } else if (experimentalThemingDataStore.isSingleOmnibarEnabled.value) {
+        } else */if (experimentalThemingDataStore.isSingleOmnibarEnabled.value) {
             if (viewMode is Omnibar.ViewMode.CustomTab) {
                 protectedShield = R.raw.protected_shield_custom_tab
                 protectedShieldDark = R.raw.dark_protected_shield_custom_tab

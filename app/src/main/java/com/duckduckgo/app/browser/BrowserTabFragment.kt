@@ -156,7 +156,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -570,9 +569,6 @@ class BrowserTabFragment :
     lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
 
     @Inject
-    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
-
-    @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
@@ -731,16 +727,17 @@ class BrowserTabFragment :
         override fun onPopUpHandled(isCosmetic: Boolean) {
             launch {
                 context?.let {
-                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
+                    // TODO uncomment when sense of protection experiment shield is enabled
+/*                    if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() &&
                         viewModel.trackersCount().isNotEmpty()
                     ) {
                         if (isCosmetic) {
                             delay(COOKIES_ANIMATION_DELAY)
                         }
                         omnibar.enqueueCookiesAnimation(isCosmetic)
-                    } else {
-                        viewModel.onAutoConsentPopUpHandled(isCosmetic)
-                    }
+                    } else {*/
+                    viewModel.onAutoConsentPopUpHandled(isCosmetic)
+                    //}
                 }
             }
         }
@@ -1217,7 +1214,6 @@ class BrowserTabFragment :
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
         contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
-        viewModel.onOmnibarPrivacyShieldButtonPressed()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1389,7 +1385,8 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
+            // TODO set to true when the sense of protection experiment shield is enabled
+            anchor = if (runBlocking { false }) {
                 omnibar.shieldIconExperiment
             } else {
                 omnibar.shieldIcon
