@@ -77,7 +77,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_6"
-        android:background="@drawable/background_preonboarding_option_buck">
+        android:minHeight="56dp"
+        android:background="@drawable/background_preonboarding_option_bb">
 
         <ImageView
             android:id="@+id/option1Icon"
@@ -87,48 +88,32 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_address_bar_position_top_buck"
-            app:tint="@color/preonboarding_address_bar_position_icon_buck" />
+            app:srcCompat="@drawable/ic_address_bar_position_top_bb"
+            app:tint="@color/preonboarding_address_bar_position_icon_bb" />
 
         <TextView
             android:id="@+id/option1Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
-            android:layout_marginTop="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_4"
             android:text="@string/highlightsPreOnboardingAddressBarOption1Title"
-            android:fontFamily="@font/pangea_semibold"
+            android:fontFamily="@font/pangea_regular"
             android:includeFontPadding="false"
-            android:textSize="14sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
+            android:textSize="18sp"
+            android:textColor="@color/bbColorPrimaryText"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/option1Icon"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/option1Body"
+        <com.duckduckgo.common.ui.view.button.RadioButton
+            android:id="@+id/option1Switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_3"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_medium"
-            android:includeFontPadding="false"
-            android:textSize="12sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
-            android:text="@string/highlightsPreOnboardingAddressBarOption1Description"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/option1Icon"
-            app:layout_constraintTop_toBottomOf="@id/option1Title" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/option1Switch"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginEnd="-12dp"
             android:checked="true"
             android:clickable="false"
-            app:buttonIcon="@drawable/ic_checkbox_buck"
-            app:buttonTint="@android:color/transparent"
-            app:useMaterialThemeColors="false"
+            android:text=""
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -140,7 +125,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:background="@drawable/background_preonboarding_option_buck">
+        android:minHeight="56dp"
+        android:background="@drawable/background_preonboarding_option_bb">
 
         <ImageView
             android:id="@+id/option2Icon"
@@ -150,47 +136,30 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_address_bar_position_bottom_buck"
-            app:tint="@color/preonboarding_address_bar_position_icon_buck" />
+            app:srcCompat="@drawable/ic_address_bar_position_bottom_bb"
+            app:tint="@color/preonboarding_address_bar_position_icon_bb" />
 
         <TextView
             android:id="@+id/option2Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
-            android:layout_marginTop="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_semibold"
+            android:layout_marginVertical="@dimen/keyline_4"
+            android:fontFamily="@font/pangea_regular"
             android:includeFontPadding="false"
-            android:textSize="14sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
+            android:textSize="18sp"
+            android:textColor="@color/bbColorPrimaryText"
             android:text="@string/highlightsPreOnboardingAddressBarOption2Title"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/option2Icon"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/option2Body"
+        <com.duckduckgo.common.ui.view.button.RadioButton
+            android:id="@+id/option2Switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_3"
-            android:layout_marginBottom="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_medium"
-            android:includeFontPadding="false"
-            android:textSize="12sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
-            android:text="@string/highlightsPreOnboardingAddressBarOption2Description"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/option2Icon"
-            app:layout_constraintTop_toBottomOf="@id/option2Title" />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/option2Switch"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginEnd="-12dp"
             android:clickable="false"
-            app:buttonIcon="@drawable/ic_checkbox_buck"
-            app:buttonTint="@android:color/transparent"
-            app:useMaterialThemeColors="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
