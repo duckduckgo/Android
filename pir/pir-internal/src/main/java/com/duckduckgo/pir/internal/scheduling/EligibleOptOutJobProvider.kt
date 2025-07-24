@@ -19,8 +19,8 @@ package com.duckduckgo.pir.internal.scheduling
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.models.scheduling.BrokerSchedulingConfig
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobRecord
-import com.duckduckgo.pir.internal.models.scheduling.OptOutJobStatus
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.PirSchedulingRepository
 import com.squareup.anvil.annotations.ContributesBinding
@@ -63,7 +63,7 @@ class RealEligibleOptOutJobProvider @Inject constructor(
         schedulingConfig: BrokerSchedulingConfig,
         timeInMillis: Long,
     ): Boolean =
-        this.status == OptOutJobStatus.ERROR && this.lastOptOutAttemptDateInMillis != null &&
+        this.status == OptOutJobStatus.ERROR && this.lastOptOutAttemptDateInMillis != 0L &&
             (this.lastOptOutAttemptDateInMillis + schedulingConfig.retryErrorInMillis) <= timeInMillis
 
     private fun OptOutJobRecord.isRequestAndShouldReRequested(
