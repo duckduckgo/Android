@@ -23,13 +23,13 @@
     android:layout_marginHorizontal="@dimen/keyline_2"
     android:layout_marginTop="@dimen/keyline_2"
     android:layout_marginBottom="@dimen/keyline_4"
-    android:background="@drawable/background_animated_tile">
+    android:background="@drawable/background_tab_switcher_trackers_animation_tile">
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/infoPanelAnimatedImage"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginStart="@dimen/keyline_3"
+        android:layout_marginStart="@dimen/keyline_2"
         android:layout_marginTop="@dimen/keyline_2"
         android:layout_marginBottom="@dimen/keyline_2"
         android:importantForAccessibility="no"
@@ -44,17 +44,29 @@
         android:id="@+id/infoPanelText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_2"
+        android:layout_marginStart="@dimen/keyline_1"
         android:layout_marginTop="@dimen/keyline_4"
-        android:layout_marginEnd="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_3"
         android:layout_marginBottom="@dimen/keyline_4"
-        android:textColor="@color/black84"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/infoIcon"
         app:layout_constraintStart_toEndOf="@+id/infoPanelAnimatedImage"
         app:layout_constraintTop_toTopOf="parent"
+        app:textType="primary"
         app:typography="body2"
-        tools:text="396 trackers blocked in the last 7 days"
-        tools:ignore="InvalidColorAttribute" />
+        tools:ignore="InvalidColorAttribute"
+        tools:text="396 trackers blocked in the last 7 days" />
+
+    <ImageView
+        android:id="@+id/infoIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginEnd="@dimen/keyline_4"
+        android:importantForAccessibility="no"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_info_16"
+        app:tint="?attr/daxColorSecondaryIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
