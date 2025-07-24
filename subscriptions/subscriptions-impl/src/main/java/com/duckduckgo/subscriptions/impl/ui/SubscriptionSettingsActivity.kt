@@ -204,6 +204,19 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     Yearly -> string.subscriptionsDataYearly
                 }
 
+                // Privacy Pro Rebranding active
+                if (viewState.rebrandingEnabled) {
+                    binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
+                    binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
+                    binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
+                    binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
+                } else {
+                    binding.subscriptionSettingsProductName.setText(string.privacyPro)
+                    binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
+                    binding.faq.setPrimaryText(getString(string.privacyProFaq))
+                    binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
+                }
+
                 binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
             }
 
@@ -235,11 +248,21 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         if (viewState.email == null) {
             binding.manageEmail.gone()
-            binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithoutEmail))
+            val secondaryTextRes = if (viewState.rebrandingEnabled) {
+                string.addToDeviceSecondaryTextWithoutEmailRebranding
+            } else {
+                string.addToDeviceSecondaryTextWithoutEmail
+            }
+            binding.addToDevice.setSecondaryText(resources.getString(secondaryTextRes))
         } else {
             binding.manageEmail.show()
             binding.manageEmail.setSecondaryText(viewState.email)
-            binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithEmail))
+            val secondaryTextRes = if (viewState.rebrandingEnabled) {
+                string.addToDeviceSecondaryTextWithEmailRebranding
+            } else {
+                string.addToDeviceSecondaryTextWithEmail
+            }
+            binding.addToDevice.setSecondaryText(resources.getString(secondaryTextRes))
         }
 
         if (viewState.showFeedback) {
