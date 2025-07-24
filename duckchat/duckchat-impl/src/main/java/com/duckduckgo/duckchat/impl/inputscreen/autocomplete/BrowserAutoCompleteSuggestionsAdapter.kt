@@ -83,7 +83,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
                             (items[oldItemPosition] as Suggestion).value == (newItems[newItemPosition] as Suggestion).value
                         else -> false
                     }
-                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = areItemsTheSame(oldItemPosition, newItemPosition)
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
             },
         )
     }
