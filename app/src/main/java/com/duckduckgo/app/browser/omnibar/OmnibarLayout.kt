@@ -80,7 +80,6 @@ import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelpe
 import com.duckduckgo.app.browser.omnibar.animations.TrackersAnimatorListener
 import com.duckduckgo.app.browser.omnibar.animations.omnibaranimation.OmnibarAnimationManager
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
@@ -178,9 +177,6 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
-
-    @Inject
-    lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
     lateinit var omnibarAnimationManager: OmnibarAnimationManager
@@ -794,17 +790,11 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (targetView != null) {
-            // We need a different asset when the experiment is enabled and the animation is played on the Privacy Shield.
-            val isPrivacyShieldAnimation = targetView == placeholder
             if (pulseAnimation.isActive) {
                 pulseAnimation.stop()
             }
             doOnLayout {
-                pulseAnimation.playOn(
-                    targetView = targetView,
-                    isSenseOfProtectionExperimentAndShieldView = isPrivacyShieldAnimation &&
-                        runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() },
-                )
+                pulseAnimation.playOn(targetView = targetView)
             }
         } else {
             pulseAnimation.stop()

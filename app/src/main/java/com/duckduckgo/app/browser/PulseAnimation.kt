@@ -65,12 +65,12 @@ class PulseAnimation(
         conflatedJob.cancel()
     }
 
-    fun playOn(targetView: View, isSenseOfProtectionExperimentAndShieldView: Boolean) {
+    fun playOn(targetView: View) {
         if (highlightImageView == null) {
-            highlightImageView = addHighlightView(targetView, isSenseOfProtectionExperimentAndShieldView)
+            highlightImageView = addHighlightView(targetView)
             highlightImageView?.doOnLayout {
                 it.setAllParentsClip(enabled = false)
-                startPulseAnimation(it, isSenseOfProtectionExperimentAndShieldView)
+                startPulseAnimation(it)
             }
             lifecycleOwner.lifecycle.addObserver(this)
         }
@@ -86,20 +86,21 @@ class PulseAnimation(
     }
 
     @SuppressLint("NoHardcodedCoroutineDispatcher")
-    private fun startPulseAnimation(view: View, isExperimentAndShieldView: Boolean) {
+    private fun startPulseAnimation(view: View) {
         if (!pulseAnimation.isRunning) {
             val pulse = getPulseObjectAnimator(view)
             pulse.repeatCount = ObjectAnimator.INFINITE
             pulse.duration = 1100L
 
-            if (isExperimentAndShieldView) {
+            // TODO renable when sense of protection animated shield is implemented
+/*            if (false) {
                 pulse.startDelay = 1000L
                 view.alpha = 0.0f
                 conflatedJob += CoroutineScope(Dispatchers.Main).launch {
                     delay(1000L)
                     view.alpha = 1.0f
                 }
-            }
+            }*/
 
             pulseAnimation = AnimatorSet().apply {
                 play(pulse)
@@ -134,7 +135,6 @@ class PulseAnimation(
 
     private fun addHighlightView(
         targetView: View,
-        isSenseOfProtectionExperimentAndShieldView: Boolean,
     ): View {
         if (targetView.parent !is ViewGroup) error("targetView parent should be ViewGroup")
 
@@ -142,10 +142,6 @@ class PulseAnimation(
         highlightImageView.id = View.generateViewId()
         val gravity: Int
         when {
-            isSenseOfProtectionExperimentAndShieldView -> {
-                highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
-                gravity = Gravity.START
-            }
             onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
                 gravity = Gravity.CENTER

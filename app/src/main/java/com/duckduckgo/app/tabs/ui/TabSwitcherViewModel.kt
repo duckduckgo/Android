@@ -22,7 +22,6 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
@@ -94,7 +93,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
@@ -594,10 +592,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTrackerAnimationInfoPanelClicked() {
-        pixel.fire(
-            pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
-            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
-        )
+        pixel.fire(pixel = TAB_MANAGER_INFO_PANEL_TAPPED)
         command.value = ShowAnimatedTileDismissalDialog
     }
 
@@ -613,17 +608,13 @@ class TabSwitcherViewModel @Inject constructor(
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             pixel.fire(
                 pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
-                parameters = mapOf("trackerCount" to trackerCount.toString()) +
-                    senseOfProtectionExperiment.getTabManagerPixelParams(),
+                parameters = mapOf("trackerCount" to trackerCount.toString())
             )
         }
     }
 
     fun onTrackerAnimationInfoPanelVisible() {
-        pixel.fire(
-            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
-            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
-        )
+        pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
     }
 
     private suspend fun getTabItems(
@@ -637,14 +628,10 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (senseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()) {
-                if (!isAnimationTileDismissed) {
-                    val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            return if(!isAnimationTileDismissed) {
+                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
-                    listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
-                } else {
-                    normalTabs
-                }
+                listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
             } else {
                 normalTabs
             }
