@@ -127,9 +127,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             option1Image.isSelected = defaultOption
             option2Image.isSelected = !defaultOption
 
-            option1Body.isSelected = defaultOption
-            option2Body.isSelected = !defaultOption
-
             val (visibleImage, hiddenImage) = if (defaultOption) {
                 option1Image to option2Image
             } else {
