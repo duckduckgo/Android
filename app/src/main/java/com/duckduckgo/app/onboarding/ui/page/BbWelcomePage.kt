@@ -661,6 +661,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             }.start()
 
             if (currentTile == TILE_02) {
+                windStrokesAnimationView.isVisible = true
                 windStrokesAnimationView.alpha = if (lightModeEnabled) 1.0f else 0.4f
                 windStrokesAnimationView.playAnimation()
             }

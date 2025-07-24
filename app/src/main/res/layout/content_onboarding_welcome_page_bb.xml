@@ -47,7 +47,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
         app:lottie_loop="false"
-        app:lottie_rawRes="@raw/bb_onboarding_wind_strokes" />
+        app:lottie_rawRes="@raw/bb_onboarding_wind_strokes"
+        android:visibility="gone" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/statusBarGuideline"
