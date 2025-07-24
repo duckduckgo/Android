@@ -208,6 +208,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     showDaxDialogCardView(
                         onAnimationEnd = {
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
+                            binding.daxDialogCta.initial.dialogTitleInvisible.text = titleText.html(context = it)
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()
@@ -282,7 +283,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog23DescriptionBb)
                     binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
                     binding.daxDialogCta.comparisonChart.descriptionInvisible.text = descriptionText.html(context = it)
-                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
 
                     val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
                         listOf(ddgLogo, chromeLogo, row1, row2, row3, row4, row5)
@@ -299,6 +299,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                             view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         }
 
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
                         binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                         binding.daxDialogCta.primaryCta.isVisible = true
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)

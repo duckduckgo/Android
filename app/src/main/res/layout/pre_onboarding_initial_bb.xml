@@ -15,12 +15,12 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/daxCtaContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/daxCtaContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <View
         android:layout_width="match_parent"
@@ -41,11 +41,11 @@
         android:layout_marginTop="@dimen/keyline_6">
 
         <TextView
+            android:id="@+id/dialogTitleInvisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.BB.H1"
             android:gravity="center"
-            android:text="@string/highlightsPreOnboardingDaxDialog1TitleBb"
             android:visibility="invisible" />
 
         <com.duckduckgo.common.ui.view.TypeAnimationTextView
