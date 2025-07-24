@@ -1682,4 +1682,3 @@ fun String.getStringForOmnibarPosition(position: OmnibarPosition): String {
 private fun View.fadeIn(duration: Duration = 500.milliseconds): ViewPropertyAnimator {
     return animate().alpha(1f).setDuration(duration.inWholeMilliseconds)
 }
-
