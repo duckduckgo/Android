@@ -280,9 +280,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     binding.daxDialogCta.comparisonChart.root.isVisible = true
 
                     val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
-                    val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog23DescriptionBb)
                     binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
-                    binding.daxDialogCta.comparisonChart.descriptionInvisible.text = descriptionText.html(context = it)
 
                     val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
                         listOf(ddgLogo, chromeLogo, row1, row2, row3, row4, row5)
@@ -291,10 +289,6 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     comparisonChartViews.forEach { view -> view.alpha = MIN_ALPHA }
 
                     afterTypingAnimation = {
-                        if (binding.daxDialogCta.comparisonChart.description.text.isEmpty()) {
-                            binding.daxDialogCta.comparisonChart.description.text = descriptionText
-                        }
-
                         comparisonChartViews.forEach { view ->
                             view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         }
@@ -306,11 +300,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                     }
 
-                    scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) {
-                        binding.daxDialogCta.comparisonChart.description.startTypingAnimation(descriptionText) {
-                            afterTypingAnimation()
-                        }
-                    }
+                    scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) { afterTypingAnimation() }
                     backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_03)
                 }
 
@@ -402,13 +392,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                     }
 
-                    scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) {
-                        val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog23DescriptionBb)
-
-                        binding.daxDialogCta.addressBarPosition.description.startTypingAnimation(descriptionText) {
-                            afterTypingAnimation()
-                        }
-                    }
+                    scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) { afterTypingAnimation() }
                     backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_04)
                 }
             }

@@ -45,27 +45,6 @@
 
     </FrameLayout>
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.duckduckgo.common.ui.view.TypeAnimationTextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="@style/Typography.BB.Body1"
-            android:textColor="@color/bbColorSecondaryText"
-            tools:text="@string/highlightsPreOnboardingDaxDialog23DescriptionBb" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/highlightsPreOnboardingDaxDialog23DescriptionBb"
-            android:textAppearance="@style/Typography.BB.Body1"
-            android:visibility="invisible" />
-
-    </FrameLayout>
-
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"
