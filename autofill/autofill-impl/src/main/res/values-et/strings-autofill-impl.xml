@@ -284,5 +284,7 @@
     <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Too oma paroolid Google\'ist DuckDuckGo\'sse</string>
     <string name="passwords_import_promo_subtitle">Impordi oma paroolid kiiresti ja turvaliselt DuckDuckGosse. Google võib paluda sul oma parooli sisestada.</string>
     <string name="passwords_import_promo_action">Impordi Google\'ist</string>
+    <string name="passwords_import_promo_in_browser_title">Too oma paroolid Google\'ist DuckDuckGo\'sse</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Ära enam küsi</string>
 
 </resources>
