@@ -1,11 +1,9 @@
 package com.duckduckgo.autofill.impl.importing
 
 import android.annotation.SuppressLint
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.importing.RealInSettingsPasswordImportPromoRules.Companion.MAX_CREDENTIALS_FOR_PROMO
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -17,13 +15,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 class RealInSettingsPasswordImportPromoRulesTest {
 
-    private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val autofillStore: InternalAutofillStore = mock()
 
@@ -39,7 +36,7 @@ class RealInSettingsPasswordImportPromoRulesTest {
         autofillStore = autofillStore,
         dispatchers = coroutineTestRule.testDispatcherProvider,
         autofillFeature = autofillFeature,
-        webViewCapabilityChecker = webViewCapabilityChecker,
+        importPasswordCapabilityChecker = importPasswordCapabilityChecker,
     )
 
     @Test
@@ -79,23 +76,13 @@ class RealInSettingsPasswordImportPromoRulesTest {
     }
 
     @Test
-    fun whenWebViewDoesNotSupportWebMessageListenersThenCannotShowPromo() = runTest {
-        configureWebMessageListenerAvailable(isAvailable = false)
+    fun whenWebViewDoesNotSupportImportingThenCannotShowPromo() = runTest {
+        configureWebViewImportSupport(isAvailable = false)
         assertFalse(testee.canShowPromo())
     }
 
-    @Test
-    fun whenWebViewDoesNotSupportDocumentStartJavascriptThenCannotShowPromo() = runTest {
-        configureDocumentStartJavascriptAvailable(isAvailable = false)
-        assertFalse(testee.canShowPromo())
-    }
-
-    private suspend fun configureWebMessageListenerAvailable(isAvailable: Boolean) {
-        whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(isAvailable)
-    }
-
-    private suspend fun configureDocumentStartJavascriptAvailable(isAvailable: Boolean) {
-        whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(isAvailable)
+    private suspend fun configureWebViewImportSupport(isAvailable: Boolean) {
+        whenever(importPasswordCapabilityChecker.webViewCapableOfImporting()).thenReturn(isAvailable)
     }
 
     private suspend fun configureAllConditionsToAllowPromo() {
@@ -104,8 +91,6 @@ class RealInSettingsPasswordImportPromoRulesTest {
         whenever(autofillStore.hasEverImportedPasswords).thenReturn(false)
         whenever(autofillStore.hasDismissedMainAppSettingsPromo).thenReturn(false)
         whenever(autofillStore.getCredentialCount()).thenReturn(flowOf(0))
-        whenever(webViewCapabilityChecker.isSupported(any())).thenReturn(true)
-        configureWebMessageListenerAvailable(isAvailable = true)
-        configureDocumentStartJavascriptAvailable(isAvailable = true)
+        configureWebViewImportSupport(isAvailable = true)
     }
 }

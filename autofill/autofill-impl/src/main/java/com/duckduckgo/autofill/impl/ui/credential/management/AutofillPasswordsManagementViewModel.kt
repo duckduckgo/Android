@@ -20,9 +20,6 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
@@ -35,6 +32,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -141,7 +139,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
     private val autofillFeature: AutofillFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     private val autofillEffectDispatcher: AutofillEffectDispatcher,
 ) : ViewModel() {
 
@@ -468,9 +466,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-            val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-            val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-            val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+            val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
+            val canImport = gpmImport && webViewSupportsImportingPasswords
             logcat(VERBOSE) { "Can import from Google Password Manager: $canImport" }
             _viewState.value = _viewState.value.copy(
                 canImportFromGooglePasswords = canImport,

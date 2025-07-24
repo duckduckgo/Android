@@ -29,9 +29,6 @@ import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.InternalDevSettings
@@ -47,6 +44,7 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.In
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
 import com.duckduckgo.autofill.impl.importing.InternalInBrowserPromoStore
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
@@ -140,7 +138,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     lateinit var autofillImportPasswordConfigStore: AutofillImportPasswordConfigStore
 
     @Inject
-    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+    lateinit var importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker
 
     @Inject
     lateinit var inBrowserImportPromoPreviousPromptsStore: InternalInBrowserPromoStore
@@ -301,9 +299,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.importPasswordsLaunchGooglePasswordCustomFlow.setClickListener {
             lifecycleScope.launch {
-                val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-                val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-                if (webViewDocumentStartJavascript && webViewWebMessageSupport) {
+                if (importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()) {
                     val intent =
                         globalActivityStarter.startIntent(this@AutofillInternalSettingsActivity, AutofillImportViaGooglePasswordManagerScreen)
                     importGooglePasswordsFlowLauncher.launch(intent)

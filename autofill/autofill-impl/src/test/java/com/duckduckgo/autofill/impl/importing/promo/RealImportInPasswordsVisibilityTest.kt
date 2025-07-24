@@ -16,10 +16,8 @@
 
 package com.duckduckgo.autofill.impl.importing.promo
 
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -42,7 +40,7 @@ class RealImportInPasswordsVisibilityTest {
 
     private val internalAutofillStore: InternalAutofillStore = mock()
     private val autofillFeature: AutofillFeature = mock()
-    private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val appCoroutineScope: CoroutineScope = coroutineTestRule.testScope
     private val dispatcherProvider = coroutineTestRule.testDispatcherProvider
 
@@ -61,10 +59,7 @@ class RealImportInPasswordsVisibilityTest {
             autofillSelfEnabled = true,
             canImportFromGooglePasswordManager = true,
         )
-        setupWebViewCapabilities(
-            webMessageListener = true,
-            documentStartJavaScript = true,
-        )
+        setupWebViewCapabilities(capable = true)
         setupAutofillStore(
             hasEverImportedPasswords = false,
             hasDismissedImportedPasswordsPromo = false,
@@ -120,16 +115,8 @@ class RealImportInPasswordsVisibilityTest {
     }
 
     @Test
-    fun whenWebMessageListenerNotSupportedThenCannotShowImportPromo() = runTest {
-        setupWebViewCapabilities(webMessageListener = false)
-        createTestee()
-
-        assertFalse(testee.canShowImportInPasswords(5))
-    }
-
-    @Test
-    fun whenDocumentStartJavaScriptNotSupportedThenCannotShowImportPromo() = runTest {
-        setupWebViewCapabilities(documentStartJavaScript = false)
+    fun whenWebViewImportingNotSupportedThenCannotShowImportPromo() = runTest {
+        setupWebViewCapabilities(capable = false)
         createTestee()
 
         assertFalse(testee.canShowImportInPasswords(5))
@@ -211,7 +198,7 @@ class RealImportInPasswordsVisibilityTest {
         testee = RealImportInPasswordsVisibility(
             internalAutofillStore = internalAutofillStore,
             autofillFeature = autofillFeature,
-            webViewCapabilityChecker = webViewCapabilityChecker,
+            importGooglePasswordsCapabilityChecker = importPasswordCapabilityChecker,
             appCoroutineScope = appCoroutineScope,
             dispatcherProvider = dispatcherProvider,
         )
@@ -231,12 +218,8 @@ class RealImportInPasswordsVisibilityTest {
         whenever(autofillFeature.canImportFromGooglePasswordManager()).thenReturn(canImportFromGooglePasswordManagerToggle)
     }
 
-    private suspend fun setupWebViewCapabilities(
-        webMessageListener: Boolean = true,
-        documentStartJavaScript: Boolean = true,
-    ) {
-        whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(webMessageListener)
-        whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(documentStartJavaScript)
+    private suspend fun setupWebViewCapabilities(capable: Boolean = true) {
+        whenever(importPasswordCapabilityChecker.webViewCapableOfImporting()).thenReturn(capable)
     }
 
     private fun setupAutofillStore(

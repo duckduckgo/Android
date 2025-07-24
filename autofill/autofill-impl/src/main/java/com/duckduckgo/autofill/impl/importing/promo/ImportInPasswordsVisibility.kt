@@ -16,11 +16,9 @@
 
 package com.duckduckgo.autofill.impl.importing.promo
 
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -42,7 +40,7 @@ interface ImportInPasswordsVisibility {
 class RealImportInPasswordsVisibility @Inject constructor(
     private val internalAutofillStore: InternalAutofillStore,
     private val autofillFeature: AutofillFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) : ImportInPasswordsVisibility {
@@ -86,9 +84,8 @@ class RealImportInPasswordsVisibility @Inject constructor(
         if (internalAutofillStore.hasEverImportedPasswords || internalAutofillStore.hasDeclinedPasswordManagementImportPromo) return false
 
         val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-        val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-        val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-        canShowImportPasswords = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+        val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
+        canShowImportPasswords = gpmImport && webViewSupportsImportingPasswords
 
         return canShowImportPasswords
     }

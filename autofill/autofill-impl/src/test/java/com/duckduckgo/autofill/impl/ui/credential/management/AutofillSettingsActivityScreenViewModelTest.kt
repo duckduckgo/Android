@@ -19,9 +19,6 @@ package com.duckduckgo.autofill.impl.ui.credential.management
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
@@ -39,6 +36,7 @@ import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizerImpl
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_PASSWORD
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_COPY_USERNAME
@@ -135,7 +133,7 @@ class AutofillSettingsActivityScreenViewModelTest {
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules = mock()
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore = mock()
     private val urlMatcher = AutofillDomainNameUrlMatcher(UrlUnicodeNormalizerImpl())
-    private val webViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
     private val autofillFeature = FakeFeatureToggleFactory.create(AutofillFeature::class.java)
     private val autofillEffectDispatcher: AutofillEffectDispatcher = mock()
 
@@ -157,7 +155,7 @@ class AutofillSettingsActivityScreenViewModelTest {
         autofillBreakageReportSender = autofillBreakageReportSender,
         autofillBreakageReportDataStore = autofillBreakageReportDataStore,
         autofillBreakageReportCanShowRules = autofillBreakageReportCanShowRules,
-        webViewCapabilityChecker = webViewCapabilityChecker,
+        importGooglePasswordsCapabilityChecker = importGooglePasswordsCapabilityChecker,
         autofillFeature = autofillFeature,
         autofillEffectDispatcher = autofillEffectDispatcher,
     )
@@ -171,8 +169,7 @@ class AutofillSettingsActivityScreenViewModelTest {
             whenever(mockStore.getCredentialCount()).thenReturn(flowOf(0))
             whenever(neverSavedSiteRepository.neverSaveListCount()).thenReturn(emptyFlow())
             whenever(deviceAuthenticator.isAuthenticationRequiredForAutofill()).thenReturn(true)
-            whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
-            whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
+            whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
             whenever(autofillEffectDispatcher.effects).thenReturn(MutableSharedFlow())
             autofillFeature.self().setRawStoredState(State(enable = true))
             autofillFeature.canImportFromGooglePasswordManager().setRawStoredState(State(enable = true))
@@ -1025,18 +1022,8 @@ class AutofillSettingsActivityScreenViewModelTest {
     }
 
     @Test
-    fun whenImportGooglePasswordsFeatureDisabledDueToWebMessageListenerNotSupportedThenViewStateReflectsThat() = runTest {
-        whenever(webViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(false)
-        testee.onViewCreated()
-        testee.viewState.test {
-            assertFalse(awaitItem().canImportFromGooglePasswords)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenImportGooglePasswordsFeatureDisabledDueToDocumentStartJavascriptNotSupportedThenViewStateReflectsThat() = runTest {
-        whenever(webViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(false)
+    fun whenImportGooglePasswordsFeatureDisabledDueToWebViewNotSupportedThenViewStateReflectsThat() = runTest {
+        whenever(importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
         testee.onViewCreated()
         testee.viewState.test {
             assertFalse(awaitItem().canImportFromGooglePasswords)
