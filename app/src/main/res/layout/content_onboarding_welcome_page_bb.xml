@@ -127,4 +127,15 @@
         app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
         app:layout_constraintWidth_max="600dp" />
 
+    <com.duckduckgo.app.onboarding.ui.BbProgressDotIndicator
+        android:id="@+id/onboardingProgressDots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:layout_constraintBottom_toBottomOf="@id/navigationBarGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:alpha="0"
+        tools:alpha="1"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

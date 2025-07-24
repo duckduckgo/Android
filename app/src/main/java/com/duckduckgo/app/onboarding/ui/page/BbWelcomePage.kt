@@ -159,6 +159,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         ).also { it.initializeView() }
 
         binding.onboardingProgress.setStepCount(3)
+        binding.onboardingProgressDots.setStepCount(3)
 
         startWelcomeAnimation()
     }
@@ -211,6 +212,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                 animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                             }
 
+                            with(binding.onboardingProgressDots) {
+                                setCurrentStep(1)
+                                animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
                             binding.daxDialogCta.initial.dialogTitleInvisible.text = titleText.html(context = it)
 
@@ -255,6 +261,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                                 animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                             }
 
+                            with(binding.onboardingProgressDots) {
+                                setCurrentStep(1)
+                                animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
 
                             afterTypingAnimation = {
@@ -283,6 +294,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                 COMPARISON_CHART -> {
                     binding.onboardingProgress.setCurrentStep(2)
+                    binding.onboardingProgressDots.setCurrentStep(2)
                     TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
                     resetDialogContentVisibility()
                     binding.daxDialogCta.primaryCta.visibility = View.INVISIBLE
@@ -364,6 +376,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                 ADDRESS_BAR_POSITION -> {
                     binding.onboardingProgress.setCurrentStep(3)
+                    binding.onboardingProgressDots.setCurrentStep(3)
                     resetDialogContentVisibility()
                     binding.daxDialogCta.secondaryCta.isVisible = false
                     TransitionManager.beginDelayedTransition(
