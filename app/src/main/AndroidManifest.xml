@@ -298,6 +298,7 @@
         <activity
             android:name="com.duckduckgo.app.SelectedTextSearchActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:label="@string/systemTextSearchMessage">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
