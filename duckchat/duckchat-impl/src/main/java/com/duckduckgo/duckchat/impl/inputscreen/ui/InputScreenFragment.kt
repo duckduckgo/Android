@@ -142,6 +142,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             binding.actionSend.setImageResource(iconResource)
         }.launchIn(lifecycleScope)
+
+        viewModel.inputBoxState.onEach { inputBoxState ->
+            binding.inputModeWidget.canExpand = inputBoxState.canExpand
+        }.launchIn(lifecycleScope)
     }
 
     private fun processCommand(command: Command) {
@@ -168,8 +172,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun configureOmnibar() = with(binding.inputModeWidget) {
-        setContentId(R.id.viewPager)
-
         onSearchSent = { query ->
             viewModel.onSearchSubmitted(query)
         }
@@ -199,6 +201,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onChatTextChanged = { text ->
             viewModel.onChatInputTextChanged(text)
+        }
+        onInputBoxClicked = {
+            viewModel.onInputBoxTouched()
         }
     }
 
