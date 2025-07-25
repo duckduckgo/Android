@@ -18,10 +18,7 @@ package com.duckduckgo.pir.internal.settings
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -34,10 +31,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.PitTestingStore
-import javax.inject.Inject
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirSettingsScreenNoParams::class)
@@ -47,9 +42,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var repository: PirRepository
-
-    @Inject
-    lateinit var testingStore: PitTestingStore
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -76,25 +68,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
         binding.viewRunEvents.setOnClickListener {
             globalActivityStarter.start(this, PirEventsResultsScreen)
-        }
-
-        binding.testerInfo.setSecondaryText(testingStore.testerId)
-        if (testingStore.testerId != null) {
-            binding.testerInfo.setLongClickListener {
-                copyDataToClipboard()
-            }
-        }
-    }
-
-    private fun copyDataToClipboard() {
-        val clipboardManager = getSystemService(ClipboardManager::class.java)
-
-        lifecycleScope.launch(dispatcherProvider.io()) {
-            clipboardManager.setPrimaryClip(ClipData.newPlainText("", testingStore.testerId))
-
-            withContext(dispatcherProvider.main()) {
-                Toast.makeText(this@PirDevSettingsActivity, "Testing ID copied to clipboard", Toast.LENGTH_SHORT).show()
-            }
         }
     }
 

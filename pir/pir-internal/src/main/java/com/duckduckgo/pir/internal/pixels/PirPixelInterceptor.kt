@@ -22,12 +22,11 @@ import android.util.Base64
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.store.PitTestingStore
 import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 import okhttp3.Interceptor
 import okhttp3.Response
 import org.json.JSONObject
+import javax.inject.Inject
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -37,7 +36,6 @@ class PirPixelInterceptor @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val networkInfoProvider: NetworkInfoProvider,
-    private val testingStore: PitTestingStore,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
@@ -52,7 +50,6 @@ class PirPixelInterceptor @Inject constructor(
                         .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
                         .put("man", appBuildConfig.manufacturer)
                         .put("networkInfo", networkInfoProvider.getCurrentNetworkInfo())
-                        .put("testerId", testingStore.testerId ?: "UNKNOWN")
                         .toString().toByteArray().run {
                             Base64.encodeToString(this, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
                         },
