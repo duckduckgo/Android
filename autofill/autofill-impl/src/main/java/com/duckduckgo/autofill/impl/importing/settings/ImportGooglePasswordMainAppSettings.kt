@@ -61,7 +61,7 @@ class ImportGooglePasswordMainAppSettings @Inject constructor(
         return OneLineListItem(activity).apply {
             setLeadingIconResource(R.drawable.key_color_import_24)
 
-            setPrimaryText(activity.getString(R.string.importPasswordsChooseMethodDialogTitle))
+            setPrimaryText(activity.getString(R.string.passwords_import_promo_in_settings_title))
             setOnClickListener {
                 onLaunchImportFlow(activity, this)
             }
