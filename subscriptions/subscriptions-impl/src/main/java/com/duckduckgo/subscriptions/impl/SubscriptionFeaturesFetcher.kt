@@ -69,7 +69,16 @@ class SubscriptionFeaturesFetcher @Inject constructor(
             ?.find { it.productId == BASIC_SUBSCRIPTION }
             ?.subscriptionOfferDetails
             ?.map { it.basePlanId }
-            ?.filter { authRepository.getFeatures(it).isEmpty() }
+            ?.distinct()
+            ?.let { basePlanIds ->
+                if (privacyProFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
+                    basePlanIds
+                } else {
+                    basePlanIds.filter {
+                        authRepository.getFeatures(it).isEmpty()
+                    }
+                }
+            }
             ?.forEach { basePlanId ->
                 val features = subscriptionsService.features(basePlanId).features
                 logcat { "Subscription features for base plan $basePlanId fetched: $features" }
