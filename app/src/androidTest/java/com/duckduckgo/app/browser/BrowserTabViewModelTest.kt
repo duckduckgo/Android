@@ -5539,7 +5539,7 @@ class BrowserTabViewModelTest {
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
-        testee.userLaunchingTabSwitcher()
+        testee.userLaunchingTabSwitcher(false)
 
         verify(mockDismissedCtaDao).insert(DismissedCta(cta.ctaId))
     }
@@ -5717,7 +5717,7 @@ class BrowserTabViewModelTest {
             PixelParameter.TAB_INACTIVE_3W to inactive3w,
         )
 
-        testee.userLaunchingTabSwitcher()
+        testee.userLaunchingTabSwitcher(false)
 
         assertCommandIssued<Command.LaunchTabSwitcher>()
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_CLICKED)
@@ -6070,30 +6070,40 @@ class BrowserTabViewModelTest {
         val domain = "https://www.example.com"
         givenCurrentSite(domain)
 
-        testee.userLaunchingTabSwitcher()
+        testee.userLaunchingTabSwitcher(false)
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SITE)
     }
 
     @Test
-    fun whenTabSwitcherPressedAndUserOnSerpThenPixelIsSent() = runTest {
+    fun whenTabSwitcherPressedAndUserOnNtpThenPixelIsSent() = runTest {
         givenTabManagerData()
         setBrowserShowing(false)
 
-        testee.userLaunchingTabSwitcher()
+        testee.userLaunchingTabSwitcher(false)
 
-        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "false"))
     }
 
     @Test
-    fun whenTabSwitcherPressedAndUserOnNewTabThenPixelIsSent() = runTest {
+    fun whenTabSwitcherPressedInFocusModeAndUserOnNtpThenPixelIsSent() = runTest {
+        givenTabManagerData()
+        setBrowserShowing(false)
+
+        testee.userLaunchingTabSwitcher(true)
+
+        verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, mapOf(PixelParameter.FROM_FOCUSED_NTP to "true"))
+    }
+
+    @Test
+    fun whenTabSwitcherPressedAndUserOnSerpThenPixelIsSent() = runTest {
         givenTabManagerData()
         setBrowserShowing(true)
         whenever(mockDuckDuckGoUrlDetector.isDuckDuckGoUrl(any())).thenReturn(true)
         val domain = "https://duckduckgo.com/?q=test&atb=v395-1-wb&ia=web"
         givenCurrentSite(domain)
 
-        testee.userLaunchingTabSwitcher()
+        testee.userLaunchingTabSwitcher(false)
 
         verify(mockPixel).fire(AppPixelName.TAB_MANAGER_OPENED_FROM_SERP)
     }
