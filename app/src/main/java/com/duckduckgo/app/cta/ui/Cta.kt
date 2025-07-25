@@ -300,18 +300,16 @@ sealed class OnboardingDaxDialogCta(
             root.show()
             primaryCta.setOnClickListener(null)
 
-            val parsedTitle = title?.html(binding.root.context)
             val parsedDescription = description.html(binding.root.context)
             dialogTextCta.text = ""
             hiddenTextCta.text = parsedDescription
 
             title?.let {
-                with(onboardingDialogTitle) {
-                    text = parsedTitle
-                }
+                val parsedTitle = title.html(binding.root.context)
+                onboardingDialogTitle.text = ""
+                hiddenOnboardingDialogTitle.text = parsedTitle
                 dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorSecondaryText))
             } ?: run {
-                onboardingDialogTitle.gone()
                 dialogTextCta.setTextColor(context.getColor(CommonR.color.bbColorPrimaryText))
             }
 
@@ -334,9 +332,8 @@ sealed class OnboardingDaxDialogCta(
             root.alpha = MAX_ALPHA
 
             title?.let {
-                onboardingDialogTitle.alpha = MIN_ALPHA
-                onboardingDialogTitle.show()
-            }
+                onboardingDialogTitleContainer.show()
+            } ?: onboardingDialogTitleContainer.gone()
 
             primaryCtaText?.let {
                 primaryCta.show()
@@ -351,6 +348,7 @@ sealed class OnboardingDaxDialogCta(
             }
 
             val afterAnimation = {
+                onboardingDialogTitle.finishAnimation()
                 dialogTextCta.finishAnimation()
                 primaryCtaText?.let { primaryCta.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION }
                 primaryCta.setOnClickListener { onPrimaryCtaClicked.invoke() }
@@ -358,21 +356,22 @@ sealed class OnboardingDaxDialogCta(
                 onTypingAnimationFinished.invoke()
             }
 
-            fun typingAnimation() = dialogTextCta.startTypingAnimation(description, true) { afterAnimation() }
+            fun bodyTypingAnimation() = dialogTextCta.startTypingAnimation(description, true) { afterAnimation() }
 
             fun runBodyAnimations() =
                 leadingDescriptionIconRes?.let {
                     leadingDescriptionIcon.fadeIn(leadingIconFadeIn)
                 }?.withEndAction {
-                    typingAnimation()
+                    bodyTypingAnimation()
                 } ?: run {
-                    typingAnimation()
+                    bodyTypingAnimation()
                 }
 
+            fun runTitleTypingAnimation() =
+                onboardingDialogTitle.startTypingAnimation(title ?: "", true) { runBodyAnimations() }
+
             if (title != null) {
-                onboardingDialogTitle.fadeIn().withEndAction {
-                    runBodyAnimations()
-                }
+                runTitleTypingAnimation()
             } else {
                 runBodyAnimations()
             }
@@ -928,10 +927,14 @@ sealed class OnboardingDaxDialogCta(
             val daxText = description?.let { context.getString(it) }.orEmpty()
 
             with(binding) {
-                onboardingDialogTitle.alpha = MIN_ALPHA
                 onboardingDialogContent.gone()
+                onboardingDialogTitleContainer.gone()
 
                 TransitionManager.beginDelayedTransition(cardView, AutoTransition())
+
+                val title = context.getString(R.string.onboardingSitesSuggestionsDaxDialogTitle)
+                onboardingDialogSuggestionsTitle.text = ""
+                hiddenOnboardingDialogSuggestionsTitle.text = title
 
                 suggestionsDialogTextCta.text = ""
                 suggestionsHiddenTextCta.text = daxText.html(context)
@@ -939,7 +942,8 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDialogSuggestionsContent.show()
 
                 val afterAnimation = {
-                    onboardingDialogTitle.alpha = MAX_ALPHA
+                    onboardingDialogSuggestionsTitle.finishAnimation()
+                    suggestionsDialogTextCta.finishAnimation()
 
                     onTypingAnimationFinished()
                     val optionsViews = listOf(
@@ -964,12 +968,17 @@ sealed class OnboardingDaxDialogCta(
                     }
                 }
 
-                onboardingDialogTitle.fadeIn().withEndAction {
+                onboardingDialogSuggestionsTitle.startTypingAnimation(title, true) {
                     suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
                 }
 
-                onboardingDialogContent.setOnClickListener {
-                    dialogTextCta.finishAnimation()
+                onboardingDialogTitleContainer.setOnClickListener {
+                    afterAnimation()
+                }
+                cardContainer.setOnClickListener {
+                    afterAnimation()
+                }
+                onboardingDialogSuggestionsContent.setOnClickListener {
                     afterAnimation()
                 }
             }
