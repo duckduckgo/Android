@@ -20,18 +20,18 @@ class RealSurveyParameterManagerTest {
                 override fun getPlugins(): Collection<SurveyParameterPlugin> {
                     return listOf(
                         object : SurveyParameterPlugin {
-                            override val surveyParamKey: String = "atb"
+                            override fun matches(paramKey: String): Boolean = paramKey == "atb"
 
-                            override suspend fun evaluate(): String = "test_atb"
+                            override suspend fun evaluate(paramKey: String): String = "test_atb"
                         },
                         object : SurveyParameterPlugin {
-                            override val surveyParamKey: String = "av"
-                            override suspend fun evaluate(): String = "test_av"
+                            override fun matches(paramKey: String): Boolean = paramKey == "av"
+                            override suspend fun evaluate(paramKey: String): String = "test_av"
                         },
                         object : SurveyParameterPlugin {
-                            override val surveyParamKey: String = "da"
+                            override fun matches(paramKey: String): Boolean = paramKey == "da"
 
-                            override suspend fun evaluate(): String = "test_da"
+                            override suspend fun evaluate(paramKey: String): String = "test_da"
                         },
                     )
                 }

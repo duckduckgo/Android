@@ -17,7 +17,7 @@
 package com.duckduckgo.survey.api
 
 interface SurveyParameterPlugin {
-    val surveyParamKey: String
+    fun matches(paramKey: String): Boolean
 
-    suspend fun evaluate(): String
+    suspend fun evaluate(paramKey: String): String
 }

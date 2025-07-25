@@ -29,9 +29,9 @@ class VpnFirstUsedSurveyParameterPlugin @Inject constructor(
     private val netpCohortStore: NetpCohortStore,
     private val currentTimeProvider: CurrentTimeProvider,
 ) : SurveyParameterPlugin {
-    override val surveyParamKey: String = "vpn_first_used"
+    override fun matches(paramKey: String): Boolean = paramKey == "vpn_first_used"
 
-    override suspend fun evaluate(): String {
+    override suspend fun evaluate(paramKey: String): String {
         val now = currentTimeProvider.localDateTimeNow()
         val days = netpCohortStore.cohortLocalDate?.let { cohortLocalDate ->
             ChronoUnit.DAYS.between(cohortLocalDate, now)

@@ -46,7 +46,7 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproPurchasePlatformSurveyParameterPlugin(subscriptionsManager)
 
-        assertEquals("android", plugin.evaluate())
+        assertEquals("android", plugin.evaluate("ppro_platform"))
     }
 
     @Test
@@ -55,7 +55,7 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproPurchasePlatformSurveyParameterPlugin(subscriptionsManager)
 
-        assertEquals("", plugin.evaluate())
+        assertEquals("", plugin.evaluate("ppro_platform"))
     }
 
     @Test
@@ -64,7 +64,7 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproBillingParameterPlugin(subscriptionsManager)
 
-        assertEquals("Monthly", plugin.evaluate())
+        assertEquals("Monthly", plugin.evaluate("ppro_billing"))
     }
 
     @Test
@@ -83,7 +83,7 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproBillingParameterPlugin(subscriptionsManager)
 
-        assertEquals("Yearly", plugin.evaluate())
+        assertEquals("Yearly", plugin.evaluate("ppro_billing"))
     }
 
     @Test
@@ -92,34 +92,37 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproBillingParameterPlugin(subscriptionsManager)
 
-        assertEquals("", plugin.evaluate())
+        assertEquals("", plugin.evaluate("ppro_billing"))
     }
 
     @Test
-    fun whenSubscriptionIsAvailableThenDaysSincePurchaseParamEvaluatesToSubscriptionData() = runTest {
+    fun whenSubscriptionIsAvailableThenDaysSincePurchaseParamEvaluatesToData() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1718723702145L) // June 18 UTC
+
         val plugin = PproDaysSincePurchaseSurveyParameterPlugin(subscriptionsManager, currentTimeProvider)
 
-        assertEquals("10", plugin.evaluate())
+        assertEquals("10", plugin.evaluate("ppro_days_since_purchase"))
     }
 
     @Test
     fun whenSubscriptionIsNotAvailableThenDaysSincePurchaseParamEvaluatesToZero() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1718920800000) // June 20 UTC
 
         val plugin = PproDaysSincePurchaseSurveyParameterPlugin(subscriptionsManager, currentTimeProvider)
 
-        assertEquals("0", plugin.evaluate())
+        assertEquals("0", plugin.evaluate("ppro_days_since_purchase"))
     }
 
     @Test
-    fun whenSubscriptionIsAvailableThenDaysUntilExpiryParamEvaluatesToSubscriptionData() = runTest {
+    fun whenSubscriptionIsAvailableThenDaysUntilExpiryParamEvaluatesToData() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
         whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1718723702145L) // June 18 UTC
+
         val plugin = PproDaysUntilExpirySurveyParameterPlugin(subscriptionsManager, currentTimeProvider)
 
-        assertEquals("9", plugin.evaluate())
+        assertEquals("9", plugin.evaluate("ppro_days_until_exp"))
     }
 
     @Test
@@ -128,16 +131,16 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproDaysUntilExpirySurveyParameterPlugin(subscriptionsManager, currentTimeProvider)
 
-        assertEquals("0", plugin.evaluate())
+        assertEquals("0", plugin.evaluate("ppro_days_until_exp"))
     }
 
     @Test
-    fun whenSubscriptionIsAvailableThenStatusParamEvaluatesToSubscriptionData() = runTest {
+    fun whenSubscriptionStatusIsAutoRenewableThenStatusParamEvaluatesToAutoRenewable() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(testSubscription)
 
         val plugin = PproStatusParameterPlugin(subscriptionsManager)
 
-        assertEquals("auto_renewable", plugin.evaluate())
+        assertEquals("auto_renewable", plugin.evaluate("ppro_status"))
     }
 
     @Test
@@ -146,7 +149,7 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproStatusParameterPlugin(subscriptionsManager)
 
-        assertEquals("inactive", plugin.evaluate())
+        assertEquals("inactive", plugin.evaluate("ppro_status"))
     }
 
     @Test
@@ -155,7 +158,7 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproStatusParameterPlugin(subscriptionsManager)
 
-        assertEquals("not_auto_renewable", plugin.evaluate())
+        assertEquals("not_auto_renewable", plugin.evaluate("ppro_status"))
     }
 
     @Test
@@ -164,15 +167,15 @@ class PproSurveyParameterPluginTest {
 
         val plugin = PproStatusParameterPlugin(subscriptionsManager)
 
-        assertEquals("grace_period", plugin.evaluate())
+        assertEquals("grace_period", plugin.evaluate("ppro_status"))
     }
 
     @Test
-    fun whenSubscriptionIsNotAvailableThenStatusParamEvaluatesToZero() = runTest {
+    fun whenSubscriptionIsNotAvailableThenStatusParamEvaluatesToEmpty() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenReturn(null)
 
         val plugin = PproStatusParameterPlugin(subscriptionsManager)
 
-        assertEquals("", plugin.evaluate())
+        assertEquals("", plugin.evaluate("ppro_status"))
     }
 }
