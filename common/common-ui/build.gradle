@@ -74,8 +74,11 @@ dependencies {
     api(AndroidX.compose.runtime)
     api(AndroidX.compose.foundation)
     api(AndroidX.compose.foundation.layout)
+    api(AndroidX.compose.material)
     api(AndroidX.compose.material3)
     api(AndroidX.compose.ui)
+    api(AndroidX.compose.ui.tooling)
+    api(AndroidX.lifecycle.viewModelCompose)
 
     api lintChecks("com.slack.lint.compose:compose-lint-checks:_")
 
