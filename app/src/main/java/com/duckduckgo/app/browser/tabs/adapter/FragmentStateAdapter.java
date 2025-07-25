@@ -229,6 +229,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
             for (int ix = 0; ix < mFragments.size(); ix++) {
                 long itemId = mFragments.keyAt(ix);
+                // Exclude items in itemIdQueue from garbage collection. itemIdQueue is a FIFO queue
+                // that tracks fragments which are hidden but not yet eligible for removal. This ensures
+                // that fragments are only removed when the maximum active tab limit is reached.
                 if (!isFragmentViewBound(itemId) && !itemIdQueue.contains(itemId)) {
                     toRemove.add(itemId);
                 }
