@@ -16,10 +16,8 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -37,7 +35,7 @@ class RealInSettingsPasswordImportPromoRules @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val dispatchers: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val importPasswordCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
 ) : InSettingsPasswordImportPromoRules {
 
     override suspend fun canShowPromo(): Boolean {
@@ -58,18 +56,12 @@ class RealInSettingsPasswordImportPromoRules @Inject constructor(
                 return@withContext false
             }
 
-            if (webViewCapableOfImporting().not()) {
+            if (importPasswordCapabilityChecker.webViewCapableOfImporting().not()) {
                 return@withContext false
             }
 
             return@withContext true
         }
-    }
-
-    private suspend fun webViewCapableOfImporting(): Boolean {
-        val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-        val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-        return webViewWebMessageSupport && webViewDocumentStartJavascript
     }
 
     private fun featureEnabled(): Boolean {
