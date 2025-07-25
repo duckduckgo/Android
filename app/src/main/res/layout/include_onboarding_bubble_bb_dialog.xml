@@ -63,8 +63,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_bias="0"
         app:layout_constraintTop_toBottomOf="@id/logo"
+        app:layout_constraintVertical_bias="0"
         app:layout_constraintWidth_max="600dp"
         app:topRightCornerRadius="40dp">
 
@@ -91,18 +91,34 @@
                     tools:alpha="1"
                     tools:visibility="visible" />
 
-                <TextView
-                    android:id="@+id/daxBubbleDialogTitle"
-                    style="@style/Typography.BB.H1"
+                <FrameLayout
+                    android:id="@+id/daxDialogTitleContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/bbColorPrimaryText"
-                    tools:text="@string/onboardingSearchDaxDialogTitle" />
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/hiddenDaxBubbleDialogTitle"
+                        style="@style/Typography.BB.H1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:visibility="invisible"
+                        tools:ignore="DeprecatedWidgetInXml" />
+
+                    <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                        android:id="@+id/daxBubbleDialogTitle"
+                        style="@style/Typography.BB.H1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/bbColorPrimaryText"
+                        tools:text="@string/onboardingSearchDaxDialogTitle" />
+                </FrameLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/keyline_1">
+                    android:layout_marginTop="@dimen/keyline_2">
 
                     <TextView
                         android:id="@+id/hiddenTextCta"
@@ -110,9 +126,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:visibility="invisible"
+                        tools:ignore="DeprecatedWidgetInXml"
                         tools:text="@string/onboardingSearchDaxDialogDescription"
-                        tools:visibility="visible"
-                        tools:ignore="DeprecatedWidgetInXml" />
+                        tools:visibility="visible" />
 
                     <com.duckduckgo.common.ui.view.TypeAnimationTextView
                         android:id="@+id/dialogTextCta"
