@@ -40,6 +40,8 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.HideKeyboard
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
@@ -158,9 +160,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             }
             is SubmitSearch -> submitSearchQuery(command.query)
             is SubmitChat -> submitChatQuery(command.query)
-            else -> {
-                // TODO handle other commands
-            }
+            is ShowKeyboard -> showKeyboard(binding.inputModeWidget.inputField)
+            is HideKeyboard -> hideKeyboard(binding.inputModeWidget.inputField)
         }
     }
 
