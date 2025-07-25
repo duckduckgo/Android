@@ -86,6 +86,17 @@ abstract class TabsDao {
     }
 
     @Transaction
+    open fun markTabAsDeletable(tabId: String) {
+        // requirement: only one tab can be marked as deletable
+        deleteTabsMarkedAsDeletable()
+        // ensure the tab is in the DB
+        val dbTab = tab(tabId)
+        dbTab?.let {
+            updateTab(dbTab.copy(deletable = true))
+        }
+    }
+
+    @Transaction
     open fun markTabsAsDeletable(tabIds: List<String>) {
         tabIds.forEach { tabId ->
             tab(tabId)?.let { tab ->

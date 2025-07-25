@@ -38,7 +38,7 @@
     <color name="icon_tertiary_dark">#3DFFFFFF</color>
 
     <!-- Lines-->
-    <color name="lines_dark">#1FF9F9F9</color>
+    <color name="lines_dark">#B8F9F9F9</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -64,7 +64,8 @@
     <color name="icon_tertiary_light">#661F1F1F</color>
 
     <!-- Lines-->
-    <color name="lines_light">#171F1F1F</color>
+    <!-- Was the alpha channel right for this? -->
+    <color name="lines_light">#991f1f1f</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
