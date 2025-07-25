@@ -17,12 +17,13 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.content.Context
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import kotlinx.coroutines.test.runTest
@@ -30,6 +31,7 @@ import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -37,6 +39,7 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class SubscriptionsHandlerTest {
 
     @get:Rule
@@ -182,7 +185,76 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionScreenNoParams)
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
+    }
+
+    @Test
+    fun `handleSubscriptionsFeature launches subscription purchase with origin when valid origin provided`() = runTest {
+        val featureName = "subscriptions"
+        val method = "openSubscriptionPurchase"
+        val id = "testId"
+        val data = JSONObject("{\"origin\": \"duckai_chat\"}")
+        val response = JsCallbackData(JSONObject(), featureName, method, id)
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+            .thenReturn(response)
+
+        subscriptionsHandler.handleSubscriptionsFeature(
+            featureName,
+            method,
+            id,
+            data,
+            context,
+            coroutineRule.testScope,
+            contentScopeScripts,
+        )
+
+        verify(globalActivityStarter).start(context, SubscriptionPurchase("duckai_chat"))
+    }
+
+    @Test
+    fun `handleSubscriptionsFeature launches subscription purchase without origin when empty origin provided`() = runTest {
+        val featureName = "subscriptions"
+        val method = "openSubscriptionPurchase"
+        val id = "testId"
+        val data = JSONObject("{\"origin\": \"\"}")
+        val response = JsCallbackData(JSONObject(), featureName, method, id)
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+            .thenReturn(response)
+
+        subscriptionsHandler.handleSubscriptionsFeature(
+            featureName,
+            method,
+            id,
+            data,
+            context,
+            coroutineRule.testScope,
+            contentScopeScripts,
+        )
+
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
+    }
+
+    @Test
+    fun `handleSubscriptionsFeature launches subscription purchase without origin when data is null for openSubscriptionPurchase`() = runTest {
+        val featureName = "subscriptions"
+        val method = "openSubscriptionPurchase"
+        val id = "testId"
+        val data: JSONObject? = null
+        val response = JsCallbackData(JSONObject(), featureName, method, id)
+        whenever(subscriptionsJSHelper.processJsCallbackMessage(featureName, method, id, data))
+            .thenReturn(response)
+
+        subscriptionsHandler.handleSubscriptionsFeature(
+            featureName,
+            method,
+            id,
+            data,
+            context,
+            coroutineRule.testScope,
+            contentScopeScripts,
+        )
+
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
     }
 
     @Test
@@ -230,6 +302,6 @@ class SubscriptionsHandlerTest {
         )
 
         verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
-        verify(globalActivityStarter).start(context, SubscriptionScreenNoParams)
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
     }
 }
