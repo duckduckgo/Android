@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -88,6 +89,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
@@ -143,6 +145,12 @@ class SettingsActivity : DuckDuckGoActivity() {
         _threatProtectionSettingsPlugin.getPlugins()
     }
 
+    @Inject
+    lateinit var _completeSetupSettingsPlugin: PluginPoint<CompleteSetupSettingsPlugin>
+    private val completeSetupSettingsPlugin by lazy {
+        _completeSetupSettingsPlugin.getPlugins()
+    }
+
     private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
         if (resultOk) {
             Snackbar.make(
@@ -171,6 +179,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsPro
         get() = binding.includeSettings.contentSettingsPrivacyPro
 
+    private val viewsCompleteSetup
+        get() = binding.includeSettings.contentSettingsCompleteSetup
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -180,8 +191,14 @@ class SettingsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
         configureInternalFeatures()
         configureSettings()
+        configureCompleteSetupSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
+    }
+
+    private fun configureCompleteSetupSettings() {
+        watchForCompleteSetupSettingsChanges()
+        updateCompleteSetupSettings()
     }
 
     override fun onResume() {
@@ -336,6 +353,27 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
         viewsPrivacy.widgetPromptSetting.isVisible = isVisible
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
+    }
+
+    private fun watchForCompleteSetupSettingsChanges() {
+        with(viewsCompleteSetup) {
+            settingsCompleteFeaturesContainer.viewTreeObserver.addOnGlobalLayoutListener {
+                if (settingsCompleteFeaturesContainer.children.any { it.isVisible }) {
+                    settingsSectionCompleteSetup.show()
+                } else {
+                    settingsSectionCompleteSetup.gone()
+                }
+            }
+        }
+    }
+
+    private fun updateCompleteSetupSettings() {
+        val viewsToInclude = completeSetupSettingsPlugin.map { it.getView(this) }
+
+        with(viewsCompleteSetup.settingsCompleteFeaturesContainer) {
+            removeAllViews()
+            viewsToInclude.forEach { addView(it) }
+        }
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {

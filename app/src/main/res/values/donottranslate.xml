@@ -62,4 +62,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Complete Your Setup</string>
 </resources>

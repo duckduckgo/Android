@@ -271,4 +271,5 @@ enum class AutofillImportLaunchSource(val value: String) : Parcelable {
     AutofillSettings("autofill_settings_button"),
     InBrowserPromo("in_browser_promo"),
     Unknown("unknown"),
+    MainAppSettings("settings"),
 }

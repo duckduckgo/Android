@@ -37,6 +37,7 @@ interface AutofillPrefsStore {
     fun hasEverImportedPasswordsFlow(): Flow<Boolean>
     var hasDeclinedPasswordManagementImportPromo: Boolean
     var hasDeclinedInBrowserPasswordImportPromo: Boolean
+    var hasDismissedMainAppSettingsPromo: Boolean
     val autofillStateSetByUser: Boolean
     var timestampUserLastPromptedToDisableAutofill: Long?
     var domainTargetDatasetVersion: Long
@@ -119,6 +120,12 @@ class RealAutofillPrefsStore(
             prefs.edit { putBoolean(HAS_DECLINED_IN_BROWSER_IMPORT_PASSWORDS_PROMO, value) }
         }
 
+    override var hasDismissedMainAppSettingsPromo: Boolean
+        get() = prefs.getBoolean(HAS_DISMISSED_MAIN_APP_SETTINGS_PROMO, false)
+        set(value) {
+            prefs.edit { putBoolean(HAS_DISMISSED_MAIN_APP_SETTINGS_PROMO, value) }
+        }
+
     override val autofillStateSetByUser: Boolean
         get() = autofillStateSetByUser()
 
@@ -199,6 +206,7 @@ class RealAutofillPrefsStore(
         const val HAS_DECLINED_IN_BROWSER_IMPORT_PASSWORDS_PROMO = "autofill_declined_in_browser_import_passwords_promo"
         const val HAS_DECLINED_PASSWORD_MANAGEMENT_IMPORT_PASSWORDS_PROMO = "autofill_dismissed_import_passwords_promo"
         const val BROWSER_IMPORT_PROMO_SHOWN_COUNT = "autofill_in_browser_import_promo_shown_count"
+        const val HAS_DISMISSED_MAIN_APP_SETTINGS_PROMO = "autofill_dismissed_main_app_settings_import_passwords_promo"
         const val TIMESTAMP_WHEN_USER_LAST_PROMPTED_TO_DISABLE_AUTOFILL = "timestamp_when_user_last_prompted_to_disable_autofill"
         const val AUTOFILL_DECLINE_COUNT = "autofill_decline_count"
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"

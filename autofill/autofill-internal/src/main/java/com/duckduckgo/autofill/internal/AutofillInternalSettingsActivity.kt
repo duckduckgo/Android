@@ -46,6 +46,7 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Fi
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.InProgress
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult
+import com.duckduckgo.autofill.impl.importing.InternalInBrowserPromoStore
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePassword.AutofillImportViaGooglePasswordManagerScreen
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
@@ -140,6 +141,9 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+
+    @Inject
+    lateinit var inBrowserImportPromoPreviousPromptsStore: InternalInBrowserPromoStore
 
     private var passwordImportWatcher = ConflatedJob()
 
@@ -319,14 +323,27 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
         binding.importPasswordsResetImportedFlagButton.setClickListener {
             lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasDismissedMainAppSettingsPromo = false
                 autofillStore.hasEverImportedPasswords = false
                 autofillStore.hasDeclinedPasswordManagementImportPromo = false
                 autofillStore.hasDeclinedInBrowserPasswordImportPromo = false
                 autofillStore.inBrowserImportPromoShownCount = 0
+                inBrowserImportPromoPreviousPromptsStore.clear()
             }
             Toast.makeText(
                 this@AutofillInternalSettingsActivity,
                 getString(R.string.autofillDevSettingsResetGooglePasswordsImportFlagConfirmation),
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+
+        binding.markPasswordsAsPreviouslyImportedButton.setClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillStore.hasEverImportedPasswords = true
+            }
+            Toast.makeText(
+                this@AutofillInternalSettingsActivity,
+                getString(R.string.autofillDevSettingsSimulatePasswordsImportedConfirmation),
                 Toast.LENGTH_SHORT,
             ).show()
         }
