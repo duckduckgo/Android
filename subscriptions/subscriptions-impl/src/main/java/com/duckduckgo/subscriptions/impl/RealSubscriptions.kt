@@ -38,6 +38,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
@@ -102,7 +103,7 @@ class RealSubscriptions @Inject constructor(
         val privacyPro = globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
-                url = SubscriptionsConstants.BUY_URL,
+                url = buildSubscriptionUrl(uri),
                 origin = origin,
             ),
         ) ?: return
@@ -134,6 +135,15 @@ class RealSubscriptions @Inject constructor(
 
     override suspend fun isFreeTrialEligible(): Boolean {
         return subscriptionsManager.isFreeTrialEligible()
+    }
+
+    private fun buildSubscriptionUrl(uri: Uri?): String {
+        val queryParams = uri?.query
+        return if (!queryParams.isNullOrBlank()) {
+            "$BUY_URL?$queryParams"
+        } else {
+            BUY_URL
+        }
     }
 }
 

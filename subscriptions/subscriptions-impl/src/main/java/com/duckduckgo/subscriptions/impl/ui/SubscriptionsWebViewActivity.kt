@@ -34,6 +34,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -70,6 +71,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
@@ -167,6 +169,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var subscriptions: Subscriptions
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
@@ -266,7 +271,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
 
-        if (savedInstanceState == null && params.url == BUY_URL) {
+        val isPrivacyProUrl by lazy {
+            runCatching { subscriptions.isPrivacyProUrl(params.url.toUri()) }.getOrDefault(false)
+        }
+        if (savedInstanceState == null && isPrivacyProUrl) {
             viewModel.paywallShown()
         }
     }
