@@ -95,39 +95,35 @@ class TabPagerAdapter(
 
             tabs.clear()
             tabs.addAll(newTabs)
-            diff.dispatchUpdatesTo(this)
 
-            cleanupIfTabsRemoved(diff)
+            var wereTabsRemoved = false
+            val updateCallback = object : ListUpdateCallback {
+                override fun onInserted(position: Int, count: Int) {
+                    this@TabPagerAdapter.notifyItemRangeInserted(position, count)
+                }
+
+                override fun onRemoved(position: Int, count: Int) {
+                    this@TabPagerAdapter.notifyItemRangeRemoved(position, count)
+                    wereTabsRemoved = true
+                }
+
+                override fun onMoved(fromPosition: Int, toPosition: Int) {
+                    this@TabPagerAdapter.notifyItemMoved(fromPosition, toPosition)
+                }
+
+                override fun onChanged(position: Int, count: Int, payload: Any?) {
+                    this@TabPagerAdapter.notifyItemRangeChanged(position, count, payload)
+                }
+            }
+            diff.dispatchUpdatesTo(updateCallback)
+
+            if (wereTabsRemoved) {
+                cleanupRemovedItems()
+            }
         } else {
             // the state of tabs is managed separately, so we don't need to notify the adapter, but we need URL and skipHome to create new fragments
             tabs.clear()
             tabs.addAll(newTabs)
-        }
-    }
-
-    private fun cleanupIfTabsRemoved(diff: DiffUtil.DiffResult) {
-        var wereTabsRemoved = false
-        val updateCallback = object : ListUpdateCallback {
-            override fun onInserted(position: Int, count: Int) {
-                // Not needed for tracking removals
-            }
-
-            override fun onRemoved(position: Int, count: Int) {
-                wereTabsRemoved = true
-            }
-
-            override fun onMoved(fromPosition: Int, toPosition: Int) {
-                // Not needed for tracking removals
-            }
-
-            override fun onChanged(position: Int, count: Int, payload: Any?) {
-                // Not needed for tracking removals
-            }
-        }
-        diff.dispatchUpdatesTo(updateCallback)
-
-        if (wereTabsRemoved) {
-            cleanupRemovedItems()
         }
     }
 
