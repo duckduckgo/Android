@@ -59,7 +59,6 @@ class RealVisualDesignExperimentConflictChecker @Inject constructor(
             "senseOfProtectionExistingUserExperimentMay25",
             "senseOfProtectionNewUserExperiment27May25",
             "senseOfProtectionExistingUserExperiment27May25",
-            "defaultBrowserAdditionalPrompts202501",
         )
     }
 

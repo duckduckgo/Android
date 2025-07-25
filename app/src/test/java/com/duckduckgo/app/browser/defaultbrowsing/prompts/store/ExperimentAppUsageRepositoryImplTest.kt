@@ -16,10 +16,7 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository.UserNotEnrolledException
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -27,12 +24,12 @@ import java.time.format.DateTimeParseException
 import java.time.temporal.ChronoUnit
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -66,58 +63,49 @@ class ExperimentAppUsageRepositoryImplTest {
     }
 
     @Test
-    fun `when active days since enrollment queried and no cohort assigned, return failure`() = runTest {
-        val toggleMock = mock<Toggle>()
-        whenever(toggleMock.getCohort()).thenReturn(null)
+    fun `when active days since enrollment queried and first day is null, return failure`() = runTest {
+        whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(null)
         val testee = ExperimentAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
 
-        val actual = testee.getActiveDaysUsedSinceEnrollment(toggleMock)
+        val result = testee.getActiveDaysUsedSinceEnrollment()
 
-        Assert.assertTrue(actual.exceptionOrNull() is UserNotEnrolledException)
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is NullPointerException)
     }
 
     @Test
-    fun `when active days since enrollment queried and malformed date, return failure`() = runTest {
-        val fakeCohort = Cohort(
-            name = "fakeCohort",
-            weight = 1,
-            enrollmentDateET = "2025-01-16",
-        )
-        val toggleMock = mock<Toggle>()
-        whenever(toggleMock.getCohort()).thenReturn(fakeCohort)
+    fun `when active days since enrollment queried and first day is malformed date, return failure`() = runTest {
+        val invalidDate = "not-a-valid-date"
+        whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(invalidDate)
         val testee = ExperimentAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
 
-        val actual = testee.getActiveDaysUsedSinceEnrollment(toggleMock)
+        val result = testee.getActiveDaysUsedSinceEnrollment()
 
-        Assert.assertTrue(actual.exceptionOrNull() is DateTimeParseException)
+        assertTrue(result.isFailure)
+        assertTrue(result.exceptionOrNull() is DateTimeParseException)
     }
 
     @Test
-    fun `when active days since enrollment queried and user is enrolled, return success`() = runTest {
-        val zonedDateTimeString = "2025-01-16T00:00-05:00[America/New_York]"
-        val fakeCohort = Cohort(
-            name = "fakeCohort",
-            weight = 1,
-            enrollmentDateET = zonedDateTimeString,
-        )
-        val toggleMock = mock<Toggle>()
-        whenever(toggleMock.getCohort()).thenReturn(fakeCohort)
-        val expectedIsoDateString = "2025-01-16"
-        val expectedValue = 2L
-        whenever(experimentAppUsageDaoMock.getNumberOfDaysAppUsedSinceDateET(expectedIsoDateString)).thenReturn(expectedValue)
+    fun `when active days since enrollment queried and first day is correct, return success`() = runTest {
+        val validDate = "2023-01-01"
+        val expectedDaysUsed = 2L
+        whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(validDate)
+        whenever(experimentAppUsageDaoMock.getNumberOfDaysAppUsedSinceDateET(validDate)).thenReturn(expectedDaysUsed)
+
         val testee = ExperimentAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
 
-        val actual = testee.getActiveDaysUsedSinceEnrollment(toggleMock)
+        val result = testee.getActiveDaysUsedSinceEnrollment()
 
-        Assert.assertEquals(Result.success(expectedValue), actual)
+        assertTrue(result.isSuccess)
+        Assert.assertEquals(expectedDaysUsed, result.getOrThrow())
     }
 }

@@ -38,9 +38,6 @@ class RealVisualDesignExperimentConflictCheckerTest {
     private lateinit var senseOfProtectionExistingUserExperiment27May25: Toggle
 
     @Mock
-    private lateinit var defaultBrowserAdditionalPrompts202501: Toggle
-
-    @Mock
     private lateinit var unrelatedToggle: Toggle
 
     @Mock
@@ -67,9 +64,6 @@ class RealVisualDesignExperimentConflictCheckerTest {
         )
         whenever(senseOfProtectionExistingUserExperiment27May25.featureName()).thenReturn(
             FeatureName("SenseOfProtectionToggles", "senseOfProtectionExistingUserExperiment27May25"),
-        )
-        whenever(defaultBrowserAdditionalPrompts202501.featureName()).thenReturn(
-            FeatureName("DefaultBrowserPromptsFeatureToggles", "defaultBrowserAdditionalPrompts202501"),
         )
         whenever(unrelatedToggle.featureName()).thenReturn(
             FeatureName("unrelatedToggleParent", "unrelatedToggle"),
@@ -151,18 +145,6 @@ class RealVisualDesignExperimentConflictCheckerTest {
     @Test
     fun `senseOfProtectionExistingUserExperiment27May25 active, conflicting experiments return true`() = runTest {
         whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(senseOfProtectionExistingUserExperiment27May25))
-
-        val testee = createTestee()
-
-        testee.anyConflictingExperimentEnabled.test {
-            assertTrue(awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `defaultBrowserAdditionalPrompts202501 active, conflicting experiments return true`() = runTest {
-        whenever(togglesInventory.getAllActiveExperimentToggles()).thenReturn(listOf(defaultBrowserAdditionalPrompts202501))
 
         val testee = createTestee()
 

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import java.time.format.DateTimeParseException
 
@@ -39,7 +38,7 @@ interface ExperimentAppUsageRepository {
      *  [UserNotEnrolledException] if the given feature is disable or user is not assigned to a cohort.
      *  [DateTimeParseException] if the enrollment date is malformed.
      */
-    suspend fun getActiveDaysUsedSinceEnrollment(toggle: Toggle): Result<Long>
+    suspend fun getActiveDaysUsedSinceEnrollment(): Result<Long>
 
     class UserNotEnrolledException : Exception()
 }
