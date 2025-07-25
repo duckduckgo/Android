@@ -127,7 +127,7 @@ class BrowserViewModelTest {
 
         runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any())).then { it.arguments.first() }
+            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
         }
     }
 
