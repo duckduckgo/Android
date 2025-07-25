@@ -23,12 +23,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.pir.api.PirFeatureToggle
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDesktop
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type.DASHBOARD
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled.Type.DESKTOP
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -47,10 +51,12 @@ import kotlinx.coroutines.launch
 class PirSettingViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptions: Subscriptions,
+    private val pirFeatureToggle: PirFeatureToggle,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
-        data object OpenPir : Command()
+        data object OpenPirDesktop : Command()
+        data object OpenPirDashboard : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -60,7 +66,13 @@ class PirSettingViewModel @Inject constructor(
         sealed class PirState {
 
             data object Hidden : PirState()
-            data object Enabled : PirState()
+            data class Enabled(val type: Type) : PirState() {
+                enum class Type {
+                    DESKTOP,
+                    DASHBOARD,
+                }
+            }
+
             data object Disabled : PirState()
         }
     }
@@ -68,9 +80,14 @@ class PirSettingViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun onPir() {
+    fun onPir(type: Type) {
         pixelSender.reportAppSettingsPirClick()
-        sendCommand(OpenPir)
+
+        val command = when (type) {
+            DESKTOP -> OpenPirDesktop
+            DASHBOARD -> Command.OpenPirDashboard
+        }
+        sendCommand(command)
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -111,7 +128,12 @@ class PirSettingViewModel @Inject constructor(
             SubscriptionStatus.GRACE_PERIOD,
             -> {
                 if (hasValidEntitlement) {
-                    PirState.Enabled
+                    val type = if (pirFeatureToggle.isPirBetaEnabled()) {
+                        DASHBOARD
+                    } else {
+                        DESKTOP
+                    }
+                    PirState.Enabled(type)
                 } else {
                     PirState.Hidden
                 }
