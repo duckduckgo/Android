@@ -987,6 +987,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
+
+        private const val DISABLE_SWIPING_DELAY = 1000L
     }
 
     inner class BrowserStateRenderer {
@@ -1005,7 +1007,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 if (swipingTabsFeature.isEnabled) {
-                    tabPager.isUserInputEnabled = viewState.isTabSwipingEnabled
+                    if (!viewState.isTabSwipingEnabled) {
+                        lifecycleScope.launch {
+                            // delay disabling of the swiping to allow the swipe animation to finish
+                            delay(DISABLE_SWIPING_DELAY)
+                            tabPager.isUserInputEnabled = false
+                        }
+                    } else {
+                        tabPager.isUserInputEnabled = true
+                    }
                 }
             }
         }
