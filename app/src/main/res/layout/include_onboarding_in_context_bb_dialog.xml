@@ -89,16 +89,32 @@
                     android:orientation="vertical"
                     android:padding="@dimen/keyline_6">
 
-                    <TextView
-                        android:id="@+id/onboardingDialogTitle"
-                        style="@style/Typography.BB.H1"
+                    <FrameLayout
+                        android:id="@+id/onboardingDialogTitleContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:includeFontPadding="false"
-                        android:alpha="0"
-                        android:text="@string/onboardingEndDaxDialogTitle"
-                        android:textColor="@color/bbColorPrimaryText"
-                        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/hiddenOnboardingDialogTitle"
+                            style="@style/Typography.BB.Body1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:visibility="invisible"
+                            tools:ignore="DeprecatedWidgetInXml" />
+
+                        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                            android:id="@+id/onboardingDialogTitle"
+                            style="@style/Typography.BB.H1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:includeFontPadding="false"
+                            android:text="@string/onboardingEndDaxDialogTitle"
+                            android:textColor="@color/bbColorPrimaryText"
+                            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -111,9 +127,9 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_marginEnd="@dimen/keyline_2"
-                            tools:srcCompat="@drawable/ic_fire_24"
-                            android:visibility="gone"
                             android:alpha="0"
+                            android:visibility="gone"
+                            tools:srcCompat="@drawable/ic_fire_24"
                             tools:visibility="visible" />
 
                         <FrameLayout
@@ -165,14 +181,32 @@
                     android:padding="@dimen/keyline_6"
                     android:visibility="gone">
 
-                    <TextView
-                        android:id="@+id/daxBubbleDialogTitle"
-                        style="@style/Typography.BB.H1"
+                    <FrameLayout
+                        android:id="@+id/onboardingDialogSuggestionsTitleContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/onboardingSitesSuggestionsDaxDialogTitle"
-                        android:textColor="@color/bbColorPrimaryText"
-                        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/hiddenOnboardingDialogSuggestionsTitle"
+                            style="@style/Typography.BB.Body1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:includeFontPadding="false"
+                            android:visibility="invisible"
+                            tools:ignore="DeprecatedWidgetInXml" />
+
+                        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+                            android:id="@+id/onboardingDialogSuggestionsTitle"
+                            style="@style/Typography.BB.H1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            tools:text="@string/onboardingSitesSuggestionsDaxDialogTitle"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:includeFontPadding="false"
+                            android:textColor="@color/bbColorPrimaryText"
+                            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+                    </FrameLayout>
 
                     <FrameLayout
                         android:id="@+id/cardContainer"
