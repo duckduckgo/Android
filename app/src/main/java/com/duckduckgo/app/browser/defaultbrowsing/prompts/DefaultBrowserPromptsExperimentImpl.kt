@@ -144,7 +144,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     /**
      * Caches deserialized [Toggle.getSettings] for [DefaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25].
      *
-     * Since we're re-evaluating the experiment on every process' resume,
+     * Since we're re-evaluating on every process' resume,
      * this allows us to avoid constantly deserializing the same value.
      *
      * The value is recomputed on first launch, and on each subsequent privacy config change via [onPrivacyConfigDownloaded].
@@ -174,7 +174,6 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appCoroutineScope.launch {
-            // experimentAppUsageRepository.recordAppUsedNow()
             evaluate()
         }
     }
@@ -189,7 +188,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private suspend fun evaluate() = evaluationMutex.withLock {
         // TODO ANA: handle here new users and existing users differently
         val isOnboardingComplete = userStageStore.getUserAppStage() == AppStage.ESTABLISHED
-        logcat { "TAG_ANA isOnboardingComplete = $isOnboardingComplete" }
+        logcat { "evaluate: onboarding complete = $isOnboardingComplete" }
 
         if (isOnboardingComplete) {
             experimentAppUsageRepository.recordAppUsedNow()
@@ -199,40 +198,40 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
 
         val isEnabled =
             defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
-        logcat { "TAG_ANA isEnabled = $isEnabled" }
+        logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
         if (!isEnabled) {
             return
         }
 
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
 
-        logcat { "TAG_ANA isDefaultBrowser = $isDefaultBrowser" }
+        logcat { "evaluate: is default browser = $isDefaultBrowser" }
 
         val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.first() == CONVERTED
-        logcat { "TAG_ANA hasConvertedBefore = $hasConvertedBefore" }
+        logcat { "evaluate: has converted before = $hasConvertedBefore" }
         val isStopped = defaultBrowserPromptsDataStore.experimentStage.first() == STOPPED
-        logcat { "TAG_ANA isStopped = $isStopped" }
+        logcat { "evaluate: has stopped = $isStopped" }
         if (hasConvertedBefore || isStopped) {
             return
         }
 
         // TODO ANA: use something different than enrolled / not enrolled
-        val currentExperimentStage = defaultBrowserPromptsDataStore.experimentStage.first()
-        logcat { "TAG_ANA currentExperimentStage = $currentExperimentStage" }
-        val newExperimentStage = if (isDefaultBrowser) {
-            logcat { "TAG_ANA newExperimentStage CONVERTED" }
+        val currentStage = defaultBrowserPromptsDataStore.experimentStage.first()
+        logcat { "evaluate: current stage = $currentStage" }
+        val newStage = if (isDefaultBrowser) {
+            logcat { "evaluate: new stage is CONVERTED" }
             CONVERTED
-        } else if (currentExperimentStage == NOT_ENROLLED) {
-            logcat { "TAG_ANA newExperimentStage ENROLLED" }
+        } else if (currentStage == NOT_ENROLLED) {
+            logcat { "evaluate: new stage is ENROLLED" }
             ENROLLED
         } else {
-            logcat { "TAG_ANA newExperimentStage ELSE" }
+            logcat { "evaluate: new stage is other than CONVERTED or ENROLLED" }
             val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
 
-            logcat { "TAG_ANA appActiveDaysUsedSinceEnrollment = $appActiveDaysUsedSinceEnrollment" }
+            logcat { "evaluate: active days used since enrollment = $appActiveDaysUsedSinceEnrollment" }
 
             val configSettings = featureSettings ?: run {
                 // If feature settings weren't cached before, deserialize and cache them now.
@@ -244,10 +243,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 return
             }
 
-            logcat { "TAG_ANA configSettings = $configSettings" }
-            logcat { "TAG_ANA currentExperimentStage later = $currentExperimentStage" }
-
-            when (currentExperimentStage) {
+            when (currentStage) {
                 NOT_ENROLLED -> ENROLLED
 
                 ENROLLED -> {
@@ -278,11 +274,10 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             }
         }
 
-        logcat { "TAG_ANA newExperimentStage later = $newExperimentStage" }
-        if (newExperimentStage != null) {
-            defaultBrowserPromptsDataStore.storeExperimentStage(newExperimentStage)
+        if (newStage != null) {
+            defaultBrowserPromptsDataStore.storeExperimentStage(newStage)
 
-            when (newExperimentStage) {
+            when (newStage) {
                 STAGE_1 -> {
                     metrics.getStageImpressionForStage1()?.fire()
                 }
@@ -292,7 +287,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 }
 
                 CONVERTED -> {
-                    fireConversionPixels(currentExperimentStage)
+                    fireConversionPixels(currentStage)
                 }
 
                 else -> {
@@ -300,9 +295,8 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 }
             }
 
-            val action = stageEvaluator.evaluate(newExperimentStage)
-            logcat { "TAG_ANA action = $action" }
-            logcat { "TAG_ANA action.showMessageDialog = ${action.showMessageDialog}" }
+            val action = stageEvaluator.evaluate(newStage)
+            logcat { "evaluate: action = $action show message dialog = ${action.showMessageDialog}" }
 
             if (action.showMessageDialog) {
                 _commands.send(OpenMessageDialog)
