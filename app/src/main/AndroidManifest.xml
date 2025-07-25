@@ -333,6 +333,10 @@
             android:exported="false"
             android:label="@string/tabActivityTitle" />
         <activity
+            android:name="com.duckduckgo.app.tabs.ui.compose.ComposeTabSwitcherActivity"
+            android:exported="false"
+            android:label="@string/tabActivityTitle" />
+        <activity
             android:name="com.duckduckgo.app.settings.SettingsActivity"
             android:exported="true"
             android:label="@string/settingsActivityTitle"

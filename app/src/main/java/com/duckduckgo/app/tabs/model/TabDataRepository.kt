@@ -346,6 +346,12 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun markDeletable(tabId: String) {
+        databaseExecutor().scheduleDirect {
+            tabsDao.markTabAsDeletable(tabId)
+        }
+    }
+
     override suspend fun markDeletable(tabIds: List<String>) {
         databaseExecutor().scheduleDirect {
             tabsDao.markTabsAsDeletable(tabIds)

@@ -100,7 +100,7 @@ class DuckDuckGoFaviconManager constructor(
         }
     }
 
-    override suspend fun tryFetchFaviconForUrl(url: String): File? {
+    override suspend fun tryFetchFaviconForUrl(url: String): Bitmap? {
         return withContext(dispatcherProvider.io()) {
             val domain = url.extractDomain() ?: return@withContext null
 
@@ -108,6 +108,7 @@ class DuckDuckGoFaviconManager constructor(
 
             return@withContext if (favicon != null) {
                 saveFavicon(null, favicon, domain)
+                favicon
             } else {
                 null
             }
@@ -203,6 +204,17 @@ class DuckDuckGoFaviconManager constructor(
             val cachedFavicon = faviconPersister.faviconFile(FAVICON_TEMP_DIR, tabId, domain)
             if (cachedFavicon != null) {
                 faviconPersister.copyToDirectory(cachedFavicon, FAVICON_PERSISTED_DIR, NO_SUBFOLDER, domain)
+            }
+        }
+    }
+
+    override suspend fun persistFavicon(
+        favicon: Bitmap,
+        url: String
+    ) {
+        withContext(dispatcherProvider.io()) {
+            url.extractDomain()?.let {
+                faviconPersister.store(FAVICON_PERSISTED_DIR, NO_SUBFOLDER, favicon, it)
             }
         }
     }

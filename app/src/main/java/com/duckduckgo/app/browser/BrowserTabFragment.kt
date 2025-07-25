@@ -206,6 +206,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.compose.ComposeTabSwitcherActivity
+import com.duckduckgo.app.tabs.ui.compose.ComposeTabSwitcherActivity.Companion.ComposeTabSwitcherScreenParams
+import com.duckduckgo.app.tabs.ui.compose.fakeComposeFeatureFlag
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -1415,9 +1418,14 @@ class BrowserTabFragment :
     }
 
     private fun launchTabSwitcher() {
-        val activity = activity ?: return
-        val intent = TabSwitcherActivity.intent(activity, tabId)
-        tabSwitcherActivityResult.launch(intent)
+        if (fakeComposeFeatureFlag) {
+            val intent = ComposeTabSwitcherActivity.intent(requireContext(), tabId)
+            tabSwitcherActivityResult.launch(intent)
+        } else {
+            val activity = activity ?: return
+            val intent = TabSwitcherActivity.intent(activity, tabId)
+            tabSwitcherActivityResult.launch(intent)
+        }
     }
 
     override fun onResume() {

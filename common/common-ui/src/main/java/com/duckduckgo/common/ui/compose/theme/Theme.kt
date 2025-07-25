@@ -87,6 +87,7 @@ fun ProvideDuckDuckGoTheme(
 
 @Composable
 fun DuckDuckGoTheme(
+    isDesignExperimentEnabled: Boolean = false,
     isDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
@@ -288,13 +289,39 @@ fun DuckDuckGoTheme(
         ),
     )
 
+    // example of using a different color palette for design experiments
+    val designExperimentThemeLight = lightColorPalette.copy(
+        background = colorResource(R.color.background_background_light),
+        surface = colorResource(R.color.background_surface_light),
+        container = colorResource(R.color.background_container_light),
+        lines = colorResource(R.color.lines_light),
+        primaryText = colorResource(R.color.text_primary_light),
+        secondaryText = colorResource(R.color.text_secondary_light),
+        primaryIcon = colorResource(R.color.icon_primary_light), // TODO why does this seem to be lighter than in Figma when applied?
+    )
+
+    val designExperimentThemeDark = darkColorPalette.copy(
+        background = colorResource(R.color.background_background_dark),
+        surface = colorResource(R.color.background_surface_dark),
+        container = colorResource(R.color.background_container_dark),
+        lines = colorResource(R.color.lines_dark),
+        primaryText = colorResource(R.color.text_primary_dark),
+        secondaryText = colorResource(R.color.text_secondary_dark),
+        primaryIcon = colorResource(R.color.icon_primary_dark),
+    )
+
     val shapes = DuckDuckGoShapes(
         small = RoundedCornerShape(dimensionResource(R.dimen.smallShapeCornerRadius)),
         medium = RoundedCornerShape(dimensionResource(R.dimen.mediumShapeCornerRadius)),
         large = RoundedCornerShape(dimensionResource(R.dimen.largeShapeCornerRadius)),
     )
 
-    val colors = if (isDarkTheme) darkColorPalette else lightColorPalette
+    val colors = when {
+        isDesignExperimentEnabled && isDarkTheme -> designExperimentThemeDark
+        isDesignExperimentEnabled && !isDarkTheme -> designExperimentThemeLight
+        isDarkTheme -> darkColorPalette
+        else -> lightColorPalette
+    }
 
     ProvideDuckDuckGoTheme(colors = colors, shapes = shapes, content = content)
 }

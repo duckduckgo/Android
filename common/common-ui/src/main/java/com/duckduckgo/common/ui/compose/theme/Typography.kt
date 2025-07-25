@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.ui.compose.theme
 
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
@@ -96,6 +97,7 @@ data class DuckDuckGoTypography(
     ),
 )
 
+@SuppressLint("ComposeCompositionLocalUsage")
 val LocalDuckDuckGoTypography = staticCompositionLocalOf<DuckDuckGoTypography> {
     error("No DuckDuckGoTypography provided")
 }
