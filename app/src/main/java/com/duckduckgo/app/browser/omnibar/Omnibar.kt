@@ -262,27 +262,31 @@ class Omnibar(
             newOmnibar.isScrollingEnabled = value
         }
 
-    fun setViewMode(viewMode: ViewMode) {
-        logcat { "Omnibar: setViewMode $viewMode" }
-        when (viewMode) {
+    var viewMode: ViewMode = ViewMode.Browser(null)
+        private set
+
+    fun setViewMode(newViewMode: ViewMode) {
+        logcat { "Omnibar: setViewMode $newViewMode" }
+        viewMode = newViewMode
+        when (newViewMode) {
             Error -> {
-                newOmnibar.decorate(Mode(viewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             NewTab -> {
-                newOmnibar.decorate(Mode(viewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             SSLWarning -> {
-                newOmnibar.decorate(Mode(viewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             MaliciousSiteWarning -> {
-                newOmnibar.decorate(Mode(viewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
 
             else -> {
-                newOmnibar.decorate(Mode(viewMode))
+                newOmnibar.decorate(Mode(newViewMode))
             }
         }
     }

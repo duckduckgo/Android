@@ -90,6 +90,7 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.DefaultSnackbar
@@ -744,8 +745,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         recreate()
     }
 
-    fun launchFire() {
-        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING)
+    fun launchFire(launchedFromFocusedNtp: Boolean = false) {
+        val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
+        pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING, params)
+
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,

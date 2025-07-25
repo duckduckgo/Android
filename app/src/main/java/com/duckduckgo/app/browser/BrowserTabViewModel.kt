@@ -3068,13 +3068,14 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher() {
+    fun userLaunchingTabSwitcher(launchedFromFocusedNtp: Boolean) {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
 
         if (!currentBrowserViewState().browserShowing) {
-            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+            val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
         } else {
             val url = site?.url
             if (url != null) {
