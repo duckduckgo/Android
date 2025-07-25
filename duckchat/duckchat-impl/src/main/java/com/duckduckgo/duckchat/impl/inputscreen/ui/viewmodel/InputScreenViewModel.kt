@@ -36,10 +36,10 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteItemRemoved
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
@@ -52,6 +52,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -64,6 +65,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
@@ -103,6 +105,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
+
+    private val refreshSuggestions = MutableSharedFlow<Unit>()
 
     /**
      * Tracks whether we should show autocomplete suggestions based on the initial input state.
@@ -161,9 +165,10 @@ class InputScreenViewModel @AssistedInject constructor(
     val autoCompleteSuggestionResults: StateFlow<AutoCompleteResult> = shouldShowAutoComplete
         .flatMapLatest { shouldShow ->
             if (shouldShow) {
-                searchInputTextState
-                    .debounceExceptFirst(300)
-                    .flatMapLatest { autoComplete.autoComplete(it) }
+                merge(
+                    searchInputTextState.debounceExceptFirst(300),
+                    refreshSuggestions.map { searchInputTextState.value },
+                ).flatMapLatest { autoComplete.autoComplete(it) }
             } else {
                 flowOf(AutoCompleteResult("", emptyList()))
             }
@@ -179,6 +184,7 @@ class InputScreenViewModel @AssistedInject constructor(
         .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
+    val searchTabCommand: SingleLiveEvent<SearchCommand> = SingleLiveEvent()
 
     init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
@@ -236,8 +242,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.main()) {
-            // TODO: handle remove search suggestion
-            command.value = ShowRemoveSearchSuggestionDialog(suggestion)
+            searchTabCommand.value = ShowRemoveSearchSuggestionDialog(suggestion)
+            hideKeyboard()
         }
     }
 
@@ -247,7 +253,6 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onRemoveSearchSuggestionConfirmed(
         suggestion: AutoCompleteSuggestion,
-        omnibarText: String,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             when (suggestion) {
@@ -262,8 +267,8 @@ class InputScreenViewModel @AssistedInject constructor(
                 else -> {}
             }
             withContext(dispatchers.main()) {
-                searchInputTextState.value = omnibarText
-                command.value = AutocompleteItemRemoved
+                refreshSuggestions.emit(Unit)
+                showKeyboard()
             }
         }
     }
@@ -334,6 +339,14 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun onVoiceInputAllowedChange(allowed: Boolean) {
         voiceInputAllowed.value = allowed
+    }
+
+    fun showKeyboard() {
+        command.value = Command.ShowKeyboard
+    }
+
+    fun hideKeyboard() {
+        command.value = Command.HideKeyboard
     }
 
     class InputScreenViewModelProviderFactory(
