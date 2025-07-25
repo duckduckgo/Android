@@ -165,6 +165,19 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState.Ready) {
+        // Privacy Pro Rebranding active
+        if (viewState.rebrandingEnabled) {
+            binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
+            binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
+            binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
+            binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
+        } else {
+            binding.subscriptionSettingsProductName.setText(string.privacyPro)
+            binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
+            binding.faq.setPrimaryText(getString(string.privacyProFaq))
+            binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
+        }
+
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
@@ -176,19 +189,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.changePlan.isVisible = true
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
-
-            // Privacy Pro Rebranding active
-            if (viewState.rebrandingEnabled) {
-                binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
-                binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
-                binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
-                binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
-            } else {
-                binding.subscriptionSettingsProductName.setText(string.privacyPro)
-                binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
-                binding.faq.setPrimaryText(getString(string.privacyProFaq))
-                binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
-            }
 
             // Free Trial active
             if (viewState.activeOffers.contains(ActiveOfferType.TRIAL)) {
