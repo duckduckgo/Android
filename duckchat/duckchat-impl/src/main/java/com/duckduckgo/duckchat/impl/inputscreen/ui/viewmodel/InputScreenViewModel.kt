@@ -40,6 +40,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteI
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputTextBoxCommands
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputBoxState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
@@ -52,6 +53,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -67,6 +69,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
@@ -110,7 +113,7 @@ class InputScreenViewModel @AssistedInject constructor(
      * 1. The user has modified the input text from its initial state, OR
      * 2. The initial text was not a URL (e.g., search query from SERP)
      */
-    private val hasMovedBeyondInitialUrl = MutableStateFlow(false)
+    private val hasMovedBeyondInitialUrl = MutableStateFlow(checkMovedBeyondInitialUrl(searchInputTextState.value))
 
     /**
      * Caches the feature flag and user preference state.
@@ -165,6 +168,9 @@ class InputScreenViewModel @AssistedInject constructor(
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
+    private val _inputTextBoxCommands = Channel<InputTextBoxCommands>(capacity = Channel.CONFLATED)
+    val inputTextBoxCommands: Flow<InputTextBoxCommands> = _inputTextBoxCommands.receiveAsFlow()
+
     init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
             serviceAvailable && inputAllowed
@@ -178,11 +184,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
         searchInputTextState.onEach { searchInput ->
             if (!hasMovedBeyondInitialUrl.value) {
-                // check if user modified input or initial text wasn't a webpage URL
-                val userHasModifiedInput = initialSearchInputText != searchInput
-                val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != "duck"
-
-                hasMovedBeyondInitialUrl.value = userHasModifiedInput || initialTextWasNotWebUrl
+                hasMovedBeyondInitialUrl.value = checkMovedBeyondInitialUrl(searchInput)
             }
         }.launchIn(viewModelScope)
 
@@ -191,6 +193,11 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(canExpand = hasMovedBeyondInitialUrl)
             }
         }.launchIn(viewModelScope)
+
+        if (!hasMovedBeyondInitialUrl.value) {
+            // If the initial text is a URL, we select all text in the input box
+            _inputTextBoxCommands.trySend(InputTextBoxCommands.SelectAll)
+        }
 
         shouldShowAutoComplete.onEach { showAutoComplete ->
             _visibilityState.update {
@@ -341,6 +348,14 @@ class InputScreenViewModel @AssistedInject constructor(
         _inputBoxState.update {
             it.copy(canExpand = true)
         }
+    }
+
+    private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {
+        // check if user modified input or initial text wasn't a webpage URL
+        val userHasModifiedInput = initialSearchInputText != searchInput
+        val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != "duck"
+
+        return userHasModifiedInput || initialTextWasNotWebUrl
     }
 
     class InputScreenViewModelProviderFactory(

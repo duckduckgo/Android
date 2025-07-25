@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputTextBoxCommands
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
@@ -94,15 +95,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        configureViewPager()
-        configureOmnibar()
-        configureVoice()
-        configureObservers()
-
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         params?.query?.let { query ->
             binding.inputModeWidget.provideInitialText(query)
         }
+
+        configureViewPager()
+        configureOmnibar()
+        configureVoice()
+        configureObservers()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -133,6 +134,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         ) {
             processCommand(it)
         }
+
+        viewModel.inputTextBoxCommands.onEach { command ->
+            when (command) {
+                is InputTextBoxCommands.SelectAll -> {
+                    binding.inputModeWidget.selectAllText()
+                }
+            }
+        }.launchIn(lifecycleScope)
 
         viewModel.submitButtonIconState.onEach { iconState ->
             val iconResource = when (iconState.icon) {

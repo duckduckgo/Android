@@ -1,6 +1,7 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -10,6 +11,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputTextBoxCommands
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
@@ -573,5 +575,53 @@ class InputScreenViewModelTest {
         // Back to URL - should still allow expansion
         viewModel.onSearchInputTextChanged("https://example.com")
         assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when initialized with web URL then SelectAll command should be sent`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        viewModel.inputTextBoxCommands.test {
+            val receivedCommand = awaitItem()
+            assertEquals(InputTextBoxCommands.SelectAll, receivedCommand)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with duck URL then SelectAll command should be sent`() = runTest {
+        val viewModel = createViewModel("duck://results?q=test")
+
+        viewModel.inputTextBoxCommands.test {
+            val receivedCommand = awaitItem()
+            assertEquals(InputTextBoxCommands.SelectAll, receivedCommand)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with search query then SelectAll command should NOT be sent`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        viewModel.inputTextBoxCommands.test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `when user modifies URL text after initialization then no additional SelectAll commands are sent`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        viewModel.inputTextBoxCommands.test {
+            // Should receive initial SelectAll
+            val initialCommand = awaitItem()
+            assertEquals(InputTextBoxCommands.SelectAll, initialCommand)
+
+            // Modify text
+            viewModel.onSearchInputTextChanged("https://example.com/page")
+
+            // Should not receive any additional commands
+            expectNoEvents()
+        }
     }
 }
