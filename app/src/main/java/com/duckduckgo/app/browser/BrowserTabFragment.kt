@@ -201,6 +201,7 @@ import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentT
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -1149,7 +1150,8 @@ class BrowserTabFragment :
     }
 
     private fun onTabsButtonPressed() {
-        launch { viewModel.userLaunchingTabSwitcher() }
+        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
+        launch { viewModel.userLaunchingTabSwitcher(isFocusedNtp) }
     }
 
     private fun onTabsButtonLongPressed() {
@@ -1180,7 +1182,8 @@ class BrowserTabFragment :
     }
 
     private fun onFireButtonPressed() {
-        browserActivity?.launchFire()
+        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
+        browserActivity?.launchFire(launchedFromFocusedNtp = isFocusedNtp)
         viewModel.onFireMenuSelected()
     }
 
@@ -1344,6 +1347,8 @@ class BrowserTabFragment :
     }
 
     private fun launchPopupMenu() {
+        val isFocusedNtp = omnibar.viewMode == ViewMode.NewTab && omnibar.getText().isEmpty() && omnibar.omnibarTextInput.hasFocus()
+
         // small delay added to let keyboard disappear and avoid jarring transition
         binding.rootView.postDelayed(POPUP_MENU_DELAY) {
             if (isAdded) {
@@ -1352,7 +1357,8 @@ class BrowserTabFragment :
                 if (isActiveCustomTab()) {
                     pixel.fire(CustomTabPixelNames.CUSTOM_TABS_MENU_OPENED)
                 } else {
-                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName)
+                    val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to isFocusedNtp.toString())
+                    pixel.fire(AppPixelName.MENU_ACTION_POPUP_OPENED.pixelName, params)
                 }
             }
         }
@@ -2165,8 +2171,8 @@ class BrowserTabFragment :
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
-                hideKeyboard()
                 launchPopupMenu()
+                hideKeyboard()
             }
 
             is Command.LaunchBookmarksActivity -> {
