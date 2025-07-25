@@ -23,13 +23,9 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
-
-data class InputScreenActivityParams(
-    val query: String,
-) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(InputScreenActivityParams::class)
@@ -64,11 +60,5 @@ class InputScreenActivity : DuckDuckGoActivity() {
                 exitTransition,
             )
         }
-    }
-
-    companion object {
-        // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
-        const val QUERY = "query"
-        const val TAB_ID = "tab_id"
     }
 }

@@ -33,6 +33,9 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
@@ -109,9 +112,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     val query = binding.inputModeWidget.text
-                    val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+                    val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
                     requireActivity().setResult(Activity.RESULT_CANCELED, data)
-                    exitInterstitial()
+                    exitInputScreen()
                 }
             },
         )
@@ -149,9 +152,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is UserSubmittedQuery -> binding.inputModeWidget.submitMessage(command.query)
             is EditWithSelectedQuery -> binding.inputModeWidget.text = command.query
             is SwitchToTab -> {
-                val data = Intent().putExtra(InputScreenActivity.TAB_ID, command.tabId)
-                requireActivity().setResult(Activity.RESULT_OK, data)
-                exitInterstitial()
+                val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, command.tabId)
+                requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
+                exitInputScreen()
             }
             is SubmitSearch -> submitSearchQuery(command.query)
             is SubmitChat -> submitChatQuery(command.query)
@@ -203,16 +206,16 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun submitChatQuery(query: String) {
-        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
         requireActivity().setResult(Activity.RESULT_CANCELED, data)
         requireActivity().finish()
         duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     private fun submitSearchQuery(query: String) {
-        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
-        requireActivity().setResult(Activity.RESULT_OK, data)
-        exitInterstitial()
+        val data = Intent().putExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM, query)
+        requireActivity().setResult(InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED, data)
+        exitInputScreen()
     }
 
     private fun configureVoice() {
@@ -235,7 +238,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }.launchIn(lifecycleScope)
     }
 
-    private fun exitInterstitial() {
+    private fun exitInputScreen() {
         hideKeyboard(binding.inputModeWidget.inputField)
         requireActivity().supportFinishAfterTransition()
     }
