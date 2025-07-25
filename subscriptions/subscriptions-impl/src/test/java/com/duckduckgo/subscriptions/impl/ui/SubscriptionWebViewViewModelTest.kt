@@ -29,7 +29,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -103,7 +102,7 @@ class SubscriptionWebViewViewModelTest {
             assertEquals(Companion.PURCHASE_COMPLETED_FEATURE_NAME, (success as Success).subscriptionEventData.featureName)
             assertEquals(Companion.PURCHASE_COMPLETED_SUBSCRIPTION_NAME, success.subscriptionEventData.subscriptionName)
             assertNotNull(success.subscriptionEventData.params)
-            assertEquals("completed", success.subscriptionEventData.params!!.getString("type"))
+            assertEquals("completed", success.subscriptionEventData.params.getString("type"))
 
             flowTest.emit(CurrentPurchase.InProgress)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.InProgress)
@@ -704,7 +703,7 @@ class SubscriptionWebViewViewModelTest {
         viewModel.commands().test {
             viewModel.onSubscriptionRestored()
             val result = awaitItem()
-            assertTrue(result is BackToSettings)
+            assertTrue(result is Command.BackToSettings)
         }
     }
 
