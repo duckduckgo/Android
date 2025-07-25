@@ -533,4 +533,77 @@ class InputScreenViewModelTest {
 
         verify(autoComplete, times(2)).autoComplete("query")
     }
+
+    @Test
+    fun `when initialized with web URL then inputBoxState canExpand should be false initially`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when initialized with search query then inputBoxState canExpand should be true`() {
+        val viewModel = createViewModel("search query")
+
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when user modifies initial web URL text then inputBoxState canExpand should become true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputBoxState.value.canExpand)
+        viewModel.onSearchInputTextChanged("https://example.com/modified")
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when user modifies initial search query then inputBoxState canExpand should remain true`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+        viewModel.onSearchInputTextChanged("modified search")
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when user restores original URL after modification then inputBoxState canExpand should remain true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // User modifies text
+        viewModel.onSearchInputTextChanged("modified")
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+
+        // User restores original URL
+        viewModel.onSearchInputTextChanged("https://example.com")
+
+        // Should still allow expansion because user has moved beyond initial state
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when onInputBoxTouched called then inputBoxState canExpand should become true`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputBoxState.value.canExpand)
+        viewModel.onInputBoxTouched()
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
+
+    @Test
+    fun `when onInputBoxTouched called then canExpand remains true even after text changes`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // Touch input box to enable expansion
+        viewModel.onInputBoxTouched()
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+
+        // Change text - should still allow expansion
+        viewModel.onSearchInputTextChanged("new text")
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+
+        // Back to URL - should still allow expansion
+        viewModel.onSearchInputTextChanged("https://example.com")
+        assertTrue(viewModel.inputBoxState.value.canExpand)
+    }
 }
