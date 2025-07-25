@@ -1240,6 +1240,7 @@ sealed class DaxBubbleCta(
 
         with(binding) {
             val afterAnimation = {
+                daxBubbleDialogTitle.finishAnimation()
                 dialogTextCta.finishAnimation()
                 primaryCta.fadeIn()
                 secondaryCta.fadeIn()
@@ -1259,27 +1260,25 @@ sealed class DaxBubbleCta(
             TransitionManager.beginDelayedTransition(cardView, AutoTransition())
             root.show()
 
-            daxBubbleDialogTitle.apply {
-                alpha = 0f
-                text = daxTitle.html(context)
-            }
+            val title = daxTitle.html(context)
+            hiddenDaxBubbleDialogTitle.text = title
+            daxBubbleDialogTitle.text = ""
 
-            fun fadeText() {
-                daxBubbleDialogTitle.fadeIn()
-                    .withEndAction {
-                        dialogTextCta.startTypingAnimation(daxText, true) {
-                            afterAnimation()
-                        }
+            fun runTypingAnimations() {
+                daxBubbleDialogTitle.startTypingAnimation(daxTitle, true) {
+                    dialogTextCta.startTypingAnimation(daxText, true) {
+                        afterAnimation()
                     }
+                }
             }
 
             root.fadeIn().setStartDelay(500).withEndAction {
                 if (configuration is DaxEndCta) {
                     headerImage.fadeIn().withEndAction {
-                        fadeText()
+                        runTypingAnimations()
                     }
                 } else {
-                    fadeText()
+                    runTypingAnimations()
                 }
             }
             cardContainer.setOnClickListener { afterAnimation() }
