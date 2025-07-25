@@ -69,8 +69,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchaseWithOrigin
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
@@ -126,8 +125,7 @@ data class SubscriptionsWebViewActivityWithParams(
     scope = ActivityScope::class,
     delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
-@ContributeToActivityStarter(SubscriptionScreenNoParams::class)
-@ContributeToActivityStarter(SubscriptionPurchaseWithOrigin::class)
+@ContributeToActivityStarter(SubscriptionPurchase::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
@@ -278,7 +276,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun convertIntoSubscriptionWebViewActivityParams(intent: Intent): SubscriptionsWebViewActivityWithParams {
-        intent.getActivityParams(SubscriptionPurchaseWithOrigin::class.java)?.let {
+        intent.getActivityParams(SubscriptionPurchase::class.java)?.let {
             return SubscriptionsWebViewActivityWithParams(
                 url = BUY_URL,
                 origin = it.origin,

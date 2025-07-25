@@ -20,9 +20,8 @@ import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.subscriptions.api.SubscriptionScreens
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import javax.inject.Inject
@@ -71,9 +70,9 @@ class SubscriptionsHandler @Inject constructor(
                     val subscriptionParams = runCatching {
                         data?.getString(MESSAGE_PARAM_ORIGIN_KEY).takeUnless { it.isNullOrBlank() }
                             ?.let { nonEmptyOrigin ->
-                                SubscriptionScreens.SubscriptionPurchaseWithOrigin(nonEmptyOrigin)
-                            } ?: SubscriptionScreenNoParams
-                    }.getOrDefault(SubscriptionScreenNoParams)
+                                SubscriptionPurchase(nonEmptyOrigin)
+                            } ?: SubscriptionPurchase()
+                    }.getOrDefault(SubscriptionPurchase())
 
                     withContext(dispatcherProvider.main()) {
                         globalActivityStarter.start(context, subscriptionParams)

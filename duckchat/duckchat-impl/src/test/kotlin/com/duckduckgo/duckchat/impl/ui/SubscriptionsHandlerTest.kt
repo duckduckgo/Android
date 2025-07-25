@@ -23,8 +23,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchaseWithOrigin
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import kotlinx.coroutines.test.runTest
@@ -186,7 +185,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionScreenNoParams)
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
     }
 
     @Test
@@ -209,7 +208,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionPurchaseWithOrigin("duckai_chat"))
+        verify(globalActivityStarter).start(context, SubscriptionPurchase("duckai_chat"))
     }
 
     @Test
@@ -232,7 +231,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionScreenNoParams)
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
     }
 
     @Test
@@ -255,7 +254,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionScreenNoParams)
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
     }
 
     @Test
@@ -303,6 +302,6 @@ class SubscriptionsHandlerTest {
         )
 
         verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
-        verify(globalActivityStarter).start(context, SubscriptionScreenNoParams)
+        verify(globalActivityStarter).start(context, SubscriptionPurchase())
     }
 }
