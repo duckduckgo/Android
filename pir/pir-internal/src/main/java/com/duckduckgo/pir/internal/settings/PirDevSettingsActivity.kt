@@ -31,8 +31,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.store.PirRepository
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(PirSettingsScreenNoParams::class)
