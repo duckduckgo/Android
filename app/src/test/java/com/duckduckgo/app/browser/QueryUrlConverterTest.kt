@@ -29,7 +29,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
-import java.net.URLEncoder
 
 @RunWith(AndroidJUnit4::class)
 class QueryUrlConverterTest {
