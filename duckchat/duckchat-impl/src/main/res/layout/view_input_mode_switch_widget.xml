@@ -93,7 +93,7 @@
                 android:textCursorDrawable="@drawable/text_cursor"
                 android:textSize="16sp"
                 android:textStyle="normal"
-                app:type="multi_line" />
+                android:maxLines="1" />
 
             <ImageView
                 android:id="@+id/inputFieldClearText"
