@@ -67,7 +67,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
                 if (this.secret == secret && context == jsMessage.context && isUrlAllowed(url)) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, secret, jsMessageCallback)
+                    }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {
@@ -116,7 +116,7 @@ class DuckPlayerScriptsJsMessaging @Inject constructor(
     }
 
     inner class DuckPlayerPageHandler : JsMessageHandler {
-        override fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?) {
+        override fun process(jsMessage: JsMessage, jsMessaging: JsMessaging, jsMessageCallback: JsMessageCallback?) {
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
