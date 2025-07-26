@@ -30,6 +30,7 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
@@ -195,6 +196,64 @@ class RealSubscriptionsTest {
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
         assertEquals("test", (captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
+    }
+
+    @Test
+    fun whenLaunchProUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenLaunchProWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?usePaidDuckAi=true&featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenLaunchSubscriptionUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenLaunchSubscriptionWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?usePaidDuckAi=true&featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenSubscriptionWithMultipleQueryParametersThenIsPrivacyProUrlReturnsTrue() = runTest {
+        assertTrue(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri()))
+    }
+
+    @Test
+    fun whenSubscriptionUrlButNotRootPathThenIsPrivacyProUrlReturnsFalse() = runTest {
+        assertFalse(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions/welcome?usePaidDuckAi=true&featurePage=duckai".toUri()))
     }
 
     @Test
