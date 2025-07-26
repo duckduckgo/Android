@@ -25,6 +25,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -58,6 +59,9 @@ internal class AboutDuckDuckGoViewModelTest {
     @Mock
     private lateinit var privacyProUnifiedFeedback: PrivacyProUnifiedFeedback
 
+    @Mock
+    private lateinit var mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -69,6 +73,7 @@ internal class AboutDuckDuckGoViewModelTest {
             mockAppBuildConfig,
             mockPixel,
             privacyProUnifiedFeedback,
+            mockSubscriptionRebrandingFeatureToggle,
         )
     }
 

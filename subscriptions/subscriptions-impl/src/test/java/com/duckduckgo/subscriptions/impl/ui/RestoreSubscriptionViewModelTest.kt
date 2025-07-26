@@ -2,6 +2,7 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -39,6 +40,7 @@ class RestoreSubscriptionViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val authClient: AuthClient = mock()
+    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private lateinit var viewModel: RestoreSubscriptionViewModel
 
     @Before
@@ -50,6 +52,7 @@ class RestoreSubscriptionViewModelTest {
             subscriptionsChecker = subscriptionsChecker,
             authClient = authClient,
             appCoroutineScope = coroutineTestRule.testScope,
+            subscriptionRebrandingFeatureToggle = mockSubscriptionRebrandingFeatureToggle,
         )
     }
 

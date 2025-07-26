@@ -45,12 +45,13 @@
                 android:src="@drawable/ic_privacy_pro_settings_hero" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/subscriptionSettingsProductName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:layout_marginBottom="@dimen/keyline_2"
-                android:text="@string/privacyPro"
+                tools:text="@string/privacyPro"
                 app:textType="primary"
                 app:typography="h2" />
 
@@ -112,9 +113,10 @@
                 android:layout_marginTop="@dimen/keyline_4" />
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/activateOnOtherDevices"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/activateOnOtherDevices" />
+                tools:primaryText="@string/activateOnOtherDevices" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/manageEmail"
@@ -179,8 +181,8 @@
                 android:id="@+id/faq"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/privacyProFaq"
-                app:secondaryText="@string/privacyProFaqSecondary" />
+                tools:primaryText="@string/privacyProFaq"
+                tools:secondaryText="@string/privacyProFaqSecondary" />
 
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/privacyPolicy"

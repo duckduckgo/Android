@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
@@ -40,12 +41,18 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
+    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
     @Before
     fun before() {
-        viewModel = SubscriptionSettingsViewModel(subscriptionsManager, pixelSender, privacyProUnifiedFeedback)
+        viewModel = SubscriptionSettingsViewModel(
+            subscriptionsManager,
+            pixelSender,
+            privacyProUnifiedFeedback,
+            mockSubscriptionRebrandingFeatureToggle,
+        )
     }
 
     @Test

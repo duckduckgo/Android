@@ -40,6 +40,7 @@ import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWi
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPPROUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithPrivacyPolicyUrl
 import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.Command.LaunchWebViewWithVPNUrl
+import com.duckduckgo.app.about.AboutDuckDuckGoViewModel.ViewState
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
@@ -86,7 +87,6 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
-        configureClickableLinks()
     }
 
     override fun onResume() {
@@ -94,15 +94,19 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         viewModel.resetEasterEggCounter()
     }
 
-    private fun configureClickableLinks() {
+    private fun configureClickableLinks(viewState: ViewState) {
         with(binding.includeContent.aboutText) {
-            text = addClickableLinks()
+            text = addClickableLinks(viewState)
             movementMethod = LinkMovementMethod.getInstance()
         }
     }
 
-    private fun addClickableLinks(): SpannableString {
-        val fullText = getText(R.string.aboutDescriptionBrandUpdate2025) as SpannedString
+    private fun addClickableLinks(viewState: ViewState): SpannableString {
+        val fullText = if (viewState.rebrandingEnabled) {
+            getText(R.string.aboutDescriptionBrandUpdate2025Rebranding) as SpannedString
+        } else {
+            getText(R.string.aboutDescriptionBrandUpdate2025) as SpannedString
+        }
 
         val spannableString = SpannableString(fullText)
         val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
@@ -190,6 +194,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     binding.includeContent.aboutVersion.setSecondaryText(it.version)
+                    configureClickableLinks(viewState)
                 }
             }.launchIn(lifecycleScope)
 

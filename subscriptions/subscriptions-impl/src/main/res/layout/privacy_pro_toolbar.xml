@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,38 +14,38 @@
   ~ limitations under the License.
   -->
 
-<com.google.android.material.appbar.AppBarLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+<com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/appBarLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
 
     <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/daxColorToolbar"
-            android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
-            app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/daxColorToolbar"
+        android:theme="@style/Widget.DuckDuckGo.ToolbarTheme"
+        app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
 
         <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/logoToolbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_subs_toolbar_logo"/>
+            android:id="@+id/logoToolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_subs_toolbar_logo" />
+
         <com.duckduckgo.common.ui.view.text.DaxTextView
-                android:id="@+id/titleToolbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:typography="h2"
-                android:layout_gravity="center"
-                android:layout_marginStart="@dimen/keyline_5"
-                app:textType="primary"
-                android:text="@string/privacyPro"
-        />
+            android:id="@+id/titleToolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="@dimen/keyline_5"
+            app:textType="primary"
+            app:typography="h2"
+            tools:text="@string/privacyPro" />
     </androidx.appcompat.widget.Toolbar>
 
 </com.google.android.material.appbar.AppBarLayout>

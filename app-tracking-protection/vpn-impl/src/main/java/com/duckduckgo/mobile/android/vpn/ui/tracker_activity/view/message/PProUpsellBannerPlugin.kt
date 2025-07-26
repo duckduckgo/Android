@@ -56,15 +56,12 @@ class PProUpsellBannerPlugin @Inject constructor(
     ): View? {
         val isEligible = runBlocking { subscriptions.isUpsellEligible() && !vpnStore.isPproUpsellBannerDismised() }
         return if (isEligible) {
-            val subtitle: String
             val actionText: String
             runBlocking {
-                if (subscriptions.isFreeTrialEligible() && appTPStateMessageToggle.freeTrialCopy().isEnabled()) {
-                    subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage_freeTrial)
-                    actionText = context.getString(R.string.apptp_PproUpsellBannerAction_freeTrial)
+                actionText = if (subscriptions.isFreeTrialEligible() && appTPStateMessageToggle.freeTrialCopy().isEnabled()) {
+                    context.getString(R.string.apptp_PproUpsellBannerAction_freeTrial)
                 } else {
-                    subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage)
-                    actionText = context.getString(R.string.apptp_PproUpsellBannerAction)
+                    context.getString(R.string.apptp_PproUpsellBannerAction)
                 }
             }
             MessageCta(context)
@@ -73,7 +70,7 @@ class PProUpsellBannerPlugin @Inject constructor(
                         Message(
                             topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro,
                             title = context.getString(R.string.apptp_PproUpsellBannerTitle),
-                            subtitle = subtitle,
+                            subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage_freeTrial),
                             action = actionText,
                             messageType = REMOTE_MESSAGE,
                         ),

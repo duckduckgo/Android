@@ -32,6 +32,7 @@ import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.subscription.NetpSubscriptionManager
 import com.duckduckgo.networkprotection.impl.subscription.isActive
 import com.duckduckgo.networkprotection.impl.subscription.isExpired
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -58,6 +59,7 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
     private val netPNotificationActions: NetPNotificationActions,
     private val globalActivityStarter: GlobalActivityStarter,
     private val netpSubscriptionManager: NetpSubscriptionManager,
+    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : NetPDisabledNotificationBuilder {
     private val defaultDateTimeFormatter = SimpleDateFormat.getTimeInstance(DateFormat.SHORT)
 
@@ -183,14 +185,19 @@ class RealNetPDisabledNotificationBuilder @Inject constructor(
             addNextIntentWithParentStack(intent)
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         }
+        val notificationDescriptionRes = if (subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
+            R.string.netpNotificationVpnAccessRevokedRebranding
+        } else {
+            R.string.netpNotificationVpnAccessRevoked
+        }
 
         return NotificationCompat.Builder(context, NETP_ALERTS_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(pendingIntent)
-            .setContentText(context.getString(R.string.netpNotificationVpnAccessRevoked))
+            .setContentText(context.getString(notificationDescriptionRes))
             .setStyle(
                 NotificationCompat.BigTextStyle().bigText(
-                    context.getString(R.string.netpNotificationVpnAccessRevoked),
+                    context.getString(notificationDescriptionRes),
                 ),
             )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

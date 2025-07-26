@@ -37,10 +37,10 @@ class ProSettingsTitle @Inject constructor(
 ) : ProSettingsPlugin {
     override fun getView(context: Context): View {
         return SectionHeaderListItem(context).apply {
-            if (subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
-                primaryText = context.getString(R.string.subscriptionSettingSectionTitle)
+            primaryText = if (subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
+                context.getString(R.string.subscriptionSettingSectionTitle)
             } else {
-                primaryText = context.getString(R.string.privacyPro)
+                context.getString(R.string.privacyPro)
             }
         }
     }

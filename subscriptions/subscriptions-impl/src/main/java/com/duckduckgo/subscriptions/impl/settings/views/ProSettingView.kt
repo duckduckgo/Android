@@ -161,7 +161,12 @@ class ProSettingView @JvmOverloads constructor(
 
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.isVisible = true
-                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
+                    val subscriptionExpiredRes = if (viewState.rebrandingEnabled) {
+                        R.string.subscriptionSettingExpiredRebranding
+                    } else {
+                        R.string.subscriptionSettingExpired
+                    }
+                    subscriptionSetting.setSecondaryText(context.getString(subscriptionExpiredRes))
                     subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_recolorable_16)
                 }
             }
