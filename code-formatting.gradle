@@ -1,26 +1,24 @@
 apply plugin: 'com.diffplug.spotless'
-apply plugin: 'org.jmailen.kotlinter'
 
 spotless {
+    ratchetFrom 'origin/develop'
+    kotlin {
+        target 'src/*/kotlin/**/*.kt', 'src/*/java/**/*.kt'
+        ktlint("1.7.1")
+        trimTrailingWhitespace()
+        leadingTabsToSpaces()
+    }
     java {
         target 'src/*/java/**/*.java'
         googleJavaFormat('1.22.0').aosp()
         targetExclude("**/FragmentStateAdapter.java") // temporary
         removeUnusedImports()
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
     }
     format 'xml', {
         target '**/*.xml'
-        indentWithSpaces()
+        leadingTabsToSpaces()
         trimTrailingWhitespace()
     }
-}
-
-kotlinter {
-    disabledRules = ['no-wildcard-imports', 'filename', 'package-name', 'annotation-spacing']
-}
-
-tasks.register('code_format_checks') {
-    dependsOn 'spotlessCheck', 'lintKotlin'
 }
