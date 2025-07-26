@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal
+package com.duckduckgo.pir.api.dashboard
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "pir",
-)
-interface PirRemoteFeatures {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
-
-    @DefaultValue(DefaultFeatureValue.FALSE)
-    fun allowPirRun(): Toggle
-}
+/**
+ * Use this model to launch the PIR Dashboard screen.
+ */
+data object PirDashboardScreen : GlobalActivityStarter.ActivityParams
