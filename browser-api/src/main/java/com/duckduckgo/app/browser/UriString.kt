@@ -36,6 +36,15 @@ class UriString {
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
         private val cache = LruCache<Int, Boolean>(250_000)
 
+        fun extractUrl(inputQuery: String): String? {
+            val urls = webUrlRegex.findAll(inputQuery).map { it.value }.toList()
+            return if (urls.size == 1) {
+                urls.first()
+            } else {
+                null
+            }
+        }
+
         fun host(uriString: String): String? {
             return Uri.parse(uriString).baseHost
         }
@@ -96,10 +105,18 @@ class UriString {
             return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
         }
 
-        fun isWebUrl(inputQuery: String): Boolean {
+        fun isWebUrl(inputQuery: String, extractUrlQuery: Boolean = false): Boolean {
             if (inputQuery.contains("\"") || inputQuery.contains("'")) {
                 return false
             }
+
+            if (extractUrlQuery) {
+                val extractedUrl = extractUrl(inputQuery)
+                if (extractedUrl != null) {
+                    return isWebUrl(extractedUrl)
+                }
+            }
+
             if (inputQuery.contains(space)) return false
             val rawUri = Uri.parse(inputQuery)
 

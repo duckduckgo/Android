@@ -22,6 +22,7 @@ interface OmnibarEntryConverter {
         searchQuery: String,
         vertical: String? = null,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
+        extractUrlFromQuery: Boolean = false,
     ): String
 }
 
