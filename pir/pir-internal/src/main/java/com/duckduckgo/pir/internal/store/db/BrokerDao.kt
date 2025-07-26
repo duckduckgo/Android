@@ -34,7 +34,10 @@ interface BrokerDao {
     fun getOptOutJson(brokerName: String): String?
 
     @Query("SELECT * from pir_broker_scheduling_config where brokerName = :brokerName")
-    fun getSchedulingConfig(brokerName: String): BrokerSchedulingConfig?
+    fun getSchedulingConfig(brokerName: String): BrokerSchedulingConfigEntity?
+
+    @Query("SELECT * from pir_broker_scheduling_config")
+    fun getAllSchedulingConfigs(): List<BrokerSchedulingConfigEntity>
 
     @Query("DELETE from pir_broker_details")
     fun deleteAllBrokers()
@@ -52,14 +55,14 @@ interface BrokerDao {
     fun insertOptOutSteps(brokerOptOut: BrokerOptOut)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBrokerSchedulingConfig(schedulingConfig: BrokerSchedulingConfig)
+    fun insertBrokerSchedulingConfig(schedulingConfig: BrokerSchedulingConfigEntity)
 
     @Transaction
     fun upsert(
         broker: Broker,
         brokerScan: BrokerScan,
         brokerOptOut: BrokerOptOut,
-        schedulingConfig: BrokerSchedulingConfig,
+        schedulingConfig: BrokerSchedulingConfigEntity,
     ) {
         deleteBroker(broker.name)
         insertBroker(broker)

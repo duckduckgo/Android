@@ -28,13 +28,16 @@ import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
-import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
+import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.internal.store.db.JobSchedulingDao
 import com.duckduckgo.pir.internal.store.db.OptOutActionLog
 import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
+import com.duckduckgo.pir.internal.store.db.OptOutJobRecordEntity
 import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.PirBrokerScanLog
 import com.duckduckgo.pir.internal.store.db.PirEventLog
 import com.duckduckgo.pir.internal.store.db.ScanCompletedBroker
+import com.duckduckgo.pir.internal.store.db.ScanJobRecordEntity
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
 import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
@@ -46,13 +49,13 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 4,
+    version = 5,
     entities = [
         BrokerJsonEtag::class,
         Broker::class,
         BrokerOptOut::class,
         BrokerScan::class,
-        BrokerSchedulingConfig::class,
+        BrokerSchedulingConfigEntity::class,
         UserProfile::class,
         PirEventLog::class,
         PirBrokerScanLog::class,
@@ -60,6 +63,8 @@ import com.squareup.moshi.Types
         OptOutCompletedBroker::class,
         OptOutActionLog::class,
         StoredExtractedProfile::class,
+        ScanJobRecordEntity::class,
+        OptOutJobRecordEntity::class,
     ],
 )
 @TypeConverters(PirDatabaseConverters::class)
@@ -70,11 +75,13 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun userProfileDao(): UserProfileDao
     abstract fun scanLogDao(): ScanLogDao
     abstract fun optOutResultsDao(): OptOutResultsDao
+    abstract fun jobSchedulingDao(): JobSchedulingDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration>
             get() = listOf(
                 MIGRATION_3_TO_4,
+                MIGRATION_4_TO_5,
             )
 
         private val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
@@ -96,6 +103,24 @@ abstract class PirDatabase : RoomDatabase() {
                 db.execSQL("DROP TABLE IF EXISTS `pir_scan_extracted_profile`")
                 db.execSQL("DROP TABLE IF EXISTS `pir_scan_navigate_results`")
                 db.execSQL("DROP TABLE IF EXISTS `pir_scan_error`")
+            }
+        }
+
+        private val MIGRATION_4_TO_5: Migration = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `pir_scan_job_record` (`brokerName` TEXT NOT NULL, `userProfileId` INTEGER NOT NULL, 
+                    `status` TEXT NOT NULL, `lastScanDateInMillis` INTEGER, PRIMARY KEY(`brokerName`, `userProfileId`))
+                    """.trimIndent(),
+                )
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `pir_optout_job_record` (`extractedProfileId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, 
+                    `userProfileId` INTEGER NOT NULL, `status` TEXT NOT NULL, `attemptCount` INTEGER NOT NULL, `lastOptOutAttemptDate` INTEGER, 
+                    `optOutRequestedDate` INTEGER NOT NULL, `optOutRemovedDate` INTEGER NOT NULL, PRIMARY KEY(`extractedProfileId`))
+                    """.trimIndent(),
+                )
             }
         }
     }
