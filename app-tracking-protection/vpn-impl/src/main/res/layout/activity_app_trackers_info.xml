@@ -24,7 +24,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:orientation="vertical"
-              tools:context=".ui.report.DeviceShieldAppTrackersInfo">
+              tools:context=".ui.privacyreport.DeviceShieldAppTrackersInfo">
 
     <include
         android:id="@+id/include_toolbar"
