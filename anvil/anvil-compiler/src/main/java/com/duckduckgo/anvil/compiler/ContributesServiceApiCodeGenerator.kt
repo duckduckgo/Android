@@ -46,7 +46,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
 
     override fun isApplicable(context: AnvilContext): Boolean = true
 
-    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFile> {
+    override fun generateCode(codeGenDir: File, module: ModuleDescriptor, projectFiles: Collection<KtFile>): Collection<GeneratedFileWithSources> {
         return projectFiles.classAndInnerClassReferences(module)
             .toList()
             .filter { reference -> reference.isAnnotatedWith(serviceApiAnnotations.map { it.fqName }) }
@@ -58,7 +58,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
             .toList()
     }
 
-    private fun generateServiceApiModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFile {
+    private fun generateServiceApiModule(vmClass: ClassReference.Psi, codeGenDir: File, module: ModuleDescriptor): GeneratedFileWithSources {
         val generatedPackage = vmClass.packageFqName.toString()
         val moduleClassName = "${vmClass.shortName}_Module"
 
@@ -125,7 +125,7 @@ class ContributesServiceApiCodeGenerator : CodeGenerator {
             ).build()
         }
 
-        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content)
+        return createGeneratedFile(codeGenDir, generatedPackage, moduleClassName, content, vmClass.containingFileAsJavaFile)
     }
 
     private fun ClassReference.Psi.serviceApiClassName(
