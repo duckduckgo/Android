@@ -54,7 +54,9 @@ class ExperimentAppUsageRepositoryImpl @Inject constructor(
         try {
             // enrollmentDateET is already a String like "2025-07-23"
             val enrollmentDateETString = experimentAppUsageDao.getFirstDay()
-
+            if (enrollmentDateETString == null) {
+                return@withContext Result.failure(IllegalStateException("Date is missing"))
+            }
             val parsedDate = LocalDate.parse(enrollmentDateETString, DateTimeFormatter.ISO_LOCAL_DATE)
             val isoDateET = parsedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
@@ -81,7 +83,7 @@ abstract class ExperimentAppUsageDao {
     abstract fun getNumberOfDaysAppUsedSinceDateET(isoDateET: String): Long
 
     @Query("SELECT isoDateET FROM experiment_app_usage_entity ORDER BY isoDateET ASC LIMIT 1")
-    abstract fun getFirstDay(): String
+    abstract fun getFirstDay(): String?
 }
 
 @Entity(tableName = "experiment_app_usage_entity")
