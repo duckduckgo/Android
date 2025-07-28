@@ -59,7 +59,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -183,7 +183,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private suspend fun evaluate() = evaluationMutex.withLock {
-        val isStopped = defaultBrowserPromptsDataStore.experimentStage.first() == STOPPED
+        val isStopped = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == STOPPED
         logcat { "evaluate: has stopped = $isStopped" }
         if (isStopped) {
             return
@@ -209,13 +209,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
 
-        val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.first() == CONVERTED
+        val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == CONVERTED
         logcat { "evaluate: has converted before = $hasConvertedBefore" }
         if (hasConvertedBefore) {
             return
         }
 
-        val currentStage = defaultBrowserPromptsDataStore.experimentStage.first()
+        val currentStage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull()
         logcat { "evaluate: current stage = $currentStage" }
         val newStage = if (isDefaultBrowser) {
             logcat { "evaluate: new stage is CONVERTED" }
@@ -269,7 +269,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                     }
                 }
 
-                STOPPED, CONVERTED -> null
+                else -> null
             }
         }
 
@@ -382,7 +382,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private fun fireConversionPixel(trigger: SetAsDefaultActionTrigger) = appCoroutineScope.launch {
-        val stage = defaultBrowserPromptsDataStore.experimentStage.first().toString().lowercase()
+        val stage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull().toString().lowercase()
         val triggerValue = trigger.toString().lowercase()
         logcat { "fireConversionPixel: pixelName = ${AppPixelName.SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK} - stage = $stage - trigger = $triggerValue" }
         pixel.fire(
@@ -395,7 +395,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private fun fireInteractionPixel(pixelName: AppPixelName) = appCoroutineScope.launch {
-        val stage = defaultBrowserPromptsDataStore.experimentStage.first().toString().lowercase()
+        val stage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull().toString().lowercase()
         logcat { "fireInteractionPixel pixelName = $pixelName - stage = $stage" }
         pixel.fire(
             pixel = pixelName,
