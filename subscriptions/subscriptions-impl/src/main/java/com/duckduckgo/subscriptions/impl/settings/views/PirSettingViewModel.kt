@@ -23,7 +23,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.pir.api.PirFeatureToggle
+import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 class PirSettingViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val subscriptions: Subscriptions,
-    private val pirFeatureToggle: PirFeatureToggle,
+    private val pirFeature: PirFeature,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     sealed class Command {
@@ -128,7 +128,7 @@ class PirSettingViewModel @Inject constructor(
             SubscriptionStatus.GRACE_PERIOD,
             -> {
                 if (hasValidEntitlement) {
-                    val type = if (pirFeatureToggle.isPirBetaEnabled()) {
+                    val type = if (pirFeature.isPirBetaEnabled()) {
                         DASHBOARD
                     } else {
                         DESKTOP

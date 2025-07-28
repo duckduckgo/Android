@@ -30,6 +30,7 @@ dependencies {
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
     implementation project(':common-ui')
+    implementation project(':common-utils')
     implementation project(':navigation-api')
     ksp AndroidX.room.compiler
 

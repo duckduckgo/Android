@@ -16,10 +16,12 @@
 
 package com.duckduckgo.pir.api
 
-interface PirFeatureToggle {
+interface PirFeature {
 
     /**
+     * Runs on the IO thread by default.
+     *
      * @return true if the PIR beta is enabled, false otherwise
      */
-    fun isPirBetaEnabled(): Boolean
+    suspend fun isPirBetaEnabled(): Boolean
 }

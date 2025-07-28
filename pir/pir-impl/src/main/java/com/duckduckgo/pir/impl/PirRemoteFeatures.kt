@@ -17,14 +17,16 @@
 package com.duckduckgo.pir.impl
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
-import com.duckduckgo.pir.api.PirFeatureToggle
+import com.duckduckgo.pir.api.PirFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -41,13 +43,14 @@ interface PirRemoteFeatures {
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirFeatureToggle::class,
+    boundType = PirFeature::class,
 )
-class PirRemoteFeatureToggleImpl @Inject constructor(
+class PirRemoteFeatureImpl @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
-) : PirFeatureToggle {
+    private val dispatcherProvider: DispatcherProvider,
+) : PirFeature {
 
-    override fun isPirBetaEnabled(): Boolean {
-        return pirRemoteFeatures.pirBeta().isEnabled()
+    override suspend fun isPirBetaEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        pirRemoteFeatures.pirBeta().isEnabled()
     }
 }
