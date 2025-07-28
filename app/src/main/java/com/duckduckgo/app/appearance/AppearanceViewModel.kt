@@ -66,6 +66,7 @@ class AppearanceViewModel @Inject constructor(
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
         val isFullUrlEnabled: Boolean = true,
+        val isTrackersCountInTabSwitcherEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -89,6 +90,7 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
+                    isTrackersCountInTabSwitcherEnabled = settingsDataStore.isTrackersCountInTabSwitcherEnabled,
                 )
             }
         }
@@ -176,6 +178,16 @@ class AppearanceViewModel @Inject constructor(
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
+        }
+    }
+
+    fun onShowTrackersCountInTabSwitcherChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.isTrackersCountInTabSwitcherEnabled = checked
+            viewState.update { it.copy(isTrackersCountInTabSwitcherEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            // TODO add pixel for this event
         }
     }
 }

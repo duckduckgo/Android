@@ -84,6 +84,7 @@ interface SettingsDataStore {
     var notifyMeInDownloadsDismissed: Boolean
     var experimentalWebsiteDarkMode: Boolean
     var isFullUrlEnabled: Boolean
+    var isTrackersCountInTabSwitcherEnabled: Boolean
 
     fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean
     fun isCurrentlySelected(clearWhenOption: ClearWhenOption): Boolean
@@ -217,6 +218,10 @@ class SettingsSharedPreferences @Inject constructor(
         get() = preferences.getBoolean(KEY_IS_FULL_URL_ENABLED, true)
         set(enabled) = preferences.edit { putBoolean(KEY_IS_FULL_URL_ENABLED, enabled) }
 
+    override var isTrackersCountInTabSwitcherEnabled: Boolean
+        get() = preferences.getBoolean(KEY_IS_TRACKERS_COUNT_IN_TAB_SWITCHER_ENABLED, true)
+        set(enabled) = preferences.edit { putBoolean(KEY_IS_TRACKERS_COUNT_IN_TAB_SWITCHER_ENABLED, enabled) }
+
     override fun hasBackgroundTimestampRecorded(): Boolean = preferences.contains(KEY_APP_BACKGROUNDED_TIMESTAMP)
     override fun clearAppBackgroundTimestamp() = preferences.edit { remove(KEY_APP_BACKGROUNDED_TIMESTAMP) }
 
@@ -293,6 +298,7 @@ class SettingsSharedPreferences @Inject constructor(
         const val KEY_EXPERIMENTAL_SITE_DARK_MODE = "KEY_EXPERIMENTAL_SITE_DARK_MODE"
         const val KEY_OMNIBAR_POSITION = "KEY_OMNIBAR_POSITION"
         const val KEY_IS_FULL_URL_ENABLED = "KEY_IS_FULL_URL_ENABLED"
+        const val KEY_IS_TRACKERS_COUNT_IN_TAB_SWITCHER_ENABLED = "KEY_IS_TRACKERS_COUNT_IN_TAB_SWITCHER_ENABLED"
     }
 
     private class FireAnimationPrefsMapper {

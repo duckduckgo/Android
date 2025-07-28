@@ -62,4 +62,7 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
+
+    <!-- Trackers animation -->
+    <string name="trackersCountInTabSwitcher">Trackers Count in Tab Switcher</string>
 </resources>
