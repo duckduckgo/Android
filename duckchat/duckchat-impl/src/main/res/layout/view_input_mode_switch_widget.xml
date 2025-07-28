@@ -86,14 +86,13 @@
                 android:lineSpacingMultiplier="1.2"
                 android:minHeight="@dimen/toolbarIcon"
                 android:paddingVertical="@dimen/keyline_2"
-                android:selectAllOnFocus="true"
                 android:textColor="?attr/daxColorPrimaryText"
                 android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
                 android:textColorHint="?attr/daxColorSecondaryText"
                 android:textCursorDrawable="@drawable/text_cursor"
                 android:textSize="16sp"
                 android:textStyle="normal"
-                app:type="multi_line" />
+                android:maxLines="1" />
 
             <ImageView
                 android:id="@+id/inputFieldClearText"

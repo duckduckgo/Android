@@ -1,6 +1,7 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -11,6 +12,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
@@ -532,5 +534,126 @@ class InputScreenViewModelTest {
         assertEquals(refreshedResult, viewModel.autoCompleteSuggestionResults.value)
 
         verify(autoComplete, times(2)).autoComplete("query")
+    }
+
+    @Test
+    fun `when initialized with web URL then inputFieldState canExpand should be false initially`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when initialized with search query then inputFieldState canExpand should be true`() {
+        val viewModel = createViewModel("search query")
+
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when user modifies initial web URL text then inputFieldState canExpand should become true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputFieldState.value.canExpand)
+        viewModel.onSearchInputTextChanged("https://example.com/modified")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when user modifies initial search query then inputFieldState canExpand should remain true`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+        viewModel.onSearchInputTextChanged("modified search")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when user restores original URL after modification then inputFieldState canExpand should remain true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // User modifies text
+        viewModel.onSearchInputTextChanged("modified")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+
+        // User restores original URL
+        viewModel.onSearchInputTextChanged("https://example.com")
+
+        // Should still allow expansion because user has moved beyond initial state
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when onInputFieldTouched called then inputFieldState canExpand should become true`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputFieldState.value.canExpand)
+        viewModel.onInputFieldTouched()
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when onInputFieldTouched called then canExpand remains true even after text changes`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // Touch input field to enable expansion
+        viewModel.onInputFieldTouched()
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+
+        // Change text - should still allow expansion
+        viewModel.onSearchInputTextChanged("new text")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+
+        // Back to URL - should still allow expansion
+        viewModel.onSearchInputTextChanged("https://example.com")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when initialized with web URL then SelectAll command should be sent`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        viewModel.inputFieldCommand.test {
+            val receivedCommand = awaitItem()
+            assertEquals(InputFieldCommand.SelectAll, receivedCommand)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with duck URL then SelectAll command should be sent`() = runTest {
+        val viewModel = createViewModel("duck://results?q=test")
+
+        viewModel.inputFieldCommand.test {
+            val receivedCommand = awaitItem()
+            assertEquals(InputFieldCommand.SelectAll, receivedCommand)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with search query then SelectAll command should NOT be sent`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        viewModel.inputFieldCommand.test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `when user modifies URL text after initialization then no additional SelectAll commands are sent`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        viewModel.inputFieldCommand.test {
+            // Should receive initial SelectAll
+            val initialCommand = awaitItem()
+            assertEquals(InputFieldCommand.SelectAll, initialCommand)
+
+            // Modify text
+            viewModel.onSearchInputTextChanged("https://example.com/page")
+
+            // Should not receive any additional commands
+            expectNoEvents()
+        }
     }
 }

@@ -38,8 +38,10 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputFieldState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
@@ -51,6 +53,7 @@ import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -68,6 +71,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
@@ -109,16 +113,11 @@ class InputScreenViewModel @AssistedInject constructor(
     private val refreshSuggestions = MutableSharedFlow<Unit>()
 
     /**
-     * Tracks whether we should show autocomplete suggestions based on the initial input state.
-     *
      * This becomes true when either:
      * 1. The user has modified the input text from its initial state, OR
      * 2. The initial text was not a URL (e.g., search query from SERP)
-     *
-     * We suppress autocomplete when the user is on a webpage and the input still shows
-     * that page's URL unchanged, since autocomplete suggestions would then obfuscate favorites.
      */
-    private var hasMovedBeyondInitialUrl = false
+    private val hasMovedBeyondInitialUrl = MutableStateFlow(checkMovedBeyondInitialUrl(searchInputTextState.value))
 
     /**
      * Caches the feature flag and user preference state.
@@ -140,25 +139,11 @@ class InputScreenViewModel @AssistedInject constructor(
     private val shouldShowAutoComplete = combine(
         autoCompleteSuggestionsEnabled,
         searchInputTextState,
-    ) { autoCompleteEnabled, searchInput ->
-        val shouldShowBasedOnInput = if (hasMovedBeyondInitialUrl) {
-            // once user has interacted or initial text wasn't a URL, allow autocomplete (if the rest of the conditions are met as well)
-            true
-        } else {
-            // check if user modified input or initial text wasn't a webpage URL
-            val userHasModifiedInput = initialSearchInputText != searchInput
-            val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != "duck"
-
-            val shouldShow = userHasModifiedInput || initialTextWasNotWebUrl
-            if (shouldShow) {
-                hasMovedBeyondInitialUrl = true
-            }
-            shouldShow
-        }
-
+        hasMovedBeyondInitialUrl,
+    ) { autoCompleteEnabled, searchInput, hasMovedBeyondInitialUrl ->
         autoCompleteEnabled &&
             searchInput.isNotEmpty() &&
-            shouldShowBasedOnInput
+            hasMovedBeyondInitialUrl
     }.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue = false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -183,8 +168,14 @@ class InputScreenViewModel @AssistedInject constructor(
         .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
 
+    private val _inputFieldState = MutableStateFlow(InputFieldState(canExpand = false))
+    val inputFieldState: StateFlow<InputFieldState> = _inputFieldState.asStateFlow()
+
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     val searchTabCommand: SingleLiveEvent<SearchCommand> = SingleLiveEvent()
+
+    private val _inputFieldCommand = Channel<InputFieldCommand>(capacity = Channel.CONFLATED)
+    val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
 
     init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
@@ -196,6 +187,23 @@ class InputScreenViewModel @AssistedInject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+
+        searchInputTextState.onEach { searchInput ->
+            if (!hasMovedBeyondInitialUrl.value) {
+                hasMovedBeyondInitialUrl.value = checkMovedBeyondInitialUrl(searchInput)
+            }
+        }.launchIn(viewModelScope)
+
+        hasMovedBeyondInitialUrl.onEach { hasMovedBeyondInitialUrl ->
+            _inputFieldState.update {
+                it.copy(canExpand = hasMovedBeyondInitialUrl)
+            }
+        }.launchIn(viewModelScope)
+
+        if (!hasMovedBeyondInitialUrl.value) {
+            // If the initial text is a URL, we select all text in the input box
+            _inputFieldCommand.trySend(InputFieldCommand.SelectAll)
+        }
 
         shouldShowAutoComplete.onEach { showAutoComplete ->
             _visibilityState.update {
@@ -346,6 +354,20 @@ class InputScreenViewModel @AssistedInject constructor(
         command.value = Command.HideKeyboard
     }
 
+    fun onInputFieldTouched() {
+        _inputFieldState.update {
+            it.copy(canExpand = true)
+        }
+    }
+
+    private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {
+        // check if user modified input or initial text wasn't a webpage URL
+        val userHasModifiedInput = initialSearchInputText != searchInput
+        val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != DUCK_SCHEME
+
+        return userHasModifiedInput || initialTextWasNotWebUrl
+    }
+
     class InputScreenViewModelProviderFactory(
         private val assistedFactory: InputScreenViewModelFactory,
         private val currentOmnibarText: String,
@@ -362,6 +384,10 @@ class InputScreenViewModel @AssistedInject constructor(
         fun create(
             currentOmnibarText: String,
         ): InputScreenViewModel
+    }
+
+    companion object {
+        const val DUCK_SCHEME = "duck"
     }
 }
 

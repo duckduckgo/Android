@@ -46,6 +46,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
@@ -98,15 +99,15 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        configureViewPager()
-        configureOmnibar()
-        configureVoice()
-        configureObservers()
-
         val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
         params?.query?.let { query ->
             binding.inputModeWidget.provideInitialText(query)
         }
+
+        configureViewPager()
+        configureOmnibar()
+        configureVoice()
+        configureObservers()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -138,12 +139,24 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             processCommand(it)
         }
 
+        viewModel.inputFieldCommand.onEach { command ->
+            when (command) {
+                is InputFieldCommand.SelectAll -> {
+                    binding.inputModeWidget.selectAllText()
+                }
+            }
+        }.launchIn(lifecycleScope)
+
         viewModel.submitButtonIconState.onEach { iconState ->
             val iconResource = when (iconState.icon) {
                 SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
                 SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
             }
             binding.actionSend.setImageResource(iconResource)
+        }.launchIn(lifecycleScope)
+
+        viewModel.inputFieldState.onEach { inputBoxState ->
+            binding.inputModeWidget.canExpand = inputBoxState.canExpand
         }.launchIn(lifecycleScope)
     }
 
@@ -170,8 +183,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun configureOmnibar() = with(binding.inputModeWidget) {
-        setContentId(R.id.viewPager)
-
         onSearchSent = { query ->
             viewModel.onSearchSubmitted(query)
         }
@@ -201,6 +212,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onChatTextChanged = { text ->
             viewModel.onChatInputTextChanged(text)
+        }
+        onInputFieldClicked = {
+            viewModel.onInputFieldTouched()
         }
     }
 

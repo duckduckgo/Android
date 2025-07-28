@@ -35,7 +35,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
-import androidx.annotation.IdRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -74,6 +73,7 @@ class InputModeWidget @JvmOverloads constructor(
     var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
+    var onInputFieldClicked: (() -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -82,8 +82,16 @@ class InputModeWidget @JvmOverloads constructor(
             inputField.setSelection(value.length)
         }
 
-    @IdRes
-    private var contentId: Int = View.NO_ID
+    var canExpand: Boolean = false
+        set(value) {
+            if (field != value) {
+                field = value
+                beginChangeBoundsTransition()
+                inputField.maxLines = if (value) MAX_LINES else 1
+                inputField.setHorizontallyScrolling(!value)
+            }
+        }
+
     private var originalText: String? = null
     private var hasTextChangedFromOriginal = false
 
@@ -107,7 +115,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun provideInitialText(text: String) {
         originalText = text
-        inputField.setText(text)
+        this.text = text
     }
 
     private fun configureClickListeners() {
@@ -118,11 +126,13 @@ class InputModeWidget @JvmOverloads constructor(
             beginChangeBoundsTransition()
         }
         inputModeWidgetBack.setOnClickListener { onBack?.invoke() }
+        inputField.setOnClickListener {
+            onInputFieldClicked?.invoke()
+        }
     }
 
     private fun configureInputBehavior() = with(inputField) {
-        maxLines = MAX_LINES
-        setHorizontallyScrolling(false)
+        setHorizontallyScrolling(true)
 
         setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_GO) {
@@ -149,12 +159,6 @@ class InputModeWidget @JvmOverloads constructor(
 
             val isNullOrEmpty = text.isNullOrEmpty()
             fade(inputFieldClearText, !isNullOrEmpty)
-
-            if (isNullOrEmpty && inputField.minLines > 1) {
-                inputField.post {
-                    inputField.minLines = if (inputModeSwitch.selectedTabPosition == 0) SEARCH_MIN_LINES else DUCK_CHAT_MIN_LINES
-                }
-            }
         }
 
         doAfterTextChanged { text ->
@@ -201,7 +205,6 @@ class InputModeWidget @JvmOverloads constructor(
     private fun applyModeSpecificInputBehaviour(isSearchTab: Boolean) {
         inputField.apply {
             if (isSearchTab) {
-                minLines = SEARCH_MIN_LINES
                 hint = context.getString(R.string.input_screen_search_hint)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
                 setRawInputType(
@@ -210,7 +213,6 @@ class InputModeWidget @JvmOverloads constructor(
                         InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS,
                 )
             } else {
-                minLines = DUCK_CHAT_MIN_LINES
                 hint = context.getString(R.string.input_screen_chat_hint)
                 imeOptions = EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_PERSONALIZED_LEARNING or EditorInfo.IME_ACTION_GO
                 setRawInputType(
@@ -225,20 +227,17 @@ class InputModeWidget @JvmOverloads constructor(
 
     private fun beginChangeBoundsTransition() {
         (parent as? ViewGroup ?: this).let { root ->
-            val pager = root.findViewById<View>(contentId).apply {
-                isTransitionGroup = true
-            }
             TransitionManager.beginDelayedTransition(
                 root,
                 ChangeBounds().apply {
-                    excludeChildren(pager, true)
+                    duration = EXPAND_COLLAPSE_TRANSITION_DURATION
                 },
             )
         }
     }
 
     fun submitMessage(message: String? = null) {
-        val text = message?.also(inputField::setText) ?: inputField.text
+        val text = message?.also { text = it } ?: inputField.text
         val textToSubmit = text.getTextToSubmit()?.toString()
         if (textToSubmit != null) {
             if (inputModeSwitch.selectedTabPosition == 0) {
@@ -271,17 +270,17 @@ class InputModeWidget @JvmOverloads constructor(
         view.isVisible = visible
     }
 
-    fun setContentId(@IdRes id: Int) {
-        contentId = id
-    }
-
     fun printNewLine() {
         val currentText = inputField.text.toString()
         val selectionStart = inputField.selectionStart
         val selectionEnd = inputField.selectionEnd
         val newText = currentText.substring(0, selectionStart) + "\n" + currentText.substring(selectionEnd)
-        inputField.setText(newText)
+        text = newText
         inputField.setSelection(selectionStart + 1)
+    }
+
+    fun selectAllText() {
+        inputField.selectAll()
     }
 
     private fun CharSequence.getTextToSubmit(): CharSequence? {
@@ -302,8 +301,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     companion object {
         private const val FADE_DURATION = 150L
+        private const val EXPAND_COLLAPSE_TRANSITION_DURATION = 150L
         private const val MAX_LINES = 8
-        private const val SEARCH_MIN_LINES = 1
-        private const val DUCK_CHAT_MIN_LINES = 1
     }
 }
