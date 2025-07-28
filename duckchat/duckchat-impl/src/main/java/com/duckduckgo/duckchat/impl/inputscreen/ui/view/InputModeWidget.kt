@@ -73,7 +73,7 @@ class InputModeWidget @JvmOverloads constructor(
     var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
-    var onInputBoxClicked: (() -> Unit)? = null
+    var onInputFieldClicked: (() -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -127,7 +127,7 @@ class InputModeWidget @JvmOverloads constructor(
         }
         inputModeWidgetBack.setOnClickListener { onBack?.invoke() }
         inputField.setOnClickListener {
-            onInputBoxClicked?.invoke()
+            onInputFieldClicked?.invoke()
         }
     }
 

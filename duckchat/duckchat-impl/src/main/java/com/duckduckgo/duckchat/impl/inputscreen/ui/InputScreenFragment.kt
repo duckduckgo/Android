@@ -211,7 +211,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onChatTextChanged = { text ->
             viewModel.onChatInputTextChanged(text)
         }
-        onInputBoxClicked = {
+        onInputFieldClicked = {
             viewModel.onInputFieldTouched()
         }
     }
