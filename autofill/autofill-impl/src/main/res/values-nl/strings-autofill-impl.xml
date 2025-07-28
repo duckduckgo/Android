@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Importeren van Google</string>
     <string name="passwords_import_promo_in_browser_title">Breng je wachtwoorden van Google naar DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Niet opnieuw vragen</string>
+    <string name="passwords_import_promo_in_settings_title">Wachtwoorden importeren van Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Verbergen</string>
 
 </resources>

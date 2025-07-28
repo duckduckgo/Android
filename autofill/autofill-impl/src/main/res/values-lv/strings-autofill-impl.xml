@@ -292,5 +292,7 @@
     <string name="passwords_import_promo_action">Importēt no Google</string>
     <string name="passwords_import_promo_in_browser_title">Pārvieto savas paroles no&lt;br /&gt;Google uz DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Vairs nejautāt</string>
+    <string name="passwords_import_promo_in_settings_title">Importēt paroles no Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Paslēpt</string>
 
 </resources>
