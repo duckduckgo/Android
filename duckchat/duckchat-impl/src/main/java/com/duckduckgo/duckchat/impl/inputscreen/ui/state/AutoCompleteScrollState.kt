@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.ui.command
+package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
-
-sealed class SearchCommand {
-    data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : SearchCommand()
-    data class RestoreAutoCompleteScrollPosition(val firstVisibleItemPosition: Int, val itemOffsetTop: Int) : SearchCommand()
-}
+data class AutoCompleteScrollState(
+    val firstVisibleItemPosition: Int = 0,
+    val itemOffsetTop: Int = 0,
+)

@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.AutoCompleteScrollState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputFieldState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
@@ -170,6 +171,8 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val _inputFieldState = MutableStateFlow(InputFieldState(canExpand = false))
     val inputFieldState: StateFlow<InputFieldState> = _inputFieldState.asStateFlow()
+
+    private var autoCompleteScrollState = AutoCompleteScrollState()
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
     val searchTabCommand: SingleLiveEvent<SearchCommand> = SingleLiveEvent()
@@ -358,6 +361,20 @@ class InputScreenViewModel @AssistedInject constructor(
         _inputFieldState.update {
             it.copy(canExpand = true)
         }
+    }
+
+    fun storeAutoCompleteScrollPosition(firstVisibleItemPosition: Int, itemOffsetTop: Int) {
+        autoCompleteScrollState = autoCompleteScrollState.copy(
+            firstVisibleItemPosition = firstVisibleItemPosition,
+            itemOffsetTop = itemOffsetTop,
+        )
+    }
+
+    fun restoreAutoCompleteScrollPosition() {
+        searchTabCommand.value = SearchCommand.RestoreAutoCompleteScrollPosition(
+            firstVisibleItemPosition = autoCompleteScrollState.firstVisibleItemPosition,
+            itemOffsetTop = autoCompleteScrollState.itemOffsetTop,
+        )
     }
 
     private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {
