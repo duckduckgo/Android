@@ -16,6 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.command
 
-sealed class InputTextBoxCommands {
-    data object SelectAll : InputTextBoxCommands()
+sealed class InputFieldCommand {
+    data object SelectAll : InputFieldCommand()
 }

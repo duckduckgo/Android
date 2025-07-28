@@ -41,7 +41,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputTextBoxCommands
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
@@ -135,9 +135,9 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             processCommand(it)
         }
 
-        viewModel.inputTextBoxCommands.onEach { command ->
+        viewModel.inputFieldCommand.onEach { command ->
             when (command) {
-                is InputTextBoxCommands.SelectAll -> {
+                is InputFieldCommand.SelectAll -> {
                     binding.inputModeWidget.selectAllText()
                 }
             }
@@ -152,7 +152,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             binding.actionSend.setImageResource(iconResource)
         }.launchIn(lifecycleScope)
 
-        viewModel.inputBoxState.onEach { inputBoxState ->
+        viewModel.inputFieldState.onEach { inputBoxState ->
             binding.inputModeWidget.canExpand = inputBoxState.canExpand
         }.launchIn(lifecycleScope)
     }
@@ -212,7 +212,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             viewModel.onChatInputTextChanged(text)
         }
         onInputBoxClicked = {
-            viewModel.onInputBoxTouched()
+            viewModel.onInputFieldTouched()
         }
     }
 

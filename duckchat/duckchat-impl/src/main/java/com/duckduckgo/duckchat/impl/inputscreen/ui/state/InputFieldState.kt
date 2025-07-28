@@ -16,6 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.state
 
-data class InputBoxState(
+data class InputFieldState(
     val canExpand: Boolean,
 )

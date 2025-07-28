@@ -40,8 +40,8 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.AutocompleteI
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
-import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputTextBoxCommands
-import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputBoxState
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputFieldState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.InputScreenVisibilityState
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIconState
@@ -163,13 +163,13 @@ class InputScreenViewModel @AssistedInject constructor(
         .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
         .stateIn(viewModelScope, SharingStarted.Eagerly, AutoCompleteResult("", emptyList()))
 
-    private val _inputBoxState = MutableStateFlow(InputBoxState(canExpand = false))
-    val inputBoxState: StateFlow<InputBoxState> = _inputBoxState.asStateFlow()
+    private val _inputFieldState = MutableStateFlow(InputFieldState(canExpand = false))
+    val inputFieldState: StateFlow<InputFieldState> = _inputFieldState.asStateFlow()
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
-    private val _inputTextBoxCommands = Channel<InputTextBoxCommands>(capacity = Channel.CONFLATED)
-    val inputTextBoxCommands: Flow<InputTextBoxCommands> = _inputTextBoxCommands.receiveAsFlow()
+    private val _inputFieldCommand = Channel<InputFieldCommand>(capacity = Channel.CONFLATED)
+    val inputFieldCommand: Flow<InputFieldCommand> = _inputFieldCommand.receiveAsFlow()
 
     init {
         combine(voiceServiceAvailable, voiceInputAllowed) { serviceAvailable, inputAllowed ->
@@ -189,14 +189,14 @@ class InputScreenViewModel @AssistedInject constructor(
         }.launchIn(viewModelScope)
 
         hasMovedBeyondInitialUrl.onEach { hasMovedBeyondInitialUrl ->
-            _inputBoxState.update {
+            _inputFieldState.update {
                 it.copy(canExpand = hasMovedBeyondInitialUrl)
             }
         }.launchIn(viewModelScope)
 
         if (!hasMovedBeyondInitialUrl.value) {
             // If the initial text is a URL, we select all text in the input box
-            _inputTextBoxCommands.trySend(InputTextBoxCommands.SelectAll)
+            _inputFieldCommand.trySend(InputFieldCommand.SelectAll)
         }
 
         shouldShowAutoComplete.onEach { showAutoComplete ->
@@ -344,8 +344,8 @@ class InputScreenViewModel @AssistedInject constructor(
         voiceInputAllowed.value = allowed
     }
 
-    fun onInputBoxTouched() {
-        _inputBoxState.update {
+    fun onInputFieldTouched() {
+        _inputFieldState.update {
             it.copy(canExpand = true)
         }
     }
