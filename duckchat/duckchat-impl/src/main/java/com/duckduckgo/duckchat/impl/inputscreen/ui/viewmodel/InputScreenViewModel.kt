@@ -353,7 +353,7 @@ class InputScreenViewModel @AssistedInject constructor(
     private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {
         // check if user modified input or initial text wasn't a webpage URL
         val userHasModifiedInput = initialSearchInputText != searchInput
-        val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != "duck"
+        val initialTextWasNotWebUrl = !isWebUrl(searchInput) && searchInput.toUri().scheme != DUCK_SCHEME
 
         return userHasModifiedInput || initialTextWasNotWebUrl
     }
@@ -374,6 +374,10 @@ class InputScreenViewModel @AssistedInject constructor(
         fun create(
             currentOmnibarText: String,
         ): InputScreenViewModel
+    }
+
+    companion object {
+        const val DUCK_SCHEME = "duck"
     }
 }
 
