@@ -164,7 +164,7 @@ import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -463,7 +463,7 @@ class BrowserTabViewModel @Inject constructor(
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
-    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
@@ -724,7 +724,7 @@ class BrowserTabViewModel @Inject constructor(
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
-        defaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem
+        additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
             }
@@ -2706,7 +2706,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserSelected() {
-        defaultBrowserPromptsExperiment.onSetAsDefaultPopupMenuItemSelected()
+        additionalDefaultBrowserPrompts.onSetAsDefaultPopupMenuItemSelected()
     }
 
     fun onShareSelected() {
@@ -2820,7 +2820,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPopupMenuLaunched() {
-        defaultBrowserPromptsExperiment.onPopupMenuLaunched()
+        additionalDefaultBrowserPrompts.onPopupMenuLaunched()
     }
 
     fun onNewTabMenuItemClicked(

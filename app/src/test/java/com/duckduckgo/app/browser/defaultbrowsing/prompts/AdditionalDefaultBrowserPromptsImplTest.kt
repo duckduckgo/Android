@@ -21,12 +21,12 @@ import android.content.Intent
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.DIALOG
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.MENU
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.Companion.PIXEL_PARAM_KEY_STAGE
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperimentImpl.FeatureSettingsConfigModel
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.DIALOG
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MENU
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.PIXEL_PARAM_KEY_STAGE
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.FeatureSettingsConfigModel
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
@@ -71,7 +71,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DefaultBrowserPromptsExperimentImplTest {
+class AdditionalDefaultBrowserPromptsImplTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -846,7 +846,7 @@ class DefaultBrowserPromptsExperimentImplTest {
         experimentStageEvaluator: DefaultBrowserPromptsExperimentStageEvaluator = stageEvaluatorMock,
         pixel: Pixel = pixelMock,
         moshi: Moshi = moshiMock,
-    ) = DefaultBrowserPromptsExperimentImpl(
+    ) = AdditionalDefaultBrowserPromptsImpl(
         appCoroutineScope = appCoroutineScope,
         dispatchers = dispatchers,
         applicationContext = applicationContext,
