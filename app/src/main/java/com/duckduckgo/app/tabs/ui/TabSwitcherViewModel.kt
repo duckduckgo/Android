@@ -28,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
@@ -77,11 +78,11 @@ import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -99,6 +100,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
     experimentalThemingDataStore: ExperimentalThemingDataStore,
+    private val settingsDataStore: SettingsDataStore,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -115,9 +117,9 @@ class TabSwitcherViewModel @Inject constructor(
             combine(
                 tabRepository.flowSelectedTab,
                 _selectionViewState,
-                tabSwitcherDataStore.isAnimationTileDismissed(),
-            ) { activeTab, viewState, isAnimationTileDismissed ->
-                getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
+                flowOf { settingsDataStore.isTrackersCountInTabSwitcherEnabled },
+            ) { activeTab, viewState, isTrackersCountAnimationEnabled ->
+                getTabItems(tabEntities, activeTab, isTrackersCountAnimationEnabled(), viewState.mode)
             }
         }
 
@@ -606,7 +608,7 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onTrackerAnimationTileNegativeButtonClicked() {
         viewModelScope.launch {
-            tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
+            settingsDataStore.isTrackersCountInTabSwitcherEnabled = false
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             pixel.fire(
                 pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
@@ -622,7 +624,7 @@ class TabSwitcherViewModel @Inject constructor(
     private suspend fun getTabItems(
         tabEntities: List<TabEntity>,
         activeTab: TabEntity?,
-        isAnimationTileDismissed: Boolean,
+        isTrackersCountAnimationEnabled: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
         val normalTabs = tabEntities.map {
@@ -630,7 +632,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if(!isAnimationTileDismissed) {
+            return if(isTrackersCountAnimationEnabled) {
                 val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
                 listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
