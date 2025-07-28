@@ -919,4 +919,7 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Pripomoček na domačem zaslonu</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Dokončanje nastavitve</string>
 </resources>

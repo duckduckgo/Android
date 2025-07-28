@@ -887,4 +887,7 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget écran d\'accueil</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Terminez votre configuration</string>
 </resources>

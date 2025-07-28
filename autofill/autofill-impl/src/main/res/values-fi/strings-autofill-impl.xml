@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Tuo Googlesta</string>
     <string name="passwords_import_promo_in_browser_title">Tuo salasanasi Googlesta DuckDuckGohon</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Älä kysy uudelleen</string>
+    <string name="passwords_import_promo_in_settings_title">Tuo salasanat Googlesta</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Piilota</string>
 
 </resources>

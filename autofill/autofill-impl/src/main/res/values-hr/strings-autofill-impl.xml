@@ -298,5 +298,7 @@
     <string name="passwords_import_promo_action">Uvezi s Googlea</string>
     <string name="passwords_import_promo_in_browser_title">Prenesi svoje lozinke s&lt;br /&gt;Googlea na DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Ne pitaj ponovno</string>
+    <string name="passwords_import_promo_in_settings_title">Uvezi lozinke s Googlea</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Sakrij</string>
 
 </resources>
