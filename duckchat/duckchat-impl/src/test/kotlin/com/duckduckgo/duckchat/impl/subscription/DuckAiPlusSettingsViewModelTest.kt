@@ -3,11 +3,8 @@ package com.duckduckgo.duckchat.impl.subscription
 import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.Command.OpenDuckAiPlusSettings
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -25,27 +22,12 @@ class DuckAiPlusSettingsViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private val subscriptions: Subscriptions = mock()
-    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java).also {
-        it.duckAiPlus().setRawStoredState(State(true))
-    }
 
     private val viewModel: DuckAiPlusSettingsViewModel by lazy {
         DuckAiPlusSettingsViewModel(
             subscriptions = subscriptions,
-            duckChatFeature = duckChatFeature,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
         )
-    }
-
-    @Test
-    fun `when feature flag is disabled then SettingState is Hidden`() = runTest {
-        duckChatFeature.duckAiPlus().setRawStoredState(State(false))
-        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.DuckAiPlus)))
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
-
-        viewModel.viewState.test {
-            assertEquals(SettingState.Hidden, expectMostRecentItem().settingState)
-        }
     }
 
     @Test

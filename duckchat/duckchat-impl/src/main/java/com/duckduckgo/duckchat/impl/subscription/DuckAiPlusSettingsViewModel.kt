@@ -24,7 +24,6 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Disabled
 import com.duckduckgo.duckchat.impl.subscription.DuckAiPlusSettingsViewModel.ViewState.SettingState.Hidden
@@ -48,7 +47,6 @@ import kotlinx.coroutines.launch
 @ContributesViewModel(ViewScope::class)
 class DuckAiPlusSettingsViewModel @Inject constructor(
     private val subscriptions: Subscriptions,
-    private val duckChatFeature: DuckChatFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel(), DefaultLifecycleObserver {
 
@@ -79,11 +77,6 @@ class DuckAiPlusSettingsViewModel @Inject constructor(
         super.onCreate(owner)
 
         viewModelScope.launch(dispatcherProvider.io()) {
-            if (duckChatFeature.duckAiPlus().isEnabled().not()) {
-                _viewState.update { it.copy(settingState = Hidden) }
-                return@launch
-            }
-
             subscriptions.getEntitlementStatus().map { entitlements ->
                 entitlements.any { product ->
                     product == DuckAiPlus

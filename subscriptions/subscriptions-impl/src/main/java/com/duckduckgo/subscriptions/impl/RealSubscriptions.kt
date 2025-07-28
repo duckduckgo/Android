@@ -36,6 +36,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
@@ -49,10 +50,12 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -61,6 +64,7 @@ class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
+    private val subscriptionsFeature: Lazy<PrivacyProFeature>,
 ) : Subscriptions {
     override suspend fun isSignedIn(): Boolean =
         subscriptionsManager.isSignedIn()
@@ -73,7 +77,13 @@ class RealSubscriptions @Inject constructor(
     }
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
-        return subscriptionsManager.entitlements
+        return subscriptionsManager.entitlements.map { list ->
+            if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                list.filterNot { entitlement -> entitlement == DuckAiPlus }
+            } else {
+                list
+            }
+        }
     }
 
     override suspend fun isEligible(): Boolean {
@@ -94,7 +104,13 @@ class RealSubscriptions @Inject constructor(
     override suspend fun getAvailableProducts(): Set<Product> {
         return subscriptionsManager.getFeatures()
             .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
-            .toSet()
+            .let {
+                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                    it.filterNot { feature -> feature == DuckAiPlus }
+                } else {
+                    it
+                }
+            }.toSet()
     }
 
     override fun launchPrivacyPro(context: Context, uri: Uri?) {
