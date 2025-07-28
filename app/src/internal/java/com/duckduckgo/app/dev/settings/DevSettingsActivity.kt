@@ -105,7 +105,6 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
         binding.notifications.setOnClickListener { viewModel.notificationsClicked() }
         binding.tabs.setOnClickListener { viewModel.tabsClicked() }
-        binding.showTabSwitcherAnimatedTile.setOnClickListener { viewModel.showAnimatedTileClicked() }
     }
 
     private fun observeViewModel() {

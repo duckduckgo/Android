@@ -95,13 +95,6 @@
                 app:primaryText="@string/devSettingsScreenTabs"
                 app:secondaryText="@string/devSettingsScreenTabsSubtitle" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/showTabSwitcherAnimatedTile"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/devSettingsShowTabSwitcherAnimatedTile"
-                app:secondaryText="@string/devSettingsShowTabSwitcherAnimatedSubtitle" />
-
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:id="@+id/privacyTitle"
                 android:layout_width="wrap_content"

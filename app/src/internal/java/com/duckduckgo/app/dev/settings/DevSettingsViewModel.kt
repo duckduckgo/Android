@@ -43,9 +43,7 @@ class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
     private val userAgentProvider: UserAgentProvider,
-    private val dispatcherProvider: DispatcherProvider,
     private val surveyEndpointDataStore: SurveyEndpointDataStore,
-    private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -140,12 +138,5 @@ class DevSettingsViewModel @Inject constructor(
 
     fun tabsClicked() {
         viewModelScope.launch { command.send(Command.Tabs) }
-    }
-
-    fun showAnimatedTileClicked() {
-        viewModelScope.launch {
-            tabSwitcherPrefsDataStore.setIsAnimationTileDismissed(isDismissed = false)
-            command.send(Command.Toast("Animated tile dismissal has been reset"))
-        }
     }
 }
