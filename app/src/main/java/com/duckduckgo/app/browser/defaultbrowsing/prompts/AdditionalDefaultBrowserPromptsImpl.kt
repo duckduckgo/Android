@@ -183,7 +183,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private suspend fun evaluate() = evaluationMutex.withLock {
-        // TODO ANA: handle here new users and existing users differently
         val isStopped = defaultBrowserPromptsDataStore.experimentStage.first() == STOPPED
         logcat { "evaluate: has stopped = $isStopped" }
         if (isStopped) {
@@ -216,7 +215,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return
         }
 
-        // TODO ANA: use something different than enrolled / not enrolled
         val currentStage = defaultBrowserPromptsDataStore.experimentStage.first()
         logcat { "evaluate: current stage = $currentStage" }
         val newStage = if (isDefaultBrowser) {
