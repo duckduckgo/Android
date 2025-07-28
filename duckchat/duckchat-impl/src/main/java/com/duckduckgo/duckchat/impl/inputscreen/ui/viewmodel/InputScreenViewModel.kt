@@ -279,7 +279,6 @@ class InputScreenViewModel @AssistedInject constructor(
             }
             withContext(dispatchers.main()) {
                 refreshSuggestions.emit(Unit)
-                showKeyboard()
             }
         }
     }
@@ -375,6 +374,7 @@ class InputScreenViewModel @AssistedInject constructor(
             firstVisibleItemPosition = autoCompleteScrollState.firstVisibleItemPosition,
             itemOffsetTop = autoCompleteScrollState.itemOffsetTop,
         )
+        showKeyboard()
     }
 
     private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {

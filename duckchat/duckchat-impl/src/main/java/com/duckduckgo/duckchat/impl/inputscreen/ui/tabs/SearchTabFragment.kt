@@ -155,7 +155,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun processCommand(command: SearchCommand) {
         when (command) {
             is ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(command.suggestion)
-            is RestoreAutoCompleteScrollPosition -> showKeyboardAndRestorePosition(
+            is RestoreAutoCompleteScrollPosition -> restoreAutoCompleteScrollPosition(
                 command.firstVisibleItemPosition,
                 command.itemOffsetTop,
             )
@@ -195,7 +195,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition, itemOffsetTop)
     }
 
-    private fun showKeyboardAndRestorePosition(position: Int, offset: Int) {
+    private fun restoreAutoCompleteScrollPosition(position: Int, offset: Int) {
         val layoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 binding.autoCompleteSuggestionsList.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -203,7 +203,6 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             }
         }
         binding.autoCompleteSuggestionsList.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
-        viewModel.showKeyboard()
     }
 
     private fun scrollToPositionWithOffset(position: Int, offset: Int) {
