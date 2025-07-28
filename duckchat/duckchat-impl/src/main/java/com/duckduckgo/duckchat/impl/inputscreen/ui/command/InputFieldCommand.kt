@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.inputscreen.ui.state
+package com.duckduckgo.duckchat.impl.inputscreen.ui.command
 
-data class InputBoxState(
-    val canExpand: Boolean,
-)
+sealed class InputFieldCommand {
+    data object SelectAll : InputFieldCommand()
+}

@@ -86,7 +86,6 @@
                 android:lineSpacingMultiplier="1.2"
                 android:minHeight="@dimen/toolbarIcon"
                 android:paddingVertical="@dimen/keyline_2"
-                android:selectAllOnFocus="true"
                 android:textColor="?attr/daxColorPrimaryText"
                 android:textColorHighlight="?attr/daxOmnibarTextColorHighlight"
                 android:textColorHint="?attr/daxColorSecondaryText"

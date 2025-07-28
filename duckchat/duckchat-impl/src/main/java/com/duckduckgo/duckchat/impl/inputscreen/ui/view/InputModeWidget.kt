@@ -73,7 +73,7 @@ class InputModeWidget @JvmOverloads constructor(
     var onVoiceInputAllowed: ((Boolean) -> Unit)? = null
     var onSearchTextChanged: ((String) -> Unit)? = null
     var onChatTextChanged: ((String) -> Unit)? = null
-    var onInputBoxClicked: (() -> Unit)? = null
+    var onInputFieldClicked: (() -> Unit)? = null
 
     var text: String
         get() = inputField.text.toString()
@@ -115,7 +115,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     fun provideInitialText(text: String) {
         originalText = text
-        inputField.setText(text)
+        this.text = text
     }
 
     private fun configureClickListeners() {
@@ -127,7 +127,7 @@ class InputModeWidget @JvmOverloads constructor(
         }
         inputModeWidgetBack.setOnClickListener { onBack?.invoke() }
         inputField.setOnClickListener {
-            onInputBoxClicked?.invoke()
+            onInputFieldClicked?.invoke()
         }
     }
 
@@ -237,7 +237,7 @@ class InputModeWidget @JvmOverloads constructor(
     }
 
     fun submitMessage(message: String? = null) {
-        val text = message?.also(inputField::setText) ?: inputField.text
+        val text = message?.also { text = it } ?: inputField.text
         val textToSubmit = text.getTextToSubmit()?.toString()
         if (textToSubmit != null) {
             if (inputModeSwitch.selectedTabPosition == 0) {
@@ -275,8 +275,12 @@ class InputModeWidget @JvmOverloads constructor(
         val selectionStart = inputField.selectionStart
         val selectionEnd = inputField.selectionEnd
         val newText = currentText.substring(0, selectionStart) + "\n" + currentText.substring(selectionEnd)
-        inputField.setText(newText)
+        text = newText
         inputField.setSelection(selectionStart + 1)
+    }
+
+    fun selectAllText() {
+        inputField.selectAll()
     }
 
     private fun CharSequence.getTextToSubmit(): CharSequence? {
