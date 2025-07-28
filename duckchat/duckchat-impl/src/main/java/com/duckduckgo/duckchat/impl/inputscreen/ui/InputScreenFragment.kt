@@ -44,7 +44,6 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
-import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
@@ -139,9 +138,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
 
         viewModel.submitButtonIconState.onEach { iconState ->
             val iconResource = when (iconState.icon) {
-                GLOBE -> com.duckduckgo.mobile.android.R.drawable.ic_globe_24
                 SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
-                SEND -> R.drawable.ic_arrow_up_24
+                SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
             }
             binding.actionSend.setImageResource(iconResource)
         }.launchIn(lifecycleScope)
