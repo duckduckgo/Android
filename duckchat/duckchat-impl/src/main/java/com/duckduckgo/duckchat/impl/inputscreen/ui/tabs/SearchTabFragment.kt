@@ -26,8 +26,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
@@ -36,6 +38,8 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -141,5 +145,38 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         viewModel.autoCompleteSuggestionResults.onEach {
             autoCompleteSuggestionsAdapter.updateData(it.query, it.suggestions)
         }.launchIn(lifecycleScope)
+
+        viewModel.searchTabCommand.observe(viewLifecycleOwner) {
+            processCommand(it)
+        }
+    }
+
+    private fun processCommand(command: SearchCommand) {
+        when (command) {
+            is ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(command.suggestion)
+        }
+    }
+
+    private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        TextAlertDialogBuilder(requireContext())
+            .setTitle(R.string.autocompleteRemoveItemTitle)
+            .setCancellable(true)
+            .setPositiveButton(R.string.autocompleteRemoveItemRemove)
+            .setNegativeButton(R.string.autocompleteRemoveItemCancel)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onRemoveSearchSuggestionConfirmed(suggestion)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.showKeyboard()
+                    }
+
+                    override fun onDialogCancelled() {
+                        viewModel.showKeyboard()
+                    }
+                },
+            ).show()
     }
 }

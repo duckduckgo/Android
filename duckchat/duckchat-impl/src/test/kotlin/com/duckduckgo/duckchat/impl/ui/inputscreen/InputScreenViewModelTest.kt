@@ -4,6 +4,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
@@ -15,11 +16,12 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewMode
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import java.io.IOException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -31,6 +33,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -43,7 +46,6 @@ class InputScreenViewModelTest {
 
     private val autoComplete: AutoComplete = mock()
     private val history: NavigationHistory = mock()
-    private val appCoroutineScope: CoroutineScope = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -61,7 +63,7 @@ class InputScreenViewModelTest {
             autoComplete = autoComplete,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
-            appCoroutineScope = appCoroutineScope,
+            appCoroutineScope = coroutineRule.testScope,
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
         )
@@ -500,5 +502,33 @@ class InputScreenViewModelTest {
         // Change to empty - should be true
         viewModel.onChatInputTextChanged("")
         assertTrue(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onRemoveSearchSuggestionConfirmed then refreshSuggestions triggered and autoComplete results updated`() = runTest {
+        val initialResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
+        val refreshedResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
+
+        val flow1 = MutableSharedFlow<AutoCompleteResult>()
+        val flow2 = MutableSharedFlow<AutoCompleteResult>()
+        whenever(autoComplete.autoComplete("query"))
+            .thenReturn(flow1)
+            .thenReturn(flow2)
+
+        val viewModel = createViewModel("query")
+
+        flow1.emit(initialResult)
+        advanceUntilIdle()
+        assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
+
+        viewModel.onRemoveSearchSuggestionConfirmed(
+            AutoCompleteHistorySuggestion(phrase = "query", url = "example.com", title = "title", isAllowedInTopHits = true),
+        )
+
+        flow2.emit(refreshedResult)
+        advanceUntilIdle()
+        assertEquals(refreshedResult, viewModel.autoCompleteSuggestionResults.value)
+
+        verify(autoComplete, times(2)).autoComplete("query")
     }
 }
