@@ -67,7 +67,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserUsernameCopied
@@ -1032,21 +1031,10 @@ class AutofillSettingsActivityScreenViewModelTest {
     }
 
     @Test
-    fun whenShowListModeWithNewFeatureEnabledThenSeeNewListMode() = runTest {
-        autofillFeature.newScrollBehaviourInPasswordManagementScreen().setRawStoredState(State(enable = true))
+    fun whenShowListModeThenSeeNewListMode() = runTest {
         testee.onInitialiseListMode()
         testee.commands.test {
             awaitItem().verifyHasCommandToShowListMode()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenShowListModeWithNewScrollFeatureDisabledThenSeeLegacyListMode() = runTest {
-        autofillFeature.newScrollBehaviourInPasswordManagementScreen().setRawStoredState(State(enable = false))
-        testee.onInitialiseListMode()
-        testee.commands.test {
-            awaitItem().verifyHasCommandToShowLegacyListMode()
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1070,10 +1058,6 @@ class AutofillSettingsActivityScreenViewModelTest {
 
     private fun List<Command>.verifyHasCommandToShowListMode() {
         assertNotNull(this.firstOrNull { it is ShowListMode })
-    }
-
-    private fun List<Command>.verifyHasCommandToShowLegacyListMode() {
-        assertNotNull(this.firstOrNull { it is ShowListModeLegacy })
     }
 
     private fun List<ListModeCommand>.verifyDoesNotHaveCommandToShowDeleteAllConfirmation() {
