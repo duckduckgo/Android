@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Importer fra Google</string>
     <string name="passwords_import_promo_in_browser_title">Ta med passordene dine fra Google til DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Ikke spør igjen</string>
+    <string name="passwords_import_promo_in_settings_title">Importer passord fra Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Skjul</string>
 
 </resources>

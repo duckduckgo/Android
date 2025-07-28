@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Importer depuis Google</string>
     <string name="passwords_import_promo_in_browser_title">Transférez vos mots de passe de Google vers DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Ne plus demander</string>
+    <string name="passwords_import_promo_in_settings_title">Importer des mots de passe depuis Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Masquer</string>
 
 </resources>

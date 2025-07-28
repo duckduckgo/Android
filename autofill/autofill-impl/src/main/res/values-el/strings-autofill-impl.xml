@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Εισαγωγή από το Google</string>
     <string name="passwords_import_promo_in_browser_title">Μεταφέρετε τους κωδικούς σας από&lt;br /&gt;το Google στο DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Να μην ερωτηθώ ξανά</string>
+    <string name="passwords_import_promo_in_settings_title">Εισαγωγή κωδικών πρόσβασης από το Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Αποκρυψη</string>
 
 </resources>

@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Google\'dan İçe Aktar</string>
     <string name="passwords_import_promo_in_browser_title">Şifrelerinizi Google\'dan DuckDuckGo\'ya taşıyın</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Bir Daha Sorma</string>
+    <string name="passwords_import_promo_in_settings_title">Google\'dan Şifreleri İçe Aktar</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Gizle</string>
 
 </resources>
