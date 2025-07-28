@@ -887,4 +887,7 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Vii seadistamine lõpule</string>
 </resources>
