@@ -693,7 +693,7 @@ class BrowserTabViewModelTest {
             coroutineRule.testScope,
         )
 
-        whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any())).thenReturn("duckduckgo.com")
+        whenever(mockOmnibarConverter.convertQueryToUrl(any(), any(), any(), any())).thenReturn("duckduckgo.com")
         whenever(mockTabRepository.liveSelectedTab).thenReturn(selectedTabLiveData)
         whenever(mockNavigationAwareLoginDetector.loginEventLiveData).thenReturn(loginEventLiveData)
         whenever(mockTabRepository.retrieveSiteData(any())).thenReturn(MutableLiveData())
