@@ -28,6 +28,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_LIGHT
 import com.duckduckgo.app.pixels.AppPixelName.SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
@@ -41,6 +42,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -54,6 +56,7 @@ class AppearanceViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
+    private val tabSwitcherDataStore: TabSwitcherDataStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -64,6 +67,7 @@ class AppearanceViewModel @Inject constructor(
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
         val isFullUrlEnabled: Boolean = true,
+        val isTrackersCountInTabSwitcherEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -87,6 +91,7 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
+                    isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isAnimationTileDismissed().firstOrNull() != true,
                 )
             }
         }
@@ -172,6 +177,16 @@ class AppearanceViewModel @Inject constructor(
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
             pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
+        }
+    }
+
+    fun onShowTrackersCountInTabSwitcherChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            tabSwitcherDataStore.setIsAnimationTileDismissed(!checked)
+            viewState.update { it.copy(isTrackersCountInTabSwitcherEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            // TODO add pixel for this event
         }
     }
 }
