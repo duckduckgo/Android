@@ -400,24 +400,26 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when chat text is web url then submitButtonIcon is GLOBE`() {
+    fun `when chat text is web url then submitButtonIcon is SEND`() {
         val viewModel = createViewModel()
+        viewModel.onChatSelected()
         viewModel.onChatInputTextChanged("https://example.com")
-        assertEquals(SubmitButtonIcon.GLOBE, viewModel.submitButtonIconState.value.icon)
+        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 
     @Test
     fun `when chat text is not web url then submitButtonIcon is SEND`() {
         val viewModel = createViewModel()
+        viewModel.onChatSelected()
         viewModel.onChatInputTextChanged("example")
         assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 
     @Test
-    fun `when search text is web url then submitButtonIcon is GLOBE`() {
+    fun `when search text is web url then submitButtonIcon is SEND`() {
         val viewModel = createViewModel()
         viewModel.onSearchInputTextChanged("https://example.com")
-        assertEquals(SubmitButtonIcon.GLOBE, viewModel.submitButtonIconState.value.icon)
+        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 
     @Test

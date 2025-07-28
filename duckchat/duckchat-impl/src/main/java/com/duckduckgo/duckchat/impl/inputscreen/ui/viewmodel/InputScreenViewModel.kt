@@ -285,14 +285,11 @@ class InputScreenViewModel @AssistedInject constructor(
     fun onSearchInputTextChanged(query: String) {
         searchInputTextState.value = query.trim()
         _submitButtonIconState.update {
-            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEARCH)
+            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.SEND else SubmitButtonIcon.SEARCH)
         }
     }
 
     fun onChatInputTextChanged(query: String) {
-        _submitButtonIconState.update {
-            it.copy(icon = if (isWebUrl(query)) SubmitButtonIcon.GLOBE else SubmitButtonIcon.SEND)
-        }
         _visibilityState.update {
             it.copy(showChatLogo = (query == initialSearchInputText && !it.autoCompleteSuggestionsVisible) || query.isEmpty())
         }
