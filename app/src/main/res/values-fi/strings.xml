@@ -890,4 +890,27 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Viimeistele asennuksesi</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hei!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Suojaukset</b> <i>aktivoitu!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hei!<br/>Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Tyhjennä selaustoimintasi välittömästi <font color=\"#F05C2B\">Fire Buttonilla</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Kokeile nyt!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ja %1$d muu yritti seurata sinua täällä. <font color=\"#F05C2B\">Estin sen!</font>]]></item>
+        <item quantity="other"><![CDATA[ ja %1$d muuta yritti seurata sinua täällä. <font color=\"#F05C2B\">Estin ne!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ yritti seurata sinua täällä. <font color=\"#F05C2B\">Estin sen!</font>]]></item>
+        <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. <font color=\"#F05C2B\">Estin ne!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Napauta kilpeä saadaksesi lisätietoja.️</string>
+
 </resources>
