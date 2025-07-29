@@ -36,6 +36,8 @@ class SubscriptionsHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) {
 
+    private val defaultDuckAiSubscriptionPurchase = SubscriptionPurchase(featurePage = DUCK_AI_FEATURE_PAGE)
+
     fun handleSubscriptionsFeature(
         featureName: String,
         method: String,
@@ -68,11 +70,12 @@ class SubscriptionsHandler @Inject constructor(
 
                 METHOD_OPEN_SUBSCRIPTION_PURCHASE -> {
                     val subscriptionParams = runCatching {
-                        data?.getString(MESSAGE_PARAM_ORIGIN_KEY).takeUnless { it.isNullOrBlank() }
+                        data?.getString(MESSAGE_PARAM_ORIGIN_KEY)
+                            .takeUnless { it.isNullOrBlank() }
                             ?.let { nonEmptyOrigin ->
-                                SubscriptionPurchase(nonEmptyOrigin)
-                            } ?: SubscriptionPurchase()
-                    }.getOrDefault(SubscriptionPurchase())
+                                defaultDuckAiSubscriptionPurchase.copy(origin = nonEmptyOrigin)
+                            } ?: defaultDuckAiSubscriptionPurchase
+                    }.getOrDefault(defaultDuckAiSubscriptionPurchase)
 
                     withContext(dispatcherProvider.main()) {
                         globalActivityStarter.start(context, subscriptionParams)
@@ -89,5 +92,6 @@ class SubscriptionsHandler @Inject constructor(
         private const val METHOD_OPEN_SUBSCRIPTION_ACTIVATION = "openSubscriptionActivation"
         private const val METHOD_OPEN_SUBSCRIPTION_PURCHASE = "openSubscriptionPurchase"
         private const val MESSAGE_PARAM_ORIGIN_KEY = "origin"
+        private const val DUCK_AI_FEATURE_PAGE = "duckai"
     }
 }

@@ -61,6 +61,7 @@ object SubscriptionsConstants {
     const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration"
     const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
     const val PRIVACY_PRO_ETLD = "duckduckgo.com"
+    const val FEATURE_PAGE_QUERY_PARAM_KEY = "featurePage"
     const val PRIVACY_PRO_PATH = "pro"
     const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
 }
