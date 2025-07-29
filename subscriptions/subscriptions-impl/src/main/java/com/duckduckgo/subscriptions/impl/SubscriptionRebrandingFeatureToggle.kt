@@ -78,7 +78,7 @@ class SubscriptionRebrandingFeatureToggleImpl @Inject constructor(
             cachedPrivacyProRebrandingValue = isEnabled
             logcat { "SubscriptionRebrandingFeatureToggle: Feature flag cached, value = $isEnabled" }
             val isAIFeaturesEnabled = privacyProFeature.subscriptionAIFeaturesRebranding().isEnabled()
-            cachedPrivacyProRebrandingValue = isAIFeaturesEnabled
+            cachedAIFeaturesRebrandingValue = isAIFeaturesEnabled
             logcat { "SubscriptionAIFeaturesRebrandingFeatureToggle: Feature flag cached, value = $isAIFeaturesEnabled" }
         }
     }
