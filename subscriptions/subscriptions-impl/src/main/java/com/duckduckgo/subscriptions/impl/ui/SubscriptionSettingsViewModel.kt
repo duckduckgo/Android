@@ -103,9 +103,13 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
                 rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled(),
+                showRebrandingBanner = shouldShowRebrandingBanner(),
             ),
         )
     }
+
+    private suspend fun shouldShowRebrandingBanner(): Boolean =
+        subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled() && !subscriptionsManager.isRebrandingBannerShown()
 
     fun onEditEmailButtonClicked() {
         viewModelScope.launch {
@@ -135,6 +139,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
+    fun rebrandingBannerDismissed() {
+        viewModelScope.launch {
+            subscriptionsManager.setRebrandingBannerAsViewed()
+        }
+    }
+
     sealed class SubscriptionDuration {
         data object Monthly : SubscriptionDuration()
         data object Yearly : SubscriptionDuration()
@@ -159,6 +169,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
             val rebrandingEnabled: Boolean = false,
+            val showRebrandingBanner: Boolean = false,
         ) : ViewState()
     }
 }

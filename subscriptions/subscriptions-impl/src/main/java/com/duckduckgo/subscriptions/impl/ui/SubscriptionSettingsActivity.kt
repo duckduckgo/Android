@@ -177,6 +177,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.faq.setPrimaryText(getString(string.privacyProFaq))
             binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
         }
+        if (viewState.showRebrandingBanner) {
+            binding.includePrivacyProRebrandingBanner.root.show()
+            binding.includePrivacyProRebrandingBanner.settingsBannerClose.setOnClickListener {
+                viewModel.rebrandingBannerDismissed()
+            }
+        } else {
+            binding.includePrivacyProRebrandingBanner.root.gone()
+        }
 
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true

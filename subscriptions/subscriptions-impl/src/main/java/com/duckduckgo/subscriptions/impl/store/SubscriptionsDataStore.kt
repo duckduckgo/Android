@@ -43,6 +43,7 @@ interface SubscriptionsDataStore {
     var entitlements: String?
     var productId: String?
     var freeTrialActive: Boolean
+    var rebrandingBannerShown: Boolean
 
     var subscriptionFeatures: String?
 
@@ -205,6 +206,14 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var rebrandingBannerShown: Boolean
+        get() = encryptedPreferences?.getBoolean(KEY_REBRANDING_BANNER_SHOWN, false) ?: false
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putBoolean(KEY_REBRANDING_BANNER_SHOWN, value)
+            }
+        }
+
     override var subscriptionFeatures: String?
         get() = encryptedPreferences?.getString(KEY_SUBSCRIPTION_FEATURES, null)
         set(value) {
@@ -237,5 +246,6 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_PRODUCT_ID = "KEY_PRODUCT_ID"
         const val KEY_SUBSCRIPTION_FEATURES = "KEY_SUBSCRIPTION_FEATURES"
         const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
+        const val KEY_REBRANDING_BANNER_SHOWN = "KEY_REBRANDING_BANNER_SHOWN"
     }
 }
