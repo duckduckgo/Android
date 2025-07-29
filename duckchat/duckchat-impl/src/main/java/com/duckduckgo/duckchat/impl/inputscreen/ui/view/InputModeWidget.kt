@@ -89,6 +89,9 @@ class InputModeWidget @JvmOverloads constructor(
                 beginChangeBoundsTransition()
                 inputField.maxLines = if (value) MAX_LINES else 1
                 inputField.setHorizontallyScrolling(!value)
+                inputField.post {
+                    inputField.requestLayout()
+                }
             }
         }
 
