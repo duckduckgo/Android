@@ -31,7 +31,8 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.listitem.DaxListItem.ImageBackground
+import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -116,25 +117,21 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-
         if (viewState.isRebrandingAiFeaturesEnabled) {
+            binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
             binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_settings_activity_description_rebranding)
-            binding.userEnabledDuckChatToggle.setPrimaryText(getString(R.string.duck_chat_enable_duck_ai_setting_rebranding))
-            binding.userEnabledDuckChatToggle.setSecondaryText(getString(R.string.duck_chat_enable_duck_ai_setting_description_rebranding))
-            binding.userEnabledDuckChatToggle.setLeadingIconResource(com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_24)
-            binding.userEnabledDuckChatToggle.setLeadingIconBackgroundType(ImageBackground.Circular)
+            binding.userEnabledDuckChatToggle.gone()
+            binding.userEnabledDuckChatToggleRebranding.show()
             binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading_rebranding)
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
         } else {
+            binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
             binding.duckChatSettingsText.setText(R.string.duck_chat_settings_activity_description)
-            binding.userEnabledDuckChatToggle.setPrimaryText(getString(R.string.duck_chat_enable_duck_ai_setting))
-            binding.userEnabledDuckChatToggle.setSecondaryText(null)
-            binding.userEnabledDuckChatToggle.setLeadingIconVisibility(false)
-            binding.userEnabledDuckChatToggle.setLeadingIconBackgroundType(ImageBackground.None)
+            binding.userEnabledDuckChatToggle.show()
+            binding.userEnabledDuckChatToggleRebranding.gone()
             binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading)
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))

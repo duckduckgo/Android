@@ -71,12 +71,23 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/divider"/>
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/userEnabledDuckChatToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:primaryText="@string/duck_chat_enable_duck_ai_setting"
                 app:showSwitch="true"/>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/userEnabledDuckChatToggleRebranding"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:leadingIcon="@drawable/ic_ai_chat_24"
+                app:leadingIconBackground="circular"
+                app:primaryText="@string/duck_chat_enable_duck_ai_setting_rebranding"
+                app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description_rebranding"
+                app:showSwitch="true" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/duckAiInputScreenEnabledToggle"
