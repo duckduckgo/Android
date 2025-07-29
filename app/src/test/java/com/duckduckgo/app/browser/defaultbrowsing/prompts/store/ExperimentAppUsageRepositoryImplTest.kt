@@ -73,7 +73,7 @@ class ExperimentAppUsageRepositoryImplTest {
         val result = testee.getActiveDaysUsedSinceEnrollment()
 
         assertTrue(result.isFailure)
-        assertTrue(result.exceptionOrNull() is NullPointerException)
+        assertTrue(result.exceptionOrNull() is IllegalStateException)
     }
 
     @Test
