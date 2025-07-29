@@ -42,15 +42,10 @@ class BBCardView @JvmOverloads constructor(
 
         val shapeBuilder = ShapeAppearanceModel.builder()
 
-        val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.BBCardView, defStyleAttr, 0)
-        val defaultCornerSize = 56.toPx() * 1f
+        val defaultCornerSize = 56.toPx().toFloat()
 
         shapeAppearanceModel = shapeBuilder.apply {
             setAllCornerSizes(defaultCornerSize)
-
-            if (attr.hasValue(R.styleable.BBCardView_topRightCornerRadius)) {
-                setTopRightCornerSize(attr.getDimension(R.styleable.BBCardView_topRightCornerRadius, 0f))
-            }
 
             setTopEdge(offsetEdgeTreatment)
         }.build()
