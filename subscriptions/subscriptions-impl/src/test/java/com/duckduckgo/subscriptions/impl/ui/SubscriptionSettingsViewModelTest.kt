@@ -12,6 +12,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -224,5 +225,15 @@ class SubscriptionSettingsViewModelTest {
     fun whenRemoveFromDeviceThenPixelIsSent() = runTest {
         viewModel.removeFromDevice()
         verify(pixelSender).reportSubscriptionSettingsRemoveFromDeviceClick()
+    }
+
+    @Test
+    fun whenDismissRebrandingBannerThenSetRebrandingAsViewedAndDismissBannerCommandIsSent() = runTest {
+        viewModel.commands().test {
+            viewModel.rebrandingBannerDismissed()
+            verify(subscriptionsManager).setRebrandingBannerAsViewed()
+            assertEquals(DismissRebrandingBanner, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }
