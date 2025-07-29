@@ -42,5 +42,11 @@
     <string name="duck_ai_paid_settings_learn_more_title">Learn more</string>
 
     <!-- Rebranding-->
-    <string name="duck_ai_rebranding">AI Features</string>
+    <string name="duck_chat_title_rebranding">AI Features</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI features are private and optional.\nYour data is not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat anonymously with popular 3rd-party AI chat models</string>
+    <string name="duck_chat_show_in_heading_rebranding">Duck.ai Shortcuts</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Search Assist Settings</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Choose how often you want AI-Assisted answers to appear in your searches</string>
 </resources>

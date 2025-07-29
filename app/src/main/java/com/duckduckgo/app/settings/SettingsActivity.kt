@@ -341,10 +341,10 @@ class SettingsActivity : DuckDuckGoActivity() {
             val titleRes: Int
             if (isAiFeaturesRebrandingEnabled) {
                 imageRes = com.duckduckgo.mobile.android.R.drawable.ai_general_color_24
-                titleRes = R.string.duck_ai_settings_rebranding
+                titleRes = R.string.settingsDuckAiRebranding
             } else {
                 imageRes = com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24
-                titleRes = R.string.duck_ai_settings
+                titleRes = R.string.settingsDuckAi
             }
             viewsMain.includeDuckChatSetting.duckChatSetting.show()
             viewsMain.includeDuckChatSetting.leadingIcon.setImageResource(imageRes)

@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/divider"/>
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/userEnabledDuckChatToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -120,7 +120,6 @@
                 app:leadingIcon="@drawable/ic_assist_24"
                 app:leadingIconBackground="circular"
                 app:showSwitch="false"/>
-
 
         </LinearLayout>
     </ScrollView>

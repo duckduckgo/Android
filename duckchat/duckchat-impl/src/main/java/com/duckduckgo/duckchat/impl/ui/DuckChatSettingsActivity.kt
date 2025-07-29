@@ -117,6 +117,24 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private fun renderViewState(viewState: ViewState) {
         binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
+        if (viewState.isRebrandingAiFeaturesEnabled) {
+            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
+            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_settings_activity_description_rebranding)
+            binding.userEnabledDuckChatToggle.setPrimaryText(getString(R.string.duck_chat_enable_duck_ai_setting_rebranding))
+            binding.userEnabledDuckChatToggle.setSecondaryText(getString(R.string.duck_chat_enable_duck_ai_setting_description_rebranding))
+            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading_rebranding)
+            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
+            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
+        } else {
+            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
+            binding.duckChatSettingsText.setText(R.string.duck_chat_settings_activity_description)
+            binding.userEnabledDuckChatToggle.setPrimaryText(getString(R.string.duck_chat_enable_duck_ai_setting))
+            binding.userEnabledDuckChatToggle.setSecondaryText(null)
+            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading)
+            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
+            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
+        }
+
         binding.duckAiInputScreenEnabledToggle.apply {
             isVisible = viewState.shouldShowInputScreenToggle
             quietlySetIsChecked(viewState.isInputScreenEnabled, inputScreenToggleListener)
