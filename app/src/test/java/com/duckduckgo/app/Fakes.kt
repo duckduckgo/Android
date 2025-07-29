@@ -134,6 +134,10 @@ class FakeSettingsDataStore : SettingsDataStore, AutoCompleteSettings {
         get() = store["isFullUrlEnabled"] as Boolean? ?: false
         set(value) { store["isFullUrlEnabled"] = value }
 
+    override var isTrackersCountInTabSwitcherEnabled: Boolean
+        get() = store["isTrackersCountInTabSwitcherEnabled"] as Boolean? ?: false
+        set(value) { store["isTrackersCountInTabSwitcherEnabled"] = value }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption
