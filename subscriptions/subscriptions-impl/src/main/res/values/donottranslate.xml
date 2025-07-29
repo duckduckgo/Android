@@ -40,4 +40,5 @@
     <string name="activateOnOtherDevicesRebranding">Add Your Subscription to Other Devices</string>
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Add your subscription to your other devices via Google Play or by linking an email address.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Use the email above to add your subscription on your other devices in the DuckDuckGo app. Go to Settings > Subscription Settings > I Have a Subscription.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro is now just called the DuckDuckGo subscription</string>"
 </resources>
