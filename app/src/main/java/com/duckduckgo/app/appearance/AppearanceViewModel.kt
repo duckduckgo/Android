@@ -186,7 +186,7 @@ class AppearanceViewModel @Inject constructor(
             viewState.update { it.copy(isTrackersCountInTabSwitcherEnabled = checked) }
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
-            // TODO add pixel for this event
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED, params)
         }
     }
 }
