@@ -10,9 +10,11 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
@@ -655,5 +657,16 @@ class InputScreenViewModelTest {
             // Should not receive any additional commands
             expectNoEvents()
         }
+    }
+
+    @Test
+    fun `when restoreAutoCompleteScrollPosition called then RestoreAutoCompleteScrollPosition command sent and keyboard shown`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition = 123, itemOffsetTop = 456)
+        viewModel.restoreAutoCompleteScrollPosition()
+
+        assertEquals(SearchCommand.RestoreAutoCompleteScrollPosition(123, 456), viewModel.searchTabCommand.value)
+        assertEquals(ShowKeyboard, viewModel.command.value)
     }
 }

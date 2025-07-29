@@ -39,6 +39,7 @@ import com.duckduckgo.duckchat.impl.databinding.FragmentSearchTabBinding
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.OmnibarPosition.TOP
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.RestoreAutoCompleteScrollPosition
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand.ShowRemoveSearchSuggestionDialog
 import com.duckduckgo.duckchat.impl.inputscreen.ui.view.BottomBlurView
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -154,10 +155,16 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
     private fun processCommand(command: SearchCommand) {
         when (command) {
             is ShowRemoveSearchSuggestionDialog -> showRemoveSearchSuggestionDialog(command.suggestion)
+            is RestoreAutoCompleteScrollPosition -> restoreAutoCompleteScrollPosition(
+                command.firstVisibleItemPosition,
+                command.itemOffsetTop,
+            )
         }
     }
 
     private fun showRemoveSearchSuggestionDialog(suggestion: AutoCompleteSuggestion) {
+        storeAutocompletePosition()
+
         TextAlertDialogBuilder(requireContext())
             .setTitle(R.string.autocompleteRemoveItemTitle)
             .setCancellable(true)
@@ -167,16 +174,39 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onRemoveSearchSuggestionConfirmed(suggestion)
+                        viewModel.restoreAutoCompleteScrollPosition()
                     }
 
                     override fun onNegativeButtonClicked() {
-                        viewModel.showKeyboard()
+                        viewModel.restoreAutoCompleteScrollPosition()
                     }
 
                     override fun onDialogCancelled() {
-                        viewModel.showKeyboard()
+                        viewModel.restoreAutoCompleteScrollPosition()
                     }
                 },
             ).show()
+    }
+
+    private fun storeAutocompletePosition() {
+        val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
+        val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+        val itemOffsetTop = layoutManager.findViewByPosition(firstVisibleItemPosition)?.top ?: 0
+        viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition, itemOffsetTop)
+    }
+
+    private fun restoreAutoCompleteScrollPosition(position: Int, offset: Int) {
+        val layoutListener = object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                binding.autoCompleteSuggestionsList.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                scrollToPositionWithOffset(position, offset)
+            }
+        }
+        binding.autoCompleteSuggestionsList.viewTreeObserver.addOnGlobalLayoutListener(layoutListener)
+    }
+
+    private fun scrollToPositionWithOffset(position: Int, offset: Int) {
+        val layoutManager = binding.autoCompleteSuggestionsList.layoutManager as LinearLayoutManager
+        layoutManager.scrollToPositionWithOffset(position, offset)
     }
 }
