@@ -109,13 +109,15 @@ class InputModeWidget @JvmOverloads constructor(
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
         configureShadow()
-
-        onSearchSelected?.invoke()
     }
 
     fun provideInitialText(text: String) {
         originalText = text
         this.text = text
+    }
+
+    fun init() {
+        onSearchSelected?.invoke()
     }
 
     private fun configureClickListeners() {
