@@ -34,6 +34,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -70,10 +71,12 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R.string
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -105,6 +108,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONObject
 
 data class SubscriptionsWebViewActivityWithParams(
@@ -168,6 +172,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var duckChat: DuckChat
 
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -184,7 +191,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        params = convertIntoSubscriptionWebViewActivityParams(intent)
+        params = convertIntoSubscriptionWebViewActivityParams(intent).also {
+            logcat { "Subscription Flow: entering with params $it" }
+        }
 
         setContentView(binding.root)
 
@@ -266,7 +275,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
 
-        if (savedInstanceState == null && params.url == BUY_URL) {
+        val isPrivacyProUrl by lazy {
+            runCatching { subscriptions.isPrivacyProUrl(params.url.toUri()) }.getOrDefault(false)
+        }
+        if (savedInstanceState == null && isPrivacyProUrl) {
             viewModel.paywallShown()
         }
     }
@@ -280,11 +292,26 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun convertIntoSubscriptionWebViewActivityParams(intent: Intent): SubscriptionsWebViewActivityWithParams {
-        intent.getActivityParams(SubscriptionPurchase::class.java)?.let {
+        intent.getActivityParams(SubscriptionPurchase::class.java)?.let { subscriptionPurchaseActivityParams ->
             return SubscriptionsWebViewActivityWithParams(
                 url = BUY_URL,
-                origin = it.origin,
-            )
+                origin = subscriptionPurchaseActivityParams.origin,
+            ).let { webViewActivityWithParams ->
+                if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
+                    val urlWithParams = kotlin.runCatching {
+                        BUY_URL.toUri()
+                            .buildUpon()
+                            .appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, subscriptionPurchaseActivityParams.featurePage)
+                            .build()
+                            .toString()
+                    }.getOrDefault(BUY_URL)
+                    webViewActivityWithParams.copy(
+                        url = urlWithParams,
+                    )
+                } else {
+                    webViewActivityWithParams
+                }
+            }
         }
 
         return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)

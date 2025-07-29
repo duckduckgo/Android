@@ -185,7 +185,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionPurchase())
+        verify(globalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
     }
 
     @Test
@@ -208,7 +208,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionPurchase("duckai_chat"))
+        verify(globalActivityStarter).start(context, SubscriptionPurchase(origin = "duckai_chat", featurePage = "duckai"))
     }
 
     @Test
@@ -231,7 +231,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionPurchase())
+        verify(globalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
     }
 
     @Test
@@ -254,7 +254,7 @@ class SubscriptionsHandlerTest {
             contentScopeScripts,
         )
 
-        verify(globalActivityStarter).start(context, SubscriptionPurchase())
+        verify(globalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
     }
 
     @Test
@@ -302,6 +302,6 @@ class SubscriptionsHandlerTest {
         )
 
         verify(subscriptionsJSHelper).processJsCallbackMessage(featureName, method, id, data)
-        verify(globalActivityStarter).start(context, SubscriptionPurchase())
+        verify(globalActivityStarter).start(context, SubscriptionPurchase(featurePage = "duckai"))
     }
 }
