@@ -52,6 +52,7 @@ import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker
 import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
 import com.duckduckgo.pir.internal.store.PirRepository
+import com.duckduckgo.pir.internal.store.PirSchedulingRepository
 import com.duckduckgo.pir.internal.store.db.Address
 import com.duckduckgo.pir.internal.store.db.EventType
 import com.duckduckgo.pir.internal.store.db.PirEventLog
@@ -69,6 +70,9 @@ import logcat.logcat
 class PirDevScanActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: PirRepository
+
+    @Inject
+    lateinit var pirSchedulingRepository: PirSchedulingRepository
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
@@ -170,6 +174,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
                 repository.deleteAllScanResults()
                 repository.deleteAllUserProfilesQueries()
                 repository.deleteEventLogs()
+                pirSchedulingRepository.deleteAllJobRecords()
             }
             notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
             workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)

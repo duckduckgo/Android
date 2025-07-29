@@ -34,6 +34,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.logcat
 
 interface PirJobsRunner {
     /**
@@ -45,7 +46,7 @@ interface PirJobsRunner {
     suspend fun runEligibleJobs(
         context: Context,
         executionType: PirExecutionType,
-    )
+    ): Result<Unit>
 
     /**
      * Stop any job that is in progress if any.
@@ -68,20 +69,28 @@ class RealPirJobsRunner @Inject constructor(
     override suspend fun runEligibleJobs(
         context: Context,
         executionType: PirExecutionType,
-    ) = withContext(dispatcherProvider.io()) {
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
         // This should be all brokers since all brokers have scan steps and inactive brokers are removed
         val activeBrokers = pirRepository.getAllBrokersForScan()
 
         // Multiple profile support
         val profileQueries = obtainProfiles()
 
-        if (profileQueries.isEmpty()) return@withContext
-        if (activeBrokers.isEmpty()) return@withContext
+        if (profileQueries.isEmpty()) {
+            logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
+            return@withContext Result.success(Unit)
+        }
+        if (activeBrokers.isEmpty()) {
+            logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
+            return@withContext Result.success(Unit)
+        }
 
         attemptCreateScanJobs(activeBrokers, profileQueries)
         executeScanJobs(context, executionType)
         attemptCreateOptOutJobs(activeBrokers)
         executeOptOutJobs(context)
+
+        return@withContext Result.success(Unit)
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
@@ -96,6 +105,7 @@ class RealPirJobsRunner @Inject constructor(
         activeBrokers: List<String>,
         profileQueries: List<ProfileQuery>,
     ) {
+        logcat { "PIR-JOB-RUNNER: Attempting to create new scan jobs" }
         // No scan jobs mean that this is the first time PR is being run OR all jobs have been invalidated.
         val toCreate = mutableListOf<ScanJobRecord>()
 
@@ -113,22 +123,33 @@ class RealPirJobsRunner @Inject constructor(
                 }
             }
         }
-        pirSchedulingRepository.saveScanJobRecords(toCreate)
+
+        if (toCreate.isNotEmpty()) {
+            logcat { "PIR-JOB-RUNNER: New scan job records created. Saving... $toCreate" }
+            pirSchedulingRepository.saveScanJobRecords(toCreate)
+        } else {
+            logcat { "PIR-JOB-RUNNER: No new scan job records created." }
+        }
     }
 
     private suspend fun executeScanJobs(
         context: Context,
         executionType: PirExecutionType,
     ) {
-        eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
-            .also {
-                val runType = if (executionType == MANUAL) {
-                    RunType.MANUAL
-                } else {
-                    RunType.SCHEDULED
-                }
-                // pirScan.execute(it, context, runType)
+        eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis()).also {
+            val runType = if (executionType == MANUAL) {
+                RunType.MANUAL
+            } else {
+                RunType.SCHEDULED
             }
+
+            if (it.isNotEmpty()) {
+                logcat { "PIR-JOB-RUNNER: Executing scan for ${it.size} eligible scan jobs." }
+                pirScan.executeScanForJobs(it, context, runType)
+            } else {
+                logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
+            }
+        }
     }
 
     private suspend fun attemptCreateOptOutJobs(activeBrokers: List<String>) {
@@ -148,7 +169,13 @@ class RealPirJobsRunner @Inject constructor(
                 )
             }
         }
-        pirSchedulingRepository.saveOptOutJobRecords(toCreate)
+
+        if (toCreate.isNotEmpty()) {
+            logcat { "PIR-JOB-RUNNER: New opt-out job records created. Saving... $toCreate" }
+            pirSchedulingRepository.saveOptOutJobRecords(toCreate)
+        } else {
+            logcat { "PIR-JOB-RUNNER: No new opt-out job records created." }
+        }
     }
 
     private suspend fun executeOptOutJobs(context: Context) {

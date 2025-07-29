@@ -31,6 +31,7 @@ import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_C
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.models.ProfileQuery
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.store.PirRepository
@@ -48,8 +49,14 @@ import logcat.logcat
  * This class is the main entry point for any scan execution (manual or scheduled)
  */
 interface PirScan {
+    suspend fun executeScanForJobs(
+        jobRecords: List<ScanJobRecord>,
+        context: Context,
+        runType: RunType,
+    ): Result<Unit>
 
     /**
+     * NOTE: This method should only be used for internal dev functionality only.
      * This method can be used to execute pir scan for a given list of [brokers] names.
      * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
@@ -63,6 +70,7 @@ interface PirScan {
     ): Result<Unit>
 
     /**
+     * NOTE: This method should only be used for internal dev functionality only.
      * This method can be used to execute pir scan for all active brokers (from json).
      * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
@@ -97,6 +105,96 @@ class RealPirScan @Inject constructor(
 
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
     private var maxWebViewCount = 1
+
+    override suspend fun executeScanForJobs(
+        jobRecords: List<ScanJobRecord>,
+        context: Context,
+        runType: RunType,
+    ) = withContext(dispatcherProvider.io()) {
+        logcat { "PIR-SCAN: Running scan on the following records: $jobRecords on ${Thread.currentThread().name}" }
+        onJobStarted()
+
+        val startTimeMillis = currentTimeProvider.currentTimeMillis()
+        cleanPreviousRun()
+
+        val script = pirCssScriptLoader.getScript()
+        maxWebViewCount = minOf(jobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
+        var createCount = 0
+        while (createCount != maxWebViewCount) {
+            runners.add(
+                pirActionsRunnerFactory.create(
+                    context,
+                    script,
+                    runType,
+                ),
+            )
+            createCount++
+        }
+
+        val relevantBrokerSteps = jobRecords.map { it.brokerName }.distinct().mapNotNull {
+            val steps = repository.getBrokerScanSteps(it)?.run {
+                brokerStepsParser.parseStep(it, this)
+            }
+            if (!steps.isNullOrEmpty()) {
+                it to steps[0]
+            } else {
+                null
+            }
+        }.toMap()
+
+        logcat { "PIR-SCAN: Relevant broker steps $relevantBrokerSteps" }
+
+        val allProfiles = obtainProfiles().associateBy { it.id }
+        val relevantProfiles = jobRecords.map { it.userProfileId }.distinct().mapNotNull {
+            val profileQuery = allProfiles[it]
+
+            if (profileQuery != null) {
+                it to allProfiles[it]
+            } else {
+                null
+            }
+        }.toMap()
+
+        logcat { "PIR-SCAN: Relevant profileQueries $relevantProfiles" }
+
+        val jobRecordsParts = jobRecords.mapNotNull {
+            val profileQuery = relevantProfiles[it.userProfileId]
+            val brokerSteps = relevantBrokerSteps[it.brokerName]
+            if (profileQuery != null && brokerSteps != null) {
+                profileQuery to brokerSteps
+            } else {
+                null
+            }
+        }.splitIntoParts(maxWebViewCount)
+
+        logcat { "PIR-SCAN: Total parts ${jobRecordsParts.size}" }
+
+        // Execute the steps in parallel
+        jobRecordsParts.mapIndexed { index, partSteps ->
+            logcat { "PIR-SCAN: Record part [$index] -> ${partSteps.size}" }
+            logcat { "PIR-SCAN: Record part [$index] breakdown -> ${partSteps.map { it.first.id to it.second.brokerName }}" }
+            // We want to run the runners in parallel but wait for everything to complete before we proceed
+            async {
+                partSteps.forEach { (profile, step) ->
+                    logcat { "PIR-SCAN: Start scan on runner=$index for profile=$profile with step=$step" }
+                    runners[index].start(profile, listOf(step))
+                    runners[index].stop()
+                    logcat { "PIR-SCAN: Finish scan on runner=$index for profile=$profile with step=$step" }
+                }
+            }
+        }.awaitAll()
+
+        logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
+        emitScanCompletedPixel(
+            runType,
+            currentTimeProvider.currentTimeMillis() - startTimeMillis,
+            maxWebViewCount,
+        )
+        onJobCompleted()
+        return@withContext Result.success(Unit)
+    }
 
     override suspend fun execute(
         brokers: List<String>,
