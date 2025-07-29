@@ -32,6 +32,7 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(':js-messaging-api')
     implementation project(':navigation-api')
+    implementation project(':pir-impl')
     implementation project(':subscriptions-api')
     implementation project(':statistics-api')
     implementation "com.squareup.logcat:logcat:_"

@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal
+package com.duckduckgo.pir.api
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
+interface PirFeature {
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "pir",
-)
-interface PirRemoteFeatures {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
-
-    @DefaultValue(DefaultFeatureValue.FALSE)
-    fun allowPirRun(): Toggle
+    /**
+     * Runs on the IO thread by default.
+     *
+     * @return true if the PIR beta is enabled, false otherwise
+     */
+    suspend fun isPirBetaEnabled(): Boolean
 }
