@@ -242,6 +242,34 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
+    fun `when tracker count in tab switcher is enabled then setting enabled`() = runTest {
+        val enabled = true
+        testee.onShowTrackersCountInTabSwitcherChanged(enabled)
+        verify(mockAppSettingsDataStore).isTrackersCountInTabSwitcherEnabled = enabled
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun `when tracker count in tab switcher is disabled then setting disabled`() = runTest {
+        val enabled = false
+        testee.onShowTrackersCountInTabSwitcherChanged(enabled)
+        verify(mockAppSettingsDataStore).isTrackersCountInTabSwitcherEnabled = enabled
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
     fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() = runTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)
