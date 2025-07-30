@@ -1457,15 +1457,35 @@ sealed class DaxBubbleCta(
         }
     }
 
-    fun setOnOptionClicked(onOptionClicked: (DaxDialogIntroOption) -> Unit) {
-        options?.forEachIndexed { index, option ->
-            val optionView = when (index) {
-                0 -> R.id.daxDialogOption1
-                1 -> R.id.daxDialogOption2
-                2 -> R.id.daxDialogOption3
-                else -> R.id.daxDialogOption4
+    fun setOnOptionClicked(
+        onboardingExperimentEnabled: Boolean = false,
+        configuration: DaxBubbleCta? = null,
+        onOptionClicked: (DaxDialogIntroOption) -> Unit,
+    ) {
+        if (onboardingExperimentEnabled && configuration is DaxIntroVisitSiteOptionsCta) {
+            val optionsWithoutRegionalNews = options?.toMutableList()?.apply {
+                removeAt(1) // Remove the regional news option
+            }?.toList()
+
+            optionsWithoutRegionalNews?.forEachIndexed { index, option ->
+                val optionView = when (index) {
+                    0 -> R.id.daxDialogOption1
+                    1 -> R.id.daxDialogOption2
+                    2 -> R.id.daxDialogOption3
+                    else -> R.id.daxDialogOption4 // This will not be visible for the experiments
+                }
+                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
             }
-            option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+        } else {
+            options?.forEachIndexed { index, option ->
+                val optionView = when (index) {
+                    0 -> R.id.daxDialogOption1
+                    1 -> R.id.daxDialogOption2
+                    2 -> R.id.daxDialogOption3
+                    else -> R.id.daxDialogOption4
+                }
+                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+            }
         }
     }
 

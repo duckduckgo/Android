@@ -4423,12 +4423,18 @@ class BrowserTabFragment :
                 when {
                     onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
                         showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked { userEnteredQuery(it.link) }
+                            setOnOptionClicked(
+                                onboardingExperimentEnabled = true,
+                                configuration = configuration,
+                            ) { userEnteredQuery(it.link) }
                         }
                     }
                     onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                         showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked { userEnteredQuery(it.link) }
+                            setOnOptionClicked(
+                                onboardingExperimentEnabled = true,
+                                configuration = configuration,
+                            ) { userEnteredQuery(it.link) }
                         }
                     }
                     else -> {
