@@ -11,7 +11,9 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
+import com.duckduckgo.subscriptions.impl.repository.RebrandingRepository
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -42,6 +44,7 @@ class SubscriptionSettingsViewModelTest {
     private val pixelSender: SubscriptionPixelSender = mock()
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback = mock()
     private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
+    private val mockRebrandingRepository: RebrandingRepository = mock()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
 
@@ -52,6 +55,7 @@ class SubscriptionSettingsViewModelTest {
             pixelSender,
             privacyProUnifiedFeedback,
             mockSubscriptionRebrandingFeatureToggle,
+            mockRebrandingRepository,
         )
     }
 
@@ -224,5 +228,15 @@ class SubscriptionSettingsViewModelTest {
     fun whenRemoveFromDeviceThenPixelIsSent() = runTest {
         viewModel.removeFromDevice()
         verify(pixelSender).reportSubscriptionSettingsRemoveFromDeviceClick()
+    }
+
+    @Test
+    fun whenDismissRebrandingBannerThenSetRebrandingAsViewedAndDismissBannerCommandIsSent() = runTest {
+        viewModel.commands().test {
+            viewModel.rebrandingBannerDismissed()
+            verify(mockRebrandingRepository).setRebrandingBannerAsViewed()
+            assertEquals(DismissRebrandingBanner, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

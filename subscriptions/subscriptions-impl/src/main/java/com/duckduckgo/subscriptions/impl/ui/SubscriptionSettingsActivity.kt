@@ -52,6 +52,7 @@ import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSetting
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -177,6 +178,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.faq.setPrimaryText(getString(string.privacyProFaq))
             binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
         }
+        if (viewState.showRebrandingBanner) {
+            binding.includePrivacyProRebrandingBanner.root.show()
+            binding.includePrivacyProRebrandingBanner.settingsBannerClose.setOnClickListener {
+                viewModel.rebrandingBannerDismissed()
+            }
+        } else {
+            binding.includePrivacyProRebrandingBanner.root.gone()
+        }
 
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
@@ -291,6 +300,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
+
+            is DismissRebrandingBanner -> dismissRebrandingBanner()
         }
     }
 
@@ -350,6 +361,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 screenTitle = getString(string.privacyPolicyAndTermsOfService),
             ),
         )
+    }
+
+    private fun dismissRebrandingBanner() {
+        binding.includePrivacyProRebrandingBanner.root.gone()
     }
 
     companion object {
