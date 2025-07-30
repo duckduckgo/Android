@@ -15,7 +15,4 @@
   -->
 
 <resources>
-    <!-- Privacy Pro Rebranding-->
-    <string name="netpNotificationVpnAccessRevokedRebranding">VPN disconnected due to expired subscription. Subscribe to DuckDuckGo to reconnect the VPN.</string>
-    <string name="netpDialogVpnAccessRevokedBodyRebranding">Subscribe to DuckDuckGo to reconnect the VPN.</string>
 </resources>
