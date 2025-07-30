@@ -50,7 +50,7 @@
         android:layout_height="match_parent"
         android:background="?attr/daxColorBrowserOverlay"
         android:clipToPadding="false"
-        android:elevation="4dp"
+        android:paddingTop="@dimen/keyline_3"
         android:paddingBottom="64dp"
         tools:itemCount="3"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
