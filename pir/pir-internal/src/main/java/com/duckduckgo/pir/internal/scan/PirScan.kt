@@ -115,7 +115,59 @@ class RealPirScan @Inject constructor(
         onJobStarted()
 
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
+
+        if (jobRecords.isEmpty()) {
+            logcat { "PIR-SCAN: Nothing to scan here." }
+            completeScan(runType, startTimeMillis)
+            return@withContext Result.success(Unit)
+        }
+
         cleanPreviousRun()
+
+        val relevantBrokerSteps = jobRecords.map { it.brokerName }.distinct().mapNotNull {
+            val steps = repository.getBrokerScanSteps(it)?.run {
+                brokerStepsParser.parseStep(it, this)
+            }
+            if (!steps.isNullOrEmpty()) {
+                it to steps[0]
+            } else {
+                null
+            }
+        }.toMap()
+
+        logcat { "PIR-SCAN: Relevant broker steps $relevantBrokerSteps" }
+
+        if (relevantBrokerSteps.isEmpty()) {
+            logcat { "PIR-SCAN: No steps available." }
+            completeScan(runType, startTimeMillis)
+            return@withContext Result.success(Unit)
+        }
+
+        val allProfiles = obtainProfiles().associateBy { it.id }
+
+        if (allProfiles.isEmpty()) {
+            logcat { "PIR-SCAN: Nothing to scan here. No user profiles available." }
+            completeScan(runType, startTimeMillis)
+            return@withContext Result.success(Unit)
+        }
+
+        val relevantProfiles = jobRecords.map { it.userProfileId }.distinct().mapNotNull {
+            val profileQuery = allProfiles[it]
+
+            if (profileQuery != null) {
+                it to allProfiles[it]
+            } else {
+                null
+            }
+        }.toMap()
+
+        logcat { "PIR-SCAN: Relevant profileQueries $relevantProfiles" }
+
+        if (relevantProfiles.isEmpty()) {
+            logcat { "PIR-SCAN: Nothing to scan here. Can't map jobrecord profiles." }
+            completeScan(runType, startTimeMillis)
+            return@withContext Result.success(Unit)
+        }
 
         val script = pirCssScriptLoader.getScript()
         maxWebViewCount = minOf(jobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
@@ -132,32 +184,6 @@ class RealPirScan @Inject constructor(
             )
             createCount++
         }
-
-        val relevantBrokerSteps = jobRecords.map { it.brokerName }.distinct().mapNotNull {
-            val steps = repository.getBrokerScanSteps(it)?.run {
-                brokerStepsParser.parseStep(it, this)
-            }
-            if (!steps.isNullOrEmpty()) {
-                it to steps[0]
-            } else {
-                null
-            }
-        }.toMap()
-
-        logcat { "PIR-SCAN: Relevant broker steps $relevantBrokerSteps" }
-
-        val allProfiles = obtainProfiles().associateBy { it.id }
-        val relevantProfiles = jobRecords.map { it.userProfileId }.distinct().mapNotNull {
-            val profileQuery = allProfiles[it]
-
-            if (profileQuery != null) {
-                it to allProfiles[it]
-            } else {
-                null
-            }
-        }.toMap()
-
-        logcat { "PIR-SCAN: Relevant profileQueries $relevantProfiles" }
 
         val jobRecordsParts = jobRecords.mapNotNull {
             val profileQuery = relevantProfiles[it.userProfileId]
@@ -186,6 +212,14 @@ class RealPirScan @Inject constructor(
             }
         }.awaitAll()
 
+        completeScan(runType, startTimeMillis)
+        return@withContext Result.success(Unit)
+    }
+
+    private suspend fun completeScan(
+        runType: RunType,
+        startTimeMillis: Long,
+    ) {
         logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
         emitScanCompletedPixel(
             runType,
@@ -193,7 +227,6 @@ class RealPirScan @Inject constructor(
             maxWebViewCount,
         )
         onJobCompleted()
-        return@withContext Result.success(Unit)
     }
 
     override suspend fun execute(
@@ -260,13 +293,7 @@ class RealPirScan @Inject constructor(
             }
         }.awaitAll()
 
-        logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
-        emitScanCompletedPixel(
-            runType,
-            currentTimeProvider.currentTimeMillis() - startTimeMillis,
-            maxWebViewCount,
-        )
-        onJobCompleted()
+        completeScan(runType, startTimeMillis)
         return@withContext Result.success(Unit)
     }
 
