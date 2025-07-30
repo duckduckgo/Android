@@ -73,7 +73,6 @@ class ProSettingViewModel @Inject constructor(
     data class ViewState(
         val status: SubscriptionStatus = UNKNOWN,
         val region: SubscriptionRegion? = null,
-        val duckAiEnabled: Boolean = false,
         val rebrandingEnabled: Boolean = false,
         val duckAiPlusAvailable: Boolean = false,
         val freeTrialEligible: Boolean = false,
@@ -121,7 +120,6 @@ class ProSettingViewModel @Inject constructor(
                         viewState.value.copy(
                             status = subscriptionStatus,
                             region = region,
-                            duckAiEnabled = duckAiEnabled,
                             rebrandingEnabled = rebrandingEnabled,
                             duckAiPlusAvailable = duckAiAvailable,
                             freeTrialEligible = subscriptionsManager.isFreeTrialEligible(),
