@@ -890,4 +890,27 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Slutför din inställning</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hej!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Är du redo för en snabbare webbläsare som också skyddar dig?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Skydd</b> <i>är aktiverade!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hej!<br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Rensa omedelbart din surfaktivitet med <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Prova det!</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ och %1$d till försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ och %1$d till försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tryck på skölden för mer info.️</string>
+
 </resources>

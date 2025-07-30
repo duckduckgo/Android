@@ -890,4 +890,27 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Completa la configurazione</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Ciao.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Vuoi un browser più veloce che ti garantisca protezione?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Protezioni</b> <i>attivate!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Ciao.Vuoi un browser più veloce che ti garantisca protezione?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Provalo!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ e %1$d altro stavano cercando di tracciarti qui. <font color=\"#F05C2B\">Li ho bloccati!</font>]]></item>
+        <item quantity="other"><![CDATA[ e altri %1$d stavano cercando di tracciarti qui. <font color=\"#F05C2B\">Li ho bloccati!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ stava cercando di tracciare la tua attività qui. <font color=\"#F05C2B\">Li ho bloccati!</font>]]></item>
+        <item quantity="other"><![CDATA[ stavano cercando di tracciare la tua attività qui. <font color=\"#F05C2B\">Li ho bloccati!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tocca lo scudo per maggiori informazioni.️</string>
+
 </resources>
