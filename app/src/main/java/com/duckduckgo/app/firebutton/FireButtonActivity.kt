@@ -20,6 +20,7 @@ import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -84,6 +85,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
             automaticallyClearWhatSetting.setClickListener { viewModel.onAutomaticallyClearWhatClicked() }
             automaticallyClearWhenSetting.setClickListener { viewModel.onAutomaticallyClearWhenClicked() }
             selectedFireAnimationSetting.setClickListener { viewModel.userRequestedToChangeFireAnimation() }
+            clearDuckAiDataSetting.setOnCheckedChangeListener { _, isChecked -> viewModel.onClearDuckAiDataToggled(isChecked) }
         }
     }
 
@@ -94,6 +96,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 viewState.let {
                     updateAutomaticClearDataOptions(it.automaticallyClearData)
                     updateSelectedFireAnimation(it.selectedFireAnimation)
+                    updateClearDuckAiDataSetting(it.clearDuckAiData, it.showClearDuckAiDataSetting)
                 }
             }.launchIn(lifecycleScope)
 
@@ -117,6 +120,11 @@ class FireButtonActivity : DuckDuckGoActivity() {
     private fun updateSelectedFireAnimation(fireAnimation: FireAnimation) {
         val subtitle = getString(fireAnimation.nameResId)
         binding.selectedFireAnimationSetting.setSecondaryText(subtitle)
+    }
+
+    private fun updateClearDuckAiDataSetting(enabled: Boolean, isVisible: Boolean) {
+        binding.clearDuckAiDataSetting.setIsChecked(enabled)
+        binding.clearDuckAiDataSetting.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
 
     private fun processCommand(it: Command) {

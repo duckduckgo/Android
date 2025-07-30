@@ -157,6 +157,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED("ms_private_search_more_search_settings_pressed"),
     SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED("ms_cookie_popup_protection_setting_pressed"),
     SETTINGS_FIRE_BUTTON_PRESSED("ms_fire_button_setting_pressed"),
+    SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_ON("ms_clear_duck_ai_data_toggled_on"),
+    SETTINGS_CLEAR_DUCK_AI_DATA_TOGGLED_OFF("ms_clear_duck_ai_data_toggled_off"),
     SETTINGS_GENERAL_APP_LAUNCH_PRESSED("m_settings_general_app_launch_pressed"),
 
     SURVEY_CTA_SHOWN(pixelName = "mus_cs"),
