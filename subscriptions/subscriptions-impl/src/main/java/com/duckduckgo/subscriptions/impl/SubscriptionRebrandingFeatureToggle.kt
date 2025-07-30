@@ -50,10 +50,15 @@ class SubscriptionRebrandingFeatureToggleImpl @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
 ) : SubscriptionRebrandingFeatureToggle, PrivacyConfigCallbackPlugin, MainProcessLifecycleObserver {
 
-    private var cachedValue: Boolean = false
+    private var cachedPrivacyProRebrandingValue: Boolean = false
+    private var cachedAIFeaturesRebrandingValue: Boolean = false
 
     override fun isSubscriptionRebrandingEnabled(): Boolean {
-        return cachedValue
+        return cachedPrivacyProRebrandingValue
+    }
+
+    override fun isAIFeaturesRebrandingEnabled(): Boolean {
+        return cachedAIFeaturesRebrandingValue
     }
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -70,8 +75,11 @@ class SubscriptionRebrandingFeatureToggleImpl @Inject constructor(
     private fun prefetchFeatureFlag() {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val isEnabled = privacyProFeature.subscriptionRebranding().isEnabled()
-            cachedValue = isEnabled
+            cachedPrivacyProRebrandingValue = isEnabled
             logcat { "SubscriptionRebrandingFeatureToggle: Feature flag cached, value = $isEnabled" }
+            val isAIFeaturesEnabled = privacyProFeature.subscriptionAIFeaturesRebranding().isEnabled()
+            cachedAIFeaturesRebrandingValue = isAIFeaturesEnabled
+            logcat { "SubscriptionAIFeaturesRebrandingFeatureToggle: Feature flag cached, value = $isAIFeaturesEnabled" }
         }
     }
 }

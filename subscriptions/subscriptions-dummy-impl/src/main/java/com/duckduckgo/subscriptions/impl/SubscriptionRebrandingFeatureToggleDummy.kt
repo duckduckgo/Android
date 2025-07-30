@@ -30,4 +30,8 @@ class SubscriptionRebrandingFeatureToggleDummy @Inject constructor() : Subscript
     override fun isSubscriptionRebrandingEnabled(): Boolean {
         return false
     }
+
+    override fun isAIFeaturesRebrandingEnabled(): Boolean {
+        return false
+    }
 }

@@ -26,6 +26,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -40,6 +41,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
+    private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -53,6 +55,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val shouldShowBrowserMenuToggle: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
+        val isRebrandingAiFeaturesEnabled: Boolean = false,
     )
 
     val viewState = combine(
@@ -69,6 +72,7 @@ class DuckChatSettingsViewModel @Inject constructor(
             shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
             shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
             shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
+            isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

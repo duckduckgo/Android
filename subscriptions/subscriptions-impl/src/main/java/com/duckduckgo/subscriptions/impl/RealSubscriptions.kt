@@ -226,6 +226,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun refreshSubscriptionPlanFeatures(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionAIFeaturesRebranding(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

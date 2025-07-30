@@ -41,6 +41,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -102,6 +103,8 @@ class SettingsViewModelTest {
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
     private val duckAiShowSettingsFlow = MutableStateFlow(false)
 
+    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
+
     @Before
     fun before() = runTest {
         whenever(dispatcherProviderMock.io()).thenReturn(coroutineTestRule.testDispatcher)
@@ -131,6 +134,7 @@ class SettingsViewModelTest {
             settingsPageFeature = fakeSettingsPageFeature,
             widgetCapabilities = mockWidgetCapabilities,
             postCtaExperienceExperiment = mockPostCtaExperienceExperiment,
+            rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
     }
 

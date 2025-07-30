@@ -298,7 +298,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
-                    updateDuckChat(it.isDuckChatEnabled)
+                    updateDuckChat(it.isDuckChatEnabled, it.isAiFeaturesRebrandingEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                 }
@@ -335,9 +335,20 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDuckChat(isDuckChatEnabled: Boolean) {
+    private fun updateDuckChat(isDuckChatEnabled: Boolean, isAiFeaturesRebrandingEnabled: Boolean) {
         if (isDuckChatEnabled) {
+            val imageRes: Int
+            val titleRes: Int
+            if (isAiFeaturesRebrandingEnabled) {
+                imageRes = com.duckduckgo.mobile.android.R.drawable.ai_general_color_24
+                titleRes = R.string.settingsDuckAiRebranding
+            } else {
+                imageRes = com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24
+                titleRes = R.string.settingsDuckAi
+            }
             viewsMain.includeDuckChatSetting.duckChatSetting.show()
+            viewsMain.includeDuckChatSetting.leadingIcon.setImageResource(imageRes)
+            viewsMain.includeDuckChatSetting.primaryText.setText(titleRes)
         } else {
             viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }
