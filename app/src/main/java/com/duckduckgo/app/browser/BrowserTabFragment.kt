@@ -4439,7 +4439,10 @@ class BrowserTabFragment :
                     }
                     else -> {
                         showCta(daxDialogIntroBubble.daxCtaContainer) {
-                            setOnOptionClicked { userEnteredQuery(it.link) }
+                            setOnOptionClicked(
+                                onboardingExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled(),
+                                configuration = configuration,
+                            ) { userEnteredQuery(it.link) }
                         }
                     }
                 }

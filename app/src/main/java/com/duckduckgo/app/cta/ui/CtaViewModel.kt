@@ -251,7 +251,9 @@ class CtaViewModel @Inject constructor(
 
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore).apply {
+                    isModifiedControlOnboardingExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled()
+                }
             }
 
             // End
