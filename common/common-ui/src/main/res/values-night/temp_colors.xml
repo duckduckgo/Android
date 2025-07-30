@@ -65,7 +65,7 @@
 
     <color name="bbColorComparisonChartItemBackground">#242423</color>
     <color name="bbColorComparisonChartDivider">#2E2E2B</color>
-    <color name="bbColorComparisonChartCrossIcon">#9D9D9D</color>
+    <color name="bbColorComparisonChartCrossIcon">#7B7B7B</color>
 
     <color name="bbColorPreonboardingOptionOutline">#2E2E2B</color>
     <color name="bbColorPreonboardingOptionOutlineSelected">#802373D5</color>
