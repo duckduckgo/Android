@@ -906,4 +906,29 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Finalizează configurarea</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Salut!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ești gata pentru un browser mai rapid care îți asigură protecția?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Mecanismele de protecție</b> <i>au fost activate!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Salut!<br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Încearcă!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+        <item quantity="few"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+        <item quantity="other"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <font color=\"#F05C2B\">L-am blocat!</font>]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Atinge scutul pentru mai multe informații.️</string>
+
 </resources>
