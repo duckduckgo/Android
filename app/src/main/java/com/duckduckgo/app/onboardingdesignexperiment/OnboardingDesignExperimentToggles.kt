@@ -39,6 +39,13 @@ interface OnboardingDesignExperimentToggles {
     fun self(): Toggle
 
     /**
+     * Toggle for enabling or disabling the "modifiedControl" version of the design experiment.
+     * Default value: false (disabled).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun modifiedControl(): Toggle
+
+    /**
      * Toggle for enabling or disabling the "buckOnboarding" design experiment.
      * Default value: false (disabled).
      */
