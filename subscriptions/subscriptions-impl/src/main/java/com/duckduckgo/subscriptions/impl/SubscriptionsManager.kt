@@ -231,16 +231,6 @@ interface SubscriptionsManager {
      * @return `true` if a Free Trial offer is available for the user, `false` otherwise
      */
     suspend fun isFreeTrialEligible(): Boolean
-
-    /**
-     * @return `true` if the rebranding banner should be shown to the user, `false` otherwise
-     */
-    suspend fun isRebrandingBannerShown(): Boolean
-
-    /**
-     * Marks the rebranding banner as viewed so it will not be shown again.
-     */
-    suspend fun setRebrandingBannerAsViewed()
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -367,14 +357,6 @@ class RealSubscriptionsManager @Inject constructor(
             it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
         }
         return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
-    }
-
-    override suspend fun isRebrandingBannerShown(): Boolean {
-        return authRepository.getRebrandingBannerViewed()
-    }
-
-    override suspend fun setRebrandingBannerAsViewed() {
-        authRepository.setRebrandingBannerShown()
     }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()

@@ -64,8 +64,6 @@ interface AuthRepository {
     suspend fun canSupportEncryption(): Boolean
     suspend fun setFeatures(basePlanId: String, features: Set<String>)
     suspend fun getFeatures(basePlanId: String): Set<String>
-    suspend fun getRebrandingBannerViewed(): Boolean
-    suspend fun setRebrandingBannerShown()
 }
 
 @Module
@@ -229,14 +227,6 @@ internal class RealAuthRepository constructor(
         subscriptionsDataStore.subscriptionFeatures
             ?.let(featuresAdapter::fromJson)
             ?.get(basePlanId) ?: emptySet()
-    }
-
-    override suspend fun getRebrandingBannerViewed(): Boolean {
-        return subscriptionsDataStore.rebrandingBannerShown
-    }
-
-    override suspend fun setRebrandingBannerShown() {
-        subscriptionsDataStore.rebrandingBannerShown = true
     }
 
     private suspend fun updateSerpPromoCookie() = withContext(dispatcherProvider.io()) {

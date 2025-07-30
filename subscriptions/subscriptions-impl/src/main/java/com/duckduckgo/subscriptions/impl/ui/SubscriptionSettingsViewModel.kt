@@ -33,6 +33,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.RebrandingRepository
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
@@ -61,6 +62,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
     private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
+    private val rebrandingRepository: RebrandingRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -110,7 +112,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     private suspend fun shouldShowRebrandingBanner(): Boolean =
-        subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled() && !subscriptionsManager.isRebrandingBannerShown()
+        subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled() && !rebrandingRepository.isRebrandingBannerShown()
 
     fun onEditEmailButtonClicked() {
         viewModelScope.launch {
@@ -142,7 +144,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     fun rebrandingBannerDismissed() {
         viewModelScope.launch {
-            subscriptionsManager.setRebrandingBannerAsViewed()
+            rebrandingRepository.setRebrandingBannerAsViewed()
             command.send(DismissRebrandingBanner)
         }
     }
