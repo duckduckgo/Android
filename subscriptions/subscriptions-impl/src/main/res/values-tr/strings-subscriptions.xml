@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Aboneliğim Var</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo Aboneliği</string>
+    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo aboneliğinizin süresi doldu</string>
+    <string name="privacyProFaqRebranding">Aboneliğinizle ilgili yardıma mı ihtiyacınız var?</string>
+    <string name="privacyProFaqSecondaryRebranding">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya abonelik destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
+    <string name="restoreSubscriptionTitleRebranding">Aboneliğinizi bu cihaza ekleyin</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
+    <string name="activateOnOtherDevicesRebranding">Aboneliğinizi diğer cihazlara ekleyin</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Aboneliğinizi Google Play üzerinden veya bir e-posta adresi bağlayarak diğer cihazlarınıza ekleyebilirsiniz.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Abonelik Ayarları &gt; Aboneliğim Var\'a gidin.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro artık sadece DuckDuckGo aboneliği olarak adlandırılıyor</string>
+
 </resources>
