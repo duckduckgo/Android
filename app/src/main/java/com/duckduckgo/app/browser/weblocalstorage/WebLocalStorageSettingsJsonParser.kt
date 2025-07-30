@@ -26,10 +26,12 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 data class Domains(val list: List<String> = emptyList())
+data class AllowedKeys(val list: List<String> = emptyList())
 data class MatchingRegex(val list: List<String> = emptyList())
 
 data class WebLocalStorageSettings(
     val domains: Domains = Domains(),
+    val allowedKeys: AllowedKeys = AllowedKeys(),
     val matchingRegex: MatchingRegex = MatchingRegex(),
 )
 
@@ -50,26 +52,32 @@ class WebLocalStorageSettingsJsonParserImpl @Inject constructor(
     }
 
     override suspend fun parseJson(json: String?): WebLocalStorageSettings = withContext(dispatcherProvider.io()) {
-        if (json == null) return@withContext WebLocalStorageSettings(Domains(), MatchingRegex())
+        if (json == null) return@withContext WebLocalStorageSettings(Domains(), AllowedKeys(), MatchingRegex())
 
         kotlin.runCatching {
             val parsed = jsonAdapter.fromJson(json)
             val domains = parsed?.asDomains() ?: Domains()
+            val allowedKeys = parsed?.asAllowedKeys() ?: AllowedKeys()
             val matchingRegex = parsed?.asMatchingRegex() ?: MatchingRegex()
-            WebLocalStorageSettings(domains, matchingRegex)
-        }.getOrDefault(WebLocalStorageSettings(Domains(), MatchingRegex()))
+            WebLocalStorageSettings(domains, allowedKeys, matchingRegex)
+        }.getOrDefault(WebLocalStorageSettings(Domains(), AllowedKeys(), MatchingRegex()))
     }
 
     private fun SettingsJson.asDomains(): Domains {
-        return Domains(domains.map { it })
+        return Domains(domains ?: emptyList())
+    }
+
+    private fun SettingsJson.asAllowedKeys(): AllowedKeys {
+        return AllowedKeys(allowedKeys ?: emptyList())
     }
 
     private fun SettingsJson.asMatchingRegex(): MatchingRegex {
-        return MatchingRegex(matchingRegex.map { it })
+        return MatchingRegex(matchingRegex ?: emptyList())
     }
 
     private data class SettingsJson(
-        val domains: List<String>,
-        val matchingRegex: List<String>,
+        val domains: List<String>?,
+        val allowedKeys: List<String>?,
+        val matchingRegex: List<String>?,
     )
 }
