@@ -93,7 +93,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
-    private var daxDialogAnimaationStarted = false
+    private var daxDialogAnimationStarted = false
     private var onboardingAnimationViewOnLayoutChangeListener: OnLayoutChangeListener? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -425,8 +425,8 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private fun startDaxDialogAnimation() {
-        if (daxDialogAnimaationStarted) return
-        daxDialogAnimaationStarted = true
+        if (daxDialogAnimationStarted) return
+        daxDialogAnimationStarted = true
 
         var welcomeContentFadedAway = false
         var welcomeDaxFadedAway = false
