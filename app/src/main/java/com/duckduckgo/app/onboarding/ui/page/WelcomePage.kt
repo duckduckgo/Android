@@ -357,7 +357,7 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     private fun scheduleTypingAnimation(
         ctaText: String,
-        afterAnimation: () -> Unit = {}
+        afterAnimation: () -> Unit = {},
     ) {
         typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
             .alpha(MAX_ALPHA)
