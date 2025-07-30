@@ -69,15 +69,11 @@ import dagger.SingleInstanceIn
 import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.Headers.Companion.toHeaders
-import okhttp3.OkHttpClient
-import okhttp3.Request
 
 private const val DUCK_PLAYER_VIDEO_ID_QUERY_PARAM = "videoID"
 const val DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH = "openInYoutube"
@@ -85,6 +81,8 @@ private const val DUCK_PLAYER_DOMAIN = "player"
 private const val DUCK_PLAYER_URL_BASE = "$duck://$DUCK_PLAYER_DOMAIN/"
 private const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/"
 private const val DUCK_PLAYER_ASSETS_INDEX_PATH = "${DUCK_PLAYER_ASSETS_PATH}index.html"
+private const val REFERER_HEADER = "referer"
+private const val EMBED_REFERER_VALUE = "http://android.mobile.duckduckgo.com"
 
 interface DuckPlayerInternal : DuckPlayer {
     /**
@@ -114,7 +112,6 @@ class RealDuckPlayer @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @IsMainProcess private val isMainProcess: Boolean,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    @Named("api") private val okHttpClient: OkHttpClient,
 ) : DuckPlayerInternal, PrivacyConfigCallbackPlugin {
 
     private var shouldForceYTNavigation = false
@@ -341,11 +338,10 @@ class RealDuckPlayer @Inject constructor(
 
     private suspend fun getEmbedWithReferer(request: WebResourceRequest): InputStream? {
         val headers = request.requestHeaders
-            .filterNot { it.key.lowercase() == "referer" }
-            .plus("referer" to "http://android.mobile.duckduckgo.com")
-            .toHeaders()
-        val okHttpRequest = Request.Builder().url(request.url.toString()).headers(headers).build()
-        return withContext(dispatchers.io()) { okHttpClient.newCall(okHttpRequest).execute().body?.byteStream() }
+            .filterNot { it.key.lowercase() == REFERER_HEADER }
+            .plus(REFERER_HEADER to EMBED_REFERER_VALUE)
+
+        return duckPlayerFeatureRepository.requestEmbed(request.url.toString(), headers)
     }
 
     private fun processSimulatedYouTubeNoCookieUri(
