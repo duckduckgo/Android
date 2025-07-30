@@ -26,9 +26,11 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup.MarginLayoutParams
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams
 import androidx.annotation.RawRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
@@ -92,6 +94,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var daxDialogAnimaationStarted = false
+    private var onboardingAnimationViewOnLayoutChangeListener: OnLayoutChangeListener? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
     override fun onAttach(context: Context) {
@@ -495,13 +498,25 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
         }
         setMinAndMaxProgress(minProgress, maxProgress)
 
-        updateLayoutParams<FrameLayout.LayoutParams> {
-            marginStart = animation.viewLayoutParamsOverride.marginStart
-            marginEnd = animation.viewLayoutParamsOverride.marginEnd
-            topMargin = animation.viewLayoutParamsOverride.marginTop
-            bottomMargin = animation.viewLayoutParamsOverride.marginBottom
-            gravity = animation.viewLayoutParamsOverride.gravity
+        if (onboardingAnimationViewOnLayoutChangeListener != null) {
+            removeOnLayoutChangeListener(onboardingAnimationViewOnLayoutChangeListener)
         }
+
+        val parentView = parent as FrameLayout
+
+        onboardingAnimationViewOnLayoutChangeListener = OnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            val layoutCustomization = animation.layoutCustomization(parentView)
+            updateLayoutParams<LayoutParams> {
+                marginStart = layoutCustomization.marginStart
+                marginEnd = layoutCustomization.marginEnd
+                topMargin = layoutCustomization.marginTop
+                bottomMargin = layoutCustomization.marginBottom
+                gravity = layoutCustomization.gravity
+            }
+            translationX = layoutCustomization.translationX
+        }
+
+        parentView.addOnLayoutChangeListener(onboardingAnimationViewOnLayoutChangeListener)
 
         addAnimatorListener(
             object : Animator.AnimatorListener {
@@ -548,45 +563,70 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 private enum class LottieOnboardingAnimationSpec(
     @RawRes val resId: Int,
     val enterPhaseMaxProgress: Float = 1.0f,
-    val viewLayoutParamsOverride: LottieAnimationViewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(),
+    val layoutCustomization: (FrameLayout) -> LayoutCustomization,
 ) {
     WALK_WAVE(
         resId = R.raw.ob_1_walk_wave,
         enterPhaseMaxProgress = 0.92f,
-        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
-            marginStart = (-112).toPx(),
-            marginEnd = 16.toPx(),
-            marginBottom = 48.toPx(),
-        ),
+        layoutCustomization = { parentView ->
+            val baseMarginHorizontal = 48.toPx()
+            val targetTopMargin = 16.toPx()
+            val targetBottomMargin = 48.toPx()
+            val containerHeight = parentView.height - targetTopMargin - targetBottomMargin
+            val containerWidth = parentView.width - baseMarginHorizontal * 2
+            val aspectRatioLimit = 6f / 5f
+
+            val targetHeight = containerHeight.coerceAtMost((containerWidth * aspectRatioLimit).toInt())
+            val targetWidth = targetHeight // the animation asset has 1:1 aspect ratio
+
+            // apply negative horizontal margins to stretch the animation view beyond screen width
+            val targetHorizontalMargin = -(targetWidth - containerWidth) / 2
+
+            LayoutCustomization(
+                marginStart = targetHorizontalMargin,
+                marginEnd = targetHorizontalMargin,
+                marginBottom = targetBottomMargin,
+                marginTop = targetTopMargin,
+                gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
+                translationX = -0.15f * targetWidth,
+            )
+        },
     ),
     POPUP(
         resId = R.raw.ob_2_popup,
         enterPhaseMaxProgress = 0.75f,
-        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+        layoutCustomization = LayoutCustomization(
             marginEnd = 16.toPx(),
         ),
     ),
     WING(
         resId = R.raw.ob_3_wing,
         enterPhaseMaxProgress = 0.8f,
-        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+        layoutCustomization = LayoutCustomization(
             gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
         ),
     ),
     POPUP_SMALL(
         resId = R.raw.ob_4_popup,
-        viewLayoutParamsOverride = LottieAnimationViewLayoutParamsOverride(
+        layoutCustomization = LayoutCustomization(
             marginEnd = 16.toPx(),
         ),
     ),
     ;
 
-    data class LottieAnimationViewLayoutParamsOverride(
+    constructor(
+        @RawRes resId: Int,
+        enterPhaseMaxProgress: Float = 1.0f,
+        layoutCustomization: LayoutCustomization = LayoutCustomization(),
+    ) : this(resId, enterPhaseMaxProgress, { _ -> layoutCustomization })
+
+    data class LayoutCustomization(
         val marginStart: Int = 0,
         val marginEnd: Int = 0,
         val marginTop: Int = 0,
         val marginBottom: Int = 0,
         val gravity: Int = Gravity.BOTTOM or Gravity.START,
+        val translationX: Float = 0f,
     )
 
     enum class AnimationPhase { ENTER, EXIT }
