@@ -21,11 +21,11 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.impl.PirRemoteFeatures
-import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.pir.internal.checker.PirWorkHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -37,19 +37,26 @@ class PirDataUpdateObserver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val brokerJsonUpdater: BrokerJsonUpdater,
-    private val subscriptions: Subscriptions,
-    private val pirRemoteFeatures: PirRemoteFeatures,
+    private val pirWorkHandler: PirWorkHandler,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            if (pirRemoteFeatures.pirBeta().isEnabled() && subscriptions.getAccessToken() != null) {
-                logcat { "PIR-update: Attempting to update all broker data" }
-                if (brokerJsonUpdater.update()) {
-                    logcat { "PIR-update: Update successfully completed." }
-                } else {
-                    logcat { "PIR-update: Failed to complete." }
+            // observe when PIR becomes available so we can fetch the broker data or cancel all related work
+            pirWorkHandler
+                .canRunPir()
+                .collectLatest { enabled ->
+                    if (enabled) {
+                        logcat { "PIR-update: Attempting to update all broker data" }
+                        if (brokerJsonUpdater.update()) {
+                            logcat { "PIR-update: Update successfully completed." }
+                        } else {
+                            logcat { "PIR-update: Failed to complete." }
+                        }
+                    } else {
+                        logcat { "PIR-update: PIR not enabled" }
+                        pirWorkHandler.cancelWork()
+                    }
                 }
-            }
         }
     }
 }

@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
+import com.duckduckgo.pir.internal.checker.PirWorkHandler
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
@@ -35,6 +36,7 @@ import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -45,6 +47,9 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var pirWorkHandler: PirWorkHandler
 
     override fun onCreate() {
         super.onCreate()
@@ -66,6 +71,13 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
         startForeground(1, notification)
 
         launch {
+            if (pirWorkHandler.canRunPir().firstOrNull() == false) {
+                logcat { "PIR-OPT-OUT: PIR opt-out not allowed to run!" }
+                pirWorkHandler.cancelWork()
+                stopSelf()
+                return@launch
+            }
+
             val brokers = intent?.getStringExtra(EXTRA_BROKER_TO_OPT_OUT)
 
             val result = if (!brokers.isNullOrEmpty()) {
