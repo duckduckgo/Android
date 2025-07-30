@@ -31,20 +31,20 @@ interface RebrandingDataStore {
 class SharedPreferencesRebrandingDataStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,
 ) : RebrandingDataStore {
-    private val encryptedPreferences: SharedPreferences? by lazy { encryptedPreferences() }
+    private val sharedPreferences: SharedPreferences? by lazy { sharedPreferences() }
 
-    private fun encryptedPreferences(): SharedPreferences? {
+    private fun sharedPreferences(): SharedPreferences? {
         return try {
-            sharedPreferencesProvider.getEncryptedSharedPreferences(FILENAME)
+            sharedPreferencesProvider.getSharedPreferences(FILENAME)
         } catch (e: Exception) {
             null
         }
     }
 
     override var rebrandingBannerShown: Boolean
-        get() = encryptedPreferences?.getBoolean(KEY_REBRANDING_BANNER_SHOWN, false) ?: false
+        get() = sharedPreferences?.getBoolean(KEY_REBRANDING_BANNER_SHOWN, false) ?: false
         set(value) {
-            encryptedPreferences?.edit(commit = true) {
+            sharedPreferences?.edit(commit = true) {
                 putBoolean(KEY_REBRANDING_BANNER_SHOWN, value)
             }
         }
