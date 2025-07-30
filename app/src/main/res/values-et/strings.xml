@@ -890,4 +890,27 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Vii seadistamine lõpule</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Tere!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Kaitsed</b> <i>aktiveeritud!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Tere!<br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Tühjenda oma sirvimistegevus hetkega nupuga <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Proovi ära!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ja %1$d teine üritasid sind siin jälgida. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+        <item quantity="other"><![CDATA[ ja %1$d teist üritasid sind siin jälgida. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ üritas sind siin jälitada. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+        <item quantity="other"><![CDATA[ üritasid sind siin jälitada. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Lisateabe saamiseks vajuta kilbile.️</string>
+
 </resources>
