@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Automaticky vylúčiť aplikácie, ktoré nie sú kompatibilné s VPN sieťami.</string>
     <string name="netpExclusionListLabelAutoExclude">Nekompatibilné s VPN sieťami</string>
     <string name="netpExclusionListAutoExcludeDescription">Niektoré aplikácie, ako sú bankové alebo streamovacie aplikácie, nefungujú dobre s VPN. Ak je toto nastavenie povolené, takéto aplikácie automaticky vylúčime.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN bola odpojená kvôli vypršaniu platnosti predplatného. Predplať si DuckDuckGo na opätovné pripojenie VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Predplať si DuckDuckGo, aby si znova pripojil/a VPN.</string>
 </resources>
