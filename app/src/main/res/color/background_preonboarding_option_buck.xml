@@ -14,9 +14,9 @@
   ~ limitations under the License.
   -->
 
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
+<selector xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:color="@color/buckColorPreonboardingOptionBackgroundSelected" android:state_selected="true" />
-    <item android:color="@color/buckColorPreonboardingOptionBackground" />
+    <item android:color="@color/buckColorPreonboardingOptionBackgroundSelected" android:state_selected="true" tools:ignore="InvalidColorAttribute" />
+    <item android:color="@color/buckColorPreonboardingOptionBackground" tools:ignore="InvalidColorAttribute" />
 
 </selector>

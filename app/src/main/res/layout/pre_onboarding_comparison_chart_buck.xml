@@ -36,7 +36,8 @@
             android:textSize="40sp"
             android:lineSpacingExtra="-10sp"
             tools:text="Protections activated!"
-            android:textColor="@color/buckColorPrimaryText" />
+            android:textColor="@color/buckColorPrimaryText"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/titleInvisible"
@@ -47,7 +48,8 @@
             android:textSize="40sp"
             android:lineSpacingExtra="-10sp"
             android:textColor="@color/buckColorPrimaryText"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     </FrameLayout>
 
@@ -92,7 +94,8 @@
             android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
             app:srcCompat="@drawable/ic_find_search_buck"
-            app:tint="@color/buckColorComparisonChartSearchIcon"/>
+            app:tint="@color/buckColorComparisonChartSearchIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature1"
@@ -103,7 +106,8 @@
             android:includeFontPadding="false"
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem1"
-            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <ImageView
             android:id="@+id/cross1"
@@ -141,7 +145,8 @@
             android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
             app:srcCompat="@drawable/ic_shield_buck"
-            app:tint="@color/buckColorComparisonChartShieldIcon" />
+            app:tint="@color/buckColorComparisonChartShieldIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature2"
@@ -152,7 +157,8 @@
             android:includeFontPadding="false"
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem2"
-            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <ImageView
             android:id="@+id/cross2"
@@ -191,7 +197,8 @@
             android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
             app:srcCompat="@drawable/ic_cookie_blocked_buck"
-            app:tint="@color/buckColorComparisonChartCookieIcon" />
+            app:tint="@color/buckColorComparisonChartCookieIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature3"
@@ -202,7 +209,8 @@
             android:includeFontPadding="false"
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem3"
-            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <ImageView
             android:id="@+id/cross3"
@@ -240,7 +248,8 @@
             android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
             app:srcCompat="@drawable/ic_ads_blocked_buck"
-            app:tint="@color/buckColorComparisonChartBlockIcon" />
+            app:tint="@color/buckColorComparisonChartBlockIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature4"
@@ -251,7 +260,8 @@
             android:includeFontPadding="false"
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem4"
-            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem" />
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <ImageView
             android:id="@+id/cross4"
@@ -290,7 +300,8 @@
             android:layout_height="@dimen/keyline_4"
             android:layout_marginStart="@dimen/keyline_3"
             app:srcCompat="@drawable/ic_fire_buck"
-            app:tint="@color/buckColorComparisonChartFireIcon" />
+            app:tint="@color/buckColorComparisonChartFireIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature5"
@@ -301,7 +312,8 @@
             android:includeFontPadding="false"
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem5"
-            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"/>
+            android:textAppearance="@style/Typography.DuckDuckGo.BuckPreOnboardingComparisonChartItem"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <ImageView
             android:id="@+id/cross5"

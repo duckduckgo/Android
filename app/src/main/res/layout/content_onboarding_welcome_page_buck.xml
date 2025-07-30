@@ -68,7 +68,8 @@
                     android:includeFontPadding="false"
                     android:textColor="@color/buckColorPrimaryText"
                     android:textSize="40sp"
-                    android:lineSpacingExtra="-10sp"/>
+                    android:lineSpacingExtra="-10sp"
+                    tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         </com.duckduckgo.app.onboarding.ui.page.BuckOnboardingDialogView>
 

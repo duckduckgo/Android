@@ -34,7 +34,8 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/pangea_medium"
             android:textSize="24sp"
-            android:textColor="@color/buckColorPrimaryText"/>
+            android:textColor="@color/buckColorPrimaryText"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:layout_width="match_parent"
@@ -42,7 +43,8 @@
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
             android:text="@string/highlightsPreOnboardingAddressBarTitle"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     </FrameLayout>
 
@@ -62,7 +64,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_address_bar_position_top_buck"
-            app:tint="@color/preonboarding_address_bar_position_icon_buck" />
+            app:tint="@color/preonboarding_address_bar_position_icon_buck"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/option1Title"
@@ -76,7 +79,8 @@
             android:textSize="14sp"
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
             app:layout_constraintStart_toEndOf="@id/option1Image"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/option1Body"
@@ -91,7 +95,8 @@
             android:text="@string/highlightsPreOnboardingAddressBarOption1Description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/option1Image"
-            app:layout_constraintTop_toBottomOf="@id/option1Title" />
+            app:layout_constraintTop_toBottomOf="@id/option1Title"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/option1Switch"
@@ -125,7 +130,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_address_bar_position_bottom_buck"
-            app:tint="@color/preonboarding_address_bar_position_icon_buck" />
+            app:tint="@color/preonboarding_address_bar_position_icon_buck"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/option2Title"
@@ -139,7 +145,8 @@
             android:textColor="@color/preonboarding_address_bar_position_text_buck"
             android:text="@string/highlightsPreOnboardingAddressBarOption2Title"
             app:layout_constraintStart_toEndOf="@id/option2Image"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/option2Body"
@@ -154,7 +161,8 @@
             android:text="@string/highlightsPreOnboardingAddressBarOption2Description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/option2Image"
-            app:layout_constraintTop_toBottomOf="@id/option2Title" />
+            app:layout_constraintTop_toBottomOf="@id/option2Title"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/option2Switch"
