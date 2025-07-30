@@ -38,13 +38,6 @@
             app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
     </com.google.android.material.appbar.AppBarLayout>
 
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/testerInfo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        app:primaryText="Tester ID" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
