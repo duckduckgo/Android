@@ -354,7 +354,6 @@ internal class RealPirRepository(
 
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
-            scanResultsDao.deleteAllExtractedProfiles()
             scanResultsDao.deleteAllScanCompletedBroker()
             scanLogDao.deleteAllBrokerScanEvents()
         }
@@ -375,6 +374,7 @@ internal class RealPirRepository(
     override suspend fun deleteAllUserProfilesQueries() {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
+            scanResultsDao.deleteAllExtractedProfiles()
         }
     }
 
@@ -579,7 +579,11 @@ internal class RealPirRepository(
             fullName = this.fullName,
             profileUrl = this.profileUrl,
             identifier = this.identifier,
-            dateAddedInMillis = currentTimeProvider.currentTimeMillis(),
+            dateAddedInMillis = if (this.dateAddedInMillis == 0L) {
+                currentTimeProvider.currentTimeMillis()
+            } else {
+                this.dateAddedInMillis
+            },
             deprecated = this.deprecated,
         )
     }

@@ -56,6 +56,13 @@ interface PirSchedulingRepository {
         extractedProfileId: Long,
     ): OptOutJobRecord?
 
+    suspend fun updateScanJobRecordStatus(
+        newStatus: ScanJobStatus,
+        newLastScanDateMillis: Long,
+        brokerName: String,
+        profileQueryId: Long,
+    )
+
     suspend fun saveScanJobRecord(scanJobRecord: ScanJobRecord)
     suspend fun saveScanJobRecords(scanJobRecords: List<ScanJobRecord>)
     suspend fun saveOptOutJobRecord(optOutJobRecord: OptOutJobRecord)
@@ -163,6 +170,22 @@ class RealPirSchedulingRepository @Inject constructor(
             }.also {
                 jobSchedulingDao.saveScanJobRecords(it)
             }
+        }
+    }
+
+    override suspend fun updateScanJobRecordStatus(
+        newStatus: ScanJobStatus,
+        newLastScanDateMillis: Long,
+        brokerName: String,
+        profileQueryId: Long,
+    ) {
+        withContext(dispatcherProvider.io()) {
+            jobSchedulingDao.updateScanJobRecordStatus(
+                brokerName = brokerName,
+                profileQueryId = profileQueryId,
+                newStatus = newStatus.name,
+                newLastScanDateMillis = newLastScanDateMillis,
+            )
         }
     }
 

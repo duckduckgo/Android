@@ -158,7 +158,7 @@ class RealPirJobsRunner @Inject constructor(
 
         extractedProfiles.forEach {
             if (activeBrokers.contains(it.brokerName) &&
-                pirSchedulingRepository.getValidOptOutJobRecord(it.dbId) != null
+                pirSchedulingRepository.getValidOptOutJobRecord(it.dbId) == null
             ) {
                 toCreate.add(
                     OptOutJobRecord(
