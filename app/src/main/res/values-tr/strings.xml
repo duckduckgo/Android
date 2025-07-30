@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo ayrıca <b>isteğe bağlı ücretli abonelikle</b> kullanılabilen güvenli bir <b>VPN + 2 premium koruma daha</b> sunuyor.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ayrıca <b>isteğe bağlı ücretli abonelikle</b> kullanılabilen güvenli bir <b>VPN + 2 premium koruma daha</b> sunuyor.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
@@ -887,4 +886,11 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo, kişisel bilgilerinin kontrolünü geri almak isteyen herkes için bağımsız bir online koruma şirketidir.\n\nKişisel bilgilerinizi bilgisayar korsanlarından, dolandırıcılardan ve gizliliğinizi ihlal eden şirketlerden korumanın en iyi yolunun, bu bilgilerin toplanmasını tamamen durdurmak olduğuna inanıyoruz. Bu yüzden milyonlarca insan internette arama yapmak ve gezinmek için <annotation type="chart_comparison">Chrome ve diğer tarayıcılar yerine DuckDuckGo\'yu tercih ediyor</annotation>. Yerleşik arama motorumuz Google gibidir ancak aramalarınızı asla izlemez. Reklam izleyici ve çerezleri engelleme gibi tarama korumalarımız, diğer şirketlerin verilerinizi toplamasını önlemeye de yardımcı olur. Ayrıca, tarayıcımız ücretsizdir. Verilerinizi kullanarak değil, <annotation type="privacy_respecting_ads">gizliliğe saygılı arama reklamlarından</annotation> para kazanıyoruz.\n\nBuna ek olarak, tarayıcımıza entegre edilmiş <annotation type="ppro_help_page">DuckDuckGo aboneliği</annotation> sunuyoruz. Aboneler, internetteki etkinliklerinizi güvence altına alan hızlı ve basit bir <annotation type="vpn_help_page">VPN</annotation>, özel yapay zeka sohbet hizmetimiz Duck.ai\'daki gelişmiş yapay zeka modellerine erişim, kişisel bilgilerinizi kişi bulma sitelerinden bulan ve kaldıran ve çalınması durumunda kimliğinizi geri yükleyen bir hizmet ile daha fazla gizlilik koruması elde eder.\n\nVeri koruma için tasarlanmış, veri toplama amacı gütmeyen tarayıcıyla kişisel bilgilerinizin kontrolünü geri alın.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve gelişmiş, özel yapay zeka içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
+    <string name="settingsDuckAiRebranding">AI Özellikleri</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>
