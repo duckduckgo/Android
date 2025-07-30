@@ -58,6 +58,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
@@ -65,6 +66,7 @@ class RealSubscriptions @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
     private val subscriptionsFeature: Lazy<PrivacyProFeature>,
+    private val dispatcherProvider: DispatcherProvider,
 ) : Subscriptions {
     override suspend fun isSignedIn(): Boolean =
         subscriptionsManager.isSignedIn()
@@ -78,10 +80,12 @@ class RealSubscriptions @Inject constructor(
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
         return subscriptionsManager.entitlements.map { list ->
-            if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
-                list.filterNot { entitlement -> entitlement == DuckAiPlus }
-            } else {
-                list
+            withContext(dispatcherProvider.io()) {
+                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                    list.filterNot { entitlement -> entitlement == DuckAiPlus }
+                } else {
+                    list
+                }
             }
         }
     }
@@ -105,10 +109,12 @@ class RealSubscriptions @Inject constructor(
         return subscriptionsManager.getFeatures()
             .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
             .let {
-                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
-                    it.filterNot { feature -> feature == DuckAiPlus }
-                } else {
-                    it
+                withContext(dispatcherProvider.io()) {
+                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                        it.filterNot { feature -> feature == DuckAiPlus }
+                    } else {
+                        it
+                    }
                 }
             }.toSet()
     }

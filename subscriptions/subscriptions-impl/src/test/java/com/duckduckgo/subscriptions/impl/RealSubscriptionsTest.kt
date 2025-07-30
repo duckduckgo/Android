@@ -83,7 +83,13 @@ class RealSubscriptionsTest {
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, globalActivityStarter, pixel, { subscriptionFeature })
+        subscriptions = RealSubscriptions(
+            mockSubscriptionsManager,
+            globalActivityStarter,
+            pixel,
+            { subscriptionFeature },
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @Test
