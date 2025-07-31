@@ -243,8 +243,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             when (currentStage) {
-                NOT_ENROLLED -> ENROLLED
-
                 ENROLLED -> {
                     if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage1) {
                         STAGE_1
