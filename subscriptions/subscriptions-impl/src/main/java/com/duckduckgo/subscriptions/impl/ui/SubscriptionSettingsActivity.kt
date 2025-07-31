@@ -99,26 +99,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             .onEach { renderView(it) }
             .launchIn(lifecycleScope)
 
-        binding.removeDevice.setClickListener {
-            TextAlertDialogBuilder(this)
-                .setTitle(string.removeFromDevice)
-                .setMessage(string.removeFromDeviceDescription)
-                .setPositiveButton(string.removeSubscription, DESTRUCTIVE)
-                .setNegativeButton(string.cancel, GHOST_ALT)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.removeFromDevice()
-                        }
-
-                        override fun onNegativeButtonClicked() {
-                            // NOOP
-                        }
-                    },
-                )
-                .show()
-        }
-
         binding.manageEmail.setOnClickListener {
             viewModel.onEditEmailButtonClicked()
         }
@@ -167,17 +147,21 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderView(viewState: ViewState.Ready) {
         // Privacy Pro Rebranding active
+        val removeFromDeviceMessage: Int
         if (viewState.rebrandingEnabled) {
+            removeFromDeviceMessage = string.removeFromDeviceDescriptionRebranding
             binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
             binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
             binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
             binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
         } else {
+            removeFromDeviceMessage = string.removeFromDeviceDescription
             binding.subscriptionSettingsProductName.setText(string.privacyPro)
             binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
             binding.faq.setPrimaryText(getString(string.privacyProFaq))
             binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
         }
+
         if (viewState.showRebrandingBanner) {
             binding.includePrivacyProRebrandingBanner.root.show()
             binding.includePrivacyProRebrandingBanner.settingsBannerClose.setOnClickListener {
@@ -278,6 +262,26 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.sendFeedback.show()
         } else {
             binding.sendFeedback.gone()
+        }
+
+        binding.removeDevice.setClickListener {
+            TextAlertDialogBuilder(this)
+                .setTitle(string.removeFromDevice)
+                .setMessage(removeFromDeviceMessage)
+                .setPositiveButton(string.removeSubscription, DESTRUCTIVE)
+                .setNegativeButton(string.cancel, GHOST_ALT)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.removeFromDevice()
+                        }
+
+                        override fun onNegativeButtonClicked() {
+                            // NOOP
+                        }
+                    },
+                )
+                .show()
         }
     }
 
