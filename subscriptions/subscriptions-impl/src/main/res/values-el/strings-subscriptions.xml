@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Έχω συνδρομή</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Αποστολή σχολίου</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Συνδρομή DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Η συνδρομή σας στο DuckDuckGo έληξε</string>
+    <string name="privacyProFaqRebranding">Χρειάζεστε βοήθεια με τη συνδρομή σας;</string>
+    <string name="privacyProFaqSecondaryRebranding">Πάρτε απαντήσεις σε συχνές ερωτήσεις ή επικοινωνήστε με την υποστήριξη συνδρομών από τις σελίδες βοήθειας που διαθέτουμε. Η διαθεσιμότητα των λειτουργιών διαφέρει ανά χώρα.</string>
+    <string name="restoreSubscriptionTitleRebranding">Προσθέστε τη συνδρομή σας σε αυτήν τη συσκευή</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Συνδέστε μια διεύθυνση email με τη συνδρομή σας για να την προσθέσετε σε αυτήν τη συσκευή.</string>
+    <string name="activateOnOtherDevicesRebranding">Προσθέστε τη συνδρομή σας σε άλλες συσκευές</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Προσθέστε τη συνδρομή σας στις άλλες συσκευές σας μέσω Google Play ή συνδέοντας μια διεύθυνση email.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Ρυθμίσεις συνδρομής &gt; Έχω συνδρομή.</string>
+    <string name="subscriptionSettingRebrandingMessage">Το Privacy Pro ονομάζεται πλέον απλά Συνδρομή DuckDuckGo</string>
+
 </resources>
