@@ -33,6 +33,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_1
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_2
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_3
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STOPPED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -120,6 +121,12 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         initialValue = false,
     )
 
+    override val showSetAsDefaultMessage: StateFlow<Boolean> = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.stateIn(
+        scope = appCoroutineScope,
+        started = SharingStarted.Lazily,
+        initialValue = false,
+    )
+
     /**
      * Model used to parse remote config setting. All values are integer strings, for example "1" or "20".
      */
@@ -127,12 +134,14 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     data class FeatureSettingsConfigModel(
         val activeDaysUntilStage1: String,
         val activeDaysUntilStage2: String,
+        val activeDaysUntilStage3: String,
         val activeDaysUntilStop: String,
     )
 
     private data class FeatureSettings(
         val activeDaysUntilStage1: Int,
         val activeDaysUntilStage2: Int,
+        val activeDaysUntilStage3: Int,
         val activeDaysUntilStop: Int,
     )
 
@@ -260,7 +269,16 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                 }
 
                 STAGE_2 -> {
-                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStop) {
+                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage3) {
+                        STAGE_3
+                    } else {
+                        null
+                    }
+                }
+
+                STAGE_3 -> {
+                    val stage3Finished = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == false
+                    if (stage3Finished) {
                         STOPPED
                     } else {
                         null
@@ -282,6 +300,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
             defaultBrowserPromptsDataStore.storeShowSetAsDefaultPopupMenuItemState(action.showSetAsDefaultPopupMenuItem)
             defaultBrowserPromptsDataStore.storeHighlightPopupMenuState(action.highlightPopupMenu)
+            defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(action.showMessage)
         }
     }
 
@@ -407,6 +426,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private fun FeatureSettingsConfigModel.toFeatureSettings() = FeatureSettings(
         activeDaysUntilStage1 = activeDaysUntilStage1.toInt(),
         activeDaysUntilStage2 = activeDaysUntilStage2.toInt(),
+        activeDaysUntilStage3 = activeDaysUntilStage3.toInt(),
         activeDaysUntilStop = activeDaysUntilStop.toInt(),
     )
 

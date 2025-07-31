@@ -36,16 +36,19 @@ interface DefaultBrowserPromptsDataStore {
     val experimentStage: Flow<ExperimentStage>
     val showSetAsDefaultPopupMenuItem: Flow<Boolean>
     val highlightPopupMenu: Flow<Boolean>
+    val showSetAsDefaultMessage: Flow<Boolean>
 
     suspend fun storeExperimentStage(stage: ExperimentStage)
     suspend fun storeShowSetAsDefaultPopupMenuItemState(show: Boolean)
     suspend fun storeHighlightPopupMenuState(highlight: Boolean)
+    suspend fun storeShowSetAsDefaultMessageState(show: Boolean)
 
     enum class ExperimentStage {
         NOT_ENROLLED,
         ENROLLED,
         STAGE_1,
         STAGE_2,
+        STAGE_3,
         STOPPED,
         CONVERTED,
     }
@@ -60,6 +63,7 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
         private const val PREF_KEY_EXPERIMENT_STAGE_ID = "additional_default_browser_prompts_experiment_stage_id"
         private const val PREF_KEY_SHOW_OVERFLOW_MENU_ITEM = "additional_default_browser_prompts_show_overflow_menu_item"
         private const val PREF_KEY_HIGHLIGHT_OVERFLOW_MENU_ICON = "additional_default_browser_prompts_highlight_overflow_menu_icon"
+        private const val PREF_KEY_SHOW_SET_AS_DEFAULT_MESSAGE = "additional_default_browser_prompts_show_set_as_default_message"
     }
 
     override val experimentStage: Flow<ExperimentStage> = store.data.map { preferences ->
@@ -72,6 +76,10 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
 
     override val highlightPopupMenu: Flow<Boolean> = store.data.map { preferences ->
         preferences[booleanPreferencesKey(PREF_KEY_HIGHLIGHT_OVERFLOW_MENU_ICON)] ?: false
+    }
+
+    override val showSetAsDefaultMessage: Flow<Boolean> = store.data.map { preferences ->
+        preferences[booleanPreferencesKey(PREF_KEY_SHOW_SET_AS_DEFAULT_MESSAGE)] ?: false
     }
 
     override suspend fun storeExperimentStage(stage: ExperimentStage) {
@@ -94,6 +102,14 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
         withContext(dispatchers.io()) {
             store.edit { preferences ->
                 preferences[booleanPreferencesKey(PREF_KEY_HIGHLIGHT_OVERFLOW_MENU_ICON)] = highlight
+            }
+        }
+    }
+
+    override suspend fun storeShowSetAsDefaultMessageState(show: Boolean) {
+        withContext(dispatchers.io()) {
+            store.edit { preferences ->
+                preferences[booleanPreferencesKey(PREF_KEY_SHOW_SET_AS_DEFAULT_MESSAGE)] = show
             }
         }
     }

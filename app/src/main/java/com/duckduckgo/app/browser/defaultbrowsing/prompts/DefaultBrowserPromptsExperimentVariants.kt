@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_1
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_2
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_3
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STOPPED
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -31,12 +32,14 @@ data class DefaultBrowserPromptsExperimentStageAction(
     val showMessageDialog: Boolean,
     val showSetAsDefaultPopupMenuItem: Boolean,
     val highlightPopupMenu: Boolean,
+    val showMessage: Boolean,
 ) {
     companion object {
         val disableAll = DefaultBrowserPromptsExperimentStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
+            showMessage = false,
         )
     }
 }
@@ -58,12 +61,21 @@ class DefaultBrowserPromptsExperimentStageEvaluatorImpl @Inject constructor() : 
                 showMessageDialog = true,
                 showSetAsDefaultPopupMenuItem = true,
                 highlightPopupMenu = true,
+                showMessage = false,
             )
 
             STAGE_2 -> DefaultBrowserPromptsExperimentStageAction(
                 showMessageDialog = true,
                 showSetAsDefaultPopupMenuItem = true,
                 highlightPopupMenu = true,
+                showMessage = false,
+            )
+
+            STAGE_3 -> DefaultBrowserPromptsExperimentStageAction(
+                showMessageDialog = false,
+                showSetAsDefaultPopupMenuItem = false,
+                highlightPopupMenu = false,
+                showMessage = true,
             )
 
             STOPPED -> DefaultBrowserPromptsExperimentStageAction.disableAll
