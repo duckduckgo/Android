@@ -115,6 +115,7 @@ class RealPirScan @Inject constructor(
         onJobStarted()
 
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
+        emitScanStartPixel(runType)
 
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
