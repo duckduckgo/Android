@@ -82,7 +82,6 @@ class RealPirOptOutTest {
     private val testBrokerName2 = "test-broker-2"
     private val testScript = "test-script-content"
     private val testStepsJson = """{"stepType":"optOut","actions":[]}"""
-    private val testStepsJson2 = """{"stepType":"optOut","actions":[]}"""
 
     private val testProfileQuery = ProfileQuery(
         id = 123L,
@@ -127,23 +126,6 @@ class RealPirOptOutTest {
         fullName = "John Doe",
         profileUrl = "https://example.com/profile",
         identifier = "id123",
-    )
-
-    private val testExtractedProfile2 = ExtractedProfile(
-        dbId = 999L,
-        profileQueryId = testProfileQuery2.id,
-        brokerName = testBrokerName2,
-        name = "Jane Smith",
-        alternativeNames = emptyList(),
-        age = "38",
-        addresses = emptyList(),
-        phoneNumbers = emptyList(),
-        relatives = emptyList(),
-        reportId = "report456",
-        email = "jane@example.com",
-        fullName = "Jane Smith",
-        profileUrl = "https://example.com/profile2",
-        identifier = "id456",
     )
 
     private val testOptOutJobRecord = OptOutJobRecord(

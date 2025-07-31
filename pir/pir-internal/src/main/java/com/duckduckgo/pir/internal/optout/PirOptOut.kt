@@ -132,11 +132,55 @@ class RealPirOptOut @Inject constructor(
             runners.clear()
         }
 
+        val processedJobRecords = processJobRecords(jobRecords)
+
+        if (processedJobRecords.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
+            completeOptOut()
+            return@withContext Result.success(Unit)
+        }
+
+        val script = pirCssScriptLoader.getScript()
+        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
+
+        // Initiate runners
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, OPTOUT))
+        }
+
+        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
+
+        logcat { "PIR-OPT-OUT: Total parts ${jobRecordsParts.size}" }
+
+        jobRecordsParts.mapIndexed { index, partSteps ->
+            logcat { "PIR-OPT-OUT: Record part [$index] -> ${partSteps.size}" }
+            async {
+                partSteps.map { (profileQuery, step) ->
+                    logcat {
+                        "PIR-OPT-OUT: Start opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
+                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                    }
+                    runners[index].start(profileQuery, listOf(step))
+                    runners[index].stop()
+                    logcat {
+                        "PIR-OPT-OUT: Finish opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
+                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                    }
+                }
+            }
+        }.awaitAll()
+
+        completeOptOut()
+        return@withContext Result.success(Unit)
+    }
+
+    private suspend fun processJobRecords(jobRecords: List<OptOutJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
         val allUserProfiles = obtainProfiles().associateBy { it.id }
         if (allUserProfiles.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid user profile available. Nothing to opt-out." }
-            completeOptOut()
-            return@withContext Result.success(Unit)
+            return emptyList()
         }
 
         // Load opt-out steps jsons for each broker
@@ -146,8 +190,7 @@ class RealPirOptOut @Inject constructor(
 
         if (brokerOptOutStepsJsons.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid broker's with opt-out steps. Nothing to opt-out." }
-            completeOptOut()
-            return@withContext Result.success(Unit)
+            return emptyList()
         }
 
         val temporaryCache = mutableMapOf<String, List<BrokerStep>>()
@@ -191,46 +234,13 @@ class RealPirOptOut @Inject constructor(
         }
 
         temporaryCache.clear()
-        logcat { "PIR-OPT-OUT: Processed job records resulted to ${processedJobRecords.size}" }
+        logcat { "PIR-OPT-OUT: Total processed records ${processedJobRecords.size}" }
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
-            completeOptOut()
-            return@withContext Result.success(Unit)
+            return emptyList()
         }
-
-        val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
-
-        logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
-
-        // Initiate runners
-        repeat(maxWebViewCount) {
-            runners.add(pirActionsRunnerFactory.create(context, script, OPTOUT))
-        }
-
-        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
-
-        jobRecordsParts.mapIndexed { index, partSteps ->
-            logcat { "PIR-OPT-OUT: Record part [$index] -> ${partSteps.size}" }
-            async {
-                partSteps.map { (profileQuery, step) ->
-                    logcat {
-                        "PIR-OPT-OUT: Start opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.brokerName} profile=${profileQuery.id}"
-                    }
-                    runners[index].start(profileQuery, listOf(step))
-                    runners[index].stop()
-                    logcat {
-                        "PIR-OPT-OUT: Finish opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
-                            "broker=${step.brokerName} profile=${profileQuery.id}"
-                    }
-                }
-            }
-        }.awaitAll()
-
-        completeOptOut()
-        return@withContext Result.success(Unit)
+        return processedJobRecords
     }
 
     private suspend fun completeOptOut() {
