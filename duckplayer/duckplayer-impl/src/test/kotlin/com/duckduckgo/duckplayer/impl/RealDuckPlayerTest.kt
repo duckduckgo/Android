@@ -783,6 +783,27 @@ class RealDuckPlayerTest {
     }
 
     @Test
+    fun whenIsYouTubeNoCookieEmbedUriForCurrentDuckPlayerVideoAndAddCustomEmbedRefererAndRequestEmbedReturnsNull_thenReturnNull() = runTest {
+        val mockRequest: WebResourceRequest = mock()
+        whenever(mockRequest.isForMainFrame).thenReturn(true)
+        val headers = mapOf("header" to "value", "referer" to "value")
+        val expectedHeaders = headers.plus("referer" to "http://android.mobile.duckduckgo.com")
+        whenever(mockRequest.requestHeaders).thenReturn(headers)
+        val url: Uri = Uri.parse("https://www.youtube-nocookie.com/embed/12345")
+        whenever(mockRequest.url).thenReturn(url)
+        duckPlayerFeature.addCustomEmbedReferer().setRawStoredState(State(true))
+        val webView: WebView = mock()
+        whenever(webView.url).thenReturn("https://www.youtube-nocookie.com?videoID=12345")
+        whenever(mockDuckPlayerFeatureRepository.getUserPreferences()).thenReturn(UserPreferences(true, AlwaysAsk))
+        whenever(mockDuckPlayerFeatureRepository.requestEmbed(url.toString(), expectedHeaders)).thenReturn(null)
+
+        val result = testee.intercept(mockRequest, url, webView)
+
+        verify(mockDuckPlayerFeatureRepository).requestEmbed(url.toString(), expectedHeaders)
+        assertNull(result)
+    }
+
+    @Test
     fun whenIsYouTubeNoCookieEmbedUriForCurrentDuckPlayerVideoAndAddCustomEmbedRefererDisabled_thenReturnNull() = runTest {
         val mockRequest: WebResourceRequest = mock()
         whenever(mockRequest.isForMainFrame).thenReturn(true)

@@ -66,7 +66,6 @@ import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
-import java.io.IOException
 import java.io.InputStream
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -326,10 +325,8 @@ class RealDuckPlayer @Inject constructor(
             } else if (isSimulatedYoutubeNoCookie(url)) {
                 return processSimulatedYouTubeNoCookieUri(url, webView)
             } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
-                return try {
-                    WebResourceResponse("text/html", "UTF-8", getEmbedWithReferer(request))
-                } catch (e: IOException) {
-                    null
+                return getEmbedWithReferer(request)?.let { inputStream ->
+                    WebResourceResponse("text/html", "UTF-8", inputStream)
                 }
             }
         }
