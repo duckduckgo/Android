@@ -28,13 +28,13 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MENU
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.UNKNOWN
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.CONVERTED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_1
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_2
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_3
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STOPPED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.CONVERTED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
@@ -99,7 +99,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val experimentAppUsageRepository: ExperimentAppUsageRepository,
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
-    private val stageEvaluator: DefaultBrowserPromptsExperimentStageEvaluator,
+    private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
     private val pixel: Pixel,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
@@ -199,7 +199,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return
         }
 
-        val isStopped = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == STOPPED
+        val isStopped = defaultBrowserPromptsDataStore.stage.firstOrNull() == STOPPED
         logcat { "evaluate: has stopped = $isStopped" }
         if (isStopped) {
             return
@@ -218,13 +218,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
 
-        val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == CONVERTED
+        val hasConvertedBefore = defaultBrowserPromptsDataStore.stage.firstOrNull() == CONVERTED
         logcat { "evaluate: has converted before = $hasConvertedBefore" }
         if (hasConvertedBefore) {
             return
         }
 
-        val currentStage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull()
+        val currentStage = defaultBrowserPromptsDataStore.stage.firstOrNull()
         logcat { "evaluate: current stage = $currentStage" }
         val newStage = if (isDefaultBrowser) {
             logcat { "evaluate: new stage is CONVERTED" }
@@ -399,7 +399,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private fun fireConversionPixel(trigger: SetAsDefaultActionTrigger) = appCoroutineScope.launch {
-        val stage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull().toString().lowercase()
+        val stage = defaultBrowserPromptsDataStore.stage.firstOrNull().toString().lowercase()
         val triggerValue = trigger.toString().lowercase()
         logcat { "fireConversionPixel: pixelName = ${AppPixelName.SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK} - stage = $stage - trigger = $triggerValue" }
         pixel.fire(
@@ -412,7 +412,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private fun fireInteractionPixel(pixelName: AppPixelName) = appCoroutineScope.launch {
-        val stage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull().toString().lowercase()
+        val stage = defaultBrowserPromptsDataStore.stage.firstOrNull().toString().lowercase()
         logcat { "fireInteractionPixel pixelName = $pixelName - stage = $stage" }
         pixel.fire(
             pixel = pixelName,

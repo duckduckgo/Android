@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.PIXEL_PARAM_KEY_STAGE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.FeatureSettingsConfigModel
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -96,7 +96,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
     @Mock private lateinit var userStageStoreMock: UserStageStore
 
-    @Mock private lateinit var stageEvaluatorMock: DefaultBrowserPromptsExperimentStageEvaluator
+    @Mock private lateinit var stageEvaluatorMock: DefaultBrowserPromptsFlowStageEvaluator
 
     @Mock private lateinit var moshiMock: Moshi
 
@@ -290,7 +290,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(ExperimentStage.NOT_ENROLLED, dataStoreMock.experimentStage.first())
+        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -302,7 +302,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(ExperimentStage.NOT_ENROLLED, dataStoreMock.experimentStage.first())
+        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -314,7 +314,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(ExperimentStage.NOT_ENROLLED, dataStoreMock.experimentStage.first())
+        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -325,8 +325,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, atMostOnce()).storeExperimentStage(ExperimentStage.CONVERTED)
-        assertEquals(ExperimentStage.CONVERTED, dataStoreMock.experimentStage.first())
+        verify(dataStoreMock, atMostOnce()).storeExperimentStage(Stage.CONVERTED)
+        assertEquals(Stage.CONVERTED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -341,18 +341,18 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStop = 5,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.ENROLLED)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.ENROLLED)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.ENROLLED)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.ENROLLED)
+        verify(dataStoreMock).storeExperimentStage(Stage.ENROLLED)
+        verify(stageEvaluatorMock).evaluate(Stage.ENROLLED)
     }
 
     @Test
@@ -367,31 +367,31 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStop = 5,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.ENROLLED)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.ENROLLED)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
         // verify not enrolled because user is onboarding
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(ExperimentStage.NOT_ENROLLED, dataStoreMock.experimentStage.first())
+        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
 
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         fakeUserAppStageFlow.emit(AppStage.ESTABLISHED)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.ENROLLED)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.ENROLLED)
+        verify(dataStoreMock).storeExperimentStage(Stage.ENROLLED)
+        verify(stageEvaluatorMock).evaluate(Stage.ENROLLED)
     }
 
     @Test
     fun `evaluate - if enrolled, browser not set as default, and not enough active days until stage 1, then do nothing`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.ENROLLED,
+            initialStage = Stage.ENROLLED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -417,7 +417,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if enrolled, browser not set as default, and enough active days until stage 1, then move to stage 1`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.ENROLLED,
+            initialStage = Stage.ENROLLED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -431,24 +431,24 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStop = 5,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(1))
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.STAGE_1)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STAGE_1)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.STAGE_1)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.STAGE_1)
+        verify(dataStoreMock).storeExperimentStage(Stage.STAGE_1)
+        verify(stageEvaluatorMock).evaluate(Stage.STAGE_1)
     }
 
     @Test
     fun `evaluate - if enrolled, browser not set as default, and not enough active days until stage 2, then do nothing`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -474,7 +474,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if enrolled, browser not set as default, and enough active days until stage 2, then move to stage 2`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -488,24 +488,24 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStop = 5,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.STAGE_2)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.STAGE_2)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.STAGE_2)
+        verify(dataStoreMock).storeExperimentStage(Stage.STAGE_2)
+        verify(stageEvaluatorMock).evaluate(Stage.STAGE_2)
     }
 
     @Test
     fun `evaluate - if enrolled, browser not set as default, and not enough active days until stop, then do nothing`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_3,
+            initialStage = Stage.STAGE_3,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -529,7 +529,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if enrolled, browser not set as default, and enough active days until stop, then move to stopped`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_3,
+            initialStage = Stage.STAGE_3,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -543,71 +543,71 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStop = 5,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.STOPPED)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STOPPED)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.STOPPED)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.STOPPED)
+        verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
+        verify(stageEvaluatorMock).evaluate(Stage.STOPPED)
     }
 
     @Test
     fun `evaluate - if stage 1 and browser set as default, then convert`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.CONVERTED)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.CONVERTED)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.CONVERTED)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.CONVERTED)
+        verify(dataStoreMock).storeExperimentStage(Stage.CONVERTED)
+        verify(stageEvaluatorMock).evaluate(Stage.CONVERTED)
     }
 
     @Test
     fun `evaluate - if stage 2 and browser set as default, then convert`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_2,
+            initialStage = Stage.STAGE_2,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.CONVERTED)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.CONVERTED)).thenReturn(action)
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(ExperimentStage.CONVERTED)
-        verify(stageEvaluatorMock).evaluate(ExperimentStage.CONVERTED)
+        verify(dataStoreMock).storeExperimentStage(Stage.CONVERTED)
+        verify(stageEvaluatorMock).evaluate(Stage.CONVERTED)
     }
 
     @Test
     fun `evaluate - if stopped and browser set as default, then don't convert`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STOPPED,
+            initialStage = Stage.STOPPED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -624,7 +624,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if converted and browser set as default, then don't convert again`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.CONVERTED,
+            initialStage = Stage.CONVERTED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -641,7 +641,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if stage changes and show dialog action produced, then propagate it`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.ENROLLED,
+            initialStage = Stage.ENROLLED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -654,14 +654,14 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
             showMessage = false,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(1))
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.STAGE_1)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STAGE_1)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
         val command = testee.commands.first()
@@ -672,7 +672,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if stage changes and show menu item action produced, then propagate it`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -685,14 +685,14 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = true,
             highlightPopupMenu = false,
             showMessage = false,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.STAGE_2)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
         val result = testee.showSetAsDefaultPopupMenuItem.first()
@@ -704,7 +704,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if stage changes and highlight menu action produced, then propagate it`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -717,14 +717,14 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        val action = DefaultBrowserPromptsExperimentStageAction(
+        val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = true,
             showMessage = false,
         )
         whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
-        whenever(stageEvaluatorMock.evaluate(ExperimentStage.STAGE_2)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
         val result = testee.highlightPopupMenu.first()
@@ -736,7 +736,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if changing stage but evaluator for a cohort not found, then abort and clean up`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -764,7 +764,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -781,7 +781,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -798,7 +798,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -815,7 +815,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -832,7 +832,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
         val dataStoreMock = createDataStoreFake(
-            initialExperimentStage = ExperimentStage.STAGE_1,
+            initialStage = Stage.STAGE_1,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -863,7 +863,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         experimentAppUsageRepository: ExperimentAppUsageRepository = experimentAppUsageRepositoryMock,
         userStageStore: UserStageStore = userStageStoreMock,
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
-        experimentStageEvaluator: DefaultBrowserPromptsExperimentStageEvaluator = stageEvaluatorMock,
+        experimentStageEvaluator: DefaultBrowserPromptsFlowStageEvaluator = stageEvaluatorMock,
         pixel: Pixel = pixelMock,
         moshi: Moshi = moshiMock,
     ) = AdditionalDefaultBrowserPromptsImpl(
@@ -882,13 +882,13 @@ class AdditionalDefaultBrowserPromptsImplTest {
     )
 
     private fun createDataStoreFake(
-        initialExperimentStage: ExperimentStage = ExperimentStage.NOT_ENROLLED,
+        initialStage: Stage = Stage.NOT_ENROLLED,
         initialShowPopupMenuItem: Boolean = false,
         initialHighlightPopupMenuIcon: Boolean = false,
         initialShowSetAsDefaultMessage: Boolean = false,
     ) = spy(
         DefaultBrowserPromptsDataStoreMock(
-            initialExperimentStage,
+            initialStage,
             initialShowPopupMenuItem,
             initialHighlightPopupMenuIcon,
             initialShowSetAsDefaultMessage,
@@ -913,14 +913,14 @@ class AdditionalDefaultBrowserPromptsImplTest {
 }
 
 class DefaultBrowserPromptsDataStoreMock(
-    initialExperimentStage: ExperimentStage,
+    initialStage: Stage,
     initialShowPopupMenuItem: Boolean,
     initialHighlightPopupMenuIcon: Boolean,
     initialShowSetAsDefaultMessage: Boolean,
 ) : DefaultBrowserPromptsDataStore {
 
-    private val _experimentStage = MutableStateFlow(initialExperimentStage)
-    override val experimentStage: Flow<ExperimentStage> = _experimentStage.asStateFlow()
+    private val _experimentStage = MutableStateFlow(initialStage)
+    override val stage: Flow<Stage> = _experimentStage.asStateFlow()
 
     private val _showPopupMenuItem = MutableStateFlow(initialShowPopupMenuItem)
     override val showSetAsDefaultPopupMenuItem: Flow<Boolean> = _showPopupMenuItem.asStateFlow()
@@ -931,7 +931,7 @@ class DefaultBrowserPromptsDataStoreMock(
     private val _showSetAsDefaultMessage = MutableStateFlow(initialShowSetAsDefaultMessage)
     override val showSetAsDefaultMessage: Flow<Boolean> = _showSetAsDefaultMessage.asStateFlow()
 
-    override suspend fun storeExperimentStage(stage: ExperimentStage) {
+    override suspend fun storeExperimentStage(stage: Stage) {
         _experimentStage.value = stage
     }
 
