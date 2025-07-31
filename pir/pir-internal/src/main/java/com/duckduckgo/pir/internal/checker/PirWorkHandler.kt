@@ -74,12 +74,12 @@ class RealPirWorkHandler @Inject constructor(
                 // User could have a valid subscription but is not entitled to PIR,
                 // so we have to check both
                 subscriptions.getEntitlementStatus()
-                    .map { entitledProducts -> entitledProducts.contains(PIR) }
-                    .distinctUntilChanged()
-                    .map { hasValidEntitlement ->
+                    .map { entitledProducts ->
+                        val hasValidEntitlement = entitledProducts.contains(PIR)
                         val subscriptionStatus = subscriptions.getSubscriptionStatus()
                         isPirEnabled(hasValidEntitlement, subscriptionStatus)
                     }
+                    .distinctUntilChanged()
             } else {
                 flowOf(false)
             }
