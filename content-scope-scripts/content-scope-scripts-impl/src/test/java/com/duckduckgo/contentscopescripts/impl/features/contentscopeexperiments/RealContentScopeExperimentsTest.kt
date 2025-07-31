@@ -20,7 +20,6 @@ class RealContentScopeExperimentsTest {
     private val mockFeatureTogglesInventory: FeatureTogglesInventory = FakeFeatureTogglesInventory(fakeContentScopeExperimentsFeature)
 
     @get:Rule
-    @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
     private val testee = RealContentScopeExperiments(
