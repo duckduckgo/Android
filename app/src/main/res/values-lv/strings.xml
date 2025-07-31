@@ -813,8 +813,7 @@
     <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
     <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ak, pirms es aizmirsu...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ir arī iebūvēts <b>VPN</b>!<br/><br/>Aktivizējiet to, izmantojot <b>maksas Privacy Pro abonementu.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
@@ -903,4 +902,11 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo ir neatkarīgs tiešsaistes aizsardzības uzņēmums ikvienam, kurš vēlas atgūt kontroli pār savu personisko informāciju.\n\nMēs uzskatām, ka labākais veids, kā aizsargāt savu personisko informāciju no hakeriem, krāpniekiem un privātumu apdraudošiem uzņēmumiem, ir to neievākt vispār. Tāpēc miljoniem cilvēku <annotation type="chart_comparison">izvēlas DuckDuckGo, nevis Chrome un citas pārlūkprogrammas</annotation> meklēšanai un pārlūkošanai tiešsaistē. Mūsu iebūvētā meklētājprogramma ir līdzīga Google, taču tā neizseko jūsu meklēšanas vaicājumus. Mūsu pārlūkošanas aizsardzība, piemēram, reklāmu izsekotāju bloķēšana un sīkfailu bloķēšana neļauj citiem uzņēmumiem ievākt tavus datus. Turklāt mūsu pārlūkprogramma ir bez maksas — mēs pelnām ar <annotation type="privacy_respecting_ads">meklēšanas laikā rādītām reklāmām, kas ievēro privātumu</annotation>, nevis izmantojot tavus datus.Turklāt mēs piedāvājam arī <annotation type="ppro_help_page">DuckDuckGo abonementu</annotation>, kas ir integrēts mūsu pārlūkprogrammā. Abonenti saņem vēl lielāku privātuma aizsardzību ar ātru un vienkāršu <annotation type="vpn_help_page">VPN</annotation>, kas palīdz pasargāt tavas darbības tiešsaistē, piekļuvi uzlabotiem MI modeļiem mūsu privātajā MI tērzēšanas pakalpojumā Duck.ai, pakalpojumu, kas atrod un izdzēš tavu personisko informāciju no cilvēku meklētāju vietnēm, un pakalpojumu, kas atjauno tavu identitāti, ja tā tiek nozagta.\n\nAtgūsti kontroli pār savu personisko informāciju ar pārlūkprogrammu, kas paredzēta datu aizsardzībai, nevis datu apkopošanai.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un uzlabotu, privātu mākslīgo intelektu.]]></string>
+    <string name="settingsDuckAiRebranding">Mākslīgā intelekta funkcijas</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>
