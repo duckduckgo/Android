@@ -3147,7 +3147,7 @@ class BrowserTabFragment :
     private fun hideDaxBubbleCta() {
         if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
             newBrowserTab.newTabLayout.setBackgroundColor(
-                    requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
+                requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
         } else {
             newBrowserTab.browserBackground.setImageResource(0)
@@ -4449,7 +4449,7 @@ class BrowserTabFragment :
                         configuration.hideBBEndCta(
                             onAnimationEnd = {
                                 viewModel.onUserClickCtaOkButton(configuration)
-                            }
+                            },
                         )
                     } else {
                         viewModel.onUserClickCtaOkButton(configuration)

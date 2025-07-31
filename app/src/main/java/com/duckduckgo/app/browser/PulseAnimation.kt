@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(
     private val lifecycleOwner: LifecycleOwner,
-    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
 ) : DefaultLifecycleObserver {
 
     private var pulseAnimation: AnimatorSet = AnimatorSet()

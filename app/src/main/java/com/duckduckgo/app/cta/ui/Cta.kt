@@ -62,12 +62,12 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.button.MaterialButton
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import com.duckduckgo.mobile.android.R as CommonR
 
 interface ViewCta {
     fun showCta(
@@ -1710,4 +1710,3 @@ fun String.getStringForOmnibarPosition(position: OmnibarPosition): String {
 private fun View.fadeIn(duration: Duration = 500.milliseconds): ViewPropertyAnimator {
     return animate().alpha(1f).setDuration(duration.inWholeMilliseconds)
 }
-

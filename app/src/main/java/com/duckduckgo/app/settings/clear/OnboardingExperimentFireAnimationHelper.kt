@@ -19,7 +19,6 @@ package com.duckduckgo.app.settings.clear
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import javax.inject.Inject
-import kotlin.io.path.Path
 
 class OnboardingExperimentFireAnimationHelper @Inject constructor(
     private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,

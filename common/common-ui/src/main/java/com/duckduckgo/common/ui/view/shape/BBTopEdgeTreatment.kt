@@ -39,24 +39,30 @@ class BBTopEdgeTreatment(
 
         shapePath.lineTo(
             0f * scaleFactor,
-            0f * scaleFactor
+            0f * scaleFactor,
         )
 
         shapePath.cubicToPoint(
-            21.2893f * scaleFactor,  0f          * scaleFactor,
-            11.5702f * scaleFactor, -24f         * scaleFactor,
-            11.5702f * scaleFactor, -24f         * scaleFactor
+            21.2893f * scaleFactor,
+            0f * scaleFactor,
+            11.5702f * scaleFactor,
+            -24f * scaleFactor,
+            11.5702f * scaleFactor,
+            -24f * scaleFactor,
         )
 
         shapePath.cubicToPoint(
-            11.5702f * scaleFactor, -24f         * scaleFactor,
-            38.4132f * scaleFactor, -22.6063f    * scaleFactor,
-            56f       * scaleFactor,  0f         * scaleFactor
+            11.5702f * scaleFactor,
+            -24f * scaleFactor,
+            38.4132f * scaleFactor,
+            -22.6063f * scaleFactor,
+            56f * scaleFactor,
+            0f * scaleFactor,
         )
 
         shapePath.lineTo(
             0f * scaleFactor,
-            0f * scaleFactor
+            0f * scaleFactor,
         )
     }
 
@@ -64,4 +70,3 @@ class BBTopEdgeTreatment(
         const val ORIGINAL_TOP_ARROW_HEIGHT_DP = 24
     }
 }
-
