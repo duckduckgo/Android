@@ -299,7 +299,8 @@
             style="@style/Widget.DuckDuckGo.BBButton.TextButton.Primary"
             android:text="Primary BB"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <Space
             android:layout_width="match_parent"
