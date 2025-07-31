@@ -829,8 +829,7 @@
     <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gotovo!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, prije nego zaboravim...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo također ima ugrađeni <b>VPN</b>!<br/><br/>Aktiviraj ga uz <b>plaćenu pretplatu na Privacy Pro.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo također ima siguran <b>VPN + još 2 vrhunske zaštite</b>, dostupno uz <b>neobaveznu plaćenu pretplatu</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo također ima siguran <b>VPN + još 2 vrhunske zaštite</b>, dostupno uz <b>neobaveznu plaćenu pretplatu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Saznajte više</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Isprobaj besplatno!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskoči</string>
@@ -948,5 +947,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Dodirni štit za više informacija.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo je neovisna tvrtka za zaštitu privatnosti na internetu za svakoga tko želi preuzeti kontrolu nad svojim osobnim podacima.\n\nMi vjerujemo da je najbolji način zaštite tvojih osobnih podataka od hakera, prevaranata i tvrtki koje narušavaju privatnost spriječiti prikupljanje takvih podataka. Zato milijuni ljudi <annotation type="chart_comparison">biraju DuckDuckGo umjesto Chromea i drugih preglednika</annotation> za pretraživanje i pregledavanje interneta. Naša ugrađena tražilica je poput Googlea, ali nikad ne prati tvoja pretraživanja. Uz to, naša zaštita pri pregledavanju, poput blokiranja praćenja oglasa i blokiranja kolačića, pomaže spriječiti druge tvrtke da prikupljaju tvoje podatke. Napominjemo i da je naš preglednik besplatan — mi zarađujemo od <annotation type="privacy_respecting_ads">oglasa koji poštuju privatnost u pretraživaču</annotation>, a ne iskorištavanjem tvojih podataka.Osim toga, nudimo i <annotation type="ppro_help_page">DuckDuckGo pretplatu</annotation> integriranu u naš preglednik. Pretplatnici dobivaju još veću zaštitu privatnosti outem brzog i jednostavnog <annotation type="vpn_help_page">VPN-a</annotation> koji pomaže osigurati tvoju online aktivnost, pristup naprednim modelima umjetne inteligencije u našoj privatnoj usluzi razgovora s umjetnom inteligencijom Duck.ai, uslugu koja pronalazi i uklanja tvoje osobne podatke s mrežnih lokacija za pronalaženje ljudi te uslugu koja vraća tvoj identitet u slučaju krađe.\n\nPreuzmi kontrolu nad svojim osobnim podacima uz preglednik dizajniran za zaštitu, a ne za prikupljanje podataka.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo također nudi <b>izbornu plaćenu pretplatu</b>, sa sigurnim <b>VPN-om</b> i naprednom, privatnom umjetnom inteligencijom.]]></string>
+    <string name="settingsDuckAiRebranding">AI značajke</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>
