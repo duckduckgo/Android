@@ -813,8 +813,7 @@
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
@@ -930,5 +929,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Atinge scutul pentru mai multe informații.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo este o companie independentă din domeniul protecției online care se adresează oricărei persoane ce dorește să recâștige controlul asupra informațiilor sale personale.\n\nCredem că cel mai bun mod de a-ți proteja datele cu caracter personal împotriva hackerilor, a escrocilor și a companiilor care încalcă viața privată este să împiedici colectarea lor. De aceea, milioane de oameni <annotation type="chart_comparison">aleg DuckDuckGo în locul Chrome și al altor browsere</annotation> pentru a căuta și naviga online. Motorul nostru de căutare încorporat este asemănător cu Google, dar nu îți urmărește niciodată căutările. Iar mecanismele noastre de protecție pentru navigare, cum ar fi blocarea tehnologiilor de urmărire a reclamelor și blocarea modulelor cookie, contribuie la împiedicarea colectării datelor tale de alte companii. De asemenea, browserul nostru este gratuit ‑ obținem câștiguri din <annotation type="privacy_respecting_ads">anunțurile de căutare care respectă viața privată</annotation>, nu din exploatarea datelor tale.În plus, oferim și <annotation type="ppro_help_page">abonamentul DuckDuckGo</annotation> integrat în browserul nostru. Abonații beneficiază de și mai multă protecție a vieții private, cu un <annotation type="vpn_help_page">VPN</annotation> rapid și simplu care contribuie la securizarea activității tale online, acces la modele de inteligență artificială avansate în serviciul nostru privat de chat cu inteligență artificială Duck.ai, un serviciu care găsește și elimină datele tale cu caracter personal de pe site-urile de căutare a persoanelor și un serviciu care îți restabilește identitatea în cazul în care aceasta este sustrasă.\n\nPreia din nou controlul asupra datelor tale cu caracter personal cu browserul conceput pentru protecția datelor, nu pentru colectarea lor.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo are și un <b>abonament opțional plătit</b>, cu un <b>VPN</b> securizat și inteligență artificială avansată și privată.]]></string>
+    <string name="settingsDuckAiRebranding">Caracteristici AI</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>
