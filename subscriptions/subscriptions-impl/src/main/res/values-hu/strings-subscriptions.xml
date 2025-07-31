@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Van előfizetésem</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo-előfizetés</string>
+    <string name="subscriptionSettingExpiredRebranding">A DuckDuckGo-előfizetésed lejárt</string>
+    <string name="privacyProFaqRebranding">Segítségre van szükséged az előfizetéssel kapcsolatban?</string>
+    <string name="privacyProFaqSecondaryRebranding">A súgóoldalainkon választ kaphatsz a gyakran ismételt kérdésekre, vagy felveheted a kapcsolatot az előfizetési támogatást nyújtó ügyfélszolgálattal. A funkciók elérhetősége országonként változik.</string>
+    <string name="restoreSubscriptionTitleRebranding">Add hozzá az előfizetésedet ezen az eszközön</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Az előfizetés hozzáadásához társíts hozzá egy e-mail-címet.</string>
+    <string name="activateOnOtherDevicesRebranding">Előfizetésed hozzáadása más eszközökhöz</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Add hozzá az előfizetésedet a többi eszközödön is a Google Play-en keresztül, vagy e-mail-cím társításával.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">A DuckDuckGo-alkalmazásban hozzáadhatod az előfizetésedet a többi eszközödön a fenti e-mail-cím használatával. Lépj a Beállítások &gt; Előfizetési beállítások &gt; Van előfizetésem menüpontra.</string>
+    <string name="subscriptionSettingRebrandingMessage">A Privacy Pro mostantól egyszerűen DuckDuckGo-előfizetés néven fut</string>
+
 </resources>
