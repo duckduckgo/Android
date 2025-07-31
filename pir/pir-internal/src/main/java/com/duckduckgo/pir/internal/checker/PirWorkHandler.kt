@@ -38,9 +38,20 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
+/**
+ * Handler to control PIR work execution and cancellation.
+ */
 interface PirWorkHandler {
+    /**
+     * Checks if PIR can run based on remote features and subscription status.
+     *
+     * @return Flow that emits true if PIR can run, false otherwise.
+     */
     suspend fun canRunPir(): Flow<Boolean>
 
+    /**
+     * Cancels any ongoing PIR work, including foreground services and scheduled scans.
+     */
     fun cancelWork()
 }
 
@@ -60,6 +71,8 @@ class RealPirWorkHandler @Inject constructor(
     override suspend fun canRunPir(): Flow<Boolean> {
         return withContext(dispatcherProvider.io()) {
             if (pirRemoteFeatures.pirBeta().isEnabled() && subscriptions.getAccessToken() != null) {
+                // User could have a valid subscription but is not entitled to PIR,
+                // so we have to check both
                 subscriptions.getEntitlementStatus()
                     .map { entitledProducts -> entitledProducts.contains(PIR) }
                     .distinctUntilChanged()
@@ -74,9 +87,11 @@ class RealPirWorkHandler @Inject constructor(
     }
 
     override fun cancelWork() {
+        // Stop any running foreground services
         context.stopService(Intent(context, PirForegroundScanService::class.java))
         context.stopService(Intent(context, PirForegroundOptOutService::class.java))
         context.stopService(Intent(context, PirRemoteWorkerService::class.java))
+        // Cancel any running or scheduled workers
         workManager.cancelUniqueWork(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
     }
 

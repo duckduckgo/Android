@@ -41,7 +41,7 @@ class PirDataUpdateObserver @Inject constructor(
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
         coroutineScope.launch(dispatcherProvider.io()) {
-            // observe when PIR becomes available so we can fetch the broker data or cancel all related work
+            // Observe when PIR becomes available so we can fetch the broker data or cancel all related work
             pirWorkHandler
                 .canRunPir()
                 .collectLatest { enabled ->
@@ -54,6 +54,7 @@ class PirDataUpdateObserver @Inject constructor(
                         }
                     } else {
                         logcat { "PIR-update: PIR not enabled" }
+                        // This will also cancel any ongoing work that is currently running if PIR is not enabled
                         pirWorkHandler.cancelWork()
                     }
                 }
