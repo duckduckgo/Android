@@ -890,4 +890,27 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Terminez votre configuration</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Bonjour.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Envie de profiter d\'un navigateur plus rapide qui vous protège ?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Protections</b> <i>activées !</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Bonjour.<br/>Envie de profiter d\'un navigateur plus rapide qui vous protège ?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Effacez instantanément votre activité de navigation avec le <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Essayez par vous-même !️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ et %1$d autre essayaient de vous suivre ici. <font color=\"#F05C2B\">Je les ai bloqués !</font>]]></item>
+        <item quantity="other"><![CDATA[ et %1$d autres essayaient de vous suivre ici. <font color=\"#F05C2B\">Je les ai bloqués !</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ essayait de vous suivre ici. <font color=\"#F05C2B\">Je l\'ai bloqué !</font>]]></item>
+        <item quantity="other"><![CDATA[ essayaient de vous suivre ici. <font color=\"#F05C2B\">Je les ai bloqués !</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Appuyez sur le bouclier pour en savoir plus.️</string>
+
 </resources>
