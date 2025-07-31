@@ -26,12 +26,12 @@ import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -39,8 +39,16 @@ class RoomDatabaseProviderImpl @Inject constructor(
     private val context: Context,
 ) : DatabaseProvider {
 
-    val executor: Executor by lazy {
-        Executors.newFixedThreadPool(6)
+    private val defaultPoolSize = 6
+    private val defaultExecutor: Executor by lazy {
+        ThreadPoolExecutor(
+            defaultPoolSize,
+            defaultPoolSize,
+            0L,
+            SECONDS,
+            ArrayBlockingQueue(defaultPoolSize * 2),
+            ThreadPoolExecutor.CallerRunsPolicy(),
+        )
     }
 
     override fun<T : RoomDatabase> buildRoomDatabase(
@@ -79,12 +87,24 @@ class RoomDatabaseProviderImpl @Inject constructor(
                 }
                 when (config.executor) {
                     is Custom -> {
-                        setQueryExecutor(createExecutor((config.executor as Custom).queryPoolSize))
-                        setTransactionExecutor(createExecutor((config.executor as Custom).transactionPoolSize))
+                        (config.executor as? Custom)?.let { executor ->
+                            setQueryExecutor(
+                                createExecutor(
+                                    executor.queryPoolSize,
+                                    executor.queryQueueSize,
+                                ),
+                            )
+                            setTransactionExecutor(
+                                createExecutor(
+                                    executor.transactionPoolSize,
+                                    executor.transactionQueueSize,
+                                ),
+                            )
+                        }
                     }
                     Default -> {
-                        setQueryExecutor(executor)
-                        setTransactionExecutor(executor)
+                        setQueryExecutor(defaultExecutor)
+                        setTransactionExecutor(defaultExecutor)
                     }
                 }
             }
@@ -93,13 +113,28 @@ class RoomDatabaseProviderImpl @Inject constructor(
 
     private fun createExecutor(
         poolSize: Int,
+        queueSize: Int,
     ): Executor {
+        logcat("Cris") { "Creating executor with poolSize $poolSize and queueSize $queueSize" }
+        val queue = object : ArrayBlockingQueue<Runnable>(queueSize) {
+
+            init {
+                logcat("Cris") { "Creating executor queue with size: $queueSize" }
+            }
+
+            override fun add(element: Runnable): Boolean {
+                logcat("Cris") { "Adding task to executor queue, remaining capacity: ${this.remainingCapacity()}, queue size: ${this.size}" }
+                return super.add(element)
+            }
+        }
+
         return ThreadPoolExecutor(
             poolSize,
             poolSize,
             60L,
             SECONDS,
-            LinkedBlockingQueue(),
+            queue,
+            ThreadPoolExecutor.CallerRunsPolicy(),
         ).apply {
             allowCoreThreadTimeOut(true)
         }
