@@ -219,10 +219,8 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        repository.getUserProfileQueries().also { profiles ->
-            return profiles.ifEmpty {
-                DEFAULT_PROFILE_QUERIES
-            }
+        return repository.getUserProfileQueries().ifEmpty {
+            DEFAULT_PROFILE_QUERIES
         }
     }
 

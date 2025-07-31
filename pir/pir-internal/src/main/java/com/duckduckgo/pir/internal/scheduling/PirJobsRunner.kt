@@ -94,10 +94,8 @@ class RealPirJobsRunner @Inject constructor(
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
-        pirRepository.getUserProfileQueries().also { profiles ->
-            return profiles.ifEmpty {
-                DEFAULT_PROFILE_QUERIES
-            }
+        return pirRepository.getUserProfileQueries().ifEmpty {
+            DEFAULT_PROFILE_QUERIES
         }
     }
 

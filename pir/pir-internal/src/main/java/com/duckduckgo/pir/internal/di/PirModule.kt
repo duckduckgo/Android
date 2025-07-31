@@ -104,7 +104,7 @@ class PirModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providejobSchedulingDao(database: PirDatabase): JobSchedulingDao {
+    fun provideJobSchedulingDao(database: PirDatabase): JobSchedulingDao {
         return database.jobSchedulingDao()
     }
 
