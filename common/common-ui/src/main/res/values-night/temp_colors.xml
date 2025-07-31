@@ -26,4 +26,23 @@
     <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
 
     <color name="buckColorButtonFAB">#042E50</color>
+    <color name="buckColorComparisonChartItemBackground">#1AFFFFFF</color>
+
+    <color name="buckColorComparisonChartCheckIcon">#00DE4E</color>
+    <color name="buckColorComparisonChartCrossIcon">#888888</color>
+    <color name="buckColorComparisonChartSearchIcon">#68C5FF</color>
+    <color name="buckColorComparisonChartShieldIcon">#FFFFFF</color>
+    <color name="buckColorComparisonChartCookieIcon">#68C5FF</color>
+    <color name="buckColorComparisonChartBlockIcon">#FFFFFF</color>
+    <color name="buckColorComparisonChartFireIcon">#68C5FF</color>
+
+    <color name="buckColorPreonboardingOptionBackground">#260D7BDE</color>
+    <color name="buckColorPreonboardingOptionBackgroundSelected">#B2FFFFFF</color>
+    <color name="buckColorPreonboardingOptionIcon">@color/white18</color>
+    <color name="buckColorPreonboardingOptionIconSelected">#252A38</color>
+
+    <color name="buckColorCheckBoxCheckedBackground">#0D7BDE</color>
+    <color name="buckColorCheckBoxCheckedIcon">@color/white</color>
+    <color name="buckColorCheckBoxUncheckedBackground">@color/white3</color>
+    <color name="buckColorCheckBoxUncheckedOutline">@color/white18</color>
 </resources>
