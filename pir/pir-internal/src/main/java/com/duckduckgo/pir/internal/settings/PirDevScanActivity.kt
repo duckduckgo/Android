@@ -169,16 +169,25 @@ class PirDevScanActivity : DuckDuckGoActivity() {
         }
 
         binding.debugForceKill.setOnClickListener {
-            stopService(Intent(this, PirForegroundScanService::class.java))
+            killRunningWork()
+        }
+
+        binding.debugResetAll.setOnClickListener {
+            killRunningWork()
             lifecycleScope.launch(dispatcherProvider.io()) {
                 repository.deleteAllScanResults()
                 repository.deleteAllUserProfilesQueries()
                 repository.deleteEventLogs()
+                repository.deleteAllOptOutData()
                 pirSchedulingRepository.deleteAllJobRecords()
             }
-            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
-            workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
-            stopService(Intent(this, PirRemoteWorkerService::class.java))
+        }
+
+        binding.debugResetOptOut.setOnClickListener {
+            killRunningWork()
+            lifecycleScope.launch(dispatcherProvider.io()) {
+                pirSchedulingRepository.deleteAllOptOutJobRecords()
+            }
         }
 
         binding.viewResults.setOnClickListener {
@@ -189,6 +198,13 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             schedulePeriodicScan()
             Toast.makeText(this, getString(R.string.pirMessageSchedule), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun killRunningWork() {
+        stopService(Intent(this, PirForegroundScanService::class.java))
+        notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+        workManager.cancelUniqueWork(TAG_SCHEDULED_SCAN)
+        stopService(Intent(this, PirRemoteWorkerService::class.java))
     }
 
     private fun schedulePeriodicScan() {
