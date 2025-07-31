@@ -440,13 +440,11 @@ class BrowserWebViewClient @Inject constructor(
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
 
-        appCoroutineScope.launch(dispatcherProvider.io()) {
+        appCoroutineScope.launch(dispatcherProvider.main()) {
             val activeExperiments = contentScopeExperiments.getActiveExperiments()
-            withContext(dispatcherProvider.main()) {
-                webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
-                jsPlugins.getPlugins().forEach {
-                    it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
-                }
+            webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+            jsPlugins.getPlugins().forEach {
+                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
             }
         }
         if (url != null && url == lastPageStarted) {
