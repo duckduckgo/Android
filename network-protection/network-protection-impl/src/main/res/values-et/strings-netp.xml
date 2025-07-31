@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">VPN-idega mitteühilduvate rakenduste automaatne välistamine</string>
     <string name="netpExclusionListLabelAutoExclude">Ei ühildu VPN-idega</string>
     <string name="netpExclusionListAutoExcludeDescription">Mõned rakendused, nagu pangandus- või voogedastusrakendused, ei tööta VPN-idega hästi. Kui see seade on lubatud, välistame need rakendused automaatselt.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN-ühendus katkestati aegunud tellimuse tõttu. DuckDuckGo VPN-i taasühendamiseks telli DuckDuckGo.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">DuckDuckGo VPN-i taasühendamiseks telli DuckDuckGo.</string>
 </resources>
