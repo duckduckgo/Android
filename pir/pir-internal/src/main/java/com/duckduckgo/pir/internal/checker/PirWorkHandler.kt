@@ -33,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -70,16 +71,20 @@ class RealPirWorkHandler @Inject constructor(
 
     override suspend fun canRunPir(): Flow<Boolean> {
         return withContext(dispatcherProvider.io()) {
-            if (pirRemoteFeatures.pirBeta().isEnabled() && subscriptions.getAccessToken() != null) {
+            if (pirRemoteFeatures.pirBeta().isEnabled()) {
                 // User could have a valid subscription but is not entitled to PIR,
                 // so we have to check both
-                subscriptions.getEntitlementStatus()
-                    .map { entitledProducts ->
-                        val hasValidEntitlement = entitledProducts.contains(PIR)
-                        val subscriptionStatus = subscriptions.getSubscriptionStatus()
-                        isPirEnabled(hasValidEntitlement, subscriptionStatus)
-                    }
-                    .distinctUntilChanged()
+                combine(
+                    subscriptions.getSubscriptionStatusFlow()
+                        .distinctUntilChanged(),
+                    subscriptions.getEntitlementStatus()
+                        .map { entitledProducts ->
+                            entitledProducts.contains(PIR)
+                        }
+                        .distinctUntilChanged(),
+                ) { subscriptionStatus, hasValidEntitlement ->
+                    isPirEnabled(hasValidEntitlement, subscriptionStatus)
+                }
             } else {
                 flowOf(false)
             }

@@ -78,9 +78,10 @@ class RealPirWorkHandlerTest {
     }
 
     @Test
-    fun whenAccessTokenIsNullThenCanRunPirReturnsFalse() = runTest {
+    fun whenSubscriptionStatusIsUnknownThenCanRunPirReturnsFalse() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
+        whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf()))
 
         pirWorkHandler.canRunPir().test {
             assertFalse(awaitItem())
@@ -89,12 +90,11 @@ class RealPirWorkHandlerTest {
     }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledAndAutoRenewableThenCanRunPirReturnsTrue() =
+    fun whenPirBetaEnabledAndPirEntitledAndAutoRenewableThenCanRunPirReturnsTrue() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
                 assertTrue(awaitItem())
@@ -103,12 +103,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledAndNotAutoRenewableThenCanRunPirReturnsTrue() =
+    fun whenPirBetaEnabledAndPirEntitledAndNotAutoRenewableThenCanRunPirReturnsTrue() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.NOT_AUTO_RENEWABLE)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.NOT_AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
                 assertTrue(awaitItem())
@@ -117,12 +116,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledAndGracePeriodThenCanRunPirReturnsTrue() =
+    fun whenPirBetaEnabledAndPirEntitledAndGracePeriodThenCanRunPirReturnsTrue() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.GRACE_PERIOD)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.GRACE_PERIOD))
 
             pirWorkHandler.canRunPir().test {
                 assertTrue(awaitItem())
@@ -131,12 +129,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledButUnknownStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButUnknownStatusThenCanRunPirReturnsFalse() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.UNKNOWN)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.UNKNOWN))
 
             pirWorkHandler.canRunPir().test {
                 assertFalse(awaitItem())
@@ -145,12 +142,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledButInactiveStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButInactiveStatusThenCanRunPirReturnsFalse() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.INACTIVE))
 
             pirWorkHandler.canRunPir().test {
                 assertFalse(awaitItem())
@@ -159,12 +155,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledButExpiredStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButExpiredStatusThenCanRunPirReturnsFalse() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.EXPIRED)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.EXPIRED))
 
             pirWorkHandler.canRunPir().test {
                 assertFalse(awaitItem())
@@ -173,12 +168,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsAndPirEntitledButWaitingStatusThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndPirEntitledButWaitingStatusThenCanRunPirReturnsFalse() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.PIR)))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.WAITING)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.WAITING))
 
             pirWorkHandler.canRunPir().test {
                 assertFalse(awaitItem())
@@ -187,12 +181,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsButNotPirEntitledThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndAutoRenewableButNotPirEntitledThenCanRunPirReturnsFalse() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(listOf(Product.NetP))) // Different product
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
                 assertFalse(awaitItem())
@@ -201,12 +194,11 @@ class RealPirWorkHandlerTest {
         }
 
     @Test
-    fun whenPirBetaEnabledAndAccessTokenExistsButNoEntitlementsThenCanRunPirReturnsFalse() =
+    fun whenPirBetaEnabledAndAutoRenewableButNoEntitlementsThenCanRunPirReturnsFalse() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
             whenever(subscriptions.getEntitlementStatus()).thenReturn(flowOf(emptyList()))
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             pirWorkHandler.canRunPir().test {
                 assertFalse(awaitItem())
@@ -218,8 +210,7 @@ class RealPirWorkHandlerTest {
     fun whenEntitlementStatusChangesFromEnabledToDisabledThenCanRunPirEmitsCorrectValues() =
         runTest {
             whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-            whenever(subscriptions.getAccessToken()).thenReturn("access_token")
-            whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+            whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
             val entitlementFlow = MutableStateFlow(listOf(Product.PIR))
             whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementFlow)
@@ -243,8 +234,7 @@ class RealPirWorkHandlerTest {
     @Test
     fun whenSameValueEmittedMultipleTimesThenDistinctUntilChangedWorksCorrectly() = runTest {
         whenever(pirBetaToggle.isEnabled()).thenReturn(true)
-        whenever(subscriptions.getAccessToken()).thenReturn("access_token")
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(SubscriptionStatus.AUTO_RENEWABLE))
 
         val entitlementFlow = MutableStateFlow(listOf(Product.PIR))
         whenever(subscriptions.getEntitlementStatus()).thenReturn(entitlementFlow)
