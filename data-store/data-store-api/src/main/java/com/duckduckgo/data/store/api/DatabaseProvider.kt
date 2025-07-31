@@ -43,7 +43,19 @@ data class RoomDatabaseConfig(
 
 sealed class DatabaseExecutor {
 
-    class Custom(val transactionPoolSize: Int, val queryPoolSize: Int) : DatabaseExecutor()
+    /**
+     * Custom executor configuration for Room database operations.
+     * @property transactionPoolSize The size of the thread pool for transaction operations.
+     * @property queryPoolSize The size of the thread pool for query operations.
+     * @property transactionQueueSize Optional size of the queue for transaction operations. If not set, 2 * [transactionPoolSize] will be used.
+     * @property queryQueueSize Optional size of the queue for query operations. If not set, 2 * [queryPoolSize] will be used.
+     */
+    class Custom(
+        val transactionPoolSize: Int,
+        val queryPoolSize: Int,
+        val transactionQueueSize: Int = 2 * transactionPoolSize,
+        val queryQueueSize: Int = 2 * queryPoolSize,
+    ) : DatabaseExecutor()
 
     data object Default : DatabaseExecutor()
 }
