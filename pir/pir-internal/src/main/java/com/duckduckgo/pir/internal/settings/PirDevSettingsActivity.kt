@@ -33,7 +33,7 @@ import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBindin
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.store.PirRepository
 import javax.inject.Inject
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -74,17 +74,14 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         binding.viewRunEvents.setOnClickListener {
             globalActivityStarter.start(this, PirEventsResultsScreen)
         }
-
-        binding.cancelAllWork.setOnClickListener {
-            pirWorkHandler.cancelWork()
-        }
     }
 
     private fun bindViews() {
         lifecycleScope.launch {
-            val canRunPir = pirWorkHandler.canRunPir().firstOrNull() == true
-            binding.pirDebugScan.isEnabled = canRunPir
-            binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
+            pirWorkHandler.canRunPir().collectLatest { canRunPir ->
+                binding.pirDebugScan.isEnabled = canRunPir
+                binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
+            }
         }
     }
 

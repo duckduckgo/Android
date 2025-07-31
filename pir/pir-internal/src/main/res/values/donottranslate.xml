@@ -27,7 +27,6 @@
     <string name="pirDevViewScanResults">View All Scan Results</string>
     <string name="pirDevViewOptOutResults">View All OptOut Results</string>
     <string name="pirDevViewRunEvents">View PIR Run events</string>
-    <string name="pirDevCancelAllWork">Cancel all work</string>
     <string name="pirDevSchedule">Schedule Scan</string>
     <string name="pirDevSimpleScanHeader">Simple Scan Results</string>
     <string name="pirDevHeader">Test Actions</string>
