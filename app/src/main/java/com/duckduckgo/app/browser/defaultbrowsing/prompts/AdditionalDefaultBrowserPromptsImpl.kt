@@ -183,6 +183,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     }
 
     private suspend fun evaluate() = evaluationMutex.withLock {
+        val isEnabled =
+            defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
+        logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
+        if (!isEnabled) {
+            return
+        }
+
         val isStopped = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == STOPPED
         logcat { "evaluate: has stopped = $isStopped" }
         if (isStopped) {
@@ -195,13 +202,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         if (isOnboardingComplete) {
             experimentAppUsageRepository.recordAppUsedNow()
         } else {
-            return
-        }
-
-        val isEnabled =
-            defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
-        logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
-        if (!isEnabled) {
             return
         }
 
