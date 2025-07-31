@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Turiu prenumeratą</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">„DuckDuckGo“ prenumerata</string>
+    <string name="subscriptionSettingExpiredRebranding">Jūsų „DuckDuckGo“ prenumerata baigėsi</string>
+    <string name="privacyProFaqRebranding">Reikia pagalbos su prenumerata?</string>
+    <string name="privacyProFaqSecondaryRebranding">Gauk atsakymus į dažniausiai užduodamus klausimus arba susisiek su prenumeratos palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
+    <string name="restoreSubscriptionTitleRebranding">Pridėkite savo prenumeratą prie šio įrenginio</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Susiekite el. pašto adresą su prenumerata, kad pridėtumėte jį prie šio įrenginio.</string>
+    <string name="activateOnOtherDevicesRebranding">Pridėkite savo prenumeratą prie kitų įrenginių</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridėkite prenumeratą į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į Nustatymai &gt; Prenumeratos nustatymai &gt; Turiu prenumeratą.</string>
+    <string name="subscriptionSettingRebrandingMessage">„Privacy Pro“ dabar tiesiog vadinama „DuckDuckGo“ prenumerata.</string>
+
 </resources>
