@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import java.time.format.DateTimeParseException
 
@@ -36,10 +35,7 @@ interface ExperimentAppUsageRepository {
      * Only if a given instant crossed dateline in ET timezone, the value will be incremented.
      *
      * @return Count if successful.
-     *  [UserNotEnrolledException] if the given feature is disable or user is not assigned to a cohort.
      *  [DateTimeParseException] if the enrollment date is malformed.
      */
-    suspend fun getActiveDaysUsedSinceEnrollment(toggle: Toggle): Result<Long>
-
-    class UserNotEnrolledException : Exception()
+    suspend fun getActiveDaysUsedSinceEnrollment(): Result<Long>
 }

@@ -21,15 +21,13 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.DIALOG
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.MENU
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger.UNKNOWN
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.DIALOG
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MENU
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.UNKNOWN
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.CONVERTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
@@ -45,9 +43,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.squareup.anvil.annotations.ContributesBinding
@@ -63,7 +59,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -89,10 +85,10 @@ import logcat.logcat
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DefaultBrowserPromptsExperiment::class,
+    boundType = AdditionalDefaultBrowserPrompts::class,
 )
 @SingleInstanceIn(scope = AppScope::class)
-class DefaultBrowserPromptsExperimentImpl @Inject constructor(
+class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val applicationContext: Context,
@@ -102,11 +98,10 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private val experimentAppUsageRepository: ExperimentAppUsageRepository,
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
-    private val experimentStageEvaluatorPluginPoint: PluginPoint<DefaultBrowserPromptsExperimentStageEvaluator>,
-    private val metrics: DefaultBrowserPromptsExperimentMetrics,
+    private val stageEvaluator: DefaultBrowserPromptsExperimentStageEvaluator,
     private val pixel: Pixel,
     moshi: Moshi,
-) : DefaultBrowserPromptsExperiment, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
+) : AdditionalDefaultBrowserPrompts, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     private val evaluationMutex = Mutex()
 
@@ -144,9 +139,9 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     private val featureSettingsJsonAdapter = moshi.adapter(FeatureSettingsConfigModel::class.java)
 
     /**
-     * Caches deserialized [Toggle.getSettings] for [DefaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501].
+     * Caches deserialized [Toggle.getSettings] for [DefaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25].
      *
-     * Since we're re-evaluating the experiment on every process' resume,
+     * Since we're re-evaluating on every process' resume,
      * this allows us to avoid constantly deserializing the same value.
      *
      * The value is recomputed on first launch, and on each subsequent privacy config change via [onPrivacyConfigDownloaded].
@@ -176,7 +171,6 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         appCoroutineScope.launch {
-            experimentAppUsageRepository.recordAppUsedNow()
             evaluate()
         }
     }
@@ -189,39 +183,54 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private suspend fun evaluate() = evaluationMutex.withLock {
+        val isEnabled =
+            defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
+        logcat { "evaluate: default browser remote flag enabled = $isEnabled" }
+        if (!isEnabled) {
+            return
+        }
+
+        val isStopped = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == STOPPED
+        logcat { "evaluate: has stopped = $isStopped" }
+        if (isStopped) {
+            return
+        }
+
         val isOnboardingComplete = userStageStore.getUserAppStage() == AppStage.ESTABLISHED
-        val isEnrolled = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501().getCohort() != null
-        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-        val isEligible = isOnboardingComplete && (isEnrolled || !isDefaultBrowser)
-        if (!isEligible) {
-            return
-        }
+        logcat { "evaluate: onboarding complete = $isOnboardingComplete" }
 
-        val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.first() == CONVERTED
-        val isStopped = defaultBrowserPromptsDataStore.experimentStage.first() == STOPPED
-        if (hasConvertedBefore || isStopped) {
-            return
-        }
-
-        val activeCohortName = defaultBrowserPromptsFeatureToggles.getOrAssignCohort()
-        val currentExperimentStage = defaultBrowserPromptsDataStore.experimentStage.first()
-        if (activeCohortName == null && currentExperimentStage == NOT_ENROLLED) {
-            // The user wasn't enrolled before and wasn't enrolled now either.
-            return
-        }
-
-        val newExperimentStage = if (activeCohortName == null) {
-            // If experiment was underway but we lost the cohort name, it means that the experiment was remotely disabled.
-            STOPPED
-        } else if (isDefaultBrowser) {
-            CONVERTED
+        if (isOnboardingComplete) {
+            experimentAppUsageRepository.recordAppUsedNow()
         } else {
-            val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment(
-                defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501(),
-            ).getOrElse { throwable ->
+            return
+        }
+
+        val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
+
+        logcat { "evaluate: is default browser = $isDefaultBrowser" }
+
+        val hasConvertedBefore = defaultBrowserPromptsDataStore.experimentStage.firstOrNull() == CONVERTED
+        logcat { "evaluate: has converted before = $hasConvertedBefore" }
+        if (hasConvertedBefore) {
+            return
+        }
+
+        val currentStage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull()
+        logcat { "evaluate: current stage = $currentStage" }
+        val newStage = if (isDefaultBrowser) {
+            logcat { "evaluate: new stage is CONVERTED" }
+            CONVERTED
+        } else if (currentStage == NOT_ENROLLED) {
+            logcat { "evaluate: new stage is ENROLLED" }
+            ENROLLED
+        } else {
+            logcat { "evaluate: new stage is other than CONVERTED or ENROLLED" }
+            val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
+
+            logcat { "evaluate: active days used since enrollment = $appActiveDaysUsedSinceEnrollment" }
 
             val configSettings = featureSettings ?: run {
                 // If feature settings weren't cached before, deserialize and cache them now.
@@ -233,9 +242,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                 return
             }
 
-            when (currentExperimentStage) {
-                NOT_ENROLLED -> ENROLLED
-
+            when (currentStage) {
                 ENROLLED -> {
                     if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage1) {
                         STAGE_1
@@ -260,34 +267,15 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
                     }
                 }
 
-                STOPPED, CONVERTED -> null
+                else -> null
             }
         }
 
-        if (newExperimentStage != null) {
-            defaultBrowserPromptsDataStore.storeExperimentStage(newExperimentStage)
+        if (newStage != null) {
+            defaultBrowserPromptsDataStore.storeExperimentStage(newStage)
 
-            when (newExperimentStage) {
-                STAGE_1 -> {
-                    metrics.getStageImpressionForStage1()?.fire()
-                }
-
-                STAGE_2 -> {
-                    metrics.getStageImpressionForStage2()?.fire()
-                }
-
-                CONVERTED -> {
-                    fireConversionPixels(currentExperimentStage)
-                }
-
-                else -> {
-                    // no-op
-                }
-            }
-
-            val action = experimentStageEvaluatorPluginPoint.getPlugins()
-                .firstOrNull { it.targetCohort == activeCohortName }?.evaluate(newExperimentStage)
-                ?: DefaultBrowserPromptsExperimentStageAction.disableAll // if there's no matching evaluator, or cohort is null or disabled, clean up
+            val action = stageEvaluator.evaluate(newStage)
+            logcat { "evaluate: action = $action show message dialog = ${action.showMessageDialog}" }
 
             if (action.showMessageDialog) {
                 _commands.send(OpenMessageDialog)
@@ -329,13 +317,13 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
         browserSelectionWindowFallbackDeferred = appCoroutineScope.async {
             delay(FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS)
         }
+        fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION)
     }
 
     override fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger) {
         appCoroutineScope.launch {
             when (trigger) {
-                DIALOG -> metrics.getDefaultSetViaDialog()?.fire()
-                MENU -> metrics.getDefaultSetViaMenu()?.fire()
+                DIALOG, MENU -> fireConversionPixel(trigger)
                 UNKNOWN -> {
                     logcat(ERROR) { "Trigger for default browser dialog result wasn't provided." }
                 }
@@ -348,14 +336,14 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
             browserSelectionWindowFallbackDeferred?.cancel()
             launchSystemDefaultAppsActivity(trigger)
         }
+        fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_SYSTEM_DIALOG_DISMISSED)
     }
 
     override fun onSystemDefaultAppsActivityClosed(trigger: SetAsDefaultActionTrigger) {
         if (defaultBrowserDetector.isDefaultBrowser()) {
             appCoroutineScope.launch {
                 when (trigger) {
-                    DIALOG -> metrics.getDefaultSetViaDialog()?.fire()
-                    MENU -> metrics.getDefaultSetViaMenu()?.fire()
+                    DIALOG, MENU -> fireConversionPixel(trigger)
                     UNKNOWN -> {
                         logcat(ERROR) { "Trigger for default apps result wasn't provided." }
                     }
@@ -381,7 +369,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
     }
 
     private suspend fun DefaultBrowserPromptsFeatureToggles.parseFeatureSettings(): FeatureSettings? = withContext(dispatchers.io()) {
-        defaultBrowserAdditionalPrompts202501().getSettings()?.let { settings ->
+        defaultBrowserPrompts25().getSettings()?.let { settings ->
             try {
                 featureSettingsJsonAdapter.fromJson(settings)?.toFeatureSettings()
             } catch (e: Exception) {
@@ -391,46 +379,28 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
         }
     }
 
-    private suspend fun DefaultBrowserPromptsFeatureToggles.getOrAssignCohort(): AdditionalPromptsCohortName? {
-        defaultBrowserAdditionalPrompts202501().enroll()
-        for (cohort in AdditionalPromptsCohortName.entries) {
-            if (defaultBrowserAdditionalPrompts202501().isEnrolledAndEnabled(cohort)) {
-                return cohort
-            }
-        }
-        return null
-    }
-
-    private suspend fun fireConversionPixels(currentExperimentStage: ExperimentStage) {
-        when (currentExperimentStage) {
-            STAGE_1 -> {
-                metrics.getDefaultSetForStage1()?.fire()
-            }
-
-            STAGE_2 -> {
-                metrics.getDefaultSetForStage2()?.fire()
-            }
-
-            else -> {
-                // no-op
-            }
-        }
-    }
-
-    private fun fireInteractionPixel(pixelName: AppPixelName) = appCoroutineScope.launch {
-        val variant = defaultBrowserPromptsFeatureToggles.defaultBrowserAdditionalPrompts202501().getCohort()?.name?.lowercase() ?: ""
-        val stage = defaultBrowserPromptsDataStore.experimentStage.first().toString().lowercase()
+    private fun fireConversionPixel(trigger: SetAsDefaultActionTrigger) = appCoroutineScope.launch {
+        val stage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull().toString().lowercase()
+        val triggerValue = trigger.toString().lowercase()
+        logcat { "fireConversionPixel: pixelName = ${AppPixelName.SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK} - stage = $stage - trigger = $triggerValue" }
         pixel.fire(
-            pixel = pixelName,
+            pixel = AppPixelName.SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK,
             parameters = mapOf(
-                PIXEL_PARAM_KEY_VARIANT to variant,
                 PIXEL_PARAM_KEY_STAGE to stage,
+                PIXEL_PARAM_KEY_TRIGGER to triggerValue,
             ),
         )
     }
 
-    private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
-        pixel.fire(it.pixelName, it.params)
+    private fun fireInteractionPixel(pixelName: AppPixelName) = appCoroutineScope.launch {
+        val stage = defaultBrowserPromptsDataStore.experimentStage.firstOrNull().toString().lowercase()
+        logcat { "fireInteractionPixel pixelName = $pixelName - stage = $stage" }
+        pixel.fire(
+            pixel = pixelName,
+            parameters = mapOf(
+                PIXEL_PARAM_KEY_STAGE to stage,
+            ),
+        )
     }
 
     @Throws(NumberFormatException::class)
@@ -442,7 +412,7 @@ class DefaultBrowserPromptsExperimentImpl @Inject constructor(
 
     companion object {
         const val FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS = 500L
-        const val PIXEL_PARAM_KEY_VARIANT = "expVar"
-        const val PIXEL_PARAM_KEY_STAGE = "expStage"
+        const val PIXEL_PARAM_KEY_STAGE = "stage"
+        const val PIXEL_PARAM_KEY_TRIGGER = "trigger"
     }
 }

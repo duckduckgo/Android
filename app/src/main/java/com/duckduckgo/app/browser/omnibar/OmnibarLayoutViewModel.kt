@@ -23,7 +23,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -93,7 +93,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
-    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
@@ -111,7 +111,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     val viewState = combine(
         _viewState,
         tabRepository.flowTabs,
-        defaultBrowserPromptsExperiment.highlightPopupMenu,
+        additionalDefaultBrowserPrompts.highlightPopupMenu,
         experimentalThemingDataStore.isSingleOmnibarEnabled,
     ) { state, tabs, highlightOverflowMenu, isSingleOmnibarEnabled ->
         state.copy(

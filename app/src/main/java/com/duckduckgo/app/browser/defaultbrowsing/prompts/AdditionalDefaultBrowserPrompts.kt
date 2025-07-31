@@ -20,7 +20,7 @@ import android.content.Intent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface DefaultBrowserPromptsExperiment {
+interface AdditionalDefaultBrowserPrompts {
 
     val highlightPopupMenu: StateFlow<Boolean>
     val showSetAsDefaultPopupMenuItem: StateFlow<Boolean>
