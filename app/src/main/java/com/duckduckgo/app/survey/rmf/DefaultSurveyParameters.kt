@@ -123,7 +123,7 @@ class CohortSurveyParameterPlugin @Inject constructor(
     override fun matches(paramKey: String): Boolean = paramKey.contains("cohort_")
 
     override suspend fun evaluate(paramKey: String): String {
-        val experimentName = paramKey.split("_").getOrNull(2)
+        val experimentName = paramKey.split("_").getOrNull(1)
         if (experimentName.isNullOrBlank()) return ""
 
         val matchingExperiment = featureTogglesInventory
