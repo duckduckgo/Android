@@ -111,6 +111,12 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
             fieldName = MATCH_ALL,
             errorMessage = "No one remembers what these constants map to. Use the API level integer value directly since it's self-defining."
         ),
+        DenyListedEntry(
+            className = "androidx.room.Room",
+            functionName = "databaseBuilder",
+            errorMessage = "Use com.duckduckgo.data.store.api.DatabaseProvider to build Room databases. " +
+                "This allows us to use custom executors and other configuration options."
+        ),
     )
 
     override fun getApplicableUastTypes() = config.applicableTypes()
