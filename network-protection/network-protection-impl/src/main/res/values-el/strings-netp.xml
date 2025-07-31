@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Εξαιρέστε αυτόματα εφαρμογές που δεν είναι συμβατές με VPN</string>
     <string name="netpExclusionListLabelAutoExclude">Μη συμβατό με VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Κάποιες εφαρμογές, όπως οι τραπεζικές ή οι εφαρμογές streaming, δεν λειτουργούν καλά με VPN. Όταν έχει ενεργοποιηθεί η ρύθμιση αυτή, θα εξαιρούμε αυτόματα τις εφαρμογές αυτές.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">Το VPN αποσυνδέθηκε λόγω λήξης της συνδρομής. Εγγραφείτε στο DuckDuckGo για να συνδέσετε εκ νέου το VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Εγγραφείτε στο DuckDuckGo για να συνδέσετε εκ νέου το VPN.</string>
 </resources>
