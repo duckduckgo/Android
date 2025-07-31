@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">VPN\'lerle uyumlu olmayan uygulamaları otomatik olarak hariç tutun</string>
     <string name="netpExclusionListLabelAutoExclude">VPN\'lerle uyumlu değil</string>
     <string name="netpExclusionListAutoExcludeDescription">Bankacılık veya yayın uygulamaları gibi bazı uygulamalar VPN\'lerle iyi çalışmaz. Bu ayar etkinleştirildiğinde, bu uygulamalar otomatik olarak hariç tutulur.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">Abonelik süresi dolduğu için VPN bağlantısı kesildi. VPN\'i yeniden bağlamak için DuckDuckGo\'ya abone olun.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">VPN\'i yeniden bağlamak için DuckDuckGo\'ya abone olun.</string>
 </resources>
