@@ -170,23 +170,7 @@ class RealPirScan @Inject constructor(
             return@withContext Result.success(Unit)
         }
 
-        val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = minOf(jobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
-
-        logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
-        var createCount = 0
-        while (createCount != maxWebViewCount) {
-            runners.add(
-                pirActionsRunnerFactory.create(
-                    context,
-                    script,
-                    runType,
-                ),
-            )
-            createCount++
-        }
-
-        val jobRecordsParts = jobRecords.mapNotNull {
+        val processedJobRecords = jobRecords.mapNotNull {
             val profileQuery = relevantProfiles[it.userProfileId]
             val brokerSteps = relevantBrokerSteps[it.brokerName]
             if (profileQuery != null && brokerSteps != null) {
@@ -194,7 +178,24 @@ class RealPirScan @Inject constructor(
             } else {
                 null
             }
-        }.splitIntoParts(maxWebViewCount)
+        }
+
+        if (processedJobRecords.isEmpty()) {
+            logcat { "PIR-SCAN: No job records." }
+            completeScan(runType, startTimeMillis)
+            return@withContext Result.success(Unit)
+        }
+
+        val script = pirCssScriptLoader.getScript()
+        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
+        // Initiate runners
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, runType))
+        }
+
+        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
 
         logcat { "PIR-SCAN: Total parts ${jobRecordsParts.size}" }
 
@@ -252,16 +253,8 @@ class RealPirScan @Inject constructor(
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
-        var createCount = 0
-        while (createCount != maxWebViewCount) {
-            runners.add(
-                pirActionsRunnerFactory.create(
-                    context,
-                    script,
-                    runType,
-                ),
-            )
-            createCount++
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, runType))
         }
 
         // Prepare a list of all broker steps that need to be run

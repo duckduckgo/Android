@@ -193,6 +193,12 @@ class RealPirOptOut @Inject constructor(
         temporaryCache.clear()
         logcat { "PIR-OPT-OUT: Processed job records resulted to ${processedJobRecords.size}" }
 
+        if (processedJobRecords.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
+            completeOptOut()
+            return@withContext Result.success(Unit)
+        }
+
         val script = pirCssScriptLoader.getScript()
         maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
 
