@@ -368,7 +368,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
                             val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
                             contentViews.forEach { view -> view.alpha = MIN_ALPHA }
-                            val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                            val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
@@ -558,6 +558,17 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
         private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
     }
+}
+
+private fun String.preventWidows(): String {
+    val lastSpaceIndex = this.lastIndexOf(' ')
+    // Ensure there is a space and it's not the last character
+    if (lastSpaceIndex > 0 && lastSpaceIndex < this.length - 1) {
+        val builder = StringBuilder(this)
+        builder.setCharAt(lastSpaceIndex, '\u00A0')
+        return builder.toString()
+    }
+    return this
 }
 
 private enum class LottieOnboardingAnimationSpec(
