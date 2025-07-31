@@ -18,24 +18,39 @@ package com.duckduckgo.duckchat.impl.inputscreen.autocomplete
 
 import android.view.ViewGroup
 import androidx.annotation.UiThread
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.DiffUtil.Callback
+import androidx.recyclerview.widget.DiffUtil.DiffResult
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteItem.Divider
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteItem.Suggestion
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DIVIDER_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SWITCH_TO_TAB_TYPE
+
+private sealed interface AutoCompleteItem {
+    data class Suggestion(val value: AutoCompleteSuggestion) : AutoCompleteItem
+    data object Divider : AutoCompleteItem
+}
+
+private val AutoCompleteSuggestion.isSearchItem: Boolean
+    get() = this is AutoCompleteSearchSuggestion && !this.isAllowedInTopHits
 
 class BrowserAutoCompleteSuggestionsAdapter(
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
@@ -47,9 +62,30 @@ class BrowserAutoCompleteSuggestionsAdapter(
 ) : RecyclerView.Adapter<AutoCompleteViewHolder>() {
 
     private val deleteClickListener: (AutoCompleteSuggestion) -> Unit = {
-        suggestions = suggestions.filter { suggestion -> suggestion != it }
-        notifyItemRemoved((suggestions.indexOf(it)))
+        val suggestions = getSuggestions().filter { suggestion -> suggestion != it }
+        val newItems = createItemsWithDividers(suggestions)
+        val diffResult = calculateDiff(newItems)
+        items = newItems
+        // Animate the change
+        diffResult.dispatchUpdatesTo(this)
         autoCompleteInAppMessageDismissedListener()
+    }
+
+    private fun calculateDiff(newItems: List<AutoCompleteItem>): DiffResult {
+        return DiffUtil.calculateDiff(
+            object : Callback() {
+                override fun getOldListSize() = items.size
+                override fun getNewListSize() = newItems.size
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                    when {
+                        items[oldItemPosition] is Divider && newItems[newItemPosition] is Divider -> true
+                        items[oldItemPosition] is Suggestion && newItems[newItemPosition] is Suggestion ->
+                            (items[oldItemPosition] as Suggestion).value == (newItems[newItemPosition] as Suggestion).value
+                        else -> false
+                    }
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) = true
+            },
+        )
     }
 
     private val viewHolderFactoryMap: Map<Int, SuggestionViewHolderFactory> = mapOf(
@@ -61,10 +97,11 @@ class BrowserAutoCompleteSuggestionsAdapter(
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
         SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
+        DIVIDER_TYPE to DividerViewHolderFactory(),
     )
 
     private var phrase = ""
-    private var suggestions: List<AutoCompleteSuggestion> = emptyList()
+    private var items: List<AutoCompleteItem> = emptyList()
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -72,44 +109,45 @@ class BrowserAutoCompleteSuggestionsAdapter(
     ): AutoCompleteViewHolder =
         viewHolderFactoryMap.getValue(viewType).onCreateViewHolder(parent)
 
-    override fun getItemViewType(position: Int): Int {
-        return when {
-            suggestions.isEmpty() -> EMPTY_TYPE
-            suggestions[position] is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
-            suggestions[position] is AutoCompleteHistorySuggestion -> HISTORY_TYPE
-            suggestions[position] is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
-            suggestions[position] is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
-            suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
-            suggestions[position] is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
-            suggestions[position] is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
+    override fun getItemViewType(position: Int): Int = when (val item = items[position]) {
+        is Divider -> DIVIDER_TYPE
+        is Suggestion -> when (item.value) {
+            is AutoCompleteBookmarkSuggestion -> BOOKMARK_TYPE
+            is AutoCompleteHistorySuggestion -> HISTORY_TYPE
+            is AutoCompleteHistorySearchSuggestion -> HISTORY_SEARCH_TYPE
+            is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
+            is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
+            is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
+            is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
             else -> SUGGESTION_TYPE
         }
     }
 
-    override fun onBindViewHolder(
-        holder: AutoCompleteViewHolder,
-        position: Int,
-    ) {
-        if (holder is EmptySuggestionViewHolder) {
-            // nothing required
-        } else {
-            viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
-                holder,
-                suggestions[position],
-                immediateSearchClickListener,
-                editableSearchClickListener,
-                deleteClickListener,
-                autoCompleteOpenSettingsClickListener,
-                autoCompleteLongPressClickListener,
-            )
+    override fun onBindViewHolder(holder: AutoCompleteViewHolder, position: Int) {
+        if (holder is EmptySuggestionViewHolder) return
+
+        when (val item = items[position]) {
+            Divider -> return
+            is Suggestion -> {
+                viewHolderFactoryMap.getValue(getItemViewType(position))
+                    .onBindViewHolder(
+                        holder,
+                        item.value,
+                        immediateSearchClickListener,
+                        editableSearchClickListener,
+                        deleteClickListener,
+                        autoCompleteOpenSettingsClickListener,
+                        autoCompleteLongPressClickListener,
+                    )
+            }
         }
     }
 
     override fun getItemCount(): Int {
-        if (suggestions.isEmpty() && phrase.isNotBlank()) {
+        if (items.isEmpty() && phrase.isNotBlank()) {
             return 1 // Empty ViewHolder
         }
-        return suggestions.size
+        return items.size
     }
 
     @UiThread
@@ -117,10 +155,26 @@ class BrowserAutoCompleteSuggestionsAdapter(
         newPhrase: String,
         newSuggestions: List<AutoCompleteSuggestion>,
     ) {
-        if (phrase == newPhrase && suggestions == newSuggestions) return
+        if (phrase == newPhrase && getSuggestions() == newSuggestions) return
         phrase = newPhrase
-        suggestions = newSuggestions
+        items = createItemsWithDividers(newSuggestions)
         notifyDataSetChanged()
+    }
+
+    private fun getSuggestions() = items
+        .filterIsInstance<Suggestion>()
+        .map { it.value }
+
+    private fun createItemsWithDividers(suggestions: List<AutoCompleteSuggestion>): List<AutoCompleteItem> = buildList {
+        suggestions.zipWithNext { current, next ->
+            add(Suggestion(current))
+            if (needsDivider(current, next)) add(Divider)
+        }
+        if (suggestions.isNotEmpty()) add(Suggestion(suggestions.last()))
+    }
+
+    private fun needsDivider(current: AutoCompleteSuggestion, next: AutoCompleteSuggestion): Boolean {
+        return current.isSearchItem != next.isSearchItem
     }
 
     object Type {
@@ -132,5 +186,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val IN_APP_MESSAGE_TYPE = 6
         const val DEFAULT_TYPE = 7
         const val SWITCH_TO_TAB_TYPE = 8
+        const val DIVIDER_TYPE = 9
     }
 }

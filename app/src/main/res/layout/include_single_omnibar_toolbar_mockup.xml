@@ -23,8 +23,7 @@
     android:layout_width="match_parent"
     android:layout_height="@dimen/experimentalToolbarSize"
     android:background="?daxColorToolbar"
-    android:clipChildren="false"
-    android:theme="@style/Widget.DuckDuckGo.ToolbarTheme">
+    android:clipChildren="false">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/mockOmniBarContainerShadow"

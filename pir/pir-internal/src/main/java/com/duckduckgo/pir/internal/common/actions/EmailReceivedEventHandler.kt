@@ -68,7 +68,7 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
                         ExtractedProfileParams(
                             name = this.name,
                             profileUrl = this.profileUrl,
-                            fullName = state.profileQuery?.fullName,
+                            fullName = state.profileQuery.fullName,
                             email = this.email,
                         )
                     },

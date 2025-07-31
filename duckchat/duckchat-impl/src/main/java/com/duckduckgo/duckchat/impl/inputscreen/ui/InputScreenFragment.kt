@@ -33,13 +33,20 @@ import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.common.utils.extensions.showKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.FragmentInputScreenBinding
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.EditWithSelectedQuery
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.HideKeyboard
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SwitchToTab
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.UserSubmittedQuery
-import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.GLOBE
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEARCH
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon.SEND
 import com.duckduckgo.duckchat.impl.inputscreen.ui.tabs.InputScreenPagerAdapter
@@ -92,24 +99,26 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
+        params?.query?.let { query ->
+            binding.inputModeWidget.provideInitialText(query)
+        }
+
         configureViewPager()
         configureOmnibar()
         configureVoice()
         configureObservers()
 
-        val params = requireActivity().intent.getActivityParams(InputScreenActivityParams::class.java)
-        params?.query?.let { query ->
-            binding.inputModeWidget.provideInitialText(query)
-        }
+        binding.inputModeWidget.init()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
                     val query = binding.inputModeWidget.text
-                    val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+                    val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
                     requireActivity().setResult(Activity.RESULT_CANCELED, data)
-                    exitInterstitial()
+                    exitInputScreen()
                 }
             },
         )
@@ -132,13 +141,24 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             processCommand(it)
         }
 
+        viewModel.inputFieldCommand.onEach { command ->
+            when (command) {
+                is InputFieldCommand.SelectAll -> {
+                    binding.inputModeWidget.selectAllText()
+                }
+            }
+        }.launchIn(lifecycleScope)
+
         viewModel.submitButtonIconState.onEach { iconState ->
             val iconResource = when (iconState.icon) {
-                GLOBE -> com.duckduckgo.mobile.android.R.drawable.ic_globe_24
                 SEARCH -> com.duckduckgo.mobile.android.R.drawable.ic_find_search_24
-                SEND -> R.drawable.ic_arrow_up_24
+                SEND -> com.duckduckgo.mobile.android.R.drawable.ic_arrow_right_24
             }
             binding.actionSend.setImageResource(iconResource)
+        }.launchIn(lifecycleScope)
+
+        viewModel.inputFieldState.onEach { inputBoxState ->
+            binding.inputModeWidget.canExpand = inputBoxState.canExpand
         }.launchIn(lifecycleScope)
     }
 
@@ -147,19 +167,14 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             is UserSubmittedQuery -> binding.inputModeWidget.submitMessage(command.query)
             is EditWithSelectedQuery -> binding.inputModeWidget.text = command.query
             is SwitchToTab -> {
-                val data = Intent().putExtra(InputScreenActivity.TAB_ID, command.tabId)
-                requireActivity().setResult(Activity.RESULT_OK, data)
-                exitInterstitial()
+                val data = Intent().putExtra(InputScreenActivityResultParams.TAB_ID_PARAM, command.tabId)
+                requireActivity().setResult(InputScreenActivityResultCodes.SWITCH_TO_TAB_REQUESTED, data)
+                exitInputScreen()
             }
-            is Command.SubmitSearch -> {
-                submitSearchQuery(command.query)
-            }
-            is Command.SubmitChat -> {
-                submitChatQuery(command.query)
-            }
-            else -> {
-                // TODO handle other commands
-            }
+            is SubmitSearch -> submitSearchQuery(command.query)
+            is SubmitChat -> submitChatQuery(command.query)
+            is ShowKeyboard -> showKeyboard(binding.inputModeWidget.inputField)
+            is HideKeyboard -> hideKeyboard(binding.inputModeWidget.inputField)
         }
     }
 
@@ -170,8 +185,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
     }
 
     private fun configureOmnibar() = with(binding.inputModeWidget) {
-        setContentId(R.id.viewPager)
-
         onSearchSent = { query ->
             viewModel.onSearchSubmitted(query)
         }
@@ -183,7 +196,6 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onSearchSelected = {
             binding.viewPager.setCurrentItem(0, true)
-            viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
         }
         onChatSelected = {
@@ -203,19 +215,22 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onChatTextChanged = { text ->
             viewModel.onChatInputTextChanged(text)
         }
+        onInputFieldClicked = {
+            viewModel.onInputFieldTouched()
+        }
     }
 
     private fun submitChatQuery(query: String) {
-        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
+        val data = Intent().putExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM, query)
         requireActivity().setResult(Activity.RESULT_CANCELED, data)
         requireActivity().finish()
         duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     private fun submitSearchQuery(query: String) {
-        val data = Intent().putExtra(InputScreenActivity.QUERY, query)
-        requireActivity().setResult(Activity.RESULT_OK, data)
-        exitInterstitial()
+        val data = Intent().putExtra(InputScreenActivityResultParams.SEARCH_QUERY_PARAM, query)
+        requireActivity().setResult(InputScreenActivityResultCodes.NEW_SEARCH_REQUESTED, data)
+        exitInputScreen()
     }
 
     private fun configureVoice() {
@@ -235,12 +250,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         viewModel.visibilityState.onEach {
             binding.actionVoice.isInvisible = !it.voiceInputButtonVisible
-            // TODO: Uncomment when button is implemented
-            // binding.actionForceWebSearch.isVisible = it.forceWebSearchButtonVisible
         }.launchIn(lifecycleScope)
     }
 
-    private fun exitInterstitial() {
+    private fun exitInputScreen() {
         hideKeyboard(binding.inputModeWidget.inputField)
         requireActivity().supportFinishAfterTransition()
     }

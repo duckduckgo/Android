@@ -21,11 +21,11 @@ import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.firebutton.FireButtonActivity
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -114,8 +114,8 @@ class ClearDataNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = SettingsActivity.intent(context).apply {
-            putExtra(SettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+        val intent = FireButtonActivity.intent(context).apply {
+            putExtra(FireButtonActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
         }
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)

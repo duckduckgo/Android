@@ -68,8 +68,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Subscription Settings</string>
     <string name="subscriptionSettingSubscribe">Protect your connection and identity with Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Includes our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Includes our VPN and Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Subscribers get our VPN, Personal Information Removal, and Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Subscribers get our VPN and Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Get Privacy Pro</string>
     <string name="subscriptionSettingTryFreeTrial">Try Privacy Pro Free</string>
     <string name="subscriptionSettingRestore">I Have a Subscription</string>

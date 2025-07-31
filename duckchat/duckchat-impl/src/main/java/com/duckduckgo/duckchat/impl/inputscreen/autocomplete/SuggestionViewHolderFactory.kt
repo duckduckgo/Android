@@ -31,14 +31,13 @@ import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteBookmarkSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDefaultBinding
+import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDividerBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySearchSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSearchSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteSwitchToTabSuggestionBinding
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHolder.InAppMessageViewHolder
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration.Companion.OTHER_ITEM
-import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.SuggestionItemDecoration.Companion.SEARCH_ITEM
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface SuggestionViewHolderFactory {
@@ -258,6 +257,26 @@ class InAppMessageViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
+class DividerViewHolderFactory : SuggestionViewHolderFactory {
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteDividerBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.DividerViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        // do nothing
+    }
+}
+
 sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     class SearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
@@ -279,12 +298,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 editQueryImage.setImageResource(R.drawable.ic_arrow_circle_down_left_16)
             }
-
-            if (item.isAllowedInTopHits) {
-                root.tag = OTHER_ITEM
-            } else {
-                root.tag = SEARCH_ITEM
-            }
         }
     }
 
@@ -301,8 +314,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
                 longPressClickListener(item)
                 true
             }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -316,8 +327,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
             bookmarkIndicator.setImageResource(if (item.isFavorite) R.drawable.ic_bookmark_favorite_24 else CommonR.drawable.ic_bookmark_24)
             root.setOnClickListener { immediateSearchListener(item) }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -335,8 +344,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
                 longPressClickListener(item)
                 true
             }
-
-            root.tag = OTHER_ITEM
         }
     }
 
@@ -349,12 +356,12 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             url.text = root.context.getString(R.string.autocompleteSwitchToTab, item.phrase)
 
             root.setOnClickListener { immediateSearchListener(item) }
-
-            root.tag = OTHER_ITEM
         }
     }
 
     class EmptySuggestionViewHolder(view: View) : AutoCompleteViewHolder(view)
+
+    class DividerViewHolder(val binding: ItemAutocompleteDividerBinding) : AutoCompleteViewHolder(binding.root)
 
     class DefaultSuggestionViewHolder(val binding: ItemAutocompleteDefaultBinding) : AutoCompleteViewHolder(binding.root) {
         fun bind(
@@ -368,8 +375,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             if (omnibarPosition == OmnibarPosition.BOTTOM) {
                 binding.editQueryImage.setImageResource(R.drawable.ic_arrow_circle_down_left_16)
             }
-
-            binding.root.tag = OTHER_ITEM
         }
     }
 
@@ -388,8 +393,6 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             )
             binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
             binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
-
-            binding.root.tag = OTHER_ITEM
         }
     }
 }

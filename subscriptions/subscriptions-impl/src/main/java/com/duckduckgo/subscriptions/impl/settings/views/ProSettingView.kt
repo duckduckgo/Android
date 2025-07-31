@@ -34,6 +34,8 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
@@ -50,8 +52,6 @@ import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Comm
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.ROW
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState.SubscriptionRegion.US
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -161,26 +161,24 @@ class ProSettingView @JvmOverloads constructor(
 
                     subscriptionSettingContainer.isVisible = true
                     subscriptionSetting.isVisible = true
-                    subscriptionSetting.setSecondaryText(context.getString(R.string.subscriptionSettingExpired))
+                    val subscriptionExpiredRes = if (viewState.rebrandingEnabled) {
+                        R.string.subscriptionSettingExpiredRebranding
+                    } else {
+                        R.string.subscriptionSettingExpired
+                    }
+                    subscriptionSetting.setSecondaryText(context.getString(subscriptionExpiredRes))
                     subscriptionSetting.setTrailingIconResource(CommonR.drawable.ic_exclamation_recolorable_16)
                 }
             }
             else -> {
                 with(binding) {
-                    subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
-                    subscriptionBuy.setSecondaryText(
-                        when (viewState.region) {
-                            ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
-                            US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
-                            else -> ""
-                        },
-                    )
-                    subscriptionGet.setText(
-                        when (viewState.freeTrialEligible) {
-                            true -> R.string.subscriptionSettingTryFreeTrial
-                            false -> R.string.subscriptionSettingGet
-                        },
-                    )
+                    if (viewState.duckAiPlusAvailable) {
+                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeSecure))
+                    } else {
+                        subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribeRebranding))
+                    }
+                    subscriptionBuy.setSecondaryText(getSubscriptionSecondaryText(viewState))
+                    subscriptionGet.setText(getActionButtonText(viewState))
 
                     subscriptionBuyContainer.isVisible = true
                     subscriptionRestoreContainer.isVisible = true
@@ -188,6 +186,38 @@ class ProSettingView @JvmOverloads constructor(
                     subscriptionSettingContainer.isGone = true
                 }
             }
+        }
+    }
+
+    private fun getActionButtonText(viewState: ViewState) = when (viewState.freeTrialEligible) {
+        true -> {
+            if (viewState.rebrandingEnabled) {
+                R.string.subscriptionSettingTryFreeTrialRebranding
+            } else {
+                R.string.subscriptionSettingTryFreeTrial
+            }
+        }
+
+        false -> {
+            if (viewState.rebrandingEnabled) {
+                R.string.subscriptionSettingGetRebranding
+            } else {
+                R.string.subscriptionSettingGet
+            }
+        }
+    }
+
+    private fun getSubscriptionSecondaryText(viewState: ViewState) = if (viewState.duckAiPlusAvailable) {
+        when (viewState.region) {
+            ROW -> context.getString(R.string.subscriptionSettingSubscribeWithDuckAiSubtitleRow)
+            US -> context.getString(R.string.subscriptionSettingSubscribeWithDuckAiSubtitle)
+            else -> ""
+        }
+    } else {
+        when (viewState.region) {
+            ROW -> context.getString(R.string.subscriptionSettingSubscribeSubtitleRow)
+            US -> context.getString(R.string.subscriptionSettingSubscribeSubtitle)
+            else -> ""
         }
     }
 

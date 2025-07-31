@@ -21,18 +21,18 @@ import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.anim.AnimationResourceProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.navigation.api.GlobalActivityStarter
-
-data class InputScreenActivityParams(
-    val query: String,
-) : GlobalActivityStarter.ActivityParams
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(InputScreenActivityParams::class)
 class InputScreenActivity : DuckDuckGoActivity() {
+
+    @Inject
+    lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +45,9 @@ class InputScreenActivity : DuckDuckGoActivity() {
     }
 
     private fun applyExitTransition() {
-        val enterTransition = AnimationResourceProvider.getSlideInFromBottomFadeIn()
-        val exitTransition = AnimationResourceProvider.getSlideOutToTopFadeOut()
+        val enterTransition = browserAndInputScreenTransitionProvider.getBrowserEnterAnimation()
+        val exitTransition = browserAndInputScreenTransitionProvider.getInputScreenExitAnimation()
+
         if (VERSION.SDK_INT >= 34) {
             overrideActivityTransition(
                 OVERRIDE_TRANSITION_CLOSE,
@@ -59,11 +60,5 @@ class InputScreenActivity : DuckDuckGoActivity() {
                 exitTransition,
             )
         }
-    }
-
-    companion object {
-        // TODO: This is in an :impl module and accessed directly from :app module, it should be moved to an API
-        const val QUERY = "query"
-        const val TAB_ID = "tab_id"
     }
 }

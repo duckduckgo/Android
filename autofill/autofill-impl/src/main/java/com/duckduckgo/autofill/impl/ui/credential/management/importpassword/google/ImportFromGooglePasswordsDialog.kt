@@ -28,7 +28,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.os.BundleCompat
-import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -73,7 +73,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
+import logcat.asLog
 import logcat.logcat
 
 @InjectWith(FragmentScope::class)
@@ -299,15 +301,25 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
     }
 
     private fun setResult(successImport: Boolean) {
-        logcat { "Setting result for ImportFromGooglePasswordsDialog, successful import? $successImport" }
+        logcat { "Autofill-import: Setting result for ImportFromGooglePasswordsDialog, successful import? $successImport. tabId=${getTabId()}" }
 
         getTabId()?.let { tabId ->
             val result = Bundle().also {
                 it.putBoolean(KEY_IMPORT_SUCCESS, successImport)
                 it.putString(KEY_URL, getOriginalUrl())
             }
-            parentFragment?.setFragmentResult(ImportPasswordsDialog.resultKey(tabId), result)
+
+            val resultKey = ImportPasswordsDialog.resultKey(tabId)
+            findCorrectFragmentManager()?.setFragmentResult(resultKey, result)
         }
+    }
+
+    private fun findCorrectFragmentManager(): FragmentManager? {
+        val result = kotlin.runCatching {
+            parentFragment?.parentFragmentManager ?: parentFragmentManager
+        }.onFailure { logcat(ERROR) { "Autofill-import: Failed to find a valid fragment manager ${it.asLog()}" } }
+
+        return result.getOrNull()
     }
 
     override fun onDestroyView() {
@@ -372,7 +384,7 @@ class ImportFromGooglePasswordsDialog : BottomSheetDialogFragment() {
         binding.closeButton.setOnClickListener { (dialog as BottomSheetDialog).animateClosed() }
     }
 
-    private fun getOriginalUrl() = arguments?.getString(KEY_URL)!!
+    private fun getOriginalUrl() = arguments?.getString(KEY_URL)
 
     private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory)[V::class.java] }
 

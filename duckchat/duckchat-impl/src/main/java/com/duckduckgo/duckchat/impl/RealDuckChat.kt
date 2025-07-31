@@ -112,6 +112,9 @@ interface DuckChatInternal : DuckChat {
      */
     fun closeDuckChat()
 
+    /**
+     * Opens DuckChat with a new session.
+     */
     fun openNewDuckChatSession()
 
     /**

@@ -30,8 +30,8 @@ import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import logcat.logcat
 
 @InjectWith(ActivityScope::class)
@@ -47,9 +47,11 @@ class IntentDispatcherActivity : DuckDuckGoActivity() {
 
         logcat { "onCreate called with intent $intent" }
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
-            dispatch(it)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).collectLatest {
+                dispatch(it)
+            }
+        }
 
         val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
         viewModel.onIntentReceived(intent, surfaceColor, isExternal = true)

@@ -83,6 +83,7 @@ class JsActionSuccessEventHandler @Inject constructor(
             pirRunStateHandler.handleState(
                 BrokerScanActionSucceeded(
                     currentBrokerStep.brokerName,
+                    state.profileQuery.id,
                     pirSuccessResponse,
                 ),
             )

@@ -141,7 +141,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
     private fun completeRequestData(
         brokerStep: BrokerStep,
         actionToExecute: BrokerAction,
-        profileQuery: ProfileQuery?,
+        profileQuery: ProfileQuery,
         requestData: PirScriptRequestData,
     ): PirScriptRequestData {
         return if (brokerStep is OptOutStep && actionToExecute.dataSource == EXTRACTED_PROFILE &&
@@ -154,7 +154,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
                 extractedProfile = ExtractedProfileParams(
                     name = extractedProfile.name,
                     profileUrl = extractedProfile.profileUrl,
-                    fullName = profileQuery?.fullName,
+                    fullName = profileQuery.fullName,
                     email = extractedProfile.email,
                 ),
             )

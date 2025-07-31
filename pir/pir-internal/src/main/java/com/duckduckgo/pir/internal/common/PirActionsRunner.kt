@@ -165,12 +165,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
 
-        engine = engineFactory.create(runType, brokerSteps)
-        engine!!.dispatch(
-            Started(
-                profileQuery = profileQuery,
-            ),
-        )
+        engine = engineFactory.create(runType, brokerSteps, profileQuery)
+        engine!!.dispatch(Started)
 
         return awaitResult()
     }
@@ -202,12 +198,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
 
-        engine = engineFactory.create(runType, brokerSteps)
-        engine!!.dispatch(
-            Started(
-                profileQuery = profileQuery,
-            ),
-        )
+        engine = engineFactory.create(runType, brokerSteps, profileQuery)
+        engine!!.dispatch(Started)
 
         return awaitResult()
     }

@@ -223,13 +223,16 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
         }
 
-        // Remove Fragments that are not bound anywhere -- pending a grace period
+        // Remove Fragments that are not bound anywhere and are not hidden -- pending a grace period
         if (!mIsInGracePeriod) {
             mHasStaleFragments = false; // we've executed all GC checks
 
             for (int ix = 0; ix < mFragments.size(); ix++) {
                 long itemId = mFragments.keyAt(ix);
-                if (!isFragmentViewBound(itemId)) {
+                // Exclude items in itemIdQueue from garbage collection. itemIdQueue is a FIFO queue
+                // that tracks fragments which are hidden but not yet eligible for removal. This ensures
+                // that fragments are only removed when the maximum active tab limit is reached.
+                if (!isFragmentViewBound(itemId) && !itemIdQueue.contains(itemId)) {
                     toRemove.add(itemId);
                 }
             }
@@ -457,6 +460,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
             mItemIdToViewHolder.remove(boundItemId);
         }
+    }
+
+    public void cleanupRemovedItems() {
+        mHasStaleFragments = true;
+        gcFragments();
     }
 
     @Override

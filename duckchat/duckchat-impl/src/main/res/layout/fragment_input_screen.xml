@@ -26,6 +26,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_2"
+        android:elevation="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -34,7 +35,6 @@
         android:id="@+id/viewPager"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/keyline_3"
         android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -91,23 +91,6 @@
         app:layout_constraintEnd_toStartOf="@id/actionNewLine"
         app:rippleColor="?attr/daxColorRipple"
         app:srcCompat="@drawable/ic_microphone_24"
-        app:tint="?attr/daxColorPrimaryIcon" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/actionForceWebSearch"
-        style="@style/Widget.DuckDuckGo.FloatingActionButton.Circular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/keyline_3"
-        android:layout_marginBottom="@dimen/keyline_3"
-        android:importantForAccessibility="no"
-        android:visibility="gone"
-        app:backgroundTint="?attr/daxColorWindow"
-        app:fabSize="mini"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:rippleColor="?attr/daxColorRipple"
-        app:srcCompat="@drawable/ic_globe_24"
         app:tint="?attr/daxColorPrimaryIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -362,6 +362,7 @@ import java.net.URISyntaxException
 import java.util.Locale
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -887,7 +888,7 @@ class BrowserTabViewModel @Inject constructor(
                     when (cta) {
                         is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
                             // Let the keyboard show before showing the animation, using insets were problematic
-                            delay(500)
+                            delay(750.milliseconds)
                             buckTryASearchAnimationEnabled.value = true
                         }
                     }
@@ -2886,13 +2887,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun showOrHideKeyboard(cta: Cta?) {
         // we hide the keyboard when showing a DialogCta and HomeCta type in the home screen otherwise we show it
-        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta || isBuckExperimentEnabledAndDaxEndCta(cta) ||
+        val shouldHideKeyboard = cta is HomePanelCta || cta is DaxBubbleCta.DaxPrivacyProCta ||
             duckAiFeatureState.showInputScreen.value || currentBrowserViewState().lastQueryOrigin == QueryOrigin.FromBookmark
         command.value = if (shouldHideKeyboard) HideKeyboard else ShowKeyboard
     }
-
-    private fun isBuckExperimentEnabledAndDaxEndCta(cta: Cta?): Boolean =
-        onboardingDesignExperimentToggles.buckOnboarding().isEnabled() && cta is DaxBubbleCta.DaxEndCta
 
     fun onUserClickCtaOkButton(cta: Cta) {
         viewModelScope.launch {
@@ -3070,13 +3068,14 @@ class BrowserTabViewModel @Inject constructor(
         command.value = ShowWebContent
     }
 
-    fun userLaunchingTabSwitcher() {
+    fun userLaunchingTabSwitcher(launchedFromFocusedNtp: Boolean) {
         command.value = LaunchTabSwitcher
         pixel.fire(AppPixelName.TAB_MANAGER_CLICKED)
         fireDailyLaunchPixel()
 
         if (!currentBrowserViewState().browserShowing) {
-            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB)
+            val params = mapOf(PixelParameter.FROM_FOCUSED_NTP to launchedFromFocusedNtp.toString())
+            pixel.fire(AppPixelName.TAB_MANAGER_OPENED_FROM_NEW_TAB, parameters = params)
         } else {
             val url = site?.url
             if (url != null) {

@@ -1,25 +1,31 @@
 package com.duckduckgo.duckchat.impl.ui.inputscreen
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import java.io.IOException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -31,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -43,7 +50,6 @@ class InputScreenViewModelTest {
 
     private val autoComplete: AutoComplete = mock()
     private val history: NavigationHistory = mock()
-    private val appCoroutineScope: CoroutineScope = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
 
@@ -61,24 +67,10 @@ class InputScreenViewModelTest {
             autoComplete = autoComplete,
             dispatchers = coroutineRule.testDispatcherProvider,
             history = history,
-            appCoroutineScope = appCoroutineScope,
+            appCoroutineScope = coroutineRule.testScope,
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
         )
-    }
-
-    @Test
-    fun `when onSearchSelected then set forceWebSearchButtonVisible to false`() {
-        val viewModel = createViewModel()
-        viewModel.onSearchSelected()
-        assertFalse(viewModel.visibilityState.value.forceWebSearchButtonVisible)
-    }
-
-    @Test
-    fun `when onChatSelected then set forceWebSearchButtonVisible to true`() {
-        val viewModel = createViewModel()
-        viewModel.onChatSelected()
-        assertTrue(viewModel.visibilityState.value.forceWebSearchButtonVisible)
     }
 
     @Test
@@ -412,24 +404,26 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when chat text is web url then submitButtonIcon is GLOBE`() {
+    fun `when chat text is web url then submitButtonIcon is SEND`() {
         val viewModel = createViewModel()
+        viewModel.onChatSelected()
         viewModel.onChatInputTextChanged("https://example.com")
-        assertEquals(SubmitButtonIcon.GLOBE, viewModel.submitButtonIconState.value.icon)
+        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 
     @Test
     fun `when chat text is not web url then submitButtonIcon is SEND`() {
         val viewModel = createViewModel()
+        viewModel.onChatSelected()
         viewModel.onChatInputTextChanged("example")
         assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 
     @Test
-    fun `when search text is web url then submitButtonIcon is GLOBE`() {
+    fun `when search text is web url then submitButtonIcon is SEND`() {
         val viewModel = createViewModel()
         viewModel.onSearchInputTextChanged("https://example.com")
-        assertEquals(SubmitButtonIcon.GLOBE, viewModel.submitButtonIconState.value.icon)
+        assertEquals(SubmitButtonIcon.SEND, viewModel.submitButtonIconState.value.icon)
     }
 
     @Test
@@ -467,5 +461,212 @@ class InputScreenViewModelTest {
         viewModel.onChatSubmitted(query)
 
         assertEquals(SubmitChat(query), viewModel.command.value)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with empty query then showChatLogo should be true`() {
+        val viewModel = createViewModel("initial text")
+
+        viewModel.onChatInputTextChanged("")
+
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with different text than initial then showChatLogo should be false`() {
+        val viewModel = createViewModel("initial text")
+
+        viewModel.onChatInputTextChanged("different text")
+
+        assertFalse(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with same initial text but autocomplete suggestions visible then showChatLogo should be false`() = runTest {
+        val initialText = "test query"
+        val viewModel = createViewModel(initialText)
+
+        assertTrue(viewModel.visibilityState.value.autoCompleteSuggestionsVisible)
+
+        viewModel.onChatInputTextChanged(initialText)
+
+        assertFalse(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onChatInputTextChanged with web URL then showChatLogo logic still applies`() {
+        val viewModel = createViewModel("https://example.com")
+
+        // Initially true (same as initial text, no autocomplete suggestions for URL)
+        viewModel.onChatInputTextChanged("https://example.com")
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
+
+        // Change to different URL - should be false
+        viewModel.onChatInputTextChanged("https://different.com")
+        assertFalse(viewModel.visibilityState.value.showChatLogo)
+
+        // Change to empty - should be true
+        viewModel.onChatInputTextChanged("")
+        assertTrue(viewModel.visibilityState.value.showChatLogo)
+    }
+
+    @Test
+    fun `when onRemoveSearchSuggestionConfirmed then refreshSuggestions triggered and autoComplete results updated`() = runTest {
+        val initialResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 1")))
+        val refreshedResult = AutoCompleteResult("query", listOf(AutoCompleteDefaultSuggestion("suggestion 2")))
+
+        val flow1 = MutableSharedFlow<AutoCompleteResult>()
+        val flow2 = MutableSharedFlow<AutoCompleteResult>()
+        whenever(autoComplete.autoComplete("query"))
+            .thenReturn(flow1)
+            .thenReturn(flow2)
+
+        val viewModel = createViewModel("query")
+
+        flow1.emit(initialResult)
+        advanceUntilIdle()
+        assertEquals(initialResult, viewModel.autoCompleteSuggestionResults.value)
+
+        viewModel.onRemoveSearchSuggestionConfirmed(
+            AutoCompleteHistorySuggestion(phrase = "query", url = "example.com", title = "title", isAllowedInTopHits = true),
+        )
+
+        flow2.emit(refreshedResult)
+        advanceUntilIdle()
+        assertEquals(refreshedResult, viewModel.autoCompleteSuggestionResults.value)
+
+        verify(autoComplete, times(2)).autoComplete("query")
+    }
+
+    @Test
+    fun `when initialized with web URL then inputFieldState canExpand should be false initially`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when initialized with search query then inputFieldState canExpand should be true`() {
+        val viewModel = createViewModel("search query")
+
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when user modifies initial web URL text then inputFieldState canExpand should become true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputFieldState.value.canExpand)
+        viewModel.onSearchInputTextChanged("https://example.com/modified")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when user modifies initial search query then inputFieldState canExpand should remain true`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+        viewModel.onSearchInputTextChanged("modified search")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when user restores original URL after modification then inputFieldState canExpand should remain true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // User modifies text
+        viewModel.onSearchInputTextChanged("modified")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+
+        // User restores original URL
+        viewModel.onSearchInputTextChanged("https://example.com")
+
+        // Should still allow expansion because user has moved beyond initial state
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when onInputFieldTouched called then inputFieldState canExpand should become true`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertFalse(viewModel.inputFieldState.value.canExpand)
+        viewModel.onInputFieldTouched()
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when onInputFieldTouched called then canExpand remains true even after text changes`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // Touch input field to enable expansion
+        viewModel.onInputFieldTouched()
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+
+        // Change text - should still allow expansion
+        viewModel.onSearchInputTextChanged("new text")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+
+        // Back to URL - should still allow expansion
+        viewModel.onSearchInputTextChanged("https://example.com")
+        assertTrue(viewModel.inputFieldState.value.canExpand)
+    }
+
+    @Test
+    fun `when initialized with web URL then SelectAll command should be sent`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        viewModel.inputFieldCommand.test {
+            val receivedCommand = awaitItem()
+            assertEquals(InputFieldCommand.SelectAll, receivedCommand)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with duck URL then SelectAll command should be sent`() = runTest {
+        val viewModel = createViewModel("duck://results?q=test")
+
+        viewModel.inputFieldCommand.test {
+            val receivedCommand = awaitItem()
+            assertEquals(InputFieldCommand.SelectAll, receivedCommand)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when initialized with search query then SelectAll command should NOT be sent`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        viewModel.inputFieldCommand.test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `when user modifies URL text after initialization then no additional SelectAll commands are sent`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        viewModel.inputFieldCommand.test {
+            // Should receive initial SelectAll
+            val initialCommand = awaitItem()
+            assertEquals(InputFieldCommand.SelectAll, initialCommand)
+
+            // Modify text
+            viewModel.onSearchInputTextChanged("https://example.com/page")
+
+            // Should not receive any additional commands
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `when restoreAutoCompleteScrollPosition called then RestoreAutoCompleteScrollPosition command sent and keyboard shown`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.storeAutoCompleteScrollPosition(firstVisibleItemPosition = 123, itemOffsetTop = 456)
+        viewModel.restoreAutoCompleteScrollPosition()
+
+        assertEquals(SearchCommand.RestoreAutoCompleteScrollPosition(123, 456), viewModel.searchTabCommand.value)
+        assertEquals(ShowKeyboard, viewModel.command.value)
     }
 }

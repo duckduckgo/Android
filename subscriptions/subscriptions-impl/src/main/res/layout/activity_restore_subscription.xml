@@ -79,7 +79,7 @@
                     app:leadingIcon="@drawable/ic_email_24"
                     app:leadingIconBackground="circular"
                     app:primaryText="@string/restoreSubscriptionEmailTitle"
-                    app:secondaryText="@string/restoreSubscriptionEmailDescription" />
+                    tools:secondaryText="@string/restoreSubscriptionEmailDescription" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

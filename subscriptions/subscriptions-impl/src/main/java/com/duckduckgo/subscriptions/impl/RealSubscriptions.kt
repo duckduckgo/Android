@@ -36,8 +36,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.Product
+import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
@@ -48,18 +50,23 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class RealSubscriptions @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val globalActivityStarter: GlobalActivityStarter,
     private val pixel: SubscriptionPixelSender,
+    private val subscriptionsFeature: Lazy<PrivacyProFeature>,
+    private val dispatcherProvider: DispatcherProvider,
 ) : Subscriptions {
     override suspend fun isSignedIn(): Boolean =
         subscriptionsManager.isSignedIn()
@@ -72,7 +79,15 @@ class RealSubscriptions @Inject constructor(
     }
 
     override fun getEntitlementStatus(): Flow<List<Product>> {
-        return subscriptionsManager.entitlements
+        return subscriptionsManager.entitlements.map { list ->
+            withContext(dispatcherProvider.io()) {
+                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                    list.filterNot { entitlement -> entitlement == DuckAiPlus }
+                } else {
+                    list
+                }
+            }
+        }
     }
 
     override suspend fun isEligible(): Boolean {
@@ -82,6 +97,10 @@ class RealSubscriptions @Inject constructor(
         return isActive || (isEligible && supportsEncryption)
     }
 
+    override fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus> {
+        return subscriptionsManager.subscriptionStatus
+    }
+
     override suspend fun getSubscriptionStatus(): SubscriptionStatus {
         return subscriptionsManager.subscriptionStatus()
     }
@@ -89,7 +108,15 @@ class RealSubscriptions @Inject constructor(
     override suspend fun getAvailableProducts(): Set<Product> {
         return subscriptionsManager.getFeatures()
             .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
-            .toSet()
+            .let {
+                withContext(dispatcherProvider.io()) {
+                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                        it.filterNot { feature -> feature == DuckAiPlus }
+                    } else {
+                        it
+                    }
+                }
+            }.toSet()
     }
 
     override fun launchPrivacyPro(context: Context, uri: Uri?) {
@@ -98,7 +125,7 @@ class RealSubscriptions @Inject constructor(
         val privacyPro = globalActivityStarter.startIntent(
             context,
             SubscriptionsWebViewActivityWithParams(
-                url = SubscriptionsConstants.BUY_URL,
+                url = buildSubscriptionUrl(uri),
                 origin = origin,
             ),
         ) ?: return
@@ -130,6 +157,15 @@ class RealSubscriptions @Inject constructor(
 
     override suspend fun isFreeTrialEligible(): Boolean {
         return subscriptionsManager.isFreeTrialEligible()
+    }
+
+    private fun buildSubscriptionUrl(uri: Uri?): String {
+        val queryParams = uri?.query
+        return if (!queryParams.isNullOrBlank()) {
+            "$BUY_URL?$queryParams"
+        } else {
+            BUY_URL
+        }
     }
 }
 
@@ -169,6 +205,14 @@ interface PrivacyProFeature {
     fun privacyProFreeTrial(): Toggle
 
     /**
+     * Enables/Disables duckAi for subscribers (advanced models)
+     * This flag is used to hide the feature in the native client and FE.
+     * It will be used for the feature rollout and kill-switch if necessary.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiPlus(): Toggle
+
+    /**
      * Android supports v2 token, but still relies on old v1 subscription messaging.
      * We are introducing new JS messaging. Use this flag as kill-switch if necessary.
      * It doesn't control which version of messaging FE uses.
@@ -190,6 +234,23 @@ interface PrivacyProFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun authApiV2JwksCache(): Toggle
+
+    /**
+     * As part of Duck.ai we are adding new supported JS messages.
+     * This is enabled by default, but can be disabled if necessary.
+     * FF only controls native messaging (enabled/disabled).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun duckAISubscriptionMessaging(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionRebranding(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun refreshSubscriptionPlanFeatures(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionAIFeaturesRebranding(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

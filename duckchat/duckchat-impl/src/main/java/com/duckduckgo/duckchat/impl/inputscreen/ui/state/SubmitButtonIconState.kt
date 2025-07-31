@@ -21,5 +21,5 @@ data class SubmitButtonIconState(
 )
 
 enum class SubmitButtonIcon {
-    SEARCH, GLOBE, SEND
+    SEARCH, SEND
 }

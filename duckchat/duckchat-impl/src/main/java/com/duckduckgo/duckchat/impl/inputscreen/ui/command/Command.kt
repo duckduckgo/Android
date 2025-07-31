@@ -16,14 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.command
 
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
-
 sealed class Command {
-    data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
-    data object AutocompleteItemRemoved : Command()
     data class SwitchToTab(val tabId: String) : Command()
     data class UserSubmittedQuery(val query: String) : Command()
     data class EditWithSelectedQuery(val query: String) : Command()
     data class SubmitSearch(val query: String) : Command()
     data class SubmitChat(val query: String) : Command()
+    data object ShowKeyboard : Command()
+    data object HideKeyboard : Command()
 }
