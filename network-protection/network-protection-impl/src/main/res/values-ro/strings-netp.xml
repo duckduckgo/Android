@@ -260,4 +260,8 @@
     <string name="netpAutoExcludeToggleName">Exclude automat aplicațiile care nu sunt compatibile cu VPN-urile</string>
     <string name="netpExclusionListLabelAutoExclude">Incompatibilă cu VPN-urile</string>
     <string name="netpExclusionListAutoExcludeDescription">Unele aplicații, cum ar fi cele bancare sau de streaming, nu funcționează bine cu VPN-urile. Când această setare este activată, vom exclude automat acele aplicații.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN deconectat din cauza expirării abonamentului. Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
 </resources>
