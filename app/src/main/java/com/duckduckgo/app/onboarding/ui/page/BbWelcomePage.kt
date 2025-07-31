@@ -65,6 +65,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
@@ -392,7 +393,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
                     val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
                     contentViews.forEach { view -> view.alpha = MIN_ALPHA }
-                    val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                    val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
 
                     val (topImage, bottomImage) = if (appTheme.isLightModeEnabled()) {
                         R.drawable.bb_address_bar_top_light to R.drawable.bb_address_bar_bottom_light
