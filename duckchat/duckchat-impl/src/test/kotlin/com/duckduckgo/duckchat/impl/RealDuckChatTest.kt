@@ -414,6 +414,15 @@ class RealDuckChatTest {
     fun whenOpenDuckChatSettingsCalledThenGlobalActivityStarterCalledWithDuckChatSettings() = runTest {
         whenever(mockGlobalActivityStarter.startIntent(any(), any<ActivityParams>())).thenReturn(Intent())
 
+        val testLifecycleOwner = TestLifecycleOwner(initialState = CREATED)
+
+        var onCloseCalled = false
+        testee.observeCloseEvent(testLifecycleOwner) {
+            onCloseCalled = true
+        }
+
+        testLifecycleOwner.currentState = Lifecycle.State.STARTED
+
         testee.openDuckChatSettings()
 
         verify(mockGlobalActivityStarter).startIntent(mockContext, DuckChatSettingsNoParams)
@@ -424,7 +433,9 @@ class RealDuckChatTest {
 
         assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK, capturedIntent.flags)
 
-        verify(testee).closeDuckChat()
+        advanceUntilIdle()
+
+        assertTrue(onCloseCalled)
     }
 
     @Test

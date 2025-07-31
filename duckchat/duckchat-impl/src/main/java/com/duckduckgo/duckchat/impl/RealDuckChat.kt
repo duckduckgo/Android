@@ -320,11 +320,12 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun openDuckChatSettings() {
-        // todo what happens with this interaction? closeDuckChat() would go back to browser activity
         val intent = globalActivityStarter.startIntent(context, DuckChatSettingsNoParams)
         intent?.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         context.startActivity(intent)
-        closeDuckChat()
+        appCoroutineScope.launch {
+            closeChatFlow.emit(Unit)
+        }
     }
 
     override fun closeDuckChat() {
