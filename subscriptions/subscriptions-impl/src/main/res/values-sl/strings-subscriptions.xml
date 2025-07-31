@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Imam naročnino</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošljite povratne informacije</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Naročnina DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Vaša naročnina na DuckDuckGo je potekla</string>
+    <string name="privacyProFaqRebranding">Potrebujete pomoč pri sklenitvi naročnine?</string>
+    <string name="privacyProFaqSecondaryRebranding">Poiščite odgovore na pogosta vprašanja ali se obrnite na podporo pri naročnini na naših straneh za pomoč. Razpoložljivost funkcij se razlikuje po državah.</string>
+    <string name="restoreSubscriptionTitleRebranding">Dodajte svojo naročnino v to napravo</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Povežite e-poštni naslov z naročnino, da jo dodate v to napravo.</string>
+    <string name="activateOnOtherDevicesRebranding">Dodajte svojo naročnino v druge naprave</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodajte naročnino v svoje druge naprave prek Googla Play ali z uporabo e-poštnega naslova.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Uporabite zgornji e-naslov za dodajanje naročnine v drugih napravah v aplikaciji DuckDuckGo. Pojdi v Nastavitve &gt; Nastavitve naročnine &gt; Imam naročnino.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro se zdaj imenuje le naročnina DuckDuckGo</string>
+
 </resources>
