@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Imam pretplatu</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Pošalji povratnu informaciju</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo pretplata</string>
+    <string name="subscriptionSettingExpiredRebranding">Tvoja pretplata na DuckDuckGo je istekla</string>
+    <string name="privacyProFaqRebranding">Trebaš pomoć s pretplatom?</string>
+    <string name="privacyProFaqSecondaryRebranding">Pronađi odgovore na često postavljana pitanja ili kontaktiraj podršku za pretplatu putem naših stranica pomoći. Dostupnost značajki ovisi o zemlji.</string>
+    <string name="restoreSubscriptionTitleRebranding">Dodaj svoju pretplatu na ovaj uređaj</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Poveži adresu e-pošte sa svojom pretplatom kako bi je dodao na ovaj uređaj.</string>
+    <string name="activateOnOtherDevicesRebranding">Dodaj svoju pretplatu na druge uređaje</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodaj svoju pretplatu na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Postavke pretplate &gt; Imam pretplatu.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro sada se jednostavno zove DuckDuckGo pretplata</string>
+
 </resources>
