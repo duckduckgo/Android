@@ -65,8 +65,8 @@ class RealFeedbackHelpUrlProvider @Inject constructor() : FeedbackHelpUrlProvide
     private fun getDuckAiSubCategoryUrl(subCategory: SubscriptionFeedbackDuckAiSubCategory): String {
         return when (subCategory) {
             SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS -> HELP_PAGE_DUCK_AI_ACCESS_SUBSCRIPTION_MODELS
-                SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER -> HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER
-                SubscriptionFeedbackDuckAiSubCategory.OTHER -> HELP_PAGE_DUCK_AI_OTHER
+            SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER -> HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER
+            SubscriptionFeedbackDuckAiSubCategory.OTHER -> HELP_PAGE_DUCK_AI_OTHER
         }
     }
 
