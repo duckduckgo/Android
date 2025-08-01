@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Ekskluder automatisk apper som ikke er kompatible med VPN-er</string>
     <string name="netpExclusionListLabelAutoExclude">Inkompatible med VPN-er</string>
     <string name="netpExclusionListAutoExcludeDescription">Noen apper, som bank- eller strømmeapper, fungerer ikke så godt med VPN. Når denne innstillingen er aktivert, ekskluderer vi disse appene automatisk.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN ble frakoblet på grunn av et utløpt abonnement. Abonner på DuckDuckGo for å koble til VPN-en igjen.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonner på DuckDuckGo for å koble til VPN-en igjen.</string>
 </resources>
