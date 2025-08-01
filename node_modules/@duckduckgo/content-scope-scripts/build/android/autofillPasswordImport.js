@@ -3864,16 +3864,22 @@
     }
     urlChangeListeners.add(listener);
   }
-  function handleURLChange() {
+  function handleURLChange(navigationType = "unknown") {
     for (const listener of urlChangeListeners) {
-      listener();
+      listener(navigationType);
     }
   }
   function listenForURLChanges() {
     const urlChangedInstance = new ContentFeature("urlChanged", {}, {});
     if ("navigation" in globalThis && "addEventListener" in globalThis.navigation) {
-      globalThis.navigation.addEventListener("navigatesuccess", () => {
-        handleURLChange();
+      const navigations = /* @__PURE__ */ new WeakMap();
+      globalThis.navigation.addEventListener("navigate", (event) => {
+        navigations.set(event.target, event.navigationType);
+      });
+      globalThis.navigation.addEventListener("navigatesuccess", (event) => {
+        const navigationType = navigations.get(event.target) || "unknown";
+        handleURLChange(navigationType);
+        navigations.delete(event.target);
       });
       return;
     }
@@ -3883,13 +3889,14 @@
     const historyMethodProxy = new DDGProxy(urlChangedInstance, History.prototype, "pushState", {
       apply(target, thisArg, args) {
         const changeResult = DDGReflect.apply(target, thisArg, args);
-        handleURLChange();
+        console.log("pushstate event");
+        handleURLChange("push");
         return changeResult;
       }
     });
     historyMethodProxy.overload();
     window.addEventListener("popstate", () => {
-      handleURLChange();
+      handleURLChange("popState");
     });
   }
 
@@ -3934,9 +3941,9 @@
       if (!isFeatureBroken(args, featureName) || alwaysInitExtensionFeatures(args, featureName)) {
         featureInstance.callInit(args);
         if (featureInstance.listenForUrlChanges || featureInstance.urlChanged) {
-          registerForURLChanges(() => {
+          registerForURLChanges((navigationType) => {
             featureInstance.recomputeSiteObject();
-            featureInstance?.urlChanged();
+            featureInstance?.urlChanged(navigationType);
           });
         }
       }
