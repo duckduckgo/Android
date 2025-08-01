@@ -316,8 +316,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                         }
 
                         binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
-                        binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
-                        binding.daxDialogCta.primaryCta.isVisible = true
+                        if (!binding.daxDialogCta.primaryCta.isVisible) {
+                            binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                            binding.daxDialogCta.primaryCta.isVisible = true
+                        }
                         binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
                         binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
                     }
