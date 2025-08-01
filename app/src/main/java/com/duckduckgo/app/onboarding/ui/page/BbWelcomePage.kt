@@ -394,8 +394,12 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                     contentViews.forEach { view -> view.alpha = MIN_ALPHA }
                     val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle)
 
-                    val topImage = if (appTheme.isLightModeEnabled()) R.drawable.bb_address_bar_top_light else R.drawable.bb_address_bar_top_dark
-                    val bottomImage = if (appTheme.isLightModeEnabled()) R.drawable.bb_address_bar_bottom_light else R.drawable.bb_address_bar_bottom_dark
+                    val (topImage, bottomImage) = if (appTheme.isLightModeEnabled()) {
+                        R.drawable.bb_address_bar_top_light to R.drawable.bb_address_bar_bottom_light
+                    } else {
+                        R.drawable.bb_address_bar_top_dark to R.drawable.bb_address_bar_bottom_dark
+                    }
+
                     binding.daxDialogCta.addressBarPosition.option1Image.setImageResource(topImage)
                     binding.daxDialogCta.addressBarPosition.option2Image.setImageResource(bottomImage)
 
