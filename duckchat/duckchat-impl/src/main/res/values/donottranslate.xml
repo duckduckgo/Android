@@ -20,7 +20,7 @@
     <string name="input_screen_search_hint">Search or enter address</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Ask Duck.ai</string>
-    <string name="input_screen_user_pref_title">Search Input</string>
+    <string name="input_screen_user_pref_title">Experimental Address Bar</string>
     <string name="input_screen_user_pref_description">Search the web or ask Duck.ai directly from the Address Bar</string>
 
     <!-- AutoComplete Suggestions -->
