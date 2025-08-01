@@ -31,8 +31,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -101,26 +101,28 @@ class FireDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding.clearAllOption.setOnClickListener {
-            onClearOptionClicked()
-        }
-        binding.cancelOption.setOnClickListener {
-            cancel()
-        }
+        lifecycleScope.launch {
+            binding.clearAllOption.setOnClickListener {
+                onClearOptionClicked()
+            }
+            binding.cancelOption.setOnClickListener {
+                cancel()
+            }
 
-        if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
-            window?.navigationBarColor = context.resources.getColor(CommonR.color.translucentDark, null)
-        } else if (appBuildConfig.sdkInt > Build.VERSION_CODES.O && appBuildConfig.sdkInt < Build.VERSION_CODES.R) {
-            window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        }
+            if (appBuildConfig.sdkInt == Build.VERSION_CODES.O) {
+                window?.navigationBarColor = context.resources.getColor(CommonR.color.translucentDark, null)
+            } else if (appBuildConfig.sdkInt > Build.VERSION_CODES.O && appBuildConfig.sdkInt < Build.VERSION_CODES.R) {
+                window?.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            }
 
-        removeTopPadding()
-        addBottomPaddingToButtons()
+            removeTopPadding()
+            addBottomPaddingToButtons()
 
-        if (animationEnabled()) {
-            configureFireAnimationView()
+            if (animationEnabled()) {
+                configureFireAnimationView()
+            }
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
     private fun removeTopPadding() {
@@ -141,8 +143,8 @@ class FireDialog(
         }
     }
 
-    private fun configureFireAnimationView() {
-        if (onboardingDesignExperimentManager.isAnyExperimentEnabled()) {
+    private suspend fun configureFireAnimationView() {
+        if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
             val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)
 

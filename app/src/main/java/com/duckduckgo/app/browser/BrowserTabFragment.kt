@@ -102,6 +102,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.browser.BrowserActivity.Companion.LAUNCH_FROM_EXTERNAL_EXTRA
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
@@ -197,7 +198,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -571,7 +572,7 @@ class BrowserTabFragment :
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
-    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var omnibarTypeResolver: OmnibarTypeResolver
@@ -2222,18 +2223,22 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
-            bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
-        } else {
-            daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        lifecycleScope.launch {
+            if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
+                bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+            } else {
+                daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+            }
         }
     }
 
     private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
-        } else {
-            daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
+        lifecycleScope.launch {
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
+            } else {
+                daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
+            }
         }
     }
 
@@ -2967,130 +2972,132 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        if (!onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
-            binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        lifecycleScope.launch {
+            if (!onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
+                binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-            if (swipingTabsFeature.isEnabled) {
-                binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
-            }
-        }
-
-        val webViewLayout = R.layout.include_duckduckgo_browser_webview
-        webView = layoutInflater.inflate(
-            webViewLayout,
-            binding.webViewContainer,
-            true,
-        ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
-
-        webView?.let {
-            it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
-            it.webViewClient = webViewClient
-            it.webChromeClient = webChromeClient
-            it.clearSslPreferences()
-
-            it.settings.apply {
-                clientBrandHintProvider.setDefault(this)
-                webViewClient.clientProvider = clientBrandHintProvider
-                userAgentString = userAgentProvider.userAgent()
-                javaScriptEnabled = true
-                domStorageEnabled = true
-                loadWithOverviewMode = true
-                useWideViewPort = true
-                builtInZoomControls = true
-                displayZoomControls = false
-                mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-                javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
-                setSupportMultipleWindows(true)
-                setSupportZoom(true)
-                if (accessibilitySettingsDataStore.overrideSystemFontSize) {
-                    textZoom = accessibilitySettingsDataStore.fontSize.toInt()
-                }
-                setAlgorithmicDarkeningAllowed(this)
-            }
-
-            it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
-                lifecycleScope.launch(dispatchers.main()) {
-                    viewModel.requestFileDownload(url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
+                if (swipingTabsFeature.isEnabled) {
+                    binding.daxDialogOnboardingCtaContent.layoutTransition.setAnimateParentHierarchy(false)
                 }
             }
 
-            it.setOnTouchListener { webView, event ->
-                when (event.actionMasked) {
-                    MotionEvent.ACTION_DOWN -> {
-                        isWebViewGestureInProgress = true
+            val webViewLayout = R.layout.include_duckduckgo_browser_webview
+            webView = layoutInflater.inflate(
+                webViewLayout,
+                binding.webViewContainer,
+                true,
+            ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
+
+            webView?.let {
+                it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
+                it.webViewClient = webViewClient
+                it.webChromeClient = webChromeClient
+                it.clearSslPreferences()
+
+                it.settings.apply {
+                    clientBrandHintProvider.setDefault(this)
+                    webViewClient.clientProvider = clientBrandHintProvider
+                    userAgentString = userAgentProvider.userAgent()
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    loadWithOverviewMode = true
+                    useWideViewPort = true
+                    builtInZoomControls = true
+                    displayZoomControls = false
+                    mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                    javaScriptCanOpenWindowsAutomatically = appBuildConfig.isTest // only allow when running tests
+                    setSupportMultipleWindows(true)
+                    setSupportZoom(true)
+                    if (accessibilitySettingsDataStore.overrideSystemFontSize) {
+                        textZoom = accessibilitySettingsDataStore.fontSize.toInt()
                     }
+                    setAlgorithmicDarkeningAllowed(this)
+                }
 
-                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                        isWebViewGestureInProgress = false
+                it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
+                    lifecycleScope.launch(dispatchers.main()) {
+                        viewModel.requestFileDownload(url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
                     }
                 }
 
-                if (omnibar.omnibarTextInput.isFocused) {
-                    binding.focusDummy.requestFocus()
-                }
-                dismissAppLinkSnackBar()
-                false
-            }
-            it.setOnScrollChangeListener { v, _, _, _, _ ->
-                if (!v.canScrollVertically(-1) && !isWebViewGestureInProgress) {
-                    // Automatically expand the omnibar when the web view is at the top, but only if the user isn't actively scrolling.
-                    // Expanding the omnibar changes the web view's offset, which could otherwise be misinterpreted by the framework
-                    // as a fling gesture in the opposite direction and cause unintended content shifting.
-                    omnibar.setExpanded(true)
-                }
-            }
+                it.setOnTouchListener { webView, event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> {
+                            isWebViewGestureInProgress = true
+                        }
 
-            it.setEnableSwipeRefreshCallback { enable ->
-                binding.swipeRefreshContainer?.isEnabled = enable
-            }
-
-            registerForContextMenu(it)
-
-            it.setFindListener(this)
-            loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
-            emailInjector.addJsInterface(
-                it,
-                onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
-                onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
-            )
-            configureWebViewForBlobDownload(it)
-            configureWebViewForAutofill(it)
-            printInjector.addJsInterface(it) { viewModel.printFromWebView() }
-            autoconsent.addJsInterface(it, autoconsentCallback)
-            contentScopeScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                            it.url
+                        MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                            isWebViewGestureInProgress = false
                         }
                     }
-                },
-            )
-            duckPlayerScripts.register(
-                it,
-                object : JsMessageCallback() {
-                    override fun process(
-                        featureName: String,
-                        method: String,
-                        id: String?,
-                        data: JSONObject?,
-                    ) {
-                        viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                            it.url
-                        }
-                    }
-                },
-            )
-        }
 
-        WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+                    if (omnibar.omnibarTextInput.isFocused) {
+                        binding.focusDummy.requestFocus()
+                    }
+                    dismissAppLinkSnackBar()
+                    false
+                }
+                it.setOnScrollChangeListener { v, _, _, _, _ ->
+                    if (!v.canScrollVertically(-1) && !isWebViewGestureInProgress) {
+                        // Automatically expand the omnibar when the web view is at the top, but only if the user isn't actively scrolling.
+                        // Expanding the omnibar changes the web view's offset, which could otherwise be misinterpreted by the framework
+                        // as a fling gesture in the opposite direction and cause unintended content shifting.
+                        omnibar.setExpanded(true)
+                    }
+                }
+
+                it.setEnableSwipeRefreshCallback { enable ->
+                    binding.swipeRefreshContainer?.isEnabled = enable
+                }
+
+                registerForContextMenu(it)
+
+                it.setFindListener(this@BrowserTabFragment)
+                loginDetector.addLoginDetection(it) { viewModel.loginDetected() }
+                emailInjector.addJsInterface(
+                    it,
+                    onSignedInEmailProtectionPromptShown = { viewModel.showEmailProtectionChooseEmailPrompt() },
+                    onInContextEmailProtectionSignupPromptShown = { showNativeInContextEmailProtectionSignupPrompt() },
+                )
+                configureWebViewForBlobDownload(it)
+                configureWebViewForAutofill(it)
+                printInjector.addJsInterface(it) { viewModel.printFromWebView() }
+                autoconsent.addJsInterface(it, autoconsentCallback)
+                contentScopeScripts.register(
+                    it,
+                    object : JsMessageCallback() {
+                        override fun process(
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                        ) {
+                            viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                                it.url
+                            }
+                        }
+                    },
+                )
+                duckPlayerScripts.register(
+                    it,
+                    object : JsMessageCallback() {
+                        override fun process(
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                        ) {
+                            viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                                it.url
+                            }
+                        }
+                    },
+                )
+            }
+
+            WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+        }
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3115,15 +3122,17 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
-        when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                onboardingCta.hideBuckOnboardingCta(binding)
-            }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                onboardingCta.hideBBOnboardingCta(binding)
-            }
-            else -> {
-                onboardingCta.hideOnboardingCta(binding)
+        lifecycleScope.launch {
+            when {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                    onboardingCta.hideBuckOnboardingCta(binding)
+                }
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                    onboardingCta.hideBBOnboardingCta(binding)
+                }
+                else -> {
+                    onboardingCta.hideOnboardingCta(binding)
+                }
             }
         }
     }
@@ -3133,28 +3142,32 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
-        daxBubbleCta.hideDaxBubbleCta(binding)
-        hideDaxBubbleCta()
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
-                hideBuckEndAnimation()
+        lifecycleScope.launch {
+            daxBubbleCta.hideDaxBubbleCta(binding)
+            hideDaxBubbleCta()
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
+                    hideBuckEndAnimation()
+                }
             }
+            renderer.showNewTab()
+            showKeyboard()
         }
-        renderer.showNewTab()
-        showKeyboard()
     }
 
     private fun hideDaxBubbleCta() {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            newBrowserTab.newTabLayout.setBackgroundColor(
+        lifecycleScope.launch {
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                newBrowserTab.newTabLayout.setBackgroundColor(
                     requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
-            )
-        } else {
-            newBrowserTab.browserBackground.setImageResource(0)
+                )
+            } else {
+                newBrowserTab.browserBackground.setImageResource(0)
+            }
+            buckDialogIntroBubble.root.gone()
+            bbDialogIntroBubble.root.gone()
+            daxDialogIntroBubble.root.gone()
         }
-        buckDialogIntroBubble.root.gone()
-        bbDialogIntroBubble.root.gone()
-        daxDialogIntroBubble.root.gone()
     }
 
     private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
@@ -4399,10 +4412,12 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
-                        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                            hideBuckEndAnimation()
+                        lifecycleScope.launch {
+                            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                                hideBuckEndAnimation()
+                            }
+                            showNewTab()
                         }
-                        showNewTab()
                     }
                 }
             }
@@ -4418,76 +4433,80 @@ class BrowserTabFragment :
         }
 
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
-            hideNewTab()
-            configuration.apply {
-                when {
-                    onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                        showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = true,
-                                configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+            lifecycleScope.launch {
+                hideNewTab()
+                configuration.apply {
+                    when {
+                        onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                            showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
+                                setOnOptionClicked(
+                                    onboardingExperimentEnabled = true,
+                                    configuration = configuration,
+                                ) { userEnteredQuery(it.link) }
+                            }
+                        }
+                        onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                            showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
+                                setOnOptionClicked(
+                                    onboardingExperimentEnabled = true,
+                                    configuration = configuration,
+                                ) { userEnteredQuery(it.link) }
+                            }
+                        }
+                        else -> {
+                            showCta(daxDialogIntroBubble.daxCtaContainer) {
+                                setOnOptionClicked { userEnteredQuery(it.link) }
+                            }
                         }
                     }
-                    onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                        showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
-                            setOnOptionClicked(
-                                onboardingExperimentEnabled = true,
-                                configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
-                        }
-                    }
-                    else -> {
-                        showCta(daxDialogIntroBubble.daxCtaContainer) {
-                            setOnOptionClicked { userEnteredQuery(it.link) }
-                        }
-                    }
-                }
 
-                setOnPrimaryCtaClicked {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
-                        configuration.hideBBEndCta(
-                            onAnimationEnd = {
+                    setOnPrimaryCtaClicked {
+                        lifecycleScope.launch {
+                            if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                                configuration.hideBBEndCta(
+                                    onAnimationEnd = {
+                                        viewModel.onUserClickCtaOkButton(configuration)
+                                    },
+                                )
+                            } else {
                                 viewModel.onUserClickCtaOkButton(configuration)
                             }
-                        )
-                    } else {
-                        viewModel.onUserClickCtaOkButton(configuration)
+                        }
+                    }
+                    setOnSecondaryCtaClicked {
+                        viewModel.onUserClickCtaSecondaryButton(configuration)
+                    }
+
+                    setOnDismissCtaClicked {
+                        viewModel.onUserClickCtaDismissButton(configuration)
                     }
                 }
-                setOnSecondaryCtaClicked {
-                    viewModel.onUserClickCtaSecondaryButton(configuration)
-                }
 
-                setOnDismissCtaClicked {
-                    viewModel.onUserClickCtaDismissButton(configuration)
-                }
-            }
+                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                    if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
+                        lifecycleScope.launch {
+                            with(newBrowserTab.wingAnimation) {
+                                delay(2.5.seconds)
+                                show()
+                                playAnimation()
+                            }
+                        }
+                    }
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
-                    lifecycleScope.launch {
-                        with(newBrowserTab.wingAnimation) {
-                            delay(2.5.seconds)
-                            show()
-                            playAnimation()
+                    if (configuration is DaxBubbleCta.DaxEndCta) {
+                        lifecycleScope.launch {
+                            with(newBrowserTab.buckEndAnimation) {
+                                delay(500)
+                                isVisible = true
+                                playAnimation()
+                            }
                         }
                     }
                 }
 
-                if (configuration is DaxBubbleCta.DaxEndCta) {
-                    lifecycleScope.launch {
-                        with(newBrowserTab.buckEndAnimation) {
-                            delay(500)
-                            isVisible = true
-                            playAnimation()
-                        }
-                    }
-                }
+                viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
+                viewModel.onCtaShown()
             }
-
-            viewModel.setBrowserBackground(appTheme.isLightModeEnabled())
-            viewModel.onCtaShown()
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -4639,11 +4658,13 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                buckDialogInContext.root.gone()
-            } else {
-                daxDialogInContext.dialogTextCta.cancelAnimation()
-                daxDialogInContext.daxCtaContainer.gone()
+            lifecycleScope.launch {
+                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                    buckDialogInContext.root.gone()
+                } else {
+                    daxDialogInContext.dialogTextCta.cancelAnimation()
+                    daxDialogInContext.daxCtaContainer.gone()
+                }
             }
         }
 

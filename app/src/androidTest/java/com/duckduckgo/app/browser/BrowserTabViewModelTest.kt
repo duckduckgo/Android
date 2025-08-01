@@ -673,7 +673,7 @@ class BrowserTabViewModelTest {
             brokenSitePrompt = mockBrokenSitePrompt,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentToggles,
         )
 
         val siteFactory = SiteFactoryImpl(

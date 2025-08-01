@@ -181,7 +181,7 @@ class CtaViewModelTest {
             brokenSitePrompt = mockBrokenSitePrompt,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentToggles,
         )
     }
 

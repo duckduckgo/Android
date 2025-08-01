@@ -49,7 +49,7 @@ class LottieFireAnimationLoader constructor(
     override fun preloadSelectedAnimation() {
         appCoroutineScope.launch(dispatchers.io()) {
             if (animationEnabled()) {
-                if (onboardingDesignExperimentManager.isAnyExperimentEnabled()) {
+                if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
                     // If experiment is successful delete this chain as we can just update HeroFire res id
                     val selectedFireAnimation = settingsDataStore.selectedFireAnimation
                     val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)

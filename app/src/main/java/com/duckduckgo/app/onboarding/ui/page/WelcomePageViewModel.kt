@@ -190,6 +190,7 @@ class WelcomePageViewModel @Inject constructor(
         defaultRoleBrowserDialog.dialogShown()
         appInstallStore.defaultBrowser = true
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
+        // Fire metric for default browser set from onboarding
 
         viewModelScope.launch {
             _commands.send(ShowAddressBarPositionDialog)

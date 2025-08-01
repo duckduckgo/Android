@@ -239,7 +239,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -472,9 +472,9 @@ class BrowserTabViewModel @Inject constructor(
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
-    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -884,7 +884,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
-                if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                     when (cta) {
                         is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
                             // Let the keyboard show before showing the animation, using insets were problematic
@@ -1890,6 +1890,8 @@ class BrowserTabViewModel @Inject constructor(
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
         }
+
+        // TODO check for serp or website
     }
 
     override fun onPageCommitVisible(
@@ -2867,6 +2869,7 @@ class BrowserTabViewModel @Inject constructor(
                     isBrowserShowing && !isErrorShowing,
                     siteLiveData.value,
                     detectedRefreshPatterns,
+                    viewModelScope,
                 )
             }
             val contextDaxDialogsShown = withContext(dispatchers.io()) {
@@ -4123,16 +4126,18 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
-                command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-            else -> {
-                command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+        viewModelScope.launch {
+            when {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                    command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+                }
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                    // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
+                    command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
+                }
+                else -> {
+                    command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+                }
             }
         }
     }
@@ -4145,15 +4150,17 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-            }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
-            }
-            else -> {
-                command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+        viewModelScope.launch {
+            when {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                    command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+                }
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled()-> {
+                    command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
+                }
+                else -> {
+                    command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+                }
             }
         }
     }

@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.core.content.IntentCompat
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
 import com.airbnb.lottie.RenderMode
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -35,6 +36,7 @@ import com.duckduckgo.common.ui.view.setAndPropagateUpFitsSystemWindows
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -66,27 +68,29 @@ class FireAnimationActivity : DuckDuckGoActivity() {
         fireAnimation: FireAnimation,
         fireAnimationView: LottieAnimationView,
     ) {
-        if (onboardingDesignExperimentManager.isAnyExperimentEnabled()) {
-            val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(fireAnimation)
-            fireAnimationView.setAnimation(resId)
-        } else {
-            fireAnimationView.setAnimation(fireAnimation.resId)
+        lifecycleScope.launch {
+            if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
+                val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(fireAnimation)
+                fireAnimationView.setAnimation(resId)
+            } else {
+                fireAnimationView.setAnimation(fireAnimation.resId)
+            }
+            fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
+            fireAnimationView.enableMergePathsForKitKatAndAbove(true)
+            fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
+            fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
+            fireAnimationView.addAnimatorListener(
+                object : Animator.AnimatorListener {
+                    override fun onAnimationRepeat(animation: Animator) {}
+                    override fun onAnimationCancel(animation: Animator) {}
+                    override fun onAnimationStart(animation: Animator) {}
+                    override fun onAnimationEnd(animation: Animator) {
+                        finish()
+                        overridePendingTransition(0, R.anim.tab_anim_fade_out)
+                    }
+                },
+            )
         }
-        fireAnimationView.setRenderMode(RenderMode.SOFTWARE)
-        fireAnimationView.enableMergePathsForKitKatAndAbove(true)
-        fireAnimationView.setAndPropagateUpFitsSystemWindows(false)
-        fireAnimationView.addAnimatorUpdateListener(accelerateAnimatorUpdateListener)
-        fireAnimationView.addAnimatorListener(
-            object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(animation: Animator) {}
-                override fun onAnimationCancel(animation: Animator) {}
-                override fun onAnimationStart(animation: Animator) {}
-                override fun onAnimationEnd(animation: Animator) {
-                    finish()
-                    overridePendingTransition(0, R.anim.tab_anim_fade_out)
-                }
-            },
-        )
     }
 
     private val accelerateAnimatorUpdateListener = object : ValueAnimator.AnimatorUpdateListener {

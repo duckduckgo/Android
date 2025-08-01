@@ -46,7 +46,7 @@ import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
@@ -63,6 +63,8 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.extensions.html
 import com.google.android.material.button.MaterialButton
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.collections.forEachIndexed
 import kotlin.collections.toMutableList
 import kotlin.time.Duration
@@ -385,7 +387,8 @@ sealed class OnboardingDaxDialogCta(
     class DaxSerpCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
         R.string.highlightsOnboardingSerpDaxDialogDescription,
@@ -408,35 +411,37 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    setBuckOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    setBBOnboardingDialogView(
-                        description = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                else -> {
-                    setOnboardingDialogView(
-                        daxText = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onSecondaryCtaClicked = onSecondaryCtaClicked,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
+            scope.launch {
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBuckOnboardingDialogView(
+                            message = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBBOnboardingDialogView(
+                            description = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    else -> {
+                        setOnboardingDialogView(
+                            daxText = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onSecondaryCtaClicked = onSecondaryCtaClicked,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
                 }
             }
         }
@@ -447,7 +452,8 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val trackers: List<Entity>,
         val settingsDataStore: SettingsDataStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         null,
@@ -470,38 +476,41 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    setBuckOnboardingDialogView(
-                        message = getTrackersDescription(context, trackers),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    setBBOnboardingDialogView(
-                        title = getTrackersDescription(context, trackers),
-                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                else -> {
-                    setOnboardingDialogView(
-                        daxText = getTrackersDescription(context, trackers),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onSecondaryCtaClicked = onSecondaryCtaClicked,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
+            scope.launch {
+
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBuckOnboardingDialogView(
+                            message = getTrackersDescription(context, trackers),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                        setBBOnboardingDialogView(
+                            title = getTrackersDescription(context, trackers, isBBExperimentEnabled = true),
+                            description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    else -> {
+                        setOnboardingDialogView(
+                            daxText = getTrackersDescription(context, trackers),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onSecondaryCtaClicked = onSecondaryCtaClicked,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
                 }
             }
         }
@@ -510,6 +519,7 @@ sealed class OnboardingDaxDialogCta(
         fun getTrackersDescription(
             context: Context,
             trackersEntities: List<Entity>,
+            isBBExperimentEnabled: Boolean = false,
         ): String {
             val trackers = trackersEntities
                 .map { it.displayName }
@@ -520,7 +530,7 @@ sealed class OnboardingDaxDialogCta(
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                    if (isBBExperimentEnabled) {
                         context.resources.getQuantityString(R.plurals.bbOnboardingTrackersBlockedZeroDialogTitle, trackersFiltered.size)
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     } else {
@@ -528,7 +538,7 @@ sealed class OnboardingDaxDialogCta(
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     }
                 } else {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                    if (isBBExperimentEnabled) {
                         context.resources.getQuantityString(R.plurals.bbOnboardingTrackersBlockedDialogTitle, size, size)
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     } else {
@@ -536,7 +546,7 @@ sealed class OnboardingDaxDialogCta(
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     }
                 }
-            return if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+            return if (isBBExperimentEnabled) {
                 "$trackersText$quantityString"
             } else {
                 "<b>$trackersText</b>$quantityString"
@@ -549,7 +559,8 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val network: String,
         private val siteHost: String,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
         null,
@@ -572,35 +583,37 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    setBuckOnboardingDialogView(
-                        message = getTrackersDescription(context),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    setBBOnboardingDialogView(
-                        description = getTrackersDescription(context),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                else -> {
-                    setOnboardingDialogView(
-                        daxText = getTrackersDescription(context),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onSecondaryCtaClicked = onSecondaryCtaClicked,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
+            scope.launch {
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBuckOnboardingDialogView(
+                            message = getTrackersDescription(context),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                        setBBOnboardingDialogView(
+                            description = getTrackersDescription(context),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    else -> {
+                        setOnboardingDialogView(
+                            daxText = getTrackersDescription(context),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onSecondaryCtaClicked = onSecondaryCtaClicked,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
                 }
             }
         }
@@ -630,7 +643,8 @@ sealed class OnboardingDaxDialogCta(
     class DaxNoTrackersCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
@@ -653,35 +667,37 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    setBuckOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    setBBOnboardingDialogView(
-                        description = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                else -> {
-                    setOnboardingDialogView(
-                        daxText = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onSecondaryCtaClicked = onSecondaryCtaClicked,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
+            scope.launch {
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBuckOnboardingDialogView(
+                            message = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                        setBBOnboardingDialogView(
+                            description = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    else -> {
+                        setOnboardingDialogView(
+                            daxText = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onSecondaryCtaClicked = onSecondaryCtaClicked,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
                 }
             }
         }
@@ -690,7 +706,8 @@ sealed class OnboardingDaxDialogCta(
     class DaxFireButtonCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_FIRE_BUTTON,
         R.string.onboardingFireButtonDaxDialogDescription,
@@ -713,37 +730,39 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    setBuckOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    setBBOnboardingDialogView(
-                        title = context.getString(R.string.bbOnboardingFireButtonDaxDialogTitle),
-                        leadingDescriptionIconRes = CommonR.drawable.ic_fire_24,
-                        description = context.getString(R.string.bbOnboardingFireButtonDaxDialogDescription),
-                        primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                else -> {
-                    setOnboardingDialogView(
-                        daxText = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onSecondaryCtaClicked = onSecondaryCtaClicked,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
+            scope.launch {
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBuckOnboardingDialogView(
+                            message = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                        setBBOnboardingDialogView(
+                            title = context.getString(R.string.bbOnboardingFireButtonDaxDialogTitle),
+                            leadingDescriptionIconRes = CommonR.drawable.ic_fire_24,
+                            description = context.getString(R.string.bbOnboardingFireButtonDaxDialogDescription),
+                            primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    else -> {
+                        setOnboardingDialogView(
+                            daxText = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onSecondaryCtaClicked = onSecondaryCtaClicked,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
                 }
             }
         }
@@ -752,7 +771,8 @@ sealed class OnboardingDaxDialogCta(
     class DaxSiteSuggestionsCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_INTRO_VISIT_SITE,
         R.string.onboardingSitesDaxDialogDescription,
@@ -773,64 +793,66 @@ sealed class OnboardingDaxDialogCta(
             onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
             onDismissCtaClicked: () -> Unit,
         ) {
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    showBuckOnboardingCta(
-                        binding = binding,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = onSuggestedOptionClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    showBBOnboardingCta(
-                        binding = binding,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = { option ->
-                            onSuggestedOptionClicked?.invoke(option)
-                            with(binding.includeOnboardingInContextBBDialog) {
-                                dialogTextCta.text = ""
-                                hiddenTextCta.text = ""
-                                onboardingDialogContent.gone()
-                                onboardingDialogSuggestionsContent.gone()
-                            }
-                        },
-                    )
-                }
-                else -> {
-                    val context = binding.root.context
-                    val daxDialog = binding.includeOnboardingInContextDaxDialog
-                    val daxText = description?.let { context.getString(it) }.orEmpty()
-
-                    binding.includeOnboardingInContextDaxDialog.onboardingDialogContent.gone()
-                    binding.includeOnboardingInContextDaxDialog.onboardingDialogSuggestionsContent.show()
-                    daxDialog.suggestionsDialogTextCta.text = ""
-                    daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
-                    TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
-                    val afterAnimation = {
-                        onTypingAnimationFinished()
-                        val optionsViews = listOf<DaxButton>(
-                            daxDialog.daxDialogOption1,
-                            daxDialog.daxDialogOption2,
-                            daxDialog.daxDialogOption3,
-                            daxDialog.daxDialogOption4,
+            scope.launch {
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        showBuckOnboardingCta(
+                            binding = binding,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onSuggestedOptionClicked = onSuggestedOptionClicked,
                         )
-
-                        optionsViews.forEachIndexed { index, buttonView ->
-                            val options = onboardingStore.getSitesOptions()
-                            options[index].setOptionView(buttonView)
-                            buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                        }
-
-                        val options = onboardingStore.getSitesOptions()
-                        daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
-                        daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
-                        daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
-                        daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
                     }
-                    daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
-                    daxDialog.onboardingDialogContent.setOnClickListener {
-                        daxDialog.dialogTextCta.finishAnimation()
-                        afterAnimation()
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                        showBBOnboardingCta(
+                            binding = binding,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onSuggestedOptionClicked = { option ->
+                                onSuggestedOptionClicked?.invoke(option)
+                                with(binding.includeOnboardingInContextBBDialog) {
+                                    dialogTextCta.text = ""
+                                    hiddenTextCta.text = ""
+                                    onboardingDialogContent.gone()
+                                    onboardingDialogSuggestionsContent.gone()
+                                }
+                            },
+                        )
+                    }
+                    else -> {
+                        val context = binding.root.context
+                        val daxDialog = binding.includeOnboardingInContextDaxDialog
+                        val daxText = description?.let { context.getString(it) }.orEmpty()
+
+                        binding.includeOnboardingInContextDaxDialog.onboardingDialogContent.gone()
+                        binding.includeOnboardingInContextDaxDialog.onboardingDialogSuggestionsContent.show()
+                        daxDialog.suggestionsDialogTextCta.text = ""
+                        daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
+                        TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
+                        val afterAnimation = {
+                            onTypingAnimationFinished()
+                            val optionsViews = listOf<DaxButton>(
+                                daxDialog.daxDialogOption1,
+                                daxDialog.daxDialogOption2,
+                                daxDialog.daxDialogOption3,
+                                daxDialog.daxDialogOption4,
+                            )
+
+                            optionsViews.forEachIndexed { index, buttonView ->
+                                val options = onboardingStore.getSitesOptions()
+                                options[index].setOptionView(buttonView)
+                                buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                            }
+
+                            val options = onboardingStore.getSitesOptions()
+                            daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
+                            daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
+                            daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
+                            daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
+                        }
+                        daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
+                        daxDialog.onboardingDialogContent.setOnClickListener {
+                            daxDialog.dialogTextCta.finishAnimation()
+                            afterAnimation()
+                        }
                     }
                 }
             }
@@ -988,7 +1010,8 @@ sealed class OnboardingDaxDialogCta(
     class DaxEndCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val scope: CoroutineScope,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
         R.string.highlightsOnboardingEndDaxDialogDescription,
@@ -1013,35 +1036,37 @@ sealed class OnboardingDaxDialogCta(
         ) {
             val context = binding.root.context
 
-            when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
-                    setBuckOnboardingDialogView(
-                        message = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
-                    setBBOnboardingDialogView(
-                        description = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
-                }
-                else -> {
-                    setOnboardingDialogView(
-                        daxText = description?.let { context.getString(it) }.orEmpty(),
-                        primaryCtaText = buttonText?.let { context.getString(it) },
-                        binding = binding,
-                        onPrimaryCtaClicked = onPrimaryCtaClicked,
-                        onSecondaryCtaClicked = onSecondaryCtaClicked,
-                        onTypingAnimationFinished = onTypingAnimationFinished,
-                        onDismissCtaClicked = onDismissCtaClicked,
-                    )
+            scope.launch {
+                when {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                        setBuckOnboardingDialogView(
+                            message = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                        setBBOnboardingDialogView(
+                            description = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
+                    else -> {
+                        setOnboardingDialogView(
+                            daxText = description?.let { context.getString(it) }.orEmpty(),
+                            primaryCtaText = buttonText?.let { context.getString(it) },
+                            binding = binding,
+                            onPrimaryCtaClicked = onPrimaryCtaClicked,
+                            onSecondaryCtaClicked = onSecondaryCtaClicked,
+                            onTypingAnimationFinished = onTypingAnimationFinished,
+                            onDismissCtaClicked = onDismissCtaClicked,
+                        )
+                    }
                 }
             }
         }
