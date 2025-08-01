@@ -143,10 +143,11 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         }
         if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)
-        } else if (viewState.lowPriorityMessage != null) {
-            showLowPriorityMessage(viewState.lowPriorityMessage)
         } else {
             binding.messageCta.gone()
+            if (viewState.lowPriorityMessage != null) {
+                showLowPriorityMessage(viewState.lowPriorityMessage)
+            }
         }
 
         if (viewState.favourites.isEmpty()) {
