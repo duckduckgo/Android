@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+<!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,17 +15,6 @@
   ~ limitations under the License.
   -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="@integer/input_screen_slide_animation_duration_ms">
-
-    <translate
-        android:fromYDelta="-56dp"
-        android:interpolator="@anim/overshoot_interpolator_tension_1"
-        android:toYDelta="0dp" />
-
-    <alpha
-        android:fromAlpha="0.0"
-        android:interpolator="@android:anim/decelerate_interpolator"
-        android:toAlpha="1.0" />
-
-</set>
+<resources>
+    <integer name="input_screen_slide_animation_duration_ms">200</integer>
+</resources>
