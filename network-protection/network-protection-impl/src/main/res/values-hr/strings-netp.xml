@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Automatski izuzmi aplikacije koje nisu kompatibilne s VPN-ovima</string>
     <string name="netpExclusionListLabelAutoExclude">Nekompatibilno s VPN-ovima</string>
     <string name="netpExclusionListAutoExcludeDescription">Neke aplikacije, poput bankarskih ili streaming aplikacija, ne funkcioniraju dobro s VPN-ovima. Kad je ova postavka omogućena, automatski ćemo izuzeti (isključiti) te aplikacije.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN je prekinut zbog istekle pretplate. Pretplati se na DuckDuckGo za ponovno povezivanje VPN-a.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Pretplati se na DuckDuckGo za ponovno povezivanje VPN-a.</string>
 </resources>
