@@ -290,6 +290,43 @@
             android:layout_height="wrap_content"
             tools:ignore="DeprecatedWidgetInXml" />
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bb_button_primary"
+            style="@style/Widget.DuckDuckGo.BBButton.TextButton.Primary"
+            android:text="Primary BB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bb_button_secondary"
+            style="@style/Widget.DuckDuckGo.BBButton.TextButton.Secondary"
+            android:text="Secondary BB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="16dp"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bb_button_option"
+            style="@style/Widget.DuckDuckGo.BBButton.Option"
+            android:text="Option BB"
+            app:icon="@drawable/ic_find_search_20_light"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:ignore="DeprecatedWidgetInXml" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

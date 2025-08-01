@@ -268,6 +268,7 @@ sealed class Command {
     object OpenDuckPlayerPageInfo : Command()
     class SetBrowserBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetBrowserBackgroundColor(@ColorRes val colorRes: Int) : Command()
+    class SetBubbleDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetOnboardingDialogBackground(@DrawableRes val backgroundRes: Int) : Command()
     class SetOnboardingDialogBackgroundColor(@ColorRes val colorRes: Int) : Command()
     data class LaunchFireDialogFromOnboardingDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()

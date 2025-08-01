@@ -51,7 +51,7 @@ import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
@@ -169,7 +169,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
 
     @Inject
-    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
@@ -743,7 +743,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
             dispatcherProvider = dispatcherProvider,
             fireButtonStore = fireButtonStore,
             appBuildConfig = appBuildConfig,
-            onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = onboardingDesignExperimentManager,
             onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
         )
         dialog.show()

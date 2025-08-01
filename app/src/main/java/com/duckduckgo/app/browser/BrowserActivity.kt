@@ -84,7 +84,7 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
@@ -205,7 +205,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var omnibarTypeResolver: OmnibarTypeResolver
 
     @Inject
-    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper
@@ -768,7 +768,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             dispatcherProvider = dispatcherProvider,
             fireButtonStore = fireButtonStore,
             appBuildConfig = appBuildConfig,
-            onboardingDesignExperimentToggles = onboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = onboardingDesignExperimentManager,
             onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
         )
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
