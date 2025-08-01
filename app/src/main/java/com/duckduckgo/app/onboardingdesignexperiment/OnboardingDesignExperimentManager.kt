@@ -16,15 +16,15 @@
 
 package com.duckduckgo.app.onboardingdesignexperiment
 
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.Cohorts.BB
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.Cohorts.BUCK
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.squareup.anvil.annotations.ContributesBinding
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 interface OnboardingDesignExperimentManager {
     suspend fun isAnyExperimentEnrolledAndEnabled(): Boolean
