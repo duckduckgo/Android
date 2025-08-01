@@ -44,11 +44,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.impl.R.*
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
@@ -75,6 +74,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixelSender: SubscriptionPixelSender
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     private val viewModel: SubscriptionSettingsViewModel by bindViewModel()
     private val binding: ActivitySubscriptionSettingsBinding by viewBinding()
@@ -333,7 +335,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(
             context = this,
             params = SubscriptionsWebViewActivityWithParams(
-                url = SubscriptionsConstants.BUY_URL,
+                url = subscriptionsUrlProvider.buyUrl,
             ),
         )
     }
@@ -342,7 +344,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = MANAGE_URL,
+                url = subscriptionsUrlProvider.manageUrl,
                 toolbarConfig = CustomTitle(getString(string.manageEmail)),
             ),
         )
@@ -352,7 +354,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = ACTIVATE_URL,
+                url = subscriptionsUrlProvider.activateUrl,
             ),
         )
     }
@@ -373,7 +375,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
-        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
+
+        // const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
     }
