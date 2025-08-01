@@ -21,8 +21,10 @@
     <string name="pirDevOptOutTitle">PIR Dev Opt-out</string>
     <string name="pirDevDebugOptOutTitle">PIR Dev Debug Opt-out</string>
     <string name="pirDevSettingsOptOut">PIR Opt-out</string>
-    <string name="pirDevRunSimpleScan">Run simple scan</string>
-    <string name="pirDevForceKillScan">Reset scan</string>
+    <string name="pirDevRunSimpleScan">Run all pending jobs</string>
+    <string name="pirDevResetAll">Reset ALL data</string>
+    <string name="pirDevResetOptOutOnly">Reset opt out data only</string>
+    <string name="pirDevForceKillScan">Kill with no reset</string>
     <string name="pirDevForceKillOptOut">Reset optout</string>
     <string name="pirDevViewScanResults">View All Scan Results</string>
     <string name="pirDevViewOptOutResults">View All OptOut Results</string>

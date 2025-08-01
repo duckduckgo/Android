@@ -363,6 +363,72 @@ class RealPirSchedulingRepositoryTest {
         assertEquals(null, result)
     }
 
+    @Test
+    fun whenUpdateScanJobRecordStatusThenCallsDaoWithCorrectParameters() = runTest {
+        val newStatus = ScanJobStatus.MATCHES_FOUND
+        val newLastScanDateMillis = 9999L
+        val brokerName = "update-broker"
+        val profileQueryId = 888L
+
+        testee.updateScanJobRecordStatus(
+            newStatus = newStatus,
+            newLastScanDateMillis = newLastScanDateMillis,
+            brokerName = brokerName,
+            profileQueryId = profileQueryId,
+        )
+
+        verify(mockJobSchedulingDao).updateScanJobRecordStatus(
+            brokerName,
+            profileQueryId,
+            newStatus.name,
+            newLastScanDateMillis,
+        )
+    }
+
+    @Test
+    fun whenUpdateScanJobRecordStatusWithErrorStatusThenCallsDaoWithErrorStatus() = runTest {
+        val newStatus = ScanJobStatus.ERROR
+        val newLastScanDateMillis = 7777L
+        val brokerName = "error-broker"
+        val profileQueryId = 555L
+
+        testee.updateScanJobRecordStatus(
+            newStatus = newStatus,
+            newLastScanDateMillis = newLastScanDateMillis,
+            brokerName = brokerName,
+            profileQueryId = profileQueryId,
+        )
+
+        verify(mockJobSchedulingDao).updateScanJobRecordStatus(
+            brokerName,
+            profileQueryId,
+            "ERROR",
+            newLastScanDateMillis,
+        )
+    }
+
+    @Test
+    fun whenUpdateScanJobRecordStatusWithNoMatchFoundStatusThenCallsDaoWithNoMatchStatus() = runTest {
+        val newStatus = ScanJobStatus.NO_MATCH_FOUND
+        val newLastScanDateMillis = 6666L
+        val brokerName = "no-match-broker"
+        val profileQueryId = 333L
+
+        testee.updateScanJobRecordStatus(
+            newStatus = newStatus,
+            newLastScanDateMillis = newLastScanDateMillis,
+            brokerName = brokerName,
+            profileQueryId = profileQueryId,
+        )
+
+        verify(mockJobSchedulingDao).updateScanJobRecordStatus(
+            brokerName,
+            profileQueryId,
+            "NO_MATCH_FOUND",
+            newLastScanDateMillis,
+        )
+    }
+
     // Combined delete tests
     @Test
     fun whenDeleteAllJobRecordsThenCallBothDeleteMethods() = runTest {

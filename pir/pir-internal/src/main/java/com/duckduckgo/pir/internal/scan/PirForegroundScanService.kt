@@ -29,6 +29,8 @@ import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.common.PirJob.RunType.MANUAL
+import com.duckduckgo.pir.internal.scheduling.PirExecutionType
+import com.duckduckgo.pir.internal.scheduling.PirJobsRunner
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_ID_STATUS_COMPLETE
@@ -42,7 +44,7 @@ import logcat.logcat
 @InjectWith(scope = ServiceScope::class)
 class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
-    lateinit var pirScan: PirScan
+    lateinit var pirJobsRunner: PirJobsRunner
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
@@ -67,7 +69,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         startForeground(1, notification)
 
         launch {
-            val result = pirScan.executeAllBrokers(this@PirForegroundScanService, MANUAL)
+            val result = pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, PirExecutionType.MANUAL)
             if (result.isSuccess) {
                 notificationManagerCompat.checkPermissionAndNotify(
                     applicationContext,
@@ -84,7 +86,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     override fun onDestroy() {
         logcat { "PIR-SCAN: PIR service destroyed" }
-        pirScan.stop()
+        pirJobsRunner.stop()
     }
 
     private fun createNotification(message: String): Notification {

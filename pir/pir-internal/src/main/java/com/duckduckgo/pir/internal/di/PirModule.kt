@@ -40,6 +40,7 @@ import com.duckduckgo.pir.internal.store.RealPirDataStore
 import com.duckduckgo.pir.internal.store.RealPirRepository
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
+import com.duckduckgo.pir.internal.store.db.JobSchedulingDao
 import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
 import com.duckduckgo.pir.internal.store.db.ScanLogDao
 import com.duckduckgo.pir.internal.store.db.ScanResultsDao
@@ -99,6 +100,12 @@ class PirModule {
     @Provides
     fun provideOptOutResultsDao(database: PirDatabase): OptOutResultsDao {
         return database.optOutResultsDao()
+    }
+
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideJobSchedulingDao(database: PirDatabase): JobSchedulingDao {
+        return database.jobSchedulingDao()
     }
 
     @Provides

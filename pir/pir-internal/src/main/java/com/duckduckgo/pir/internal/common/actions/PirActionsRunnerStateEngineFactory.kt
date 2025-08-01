@@ -21,7 +21,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
+import com.duckduckgo.pir.internal.models.ProfileQuery
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 

@@ -45,6 +45,20 @@ interface JobSchedulingDao {
     @Query("SELECT * FROM pir_optout_job_record WHERE extractedProfileId = :extractedProfileId  ORDER BY attemptCount")
     fun getOptOutJobRecord(extractedProfileId: Long): OptOutJobRecordEntity?
 
+    @Query(
+        """
+        UPDATE pir_scan_job_record 
+        SET status = :newStatus, lastScanDateInMillis = :newLastScanDateMillis 
+        WHERE brokerName = :brokerName AND userProfileId = :profileQueryId
+    """,
+    )
+    suspend fun updateScanJobRecordStatus(
+        brokerName: String,
+        profileQueryId: Long,
+        newStatus: String,
+        newLastScanDateMillis: Long,
+    )
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun saveOptOutJobRecord(optOutJobRecord: OptOutJobRecordEntity)
 
