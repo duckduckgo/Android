@@ -292,7 +292,7 @@ class CtaViewModel @Inject constructor(
         }
     }
 
-    private fun isOnboardingExperimentEnabled() = onboardingDesignExperimentToggles.buckOnboarding().isEnabled() &&
+    private fun isOnboardingExperimentEnabled() = onboardingDesignExperimentToggles.buckOnboarding().isEnabled() ||
         onboardingDesignExperimentToggles.bbOnboarding().isEnabled()
 
     @WorkerThread
