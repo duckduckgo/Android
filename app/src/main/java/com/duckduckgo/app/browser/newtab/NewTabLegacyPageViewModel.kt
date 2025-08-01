@@ -62,6 +62,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val dismissedCtaDao: DismissedCtaDao,
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val settingsDataStore: SettingsDataStore,
+    private val lowPriorityMessagingModel: LowPriorityMessagingModel,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -69,6 +70,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
         val newMessage: Boolean = false,
         val onboardingComplete: Boolean = false,
         val favourites: List<Favorite> = emptyList(),
+        val lowPriorityMessage: LowPriorityMessage? = null,
     )
 
     private data class ViewStateSnapshot(
@@ -125,6 +127,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
                                 onboardingComplete = isHomeOnboardingComplete(),
+                                lowPriorityMessage = lowPriorityMessagingModel.getMessage(),
                             ),
                         )
                     }
@@ -187,5 +190,11 @@ class NewTabLegacyPageViewModel @Inject constructor(
 
     fun openPlayStore(appPackage: String) {
         playStoreUtils.launchPlayStore(appPackage)
+    }
+
+    fun onLowPriorityMessagePrimaryButtonClicked() {
+        viewModelScope.launch {
+            lowPriorityMessagingModel.getPrimaryButtonCommand()?.let { command.send(it) }
+        }
     }
 }

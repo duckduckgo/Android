@@ -63,6 +63,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -144,6 +145,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             showRemoteMessage(viewState.message, viewState.newMessage)
         } else {
             binding.messageCta.gone()
+            if (viewState.lowPriorityMessage != null) {
+                showLowPriorityMessage(viewState.lowPriorityMessage)
+            }
         }
 
         if (viewState.favourites.isEmpty()) {
@@ -234,5 +238,39 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             binding.messageCta.show()
             viewModel.onMessageShown()
         }
+    }
+
+    private fun showLowPriorityMessage(message: LowPriorityMessage) {
+        val parentVisible = (this.parent as? View)?.isVisible ?: false
+        val shouldRender = parentVisible && binding.messageCta.isGone
+
+        if (shouldRender) {
+            binding.messageCta.setMessage(message.message)
+            binding.messageCta.onCloseButtonClicked {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    message.onCloseButtonClicked()
+                    removeLowPriorityMessage()
+                }
+            }
+            binding.messageCta.onPrimaryActionClicked {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    message.onPrimaryButtonClicked()
+                    viewModel.onLowPriorityMessagePrimaryButtonClicked()
+                    removeLowPriorityMessage()
+                }
+            }
+            binding.messageCta.onSecondaryActionClicked {
+                findViewTreeLifecycleOwner()?.lifecycleScope?.launch {
+                    message.onSecondaryButtonClicked()
+                    removeLowPriorityMessage()
+                }
+            }
+            binding.messageCta.show()
+            message.onMessageShown()
+        }
+    }
+
+    private fun removeLowPriorityMessage() {
+        binding.messageCta.gone()
     }
 }

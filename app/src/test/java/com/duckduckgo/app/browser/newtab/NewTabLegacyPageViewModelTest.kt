@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId.DAX_END
-import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -61,7 +60,7 @@ class NewTabLegacyPageViewModelTest {
     private var mockDismissedCtaDao: DismissedCtaDao = mock()
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
-    private val mockUserStageStore: UserStageStore = mock()
+    private val mockLowPriorityMessagingModel: LowPriorityMessagingModel = mock()
 
     private lateinit var testee: NewTabLegacyPageViewModel
 
@@ -82,6 +81,7 @@ class NewTabLegacyPageViewModelTest {
             dismissedCtaDao = mockDismissedCtaDao,
             extendedOnboardingFeatureToggles = mockExtendedOnboardingFeatureToggles,
             settingsDataStore = mockSettingsDataStore,
+            lowPriorityMessagingModel = mockLowPriorityMessagingModel,
         )
     }
 
@@ -219,6 +219,19 @@ class NewTabLegacyPageViewModelTest {
         testee.commands().test {
             expectMostRecentItem().also {
                 assertEquals(it, Command.DismissMessage)
+            }
+        }
+    }
+
+    @Test
+    fun whenOnLowPriorityMessagePrimaryButtonClickedThenGetPrimaryButtonCommandCalledAndCommandSent() = runTest {
+        whenever(mockLowPriorityMessagingModel.getPrimaryButtonCommand()).thenReturn(Command.LaunchDefaultBrowser)
+        testee.onLowPriorityMessagePrimaryButtonClicked()
+
+        verify(mockLowPriorityMessagingModel).getPrimaryButtonCommand()
+        testee.commands().test {
+            expectMostRecentItem().also {
+                assertEquals(it, Command.LaunchDefaultBrowser)
             }
         }
     }
