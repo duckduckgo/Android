@@ -28,6 +28,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.internal.R
+import com.duckduckgo.pir.internal.checker.PirWorkHandler
 import com.duckduckgo.pir.internal.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity
 import com.duckduckgo.pir.internal.settings.PirDevSettingsActivity.Companion.NOTIF_CHANNEL_ID
@@ -36,6 +37,7 @@ import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -46,6 +48,9 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     @Inject
     lateinit var notificationManagerCompat: NotificationManagerCompat
+
+    @Inject
+    lateinit var pirWorkHandler: PirWorkHandler
 
     override fun onCreate() {
         super.onCreate()
@@ -67,6 +72,13 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         startForeground(1, notification)
 
         launch {
+            if (pirWorkHandler.canRunPir().firstOrNull() == false) {
+                logcat { "PIR-SCAN: PIR scan not allowed to run!" }
+                pirWorkHandler.cancelWork()
+                stopSelf()
+                return@launch
+            }
+
             val result = pirScan.executeAllBrokers(this@PirForegroundScanService, MANUAL)
             if (result.isSuccess) {
                 notificationManagerCompat.checkPermissionAndNotify(
