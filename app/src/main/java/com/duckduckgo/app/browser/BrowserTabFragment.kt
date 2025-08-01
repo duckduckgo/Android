@@ -650,11 +650,17 @@ class BrowserTabFragment :
     private val buckDialogIntroBubble
         get() = binding.includeNewBrowserTab.includeOnboardingBuckDialogBubble
 
+    private val bbDialogIntroBubble
+        get() = binding.includeNewBrowserTab.includeOnboardingBBDialogBubble
+
     private val daxDialogInContext
         get() = binding.includeOnboardingInContextDaxDialog
 
     private val buckDialogInContext
         get() = binding.includeOnboardingInContextBuckDialog
+
+    private val bbDialogInContext
+        get() = binding.includeOnboardingInContextBBDialog
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -2155,6 +2161,7 @@ class BrowserTabFragment :
 
             is Command.SetBrowserBackground -> setBrowserBackgroundRes(it.backgroundRes)
             is Command.SetBrowserBackgroundColor -> setNewTabBackgroundColor(it.colorRes)
+            is Command.SetBubbleDialogBackground -> setBubbleDialogBackground(it.backgroundRes)
             is Command.SetOnboardingDialogBackground -> setOnboardingDialogBackgroundRes(it.backgroundRes)
             is Command.SetOnboardingDialogBackgroundColor -> setOnboardingDialogBackgroundColor(it.colorRes)
             is Command.LaunchFireDialogFromOnboardingDialog -> {
@@ -2210,8 +2217,16 @@ class BrowserTabFragment :
         newBrowserTab.newTabLayout.setBackgroundColor(getColor(requireContext(), colorRes))
     }
 
+    private fun setBubbleDialogBackground(backgroundRes: Int) {
+        newBrowserTab.includeOnboardingBBDialogBubble.root.setBackgroundResource(backgroundRes)
+    }
+
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+            bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        } else {
+            daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
+        }
     }
 
     private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
@@ -3100,10 +3115,16 @@ class BrowserTabFragment :
     }
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            onboardingCta.hideBuckOnboardingCta(binding)
-        } else {
-            onboardingCta.hideOnboardingCta(binding)
+        when {
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingCta.hideBuckOnboardingCta(binding)
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingCta.hideBBOnboardingCta(binding)
+            }
+            else -> {
+                onboardingCta.hideOnboardingCta(binding)
+            }
         }
     }
 
@@ -3132,6 +3153,7 @@ class BrowserTabFragment :
             newBrowserTab.browserBackground.setImageResource(0)
         }
         buckDialogIntroBubble.root.gone()
+        bbDialogIntroBubble.root.gone()
         daxDialogIntroBubble.root.gone()
     }
 
@@ -4398,18 +4420,40 @@ class BrowserTabFragment :
         private fun showDaxOnboardingBubbleCta(configuration: DaxBubbleCta) {
             hideNewTab()
             configuration.apply {
-                if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                    showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
-                        setOnOptionClicked { userEnteredQuery(it.link) }
+                when {
+                    onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                        showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
+                            setOnOptionClicked(
+                                onboardingExperimentEnabled = true,
+                                configuration = configuration,
+                            ) { userEnteredQuery(it.link) }
+                        }
                     }
-                } else {
-                    showCta(daxDialogIntroBubble.daxCtaContainer) {
-                        setOnOptionClicked { userEnteredQuery(it.link) }
+                    onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                        showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
+                            setOnOptionClicked(
+                                onboardingExperimentEnabled = true,
+                                configuration = configuration,
+                            ) { userEnteredQuery(it.link) }
+                        }
+                    }
+                    else -> {
+                        showCta(daxDialogIntroBubble.daxCtaContainer) {
+                            setOnOptionClicked { userEnteredQuery(it.link) }
+                        }
                     }
                 }
 
                 setOnPrimaryCtaClicked {
-                    viewModel.onUserClickCtaOkButton(configuration)
+                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                        configuration.hideBBEndCta(
+                            onAnimationEnd = {
+                                viewModel.onUserClickCtaOkButton(configuration)
+                            },
+                        )
+                    } else {
+                        viewModel.onUserClickCtaOkButton(configuration)
+                    }
                 }
                 setOnSecondaryCtaClicked {
                     viewModel.onUserClickCtaSecondaryButton(configuration)

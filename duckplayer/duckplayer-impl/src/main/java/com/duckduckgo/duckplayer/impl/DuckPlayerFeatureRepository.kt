@@ -24,13 +24,21 @@ import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Disabled
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.Enabled
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
+import java.io.IOException
+import java.io.InputStream
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.logcat
+import okhttp3.Headers.Companion.toHeaders
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 interface DuckPlayerFeatureRepository {
     fun getDuckPlayerRemoteConfigJson(): String
@@ -73,6 +81,11 @@ interface DuckPlayerFeatureRepository {
 
     suspend fun wasUsedBefore(): Boolean
     suspend fun setUsed()
+
+    suspend fun requestEmbed(
+        url: String,
+        headers: Map<String, String>,
+    ): InputStream?
 }
 
 @SingleInstanceIn(AppScope::class)
@@ -81,6 +94,7 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
     private val duckPlayerDataStore: DuckPlayerDataStore,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
+    @Named("api") private val okHttpClient: Lazy<OkHttpClient>,
 ) : DuckPlayerFeatureRepository {
 
     override fun getDuckPlayerRemoteConfigJson(): String {
@@ -211,5 +225,18 @@ class RealDuckPlayerFeatureRepository @Inject constructor(
 
     override suspend fun setUsed() {
         duckPlayerDataStore.setUsed()
+    }
+
+    override suspend fun requestEmbed(
+        url: String,
+        headers: Map<String, String>,
+    ): InputStream? {
+        return try {
+            val okHttpRequest = Request.Builder().url(url).headers(headers.toHeaders()).build()
+            withContext(dispatcherProvider.io()) { okHttpClient.get().newCall(okHttpRequest).execute().body?.byteStream() }
+        } catch (e: IOException) {
+            logcat { "Request failed: ${e.message}" }
+            null
+        }
     }
 }

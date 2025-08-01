@@ -26,6 +26,9 @@ interface UserProfileDao {
     @Query("SELECT * FROM pir_user_profile")
     fun getUserProfiles(): List<UserProfile>
 
+    @Query("SELECT * FROM pir_user_profile WHERE id IN (:ids)")
+    fun getUserProfilesWithIds(ids: List<Long>): List<UserProfile>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUserProfile(userProfile: UserProfile)
 

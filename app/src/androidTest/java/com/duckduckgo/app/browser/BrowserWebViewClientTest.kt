@@ -173,6 +173,8 @@ class BrowserWebViewClientTest {
     fun setup() = runTest {
         webView = TestWebView(context)
         whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
+        val toggle: Toggle = mock()
+        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
         testee = BrowserWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
@@ -183,7 +185,7 @@ class BrowserWebViewClientTest {
             loginDetector,
             dosDetector,
             thirdPartyCookieManager,
-            TestScope(),
+            coroutinesTestRule.testScope,
             coroutinesTestRule.testDispatcherProvider,
             browserAutofillConfigurator,
             ampLinks,
@@ -224,7 +226,7 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenOnPageStartedCalledThenListenerNotified() {
+    fun whenOnPageStartedCalledThenListenerNotified() = runTest {
         val toggle: Toggle = mock()
         whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
 

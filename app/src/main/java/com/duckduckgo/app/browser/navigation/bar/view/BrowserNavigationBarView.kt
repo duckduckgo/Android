@@ -117,7 +117,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     }
 
     private val pulseAnimation: PulseAnimation by lazy {
-        PulseAnimation(lifecycleOwner)
+        PulseAnimation(lifecycleOwner, onboardingDesignExperimentToggles)
     }
 
     val popupMenuAnchor: View = binding.menuButton
@@ -236,7 +236,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
                     pulseAnimation.playOn(
                         targetView = binding.fireIconImageView,
                         isSenseOfProtectionExperimentAndShieldView = false,
-                        isBuckOnboardingExperiment = onboardingDesignExperimentToggles.buckOnboarding().isEnabled(),
                     )
                 }
             }

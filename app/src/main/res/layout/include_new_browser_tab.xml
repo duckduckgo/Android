@@ -77,6 +77,17 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_max="600dp" />
 
+        <include
+            android:id="@+id/includeOnboardingBBDialogBubble"
+            layout="@layout/include_onboarding_bubble_bb_dialog"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintWidth_max="600dp" />
+
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/buckMagnifyingGlassAnimation"
             android:layout_width="0dp"

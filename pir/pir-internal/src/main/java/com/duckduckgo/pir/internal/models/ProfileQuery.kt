@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.scripts.models
+package com.duckduckgo.pir.internal.models
 
-/**
- * This profile represents the data we can get from the web UI / from the user
- */
 data class ProfileQuery(
     val id: Long,
     val firstName: String,

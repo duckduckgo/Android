@@ -21,7 +21,7 @@ import androidx.annotation.UiThread
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.lottie.LottieCompositionFactory
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -37,7 +37,7 @@ class LottieFireAnimationLoader constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val appCoroutineScope: CoroutineScope,
-    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper,
 ) : FireAnimationLoader {
 
@@ -49,7 +49,7 @@ class LottieFireAnimationLoader constructor(
     override fun preloadSelectedAnimation() {
         appCoroutineScope.launch(dispatchers.io()) {
             if (animationEnabled()) {
-                if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if (onboardingDesignExperimentManager.isAnyExperimentEnabled()) {
                     // If experiment is successful delete this chain as we can just update HeroFire res id
                     val selectedFireAnimation = settingsDataStore.selectedFireAnimation
                     val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)

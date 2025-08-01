@@ -162,6 +162,8 @@ class CtaViewModelTest {
         whenever(mockBrokenSitePrompt.isFeatureEnabled()).thenReturn(false)
         whenever(mockBrokenSitePrompt.getUserRefreshPatterns()).thenReturn(emptySet())
         whenever(mockSubscriptions.isEligible()).thenReturn(false)
+        whenever(mockOnboardingDesignExperimentToggles.buckOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockDisabledToggle)
 
         testee = CtaViewModel(
             appInstallStore = mockAppInstallStore,
@@ -876,6 +878,7 @@ class CtaViewModelTest {
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
         whenever(mockOnboardingDesignExperimentToggles.buckOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockDisabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
@@ -884,6 +887,42 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is DaxBubbleCta.DaxPrivacyProCta)
+    }
+
+    @Test
+    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndBuckOnboardingExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockOnboardingDesignExperimentToggles.buckOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
+    }
+
+    @Test
+    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndBBOnboardingExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentToggles.buckOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
+        whenever(mockSubscriptions.isEligible()).thenReturn(true)
+        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
+        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
+        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
+
+        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
+        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
     }
 
     @Test
