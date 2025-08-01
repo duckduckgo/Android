@@ -20,8 +20,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.FullOnboardingSkipper.ViewState
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.device.DeviceInfo
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -49,6 +51,10 @@ class OnboardingViewModelTest {
 
     private val appBuildConfig: AppBuildConfig = mock()
 
+    private val deviceInfo: DeviceInfo = mock()
+
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
+
     private val testee: OnboardingViewModel by lazy {
         OnboardingViewModel(
             userStageStore = userStageStore,
@@ -56,6 +62,8 @@ class OnboardingViewModelTest {
             dispatchers = coroutineRule.testDispatcherProvider,
             onboardingSkipper = onboardingSkipper,
             appBuildConfig = appBuildConfig,
+            deviceInfo = deviceInfo,
+            onboardingDesignExperimentManager = onboardingDesignExperimentManager,
         )
     }
 

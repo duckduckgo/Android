@@ -28,6 +28,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
 interface OnboardingDesignExperimentManager {
+    suspend fun enroll()
     suspend fun isAnyExperimentEnrolledAndEnabled(): Boolean
     suspend fun isBuckEnrolledAndEnabled(): Boolean
     suspend fun isBbEnrolledAndEnabled(): Boolean
@@ -69,6 +70,12 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     private val onboardingDesignExperimentCountDataStore: OnboardingDesignExperimentCountDataStore,
     private val pixel: Pixel,
 ) : OnboardingDesignExperimentManager {
+
+    override suspend fun enroll() {
+        withContext(dispatcherProvider.io()) {
+            onboardingDesignExperimentToggles.onboardingDesignExperimentAug25().enroll()
+        }
+    }
 
     override suspend fun isAnyExperimentEnrolledAndEnabled() = isBuckEnrolledAndEnabled() || isBbEnrolledAndEnabled()
 

@@ -22,8 +22,11 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor.TABLET
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,13 +40,29 @@ class OnboardingViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val onboardingSkipper: OnboardingSkipper,
     private val appBuildConfig: AppBuildConfig,
+    private val deviceInfo: DeviceInfo,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    fun initializePages() {
-        pageLayoutManager.buildPageBlueprints()
+    suspend fun initializePages() {
+        if (isAtLeastAndroid11() && !isTablet() && !isReturningUser()) {
+            onboardingDesignExperimentManager.enroll()
+        }
+
+        when {
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
+                pageLayoutManager.buildPageBlueprintsBb()
+            }
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
+                pageLayoutManager.buildPageBlueprintsBuck()
+            }
+            else -> {
+                pageLayoutManager.buildPageBlueprints()
+            }
+        }
     }
 
     fun pageCount(): Int {
@@ -81,6 +100,15 @@ class OnboardingViewModel @Inject constructor(
     suspend fun devOnlyFullyCompleteAllOnboarding() {
         onboardingSkipper.markOnboardingAsCompleted()
     }
+
+    private fun isTablet(): Boolean =
+        deviceInfo.formFactor() == TABLET
+
+    private suspend fun isReturningUser(): Boolean =
+        appBuildConfig.isAppReinstall()
+
+    private fun isAtLeastAndroid11(): Boolean =
+        appBuildConfig.sdkInt >= 30
 
     companion object {
         data class ViewState(val canShowSkipOnboardingButton: Boolean = false)
