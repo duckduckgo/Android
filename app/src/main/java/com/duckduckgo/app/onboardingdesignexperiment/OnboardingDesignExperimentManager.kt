@@ -18,6 +18,7 @@ package com.duckduckgo.app.onboardingdesignexperiment
 
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.MODIFIED_CONTROL
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -30,6 +31,7 @@ interface OnboardingDesignExperimentManager {
     suspend fun isAnyExperimentEnrolledAndEnabled(): Boolean
     suspend fun isBuckEnrolledAndEnabled(): Boolean
     suspend fun isBbEnrolledAndEnabled(): Boolean
+    suspend fun isModifiedControlEnrolledAndEnabled(): Boolean
     suspend fun fireIntroScreenDisplayedPixel()
     suspend fun fireComparisonScreenDisplayedPixel()
     suspend fun fireChooseBrowserPixel()
@@ -79,6 +81,12 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     override suspend fun isBbEnrolledAndEnabled(): Boolean {
         return withContext(dispatcherProvider.io()) {
             onboardingDesignExperimentToggles.onboardingDesignExperimentAug25().isEnrolledAndEnabled(BB)
+        }
+    }
+
+    override suspend fun isModifiedControlEnrolledAndEnabled(): Boolean {
+        return withContext(dispatcherProvider.io()) {
+            onboardingDesignExperimentToggles.onboardingDesignExperimentAug25().isEnrolledAndEnabled(MODIFIED_CONTROL)
         }
     }
 
