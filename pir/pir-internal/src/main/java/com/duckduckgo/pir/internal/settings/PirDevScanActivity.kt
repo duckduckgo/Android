@@ -180,6 +180,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
         stopService(Intent(this, PirForegroundScanService::class.java))
         notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
         stopService(Intent(this, PirRemoteWorkerService::class.java))
+        pirScanScheduler.cancelScheduledScans(this)
     }
 
     private fun useUserInput(): Boolean {
