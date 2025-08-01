@@ -186,7 +186,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
@@ -457,7 +456,6 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
@@ -3971,13 +3969,6 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             navigationChange = true,
         )
-
-        // the new omnibar deals with this properly
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            omnibarViewState.value = currentOmnibarViewState().copy(
-                navigationChange = false,
-            )
-        }
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
