@@ -674,19 +674,21 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when enable input screen user setting then repository updated`() = runTest {
+    fun `when enable input screen user setting then repository updated and pixel fired`() = runTest {
         testee.setInputScreenUserSetting(true)
 
-        val inOrder = inOrder(mockDuckChatFeatureRepository)
+        val inOrder = inOrder(mockDuckChatFeatureRepository, mockPixel)
+        inOrder.verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
         inOrder.verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(true)
         inOrder.verify(mockDuckChatFeatureRepository).isInputScreenUserSettingEnabled()
     }
 
     @Test
-    fun `when disable input screen user setting then repository updated`() = runTest {
+    fun `when disable input screen user setting then repository updated and pixel fired`() = runTest {
         testee.setInputScreenUserSetting(false)
 
-        val inOrder = inOrder(mockDuckChatFeatureRepository)
+        val inOrder = inOrder(mockDuckChatFeatureRepository, mockPixel)
+        inOrder.verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
         inOrder.verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(false)
         inOrder.verify(mockDuckChatFeatureRepository).isInputScreenUserSettingEnabled()
     }

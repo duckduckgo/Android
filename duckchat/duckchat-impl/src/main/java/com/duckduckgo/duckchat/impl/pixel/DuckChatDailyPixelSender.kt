@@ -60,6 +60,11 @@ class DuckChatDailyPixelSender @Inject constructor(
                 parameters = mapOf(PixelParameter.IS_ENABLED to duckChatFeatureRepository.shouldShowInAddressBar().toString()),
                 type = Daily(),
             )
+            pixel.fire(
+                pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY,
+                parameters = mapOf(PixelParameter.IS_ENABLED to duckChatFeatureRepository.isInputScreenUserSettingEnabled().toString()),
+                type = Daily(),
+            )
         }
     }
 }
