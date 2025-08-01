@@ -29,6 +29,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Si
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Click
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.EmailConfirmation
@@ -38,7 +39,6 @@ import com.duckduckgo.pir.internal.scripts.models.DataSource.EXTRACTED_PROFILE
 import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlin.reflect.KClass

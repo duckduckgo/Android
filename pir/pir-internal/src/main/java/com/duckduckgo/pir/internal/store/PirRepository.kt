@@ -18,7 +18,10 @@ package com.duckduckgo.pir.internal.store
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pir.internal.models.Address
 import com.duckduckgo.pir.internal.models.ExtractedProfile
+import com.duckduckgo.pir.internal.models.ProfileQuery
+import com.duckduckgo.pir.internal.models.scheduling.BrokerSchedulingConfig
 import com.duckduckgo.pir.internal.service.DbpService
 import com.duckduckgo.pir.internal.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
@@ -31,7 +34,7 @@ import com.duckduckgo.pir.internal.store.db.BrokerOptOut
 import com.duckduckgo.pir.internal.store.db.BrokerScan
 import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.internal.store.db.BrokerScanEventType.BROKER_SUCCESS
-import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfig
+import com.duckduckgo.pir.internal.store.db.BrokerSchedulingConfigEntity
 import com.duckduckgo.pir.internal.store.db.OptOutActionLog
 import com.duckduckgo.pir.internal.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.internal.store.db.OptOutResultsDao
@@ -44,6 +47,7 @@ import com.duckduckgo.pir.internal.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.internal.store.db.UserProfile
 import com.duckduckgo.pir.internal.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -67,6 +71,10 @@ interface PirRepository {
         fileName: String,
         broker: PirJsonBroker,
     )
+
+    suspend fun getBrokerSchedulingConfig(brokerName: String): BrokerSchedulingConfig?
+
+    suspend fun getAllBrokerSchedulingConfigs(): List<BrokerSchedulingConfig>
 
     suspend fun getBrokerScanSteps(name: String): String?
 
@@ -96,15 +104,19 @@ interface PirRepository {
 
     fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>>
 
+    suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
+
     suspend fun getScanErrorResultsCount(): Int
 
     suspend fun getScanSuccessResultsCount(): Int
 
     suspend fun deleteAllScanResults()
 
-    suspend fun getUserProfiles(): List<UserProfile>
+    suspend fun getUserProfileQueries(): List<ProfileQuery>
 
-    suspend fun deleteAllUserProfiles()
+    suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery>
+
+    suspend fun deleteAllUserProfilesQueries()
 
     suspend fun replaceUserProfile(userProfile: UserProfile)
 
@@ -169,7 +181,7 @@ interface PirRepository {
     }
 }
 
-class RealPirRepository(
+internal class RealPirRepository(
     val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
     private val pirDataStore: PirDataStore,
@@ -248,13 +260,37 @@ class RealPirRepository(
                     stepsJson = broker.steps.first { it.contains("\"stepType\":\"optOut\"") },
                     optOutUrl = broker.optOutUrl,
                 ),
-                schedulingConfig = BrokerSchedulingConfig(
+                schedulingConfig = BrokerSchedulingConfigEntity(
                     brokerName = broker.name,
                     retryError = broker.schedulingConfig.retryError,
                     confirmOptOutScan = broker.schedulingConfig.confirmOptOutScan,
                     maintenanceScan = broker.schedulingConfig.maintenanceScan,
                     maxAttempts = broker.schedulingConfig.maxAttempts,
                 ),
+            )
+        }
+    }
+
+    override suspend fun getBrokerSchedulingConfig(brokerName: String): BrokerSchedulingConfig? = withContext(dispatcherProvider.io()) {
+        return@withContext brokerDao.getSchedulingConfig(brokerName)?.run {
+            BrokerSchedulingConfig(
+                brokerName = this.brokerName,
+                retryErrorInMillis = TimeUnit.HOURS.toMillis(this.retryError.toLong()),
+                confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(this.confirmOptOutScan.toLong()),
+                maintenanceScanInMillis = TimeUnit.HOURS.toMillis(this.maintenanceScan.toLong()),
+                maxAttempts = this.maxAttempts ?: -1,
+            )
+        }
+    }
+
+    override suspend fun getAllBrokerSchedulingConfigs(): List<BrokerSchedulingConfig> = withContext(dispatcherProvider.io()) {
+        return@withContext brokerDao.getAllSchedulingConfigs().map {
+            BrokerSchedulingConfig(
+                brokerName = it.brokerName,
+                retryErrorInMillis = TimeUnit.HOURS.toMillis(it.retryError.toLong()),
+                confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(it.confirmOptOutScan.toLong()),
+                maintenanceScanInMillis = TimeUnit.HOURS.toMillis(it.maintenanceScan.toLong()),
+                maxAttempts = it.maxAttempts ?: -1,
             )
         }
     }
@@ -310,16 +346,58 @@ class RealPirRepository(
         }
     }
 
+    override suspend fun getAllExtractedProfiles(): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
+        return@withContext scanResultsDao.getAllExtractedProfiles().map {
+            it.toExtractedProfile()
+        }
+    }
+
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
-            scanResultsDao.deleteAllExtractedProfiles()
             scanResultsDao.deleteAllScanCompletedBroker()
             scanLogDao.deleteAllBrokerScanEvents()
         }
     }
 
-    override suspend fun getUserProfiles(): List<UserProfile> = withContext(dispatcherProvider.io()) {
-        userProfileDao.getUserProfiles()
+    override suspend fun getUserProfileQueries(): List<ProfileQuery> = withContext(dispatcherProvider.io()) {
+        userProfileDao.getUserProfiles().map {
+            it.toProfileQuery()
+        }
+    }
+
+    override suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery> = withContext(dispatcherProvider.io()) {
+        userProfileDao.getUserProfilesWithIds(ids).map {
+            it.toProfileQuery()
+        }
+    }
+
+    override suspend fun deleteAllUserProfilesQueries() {
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.deleteAllProfiles()
+            scanResultsDao.deleteAllExtractedProfiles()
+        }
+    }
+
+    private fun UserProfile.toProfileQuery(): ProfileQuery {
+        return ProfileQuery(
+            id = this.id,
+            firstName = this.userName.firstName,
+            lastName = this.userName.lastName,
+            city = this.addresses.city,
+            state = this.addresses.state,
+            addresses = listOf(
+                Address(
+                    city = this.addresses.city,
+                    state = this.addresses.state,
+                ),
+            ),
+            birthYear = this.birthYear,
+            fullName = this.userName.middleName?.let { middleName ->
+                "${this.userName.firstName} $middleName ${this.userName.lastName}"
+            } ?: "${this.userName.firstName} ${this.userName.lastName}",
+            age = currentTimeProvider.localDateTimeNow().year - this.birthYear,
+            deprecated = false,
+        )
     }
 
     override suspend fun getScanErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
@@ -328,12 +406,6 @@ class RealPirRepository(
 
     override suspend fun getScanSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
         scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_SUCCESS }.size
-    }
-
-    override suspend fun deleteAllUserProfiles() {
-        withContext(dispatcherProvider.io()) {
-            userProfileDao.deleteAllProfiles()
-        }
     }
 
     override suspend fun replaceUserProfile(userProfile: UserProfile) {
@@ -507,7 +579,11 @@ class RealPirRepository(
             fullName = this.fullName,
             profileUrl = this.profileUrl,
             identifier = this.identifier,
-            dateAddedInMillis = currentTimeProvider.currentTimeMillis(),
+            dateAddedInMillis = if (this.dateAddedInMillis == 0L) {
+                currentTimeProvider.currentTimeMillis()
+            } else {
+                this.dateAddedInMillis
+            },
             deprecated = this.deprecated,
         )
     }
