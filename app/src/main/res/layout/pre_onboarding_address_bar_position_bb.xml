@@ -32,19 +32,45 @@
             android:id="@+id/dialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/pangea_medium"
-            android:textSize="24sp"
-            android:textColor="@color/buckColorPrimaryText"
+            android:textAppearance="@style/Typography.BB.H1"
+            android:textColor="@color/bbColorPrimaryText"
+            tools:text="@string/highlightsPreOnboardingAddressBarTitle"
             tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/Typography.Buck.H1"
-            android:textColor="@color/buckColorPrimaryText"
             android:text="@string/highlightsPreOnboardingAddressBarTitle"
+            android:textAppearance="@style/Typography.BB.H1"
             android:visibility="invisible"
-            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+            tools:ignore="DeprecatedWidgetInXml" />
+
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="@dimen/keyline_4">
+
+        <ImageView
+            android:id="@+id/option1Image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0"
+            tools:alpha="1"
+            tools:src="@drawable/bb_address_bar_top_light" />
+
+        <ImageView
+            android:id="@+id/option2Image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:alpha="0" />
 
     </FrameLayout>
 
@@ -52,8 +78,9 @@
         android:id="@+id/option1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/keyline_4"
-        android:background="@drawable/background_preonboarding_option_buck">
+        android:layout_marginTop="@dimen/keyline_6"
+        android:minHeight="56dp"
+        android:background="@drawable/background_preonboarding_option_bb">
 
         <ImageView
             android:id="@+id/option1Icon"
@@ -63,8 +90,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_address_bar_position_top_buck"
-            app:tint="@color/preonboarding_address_bar_position_icon_buck"
+            app:srcCompat="@drawable/ic_address_bar_position_top_bb"
+            app:tint="@color/preonboarding_address_bar_position_icon_bb"
             tools:ignore="InvalidColorAttribute" />
 
         <TextView
@@ -74,10 +101,10 @@
             android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_4"
             android:text="@string/highlightsPreOnboardingAddressBarOption1Title"
-            android:fontFamily="@font/pangea_semibold"
+            android:fontFamily="@font/pangea_regular"
             android:includeFontPadding="false"
-            android:textSize="14sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
+            android:textSize="18sp"
+            android:textColor="@color/bbColorPrimaryText"
             app:layout_constraintStart_toEndOf="@id/option1Icon"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
@@ -88,26 +115,24 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_medium"
+            android:fontFamily="@font/pangea_regular"
             android:includeFontPadding="false"
-            android:textSize="12sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
+            android:textSize="14sp"
+            android:textColor="@color/bbColorSecondaryText"
             android:text="@string/highlightsPreOnboardingAddressBarOption1Description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/option1Icon"
             app:layout_constraintTop_toBottomOf="@id/option1Title"
             tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
-        <com.google.android.material.checkbox.MaterialCheckBox
+        <com.duckduckgo.common.ui.view.button.RadioButton
             android:id="@+id/option1Switch"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="-12dp"
             android:checked="true"
             android:clickable="false"
-            app:buttonIcon="@drawable/ic_checkbox_buck"
-            app:buttonTint="@android:color/transparent"
-            app:useMaterialThemeColors="false"
+            android:text=""
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -119,7 +144,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
-        android:background="@drawable/background_preonboarding_option_buck">
+        android:minHeight="56dp"
+        android:background="@drawable/background_preonboarding_option_bb">
 
         <ImageView
             android:id="@+id/option2Icon"
@@ -129,8 +155,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_address_bar_position_bottom_buck"
-            app:tint="@color/preonboarding_address_bar_position_icon_buck"
+            app:srcCompat="@drawable/ic_address_bar_position_bottom_bb"
+            app:tint="@color/preonboarding_address_bar_position_icon_bb"
             tools:ignore="InvalidColorAttribute" />
 
         <TextView
@@ -139,10 +165,10 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_semibold"
+            android:fontFamily="@font/pangea_regular"
             android:includeFontPadding="false"
-            android:textSize="14sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
+            android:textSize="18sp"
+            android:textColor="@color/bbColorPrimaryText"
             android:text="@string/highlightsPreOnboardingAddressBarOption2Title"
             app:layout_constraintStart_toEndOf="@id/option2Icon"
             app:layout_constraintTop_toTopOf="parent"
@@ -154,28 +180,31 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginBottom="@dimen/keyline_4"
-            android:fontFamily="@font/pangea_medium"
+            android:fontFamily="@font/pangea_regular"
             android:includeFontPadding="false"
-            android:textSize="12sp"
-            android:textColor="@color/preonboarding_address_bar_position_text_buck"
+            android:textSize="14sp"
+            android:textColor="@color/bbColorSecondaryText"
             android:text="@string/highlightsPreOnboardingAddressBarOption2Description"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/option2Icon"
             app:layout_constraintTop_toBottomOf="@id/option2Title"
             tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
-        <com.google.android.material.checkbox.MaterialCheckBox
+        <com.duckduckgo.common.ui.view.button.RadioButton
             android:id="@+id/option2Switch"
-            android:layout_width="@dimen/keyline_5"
-            android:layout_height="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="-12dp"
             android:clickable="false"
-            app:buttonIcon="@drawable/ic_checkbox_buck"
-            app:buttonTint="@android:color/transparent"
-            app:useMaterialThemeColors="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
 </LinearLayout>

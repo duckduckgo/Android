@@ -1,0 +1,30 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+  <path
+      android:pathData="M2,12C2,6.477 6.477,2 12,2C16.682,2 20.612,5.218 21.701,9.562C21.823,10.051 21.147,10.352 20.74,10.055C20.441,9.837 20.119,9.648 19.778,9.492C19.646,9.432 19.543,9.323 19.492,9.188C18.778,7.286 17.359,5.728 15.554,4.831C15.619,4.961 15.682,5.094 15.742,5.23C16.165,6.182 16.495,7.307 16.71,8.543C16.758,8.818 16.563,9.072 16.29,9.134C16.027,9.193 15.772,9.27 15.525,9.365C15.195,9.492 14.81,9.295 14.75,8.947C14.56,7.83 14.271,6.843 13.915,6.042C13.587,5.304 13.222,4.769 12.868,4.432C12.518,4.099 12.227,4 12,4C11.773,4 11.482,4.099 11.132,4.432C10.778,4.769 10.413,5.304 10.085,6.042C9.524,7.305 9.127,9.033 9.026,11H12.196C12.619,11 12.866,11.507 12.664,11.878C12.532,12.122 12.417,12.376 12.323,12.64C12.247,12.851 12.053,13 11.829,13H9.026C9.127,14.967 9.524,16.694 10.085,17.958C10.333,18.516 10.602,18.958 10.872,19.286C10.952,19.383 11,19.503 10.998,19.629C10.996,19.752 10.992,19.876 10.989,20.001C10.976,20.406 10.964,20.818 11.005,21.22C11.04,21.578 10.757,21.93 10.401,21.873C5.638,21.107 2,16.979 2,12ZM4.062,11C4.4,8.289 6.095,5.999 8.446,4.831C8.381,4.961 8.318,5.094 8.258,5.23C7.568,6.782 7.126,8.796 7.023,11H4.062ZM4.062,13C4.4,15.711 6.095,18.001 8.446,19.169C8.381,19.039 8.318,18.906 8.258,18.77C7.568,17.218 7.126,15.204 7.023,13H4.062Z"
+      android:fillColor="#FFFFFF"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M14,14.5C14,12.567 15.567,11 17.5,11C19.433,11 21,12.567 21,14.5V16C21.552,16 22,16.448 22,17V21C22,21.552 21.552,22 21,22H14C13.448,22 13,21.552 13,21V17C13,16.448 13.448,16 14,16V14.5ZM19,14.5V16H16V14.5C16,13.672 16.672,13 17.5,13C18.328,13 19,13.672 19,14.5Z"
+      android:fillColor="#FFFFFF"
+      android:fillType="evenOdd"/>
+</vector>

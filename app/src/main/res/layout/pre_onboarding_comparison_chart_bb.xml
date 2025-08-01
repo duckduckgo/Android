@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/titleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.duckduckgo.common.ui.view.TypeAnimationTextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Typography.BB.H1"
+            tools:text="Protections activated!"
+            android:textColor="@color/bbColorPrimaryText"
+            tools:ignore="InvalidColorAttribute" />
+
+        <TextView
+            android:id="@+id/titleInvisible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Typography.BB.H1"
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml" />
+
+    </FrameLayout>
+
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleContainer"
+        app:layout_constraintBottom_toTopOf="@id/row1"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:srcCompat="@drawable/ic_ddg_comparison_chart" />
+
+    <ImageView
+        android:id="@+id/chromeLogo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="9dp"
+        app:layout_constraintEnd_toStartOf="@id/ddgLogo"
+        app:layout_constraintTop_toTopOf="@id/ddgLogo"
+        app:srcCompat="@drawable/ic_chrome_comparison_chart" />
+
+    <!-- Row 1 -->
+    <LinearLayout
+        android:id="@+id/row1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_bb_preonboarding_comparison_chart_item"
+        app:layout_constraintTop_toBottomOf="@id/ddgLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/row2" >
+
+        <ImageView
+            android:id="@+id/featureIcon1"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_search_private_bb"
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
+
+        <TextView
+            android:id="@+id/feature1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem1"
+            android:textColor="@color/bbColorPrimaryText"
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        <ImageView
+            android:id="@+id/cross1"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
+
+        <ImageView
+            android:id="@+id/check1"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_bb" />
+
+    </LinearLayout>
+
+    <!-- Row 2 -->
+    <LinearLayout
+        android:id="@+id/row2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/row1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/row3">
+
+        <ImageView
+            android:id="@+id/featureIcon2"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_shield_bb"
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
+
+        <TextView
+            android:id="@+id/feature2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem2"
+            android:textColor="@color/bbColorPrimaryText"
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        <ImageView
+            android:id="@+id/cross2"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
+
+        <ImageView
+            android:id="@+id/check2"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_bb" />
+
+    </LinearLayout>
+
+    <!-- Row 3 -->
+    <LinearLayout
+        android:id="@+id/row3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_bb_preonboarding_comparison_chart_item"
+        app:layout_constraintTop_toBottomOf="@id/row2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/row4">
+
+        <ImageView
+            android:id="@+id/featureIcon3"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_cookie_bb"
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
+
+        <TextView
+            android:id="@+id/feature3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem3"
+            android:textColor="@color/bbColorPrimaryText"
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        <ImageView
+            android:id="@+id/cross3"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
+
+        <ImageView
+            android:id="@+id/check3"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_bb" />
+
+    </LinearLayout>
+
+    <!-- Row 4 -->
+    <LinearLayout
+        android:id="@+id/row4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/row3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/row5">
+
+        <ImageView
+            android:id="@+id/featureIcon4"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_profile_blocked_bb"
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
+
+        <TextView
+            android:id="@+id/feature4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem4"
+            android:textColor="@color/bbColorPrimaryText"
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        <ImageView
+            android:id="@+id/cross4"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
+
+        <ImageView
+            android:id="@+id/check4"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_bb" />
+
+    </LinearLayout>
+
+    <!-- Row 5 -->
+    <LinearLayout
+        android:id="@+id/row5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/background_bb_preonboarding_comparison_chart_item"
+        app:layout_constraintTop_toBottomOf="@id/row4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/featureIcon5"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginStart="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_fire_bb"
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
+
+        <TextView
+            android:id="@+id/feature5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:includeFontPadding="false"
+            android:lineSpacingExtra="-2sp"
+            android:text="@string/preOnboardingComparisonChartItem5"
+            android:textColor="@color/bbColorPrimaryText"
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+        <ImageView
+            android:id="@+id/cross5"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginVertical="@dimen/keyline_1"
+            app:srcCompat="@drawable/ic_cross_gray_bb" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/keyline_4"
+            android:layout_marginVertical="-8dp"
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
+
+        <ImageView
+            android:id="@+id/check5"
+            android:layout_width="@dimen/keyline_5"
+            android:layout_height="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_4"
+            android:layout_marginVertical="@dimen/keyline_1"
+            android:padding="2dp"
+            app:srcCompat="@drawable/ic_check_green_bb" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

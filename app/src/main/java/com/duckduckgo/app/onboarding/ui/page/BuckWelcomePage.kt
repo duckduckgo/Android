@@ -128,8 +128,8 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             option1Switch.isChecked = defaultOption
             option2Switch.isChecked = !defaultOption
 
-            option1Image.isSelected = defaultOption
-            option2Image.isSelected = !defaultOption
+            option1Icon.isSelected = defaultOption
+            option2Icon.isSelected = !defaultOption
 
             option1Body.isSelected = defaultOption
             option2Body.isSelected = !defaultOption

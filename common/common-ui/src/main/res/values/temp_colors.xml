@@ -92,6 +92,19 @@
     <color name="bbFeatherFill">#FFFFFF</color>
     <color name="bbFeatherWhisps">#000000</color>
 
+    <color name="bbColorComparisonChartItemBackground">#F1F1EE</color>
+    <color name="bbColorComparisonChartItemIcon">@color/bbColorPrimaryText</color>
+    <color name="bbColorComparisonChartDivider">#D7D5C9</color>
+    <color name="bbColorComparisonChartCheckIcon">#399F29</color>
+    <color name="bbColorComparisonChartCrossIcon">#888888</color>
+
+    <color name="bbColorPreonboardingOptionOutline">#D7D5C9</color>
+    <color name="bbColorPreonboardingOptionOutlineSelected">#802373D5</color>
+    <color name="bbColorPreonboardingOptionBackground">#EEEEEA</color>
+    <color name="bbColorPreonboardingOptionBackgroundSelected">#E0EAFF</color>
+    <color name="bbColorPreonboardingOptionIconSelected">#2373D5</color>
+    <color name="bbColorPreonboardingOptionIcon">#27251F</color>
+
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
     <color name="daxColorBackdropLight">#E0E0E0</color>

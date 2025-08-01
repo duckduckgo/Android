@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2019 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/longDescriptionContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:tag="onboardingDefaultBrowser"
+    tools:context="com.duckduckgo.app.onboarding.ui.OnboardingActivity">
+
+    <ImageView
+        android:id="@+id/background1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        tools:srcCompat="@drawable/onboarding_background_small_light" />
+
+    <ImageView
+        android:id="@+id/background2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/windStrokesAnimation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/keyline_4"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
+        app:lottie_loop="false"
+        app:lottie_rawRes="@raw/bb_onboarding_wind_strokes"
+        android:visibility="gone" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/statusBarGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_begin="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/navigationBarGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintGuide_end="0dp"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.duckduckgo.app.onboarding.ui.page.BbOnboardingProgressView
+        android:id="@+id/onboardingProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
+        android:alpha="0"
+        tools:alpha="1"/>
+
+    <!--
+        This FrameLayout is a workaround for an issue related to animating size+position of daxLogo
+        while also using scaleX/scaleY to deal with drawable's internal padding.
+     -->
+    <FrameLayout
+        android:id="@+id/daxLogoContainer"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_marginTop="128dp"
+        android:clipChildren="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/daxLogo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:scaleX="2.15"
+            android:scaleY="2.15"
+            app:lottie_loop="false"
+            app:lottie_rawRes="@raw/bb_dax_logo_wink" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/welcomeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:fontFamily="@font/pangea_medium"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="@string/onboardingWelcomeTitle"
+        android:textColor="@color/white"
+        android:textSize="48sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/daxLogoContainer"
+        android:alpha="0"
+        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
+
+    <include
+        android:id="@+id/daxDialogCta"
+        layout="@layout/pre_onboarding_dax_dialog_cta_bb"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginBottom="72dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/navigationBarGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/statusBarGuideline"
+        app:layout_constraintWidth_max="600dp" />
+
+    <com.duckduckgo.app.onboarding.ui.BbProgressDotIndicator
+        android:id="@+id/onboardingProgressDots"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/keyline_4"
+        app:layout_constraintBottom_toBottomOf="@id/navigationBarGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:alpha="0"
+        tools:alpha="1"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

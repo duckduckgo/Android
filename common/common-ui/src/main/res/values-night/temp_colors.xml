@@ -63,4 +63,15 @@
     <color name="bbFeatherFill">#5D6167</color>
     <color name="bbFeatherWhisps">#656871</color>
 
+    <color name="bbColorComparisonChartItemBackground">#242423</color>
+    <color name="bbColorComparisonChartDivider">#2E2E2B</color>
+    <color name="bbColorComparisonChartCrossIcon">#7B7B7B</color>
+
+    <color name="bbColorPreonboardingOptionOutline">#2E2E2B</color>
+    <color name="bbColorPreonboardingOptionOutlineSelected">#802373D5</color>
+    <color name="bbColorPreonboardingOptionBackground">#00000000</color>
+    <color name="bbColorPreonboardingOptionBackgroundSelected">#3B6FA3E6</color>
+    <color name="bbColorPreonboardingOptionIconSelected">#4E9EFF</color>
+    <color name="bbColorPreonboardingOptionIcon">#EDEDEC</color>
+
 </resources>

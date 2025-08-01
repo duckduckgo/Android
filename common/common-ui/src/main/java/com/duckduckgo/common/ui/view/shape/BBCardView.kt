@@ -17,10 +17,15 @@
 package com.duckduckgo.common.ui.view.shape
 
 import android.content.Context
+import android.graphics.Outline
+import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.View
+import android.view.ViewOutlineProvider
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.ShapeAppearanceModel
 
 class BBCardView @JvmOverloads constructor(
@@ -49,5 +54,15 @@ class BBCardView @JvmOverloads constructor(
 
             setTopEdge(offsetEdgeTreatment)
         }.build()
+
+        outlineProvider = object : ViewOutlineProvider() {
+            val shapeDrawable = MaterialShapeDrawable(shapeAppearanceModel)
+
+            override fun getOutline(view: View, outline: Outline) {
+                shapeDrawable.bounds = Rect(0, 0, view.width, view.height)
+                shapeDrawable.getOutline(outline)
+            }
+        }
+        clipToOutline = true
     }
 }
