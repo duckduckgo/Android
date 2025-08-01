@@ -51,6 +51,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
@@ -62,6 +63,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page) {
@@ -74,6 +76,9 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
 
     @Inject
     lateinit var appTheme: AppTheme
+
+    @Inject
+    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -140,7 +145,12 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             },
         )
 
-        requestNotificationsPermissions()
+        if (onboardingDesignExperimentToggles.modifiedControl().isEnabled()) {
+            scheduleWelcomeAnimation()
+        } else {
+            requestNotificationsPermissions()
+        }
+
         setSkipAnimationListener()
     }
 
@@ -345,7 +355,10 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
             }
     }
 
-    private fun scheduleTypingAnimation(ctaText: String, afterAnimation: () -> Unit = {}) {
+    private fun scheduleTypingAnimation(
+        ctaText: String,
+        afterAnimation: () -> Unit = {}
+    ) {
         typingAnimation = ViewCompat.animate(binding.daxDialogCta.daxCtaContainer)
             .alpha(MAX_ALPHA)
             .setDuration(ANIMATION_DURATION)
