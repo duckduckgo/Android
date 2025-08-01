@@ -21,19 +21,16 @@ import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = SubscriptionRebrandingFeatureToggleDummy::class,
-)
+@ContributesBinding(scope = AppScope::class)
 class SubscriptionRebrandingFeatureToggleDummy @Inject constructor(
-    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
+    private val subscriptionDummyFeatureToggle: SubscriptionDummyFeatureToggle,
 ) : SubscriptionRebrandingFeatureToggle {
 
     override fun isSubscriptionRebrandingEnabled(): Boolean {
-        return subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()
+        return subscriptionDummyFeatureToggle.subscriptionRebranding().isEnabled()
     }
 
     override fun isAIFeaturesRebrandingEnabled(): Boolean {
-        return subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()
+        return subscriptionDummyFeatureToggle.subscriptionAIFeaturesRebranding().isEnabled()
     }
 }
