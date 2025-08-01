@@ -90,6 +90,8 @@ class RealPirJobsRunner @Inject constructor(
         attemptCreateOptOutJobs(activeBrokers)
         executeOptOutJobs(context)
 
+        logcat { "PIR-JOB-RUNNER: Completed." }
+
         return@withContext Result.success(Unit)
     }
 
@@ -134,20 +136,21 @@ class RealPirJobsRunner @Inject constructor(
         context: Context,
         executionType: PirExecutionType,
     ) {
-        eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis()).also {
-            val runType = if (executionType == MANUAL) {
-                RunType.MANUAL
-            } else {
-                RunType.SCHEDULED
-            }
+        eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
+            .also {
+                val runType = if (executionType == MANUAL) {
+                    RunType.MANUAL
+                } else {
+                    RunType.SCHEDULED
+                }
 
-            if (it.isNotEmpty()) {
-                logcat { "PIR-JOB-RUNNER: Executing scan for ${it.size} eligible scan jobs." }
-                pirScan.executeScanForJobs(it, context, runType)
-            } else {
-                logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
+                if (it.isNotEmpty()) {
+                    logcat { "PIR-JOB-RUNNER: Executing scan for ${it.size} eligible scan jobs." }
+                    pirScan.executeScanForJobs(it, context, runType)
+                } else {
+                    logcat { "PIR-JOB-RUNNER: No eligible scan jobs to execute." }
+                }
             }
-        }
     }
 
     private suspend fun attemptCreateOptOutJobs(activeBrokers: List<String>) {
@@ -177,9 +180,18 @@ class RealPirJobsRunner @Inject constructor(
     }
 
     private suspend fun executeOptOutJobs(context: Context) {
+        val formOptOutBrokers = pirRepository.getBrokersForOptOut(true)
+
         eligibleOptOutJobProvider.getAllEligibleOptOutJobs(currentTimeProvider.currentTimeMillis())
-            .also {
-                // pirOptOut.execute(it, context)
+            .filter {
+                formOptOutBrokers.contains(it.brokerName)
+            }.also {
+                if (it.isNotEmpty()) {
+                    logcat { "PIR-JOB-RUNNER: Executing opt-outs for ${it.size} eligible optout jobs." }
+                    pirOptOut.executeOptOutForJobs(it, context)
+                } else {
+                    logcat { "PIR-JOB-RUNNER: No eligible opt-out jobs to execute." }
+                }
             }
     }
 

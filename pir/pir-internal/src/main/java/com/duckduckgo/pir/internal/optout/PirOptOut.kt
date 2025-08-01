@@ -25,6 +25,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.PirInternalConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
@@ -32,6 +34,7 @@ import com.duckduckgo.pir.internal.common.PirJobConstants.MAX_DETACHED_WEBVIEW_C
 import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.models.ProfileQuery
+import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.db.EventType
@@ -45,7 +48,13 @@ import kotlinx.coroutines.withContext
 import logcat.logcat
 
 interface PirOptOut {
+    suspend fun executeOptOutForJobs(
+        jobRecords: List<OptOutJobRecord>,
+        context: Context,
+    ): Result<Unit>
+
     /**
+     * NOTE: This method should only be used for internal dev functionality only.
      * This method can be used to execute pir opt-out for a given list of [brokers] names.
      * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
@@ -58,6 +67,7 @@ interface PirOptOut {
     ): Result<Unit>
 
     /**
+     * NOTE: This method should only be used for internal dev functionality only.
      * This method can be used to execute pir opt out for all active brokers where the user's profile has been identified as a record.
      * You DO NOT need to set any dispatcher to call this suspend function. It is already set to run on IO.
      *
@@ -102,6 +112,142 @@ class RealPirOptOut @Inject constructor(
 ) : PirOptOut, PirJob(callbacks) {
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
     private var maxWebViewCount = 1
+
+    override suspend fun executeOptOutForJobs(
+        jobRecords: List<OptOutJobRecord>,
+        context: Context,
+    ): Result<Unit> = withContext(dispatcherProvider.io()) {
+        logcat { "PIR-OPT-OUT: Running opt-out on the following records [${jobRecords.size}]: $jobRecords on ${Thread.currentThread().name}" }
+        onJobStarted()
+        emitStartPixel()
+
+        if (jobRecords.isEmpty()) {
+            logcat { "PIR-OPT-OUT: Nothing to opt-out." }
+            completeOptOut()
+            return@withContext Result.success(Unit)
+        }
+
+        if (runners.isNotEmpty()) {
+            cleanRunners()
+            runners.clear()
+        }
+
+        val processedJobRecords = processJobRecords(jobRecords)
+
+        if (processedJobRecords.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
+            completeOptOut()
+            return@withContext Result.success(Unit)
+        }
+
+        val script = pirCssScriptLoader.getScript()
+        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
+
+        // Initiate runners
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, OPTOUT))
+        }
+
+        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
+
+        logcat { "PIR-OPT-OUT: Total parts ${jobRecordsParts.size}" }
+
+        jobRecordsParts.mapIndexed { index, partSteps ->
+            logcat { "PIR-OPT-OUT: Record part [$index] -> ${partSteps.size}" }
+            async {
+                partSteps.map { (profileQuery, step) ->
+                    logcat {
+                        "PIR-OPT-OUT: Start opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
+                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                    }
+                    runners[index].start(profileQuery, listOf(step))
+                    runners[index].stop()
+                    logcat {
+                        "PIR-OPT-OUT: Finish opt-out on runner=$index, extractedProfile=${(step as OptOutStep).profileToOptOut.dbId} " +
+                            "broker=${step.brokerName} profile=${profileQuery.id}"
+                    }
+                }
+            }
+        }.awaitAll()
+
+        completeOptOut()
+        return@withContext Result.success(Unit)
+    }
+
+    private suspend fun processJobRecords(jobRecords: List<OptOutJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
+        val allUserProfiles = obtainProfiles().associateBy { it.id }
+        if (allUserProfiles.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No valid user profile available. Nothing to opt-out." }
+            return emptyList()
+        }
+
+        // Load opt-out steps jsons for each broker
+        val brokerOptOutStepsJsons = jobRecords.map { it.brokerName }.distinct().mapNotNull { broker ->
+            repository.getBrokerOptOutSteps(broker)?.let { broker to it }
+        }.toMap()
+
+        if (brokerOptOutStepsJsons.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No valid broker's with opt-out steps. Nothing to opt-out." }
+            return emptyList()
+        }
+
+        val temporaryCache = mutableMapOf<String, List<BrokerStep>>()
+
+        val processedJobRecords = jobRecords.mapNotNull { record ->
+            var brokerStep: BrokerStep? = null
+
+            val profileQuery = allUserProfiles[record.userProfileId]
+            if (profileQuery == null) {
+                logcat { "PIR-OPT-OUT: No profile query found for userProfileId=${record.userProfileId}. Skipping opt-out." }
+                return@mapNotNull null
+            }
+
+            val temporaryCacheKey = record.brokerName + record.userProfileId
+            if (temporaryCache[temporaryCacheKey] != null) {
+                // Find extractedProfile from cached BrokerSteps list
+                brokerStep = temporaryCache[temporaryCacheKey]?.find { (it as OptOutStep).profileToOptOut.dbId == record.extractedProfileId }
+            } else {
+                // Parse broker steps - this will return the extractedProfiles too
+                val brokerSteps = brokerOptOutStepsJsons[record.brokerName]?.let { stepsJson ->
+                    brokerStepsParser.parseStep(
+                        record.brokerName,
+                        stepsJson,
+                        record.userProfileId,
+                    )
+                }
+
+                if (!brokerSteps.isNullOrEmpty()) {
+                    // Store the brokers steps to cache, find the extractedProfile from the brokerSteps
+                    temporaryCache[record.brokerName + record.userProfileId] = brokerSteps
+                    brokerStep = brokerSteps.find { (it as OptOutStep).profileToOptOut.dbId == record.extractedProfileId }
+                }
+            }
+
+            if (brokerStep == null) {
+                logcat { "PIR-OPT-OUT: Extracted Profile not found. Skipping opt-out." }
+                return@mapNotNull null
+            } else {
+                return@mapNotNull profileQuery to brokerStep
+            }
+        }
+
+        temporaryCache.clear()
+        logcat { "PIR-OPT-OUT: Total processed records ${processedJobRecords.size}" }
+
+        if (processedJobRecords.isEmpty()) {
+            logcat { "PIR-OPT-OUT: No valid records. Nothing to opt-out." }
+            return emptyList()
+        }
+        return processedJobRecords
+    }
+
+    private suspend fun completeOptOut() {
+        logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
+        emitCompletedPixel()
+        onJobCompleted()
+    }
 
     override suspend fun debugExecute(
         brokers: List<String>,
@@ -188,16 +334,8 @@ class RealPirOptOut @Inject constructor(
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
-        var createCount = 0
-        while (createCount != maxWebViewCount) {
-            runners.add(
-                pirActionsRunnerFactory.create(
-                    context,
-                    script,
-                    OPTOUT,
-                ),
-            )
-            createCount++
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, OPTOUT))
         }
 
         // Execute the steps on all runners in parallel

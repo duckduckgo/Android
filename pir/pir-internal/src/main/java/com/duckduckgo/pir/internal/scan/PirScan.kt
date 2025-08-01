@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.PirInternalConstants.DEFAULT_PROFILE_QUERIES
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.PirJob.RunType
@@ -115,6 +116,7 @@ class RealPirScan @Inject constructor(
         onJobStarted()
 
         val startTimeMillis = currentTimeProvider.currentTimeMillis()
+        emitScanStartPixel(runType)
 
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
@@ -124,76 +126,25 @@ class RealPirScan @Inject constructor(
 
         cleanPreviousRun()
 
-        val relevantBrokerSteps = jobRecords.map { it.brokerName }.distinct().mapNotNull {
-            val steps = repository.getBrokerScanSteps(it)?.run {
-                brokerStepsParser.parseStep(it, this)
-            }
-            if (!steps.isNullOrEmpty()) {
-                it to steps[0]
-            } else {
-                null
-            }
-        }.toMap()
+        val processedJobRecords = processJobRecords(jobRecords)
+        logcat { "PIR-SCAN: Total processed records ${processedJobRecords.size}" }
 
-        logcat { "PIR-SCAN: Relevant broker steps $relevantBrokerSteps" }
-
-        if (relevantBrokerSteps.isEmpty()) {
-            logcat { "PIR-SCAN: No steps available." }
-            completeScan(runType, startTimeMillis)
-            return@withContext Result.success(Unit)
-        }
-
-        val allProfiles = obtainProfiles().associateBy { it.id }
-
-        if (allProfiles.isEmpty()) {
-            logcat { "PIR-SCAN: Nothing to scan here. No user profiles available." }
-            completeScan(runType, startTimeMillis)
-            return@withContext Result.success(Unit)
-        }
-
-        val relevantProfiles = jobRecords.map { it.userProfileId }.distinct().mapNotNull {
-            val profileQuery = allProfiles[it]
-
-            if (profileQuery != null) {
-                it to allProfiles[it]
-            } else {
-                null
-            }
-        }.toMap()
-
-        logcat { "PIR-SCAN: Relevant profileQueries $relevantProfiles" }
-
-        if (relevantProfiles.isEmpty()) {
-            logcat { "PIR-SCAN: Nothing to scan here. Can't map jobrecord profiles." }
+        if (processedJobRecords.isEmpty()) {
+            logcat { "PIR-SCAN: No job records." }
             completeScan(runType, startTimeMillis)
             return@withContext Result.success(Unit)
         }
 
         val script = pirCssScriptLoader.getScript()
-        maxWebViewCount = minOf(jobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
+        maxWebViewCount = minOf(processedJobRecords.size, MAX_DETACHED_WEBVIEW_COUNT)
 
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
-        var createCount = 0
-        while (createCount != maxWebViewCount) {
-            runners.add(
-                pirActionsRunnerFactory.create(
-                    context,
-                    script,
-                    runType,
-                ),
-            )
-            createCount++
+        // Initiate runners
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, runType))
         }
 
-        val jobRecordsParts = jobRecords.mapNotNull {
-            val profileQuery = relevantProfiles[it.userProfileId]
-            val brokerSteps = relevantBrokerSteps[it.brokerName]
-            if (profileQuery != null && brokerSteps != null) {
-                profileQuery to brokerSteps
-            } else {
-                null
-            }
-        }.splitIntoParts(maxWebViewCount)
+        val jobRecordsParts = processedJobRecords.splitIntoParts(maxWebViewCount)
 
         logcat { "PIR-SCAN: Total parts ${jobRecordsParts.size}" }
 
@@ -214,6 +165,51 @@ class RealPirScan @Inject constructor(
 
         completeScan(runType, startTimeMillis)
         return@withContext Result.success(Unit)
+    }
+
+    private suspend fun processJobRecords(jobRecords: List<ScanJobRecord>): List<Pair<ProfileQuery, BrokerStep>> {
+        val relevantBrokerSteps = jobRecords.mapTo(mutableSetOf()) { it.brokerName }.mapNotNull {
+            val steps = repository.getBrokerScanSteps(it)?.run {
+                brokerStepsParser.parseStep(it, this)
+            }
+            if (!steps.isNullOrEmpty()) {
+                it to steps[0]
+            } else {
+                null
+            }
+        }.toMap()
+
+        logcat { "PIR-SCAN: Relevant broker steps $relevantBrokerSteps" }
+
+        if (relevantBrokerSteps.isEmpty()) {
+            logcat { "PIR-SCAN: No steps available." }
+            return emptyList()
+        }
+
+        val relevantProfileIds = jobRecords.mapTo(mutableSetOf()) { it.userProfileId }
+        val relevantProfiles = obtainProfiles()
+            .filter {
+                it.id in relevantProfileIds
+            }.associateBy { it.id }
+
+        logcat { "PIR-SCAN: Relevant profileQueries $relevantProfiles" }
+
+        if (relevantProfiles.isEmpty()) {
+            logcat { "PIR-SCAN: Nothing to scan here. Can't map jobrecord profiles." }
+            return emptyList()
+        }
+
+        val processedJobRecords = jobRecords.mapNotNull {
+            val profileQuery = relevantProfiles[it.userProfileId]
+            val brokerSteps = relevantBrokerSteps[it.brokerName]
+            if (profileQuery != null && brokerSteps != null) {
+                profileQuery to brokerSteps
+            } else {
+                null
+            }
+        }
+
+        return processedJobRecords
     }
 
     private suspend fun completeScan(
@@ -251,16 +247,8 @@ class RealPirScan @Inject constructor(
         logcat { "PIR-SCAN: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
-        var createCount = 0
-        while (createCount != maxWebViewCount) {
-            runners.add(
-                pirActionsRunnerFactory.create(
-                    context,
-                    script,
-                    runType,
-                ),
-            )
-            createCount++
+        repeat(maxWebViewCount) {
+            runners.add(pirActionsRunnerFactory.create(context, script, runType))
         }
 
         // Prepare a list of all broker steps that need to be run
