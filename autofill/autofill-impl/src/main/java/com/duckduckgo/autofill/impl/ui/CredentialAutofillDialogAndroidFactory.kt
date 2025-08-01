@@ -17,12 +17,14 @@
 package com.duckduckgo.autofill.impl.ui
 
 import androidx.fragment.app.DialogFragment
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.CredentialAutofillDialogFactory
 import com.duckduckgo.autofill.api.CredentialUpdateExistingCredentialsDialog.CredentialUpdateType
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
 import com.duckduckgo.autofill.impl.email.EmailProtectionChooseEmailFragment
 import com.duckduckgo.autofill.impl.email.incontext.prompt.EmailProtectionInContextSignUpPromptFragment
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.google.ImportFromGooglePasswordsDialog
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.AutofillUseGeneratedPasswordDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.saving.AutofillSavingCredentialsDialogFragment
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment
@@ -100,5 +102,9 @@ class CredentialAutofillDialogAndroidFactory @Inject constructor() : CredentialA
 
     override fun emailProtectionInContextSignUpDialog(tabId: String): DialogFragment {
         return EmailProtectionInContextSignUpPromptFragment.instance(tabId)
+    }
+
+    override fun autofillImportPasswordsPromoDialog(importSource: AutofillImportLaunchSource, tabId: String, url: String): DialogFragment {
+        return ImportFromGooglePasswordsDialog.instance(importSource = importSource, tabId = tabId, originalUrl = url)
     }
 }

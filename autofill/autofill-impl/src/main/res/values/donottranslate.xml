@@ -15,5 +15,6 @@
   -->
 
 <resources>
-
+    <string name="passwords_import_promo_in_settings_title">Import Passwords from Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Hide</string>
 </resources>

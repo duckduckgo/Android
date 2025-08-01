@@ -23,20 +23,19 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerM
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerManualScanStarted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
-import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutCompleted
-import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutStarted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutCompleted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionFailed
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
+import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse
+import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptAddressCityState
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.NavigateResponse
@@ -64,6 +63,7 @@ interface PirRunStateHandler {
 
         data class BrokerManualScanCompleted(
             override val brokerName: String,
+            val profileQueryId: Long,
             val startTimeInMillis: Long,
             val eventTimeInMillis: Long,
             val totalTimeMillis: Long,
@@ -77,6 +77,7 @@ interface PirRunStateHandler {
 
         data class BrokerScheduledScanCompleted(
             override val brokerName: String,
+            val profileQueryId: Long,
             val startTimeInMillis: Long,
             val eventTimeInMillis: Long,
             val totalTimeMillis: Long,
@@ -85,6 +86,7 @@ interface PirRunStateHandler {
 
         data class BrokerScanActionSucceeded(
             override val brokerName: String,
+            val profileQueryId: Long,
             val pirSuccessResponse: PirSuccessResponse,
         ) : PirRunState(brokerName)
 
@@ -93,16 +95,6 @@ interface PirRunStateHandler {
             val actionType: String,
             val actionID: String,
             val message: String,
-        ) : PirRunState(brokerName)
-
-        data class BrokerOptOutStarted(
-            override val brokerName: String,
-        ) : PirRunState(brokerName)
-
-        data class BrokerOptOutCompleted(
-            override val brokerName: String,
-            val startTimeInMillis: Long,
-            val endTimeInMillis: Long,
         ) : PirRunState(brokerName)
 
         data class BrokerRecordOptOutStarted(
@@ -143,6 +135,9 @@ class RealPirRunStateHandler @Inject constructor(
     private val pixelSender: PirPixelSender,
     private val dispatcherProvider: DispatcherProvider,
 ) : PirRunStateHandler {
+
+    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(ScriptAddressCityState::class.java) }
+
     private val pirSuccessAdapter by lazy {
         Moshi.Builder().add(
             PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
@@ -165,8 +160,6 @@ class RealPirRunStateHandler @Inject constructor(
             is BrokerScheduledScanCompleted -> handleBrokerScheduledScanCompleted(pirRunState)
             is BrokerScanActionSucceeded -> handleBrokerScanActionSucceeded(pirRunState)
             is BrokerScanActionFailed -> handleBrokerScanActionFailed(pirRunState)
-            is BrokerOptOutStarted -> handleBrokerOptOutStarted(pirRunState)
-            is BrokerOptOutCompleted -> handleBrokerOptOutCompleted(pirRunState)
             is BrokerRecordOptOutStarted -> handleRecordOptOutStarted(pirRunState)
             is BrokerRecordOptOutCompleted -> handleRecordOptOutCompleted(pirRunState)
             is BrokerOptOutActionSucceeded -> handleBrokerOptOutActionSucceeded(pirRunState)
@@ -201,8 +194,10 @@ class RealPirRunStateHandler @Inject constructor(
         )
         repository.saveScanCompletedBroker(
             brokerName = state.brokerName,
+            profileQueryId = state.profileQueryId,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.eventTimeInMillis,
+            isSuccess = state.isSuccess,
         )
     }
 
@@ -232,46 +227,41 @@ class RealPirRunStateHandler @Inject constructor(
         )
         repository.saveScanCompletedBroker(
             brokerName = state.brokerName,
+            profileQueryId = state.profileQueryId,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.eventTimeInMillis,
+            isSuccess = state.isSuccess,
         )
     }
 
     private suspend fun handleBrokerScanActionSucceeded(state: BrokerScanActionSucceeded) {
         when (state.pirSuccessResponse) {
-            is NavigateResponse -> repository.saveNavigateResult(
-                state.brokerName,
-                state.pirSuccessResponse,
-            )
-
-            is ExtractedResponse -> repository.saveExtractProfileResult(
-                state.brokerName,
-                state.pirSuccessResponse,
-            )
+            is ExtractedResponse -> state.pirSuccessResponse.response.map {
+                ExtractedProfile(
+                    profileUrl = it.profileUrl,
+                    profileQueryId = state.profileQueryId,
+                    brokerName = state.brokerName,
+                    name = it.name,
+                    alternativeNames = it.alternativeNames,
+                    age = it.age,
+                    addresses = it.addresses.map { item -> addressCityStateAdapter.toJson(item) },
+                    phoneNumbers = it.phoneNumbers,
+                    relatives = it.relatives,
+                    identifier = it.identifier,
+                    reportId = it.reportId,
+                    email = it.email,
+                    fullName = it.fullName,
+                )
+            }.also {
+                repository.saveExtractedProfile(it)
+            }
 
             else -> {}
         }
     }
 
-    private suspend fun handleBrokerScanActionFailed(state: BrokerScanActionFailed) {
-        repository.saveErrorResult(
-            brokerName = state.brokerName,
-            actionType = state.actionType,
-            message = state.message,
-        )
-    }
-
-    private fun handleBrokerOptOutStarted(state: BrokerOptOutStarted) {
-        pixelSender.reportBrokerOptOutStarted(
-            brokerName = state.brokerName,
-        )
-    }
-
-    private fun handleBrokerOptOutCompleted(state: BrokerOptOutCompleted) {
-        pixelSender.reportBrokerOptOutCompleted(
-            brokerName = state.brokerName,
-            totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
-        )
+    private fun handleBrokerScanActionFailed(state: BrokerScanActionFailed) {
+        // TODO: remove if not needed later, might be used for stages
     }
 
     private fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {

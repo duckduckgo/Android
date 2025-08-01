@@ -33,6 +33,12 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':downloads-api')
     implementation project(':content-scope-scripts-api')
+    implementation project(':subscriptions-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':voice-search-api')
+    implementation project(':browser-api')
+    implementation project(':history-api')
+    implementation project(':saved-sites-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
@@ -47,6 +53,7 @@ dependencies {
     implementation Google.android.material
     implementation Google.dagger
     implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.viewPager2
 
     implementation "com.squareup.logcat:logcat:_"
 

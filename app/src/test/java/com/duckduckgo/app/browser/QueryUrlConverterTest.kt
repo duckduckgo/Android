@@ -103,6 +103,20 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun whenQueryOriginIsFromBookmarkAndIsQueryThenSearchQueryBuilt() {
+        val input = "foo"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromBookmark)
+        assertDuckDuckGoSearchQuery("foo", result)
+    }
+
+    @Test
+    fun whenQueryOriginIsFromBookmarkAndIsUrlThenUrlReturned() {
+        val input = "http://example.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromBookmark)
+        assertEquals(input, result)
+    }
+
+    @Test
     fun whenQueryOriginIsFromAutocompleteAndIsNavIsFalseThenSearchQueryBuilt() {
         val input = "example.com"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = false))
@@ -139,6 +153,35 @@ class QueryUrlConverterTest {
         assertFalse(result.contains("iar=$vertical"))
     }
 
+    @Test
+    fun whenQueryContainsSingleUrlThenUrlIsExtracted() {
+        val input = "Source: Towards Data Science  https://search.app/2W427"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("https://search.app/2W427", result)
+    }
+
+    @Test
+    fun whenQueryContainsSingleUrlWithNoSchemeThenUrlIsExtractedAndSchemeAdded() {
+        val input = "pre text duckduckgo.com post text"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertEquals("http://duckduckgo.com", result)
+    }
+
+    @Test
+    fun whenQueryContainsMultipleUrlsThenSearchQueryBuilt() {
+        val input = "https://duckduckgo.com https://google.com"
+        val expected = "https%3A%2F%2Fduckduckgo.com%20https%3A%2F%2Fgoogle.com"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = true)
+        assertDuckDuckGoSearchQuery(expected, result)
+    }
+
+    @Test
+    fun whenQueryContainsUrlAndExtractUrlIsFalseThenSearchQueryBuilt() {
+        val input = "Source: Towards Data Science  https://search.app/2W427"
+        val expected = "Source%3A%20Towards%20Data%20Science%20%20https%3A%2F%2Fsearch.app%2F2W427"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromUser, extractUrlFromQuery = false)
+        assertDuckDuckGoSearchQuery(expected, result)
+    }
     private fun assertDuckDuckGoSearchQuery(
         query: String,
         url: String,

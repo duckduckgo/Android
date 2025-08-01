@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -56,6 +57,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector = mock()
     private val callback: AutofillEventListener = mock()
     private val usernameBackFiller: UsernameBackFiller = mock()
+    private val webView: WebView = mock()
 
     private val testee = ResultHandlerUseGeneratedPassword(
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -81,9 +83,9 @@ class ResultHandlerUseGeneratedPasswordTest {
     }
 
     @Test
-    fun whenUserRejectedToUsePasswordThenCorrectCallbackInvoked() {
+    fun whenUserRejectedToUsePasswordThenCorrectCallbackInvoked() = runTest {
         val bundle = bundle("example.com", acceptedGeneratedPassword = false)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback).onRejectGeneratedPassword("example.com")
     }
 
@@ -91,7 +93,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     fun whenUserAcceptedToUsePasswordNoAutoLoginInThenCorrectCallbackInvoked() = runTest {
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback).onAcceptGeneratedPassword("example.com")
     }
 
@@ -99,7 +101,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     fun whenUserAcceptedToUsePasswordNoAutoLoginInThenCredentialIsSaved() = runTest {
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore).saveCredentials(any(), any())
     }
 
@@ -109,7 +111,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         whenever(autofillStore.saveCredentials(any(), any())).thenReturn(aLogin(1))
 
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autoSavedLoginsMonitor).setAutoSavedLoginId(any(), any())
     }
 
@@ -118,7 +120,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         "from-backfill".useBackFilledUsername()
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore).saveCredentials(any(), eq(LoginCredentials(domain = "example.com", username = "from-backfill", password = "pw")))
     }
 
@@ -126,14 +128,14 @@ class ResultHandlerUseGeneratedPasswordTest {
     fun whenUserAcceptedToUsePasswordAutoLoginButNothingToUpdateThenCredentialIsSaved() = runTest {
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, username = "from-js", password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore).saveCredentials(any(), eq(LoginCredentials(domain = "example.com", username = "from-js", password = "pw")))
     }
 
     fun whenUserAcceptedToUsePasswordNoAutoLoginUsernameProvidedThenBackFilledUsernameNotUsed() = runTest {
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, username = "from-js", password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore).saveCredentials(any(), eq(LoginCredentials(domain = "example.com", username = "from-js", password = "pw")))
     }
 
@@ -143,7 +145,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         whenever(autofillStore.getCredentialsWithId(1)).thenReturn(null)
 
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore).saveCredentials(any(), any())
     }
 
@@ -159,7 +161,7 @@ class ResultHandlerUseGeneratedPasswordTest {
             username = testLogin.username,
             password = testLogin.password,
         )
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore, never()).saveCredentials(any(), any())
         verify(autofillStore, never()).updateCredentials(any(), any())
     }
@@ -176,7 +178,7 @@ class ResultHandlerUseGeneratedPasswordTest {
             username = "different-username",
             password = testLogin.password,
         )
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore, never()).saveCredentials(any(), any())
         verify(autofillStore).updateCredentials(any(), any())
     }
@@ -193,7 +195,7 @@ class ResultHandlerUseGeneratedPasswordTest {
             username = testLogin.username,
             password = "different-password",
         )
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore, never()).saveCredentials(any(), any())
         verify(autofillStore).updateCredentials(any(), any())
     }
@@ -201,7 +203,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     @Test
     fun whenUserAcceptedToUsePasswordButPasswordIsNullThenCorrectCallbackNotInvoked() = runTest {
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = null)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback, never()).onAcceptGeneratedPassword("example.com")
     }
 
@@ -210,7 +212,7 @@ class ResultHandlerUseGeneratedPasswordTest {
         val bundle = bundle("example.com", acceptedGeneratedPassword = true, password = "pw")
         whenever(autoSavedLoginsMonitor.getAutoSavedLoginId(any())).thenReturn(null)
         whenever(existingCredentialMatchDetector.determine(anyOrNull(), anyOrNull(), anyOrNull())).thenReturn(UsernameMatchDifferentPassword)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(autofillStore, never()).saveCredentials(any(), any())
         verify(autofillStore, never()).updateCredentials(any(), any())
     }
@@ -218,7 +220,7 @@ class ResultHandlerUseGeneratedPasswordTest {
     @Test
     fun whenBundleMissingUrlThenCallbackNotInvoked() = runTest {
         val bundle = bundle(url = null, acceptedGeneratedPassword = true)
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verifyNoInteractions(callback)
     }
 

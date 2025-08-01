@@ -56,6 +56,7 @@ import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
 import com.duckduckgo.subscriptions.impl.billing.RetryPolicy
 import com.duckduckgo.subscriptions.impl.billing.retry
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionFailureErrorType
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.AccessToken
 import com.duckduckgo.subscriptions.impl.repository.Account
@@ -210,6 +211,11 @@ interface SubscriptionsManager {
     suspend fun signInV1(authToken: String)
 
     /**
+     * Signs the user in using the provided v2 access and refresh tokens
+     */
+    suspend fun signInV2(accessToken: String, refreshToken: String)
+
+    /**
      * Signs the user out and deletes all the data from the device
      */
     suspend fun signOut()
@@ -347,7 +353,10 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             false
         }
-        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled()
+        val freeTrialProductsAvailableInGooglePlay = getSubscriptionOffer().any {
+            it.offerId in SubscriptionsConstants.LIST_OF_FREE_TRIAL_OFFERS
+        }
+        return !userHadFreeTrial && privacyProFeature.get().privacyProFreeTrial().isEnabled() && freeTrialProductsAvailableInGooglePlay
     }
 
     override suspend fun getAccount(): Account? = authRepository.getAccount()
@@ -375,6 +384,21 @@ class RealSubscriptionsManager @Inject constructor(
             }
         } else {
             fetchAndStoreAllData()
+        }
+    }
+
+    override suspend fun signInV2(
+        accessToken: String,
+        refreshToken: String,
+    ) {
+        val tokens = TokenPair(accessToken, refreshToken)
+        val jwks = authClient.getJwks()
+        saveTokens(validateTokens(tokens, jwks))
+        authRepository.purchaseToWaitingStatus()
+        try {
+            refreshSubscriptionData()
+        } catch (e: Exception) {
+            logcat { "Subs: error when refreshing subscription on v2 sign in" }
         }
     }
 
@@ -870,7 +894,7 @@ class RealSubscriptionsManager @Inject constructor(
         } catch (e: Exception) {
             val error = extractError(e)
             logcat(ERROR) { "Subs: $error" }
-            pixelSender.reportPurchaseFailureOther()
+            pixelSender.reportPurchaseFailureOther(SubscriptionFailureErrorType.PURCHASE_EXCEPTION.name, error)
             _currentPurchaseState.emit(CurrentPurchase.Failure(error))
         }
     }

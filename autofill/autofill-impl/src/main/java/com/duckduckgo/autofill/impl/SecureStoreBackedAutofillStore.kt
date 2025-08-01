@@ -84,6 +84,40 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             autofillPrefsStore.hasEverBeenPromptedToSaveLogin = value
         }
 
+    override var hasEverImportedPasswords: Boolean
+        get() = autofillPrefsStore.hasEverImportedPasswords
+        set(value) {
+            autofillPrefsStore.hasEverImportedPasswords = value
+        }
+
+    override fun hasEverImportedPasswordsFlow(): Flow<Boolean> {
+        return autofillPrefsStore.hasEverImportedPasswordsFlow()
+    }
+
+    override var hasDismissedMainAppSettingsPromo: Boolean
+        get() = autofillPrefsStore.hasDismissedMainAppSettingsPromo
+        set(value) {
+            autofillPrefsStore.hasDismissedMainAppSettingsPromo = value
+        }
+
+    override var hasDeclinedPasswordManagementImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedPasswordManagementImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedPasswordManagementImportPromo = value
+        }
+
+    override var hasDeclinedInBrowserPasswordImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo = value
+        }
+
+    override var inBrowserImportPromoShownCount: Int
+        get() = autofillPrefsStore.inBrowserImportPromoShownCount
+        set(value) {
+            autofillPrefsStore.inBrowserImportPromoShownCount = value
+        }
+
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {

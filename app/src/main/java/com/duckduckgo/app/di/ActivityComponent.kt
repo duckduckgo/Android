@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.di
 
+import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.di.ActivityComponent.Factory
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
@@ -53,4 +55,15 @@ abstract class DaggerActivityModule {
     @IntoMap
     @ClassKey(DaggerActivity::class)
     abstract fun bindsDaggerActivityComponent(factory: Factory): AndroidInjector.Factory<*, *>
+}
+
+@Module
+@ContributesTo(ActivityScope::class)
+abstract class DaggerActivityScopedModule {
+    @Binds
+    abstract fun bindsDaggerActivity(daggerActivity: DaggerActivity): AppCompatActivity
+
+    @Binds
+    @ActivityContext
+    abstract fun bindsActivityContext(daggerActivity: DaggerActivity): Context
 }

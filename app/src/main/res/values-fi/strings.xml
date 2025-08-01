@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Ulkoasu</string>
+    <string name="settingsShowFullUrlTitle">Näytä sivuston osoite kokonaan</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -797,7 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Valmista!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ai niin...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös sisäänrakennettu <b>VPN</b>!<br/><br/>Aktivoi se <b>maksullisella Privacy Pro -tilauksella.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGossa on myös turvallinen <b>VPN + 2 muuta premium-suojausta</b>, jotka ovat saatavilla <b>valinnaisen maksullisen tilauksen</b> kautta.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kokeile ilmaiseksi!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,10 +845,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Kiitos! Ilmoituksesi auttaa tekemään DuckDuckGosta paremman kaikille!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Uusi AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Anna DuckDuckGon suojata enemmän tekemisiäsi verkossa.</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tee meistä oletusselaimesi, niin kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
@@ -878,4 +877,14 @@
     <string name="scamBlockerTitle">Huijausten esto</string>
     <string name="scamBlockerDescription">Varoita sivustoista, jotka on merkitty huijausten, tietojenkalastelun ja haittaohjelmien johdosta.</string>
     <string name="threatProtectionLearnMoreTitle">Lue lisää</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Kokeile aloitusnäytön widgetiä!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisää widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hae DuckDuckGosta</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Aloitusnäytön widget</string>
 </resources>

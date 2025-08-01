@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -40,7 +41,6 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
-import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.settings.SettingsViewModel.Command
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAboutScreen
 import com.duckduckgo.app.settings.SettingsViewModel.Command.LaunchAccessibilitySettings
@@ -73,6 +73,7 @@ import com.duckduckgo.autoconsent.impl.ui.AutoconsentSettingsActivity
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
@@ -88,6 +89,7 @@ import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreen
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.DuckPlayerSettingsPlugin
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.settings.api.ThreatProtectionSettingsPlugin
@@ -143,6 +145,12 @@ class SettingsActivity : DuckDuckGoActivity() {
         _threatProtectionSettingsPlugin.getPlugins()
     }
 
+    @Inject
+    lateinit var _completeSetupSettingsPlugin: PluginPoint<CompleteSetupSettingsPlugin>
+    private val completeSetupSettingsPlugin by lazy {
+        _completeSetupSettingsPlugin.getPlugins()
+    }
+
     private val feedbackFlow = registerForActivityResult(FeedbackContract()) { resultOk ->
         if (resultOk) {
             Snackbar.make(
@@ -171,6 +179,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsPro
         get() = binding.includeSettings.contentSettingsPrivacyPro
 
+    private val viewsCompleteSetup
+        get() = binding.includeSettings.contentSettingsCompleteSetup
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -180,12 +191,19 @@ class SettingsActivity : DuckDuckGoActivity() {
         configureUiEventHandlers()
         configureInternalFeatures()
         configureSettings()
+        configureCompleteSetupSettings()
         lifecycle.addObserver(viewModel)
         observeViewModel()
+    }
 
-        intent?.getStringExtra(BrowserActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
-            viewModel.onLaunchedFromNotification(it)
-        }
+    private fun configureCompleteSetupSettings() {
+        watchForCompleteSetupSettingsChanges()
+        updateCompleteSetupSettings()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshWidgetsInstalledState()
     }
 
     private fun configureUiEventHandlers() {
@@ -280,7 +298,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updatePrivacyPro(it.isPrivacyProEnabled)
                     updateDuckPlayer(it.isDuckPlayerEnabled)
                     updateThreatProtection(it.isNewThreatProtectionSettingsEnabled)
-                    updateDuckChat(it.isDuckChatEnabled)
+                    updateDuckChat(it.isDuckChatEnabled, it.isAiFeaturesRebrandingEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
                 }
@@ -317,9 +335,20 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDuckChat(isDuckChatEnabled: Boolean) {
+    private fun updateDuckChat(isDuckChatEnabled: Boolean, isAiFeaturesRebrandingEnabled: Boolean) {
         if (isDuckChatEnabled) {
+            val imageRes: Int
+            val titleRes: Int
+            if (isAiFeaturesRebrandingEnabled) {
+                imageRes = com.duckduckgo.mobile.android.R.drawable.ai_general_color_24
+                titleRes = R.string.settingsDuckAiRebranding
+            } else {
+                imageRes = com.duckduckgo.mobile.android.R.drawable.ic_ai_chat_color_24
+                titleRes = R.string.settingsDuckAi
+            }
             viewsMain.includeDuckChatSetting.duckChatSetting.show()
+            viewsMain.includeDuckChatSetting.leadingIcon.setImageResource(imageRes)
+            viewsMain.includeDuckChatSetting.primaryText.setText(titleRes)
         } else {
             viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }
@@ -335,6 +364,27 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
         viewsPrivacy.widgetPromptSetting.isVisible = isVisible
         viewsNextSteps.addWidgetToHomeScreenSetting.isVisible = !isVisible
+    }
+
+    private fun watchForCompleteSetupSettingsChanges() {
+        with(viewsCompleteSetup) {
+            settingsCompleteFeaturesContainer.viewTreeObserver.addOnGlobalLayoutListener {
+                if (settingsCompleteFeaturesContainer.children.any { it.isVisible }) {
+                    settingsSectionCompleteSetup.show()
+                } else {
+                    settingsSectionCompleteSetup.gone()
+                }
+            }
+        }
+    }
+
+    private fun updateCompleteSetupSettings() {
+        val viewsToInclude = completeSetupSettingsPlugin.map { it.getView(this) }
+
+        with(viewsCompleteSetup.settingsCompleteFeaturesContainer) {
+            removeAllViews()
+            viewsToInclude.forEach { addView(it) }
+        }
     }
 
     private fun updateAutofill(autofillEnabled: Boolean) = with(viewsMain.autofillLoginsSetting) {
@@ -371,7 +421,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is LaunchAppTPOnboarding -> launchScreen(AppTrackerOnboardingActivityWithEmptyParamsParams)
             is LaunchEmailProtection -> launchActivityAndFinish(BrowserActivity.intent(this, it.url, interstitialScreen = true))
             is LaunchEmailProtectionNotSupported -> launchScreen(EmailProtectionUnsupportedScreenNoParams)
-            is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget()
+            is LaunchAddHomeScreenWidget -> launchAddHomeScreenWidget(it.simpleWidgetPrompt)
             is LaunchSyncSettings -> launchScreen(SyncActivityWithEmptyParams)
             is LaunchPrivateSearchWebPage -> launchScreen(PrivateSearchScreenNoParams)
             is LaunchWebTrackingProtectionScreen -> launchScreen(WebTrackingProtectionScreenNoParams)
@@ -420,9 +470,9 @@ class SettingsActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun launchAddHomeScreenWidget() {
+    private fun launchAddHomeScreenWidget(simpleWidgetPrompt: Boolean) {
         pixel.fire(AppPixelName.SETTINGS_ADD_HOME_SCREEN_WIDGET_CLICKED)
-        addWidgetLauncher.launchAddWidget(this)
+        addWidgetLauncher.launchAddWidget(this, simpleWidgetPrompt)
     }
 
     private fun launchFeedback() {
@@ -430,8 +480,6 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
-
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
         }

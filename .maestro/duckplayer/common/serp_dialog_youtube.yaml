@@ -1,0 +1,7 @@
+appId: com.duckduckgo.mobile.android
+---
+- assertVisible:
+    text: "Duck Player lets you watch YouTube without targeted ads"
+
+- tapOn:
+    text: "Watch on YouTube"

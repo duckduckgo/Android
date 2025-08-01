@@ -39,6 +39,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProFeedbackScreens.PrivacyProFeedbackScreenWithParams
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
@@ -50,8 +51,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionSettingsBinding
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.ChangePlanActivity.Companion.ChangePlanScreenWithEmptyParams
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -97,26 +98,6 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             .filterIsInstance(ViewState.Ready::class)
             .onEach { renderView(it) }
             .launchIn(lifecycleScope)
-
-        binding.removeDevice.setClickListener {
-            TextAlertDialogBuilder(this)
-                .setTitle(string.removeFromDevice)
-                .setMessage(string.removeFromDeviceDescription)
-                .setPositiveButton(string.removeSubscription, DESTRUCTIVE)
-                .setNegativeButton(string.cancel, GHOST_ALT)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.removeFromDevice()
-                        }
-
-                        override fun onNegativeButtonClicked() {
-                            // NOOP
-                        }
-                    },
-                )
-                .show()
-        }
 
         binding.manageEmail.setOnClickListener {
             viewModel.onEditEmailButtonClicked()
@@ -165,6 +146,31 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderView(viewState: ViewState.Ready) {
+        // Privacy Pro Rebranding active
+        val removeFromDeviceMessage: Int
+        if (viewState.rebrandingEnabled) {
+            removeFromDeviceMessage = string.removeFromDeviceDescriptionRebranding
+            binding.subscriptionSettingsProductName.setText(string.privacyProRebranding)
+            binding.activateOnOtherDevices.setText(string.activateOnOtherDevicesRebranding)
+            binding.faq.setPrimaryText(getString(string.privacyProFaqRebranding))
+            binding.faq.setSecondaryText(getString(string.privacyProFaqSecondaryRebranding))
+        } else {
+            removeFromDeviceMessage = string.removeFromDeviceDescription
+            binding.subscriptionSettingsProductName.setText(string.privacyPro)
+            binding.activateOnOtherDevices.setText(string.activateOnOtherDevices)
+            binding.faq.setPrimaryText(getString(string.privacyProFaq))
+            binding.faq.setSecondaryText(getString(string.privacyProFaqSecondary))
+        }
+
+        if (viewState.showRebrandingBanner) {
+            binding.includePrivacyProRebrandingBanner.root.show()
+            binding.includePrivacyProRebrandingBanner.settingsBannerClose.setOnClickListener {
+                viewModel.rebrandingBannerDismissed()
+            }
+        } else {
+            binding.includePrivacyProRebrandingBanner.root.gone()
+        }
+
         if (viewState.status in listOf(INACTIVE, EXPIRED)) {
             binding.viewPlans.isVisible = true
             binding.changePlan.isVisible = false
@@ -235,17 +241,47 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
         if (viewState.email == null) {
             binding.manageEmail.gone()
-            binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithoutEmail))
+            val secondaryTextRes = if (viewState.rebrandingEnabled) {
+                string.addToDeviceSecondaryTextWithoutEmailRebranding
+            } else {
+                string.addToDeviceSecondaryTextWithoutEmail
+            }
+            binding.addToDevice.setSecondaryText(resources.getString(secondaryTextRes))
         } else {
             binding.manageEmail.show()
             binding.manageEmail.setSecondaryText(viewState.email)
-            binding.addToDevice.setSecondaryText(resources.getString(string.addToDeviceSecondaryTextWithEmail))
+            val secondaryTextRes = if (viewState.rebrandingEnabled) {
+                string.addToDeviceSecondaryTextWithEmailRebranding
+            } else {
+                string.addToDeviceSecondaryTextWithEmail
+            }
+            binding.addToDevice.setSecondaryText(resources.getString(secondaryTextRes))
         }
 
         if (viewState.showFeedback) {
             binding.sendFeedback.show()
         } else {
             binding.sendFeedback.gone()
+        }
+
+        binding.removeDevice.setClickListener {
+            TextAlertDialogBuilder(this)
+                .setTitle(string.removeFromDevice)
+                .setMessage(removeFromDeviceMessage)
+                .setPositiveButton(string.removeSubscription, DESTRUCTIVE)
+                .setNegativeButton(string.cancel, GHOST_ALT)
+                .addEventListener(
+                    object : TextAlertDialogBuilder.EventListener() {
+                        override fun onPositiveButtonClicked() {
+                            viewModel.removeFromDevice()
+                        }
+
+                        override fun onNegativeButtonClicked() {
+                            // NOOP
+                        }
+                    },
+                )
+                .show()
         }
     }
 
@@ -268,6 +304,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     ),
                 )
             }
+
+            is DismissRebrandingBanner -> dismissRebrandingBanner()
         }
     }
 
@@ -329,12 +367,14 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun dismissRebrandingBanner() {
+        binding.includePrivacyProRebrandingBanner.root.gone()
+    }
+
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
         const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
         const val PRIVACY_POLICY_URL = "https://duckduckgo.com/pro/privacy-terms"
-
-        data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

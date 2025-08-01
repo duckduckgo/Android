@@ -9,6 +9,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -28,7 +29,6 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -65,6 +65,7 @@ class SubscriptionWebViewViewModelTest {
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
@@ -79,6 +80,7 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState,
             pixelSender,
             privacyProFeature,
+            mockSubscriptionRebrandingFeatureToggle,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -100,7 +102,7 @@ class SubscriptionWebViewViewModelTest {
             assertEquals(Companion.PURCHASE_COMPLETED_FEATURE_NAME, (success as Success).subscriptionEventData.featureName)
             assertEquals(Companion.PURCHASE_COMPLETED_SUBSCRIPTION_NAME, success.subscriptionEventData.subscriptionName)
             assertNotNull(success.subscriptionEventData.params)
-            assertEquals("completed", success.subscriptionEventData.params!!.getString("type"))
+            assertEquals("completed", success.subscriptionEventData.params.getString("type"))
 
             flowTest.emit(CurrentPurchase.InProgress)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.InProgress)
@@ -488,6 +490,20 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToDuckAI)
+        }
+    }
+
+    @Test
     fun whenSubscriptionSelectedThenPixelIsSent() = runTest {
         viewModel.processJsCallbackMessage(
             featureName = "test",
@@ -623,6 +639,34 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+        )
+        verify(pixelSender).reportOnboardingDuckAiClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
     fun whenSubscriptionsWelcomeFaqClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
@@ -659,7 +703,7 @@ class SubscriptionWebViewViewModelTest {
         viewModel.commands().test {
             viewModel.onSubscriptionRestored()
             val result = awaitItem()
-            assertTrue(result is BackToSettings)
+            assertTrue(result is Command.BackToSettings)
         }
     }
 

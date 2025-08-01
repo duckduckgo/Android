@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">udseende</string>
+    <string name="settingsShowFullUrlTitle">Vis hele webstedsadressen</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Gem</string>
@@ -797,7 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Åh, før jeg glemmer det...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en indbygget <b>VPN</b>!<br/><br/>Aktiver den med et <b>betalt Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + 2 ekstra premium-beskyttelser</b>, tilgængelige med et <b>valgfrit betalt abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,10 +845,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Tak! Din rapport hjælper med at gøre DuckDuckGo bedre for alle!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Ny AI-chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lad DuckDuckGo beskytte mere af det, du foretager dig online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gør os til din standardbrowser, så alle links åbner i DuckDuckGo.</string>
@@ -878,4 +877,14 @@
     <string name="scamBlockerTitle">Blokering af svindel</string>
     <string name="scamBlockerDescription">Advar på websteder, der er registreret for svindel, phishing og malware.</string>
     <string name="threatProtectionLearnMoreTitle">Mere info</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Prøv vores widget til startskærmen!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Tilføj vores søgewidget på startskærmbilledet for hurtig og nem adgang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Tilføj widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Søg på DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startskærmswidget</string>
 </resources>

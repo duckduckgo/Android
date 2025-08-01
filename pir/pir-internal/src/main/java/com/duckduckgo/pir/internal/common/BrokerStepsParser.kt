@@ -21,8 +21,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
@@ -40,11 +40,15 @@ interface BrokerStepsParser {
      *
      * @param brokerName - name of the broker to which these steps belong to
      * @param stepsJson - string in JSONObject format obtained from the broker's json representing a step (scan / opt-out).
+     * @param profileQueryId - profile query id associated with the step (used for the opt-out step)
+     * @return list of broker steps resulting from the passed params. If the step is of type OptOut, it will return a list of
+     *  OptOutSteps where an OptOut step is mapped to each of the profile for the broker.
      */
     suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
-    ): BrokerStep?
+        profileQueryId: Long? = null,
+    ): List<BrokerStep>
 
     sealed class BrokerStep(
         open val brokerName: String = "", // this will be set later / not coming from json
@@ -63,7 +67,7 @@ interface BrokerStepsParser {
             override val stepType: String,
             override val actions: List<BrokerAction>,
             val optOutType: String,
-            val profilesToOptOut: List<ExtractedProfile> = emptyList(),
+            val profileToOptOut: ExtractedProfile = ExtractedProfile(-1, -1, ""), // this will be set later / not coming from json
         ) : BrokerStep(brokerName, stepType, actions)
     }
 }
@@ -99,20 +103,28 @@ class RealBrokerStepsParser @Inject constructor(
     override suspend fun parseStep(
         brokerName: String,
         stepsJson: String,
-    ): BrokerStep? = withContext(dispatcherProvider.io()) {
+        profileQueryId: Long?,
+    ): List<BrokerStep> = withContext(dispatcherProvider.io()) {
         return@withContext runCatching {
             adapter.fromJson(stepsJson)?.run {
                 if (this is OptOutStep) {
-                    this.copy(
-                        brokerName = brokerName,
-                        profilesToOptOut = repository.getExtractProfileResultForBroker(brokerName)?.extractResults ?: emptyList(),
-                    )
+                    if (profileQueryId == null) {
+                        throw IllegalStateException("The profileQueryId is required when attempting to parse the opt-out steps.")
+                    }
+                    repository.getExtractedProfiles(brokerName, profileQueryId).map {
+                        this.copy(
+                            brokerName = brokerName,
+                            profileToOptOut = it,
+                        )
+                    }
                 } else {
-                    (this as ScanStep).copy(brokerName = brokerName)
+                    listOf((this as ScanStep).copy(brokerName = brokerName))
                 }
-            }
+            } ?: emptyList<BrokerStep>()
         }.onFailure {
             logcat(ERROR) { "PIR-SCAN: Parsing the steps failed due to: $it" }
-        }.getOrNull()
+        }.getOrElse {
+            emptyList<BrokerStep>()
+        }
     }
 }

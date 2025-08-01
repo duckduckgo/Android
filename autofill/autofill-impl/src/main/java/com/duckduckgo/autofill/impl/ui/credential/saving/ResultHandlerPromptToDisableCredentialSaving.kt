@@ -19,6 +19,7 @@ package com.duckduckgo.autofill.impl.ui.credential.saving
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AlertDialog.Builder
 import androidx.fragment.app.Fragment
@@ -60,12 +61,13 @@ class ResultHandlerPromptToDisableCredentialSaving @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AutofillFragmentResultsPlugin {
 
-    override fun processResult(
+    override suspend fun processResult(
         result: Bundle,
         context: Context,
         tabId: String,
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
+        webView: WebView?,
     ) {
         logcat { "${this::class.java.simpleName}: processing result" }
 

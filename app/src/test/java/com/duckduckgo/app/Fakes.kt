@@ -24,8 +24,9 @@ import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.clear.ClearWhenOption
 import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 
-class FakeSettingsDataStore : SettingsDataStore {
+class FakeSettingsDataStore : SettingsDataStore, AutoCompleteSettings {
     private val store = mutableMapOf<String, Any?>()
 
     override var lastExecutedJobId: String?
@@ -128,6 +129,10 @@ class FakeSettingsDataStore : SettingsDataStore {
     override var experimentalWebsiteDarkMode: Boolean
         get() = store["experimentalWebsiteDarkMode"] as Boolean? ?: false
         set(value) { store["experimentalWebsiteDarkMode"] = value }
+
+    override var isFullUrlEnabled: Boolean
+        get() = store["isFullUrlEnabled"] as Boolean? ?: false
+        set(value) { store["isFullUrlEnabled"] = value }
 
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?

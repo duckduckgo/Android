@@ -16,6 +16,7 @@
 
 package com.duckduckgo.subscriptions.impl
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import androidx.core.net.toUri
@@ -24,12 +25,16 @@ import androidx.test.platform.app.InstrumentationRegistry
 import app.cash.turbine.test
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
@@ -51,6 +56,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi")
 class RealSubscriptionsTest {
 
     @get:Rule
@@ -62,6 +68,7 @@ class RealSubscriptionsTest {
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val pixel: SubscriptionPixelSender = mock()
     private lateinit var subscriptions: RealSubscriptions
+    private val subscriptionFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
     private val testSubscriptionOfferList = listOf(
         SubscriptionOffer(
@@ -76,7 +83,13 @@ class RealSubscriptionsTest {
     fun before() = runTest {
         whenever(mockSubscriptionsManager.canSupportEncryption()).thenReturn(true)
         whenever(mockSubscriptionsManager.getSubscriptionOffer()).thenReturn(emptyList())
-        subscriptions = RealSubscriptions(mockSubscriptionsManager, globalActivityStarter, pixel)
+        subscriptions = RealSubscriptions(
+            mockSubscriptionsManager,
+            globalActivityStarter,
+            pixel,
+            { subscriptionFeature },
+            coroutineRule.testDispatcherProvider,
+        )
     }
 
     @Test
@@ -104,6 +117,34 @@ class RealSubscriptionsTest {
     }
 
     @Test
+    fun whenGetEntitlementStatusHasEntitlementDuckaiButFFDisabledThenReturnRemoveFromList() = runTest {
+        subscriptionFeature.duckAiPlus().setRawStoredState(State(false))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP, DuckAiPlus)))
+
+        subscriptions.getEntitlementStatus().test {
+            val entitlements = awaitItem()
+            assertFalse(entitlements.contains(DuckAiPlus))
+            assertTrue(entitlements.size == 1)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenGetEntitlementStatusHasEntitlementDuckaiAndFFEnabledThenReturnList() = runTest {
+        subscriptionFeature.duckAiPlus().setRawStoredState(State(true))
+        whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
+        whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(listOf(NetP, DuckAiPlus)))
+
+        subscriptions.getEntitlementStatus().test {
+            val entitlements = awaitItem()
+            assertTrue(entitlements.contains(DuckAiPlus))
+            assertTrue(entitlements.size == 2)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenGetEntitlementStatusHasNoEntitlementAndEnabledAndActiveThenReturnEmptyList() = runTest {
         whenever(mockSubscriptionsManager.subscriptionStatus()).thenReturn(AUTO_RENEWABLE)
         whenever(mockSubscriptionsManager.entitlements).thenReturn(flowOf(emptyList()))
@@ -112,6 +153,28 @@ class RealSubscriptionsTest {
             assertTrue(awaitItem().isEmpty())
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenGetAvailableProductsHasDuckaiButFFDisabledThenReturnRemoveFromList() = runTest {
+        subscriptionFeature.duckAiPlus().setRawStoredState(State(false))
+        val subsProducts = setOf(NetP, DuckAiPlus).map { it.value }.toSet()
+        whenever(mockSubscriptionsManager.getFeatures()).thenReturn(subsProducts)
+
+        val products = subscriptions.getAvailableProducts()
+        assertFalse(products.contains(DuckAiPlus))
+        assertTrue(products.size == 1)
+    }
+
+    @Test
+    fun whenGetAvailableProductsHasDuckaiAndFFEnabledThenReturnList() = runTest {
+        subscriptionFeature.duckAiPlus().setRawStoredState(State(true))
+        val subsProducts = setOf(NetP, DuckAiPlus).map { it.value }.toSet()
+        whenever(mockSubscriptionsManager.getFeatures()).thenReturn(subsProducts)
+
+        val products = subscriptions.getAvailableProducts()
+        assertTrue(products.contains(DuckAiPlus))
+        assertTrue(products.size == 2)
     }
 
     @Test
@@ -195,6 +258,64 @@ class RealSubscriptionsTest {
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
         assertEquals("test", (captor.lastValue as SubscriptionsWebViewActivityWithParams).origin)
+    }
+
+    @Test
+    fun whenLaunchProUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenLaunchProWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?usePaidDuckAi=true&featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenLaunchSubscriptionUrlWithFeaturePageThenIncludeInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenLaunchSubscriptionWithMultipleQueryParametersThenTheyAreIncludedInSubscriptionURLToActivity() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<SettingsScreenNoParams>())).thenReturn(fakeIntent())
+        whenever(globalActivityStarter.startIntent(any(), any<SubscriptionsWebViewActivityWithParams>())).thenReturn(fakeIntent())
+
+        val captor = argumentCaptor<ActivityParams>()
+        subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
+
+        verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
+        assertEquals("$BUY_URL?usePaidDuckAi=true&featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+    }
+
+    @Test
+    fun whenSubscriptionWithMultipleQueryParametersThenIsPrivacyProUrlReturnsTrue() = runTest {
+        assertTrue(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri()))
+    }
+
+    @Test
+    fun whenSubscriptionUrlButNotRootPathThenIsPrivacyProUrlReturnsFalse() = runTest {
+        assertFalse(subscriptions.isPrivacyProUrl("https://duckduckgo.com/subscriptions/welcome?usePaidDuckAi=true&featurePage=duckai".toUri()))
     }
 
     @Test

@@ -203,6 +203,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Aspect</string>
+    <string name="settingsShowFullUrlTitle">Afișați adresa completă a site-ului</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Salvează</string>
@@ -813,7 +814,9 @@
     <string name="onboardingEndDaxDialogButton">Gata!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -858,10 +861,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Mulțumim! Sesizarea ta ajută la îmbunătățirea DuckDuckGo pentru toată lumea!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Chat AI nou</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lasă DuckDuckGo să protejeze mai mult din ceea ce faci online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Transformă-ne în browserul tău implicit, astfel încât toate linkurile de pe site să se deschidă în DuckDuckGo.</string>
@@ -894,4 +893,14 @@
     <string name="scamBlockerTitle">Instrument de blocare a înșelătoriilor</string>
     <string name="scamBlockerDescription">Avertizează cu privire la site-urile marcate ca incluzând escrocherii, phishing și programe rău intenționate.</string>
     <string name="threatProtectionLearnMoreTitle">Află mai multe</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Încearcă widgetul nostru pentru ecranul de întâmpinare!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Adăugă widget-ul de căutare la ecranul de pornire, pentru acces rapid și ușor.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Adaugă widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nu acum</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Căutare DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget pe ecranul de pornire</string>
 </resources>

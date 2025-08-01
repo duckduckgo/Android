@@ -26,13 +26,14 @@ import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
+import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenMessageDialog
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultAppsActivity
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
@@ -66,6 +67,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import javax.inject.Inject
@@ -80,6 +82,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
 
@@ -97,8 +100,9 @@ class BrowserViewModel @Inject constructor(
     private val skipUrlConversionOnNewTabFeature: SkipUrlConversionOnNewTabFeature,
     private val showOnAppLaunchFeature: ShowOnAppLaunchFeature,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
-    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
+    private val duckChat: DuckChat,
 ) : ViewModel(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -128,6 +132,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -189,7 +194,7 @@ class BrowserViewModel @Inject constructor(
     init {
         appEnjoymentPromptEmitter.promptType.observeForever(appEnjoymentObserver)
         viewModelScope.launch {
-            defaultBrowserPromptsExperiment.commands.collect {
+            additionalDefaultBrowserPrompts.commands.collect {
                 when (it) {
                     OpenMessageDialog -> {
                         command.value = Command.ShowSetAsDefaultBrowserDialog
@@ -359,7 +364,7 @@ class BrowserViewModel @Inject constructor(
             launch {
                 val existingTab = tabRepository.getTabs().firstOrNull { tab -> tab.url == url }
                 if (existingTab == null) {
-                    command.value = Command.OpenInNewTab(url)
+                    command.value = Command.OpenSavedSite(url)
                 } else {
                     command.value = Command.SwitchToTab(existingTab.tabId)
                 }
@@ -390,37 +395,37 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserDialogShown() {
-        defaultBrowserPromptsExperiment.onMessageDialogShown()
+        additionalDefaultBrowserPrompts.onMessageDialogShown()
     }
 
     fun onSetDefaultBrowserDialogCanceled() {
-        defaultBrowserPromptsExperiment.onMessageDialogCanceled()
+        additionalDefaultBrowserPrompts.onMessageDialogCanceled()
     }
 
     fun onSetDefaultBrowserConfirmationButtonClicked() {
         command.value = DismissSetAsDefaultBrowserDialog
-        defaultBrowserPromptsExperiment.onMessageDialogConfirmationButtonClicked()
+        additionalDefaultBrowserPrompts.onMessageDialogConfirmationButtonClicked()
     }
 
     fun onSetDefaultBrowserNotNowButtonClicked() {
         command.value = DismissSetAsDefaultBrowserDialog
-        defaultBrowserPromptsExperiment.onMessageDialogNotNowButtonClicked()
+        additionalDefaultBrowserPrompts.onMessageDialogNotNowButtonClicked()
     }
 
     fun onSystemDefaultBrowserDialogShown() {
-        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogShown()
+        additionalDefaultBrowserPrompts.onSystemDefaultBrowserDialogShown()
     }
 
     fun onSystemDefaultBrowserDialogSuccess() {
-        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogSuccess(lastSystemDefaultBrowserDialogTrigger)
+        additionalDefaultBrowserPrompts.onSystemDefaultBrowserDialogSuccess(lastSystemDefaultBrowserDialogTrigger)
     }
 
     fun onSystemDefaultBrowserDialogCanceled() {
-        defaultBrowserPromptsExperiment.onSystemDefaultBrowserDialogCanceled(lastSystemDefaultBrowserDialogTrigger)
+        additionalDefaultBrowserPrompts.onSystemDefaultBrowserDialogCanceled(lastSystemDefaultBrowserDialogTrigger)
     }
 
     fun onSystemDefaultAppsActivityClosed() {
-        defaultBrowserPromptsExperiment.onSystemDefaultAppsActivityClosed(lastSystemDefaultAppsTrigger)
+        additionalDefaultBrowserPrompts.onSystemDefaultAppsActivityClosed(lastSystemDefaultAppsTrigger)
     }
 
     fun onTabsSwiped() {
@@ -453,6 +458,15 @@ class BrowserViewModel @Inject constructor(
 
     fun onTabsDeletedInTabSwitcher(tabIds: List<String>) {
         command.value = ShowUndoDeleteTabsMessage(tabIds)
+    }
+
+    fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean) {
+        logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
+        viewModelScope.launch(dispatchers.io()) {
+            withContext(dispatchers.main()) {
+                command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive)
+            }
+        }
     }
 }
 

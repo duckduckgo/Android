@@ -24,7 +24,6 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.internal.callbacks.PirCallbacks
 import com.duckduckgo.pir.internal.common.BrokerStepsParser
-import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirActionsRunner
 import com.duckduckgo.pir.internal.common.PirJob
 import com.duckduckgo.pir.internal.common.PirJob.RunType.OPTOUT
@@ -102,21 +101,58 @@ class RealPirOptOut @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     callbacks: PluginPoint<PirCallbacks>,
 ) : PirOptOut, PirJob(callbacks) {
-    private var profileQuery: ProfileQuery = ProfileQuery(
-        firstName = "William",
-        lastName = "Smith",
-        city = "Chicago",
-        state = "IL",
-        addresses = listOf(
-            Address(
-                city = "Chicago",
-                state = "IL",
+    private var profileQueries: List<ProfileQuery> = listOf(
+        ProfileQuery(
+            id = -1,
+            firstName = "William",
+            lastName = "Smith",
+            city = "Chicago",
+            state = "IL",
+            addresses = listOf(
+                Address(
+                    city = "Chicago",
+                    state = "IL",
+                ),
             ),
+            birthYear = 1993,
+            fullName = "William Smith",
+            age = 32,
+            deprecated = false,
         ),
-        birthYear = 1993,
-        fullName = "William Smith",
-        age = 32,
-        deprecated = false,
+        ProfileQuery(
+            id = -2,
+            firstName = "Jane",
+            lastName = "Doe",
+            city = "New York",
+            state = "NY",
+            addresses = listOf(
+                Address(
+                    city = "New York",
+                    state = "NY",
+                ),
+            ),
+            birthYear = 1990,
+            fullName = "Jane Doe",
+            age = 35,
+            deprecated = false,
+        ),
+        ProfileQuery(
+            id = -3,
+            firstName = "Alicia",
+            lastName = "West",
+            city = "Los Angeles",
+            state = "CA",
+            addresses = listOf(
+                Address(
+                    city = "Los Angeles",
+                    state = "CA",
+                ),
+            ),
+            birthYear = 1985,
+            fullName = "Alicia West",
+            age = 40,
+            deprecated = false,
+        ),
     )
 
     private val runners: MutableList<PirActionsRunner> = mutableListOf()
@@ -132,9 +168,9 @@ class RealPirOptOut @Inject constructor(
             cleanRunners()
             runners.clear()
         }
-        obtainProfile()
+        obtainProfiles()
 
-        logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
+        logcat { "PIR-OPT-OUT: Running debug opt-out for $brokers on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
         runners.add(
             pirActionsRunnerFactory.create(
@@ -144,20 +180,28 @@ class RealPirOptOut @Inject constructor(
             ),
         )
 
-        // Start each runner on a subset of the broker steps
-
-        brokers.mapNotNull { broker ->
-            repository.getBrokerOptOutSteps(broker)?.run {
-                brokerStepsParser.parseStep(broker, this)
-            }
-        }.filter {
-            (it as OptOutStep).profilesToOptOut.isNotEmpty()
-        }.also { list ->
-            runners[0].startOn(webView, profileQuery, list)
-            runners[0].stop()
+        // Load opt-out steps jsons for each broker
+        val brokerOptOutStepsJsons = brokers.mapNotNull { broker ->
+            repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
 
-        logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+        // Map broker steps with their associated profile queries
+        val allSteps = profileQueries.map { profileQuery ->
+            brokerOptOutStepsJsons.map { (broker, stepsJson) ->
+                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
+            }.flatten().map { step -> profileQuery to step }
+        }.flatten()
+
+        // Execute each steps sequentially on the single runner
+        allSteps.forEach { (profileQuery, step) ->
+            logcat { "PIR-OPT-OUT: Start thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+            runners[0].startOn(webView, profileQuery, listOf(step))
+            runners[0].stop()
+            logcat { "PIR-OPT-OUT: Finish thread=${Thread.currentThread().name}, profile=$profileQuery and step=$step" }
+        }
+
+        logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
+
         emitCompletedPixel()
         onJobCompleted()
         return@withContext Result.success(Unit)
@@ -173,17 +217,29 @@ class RealPirOptOut @Inject constructor(
             cleanRunners()
             runners.clear()
         }
-        obtainProfile()
+        obtainProfiles()
 
-        logcat { "PIR-OPT-OUT: Running opt-out on profile: $profileQuery on ${Thread.currentThread().name}" }
+        logcat { "PIR-OPT-OUT: Running opt-out on profiles: $profileQueries on ${Thread.currentThread().name}" }
 
         val script = pirCssScriptLoader.getScript()
 
-        maxWebViewCount = if (brokers.size <= MAX_DETACHED_WEBVIEW_COUNT) {
-            brokers.size
-        } else {
-            MAX_DETACHED_WEBVIEW_COUNT
+        // Load opt-out steps jsons for each broker
+        val brokerOptOutStepsJsons = brokers.mapNotNull { broker ->
+            repository.getBrokerOptOutSteps(broker)?.let { broker to it }
         }
+
+        // Map broker steps with their associated profile queries
+        val allSteps = profileQueries.map { profileQuery ->
+            brokerOptOutStepsJsons.map { (broker, stepsJson) ->
+                brokerStepsParser.parseStep(broker, stepsJson, profileQuery.id)
+            }.flatten().map { step -> profileQuery to step }
+        }.flatten()
+
+        maxWebViewCount = minOf(allSteps.size, MAX_DETACHED_WEBVIEW_COUNT)
+
+        // Assign steps to runners based on the maximum number of WebViews we can use
+        val stepsPerRunner = allSteps.splitIntoParts(maxWebViewCount)
+
         logcat { "PIR-OPT-OUT: Attempting to create $maxWebViewCount parallel runners on ${Thread.currentThread().name}" }
 
         // Initiate runners
@@ -199,51 +255,49 @@ class RealPirOptOut @Inject constructor(
             createCount++
         }
 
-        // Start each runner on a subset of the broker steps
-        brokers.mapNotNull { broker ->
-            repository.getBrokerOptOutSteps(broker)?.run {
-                brokerStepsParser.parseStep(broker, this)
-            }
-        }.filter {
-            (it as OptOutStep).profilesToOptOut.isNotEmpty()
-        }.splitIntoParts(maxWebViewCount)
-            .mapIndexed { index, part ->
-                async {
-                    runners[index].start(profileQuery, part)
+        // Execute the steps on all runners in parallel
+        stepsPerRunner.mapIndexed { index, partSteps ->
+            async {
+                partSteps.map { (profileQuery, step) ->
+                    logcat { "PIR-OPT-OUT: Start opt-out on runner=$index, profile=$profileQuery and step=$step" }
+                    runners[index].start(profileQuery, listOf(step))
                     runners[index].stop()
+                    logcat { "PIR-OPT-OUT: Finish opt-out on runner=$index, profile=$profileQuery and step=$step" }
                 }
-            }.awaitAll()
+            }
+        }.awaitAll()
 
-        logcat { "PIR-OPT-OUT: Optout completed for all runners" }
+        logcat { "PIR-OPT-OUT: Opt-out completed for all runners and profiles" }
         emitCompletedPixel()
         onJobCompleted()
         return@withContext Result.success(Unit)
     }
 
-    private suspend fun obtainProfile() {
-        repository.getUserProfiles().also {
-            if (it.isNotEmpty()) {
-                // Temporarily taking the first profile only for the PoC. In the reality, more than 1 should be allowed.
-                val storedProfile = it[0]
-                profileQuery = ProfileQuery(
-                    firstName = storedProfile.userName.firstName,
-                    lastName = storedProfile.userName.lastName,
-                    city = storedProfile.addresses.city,
-                    state = storedProfile.addresses.state,
-                    addresses = listOf(
-                        Address(
-                            city = storedProfile.addresses.city,
-                            state = storedProfile.addresses.state,
+    private suspend fun obtainProfiles() {
+        repository.getUserProfiles().also { profiles ->
+            if (profiles.isNotEmpty()) {
+                profileQueries = profiles.map { storedProfile ->
+                    ProfileQuery(
+                        id = storedProfile.id,
+                        firstName = storedProfile.userName.firstName,
+                        lastName = storedProfile.userName.lastName,
+                        city = storedProfile.addresses.city,
+                        state = storedProfile.addresses.state,
+                        addresses = listOf(
+                            Address(
+                                city = storedProfile.addresses.city,
+                                state = storedProfile.addresses.state,
+                            ),
                         ),
-                    ),
-                    birthYear = storedProfile.birthYear,
-                    fullName = storedProfile.userName.middleName?.run {
-                        "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
-                    }
-                        ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
-                    age = LocalDate.now().year - storedProfile.birthYear,
-                    deprecated = false,
-                )
+                        birthYear = storedProfile.birthYear,
+                        fullName = storedProfile.userName.middleName?.run {
+                            "${storedProfile.userName.firstName} $this ${storedProfile.userName.lastName}"
+                        }
+                            ?: "${storedProfile.userName.firstName} ${storedProfile.userName.lastName}",
+                        age = LocalDate.now().year - storedProfile.birthYear,
+                        deprecated = false,
+                    )
+                }
             }
         }
     }

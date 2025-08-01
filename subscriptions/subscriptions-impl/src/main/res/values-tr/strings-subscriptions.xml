@@ -69,8 +69,10 @@
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonelik Ayarları</string>
     <string name="subscriptionSettingSubscribe">Privacy Pro ile bağlantınızı ve kimliğinizi koruyun</string>
-    <string name="subscriptionSettingSubscribeSubtitle">VPN, Personal Information Removal ve Identity Theft Restoration\'ı içerir.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">VPN ve Identity Theft Restoration hizmetlerimizi içerir.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Aboneler VPN, Personal Information Removal ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Aboneler VPN ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+
     <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
     <string name="subscriptionSettingTryFreeTrial">Privacy Pro\'yu Ücretsiz Deneyin</string>
     <string name="subscriptionSettingRestore">Aboneliğim Var</string>

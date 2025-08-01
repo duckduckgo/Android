@@ -80,6 +80,8 @@ private const val DUCK_PLAYER_DOMAIN = "player"
 private const val DUCK_PLAYER_URL_BASE = "$duck://$DUCK_PLAYER_DOMAIN/"
 private const val DUCK_PLAYER_ASSETS_PATH = "duckplayer/"
 private const val DUCK_PLAYER_ASSETS_INDEX_PATH = "${DUCK_PLAYER_ASSETS_PATH}index.html"
+private const val REFERER_HEADER = "referer"
+private const val EMBED_REFERER_VALUE = "http://android.mobile.duckduckgo.com"
 
 interface DuckPlayerInternal : DuckPlayer {
     /**
@@ -254,12 +256,24 @@ class RealDuckPlayer @Inject constructor(
         return isDuckPlayerUri(uri.toUri())
     }
 
+    private fun isYouTubeNoCookieUri(uri: Uri): Boolean {
+        val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
+        return uri.host?.removePrefix("www.") == embedUrl
+    }
+
+    private fun isYouTubeNoCookieEmbedUri(
+        uri: Uri,
+        webViewUrl: String?,
+    ): Boolean {
+        webViewUrl ?: return false
+        if (!isYouTubeNoCookieUri(uri) || uri.pathSegments.firstOrNull() != "embed") return false
+        return webViewUrl.toUri().getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) == uri.pathSegments.getOrNull(1)
+    }
+
     override fun isSimulatedYoutubeNoCookie(uri: Uri): Boolean {
         val validPaths = duckPlayerLocalFilesPath.assetsPath()
-        val embedUrl = duckPlayerFeatureRepository.getYouTubeEmbedUrl()
         return (
-            uri.host?.removePrefix("www.") ==
-                embedUrl && (
+            isYouTubeNoCookieUri(uri) && (
                 uri.pathSegments.firstOrNull() == null ||
                     validPaths.any { uri.path?.contains(it) == true } ||
                     (uri.pathSegments.firstOrNull() != "embed" && uri.getQueryParameter(DUCK_PLAYER_VIDEO_ID_QUERY_PARAM) != null)
@@ -305,13 +319,26 @@ class RealDuckPlayer @Inject constructor(
             return processDuckPlayerUri(url, webView)
         } else {
             if (!isFeatureEnabled) return null
+            val webViewUrl = withContext(dispatchers.main()) { webView.url }
             if (isYoutubeWatchUrl(url)) {
                 return processYouTubeWatchUri(request, url, webView)
             } else if (isSimulatedYoutubeNoCookie(url)) {
                 return processSimulatedYouTubeNoCookieUri(url, webView)
+            } else if (duckPlayerFeature.addCustomEmbedReferer().isEnabled() && isYouTubeNoCookieEmbedUri(url, webViewUrl)) {
+                return getEmbedWithReferer(request)?.let { inputStream ->
+                    WebResourceResponse("text/html", "UTF-8", inputStream)
+                }
             }
         }
         return null
+    }
+
+    private suspend fun getEmbedWithReferer(request: WebResourceRequest): InputStream? {
+        val headers = request.requestHeaders
+            .filterNot { it.key.lowercase() == REFERER_HEADER }
+            .plus(REFERER_HEADER to EMBED_REFERER_VALUE)
+
+        return duckPlayerFeatureRepository.requestEmbed(request.url.toString(), headers)
     }
 
     private fun processSimulatedYouTubeNoCookieUri(

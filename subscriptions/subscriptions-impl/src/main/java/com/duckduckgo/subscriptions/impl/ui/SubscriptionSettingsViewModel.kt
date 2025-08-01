@@ -27,11 +27,14 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_ROW
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
+import com.duckduckgo.subscriptions.impl.repository.RebrandingRepository
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissRebrandingBanner
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
@@ -58,6 +61,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,
     private val pixelSender: SubscriptionPixelSender,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
+    private val rebrandingRepository: RebrandingRepository,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -100,9 +105,14 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 email = account.email?.takeUnless { it.isBlank() },
                 showFeedback = privacyProUnifiedFeedback.shouldUseUnifiedFeedback(source = SUBSCRIPTION_SETTINGS),
                 activeOffers = subscription.activeOffers,
+                rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled(),
+                showRebrandingBanner = shouldShowRebrandingBanner(),
             ),
         )
     }
+
+    private suspend fun shouldShowRebrandingBanner(): Boolean =
+        subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled() && !rebrandingRepository.isRebrandingBannerShown()
 
     fun onEditEmailButtonClicked() {
         viewModelScope.launch {
@@ -132,6 +142,13 @@ class SubscriptionSettingsViewModel @Inject constructor(
         }
     }
 
+    fun rebrandingBannerDismissed() {
+        viewModelScope.launch {
+            rebrandingRepository.setRebrandingBannerAsViewed()
+            command.send(DismissRebrandingBanner)
+        }
+    }
+
     sealed class SubscriptionDuration {
         data object Monthly : SubscriptionDuration()
         data object Yearly : SubscriptionDuration()
@@ -142,6 +159,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToEditEmailScreen : Command()
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
+        data object DismissRebrandingBanner : Command()
     }
 
     sealed class ViewState {
@@ -155,6 +173,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val email: String?,
             val showFeedback: Boolean = false,
             val activeOffers: List<ActiveOfferType>,
+            val rebrandingEnabled: Boolean = false,
+            val showRebrandingBanner: Boolean = false,
         ) : ViewState()
     }
 }

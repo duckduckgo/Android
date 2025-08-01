@@ -19,15 +19,13 @@ package com.duckduckgo.autofill.impl.ui.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
-import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Unknown
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_ENABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN
@@ -43,12 +41,14 @@ import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Comman
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigatePasswordList
 import com.duckduckgo.autofill.impl.ui.settings.AutofillSettingsViewModel.Command.NavigateToHowToSyncWithDesktop
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -61,7 +61,7 @@ class AutofillSettingsViewModel @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val neverSavedSiteRepository: NeverSavedSiteRepository,
     private val autofillFeature: AutofillFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
     private val deviceAuthenticator: DeviceAuthenticator,
 ) : ViewModel() {
 
@@ -106,10 +106,16 @@ class AutofillSettingsViewModel @Inject constructor(
     }
 
     fun sendLaunchPixel(autofillScreenLaunchSource: AutofillScreenLaunchSource) {
-        pixel.fire(
-            AUTOFILL_SETTINGS_OPENED,
-            parameters = mapOf("source" to autofillScreenLaunchSource.asString()),
-        )
+        viewModelScope.launch {
+            val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
+            pixel.fire(
+                AUTOFILL_SETTINGS_OPENED,
+                parameters = mapOf(
+                    "source" to autofillScreenLaunchSource.asString(),
+                    "has_credentials_saved" to hasCredentialsSaved.toBinaryString(),
+                ),
+            )
+        }
     }
 
     private fun onViewStateFlowStart() {
@@ -130,16 +136,15 @@ class AutofillSettingsViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val canImport = kotlin.runCatching {
                 val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-                val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-                val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-                return@runCatching gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
+                val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
+                return@runCatching gpmImport && webViewSupportsImportingPasswords
             }.getOrDefault(false)
             _viewState.value = _viewState.value.copy(canImportFromGooglePasswords = canImport)
             if (canImport && !importGooglePasswordButtonShownPixelSent) {
                 importGooglePasswordButtonShownPixelSent = true
                 pixel.fire(
                     pixel = AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN,
-                    parameters = mapOf("source" to (launchSource ?: Unknown).asString()),
+                    parameters = mapOf("source" to AutofillImportLaunchSource.AutofillSettings.value),
                 )
             }
         }
@@ -182,13 +187,13 @@ class AutofillSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onImportPasswordsClicked(autofillScreenLaunchSource: AutofillScreenLaunchSource?) {
+    fun onImportPasswordsClicked(launchSource: AutofillImportLaunchSource) {
         viewModelScope.launch {
             _commands.send(ImportPasswordsFromGoogle)
             // we use AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED for consistency with iOS
             pixel.fire(
                 AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED,
-                mapOf("source" to autofillScreenLaunchSource?.asString().orEmpty()),
+                mapOf("source" to launchSource.value),
             )
         }
     }

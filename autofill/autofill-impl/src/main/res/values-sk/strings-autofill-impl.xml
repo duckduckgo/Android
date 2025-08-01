@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importujte svoje heslá Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google vás môže požiadať, aby ste sa prihlásili alebo zadali svoje heslo na potvrdenie.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Otvorte heslá Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importovať z Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vyberte súbor CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importovať z prehliadača na počítači</string>
 
@@ -292,5 +292,11 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importujte heslá z Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Synchronizuj heslá pracovnej plochy</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Obnovenie vylúčených lokalít</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Prenes si heslá z&lt;br /&gt;Google do DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Rýchlo a bezpečne importuj svoje heslá do DuckDuckGo. Google ťa môže požiadať o zadanie hesla.</string>
+    <string name="passwords_import_promo_action">Importovať z Google</string>
+    <string name="passwords_import_promo_in_browser_title">Prenes si heslá z Google do DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Už sa nepýtaj znova</string>
 
 </resources>

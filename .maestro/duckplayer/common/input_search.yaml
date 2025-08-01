@@ -1,0 +1,7 @@
+appId: com.duckduckgo.mobile.android
+---
+# Select a YouTube video from SERP
+- tapOn:
+    id: "omnibarTextInput"
+- inputText: "https://duckduckgo.com/?q=DuckDuckGo%20vs%20Google%3A%205%20Reasons%20You%20Should%20Switch%20video%20site%3Ayoutube.com&ko=-1&ia=web"
+- pressKey: Enter

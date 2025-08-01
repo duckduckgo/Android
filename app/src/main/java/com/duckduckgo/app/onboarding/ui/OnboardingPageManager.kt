@@ -19,8 +19,10 @@ package com.duckduckgo.app.onboarding.ui
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.BuckWelcomePageBlueprint
 import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.DefaultBrowserBlueprint
-import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.ExperimentWelcomeBluePrint
+import com.duckduckgo.app.onboarding.ui.OnboardingPageBuilder.OnboardingPageBlueprint.WelcomePageBlueprint
+import com.duckduckgo.app.onboarding.ui.page.BuckWelcomePage
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPageFragment
 import com.duckduckgo.app.onboarding.ui.page.WelcomePage
@@ -44,7 +46,7 @@ class OnboardingPageManagerWithTrackerBlocking(
     override fun buildPageBlueprints() {
         pages.clear()
 
-        pages.add(ExperimentWelcomeBluePrint)
+        pages.add(WelcomePageBlueprint)
 
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint))
@@ -53,7 +55,8 @@ class OnboardingPageManagerWithTrackerBlocking(
 
     override fun buildPage(position: Int): OnboardingPageFragment? {
         return when (pages.getOrNull(position)) {
-            is ExperimentWelcomeBluePrint -> buildExperimentWelcomePage()
+            is WelcomePageBlueprint -> buildWelcomePage()
+            is BuckWelcomePageBlueprint -> buildBuckWelcomePage()
             is DefaultBrowserBlueprint -> buildDefaultBrowserPage()
             else -> null
         }
@@ -69,7 +72,11 @@ class OnboardingPageManagerWithTrackerBlocking(
         return onboardingPageBuilder.buildDefaultBrowserPage()
     }
 
-    private fun buildExperimentWelcomePage(): WelcomePage {
-        return onboardingPageBuilder.buildExperimentWelcomePage()
+    private fun buildWelcomePage(): WelcomePage {
+        return onboardingPageBuilder.buildWelcomePage()
+    }
+
+    private fun buildBuckWelcomePage(): BuckWelcomePage {
+        return onboardingPageBuilder.buildBuckWelcomePage()
     }
 }

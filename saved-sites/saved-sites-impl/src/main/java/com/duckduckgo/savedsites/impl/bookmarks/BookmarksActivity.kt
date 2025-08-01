@@ -97,6 +97,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -173,6 +175,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
 
         setupBookmarksRecycler()
         observeViewModel()
+        observeItemsToDisplay()
         initializeSearchBar()
 
         viewModel.fetchBookmarksAndFolders(getParentFolderId())
@@ -323,7 +326,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun setupBookmarksRecycler() {
         bookmarksAdapter = BookmarksAdapter(
             viewModel,
-            this,
+            lifecycleOwner = this,
+            dispatcherProvider = dispatchers,
             faviconManager,
             onBookmarkClick = { bookmark ->
                 viewModel.onSelected(bookmark)
@@ -354,8 +358,6 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     private fun observeViewModel() {
         viewModel.viewState.observe(this) { viewState ->
             viewState?.let { state ->
-                val items = state.sortedItems
-
                 if (state.sortingMode == MANUAL) {
                     bookmarksAdapter.isReorderingEnabled = true
                     itemTouchHelper.attachToRecyclerView(contentBookmarksBinding.recycler)
@@ -364,14 +366,8 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                     itemTouchHelper.attachToRecyclerView(null)
                 }
 
-                bookmarksAdapter.setItems(
-                    items,
-                    items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
-                    false,
-                )
                 binding.searchMenu.isVisible =
                     viewModel.viewState.value?.enableSearch == true || getParentFolderId() != SavedSitesNames.BOOKMARKS_ROOT
-                exportMenuItem?.isEnabled = items.isNotEmpty()
                 configurePromotionsContainer()
             }
         }
@@ -398,6 +394,18 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
                 is LaunchAddFolder -> launchAddFolder()
             }
         }
+    }
+
+    private fun observeItemsToDisplay() {
+        viewModel.itemsToDisplay.onEach { items ->
+            bookmarksAdapter.setItems(
+                items,
+                showEmptyHint = items.isEmpty() && getParentFolderId() == SavedSitesNames.BOOKMARKS_ROOT,
+                showEmptySearchHint = false,
+                detectMoves = true,
+            )
+            exportMenuItem?.isEnabled = items.isNotEmpty()
+        }.launchIn(lifecycleScope)
     }
 
     private fun launchSyncSettings() {
@@ -490,7 +498,7 @@ class BookmarksActivity : DuckDuckGoActivity(), BookmarksScreenPromotionPlugin.C
     }
 
     private fun initializeSearchBar() {
-        searchListener = BookmarksQueryListener(viewModel, bookmarksAdapter)
+        searchListener = BookmarksQueryListener(viewModel, bookmarksAdapter, dispatchers)
         if (bookmarksSortingFeature.self().isEnabled()) {
             binding.searchMenu.setOnClickListener {
                 showSearchBar()

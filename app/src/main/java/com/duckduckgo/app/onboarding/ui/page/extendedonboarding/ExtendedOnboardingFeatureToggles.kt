@@ -37,7 +37,7 @@ interface ExtendedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun privacyProCta(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     @Experiment
-    fun highlights(): Toggle
+    fun freeTrialCopy(): Toggle
 }

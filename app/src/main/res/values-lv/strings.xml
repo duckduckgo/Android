@@ -203,6 +203,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Izskats</string>
+    <string name="settingsShowFullUrlTitle">Rādīt pilnu vietnes adresi</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Saglabāt</string>
@@ -813,7 +814,9 @@
     <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ak, pirms es aizmirsu...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ir arī iebūvēts <b>VPN</b>!<br/><br/>Aktivizējiet to, izmantojot <b>maksas Privacy Pro abonementu.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -858,10 +861,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Paldies! Tavs ziņojums palīdz padarīt DuckDuckGo labāku visiem lietotājiem!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Jauns MI tērzēšanas rīks</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
@@ -894,4 +893,14 @@
     <string name="scamBlockerTitle">Krāpniecības bloķētājs</string>
     <string name="scamBlockerDescription">Brīdina par vietnēm, kas atzīmētas kā krāpnieciskas, pikšķerēšanas un ļaunprātīgas programmatūras vietnes.</string>
     <string name="threatProtectionLearnMoreTitle">Uzzināt vairāk</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Pamēģini mūsu sākuma ekrāna logrīku!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pievieno mūsu meklēšanas logrīku savam sākuma ekrānam ātrai un vienkāršai piekļuvei.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pievienot logrīku</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne tagad</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Meklēt DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>
 </resources>

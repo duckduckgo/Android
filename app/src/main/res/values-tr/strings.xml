@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
+    <string name="settingsShowFullUrlTitle">Tam Site Adresini Göster</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -797,7 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo ayrıca <b>isteğe bağlı ücretli abonelikle</b> kullanılabilen güvenli bir <b>VPN + 2 premium koruma daha</b> sunuyor.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,10 +845,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Yeni Yapay Zeka Sohbeti</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">DuckDuckGo\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Tüm site bağlantılarının DuckDuckGo\'da açılması için bizi varsayılan tarayıcınız yapın.</string>
@@ -878,4 +877,14 @@
     <string name="scamBlockerTitle">Dolandırıcılık Engelleyici</string>
     <string name="scamBlockerDescription">Dolandırıcılık, kimlik avı ve kötü amaçlı yazılım için işaretlenen siteler olduğunda uyarı göster.</string>
     <string name="threatProtectionLearnMoreTitle">Daha fazla bilgi</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Ana ekran widget\'ımızı deneyin!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Hızlı ve kolay erişim için arama widget\'ımızı ana ekranınıza ekleyin.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget Ekle</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Şimdi Değil</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo\'da Ara</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
 </resources>

@@ -25,6 +25,9 @@
     <dimen name="experimentalToolbarContainerPaddingTopWhenAtBottom">8dp</dimen>
     <dimen name="experimentalToolbarContainerPaddingHorizontalWhenAtBottom">2dp</dimen>
     <dimen name="experimentalOmnibarCardMarginHorizontal">16dp</dimen>
+    <dimen name="experimentalOmnibarCardMarginEnd">8dp</dimen>
+    <dimen name="experimentalOmnibarCardExtendedMarginEnd">4dp</dimen>
+    <dimen name="experimentalOmnibarCardFocusedMarginEnd">16dp</dimen>
     <dimen name="experimentalOmnibarCardMarginTop">4dp</dimen>
     <dimen name="experimentalOmnibarCardMarginBottom">12dp</dimen>
     <dimen name="experimentalOmnibarCardFocusedMarginHorizontal">14dp</dimen>
@@ -32,6 +35,7 @@
     <dimen name="experimentalOmnibarCardFocusedMarginBottom">10dp</dimen>
     <dimen name="experimentalOmnibarOutlineWidth">0dp</dimen>
     <dimen name="experimentalOmnibarOutlineFocusedWidth">2dp</dimen>
+    <dimen name="expreimentalTabSwitcherToolbarTopSize">56dp</dimen>
     <dimen name="experimentalCookiesAnimationHeight">34dp</dimen>
     <dimen name="experimentalCookiesAnimationRadius">14dp</dimen>
 </resources>

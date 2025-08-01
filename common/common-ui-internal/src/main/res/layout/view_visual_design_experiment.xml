@@ -26,6 +26,7 @@
     <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="gone"
         app:primaryText="@string/experimentalUISettings" />
 
     <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -34,17 +35,8 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/experimentalUITitle"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/experimentalUIMessage"
-        app:showSwitch="true" />
-
-    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-        android:id="@+id/duckAIPoC"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:visibility="gone"
-        app:primaryText="@string/duckAIUpdateTitle"
-        app:primaryTextTruncated="false"
-        app:secondaryText="@string/duckAIUpdateMessage"
+        app:secondaryText="@string/experimentalUIMessage"
         app:showSwitch="true" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView

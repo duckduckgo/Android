@@ -18,16 +18,12 @@
 
     <!-- Appearance -->
     <string name="experimentalUISettings">Visual design updates from O-A</string>
-    <string name="experimentalUITitle">Enable Visual design updates</string>
+    <string name="experimentalUITitle">Enable new UI design with the navigation bar</string>
     <string name="experimentalUIMessage">This feature is in active development, intended for feedback purposes.</string>
     <string name="experimentalUIWarmColorsTitle">Use Warm colors palette</string>
     <string name="experimentalUIWarmColorsMessage">When disabled, it uses Cool colors instead.</string>
     <string name="experimentalUIIconsTitle">Use colorful icons</string>
     <string name="experimentalUIIconsMessage">When enabled, colorful icons will be shown in the toolbar.</string>
-
-    <!-- Duck.ai updates - O-A -->
-    <string name="duckAIUpdateTitle">Duck.ai PoC</string>
-    <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
 
     <!--    Bottom Navigation Bar Experiment-->
     <string name="navigationBarExperimentEnableTitle">Enable navigation bar</string>

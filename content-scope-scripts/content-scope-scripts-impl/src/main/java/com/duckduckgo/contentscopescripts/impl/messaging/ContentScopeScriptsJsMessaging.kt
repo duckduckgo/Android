@@ -70,6 +70,15 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             }
             jsMessage?.let {
                 if (this.secret == secret && context == jsMessage.context && (allowedDomains.isEmpty() || allowedDomains.contains(domain))) {
+                    if (jsMessage.method == "addDebugFlag") {
+                        // If method is addDebugFlag, we want to handle it for all features
+                        jsMessageCallback.process(
+                            featureName = jsMessage.featureName,
+                            method = jsMessage.method,
+                            id = jsMessage.id,
+                            data = jsMessage.params,
+                        )
+                    }
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
                             (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))

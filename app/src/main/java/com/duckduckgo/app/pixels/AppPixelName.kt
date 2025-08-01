@@ -53,10 +53,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
     ONBOARDING_DAX_CTA_DISMISS_BUTTON("m_onboarding_dax_cta_dismiss"),
-    ONBOARDING_VISIT_SITE_CTA_SHOWN("onboarding_visit_site_cta_shown"),
-
-    // Temporary Pixel
-    ONBOARDING_AUTO_COMPLETE("onboarding_auto_complete"),
 
     BROWSER_MENU_ALLOWLIST_ADD("mb_wla"),
     BROWSER_MENU_ALLOWLIST_REMOVE("mb_wlr"),
@@ -137,6 +133,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_SYNC_PRESSED("ms_sync_pressed"),
     SETTINGS_PERMISSIONS_PRESSED("ms_permissions_setting_pressed"),
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
+    SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED("m_appearance_settings_is_full_url_option_toggled"),
+    APPEARANCE_SETTINGS_IS_FULL_URL_ENABLED_DAILY("m_appearance_settings_is_full_url_enabled_daily"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
@@ -433,10 +431,16 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 
+    SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION("m_set-as-default_system-dialog_impression"),
+    SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK("m_set-as-default_system-dialog_click"),
+    SET_AS_DEFAULT_SYSTEM_DIALOG_DISMISSED("m_set-as-default_system-dialog_dismissed"),
     SET_AS_DEFAULT_PROMPT_IMPRESSION("m_set-as-default_prompt_impression"),
     SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
     SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
+    SET_AS_DEFAULT_MESSAGE_IMPRESSION("m_set-as-default_message_impression"),
+    SET_AS_DEFAULT_MESSAGE_CLICK("m_set-as-default_message_click"),
+    SET_AS_DEFAULT_MESSAGE_DISMISSED("m_set-as-default_message_dismissed"),
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
 

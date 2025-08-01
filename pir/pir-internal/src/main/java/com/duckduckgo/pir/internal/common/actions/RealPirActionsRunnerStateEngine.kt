@@ -22,14 +22,14 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.Idle
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.None
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -38,11 +38,22 @@ class RealPirActionsRunnerStateEngine(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     dispatcherProvider: DispatcherProvider,
     runType: RunType,
-    brokers: List<BrokerStep>,
+    brokerSteps: List<BrokerStep>,
+    profileQuery: ProfileQuery,
 ) : PirActionsRunnerStateEngine {
-    private var engineState: State = State(runType, brokers)
-    private val sideEffectFlow = MutableStateFlow<SideEffect>(None)
-    private val eventsFlow = MutableStateFlow<Event>(Idle)
+    private var engineState: State = State(
+        runType = runType,
+        brokerStepsToExecute = brokerSteps,
+        profileQuery = profileQuery,
+    )
+    private val sideEffectFlow = MutableSharedFlow<SideEffect>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
+    private val eventsFlow = MutableSharedFlow<Event>(
+        replay = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
 
     init {
         coroutineScope.launch(dispatcherProvider.io()) {
@@ -52,7 +63,7 @@ class RealPirActionsRunnerStateEngine(
         }
     }
 
-    override val sideEffect: Flow<SideEffect> = sideEffectFlow.asStateFlow()
+    override val sideEffect: Flow<SideEffect> = sideEffectFlow.asSharedFlow()
 
     override fun dispatch(event: Event) {
         coroutineScope.launch {
@@ -63,26 +74,26 @@ class RealPirActionsRunnerStateEngine(
     private suspend fun handleEvent(newEvent: Event) {
         val eventHandler = eventHandlers.getPlugins().firstOrNull { it.event.isInstance(newEvent) }
         if (eventHandler == null) {
-            logcat { "PIR-ENGINE: Unable to handle event $newEvent" }
+            logcat { "PIR-ENGINE($this): Unable to handle event $newEvent" }
             return
         }
 
-        logcat { "PIR-ENGINE: $newEvent dispatched to $eventHandler" }
+        logcat { "PIR-ENGINE($this): $newEvent dispatched to $eventHandler" }
 
         val next = eventHandler.invoke(engineState, newEvent)
 
-        logcat { "PIR-ENGINE: Event resulted to state: ${next.nextState}" }
-        logcat { "PIR-ENGINE: Event resulted to event: ${next.nextEvent}" }
-        logcat { "PIR-ENGINE: Event resulted to sideeffect: ${next.sideEffect}" }
+        logcat { "PIR-ENGINE($this): Event resulted to state: ${next.nextState}" }
+        logcat { "PIR-ENGINE($this): Event resulted to event: ${next.nextEvent}" }
+        logcat { "PIR-ENGINE($this): Event resulted to sideeffect: ${next.sideEffect}" }
         engineState = next.nextState
 
         next.sideEffect?.let {
-            logcat { "PIR-ENGINE: Emitting side effect: $it" }
+            logcat { "PIR-ENGINE($this): Emitting side effect: $it" }
             sideEffectFlow.emit(it)
         }
 
         next.nextEvent?.let {
-            logcat { "PIR-ENGINE: Dispatching event: $it" }
+            logcat { "PIR-ENGINE($this): Dispatching event: $it" }
             eventsFlow.emit(next.nextEvent)
         }
     }

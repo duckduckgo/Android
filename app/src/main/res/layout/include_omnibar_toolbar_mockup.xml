@@ -55,7 +55,7 @@
             android:gravity="start|center"
             android:maxLines="1"
             android:paddingEnd="8dp"
-            android:text="@string/omnibarInputHint"
+            android:text="@string/search"
             android:textColor="?attr/daxColorSecondaryText" />
 
     </LinearLayout>
@@ -76,7 +76,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:contentDescription="AI Chat"
+            android:contentDescription="Duck.ai"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_ai_chat_24" />
     </FrameLayout>

@@ -423,9 +423,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Kullandığınız VPN yüzünden App Tracking Protection\'ı kullanamıyor musunuz? Uyumlu tek VPN olan DuckDuckGo VPN\'e geçin. <annotation type="ppro_upsell_link">Daha fazla bilgi edinin</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Kullandığınız VPN yüzünden App Tracking Protection\'ı kullanamıyor musunuz? Uyumlu tek VPN olan DuckDuckGo VPN\'e geçin. <annotation type="ppro_upsell_link">Ücretsiz deneyin!</annotation></string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection Devre Dışı Bırakıldı</b>\nKullandığınız VPN App Tracking Protection\'ı devre dışı mı bıraktı? Yeniden etkinleştirmek için yukarıdaki düğmeyi kullanın.\n\nApp Tracking Protection ile çalışan tek VPN olan DuckDuckGo VPN\'i edinin. <annotation type="ppro_upsell_link">Daha fazla bilgi edinin</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>App Tracking Protection Devre Dışı Bırakıldı</b>\nKullandığınız VPN App Tracking Protection\'ı devre dışı mı bıraktı? Yeniden etkinleştirmek için yukarıdaki düğmeyi kullanın.\n\nApp Tracking Protection ile çalışan tek VPN olan DuckDuckGo VPN\'e geçin. <annotation type="ppro_upsell_link">Ücretsiz deneyin!</annotation>.</string>
     <string name="apptp_PproUpsellBannerTitle">Gizliliğinizi bir üst seviyeye taşıyın</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo, App Tracking Protection ile uyumlu olan tek VPN\'i sunuyor. Ücretli bir Privacy Pro aboneliğiyle etkinleştirebilirsiniz.</string>
     <string name="apptp_PproUpsellBannerAction">Daha Fazla Bilgi</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">DuckDuckGo\'ya abone olun ve App Tracking Protection ile uyumlu tek VPN\'e sahip olun.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Ücretsiz deneyin!</string>
 
 </resources>

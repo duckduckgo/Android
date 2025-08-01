@@ -264,7 +264,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Импорт паролей из Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Открыть пароли Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Импортировать из Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Выбрать CSV-файл</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортировать из настольного браузера</string>
 
@@ -292,5 +292,11 @@
     <string name="autofillSettingsImportFromGoogleLabel">Импортировать пароли из Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Взять пароли из настольного приложения</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Сбросить список исключений</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Пароли из Google — в DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Импортировать пароли в DuckDuckGo легко и безопасно. В ходе операции Google может попросить вас ввести свой пароль.</string>
+    <string name="passwords_import_promo_action">Импортировать из Google</string>
+    <string name="passwords_import_promo_in_browser_title">Пароли из Google — в DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Больше не спрашивать</string>
 
 </resources>

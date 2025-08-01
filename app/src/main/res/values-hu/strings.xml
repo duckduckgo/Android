@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Megjelenés</string>
+    <string name="settingsShowFullUrlTitle">Teljes webhelycím megjelenítése</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -797,7 +798,9 @@
     <string name="onboardingEndDaxDialogButton">Minden kész!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo beépített <b>VPN</b>-nel is rendelkezik!<br/><br/>Az aktiválásához <b>fizess elő a Privacy Pro csomagra.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[A DuckDuckGo funkciói között <b>opcionális előfizetés</b> mellett igénybe vehető biztonságos <b>VPN és további két prémium védelem</b> is szerepel.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,10 +845,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Új AI-csevegés</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
@@ -878,4 +877,14 @@
     <string name="scamBlockerTitle">Csalásblokkoló</string>
     <string name="scamBlockerDescription">Figyelmeztetés azokra az oldalakra, amelyeket csalás, adathalászat vagy rosszindulatú programok miatt jelöltek meg.</string>
     <string name="threatProtectionLearnMoreTitle">További részletek</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Próbáld ki kezdőképernyő-minialkalmazásunkat!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Minialkalmazás hozzáadása</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Most nem</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a DuckDuckGo alkalmazásban</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>
 </resources>

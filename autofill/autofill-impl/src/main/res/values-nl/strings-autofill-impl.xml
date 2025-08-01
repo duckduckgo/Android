@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importeer je Google-wachtwoorden</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Google wachtwoorden openen</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importeren van Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Kies een CSV-bestand</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importeren vanuit de desktopbrowser</string>
 
@@ -280,5 +280,11 @@
     <string name="autofillSettingsImportFromGoogleLabel">Wachtwoorden importeren van Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Wachtwoorden bureaublad synchroniseren</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Uitgesloten sites opnieuw instellen</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Breng je wachtwoorden van&lt;br /&gt;Google over naar DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importeer snel en veilig je wachtwoorden naar DuckDuckGo. Google kan je vragen om je wachtwoord in te voeren.</string>
+    <string name="passwords_import_promo_action">Importeren van Google</string>
+    <string name="passwords_import_promo_in_browser_title">Breng je wachtwoorden van Google naar DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Niet opnieuw vragen</string>
 
 </resources>

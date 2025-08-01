@@ -39,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_ADD_DEVICE_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_DUCK_AI_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_VPN_CLICK
@@ -70,7 +71,7 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionActive()
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
-    fun reportPurchaseFailureOther()
+    fun reportPurchaseFailureOther(errorType: String, reason: String? = null)
     fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
@@ -89,6 +90,7 @@ interface SubscriptionPixelSender {
     fun reportOnboardingVpnClick()
     fun reportOnboardingPirClick()
     fun reportOnboardingIdtrClick()
+    fun reportOnboardingDuckAiClick()
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
@@ -127,11 +129,17 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
 
-    override fun reportPurchaseFailureOther() =
-        fire(PURCHASE_FAILURE_OTHER)
+    override fun reportPurchaseFailureOther(errorType: String, reason: String?) =
+        fire(
+            PURCHASE_FAILURE_OTHER,
+            mapOf(
+                SubscriptionPixelParameter.ERROR_TYPE to errorType,
+                SubscriptionPixelParameter.REASON to reason.orEmpty(),
+            ),
+        )
 
     override fun reportPurchaseFailureStore(errorType: String) =
-        fire(PURCHASE_FAILURE_STORE, mapOf("errorType" to errorType))
+        fire(PURCHASE_FAILURE_STORE, mapOf(SubscriptionPixelParameter.ERROR_TYPE to errorType))
 
     override fun reportPurchaseFailureBackend() =
         fire(PURCHASE_FAILURE_BACKEND)
@@ -190,6 +198,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportOnboardingIdtrClick() =
         fire(ONBOARDING_IDTR_CLICK)
+
+    override fun reportOnboardingDuckAiClick() =
+        fire(ONBOARDING_DUCK_AI_CLICK)
 
     override fun reportSubscriptionSettingsShown() =
         fire(SUBSCRIPTION_SETTINGS_SHOWN)

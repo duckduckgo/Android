@@ -24,6 +24,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ENABLED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENGAGEMENT_STACKED_LOGINS
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_COPIED_DESKTOP_LINK
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_GET_DESKTOP_BROWSER
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_SHARED_DESKTOP_LINK
@@ -159,8 +160,10 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_TOGGLED_ON_SEARCH("m_autofill_toggled_on"),
     AUTOFILL_TOGGLED_OFF_SEARCH("m_autofill_toggled_off"),
 
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN("autofill_import_google_passwords_main_app_settings_hidden"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_TAPPED("autofill_import_google_passwords_import_button_tapped"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN("autofill_import_google_passwords_import_button_shown"),
+    AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_DISMISSED("autofill_import_google_passwords_import_button_dismissed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_OVERFLOW_MENU("autofill_import_google_passwords_overflow_menu_tapped"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_DISPLAYED("autofill_import_google_passwords_preimport_prompt_displayed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_PREIMPORT_PROMPT_CONFIRMED("autofill_import_google_passwords_preimport_prompt_confirmed"),
@@ -267,6 +270,8 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_DEVICE_AUTH_ERROR_HARDWARE_UNAVAILABLE.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SETTINGS_OPENED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_IMPORT_GOOGLE_PASSWORDS_MAIN_APP_SETTINGS_HIDDEN.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

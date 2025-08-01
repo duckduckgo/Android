@@ -32,18 +32,19 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.pir.api.dashboard.PirDashboardScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDashboard
+import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPirDesktop
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Disabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Enabled
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState.PirState.Hidden
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -102,8 +103,9 @@ class PirSettingView @JvmOverloads constructor(
                     setStatus(isOn = true)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_color_24)
                     isClickable = true
-                    binding.pirSettings.setClickListener { viewModel.onPir() }
+                    binding.pirSettings.setClickListener { viewModel.onPir(viewState.pirState.type) }
                 }
+
                 is Disabled -> {
                     isVisible = true
                     isClickable = false
@@ -111,6 +113,7 @@ class PirSettingView @JvmOverloads constructor(
                     binding.pirSettings.setClickListener(null)
                     setLeadingIconResource(R.drawable.ic_identity_blocked_pir_grayscale_color_24)
                 }
+
                 Hidden -> isGone = true
             }
         }
@@ -118,8 +121,12 @@ class PirSettingView @JvmOverloads constructor(
 
     private fun processCommands(command: Command) {
         when (command) {
-            is OpenPir -> {
+            is OpenPirDesktop -> {
                 globalActivityStarter.start(context, PirScreenWithEmptyParams)
+            }
+
+            OpenPirDashboard -> {
+                globalActivityStarter.start(context, PirDashboardScreen)
             }
         }
     }

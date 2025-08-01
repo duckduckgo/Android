@@ -22,20 +22,27 @@ import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.store.db.ALL_MIGRATIONS
 import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.library.loader.LibraryLoader
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.sqlcipher.database.SupportFactory
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 interface SecureStorageDatabaseFactory {
     suspend fun getDatabase(): SecureStorageDatabase?
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SecureStorageDatabaseFactory::class,
+)
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
@@ -44,6 +51,17 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     private var _database: SecureStorageDatabase? = null
 
     private val mutex = Mutex()
+
+    init {
+        logcat { "Loading the sqlcipher native library" }
+        try {
+            LibraryLoader.loadLibrary(context, "sqlcipher")
+            logcat { "sqlcipher native library loaded ok" }
+        } catch (t: Throwable) {
+            // error loading the library
+            logcat(ERROR) { "Error loading sqlcipher library: ${t.asLog()}" }
+        }
+    }
 
     override suspend fun getDatabase(): SecureStorageDatabase? {
         return if (autofillFeature.createAsyncPreferences().isEnabled()) {
@@ -80,7 +98,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
                 context,
                 SecureStorageDatabase::class.java,
                 "secure_storage_database_encrypted.db",
-            ).openHelperFactory(SupportFactory(keyProvider.getl1Key()))
+            ).openHelperFactory(SupportOpenHelperFactory(keyProvider.getl1Key()))
                 .addMigrations(*ALL_MIGRATIONS)
                 .build()
             _database

@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhľad</string>
+    <string name="settingsShowFullUrlTitle">Zobraziť úplnú adresu lokality</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložiť</string>
@@ -829,7 +830,9 @@
     <string name="onboardingEndDaxDialogButton">Všetko je hotové!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ach, skôr ako zabudneme…</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má tiež vstavanú <b>sieť VPN</b>!<br/><br/>Aktivujte si ju pomocou <b>plateného predplatného Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo má tiež zabezpečenú <b>VPN + 2 ďalšie prémiové ochrany</b>, ktoré sú k dispozícii s <b>voliteľným plateným predplatným</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Zistite viac</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyskúšaj zadarmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Preskočiť</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,10 +877,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Ďakujeme! Vaše hlásenie pomáha zlepšovať DuckDuckGo pre všetkých!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nový AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Nechaj DuckDuckGo chrániť viac toho, čo robíš online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás ako svoj predvolený prehliadač, aby sa všetky odkazy na stránky otvárali v DuckDuckGo.</string>
@@ -910,4 +909,14 @@
     <string name="scamBlockerTitle">Blokátor podvodov</string>
     <string name="scamBlockerDescription">Upozorniť na stránkach označených ako podvod, phishing a malvér.</string>
     <string name="threatProtectionLearnMoreTitle">Zistite viac</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyskúšaj náš widget na úvodnej obrazovke!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Na rýchly a jednoduchý prístup si pridajte miniaplikáciu vyhľadávania na domovskú obrazovku.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridať miniaplikáciu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teraz nie</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Vyhľadať v DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Miniaplikácia úvodnej obrazovky</string>
 </resources>

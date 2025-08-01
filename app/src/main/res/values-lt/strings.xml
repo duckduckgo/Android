@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Išvaizda</string>
+    <string name="settingsShowFullUrlTitle">Rodyti visą svetainės adresą</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Išsaugoti</string>
@@ -829,7 +830,9 @@
     <string name="onboardingEndDaxDialogButton">Viskas!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oi, kol nepamiršau...</string>
     <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[„DuckDuckGo“ taip pat turi integruotą <b>VPN</b>!<br/><br/>Aktyvuokite jį su <b>mokama „Privacy Pro“ prenumerata.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[„DuckDuckGo“ taip pat turi saugų <b>VPN + dar 2 aukščiausios kokybės apsaugas</b>, kurias galima įsigyti su <b>pasirenkama mokama prenumerata</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Sužinoti daugiau</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Išbandyk nemokamai!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Praleisti</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,10 +877,6 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dėkojame! Jūsų pateikta informacija padeda tobulinti „DuckDuckGo“ visiems!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Naujas DI pokalbis</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>
@@ -910,4 +909,14 @@
     <string name="scamBlockerTitle">Sukčiavimo blokavimo įrankis</string>
     <string name="scamBlockerDescription">Įspėti svetainėse, pažymėtose dėl sukčiavimo, apgaulingo duomenų išviliojimo ir kenkėjiškų programų.</string>
     <string name="threatProtectionLearnMoreTitle">Sužinoti daugiau</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Išbandyk mūsų pagrindinio ekrano valdiklį!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Pridėkite mūsų paieškos valdiklį prie pagrindinio ekrano, kad galėtumėte greitai ir lengvai jį pasiekti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Pridėti valdiklį</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ne dabar</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Ieškoti „DuckDuckGo“</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Pagrindinio ekrano valdiklis</string>
 </resources>

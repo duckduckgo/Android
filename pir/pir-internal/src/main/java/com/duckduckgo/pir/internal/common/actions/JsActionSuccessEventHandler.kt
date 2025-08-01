@@ -18,13 +18,13 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJob.RunType
+import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.internal.common.PirRunStateHandler
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerOptOutActionSucceeded
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.EvaluateJs
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetCaptchaSolution
@@ -64,33 +64,35 @@ class JsActionSuccessEventHandler @Inject constructor(
          * - Else -> we proceed to the next action
          */
         val pirSuccessResponse = (event as JsActionSuccess).pirSuccessResponse
-        val currentBroker = state.brokers[state.currentBrokerIndex]
+        val currentBrokerStep = state.brokerStepsToExecute[state.currentBrokerStepIndex]
+        val baseSuccessState = state.copy(
+            actionRetryCount = 0,
+        )
 
-        if (state.runType != RunType.OPTOUT) {
+        if (currentBrokerStep is OptOutStep) {
             pirRunStateHandler.handleState(
-                BrokerScanActionSucceeded(
-                    currentBroker.brokerName,
-                    pirSuccessResponse,
+                BrokerOptOutActionSucceeded(
+                    brokerName = currentBrokerStep.brokerName,
+                    extractedProfile = currentBrokerStep.profileToOptOut,
+                    completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                    actionType = pirSuccessResponse.actionType,
+                    result = pirSuccessResponse,
                 ),
             )
         } else {
-            state.extractedProfile[state.currentExtractedProfileIndex].let {
-                pirRunStateHandler.handleState(
-                    BrokerOptOutActionSucceeded(
-                        brokerName = currentBroker.brokerName,
-                        extractedProfile = it,
-                        completionTimeInMillis = currentTimeProvider.currentTimeMillis(),
-                        actionType = pirSuccessResponse.actionType,
-                        result = pirSuccessResponse,
-                    ),
-                )
-            }
+            pirRunStateHandler.handleState(
+                BrokerScanActionSucceeded(
+                    currentBrokerStep.brokerName,
+                    state.profileQuery.id,
+                    pirSuccessResponse,
+                ),
+            )
         }
 
         return when (pirSuccessResponse) {
             is NavigateResponse -> {
                 Next(
-                    nextState = state.copy(
+                    nextState = baseSuccessState.copy(
                         pendingUrl = pirSuccessResponse.response.url,
                     ),
                     sideEffect = LoadUrl(
@@ -101,12 +103,12 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is FillFormResponse, is ClickResponse, is ExpectationResponse, is ExtractedResponse -> {
                 Next(
-                    nextState = state.copy(
-                        currentActionIndex = state.currentActionIndex + 1,
+                    nextState = baseSuccessState.copy(
+                        currentActionIndex = baseSuccessState.currentActionIndex + 1,
                     ),
-                    nextEvent = ExecuteNextBrokerAction(
+                    nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
-                            userProfile = state.profileQuery,
+                            userProfile = baseSuccessState.profileQuery,
                         ),
                     ),
                 )
@@ -114,7 +116,7 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is GetCaptchaInfoResponse -> {
                 Next(
-                    nextState = state,
+                    nextState = baseSuccessState,
                     sideEffect = GetCaptchaSolution(
                         actionId = pirSuccessResponse.actionID,
                         responseData = pirSuccessResponse.response,
@@ -125,15 +127,15 @@ class JsActionSuccessEventHandler @Inject constructor(
 
             is SolveCaptchaResponse -> {
                 Next(
-                    nextState = state.copy(
-                        currentActionIndex = state.currentActionIndex + 1,
+                    nextState = baseSuccessState.copy(
+                        currentActionIndex = baseSuccessState.currentActionIndex + 1,
                     ),
                     sideEffect = EvaluateJs(
                         callback = pirSuccessResponse.response!!.callback.eval,
                     ),
-                    nextEvent = ExecuteNextBrokerAction(
+                    nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
-                            userProfile = state.profileQuery,
+                            userProfile = baseSuccessState.profileQuery,
                         ),
                     ),
                 )

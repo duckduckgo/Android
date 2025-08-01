@@ -18,9 +18,17 @@ package com.duckduckgo.subscriptions.impl.auth2
 
 import android.net.Uri
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
+import dagger.SingleInstanceIn
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException
 import retrofit2.Response
@@ -112,10 +120,16 @@ data class TokenPair(
 )
 
 @ContributesBinding(AppScope::class)
+@SingleInstanceIn(AppScope::class)
 class AuthClientImpl @Inject constructor(
     private val authService: AuthService,
     private val appBuildConfig: AppBuildConfig,
+    private val timeProvider: CurrentTimeProvider,
+    private val privacyProFeature: Lazy<PrivacyProFeature>,
+    private val dispatchers: DispatcherProvider,
 ) : AuthClient {
+
+    private var cachedJwks: CachedJwks? = null
 
     override suspend fun authorize(codeChallenge: String): String {
         val response = authService.authorize(
@@ -183,8 +197,20 @@ class AuthClientImpl @Inject constructor(
         )
     }
 
-    override suspend fun getJwks(): String =
-        authService.jwks().string()
+    override suspend fun getJwks(): String {
+        val useCache = withContext(dispatchers.io()) {
+            privacyProFeature.get().authApiV2JwksCache().isEnabled()
+        }
+
+        return if (useCache) {
+            val cachedResult = cachedJwks?.takeIf { it.timestamp + JWKS_CACHE_DURATION > getCurrentTime() }?.jwks
+
+            cachedResult ?: authService.jwks().string()
+                .also { cachedJwks = CachedJwks(jwks = it, timestamp = getCurrentTime()) }
+        } else {
+            authService.jwks().string()
+        }
+    }
 
     override suspend fun storeLogin(
         sessionId: String,
@@ -242,6 +268,13 @@ class AuthClientImpl @Inject constructor(
         }
     }
 
+    private fun getCurrentTime(): Instant = Instant.ofEpochMilli(timeProvider.currentTimeMillis())
+
+    private data class CachedJwks(
+        val jwks: String,
+        val timestamp: Instant,
+    )
+
     private companion object {
         const val AUTH_V2_CLIENT_ID = "f4311287-0121-40e6-8bbd-85c36daf1837"
         const val AUTH_V2_REDIRECT_URI = "com.duckduckgo:/authcb"
@@ -250,5 +283,6 @@ class AuthClientImpl @Inject constructor(
         const val AUTH_V2_RESPONSE_TYPE = "code"
         const val GRANT_TYPE_AUTHORIZATION_CODE = "authorization_code"
         const val GRANT_TYPE_REFRESH_TOKEN = "refresh_token"
+        val JWKS_CACHE_DURATION: Duration = Duration.ofHours(1)
     }
 }

@@ -252,7 +252,7 @@
 
     <string name="importPasswordsChooseMethodDialogTitle">Importer Google-passordene dine</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be deg om å logge inn eller skrive inn passordet ditt for å bekrefte.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Åpne Google Passord</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importer fra Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Velg en CSV-fil</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importer fra skrivebordsnettleseren</string>
 
@@ -280,5 +280,11 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importer passord fra Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Synkroniser passord på datamaskinen</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Tilbakestill ekskluderte nettsteder</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Ta med passordene dine fra&lt;br /&gt;Google til DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importer passordene dine raskt og sikkert til DuckDuckGo. Det kan hende Google ber deg om å skrive inn passordet ditt.</string>
+    <string name="passwords_import_promo_action">Importer fra Google</string>
+    <string name="passwords_import_promo_in_browser_title">Ta med passordene dine fra Google til DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Ikke spør igjen</string>
 
 </resources>

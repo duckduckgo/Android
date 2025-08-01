@@ -60,12 +60,12 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         conflatedJob.cancel()
     }
 
-    fun playOn(targetView: View, isExperimentAndShieldView: Boolean) {
+    fun playOn(targetView: View, isSenseOfProtectionExperimentAndShieldView: Boolean, isBuckOnboardingExperiment: Boolean) {
         if (highlightImageView == null) {
-            highlightImageView = addHighlightView(targetView, isExperimentAndShieldView)
+            highlightImageView = addHighlightView(targetView, isSenseOfProtectionExperimentAndShieldView, isBuckOnboardingExperiment)
             highlightImageView?.doOnLayout {
                 it.setAllParentsClip(enabled = false)
-                startPulseAnimation(it, isExperimentAndShieldView)
+                startPulseAnimation(it, isSenseOfProtectionExperimentAndShieldView)
             }
             lifecycleOwner.lifecycle.addObserver(this)
         }
@@ -127,15 +127,22 @@ class PulseAnimation(private val lifecycleOwner: LifecycleOwner) : DefaultLifecy
         }
     }
 
-    private fun addHighlightView(targetView: View, isExperimentAndShieldView: Boolean): View {
+    private fun addHighlightView(
+        targetView: View,
+        isSenseOfProtectionExperimentAndShieldView: Boolean,
+        isBuckOnboardingExperiment: Boolean,
+    ): View {
         if (targetView.parent !is ViewGroup) error("targetView parent should be ViewGroup")
 
         val highlightImageView = ImageView(targetView.context)
         highlightImageView.id = View.generateViewId()
         val gravity: Int
-        if (isExperimentAndShieldView) {
+        if (isSenseOfProtectionExperimentAndShieldView) {
             highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
             gravity = Gravity.START
+        } else if (isBuckOnboardingExperiment) {
+            highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
+            gravity = Gravity.CENTER
         } else {
             highlightImageView.setImageResource(R.drawable.ic_circle_pulse_blue)
             gravity = Gravity.CENTER

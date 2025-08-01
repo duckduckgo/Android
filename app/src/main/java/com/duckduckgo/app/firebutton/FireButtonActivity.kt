@@ -17,6 +17,8 @@
 package com.duckduckgo.app.firebutton
 
 import android.app.ActivityOptions
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
@@ -70,6 +72,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     private fun configureUiEventHandlers() {
@@ -237,5 +243,13 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    companion object {
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+
+        fun intent(context: Context): Intent {
+            return Intent(context, FireButtonActivity::class.java)
+        }
     }
 }

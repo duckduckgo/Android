@@ -39,7 +39,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Ev
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailConfirmationLinkReceived
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionFailed
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsActionSuccess
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.JsErrorReceived
@@ -145,8 +145,12 @@ class RealPirActionsRunner @AssistedInject constructor(
         }
 
         withContext(dispatcherProvider.main()) {
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers to execute $brokerSteps" }
-            logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Brokers size: ${brokerSteps.size}" }
+            logcat {
+                "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} " +
+                    "Brokers size: ${brokerSteps.size} " +
+                    "profile=$profileQuery " +
+                    "Brokers to execute $brokerSteps"
+            }
             detachedWebView = pirDetachedWebViewProvider.createInstance(
                 context,
                 pirScriptToLoad,
@@ -161,12 +165,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
 
-        engine = engineFactory.create(runType, brokerSteps)
-        engine!!.dispatch(
-            Started(
-                profileQuery = profileQuery,
-            ),
-        )
+        engine = engineFactory.create(runType, brokerSteps, profileQuery)
+        engine!!.dispatch(Started)
 
         return awaitResult()
     }
@@ -198,12 +198,8 @@ class RealPirActionsRunner @AssistedInject constructor(
             brokerActionProcessor.register(detachedWebView!!, this@RealPirActionsRunner)
         }
 
-        engine = engineFactory.create(runType, brokerSteps)
-        engine!!.dispatch(
-            Started(
-                profileQuery = profileQuery,
-            ),
-        )
+        engine = engineFactory.create(runType, brokerSteps, profileQuery)
+        engine!!.dispatch(Started)
 
         return awaitResult()
     }
@@ -312,7 +308,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 if (this is Success) {
                     when (val status = (this.data as CaptchaSolutionStatus).status) {
                         is Ready -> engine?.dispatch(
-                            ExecuteNextBrokerAction(
+                            ExecuteBrokerStepAction(
                                 actionRequestData = PirScriptRequestData.SolveCaptcha(
                                     token = status.token,
                                 ),
@@ -486,6 +482,7 @@ class RealPirActionsRunner @AssistedInject constructor(
         when (pirError) {
             is PirError.ActionFailed -> JsActionFailed(
                 error = pirError,
+                allowRetry = true,
             )
 
             is PirError.CaptchaServiceError -> CaptchaServiceFailed(

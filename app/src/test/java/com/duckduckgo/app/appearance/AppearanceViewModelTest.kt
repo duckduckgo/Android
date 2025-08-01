@@ -214,6 +214,34 @@ internal class AppearanceViewModelTest {
     }
 
     @Test
+    fun whenFullSiteAddressEnabled() = runTest {
+        val enabled = true
+        testee.onFullUrlSettingChanged(enabled)
+        verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
+    fun whenFullSiteAddressDisabled() = runTest {
+        val enabled = false
+        testee.onFullUrlSettingChanged(enabled)
+        verify(mockAppSettingsDataStore).isFullUrlEnabled = enabled
+        val params = mapOf(Pixel.PixelParameter.IS_ENABLED to enabled.toString())
+        verify(mockPixel).fire(
+            AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED,
+            params,
+            emptyMap(),
+            Pixel.PixelType.Count,
+        )
+    }
+
+    @Test
     fun whenInitialisedAndLightThemeThenViewStateEmittedWithProperValues() = runTest {
         whenever(mockThemeSettingsDataStore.theme).thenReturn(DuckDuckGoTheme.LIGHT)
         whenever(mockAppTheme.isLightModeEnabled()).thenReturn(true)

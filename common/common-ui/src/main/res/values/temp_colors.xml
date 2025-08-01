@@ -34,6 +34,9 @@
     <!-- Should be moved to theme if experiment is successful -->
     <color name="buckYellow">#FFE080</color>
     <color name="buckLightBlue">#4284F4</color>
+    <color name="buckPulseOrange">#F2643D</color>
+
+    <color name="buckColorPrimaryText">#2C2926</color>
 
     <color name="buckColorButtonPrimaryContainer">#0267C1</color>
     <color name="buckColorButtonPrimaryContainerPressed">#002E5A</color>
@@ -43,7 +46,31 @@
     <color name="buckColorButtonSecondaryText">#0267C1</color>
     <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
 
+    <color name="buckColorButtonFAB">@color/white</color>
+    <color name="buckColorComparisonChartItemBackground">#F6EFDF</color>
+
+    <color name="buckColorComparisonChartCheckIcon">#21C000</color>
+    <color name="buckColorComparisonChartCrossIcon">#888888</color>
+    <color name="buckColorComparisonChartSearchIcon">#0856C3</color>
+    <color name="buckColorComparisonChartShieldIcon">#7349F3</color>
+    <color name="buckColorComparisonChartCookieIcon">#671807</color>
+    <color name="buckColorComparisonChartBlockIcon">#04592E</color>
+    <color name="buckColorComparisonChartFireIcon">#F2643D</color>
+
+    <color name="buckColorPreonboardingOptionBackground">#F6EFDF</color>
+    <color name="buckColorPreonboardingOptionBackgroundSelected">#B2FFAB23</color>
+    <color name="buckColorPreonboardingOptionIcon">#252A38</color>
+    <color name="buckColorPreonboardingOptionIconSelected">#252A38</color>
+
+    <color name="buckColorCheckBoxCheckedBackground">@color/white</color>
+    <color name="buckColorCheckBoxCheckedIcon">#0856C3</color>
+    <color name="buckColorCheckBoxUncheckedBackground">@color/black3</color>
+    <color name="buckColorCheckBoxUncheckedOutline">@color/black18</color>
+
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 
+    <!-- Input Screen -->
+    <color name="daxColorBackdropDark">#080808</color>
+    <color name="daxColorBackdropLight">#E0E0E0</color>
 </resources>

@@ -21,9 +21,9 @@ import com.duckduckgo.pir.internal.common.PirJobConstants.DBP_INITIAL_URL
 import com.duckduckgo.pir.internal.common.PirJobConstants.RECOVERY_URL
 import com.duckduckgo.pir.internal.common.actions.EventHandler.Next
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerActionsCompleted
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBroker
-import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.BrokerStepCompleted
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
+import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteNextBrokerStep
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.LoadUrlComplete
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
@@ -60,11 +60,11 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
             DBP_INITIAL_URL -> {
                 Next(
                     nextState = state.copy(
-                        currentBrokerIndex = 0,
+                        currentBrokerStepIndex = 0,
                         currentActionIndex = 0,
                         pendingUrl = null,
                     ),
-                    nextEvent = ExecuteNextBroker,
+                    nextEvent = ExecuteNextBrokerStep,
                 )
             }
 
@@ -75,7 +75,7 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                     nextState = state.copy(
                         pendingUrl = null,
                     ),
-                    nextEvent = BrokerActionsCompleted(false),
+                    nextEvent = BrokerStepCompleted(false),
                 )
             }
 
@@ -86,9 +86,10 @@ class LoadUrlCompleteEventHandler @Inject constructor() : EventHandler {
                 Next(
                     nextState = state.copy(
                         currentActionIndex = state.currentActionIndex + 1,
+                        actionRetryCount = 0,
                         pendingUrl = null,
                     ),
-                    nextEvent = ExecuteNextBrokerAction(
+                    nextEvent = ExecuteBrokerStepAction(
                         UserProfile(
                             userProfile = state.profileQuery,
                         ),

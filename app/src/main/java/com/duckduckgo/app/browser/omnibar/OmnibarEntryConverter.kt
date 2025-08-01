@@ -22,10 +22,12 @@ interface OmnibarEntryConverter {
         searchQuery: String,
         vertical: String? = null,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
+        extractUrlFromQuery: Boolean = false,
     ): String
 }
 
 sealed class QueryOrigin {
     object FromUser : QueryOrigin()
+    object FromBookmark : QueryOrigin()
     data class FromAutocomplete(val isNav: Boolean?) : QueryOrigin()
 }

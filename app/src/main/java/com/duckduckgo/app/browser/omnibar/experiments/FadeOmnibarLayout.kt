@@ -41,10 +41,11 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
 import com.duckduckgo.app.browser.omnibar.FindInPage
 import com.duckduckgo.app.browser.omnibar.FindInPageImpl
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
+import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
@@ -64,7 +65,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 ) : OmnibarLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var experimentDataStore: VisualDesignExperimentDataStore
+    lateinit var experimentDataStore: ExperimentalThemingDataStore
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -74,7 +75,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     private val omniBarContentContainer: View by lazy { findViewById(R.id.omniBarContentContainer) }
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
-    val omniBarClickCatcher: View by lazy { findViewById(R.id.omnibarClickCatcher) }
 
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
@@ -119,7 +119,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
 
     private var focusAnimator: ValueAnimator? = null
 
-    private var fadeOmnibarItemPressedListener: FadeOmnibarItemPressedListener? = null
+    private var fadeOmnibarItemPressedListener: OmnibarItemPressedListener? = null
 
     init {
         val attr = context.theme.obtainStyledAttributes(attrs, R.styleable.FadeOmnibarLayout, defStyle, 0)
@@ -224,8 +224,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         } else {
             backIcon.gone()
         }
-
-        omniBarClickCatcher.isVisible = viewState.showClickCatcher
     }
 
     /**
@@ -355,7 +353,7 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    fun setFadeOmnibarItemPressedListener(itemPressedListener: FadeOmnibarItemPressedListener) {
+    fun setFadeOmnibarItemPressedListener(itemPressedListener: OmnibarItemPressedListener) {
         fadeOmnibarItemPressedListener = itemPressedListener
         backIcon.setOnClickListener {
             viewModel.onBackButtonPressed()
@@ -374,8 +372,4 @@ class FadeOmnibarLayout @JvmOverloads constructor(
     companion object {
         private const val DEFAULT_ANIMATION_DURATION = 300L
     }
-}
-
-interface FadeOmnibarItemPressedListener {
-    fun onBackButtonPressed()
 }

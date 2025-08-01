@@ -141,6 +141,11 @@ enum class SubscriptionPixel(
         type = Unique(),
         includedParameters = setOf(ATB, APP_VERSION),
     ),
+    ONBOARDING_DUCK_AI_CLICK(
+        baseName = "m_privacy-pro_welcome_paid-ai-chat_click",
+        type = Unique(),
+        includedParameters = setOf(ATB, APP_VERSION),
+    ),
     SUBSCRIPTION_SETTINGS_SHOWN(
         baseName = "m_privacy-pro_settings_screen_impression",
         type = Count,
@@ -259,9 +264,19 @@ enum class SubscriptionPixel(
         types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
 }
 
+object SubscriptionPixelParameter {
+    const val ERROR_TYPE = "errorType"
+    const val REASON = "reason"
+}
+
 internal val PixelType.pixelNameSuffix: String
     get() = when (this) {
         is Count -> "c"
         is Daily -> "d"
         is Unique -> "u"
     }
+
+internal enum class SubscriptionFailureErrorType {
+    INVALID_PRODUCT_ID,
+    PURCHASE_EXCEPTION,
+}

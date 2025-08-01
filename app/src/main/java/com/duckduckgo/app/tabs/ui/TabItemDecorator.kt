@@ -27,18 +27,19 @@ import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
-class TabItemDecorator(context: Context, experimentStore: VisualDesignExperimentDataStore) : RecyclerView.ItemDecoration() {
-    private val borderPadding = if (experimentStore.isExperimentEnabled.value) BORDER_PADDING_NEW else BORDER_PADDING
-    private val activeTabBorderColor = if (experimentStore.isExperimentEnabled.value) {
+class TabItemDecorator(context: Context, experimentStore: ExperimentalThemingDataStore) : RecyclerView.ItemDecoration() {
+    private val isNewDesignEnabled = experimentStore.isSingleOmnibarEnabled.value
+    private val borderPadding = if (isNewDesignEnabled) BORDER_PADDING_NEW else BORDER_PADDING
+    private val activeTabBorderColor = if (isNewDesignEnabled) {
         CommonR.attr.daxColorTabHighlight
     } else {
         CommonR.attr.daxColorBackgroundInverted
     }
-    private val selectionBorderWidth = if (experimentStore.isExperimentEnabled.value) {
+    private val selectionBorderWidth = if (isNewDesignEnabled) {
         ACTIVE_TAB_BORDER_WIDTH
     } else {
         SELECTION_BORDER_WIDTH

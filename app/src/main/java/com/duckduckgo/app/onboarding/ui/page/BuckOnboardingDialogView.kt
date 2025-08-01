@@ -47,7 +47,7 @@ class BuckOnboardingDialogView @JvmOverloads constructor(
         outlineProvider = ViewOutlineProvider.BACKGROUND
     }
 
-    fun animateEntrance() {
+    fun animateEntrance(onAnimationEnd: () -> Unit = {}) {
         if (isEmpty()) return
 
         val contentView = getChildAt(0)
@@ -160,6 +160,8 @@ class BuckOnboardingDialogView @JvmOverloads constructor(
                         width = targetLayoutParamsWidth
                         height = targetLayoutParamsHeight
                     }
+
+                    onAnimationEnd()
                 }
 
                 start()

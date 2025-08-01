@@ -18,8 +18,8 @@ package com.duckduckgo.pir.internal.common.actions
 
 import com.duckduckgo.pir.internal.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.internal.common.PirJob.RunType
+import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfile
 import com.duckduckgo.pir.internal.scripts.models.PirError
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
@@ -45,15 +45,14 @@ interface PirActionsRunnerStateEngine {
      */
     data class State(
         val runType: RunType,
-        val brokers: List<BrokerStep>,
-        val currentBrokerIndex: Int = 0,
+        val brokerStepsToExecute: List<BrokerStep>,
+        val profileQuery: ProfileQuery,
+        val currentBrokerStepIndex: Int = 0,
         val currentActionIndex: Int = 0,
-        val brokerStartTime: Long = -1L,
-        val profileQuery: ProfileQuery? = null,
+        val brokerStepStartTime: Long = -1L,
         val transactionID: String = "",
-        val currentExtractedProfileIndex: Int = 0,
-        val extractedProfile: List<ExtractedProfile> = emptyList(),
         val pendingUrl: String? = null,
+        val actionRetryCount: Int = 0,
     )
 
     /**
@@ -61,9 +60,7 @@ interface PirActionsRunnerStateEngine {
      */
     sealed class Event {
         data object Idle : Event()
-        data class Started(
-            val profileQuery: ProfileQuery,
-        ) : Event()
+        data object Started : Event()
 
         data class LoadUrlComplete(
             val url: String,
@@ -85,15 +82,13 @@ interface PirActionsRunnerStateEngine {
             val confirmationLink: String,
         ) : Event()
 
-        data object ExecuteNextBroker : Event()
+        data object ExecuteNextBrokerStep : Event()
 
-        data class ExecuteNextBrokerAction(
+        data class ExecuteBrokerStepAction(
             val actionRequestData: PirScriptRequestData,
         ) : Event()
 
-        data object ExecuteNextProfileForBroker : Event()
-
-        data class BrokerActionsCompleted(val isSuccess: Boolean) : Event()
+        data class BrokerStepCompleted(val isSuccess: Boolean) : Event()
 
         data class JsErrorReceived(
             val error: PirError.JsError,
@@ -105,6 +100,7 @@ interface PirActionsRunnerStateEngine {
 
         data class JsActionFailed(
             val error: PirError.ActionFailed,
+            val allowRetry: Boolean,
         ) : Event()
 
         data class CaptchaServiceFailed(

@@ -1,0 +1,19 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Direct > Duck Player"
+tags:
+  - duckplayer
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+      - tapOn:
+          id: "omnibarTextInput"
+      - inputText: "duck://player/3ml7yeKBUhc"
+      - pressKey: Enter
+
+      - runFlow: common/assert_duckplayer_visible.yaml

@@ -142,6 +142,8 @@
 
         <item name="cookiesAnimationRadius">@dimen/smallShapeCornerRadius</item>
         <item name="cookiesAnimationHeight">@dimen/omnibarCookieAnimationBannerHeight</item>
+
+        <item name="toolbarExtraPadding">@dimen/keyline_empty</item>
     </style>
 
     <!-- The app theme will mostly contain values for colour attributes -->
@@ -247,6 +249,10 @@
         <item name="daxColorPreonboardingProgressBarEnd">@color/red10</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorDark</item>
 
+        <!-- Input Screen -->
+        <item name="daxColorBackdrop">@color/daxColorBackdropDark</item>
+        <item name="daxColorInputModeIndicator">@color/white18</item>
+        <item name="daxColorInputModeIndicatorShadow">@color/black</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Light" parent="Theme.DuckDuckGo">
@@ -351,6 +357,10 @@
         <item name="daxColorPreonboardingProgressBarEnd">@color/red50</item>
         <item name="daxColorOnboardingDialogBackground">@color/daxOnboardingDialogBackgroundColorLight</item>
 
+        <!-- Input Screen -->
+        <item name="daxColorBackdrop">@color/controls_fill_primary_light</item>
+        <item name="daxColorInputModeIndicator">@color/white84</item>
+        <item name="daxColorInputModeIndicatorShadow">@color/gray60</item>
     </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
