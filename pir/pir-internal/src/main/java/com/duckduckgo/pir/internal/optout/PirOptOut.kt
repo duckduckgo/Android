@@ -129,7 +129,6 @@ class RealPirOptOut @Inject constructor(
 
         if (runners.isNotEmpty()) {
             cleanRunners()
-            runners.clear()
         }
 
         val processedJobRecords = processJobRecords(jobRecords)
@@ -257,7 +256,6 @@ class RealPirOptOut @Inject constructor(
         emitStartPixel()
         if (runners.isNotEmpty()) {
             cleanRunners()
-            runners.clear()
         }
         val profileQueries = obtainProfiles()
 
@@ -306,7 +304,6 @@ class RealPirOptOut @Inject constructor(
         emitStartPixel()
         if (runners.isNotEmpty()) {
             cleanRunners()
-            runners.clear()
         }
         val profileQueries = obtainProfiles()
 
@@ -373,6 +370,7 @@ class RealPirOptOut @Inject constructor(
         runners.forEach {
             it.stop()
         }
+        runners.clear()
     }
 
     override fun stop() {
