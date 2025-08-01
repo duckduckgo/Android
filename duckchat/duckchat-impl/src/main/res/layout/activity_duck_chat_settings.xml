@@ -95,6 +95,7 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/input_screen_user_pref_title"
                 app:secondaryText="@string/input_screen_user_pref_description"
+                app:showBetaPill="true"
                 app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
