@@ -560,12 +560,30 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 }
 
+private const val NON_BREAKING_SPACE = '\u00A0'
+
+/**
+ * Prevents typographic widows by replacing the last space with a non-breaking space.
+ *
+ * A "widow" in typography refers to a single word that appears alone on the last line
+ * of a paragraph or text block, which is considered poor typography as it creates
+ * visual imbalance and awkward spacing.
+ *
+ * This function finds the last space character in the string and replaces it with
+ * a non-breaking space (U+00A0) to ensure the last two words stay together on the
+ * same line, preventing the final word from becoming orphaned.
+ *
+ * @return A new string with the last space replaced by a non-breaking space,
+ *         or the original string if no space is found or if the space is at the end
+ *
+ * @see <a href="https://en.wikipedia.org/wiki/Widows_and_orphans">Widows and orphans typography</a>
+ */
 private fun String.preventWidows(): String {
     val lastSpaceIndex = this.lastIndexOf(' ')
     // Ensure there is a space and it's not the last character
     if (lastSpaceIndex > 0 && lastSpaceIndex < this.length - 1) {
         val builder = StringBuilder(this)
-        builder.setCharAt(lastSpaceIndex, '\u00A0')
+        builder.setCharAt(lastSpaceIndex, NON_BREAKING_SPACE)
         return builder.toString()
     }
     return this
