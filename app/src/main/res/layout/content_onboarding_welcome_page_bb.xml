@@ -123,7 +123,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daxLogoContainer"
-        android:alpha="0" />
+        android:alpha="0"
+        tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     <include
         android:id="@+id/daxDialogCta"

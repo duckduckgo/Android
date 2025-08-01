@@ -32,7 +32,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            tools:text="@string/highlightsPreOnboardingDaxDialog3Title" />
+            tools:text="@string/highlightsPreOnboardingDaxDialog3Title"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/dialogTitleInvisible"
@@ -40,7 +41,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.H1"
             android:textColor="@color/buckColorPrimaryText"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     </FrameLayout>
 
@@ -55,7 +57,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.Body1"
             android:textColor="@color/buckColorPrimaryText"
-            tools:text="@string/highlightsPreOnboardingDaxDialog3Text" />
+            tools:text="@string/highlightsPreOnboardingDaxDialog3Text"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/descriptionInvisible"
@@ -63,7 +66,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.Buck.Body1"
             android:textColor="@color/buckColorPrimaryText"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
     </FrameLayout>
 

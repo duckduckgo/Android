@@ -46,7 +46,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.BB.H1"
             android:gravity="center"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml" />
 
         <com.duckduckgo.common.ui.view.TypeAnimationTextView
             android:id="@+id/dialogTitle"
@@ -54,7 +55,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.BB.H1"
             android:textColor="@color/buckColorPrimaryText"
-            android:gravity="center" />
+            android:gravity="center"
+            tools:ignore="InvalidColorAttribute" />
 
     </FrameLayout>
 

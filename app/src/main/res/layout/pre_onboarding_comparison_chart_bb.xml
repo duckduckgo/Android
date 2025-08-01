@@ -33,14 +33,16 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.BB.H1"
             tools:text="Protections activated!"
-            android:textColor="@color/bbColorPrimaryText" />
+            android:textColor="@color/bbColorPrimaryText"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/titleInvisible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/Typography.BB.H1"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:ignore="DeprecatedWidgetInXml" />
 
     </FrameLayout>
 
@@ -87,7 +89,8 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_search_private_bb"
-            app:tint="@color/bbColorComparisonChartItemIcon"/>
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature1"
@@ -100,7 +103,8 @@
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem1"
             android:textColor="@color/bbColorPrimaryText"
-            android:textAppearance="@style/Typography.BB.Body1" />
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <ImageView
             android:id="@+id/cross1"
@@ -113,7 +117,8 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/keyline_4"
-            android:background="@color/bbColorComparisonChartDivider"/>
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
 
         <ImageView
             android:id="@+id/check1"
@@ -146,7 +151,8 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_shield_bb"
-            app:tint="@color/bbColorComparisonChartItemIcon" />
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature2"
@@ -159,7 +165,8 @@
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem2"
             android:textColor="@color/bbColorPrimaryText"
-            android:textAppearance="@style/Typography.BB.Body1" />
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <ImageView
             android:id="@+id/cross2"
@@ -172,7 +179,8 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/keyline_4"
-            android:background="@color/bbColorComparisonChartDivider"/>
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
 
         <ImageView
             android:id="@+id/check2"
@@ -206,7 +214,8 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_cookie_bb"
-            app:tint="@color/bbColorComparisonChartItemIcon" />
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature3"
@@ -219,7 +228,8 @@
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem3"
             android:textColor="@color/bbColorPrimaryText"
-            android:textAppearance="@style/Typography.BB.Body1" />
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <ImageView
             android:id="@+id/cross3"
@@ -232,7 +242,8 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/keyline_4"
-            android:background="@color/bbColorComparisonChartDivider"/>
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
 
         <ImageView
             android:id="@+id/check3"
@@ -265,7 +276,8 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_profile_blocked_bb"
-            app:tint="@color/bbColorComparisonChartItemIcon" />
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature4"
@@ -278,7 +290,8 @@
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem4"
             android:textColor="@color/bbColorPrimaryText"
-            android:textAppearance="@style/Typography.BB.Body1" />
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <ImageView
             android:id="@+id/cross4"
@@ -291,7 +304,8 @@
             android:layout_width="1dp"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/keyline_4"
-            android:background="@color/bbColorComparisonChartDivider"/>
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
 
         <ImageView
             android:id="@+id/check4"
@@ -325,7 +339,8 @@
             android:layout_marginStart="@dimen/keyline_4"
             android:layout_marginVertical="@dimen/keyline_1"
             app:srcCompat="@drawable/ic_fire_bb"
-            app:tint="@color/bbColorComparisonChartItemIcon" />
+            app:tint="@color/bbColorComparisonChartItemIcon"
+            tools:ignore="InvalidColorAttribute" />
 
         <TextView
             android:id="@+id/feature5"
@@ -338,7 +353,8 @@
             android:lineSpacingExtra="-2sp"
             android:text="@string/preOnboardingComparisonChartItem5"
             android:textColor="@color/bbColorPrimaryText"
-            android:textAppearance="@style/Typography.BB.Body1" />
+            android:textAppearance="@style/Typography.BB.Body1"
+            tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
         <ImageView
             android:id="@+id/cross5"
@@ -352,7 +368,8 @@
             android:layout_height="match_parent"
             android:layout_marginHorizontal="@dimen/keyline_4"
             android:layout_marginVertical="-8dp"
-            android:background="@color/bbColorComparisonChartDivider"/>
+            android:background="@color/bbColorComparisonChartDivider"
+            tools:ignore="InvalidColorAttribute,MissingVerticalDivider" />
 
         <ImageView
             android:id="@+id/check5"

@@ -84,7 +84,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_5"
                         android:minHeight="56dp"
-                        android:text="@string/onboardingLetsDoItButton" />
+                        android:text="@string/onboardingLetsDoItButton"
+                    tools:ignore="DeprecatedWidgetInXml" />
 
                 <com.google.android.material.button.MaterialButton
                         android:id="@+id/secondaryCta"
@@ -94,7 +95,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/keyline_4"
                         android:minHeight="56dp"
-                        android:text="@string/preOnboardingDaxDialog1SecondaryButton"/>
+                        android:text="@string/preOnboardingDaxDialog1SecondaryButton"
+                    tools:ignore="DeprecatedWidgetInXml" />
 
             </LinearLayout>
         </ScrollView>
