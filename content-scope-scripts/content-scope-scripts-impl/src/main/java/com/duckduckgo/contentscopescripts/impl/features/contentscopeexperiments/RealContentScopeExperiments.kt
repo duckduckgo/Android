@@ -16,23 +16,25 @@
 
 package com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 @ContributesBinding(AppScope::class)
 class RealContentScopeExperiments @Inject constructor(
     private val contentScopeExperimentsFeature: ContentScopeExperimentsFeature,
     private val featureTogglesInventory: FeatureTogglesInventory,
+    private val dispatcherProvider: DispatcherProvider,
 ) : ContentScopeExperiments {
 
-    override fun getActiveExperiments(): List<Toggle> {
+    override suspend fun getActiveExperiments(): List<Toggle> {
         val featureName = contentScopeExperimentsFeature.self().featureName().name
-        return runBlocking {
+        return withContext(dispatcherProvider.io()) {
             val experiments = if (contentScopeExperimentsFeature.self().isEnabled()) {
                 featureTogglesInventory.getAllTogglesForParent(featureName)
             } else {
