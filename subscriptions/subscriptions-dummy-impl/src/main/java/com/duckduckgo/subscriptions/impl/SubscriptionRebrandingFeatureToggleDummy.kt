@@ -23,15 +23,17 @@ import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SubscriptionRebrandingFeatureToggle::class,
+    boundType = SubscriptionRebrandingFeatureToggleDummy::class,
 )
-class SubscriptionRebrandingFeatureToggleDummy @Inject constructor() : SubscriptionRebrandingFeatureToggle {
+class SubscriptionRebrandingFeatureToggleDummy @Inject constructor(
+    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
+) : SubscriptionRebrandingFeatureToggle {
 
     override fun isSubscriptionRebrandingEnabled(): Boolean {
-        return false
+        return subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled()
     }
 
     override fun isAIFeaturesRebrandingEnabled(): Boolean {
-        return false
+        return subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()
     }
 }
