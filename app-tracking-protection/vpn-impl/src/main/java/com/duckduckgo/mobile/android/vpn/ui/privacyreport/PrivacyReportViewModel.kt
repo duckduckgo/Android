@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.report
+package com.duckduckgo.mobile.android.vpn.ui.privacyreport
 
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
@@ -28,11 +28,13 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnState
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.VpnStore
-import javax.inject.Inject
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.ViewState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 @ContributesViewModel(ViewScope::class)
 class PrivacyReportViewModel @Inject constructor(
@@ -42,35 +44,33 @@ class PrivacyReportViewModel @Inject constructor(
     vpnStateMonitor: VpnStateMonitor,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
-
-    val viewStateFlow = vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
-        PrivacyReportView.ViewState(vpnState, trackersBlocked, shouldShowCTA())
-    }
+    val viewStateFlow =
+        vpnStateMonitor.getStateFlow(AppTpVpnFeature.APPTP_VPN).combine(getReport()) { vpnState, trackersBlocked ->
+            ViewState(vpnState, trackersBlocked, shouldShowCTA())
+        }
 
     @VisibleForTesting
-    fun getReport(): Flow<PrivacyReportView.TrackersBlocked> {
-        return repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
+    fun getReport(): Flow<TrackersBlocked> =
+        repository.getVpnTrackers({ dateOfLastHour() }).map { trackers ->
             if (trackers.isEmpty()) {
-                PrivacyReportView.TrackersBlocked("", 0, 0)
+                TrackersBlocked("", 0, 0)
             } else {
                 val perApp = trackers.groupBy { it.trackingApp }.toList().sortedByDescending { it.second.sumOf { t -> t.count } }
                 val otherAppsSize = (perApp.size - 1).coerceAtLeast(0)
                 val latestApp = perApp.first().first.appDisplayName
 
-                PrivacyReportView.TrackersBlocked(latestApp, otherAppsSize, trackers.sumOf { it.count })
+                TrackersBlocked(latestApp, otherAppsSize, trackers.sumOf { it.count })
             }
         }
-    }
 
-    private suspend fun shouldShowCTA(): Boolean {
-        return withContext(dispatchers.io()) {
+    private suspend fun shouldShowCTA(): Boolean =
+        withContext(dispatchers.io()) {
             if (vpnFeatureRemover.isFeatureRemoved()) {
                 false
             } else {
                 vpnStore.didShowOnboarding()
             }
         }
-    }
 
     object PrivacyReportView {
         data class ViewState(
