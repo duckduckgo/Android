@@ -18,14 +18,12 @@ package com.duckduckgo.pir.internal.checker
 
 import android.content.Context
 import android.content.Intent
-import androidx.work.WorkManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.internal.optout.PirForegroundOptOutService
 import com.duckduckgo.pir.internal.scan.PirForegroundScanService
-import com.duckduckgo.pir.internal.scan.PirRemoteWorkerService
-import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker
+import com.duckduckgo.pir.internal.scan.PirScanScheduler
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -65,8 +63,8 @@ class RealPirWorkHandler @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
     private val dispatcherProvider: DispatcherProvider,
     private val subscriptions: Subscriptions,
-    private val workManager: WorkManager,
     private val context: Context,
+    private val pirScanScheduler: PirScanScheduler,
 ) : PirWorkHandler {
 
     override suspend fun canRunPir(): Flow<Boolean> {
@@ -95,9 +93,8 @@ class RealPirWorkHandler @Inject constructor(
         // Stop any running foreground services
         context.stopService(Intent(context, PirForegroundScanService::class.java))
         context.stopService(Intent(context, PirForegroundOptOutService::class.java))
-        context.stopService(Intent(context, PirRemoteWorkerService::class.java))
         // Cancel any running or scheduled workers
-        workManager.cancelUniqueWork(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
+        pirScanScheduler.cancelScheduledScans(context)
     }
 
     private fun isPirEnabled(

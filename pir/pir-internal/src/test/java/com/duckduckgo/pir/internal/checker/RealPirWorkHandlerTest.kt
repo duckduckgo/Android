@@ -18,12 +18,11 @@ package com.duckduckgo.pir.internal.checker
 
 import android.content.Context
 import android.content.Intent
-import androidx.work.WorkManager
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.pir.impl.PirRemoteFeatures
-import com.duckduckgo.pir.internal.scan.PirScheduledScanRemoteWorker
+import com.duckduckgo.pir.internal.scan.PirScanScheduler
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -48,7 +47,7 @@ class RealPirWorkHandlerTest {
 
     private val pirRemoteFeatures: PirRemoteFeatures = mock()
     private val subscriptions: Subscriptions = mock()
-    private val workManager: WorkManager = mock()
+    private val pirScanScheduler: PirScanScheduler = mock()
     private val context: Context = mock()
     private val pirBetaToggle: Toggle = mock()
 
@@ -62,8 +61,8 @@ class RealPirWorkHandlerTest {
             pirRemoteFeatures = pirRemoteFeatures,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             subscriptions = subscriptions,
-            workManager = workManager,
             context = context,
+            pirScanScheduler = pirScanScheduler,
         )
     }
 
@@ -260,7 +259,7 @@ class RealPirWorkHandlerTest {
         pirWorkHandler.cancelWork()
 
         // Verify that stopService is called 3 times (for each of the 3 services)
-        verify(context, times(3)).stopService(any<Intent>())
-        verify(workManager).cancelUniqueWork(PirScheduledScanRemoteWorker.TAG_SCHEDULED_SCAN)
+        verify(context, times(2)).stopService(any<Intent>())
+        verify(pirScanScheduler).cancelScheduledScans(context)
     }
 }
