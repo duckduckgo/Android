@@ -43,8 +43,8 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
@@ -73,6 +73,9 @@ class ProSettingView @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     private val binding: ViewSettingsBinding by viewBinding()
 
@@ -230,7 +233,7 @@ class ProSettingView @JvmOverloads constructor(
                 globalActivityStarter.start(
                     context,
                     SubscriptionsWebViewActivityWithParams(
-                        url = SubscriptionsConstants.BUY_URL,
+                        url = subscriptionsUrlProvider.buyUrl,
                         origin = "funnel_appsettings_android",
                     ),
                 )

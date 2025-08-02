@@ -17,8 +17,9 @@
 package com.duckduckgo.subscriptions.impl.feedback
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.OTHER
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -27,7 +28,9 @@ interface FeedbackHelpUrlProvider {
 }
 
 @ContributesBinding(ActivityScope::class)
-class RealFeedbackHelpUrlProvider @Inject constructor() : FeedbackHelpUrlProvider {
+class RealFeedbackHelpUrlProvider @Inject constructor(
+    private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
+) : FeedbackHelpUrlProvider {
     override fun getUrl(subCategory: SubscriptionFeedbackSubCategory): String {
         return when (subCategory) {
             is SubscriptionFeedbackVpnSubCategory -> getVPNUrl(subCategory)
@@ -35,7 +38,7 @@ class RealFeedbackHelpUrlProvider @Inject constructor() : FeedbackHelpUrlProvide
             is SubscriptionFeedbackPirSubCategory -> getPirUrl(subCategory)
             is SubscriptionFeedbackItrSubCategory -> getItrUrl(subCategory)
             is SubscriptionFeedbackDuckAiSubCategory -> getDuckAiSubCategoryUrl(subCategory)
-            else -> SubscriptionsConstants.FAQS_URL
+            else -> FAQS_URL
         }
     }
 

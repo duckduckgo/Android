@@ -33,8 +33,9 @@ import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.R
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
 import com.duckduckgo.subscriptions.impl.databinding.ViewItrSettingsBinding
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.Command.OpenItr
 import com.duckduckgo.subscriptions.impl.settings.views.ItrSettingViewModel.ViewState
@@ -61,6 +62,9 @@ class ItrSettingView @JvmOverloads constructor(
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     private val binding: ViewItrSettingsBinding by viewBinding()
 
@@ -122,7 +126,7 @@ class ItrSettingView @JvmOverloads constructor(
                 globalActivityStarter.start(
                     context,
                     SubscriptionsWebViewActivityWithParams(
-                        url = SubscriptionsConstants.ITR_URL,
+                        url = ITR_URL,
                     ),
                 )
             }

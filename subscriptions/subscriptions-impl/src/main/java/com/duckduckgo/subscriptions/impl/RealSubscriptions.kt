@@ -39,10 +39,10 @@ import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Product.DuckAiPlus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_ETLD
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_PRO_PATH
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PRIVACY_SUBSCRIPTIONS_PATH
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
@@ -67,6 +67,7 @@ class RealSubscriptions @Inject constructor(
     private val pixel: SubscriptionPixelSender,
     private val subscriptionsFeature: Lazy<PrivacyProFeature>,
     private val dispatcherProvider: DispatcherProvider,
+    private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
 ) : Subscriptions {
     override suspend fun isSignedIn(): Boolean =
         subscriptionsManager.isSignedIn()
@@ -162,9 +163,9 @@ class RealSubscriptions @Inject constructor(
     private fun buildSubscriptionUrl(uri: Uri?): String {
         val queryParams = uri?.query
         return if (!queryParams.isNullOrBlank()) {
-            "$BUY_URL?$queryParams"
+            "${subscriptionsUrlProvider.buyUrl}?$queryParams"
         } else {
-            BUY_URL
+            subscriptionsUrlProvider.buyUrl
         }
     }
 }

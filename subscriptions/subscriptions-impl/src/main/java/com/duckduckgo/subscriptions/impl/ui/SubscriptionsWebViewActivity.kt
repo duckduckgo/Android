@@ -73,11 +73,10 @@ import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionS
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
@@ -174,6 +173,9 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     @Inject
     lateinit var subscriptions: Subscriptions
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
@@ -294,17 +296,17 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private fun convertIntoSubscriptionWebViewActivityParams(intent: Intent): SubscriptionsWebViewActivityWithParams {
         intent.getActivityParams(SubscriptionPurchase::class.java)?.let { subscriptionPurchaseActivityParams ->
             return SubscriptionsWebViewActivityWithParams(
-                url = BUY_URL,
+                url = subscriptionsUrlProvider.buyUrl,
                 origin = subscriptionPurchaseActivityParams.origin,
             ).let { webViewActivityWithParams ->
                 if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
                     val urlWithParams = kotlin.runCatching {
-                        BUY_URL.toUri()
+                        subscriptionsUrlProvider.buyUrl.toUri()
                             .buildUpon()
                             .appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, subscriptionPurchaseActivityParams.featurePage)
                             .build()
                             .toString()
-                    }.getOrDefault(BUY_URL)
+                    }.getOrDefault(subscriptionsUrlProvider.buyUrl)
                     webViewActivityWithParams.copy(
                         url = urlWithParams,
                     )
@@ -315,7 +317,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
 
         return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-            ?: SubscriptionsWebViewActivityWithParams(BUY_URL)
+            ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
     }
 
     private fun launchDownloadMessagesJob() {
@@ -487,7 +489,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         globalActivityStarter.start(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = SubscriptionsConstants.ITR_URL,
+                url = ITR_URL,
             ),
         )
     }
@@ -588,7 +590,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun backToSettings() {
-        if (params.url == ACTIVATE_URL) {
+        if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
         }
         finish()
