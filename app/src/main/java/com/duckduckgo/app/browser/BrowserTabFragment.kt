@@ -2479,6 +2479,21 @@ class BrowserTabFragment :
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
+                if (fallbackIntent == null && fallbackUrl == null) {
+                    intent.`package`?.let { pkg ->
+                        val playIntent = Intent(
+                            Intent.ACTION_VIEW,
+                            "market://details?id=$pkg".toUri(),
+                        ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
+
+                        if (pm.resolveActivity(playIntent, 0) != null) {
+                            kotlin.runCatching {
+                                launchDialogForIntent(it, pm, playIntent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                                return
+                            }
+                        }
+                    }
+                }
                 when {
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
