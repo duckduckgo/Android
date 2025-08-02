@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.UriString.Companion.sameOrSubdomain
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -47,6 +48,7 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     private val fileDeleter: FileDeleter,
     private val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
+    private val settingsDataStore: SettingsDataStore,
 ) : IndexedDBManager {
 
     private val jsonAdapter: JsonAdapter<IndexedDBSettings> by lazy {
@@ -81,13 +83,24 @@ class DuckDuckGoIndexedDBManager @Inject constructor(
     private fun getExcludedFolders(
         rootFolder: File,
         allowedDomains: List<String>,
+        clearDuckAiData: Boolean = settingsDataStore.clearDuckAiData,
     ): List<String> {
         return (rootFolder.listFiles() ?: emptyArray())
             .filter {
                 // IndexedDB folders have this format: <scheme>_<host>_<port>.indexeddb.leveldb
                 val host = it.name.split("_").getOrNull(1) ?: return@filter false
-                allowedDomains.any { domain -> sameOrSubdomain(host, domain) }
+                val isAllowed = allowedDomains.any { domain -> sameOrSubdomain(host, domain) }
+
+                if (clearDuckAiData && sameOrSubdomain(host, DUCKDUCKGO_DOMAIN)) {
+                    false
+                } else {
+                    isAllowed
+                }
             }
             .map { it.name }
+    }
+
+    companion object {
+        const val DUCKDUCKGO_DOMAIN = "duckduckgo.com"
     }
 }
