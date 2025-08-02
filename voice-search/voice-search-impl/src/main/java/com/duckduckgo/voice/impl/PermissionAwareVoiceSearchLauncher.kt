@@ -41,15 +41,15 @@ class PermissionAwareVoiceSearchLauncher @Inject constructor(
         source: Source,
         onEvent: (Event) -> Unit,
     ) {
+        voiceSearchActivityLauncher.registerResultsCallback(caller, activity, source) {
+            onEvent(it)
+        }
         permissionRequest.registerResultsCallback(
             caller,
             activity,
             { voiceSearchActivityLauncher.launch(activity) },
             { onEvent(VoiceSearchDisabled) },
         )
-        voiceSearchActivityLauncher.registerResultsCallback(caller, activity, source) {
-            onEvent(it)
-        }
     }
 
     override fun launch(activity: Activity) {
