@@ -848,7 +848,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Deixa o DuckDuckGo proteger melhor o que fazes online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Torna-nos o teu navegador predefinido para que todos os links dos sites sejam abertos no DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Agora não</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Não perguntar novamente</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">O DuckDuckGo não é o teu navegador predefinido. Obtém mais proteção.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Definir como predefinição</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Não perguntar novamente</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">O DuckDuckGo bloqueia rastreadores para proteger a tua navegação</string>
