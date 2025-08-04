@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Aadressiriba</string>
     <string name="duck_chat_assist_settings_title">Assisti seaded</string>
     <string name="duck_chat_assist_settings_description">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Otsing</string>
+    <string name="input_screen_search_hint">Otsi või sisesta aadress</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Küsi Duck.ai käest</string>
+    <string name="input_screen_user_pref_title">Eksperimentaalne aadressiriba</string>
+    <string name="input_screen_user_pref_description">Otsi veebist või küsi Duck.ai-lt otse aadressiribal</string>
 </resources>
