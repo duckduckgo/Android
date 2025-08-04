@@ -481,6 +481,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
+
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
                         title = getTrackersDescription(context, trackers),
@@ -805,28 +806,62 @@ sealed class OnboardingDaxDialogCta(
                     binding.includeOnboardingInContextDaxDialog.onboardingDialogSuggestionsContent.show()
                     daxDialog.suggestionsDialogTextCta.text = ""
                     daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
+
+                    val isModifiedControlExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled()
+
+                    if (isModifiedControlExperimentEnabled) {
+                        daxDialog.daxDialogOption4.gone()
+                    }
+
                     TransitionManager.beginDelayedTransition(binding.includeOnboardingInContextDaxDialog.cardView, AutoTransition())
                     val afterAnimation = {
                         onTypingAnimationFinished()
-                        val optionsViews = listOf<DaxButton>(
-                            daxDialog.daxDialogOption1,
-                            daxDialog.daxDialogOption2,
-                            daxDialog.daxDialogOption3,
-                            daxDialog.daxDialogOption4,
-                        )
 
-                        optionsViews.forEachIndexed { index, buttonView ->
+                        if (isModifiedControlExperimentEnabled) {
+                            val optionsViews = listOf<DaxButton>(
+                                daxDialog.daxDialogOption1,
+                                daxDialog.daxDialogOption2,
+                                daxDialog.daxDialogOption3,
+                            )
+
+                            // modifiedControl has 3 options to match experiment variants
+                            val modifiedControlOptions = onboardingStore.getSitesOptions()
+                                .toMutableList()
+                                .apply {
+                                    removeAt(1) // Remove the regional news option
+                                }
+                                .toList()
+
+                            optionsViews.forEachIndexed { index, buttonView ->
+                                val modifiedControlOption = modifiedControlOptions[index]
+
+                                with(buttonView) {
+                                    modifiedControlOption.setOptionView(this)
+                                    setOnClickListener { onSuggestedOptionClicked?.invoke(modifiedControlOption) }
+                                    animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                                }
+                            }
+                        } else {
+                            val optionsViews = listOf<DaxButton>(
+                                daxDialog.daxDialogOption1,
+                                daxDialog.daxDialogOption2,
+                                daxDialog.daxDialogOption3,
+                                daxDialog.daxDialogOption4,
+                            )
+
+                            optionsViews.forEachIndexed { index, buttonView ->
+                                val options = onboardingStore.getSitesOptions()
+                                options[index].setOptionView(buttonView)
+                                buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                            }
                             val options = onboardingStore.getSitesOptions()
-                            options[index].setOptionView(buttonView)
-                            buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
+                            daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
+                            daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
+                            daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
+                            daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
                         }
-
-                        val options = onboardingStore.getSitesOptions()
-                        daxDialog.daxDialogOption1.setOnClickListener { onSuggestedOptionClicked?.invoke(options[0]) }
-                        daxDialog.daxDialogOption2.setOnClickListener { onSuggestedOptionClicked?.invoke(options[1]) }
-                        daxDialog.daxDialogOption3.setOnClickListener { onSuggestedOptionClicked?.invoke(options[2]) }
-                        daxDialog.daxDialogOption4.setOnClickListener { onSuggestedOptionClicked?.invoke(options[3]) }
                     }
+
                     daxDialog.suggestionsDialogTextCta.startTypingAnimation(daxText, true) { afterAnimation() }
                     daxDialog.onboardingDialogContent.setOnClickListener {
                         daxDialog.dialogTextCta.finishAnimation()
@@ -1023,6 +1058,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
+
                 onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
                     setBBOnboardingDialogView(
                         description = description?.let { context.getString(it) }.orEmpty(),
@@ -1032,6 +1068,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
+
                 else -> {
                     setOnboardingDialogView(
                         daxText = description?.let { context.getString(it) }.orEmpty(),
@@ -1098,6 +1135,8 @@ sealed class DaxBubbleCta(
     override val appInstallStore: AppInstallStore,
 ) : Cta, ViewCta, DaxCta {
 
+    var isModifiedControlOnboardingExperimentEnabled: Boolean? = null
+
     protected var ctaView: View? = null
 
     override fun showCta(
@@ -1133,13 +1172,35 @@ sealed class DaxBubbleCta(
             view.findViewById<ImageView>(R.id.placeholder).setImageResource(it)
         }
 
-        options?.let {
-            optionsViews.forEachIndexed { index, buttonView ->
-                buttonView.show()
-                if (it.size > index) {
-                    it[index].setOptionView(buttonView)
-                } else {
-                    buttonView.gone()
+        if (isModifiedControlOnboardingExperimentEnabled == true) {
+            options?.let { options ->
+                // modifiedControl has a max of 3 options to match other experiment variants
+                val modifiedControlOptions = options
+                    .toMutableList()
+                    .apply {
+                        if (this@DaxBubbleCta is DaxIntroVisitSiteOptionsCta) {
+                            removeAt(1) // Remove the regional news option
+                        }
+                    }.toList()
+
+                optionsViews.forEachIndexed { index, buttonView ->
+                    if (modifiedControlOptions.size > index) {
+                        buttonView.show()
+                        modifiedControlOptions[index].setOptionView(buttonView)
+                    } else {
+                        buttonView.gone()
+                    }
+                }
+            }
+        } else {
+            options?.let {
+                optionsViews.forEachIndexed { index, buttonView ->
+                    buttonView.show()
+                    if (it.size > index) {
+                        it[index].setOptionView(buttonView)
+                    } else {
+                        buttonView.gone()
+                    }
                 }
             }
         }

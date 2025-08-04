@@ -251,7 +251,9 @@ class CtaViewModel @Inject constructor(
 
             // Site suggestions
             canShowDaxIntroVisitSiteCta() && !extendedOnboardingFeatureToggles.noBrowserCtas().isEnabled() -> {
-                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore)
+                DaxBubbleCta.DaxIntroVisitSiteOptionsCta(onboardingStore, appInstallStore).apply {
+                    isModifiedControlOnboardingExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled()
+                }
             }
 
             // End
@@ -293,7 +295,8 @@ class CtaViewModel @Inject constructor(
     }
 
     private fun isOnboardingExperimentEnabled() = onboardingDesignExperimentToggles.buckOnboarding().isEnabled() ||
-        onboardingDesignExperimentToggles.bbOnboarding().isEnabled()
+        onboardingDesignExperimentToggles.bbOnboarding().isEnabled() ||
+        onboardingDesignExperimentToggles.modifiedControl().isEnabled()
 
     @WorkerThread
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !hideTips()
