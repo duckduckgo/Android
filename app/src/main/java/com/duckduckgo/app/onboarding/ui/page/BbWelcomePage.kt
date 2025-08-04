@@ -89,7 +89,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
-    private var daxDialogAnimaationStarted = false
+    private var daxDialogAnimationStarted = false
     private var backgroundSceneManager: BbOnboardingBackgroundSceneManager? = null
 
     @SuppressLint("SourceLockedOrientationActivity")
@@ -458,8 +458,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private fun startDaxDialogAnimation() {
-        if (daxDialogAnimaationStarted) return
-        daxDialogAnimaationStarted = true
+        if (daxDialogAnimationStarted) return
+        daxDialogAnimationStarted = true
 
         val winkDelay = 300.milliseconds
         val transitionDelay = 1300.milliseconds
