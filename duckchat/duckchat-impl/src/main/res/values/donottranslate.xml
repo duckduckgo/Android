@@ -23,17 +23,6 @@
     <string name="input_screen_user_pref_title">Experimental Address Bar</string>
     <string name="input_screen_user_pref_description">Search the web or ask Duck.ai directly from the Address Bar</string>
 
-    <!-- AutoComplete Suggestions -->
-    <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="autocompleteRemoveItemTitle">Remove search suggestion?</string>
-    <string name="autocompleteRemoveItemCancel">Cancel</string>
-    <string name="autocompleteRemoveItemRemove">Remove</string>
-    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Switch to Tab · %1$s</string>
-
-    <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
-    <string name="openAutoCompleteSettings">Open Settings</string>
-
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
     <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
