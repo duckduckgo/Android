@@ -897,7 +897,7 @@
     <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Protezioni</b> <i>attivate!</i>]]></string>
 
     <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Ciao.Vuoi un browser più veloce che ti garantisca protezione?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Ciao.<br/>Vuoi un browser più veloce che ti garantisca protezione?]]></string>
 
     <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Cancella istantaneamente la tua attività di navigazione con il <font color=\"#F05C2B\">Fire Button</font>]]></string>
     <string name="bbOnboardingFireButtonDaxDialogDescription">Provalo!️</string>

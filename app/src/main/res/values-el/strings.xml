@@ -897,7 +897,7 @@
     <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ενεργοποιήθηκαν</b> οι <i>προστασίες!</i>]]></string>
 
     <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Γεια σας.Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Γεια σας.<br/>Είστε έτοιμοι για ένα ταχύτερο πρόγραμμα περιήγησης που σας διατηρεί προστατευμένους;]]></string>
 
     <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Διαγράψτε άμεσα τη δραστηριότητα περιήγησής σας με το <font color=\"#F05C2B\">Fire Button</font>]]></string>
     <string name="bbOnboardingFireButtonDaxDialogDescription">Δοκιμάστε το!️</string>

@@ -913,7 +913,7 @@
     <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Aizsardzība ir</b> <i>aktivizēta!</i>]]></string>
 
     <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!<br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
 
     <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <font color=\"#F05C2B\">Fire Button</font>]]></string>
     <string name="bbOnboardingFireButtonDaxDialogDescription">Izmēģini!️</string>

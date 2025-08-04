@@ -929,7 +929,7 @@
     <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Apsaugos priemonės</b> <i>įjungtos!</i>]]></string>
 
     <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!<br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
 
     <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <font color=\"#F05C2B\">Fire Button</font>]]></string>
     <string name="bbOnboardingFireButtonDaxDialogDescription">Išbandykite!️</string>
