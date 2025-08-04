@@ -88,7 +88,6 @@ fun String.compareSemanticVersion(targetVersion: String): Int? {
     return 0
 }
 
-
 private const val NON_BREAKING_SPACE = '\u00A0'
 
 /**
