@@ -328,8 +328,12 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         launchBestSelectionWindow(trigger = DIALOG)
     }
 
-    override fun onMessageDialogNotNowButtonClicked() {
-        fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED)
+    override fun onMessageDialogDoNotAskAgainButtonClicked() {
+        fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK)
+        appCoroutineScope.launch {
+            // The user does not want to see the prompt again, so we jump to stage 2.
+            defaultBrowserPromptsDataStore.storeExperimentStage(STAGE_2)
+        }
     }
 
     override fun onSystemDefaultBrowserDialogShown() {

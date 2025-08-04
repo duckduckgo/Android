@@ -36,6 +36,7 @@ import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_IN_MENU_CLICK
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED
+import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -793,7 +794,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `if message dialog not now clicked, then send a pixel`() = runTest {
+    fun `if message dialog do not ask again clicked, then send a pixel`() = runTest {
         val expectedParams = mapOf(
             PIXEL_PARAM_KEY_STAGE to "stage_1",
         )
@@ -804,9 +805,9 @@ class AdditionalDefaultBrowserPromptsImplTest {
             defaultBrowserPromptsDataStore = dataStoreMock,
         )
 
-        testee.onMessageDialogNotNowButtonClicked()
+        testee.onMessageDialogDoNotAskAgainButtonClicked()
 
-        verify(pixelMock).fire(SET_AS_DEFAULT_PROMPT_DISMISSED, expectedParams)
+        verify(pixelMock).fire(SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK, expectedParams)
     }
 
     @Test

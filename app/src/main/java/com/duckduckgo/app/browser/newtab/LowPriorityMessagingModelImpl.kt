@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.browser.newtab.LowPriorityMessage.DefaultBrowserMessage
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
@@ -72,8 +73,9 @@ class LowPriorityMessagingModelImpl @Inject constructor(
                         defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
                     },
                     onSecondaryAction = {
-                        pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DISMISSED)
+                        pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DO_NOT_ASK_AGAIN_CLICK)
                         defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
+                        defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
                     },
                     onClose = {
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DISMISSED)

@@ -33,7 +33,7 @@ interface AdditionalDefaultBrowserPrompts {
     fun onMessageDialogShown()
     fun onMessageDialogCanceled()
     fun onMessageDialogConfirmationButtonClicked()
-    fun onMessageDialogNotNowButtonClicked()
+    fun onMessageDialogDoNotAskAgainButtonClicked()
 
     fun onSystemDefaultBrowserDialogShown()
     fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger)

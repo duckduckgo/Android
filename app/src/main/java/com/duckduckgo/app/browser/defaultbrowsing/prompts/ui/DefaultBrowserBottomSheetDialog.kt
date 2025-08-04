@@ -54,7 +54,10 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
             eventListener?.onSetBrowserButtonClicked()
         }
         binding.defaultBrowserBottomSheetDialogGhostButton.setOnClickListener {
-            eventListener?.onNotNowButtonClicked()
+            eventListener?.onDoNotAskAgainButtonClicked()
+        }
+        binding.defaultBrowserBottomSheetDialogCloseButton.setOnClickListener {
+            eventListener?.onCanceled()
         }
     }
 
@@ -79,6 +82,6 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
         fun onShown()
         fun onCanceled()
         fun onSetBrowserButtonClicked()
-        fun onNotNowButtonClicked()
+        fun onDoNotAskAgainButtonClicked()
     }
 }
