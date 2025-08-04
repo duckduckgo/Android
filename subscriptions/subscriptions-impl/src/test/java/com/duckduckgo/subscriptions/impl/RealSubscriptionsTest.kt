@@ -34,7 +34,8 @@ import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.UNKNOWN
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
+import com.duckduckgo.subscriptions.impl.internal.DefaultSubscriptionsBaseUrl
+import com.duckduckgo.subscriptions.impl.internal.RealSubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import kotlinx.coroutines.flow.flowOf
@@ -67,6 +68,7 @@ class RealSubscriptionsTest {
     private val mockSubscriptionsManager: SubscriptionsManager = mock()
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val pixel: SubscriptionPixelSender = mock()
+    private val subscriptionsUrlProvider = RealSubscriptionsUrlProvider(DefaultSubscriptionsBaseUrl())
     private lateinit var subscriptions: RealSubscriptions
     private val subscriptionFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
@@ -89,6 +91,7 @@ class RealSubscriptionsTest {
             pixel,
             { subscriptionFeature },
             coroutineRule.testDispatcherProvider,
+            subscriptionsUrlProvider,
         )
     }
 
@@ -269,7 +272,7 @@ class RealSubscriptionsTest {
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("$BUY_URL?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+        assertEquals("${subscriptionsUrlProvider.buyUrl}?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
     }
 
     @Test
@@ -281,7 +284,10 @@ class RealSubscriptionsTest {
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/pro?usePaidDuckAi=true&featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("$BUY_URL?usePaidDuckAi=true&featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+        assertEquals(
+            "${subscriptionsUrlProvider.buyUrl}?usePaidDuckAi=true&featurePage=duckai",
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
     }
 
     @Test
@@ -293,7 +299,7 @@ class RealSubscriptionsTest {
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("$BUY_URL?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+        assertEquals("${subscriptionsUrlProvider.buyUrl}?featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
     }
 
     @Test
@@ -305,7 +311,10 @@ class RealSubscriptionsTest {
         subscriptions.launchPrivacyPro(context, "https://duckduckgo.com/subscriptions?usePaidDuckAi=true&featurePage=duckai".toUri())
 
         verify(globalActivityStarter, times(2)).startIntent(eq(context), captor.capture())
-        assertEquals("$BUY_URL?usePaidDuckAi=true&featurePage=duckai", (captor.lastValue as SubscriptionsWebViewActivityWithParams).url)
+        assertEquals(
+            "${subscriptionsUrlProvider.buyUrl}?usePaidDuckAi=true&featurePage=duckai",
+            (captor.lastValue as SubscriptionsWebViewActivityWithParams).url,
+        )
     }
 
     @Test

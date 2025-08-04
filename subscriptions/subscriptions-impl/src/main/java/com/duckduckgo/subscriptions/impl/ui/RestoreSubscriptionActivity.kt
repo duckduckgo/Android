@@ -33,10 +33,8 @@ import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.WELCOME_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivityRestoreSubscriptionBinding
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.Error
 import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionViewModel.Command.FinishAndGoToOnboarding
@@ -55,6 +53,9 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
 
     private val viewModel: RestoreSubscriptionViewModel by bindViewModel()
     private val binding: ActivityRestoreSubscriptionBinding by viewBinding()
@@ -120,7 +121,7 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
         val intent = globalActivityStarter.startIntent(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = ACTIVATE_URL,
+                url = subscriptionsUrlProvider.activateUrl,
             ),
         )
         startForResultRestore.launch(intent)
@@ -147,11 +148,11 @@ class RestoreSubscriptionActivity : DuckDuckGoActivity() {
     }
 
     private fun goToSubscriptions() {
-        startSubscriptionsWebViewActivity(url = BUY_URL)
+        startSubscriptionsWebViewActivity(url = subscriptionsUrlProvider.buyUrl)
     }
 
     private fun goToSubscriptionsWelcomePage() {
-        startSubscriptionsWebViewActivity(url = WELCOME_URL)
+        startSubscriptionsWebViewActivity(url = subscriptionsUrlProvider.welcomeUrl)
     }
 
     private fun startSubscriptionsWebViewActivity(url: String) {
