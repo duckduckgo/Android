@@ -59,6 +59,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -299,7 +300,13 @@ class WelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_p
                     binding.daxDialogCta.progressBarText.text = "2 / 2"
                     binding.daxDialogCta.progressBar.show()
                     binding.daxDialogCta.progressBar.progress = 2
-                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                    val ctaText = it.getString(R.string.highlightsPreOnboardingAddressBarTitle).run {
+                        if (onboardingDesignExperimentToggles.modifiedControl().isEnabled()) {
+                            preventWidows()
+                        } else {
+                            this
+                        }
+                    }
                     binding.daxDialogCta.hiddenTextCta.text = ctaText.html(it)
                     binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
                     binding.daxDialogCta.addressBarPosition.root.show()
