@@ -21,5 +21,5 @@ interface SubscriptionsBaseUrl {
 }
 
 class DefaultSubscriptionsBaseUrl : SubscriptionsBaseUrl {
-    override val subscriptionsBaseUrl: String = "http://duckduckgo.com"
+    override val subscriptionsBaseUrl: String = "https://duckduckgo.com"
 }

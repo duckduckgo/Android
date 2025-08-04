@@ -53,7 +53,7 @@ class OverrideSubscriptionBaseUrlView @JvmOverloads constructor(
             base.resetButton.setOnClickListener {
                 base.urlEditText.text = ""
                 store.setBaseUrl(null)
-                Toast.makeText(context?.applicationContext, "Base URL reset to http://duckduckgo.com/subscriptions", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context?.applicationContext, "Base URL reset to https://duckduckgo.com/subscriptions", Toast.LENGTH_SHORT).show()
             }
             base.saveButton.setOnClickListener {
                 store.setBaseUrl(base.urlEditText.text.trim())

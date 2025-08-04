@@ -37,7 +37,7 @@ class InternalSubscriptionsBaseUrlModule {
         store: SubscriptionsInternalStore,
     ): SubscriptionsBaseUrl {
         return object : SubscriptionsBaseUrl {
-            val defaultUrl = "http://duckduckgo.com/subscriptions"
+            val defaultUrl = "https://duckduckgo.com/subscriptions"
             override val subscriptionsBaseUrl: String = store.getBaseUrl() ?: defaultUrl
         }
     }
