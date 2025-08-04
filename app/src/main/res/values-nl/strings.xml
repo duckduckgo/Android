@@ -848,7 +848,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laat DuckDuckGo meer beschermen van wat je online doet</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Maak ons je standaardbrowser zodat alle sitelinks in DuckDuckGo worden geopend.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Niet nu</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Niet opnieuw vragen</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo is niet je standaardbrowser. Krijg meer bescherming.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Als standaard instellen</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Niet opnieuw vragen</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkeert trackers om je te beschermen tijdens het browsen  </string>
