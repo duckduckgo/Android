@@ -205,14 +205,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return
         }
 
-        val isOnboardingComplete = userStageStore.getUserAppStage() == AppStage.ESTABLISHED
-        logcat { "evaluate: onboarding complete = $isOnboardingComplete" }
-
-        if (isOnboardingComplete) {
-            experimentAppUsageRepository.recordAppUsedNow()
-        } else {
+        val userType = getUserType()
+        if (userType == DefaultBrowserPromptsDataStore.UserType.UNKNOWN) {
+            logcat { "evaluate: user stage is unknown, skipping evaluation" }
             return
         }
+
+        experimentAppUsageRepository.recordAppUsedNow()
 
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
@@ -258,7 +257,19 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                 }
 
                 STAGE_1 -> {
-                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage2) {
+                    // New users go from STAGE_1 to STAGE_2.
+                    // Existing users skip STAGE_2 and go from STAGE_1 to STAGE_3.
+                    if (userType == DefaultBrowserPromptsDataStore.UserType.EXISTING &&
+                        (
+                            appActiveDaysUsedSinceEnrollment >=
+                                (configSettings.activeDaysUntilStage3 - configSettings.activeDaysUntilStage2 + configSettings.activeDaysUntilStage1)
+                            )
+                    ) {
+                        logcat { "evaluate: user is existing, got to STAGE_3" }
+                        STAGE_3
+                    } else if (userType == DefaultBrowserPromptsDataStore.UserType.NEW &&
+                        appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage2
+                    ) {
                         STAGE_2
                     } else {
                         null
@@ -378,6 +389,29 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun getUserType(): DefaultBrowserPromptsDataStore.UserType {
+        val storedUserType = defaultBrowserPromptsDataStore.userType.firstOrNull()
+
+        if (storedUserType == null) {
+            return DefaultBrowserPromptsDataStore.UserType.UNKNOWN
+        }
+
+        if (storedUserType == DefaultBrowserPromptsDataStore.UserType.UNKNOWN) {
+            val userAppStage = userStageStore.getUserAppStage()
+            val userType = if (userAppStage == AppStage.ESTABLISHED) {
+                logcat { "evaluate: user is established, setting initial stage to EXISTING" }
+                DefaultBrowserPromptsDataStore.UserType.EXISTING
+            } else {
+                logcat { "evaluate: user is new, setting initial stage to NEW" }
+                DefaultBrowserPromptsDataStore.UserType.NEW
+            }
+            defaultBrowserPromptsDataStore.storeUserType(userType)
+            return userType
+        }
+
+        return storedUserType
     }
 
     private fun launchBestSelectionWindow(trigger: SetAsDefaultActionTrigger) {
