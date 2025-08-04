@@ -69,26 +69,4 @@
     <string name="settingsDuckAiRebranding">AI Features</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
-    <!--  Buck Onboarding  -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hi there.</string>
-    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ready for a faster browser that keeps you protected?</string>
-    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Protections</b> <i>activated!</i>]]></string>
-
-    <!-- BB Onboarding Experiment -->
-    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hi there.<br/>Ready for a faster browser that keeps you protected?]]></string>
-
-    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Instantly clear your browsing activity with the <font color="#F05C2B">Fire Button</font>]]></string>
-    <string name="bbOnboardingFireButtonDaxDialogDescription">Give it a try!️</string>
-
-    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
-        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and %1$d other were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
-        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and %1$d others were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
-    </plurals>
-    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
-        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
-        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
-    </plurals>
-
-    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tap the shield for more info.️</string>
-
 </resources>

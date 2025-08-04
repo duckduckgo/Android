@@ -922,4 +922,31 @@
 
     <!-- Section in main app settings -->
     <string name="settingsHeadingCompleteSetup">Užbaik savo sąranką</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Sveiki.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Pasiruošę greitesnei naršyklei, kuri jus apsaugo?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Apsaugos priemonės</b> <i>įjungtos!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!<br/>Pasiruošę greitesnei naršyklei, kuri jus apsaugo?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Išbandykite!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="few"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="many"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="other"><![CDATA[ ir %1$d bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="few"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="many"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+        <item quantity="other"><![CDATA[ bandė tave čia sekti. <font color=\"#F05C2B\">Aš juos užblokavau!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Norėdami gauti daugiau informacijos, bakstelėkite skydą.️</string>
+
 </resources>
