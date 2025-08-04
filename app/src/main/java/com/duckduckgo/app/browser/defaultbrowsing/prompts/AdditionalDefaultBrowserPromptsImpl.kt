@@ -24,8 +24,9 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.DIALOG
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MENU
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MESSAGE
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.PROMPT
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.UNKNOWN
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
@@ -219,6 +220,9 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         val currentStage = defaultBrowserPromptsDataStore.stage.firstOrNull()
         logcat { "evaluate: current stage = $currentStage" }
         val newStage = if (isDefaultBrowser) {
+            if (currentStage == STAGE_2) {
+                fireConversionPixel(MESSAGE)
+            }
             logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED and return." }
             defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
             return
@@ -318,7 +322,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     override fun onMessageDialogConfirmationButtonClicked() {
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK)
-        launchBestSelectionWindow(trigger = DIALOG)
+        launchBestSelectionWindow(trigger = PROMPT)
     }
 
     override fun onMessageDialogDoNotAskAgainButtonClicked() {
@@ -339,7 +343,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     override fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger) {
         appCoroutineScope.launch {
             when (trigger) {
-                DIALOG, MENU -> fireConversionPixel(trigger)
+                PROMPT, MENU -> fireConversionPixel(trigger)
+                MESSAGE -> {
+                    // no-op
+                    // the user selected the default browser from the message dialog and this is handled in evaluate()
+                }
                 UNKNOWN -> {
                     logcat(ERROR) { "Trigger for default browser dialog result wasn't provided." }
                 }
@@ -359,7 +367,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         if (defaultBrowserDetector.isDefaultBrowser()) {
             appCoroutineScope.launch {
                 when (trigger) {
-                    DIALOG, MENU -> fireConversionPixel(trigger)
+                    PROMPT, MENU -> fireConversionPixel(trigger)
+                    MESSAGE -> {
+                        // no-op
+                        // the user selected the default browser from the message dialog and this is handled in evaluate()
+                    }
                     UNKNOWN -> {
                         logcat(ERROR) { "Trigger for default apps result wasn't provided." }
                     }

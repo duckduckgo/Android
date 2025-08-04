@@ -55,8 +55,9 @@ interface AdditionalDefaultBrowserPrompts {
     }
 
     enum class SetAsDefaultActionTrigger {
-        DIALOG,
+        PROMPT,
         MENU,
+        MESSAGE,
         UNKNOWN,
     }
 }

@@ -30,7 +30,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
-import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class LowPriorityMessagingModelImpl @Inject constructor(
@@ -56,7 +55,6 @@ class LowPriorityMessagingModelImpl @Inject constructor(
     }
 
     private suspend fun determineLowPriorityMessage(): LowPriorityMessage? {
-        logcat { "TAG_ANA calling determineLowPriorityMessage" }
         return when {
             defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == true -> {
                 DefaultBrowserMessage(

@@ -22,8 +22,8 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.DIALOG
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MENU
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.PROMPT
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.PIXEL_PARAM_KEY_STAGE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.FeatureSettingsConfigModel
@@ -203,7 +203,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     fun `when message dialog confirmation clicked, then launch browser selection system dialog`() = runTest {
         val testee = createTestee()
         val expectedUpdates = listOf<Command>(
-            Command.OpenSystemDefaultBrowserDialog(systemDefaultBrowserDialogIntentMock, trigger = DIALOG),
+            Command.OpenSystemDefaultBrowserDialog(systemDefaultBrowserDialogIntentMock, trigger = PROMPT),
         )
         val actualUpdates = mutableListOf<Command>()
         coroutinesTestRule.testScope.launch {
@@ -255,8 +255,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onSystemDefaultBrowserDialogShown()
         advanceTimeBy(FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS - 1) // canceled before threshold
-        testee.onSystemDefaultBrowserDialogCanceled(trigger = DIALOG)
-        testee.onSystemDefaultBrowserDialogCanceled(trigger = DIALOG) // verifies that repeated cancellation won't keep opening new screens
+        testee.onSystemDefaultBrowserDialogCanceled(trigger = PROMPT)
+        testee.onSystemDefaultBrowserDialogCanceled(trigger = PROMPT) // verifies that repeated cancellation won't keep opening new screens
 
         assertEquals(1, actualUpdates.size)
         assertTrue(actualUpdates[0] is Command.OpenSystemDefaultAppsActivity)
@@ -273,7 +273,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onSystemDefaultBrowserDialogShown()
         advanceTimeBy(FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS + 1) // canceled after threshold
-        testee.onSystemDefaultBrowserDialogCanceled(trigger = DIALOG)
+        testee.onSystemDefaultBrowserDialogCanceled(trigger = PROMPT)
 
         assertTrue(actualUpdates.isEmpty())
     }
