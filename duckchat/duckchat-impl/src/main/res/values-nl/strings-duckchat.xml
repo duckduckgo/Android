@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adresbalk</string>
     <string name="duck_chat_assist_settings_title">Assist-instellingen</string>
     <string name="duck_chat_assist_settings_description">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Zoeken</string>
+    <string name="input_screen_search_hint">Zoek of voer een adres in</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Vraag stellen aan Duck.ai</string>
+    <string name="input_screen_user_pref_title">Experimentele adresbalk</string>
+    <string name="input_screen_user_pref_description">Zoeken op het web of direct een vraag stellen aan Duck.ai vanuit de adresbalk</string>
 </resources>
