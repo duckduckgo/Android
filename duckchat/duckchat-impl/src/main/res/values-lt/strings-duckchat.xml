@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adreso juosta</string>
     <string name="duck_chat_assist_settings_title">„Assist“ nustatymai</string>
     <string name="duck_chat_assist_settings_description">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Paieška</string>
+    <string name="input_screen_search_hint">Ieškoti arba įvesti adresą</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Paklausk „Duck.ai“</string>
+    <string name="input_screen_user_pref_title">Eksperimentinė adreso juosta</string>
+    <string name="input_screen_user_pref_description">Ieškok internete arba klausk „Duck.ai“ tiesiai iš adreso juostos</string>
 </resources>
