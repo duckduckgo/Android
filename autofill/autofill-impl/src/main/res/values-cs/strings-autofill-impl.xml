@@ -298,5 +298,7 @@
     <string name="passwords_import_promo_action">Import z Googlu</string>
     <string name="passwords_import_promo_in_browser_title">Přenes si hesla z Googlu do DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Už se znovu neptat</string>
+    <string name="passwords_import_promo_in_settings_title">Import hesel z Googlu</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Skrýt</string>
 
 </resources>

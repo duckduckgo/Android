@@ -298,5 +298,7 @@
     <string name="passwords_import_promo_action">Importuj z Google</string>
     <string name="passwords_import_promo_in_browser_title">Przenieś hasła z Google do DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Nie pytaj ponownie</string>
+    <string name="passwords_import_promo_in_settings_title">Importuj hasła z Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Ukryj</string>
 
 </resources>
