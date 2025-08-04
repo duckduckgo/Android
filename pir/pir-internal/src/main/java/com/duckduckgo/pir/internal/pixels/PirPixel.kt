@@ -28,56 +28,56 @@ enum class PirPixel(
 ) {
     PIR_INTERNAL_MANUAL_SCAN_STARTED(
         baseName = "pir_internal_manual-scan_started",
-        types = setOf(Count, Unique()),
+        type = Count,
     ),
 
     PIR_INTERNAL_MANUAL_SCAN_COMPLETED(
         baseName = "pir_internal_manual-scan_completed",
-        types = setOf(Count, Unique()),
-    ),
-
-    PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED(
-        baseName = "pir_internal_manual-scan_broker_started",
-        type = Count,
-    ),
-
-    PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED(
-        baseName = "pir_internal_manual-scan_broker_completed",
         type = Count,
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED(
         baseName = "pir_internal_scheduled-scan_scheduled",
-        types = setOf(Count, Unique()),
+        type = Count,
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_STARTED(
         baseName = "pir_internal_scheduled-scan_started",
-        types = setOf(Count, Unique()),
+        type = Count,
     ),
 
     PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED(
         baseName = "pir_internal_scheduled-scan_completed",
-        types = setOf(Count, Unique()),
-    ),
-
-    PIR_INTERNAL_SCHEDULED_SCAN_BROKER_STARTED(
-        baseName = "pir_internal_scheduled-scan_broker_started",
         type = Count,
     ),
 
-    PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED(
-        baseName = "pir_internal_scheduled-scan_broker_completed",
+    PIR_INTERNAL_SCAN_STATS(
+        baseName = "pir_internal_scan-stats",
         type = Count,
     ),
 
-    PIR_INTERNAL_OPT_OUT_RECORD_STARTED(
-        baseName = "pir_internal_optout_record_started",
+    PIR_INTERNAL_OPT_OUT_STATS(
+        baseName = "pir_internal_opt-out-stats",
         type = Count,
     ),
 
-    PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED(
-        baseName = "pir_internal_optout_record_completed",
+    PIR_INTERNAL_BROKER_SCAN_STARTED(
+        baseName = "pir_internal_broker_scan_started",
+        type = Count,
+    ),
+
+    PIR_INTERNAL_BROKER_SCAN_COMPLETED(
+        baseName = "pir_internal_broker_scan_completed",
+        type = Count,
+    ),
+
+    PIR_INTERNAL_BROKER_OPT_OUT_STARTED(
+        baseName = "pir_internal_opt-out_started",
+        type = Count,
+    ),
+
+    PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED(
+        baseName = "pir_internal_opt-out_completed",
         type = Count,
     ),
 
