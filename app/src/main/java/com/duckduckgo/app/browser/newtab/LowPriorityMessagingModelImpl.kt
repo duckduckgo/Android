@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.newtab
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.browser.newtab.LowPriorityMessage.DefaultBrowserMessage
@@ -31,10 +30,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class LowPriorityMessagingModelImpl @Inject constructor(
-    private val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val pixel: Pixel,
     private val context: Context,
@@ -57,10 +56,9 @@ class LowPriorityMessagingModelImpl @Inject constructor(
     }
 
     private suspend fun determineLowPriorityMessage(): LowPriorityMessage? {
+        logcat { "TAG_ANA calling determineLowPriorityMessage" }
         return when {
-            defaultBrowserPromptsFeatureToggles.self().isEnabled() &&
-                defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled() &&
-                defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == true -> {
+            defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == true -> {
                 DefaultBrowserMessage(
                     Message(
                         topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_device_mobile_default,
