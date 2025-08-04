@@ -17,7 +17,6 @@
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.CONVERTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
@@ -79,7 +78,5 @@ class DefaultBrowserPromptsFlowStageEvaluatorImpl @Inject constructor() : Defaul
             )
 
             STOPPED -> DefaultBrowserPromptsFlowStageAction.disableAll
-
-            CONVERTED -> DefaultBrowserPromptsFlowStageAction.disableAll
         }
 }

@@ -319,15 +319,15 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if user established, browser already set as default, then don't enroll and marked converted`() = runTest {
+    fun `evaluate - if user established, browser already set as default, then don't enroll and marked stopped`() = runTest {
         val testee = createTestee()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, atMostOnce()).storeExperimentStage(Stage.CONVERTED)
-        assertEquals(Stage.CONVERTED, dataStoreMock.stage.first())
+        verify(dataStoreMock, atMostOnce()).storeExperimentStage(Stage.STOPPED)
+        assertEquals(Stage.STOPPED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -559,7 +559,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if stage 1 and browser set as default, then convert`() = runTest {
+    fun `evaluate - if stage 1 and browser set as default, then stop and don't do anything else`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialStage = Stage.STAGE_1,
         )
@@ -568,22 +568,15 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        val action = DefaultBrowserPromptsFlowStageAction(
-            showMessageDialog = false,
-            showSetAsDefaultPopupMenuItem = false,
-            highlightPopupMenu = false,
-            showMessage = false,
-        )
-        whenever(stageEvaluatorMock.evaluate(Stage.CONVERTED)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(Stage.CONVERTED)
-        verify(stageEvaluatorMock).evaluate(Stage.CONVERTED)
+        verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
+        verify(stageEvaluatorMock, never()).evaluate(any())
     }
 
     @Test
-    fun `evaluate - if stage 2 and browser set as default, then convert`() = runTest {
+    fun `evaluate - if stage 2 and browser set as default, then stop and don't do anything else`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialStage = Stage.STAGE_2,
         )
@@ -592,40 +585,17 @@ class AdditionalDefaultBrowserPromptsImplTest {
         )
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-        val action = DefaultBrowserPromptsFlowStageAction(
-            showMessageDialog = false,
-            showSetAsDefaultPopupMenuItem = false,
-            highlightPopupMenu = false,
-            showMessage = false,
-        )
-        whenever(stageEvaluatorMock.evaluate(Stage.CONVERTED)).thenReturn(action)
-        testee.onResume(lifecycleOwnerMock)
-
-        verify(dataStoreMock).storeExperimentStage(Stage.CONVERTED)
-        verify(stageEvaluatorMock).evaluate(Stage.CONVERTED)
-    }
-
-    @Test
-    fun `evaluate - if stopped and browser set as default, then don't convert`() = runTest {
-        val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.STOPPED,
-        )
-        val testee = createTestee(
-            defaultBrowserPromptsDataStore = dataStoreMock,
-        )
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
         verify(stageEvaluatorMock, never()).evaluate(any())
     }
 
     @Test
-    fun `evaluate - if converted and browser set as default, then don't convert again`() = runTest {
+    fun `evaluate - if stopped and browser set as default, then don't do anything`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.CONVERTED,
+            initialStage = Stage.STOPPED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,

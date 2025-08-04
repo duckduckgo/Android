@@ -50,7 +50,6 @@ interface DefaultBrowserPromptsDataStore {
         STAGE_2,
         STAGE_3,
         STOPPED,
-        CONVERTED,
     }
 }
 

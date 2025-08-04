@@ -28,7 +28,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MENU
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.UNKNOWN
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.CONVERTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
@@ -215,25 +214,19 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         }
 
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
-
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
-
-        val hasConvertedBefore = defaultBrowserPromptsDataStore.stage.firstOrNull() == CONVERTED
-        logcat { "evaluate: has converted before = $hasConvertedBefore" }
-        if (hasConvertedBefore) {
-            return
-        }
 
         val currentStage = defaultBrowserPromptsDataStore.stage.firstOrNull()
         logcat { "evaluate: current stage = $currentStage" }
         val newStage = if (isDefaultBrowser) {
-            logcat { "evaluate: new stage is CONVERTED" }
-            CONVERTED
+            logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED and return." }
+            defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
+            return
         } else if (currentStage == NOT_ENROLLED) {
             logcat { "evaluate: new stage is ENROLLED" }
             ENROLLED
         } else {
-            logcat { "evaluate: new stage is other than CONVERTED or ENROLLED" }
+            logcat { "evaluate: current stage is other than NOT_ENROLLED and DuckDuckGo is NOT default browser." }
             val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
