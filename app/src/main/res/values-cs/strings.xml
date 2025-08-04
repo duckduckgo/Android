@@ -919,4 +919,34 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget na plochu</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Dokonči své nastavení</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Zdravíme tě.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Jsi připravený na rychlejší prohlížeč, který tě ochrání?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ochrana</b> <i>je aktivní!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Zdravíme tě!<br/>Už se těšíš na rychlejší prohlížeč, který tě ochrání?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Zkus ji!</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[a %1$d další tracker se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="few"><![CDATA[a %1$d další trackery se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="many"><![CDATA[a %1$d dalšího trackeru se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="other"><![CDATA[a %1$d dalších trackerů se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">Tenhle tracker jsem ale zablokoval!</font>]]></item>
+        <item quantity="few"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="many"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="other"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Klepnutím na štít si zobrazíš další informace.️</string>
+
 </resources>

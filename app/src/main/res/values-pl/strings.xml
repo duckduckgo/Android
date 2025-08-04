@@ -919,4 +919,34 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widżet ekranu głównego</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Dokończ swoją konfigurację</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Cześć!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ochrona</b> <i>aktywowana!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Cześć.<br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Spróbuj!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ i %1$d inny element próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="few"><![CDATA[ i %1$d inne elementy próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="many"><![CDATA[ i %1$d innych elementów próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="other"><![CDATA[ i %1$d innego elementu próbowało Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ element próbował Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem go!</font>]]></item>
+        <item quantity="few"><![CDATA[ elementy próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="many"><![CDATA[ elementów próbowało Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="other"><![CDATA[ elementu próbowało Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Dotknij tarczy, aby uzyskać więcej informacji.️</string>
+
 </resources>

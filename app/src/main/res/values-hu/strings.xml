@@ -887,4 +887,30 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Beállítás végrehajtása</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Szia!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Felkészültél egy gyorsabb böngészőre, amely védelmet nyújt neked?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Védelem</b> <i>aktiválva!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Szia!<br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Töröld azonnal a böngészési adataidat a <font color=\"#F05C2B\">Fire Button</font> használatával]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Próbáld ki!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ és %1$d másik webhely próbált téged követni itt. <font color=\"#F05C2B\">Blokkoltam őket!</font>]]></item>
+        <item quantity="other"><![CDATA[ és %1$d másik webhely próbált téged követni itt. <font color=\"#F05C2B\">Blokkoltam őket!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ követni próbált téged itt. <font color=\"#F05C2B\">Blokkoltam!</font>]]></item>
+        <item quantity="other"><![CDATA[ követni próbált téged itt. <font color=\"#F05C2B\">Blokkoltam őket!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝További információkért koppints a pajzsra.️</string>
+
 </resources>

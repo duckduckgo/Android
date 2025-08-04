@@ -20,4 +20,5 @@ object PirJobConstants {
     const val DBP_INITIAL_URL = "dbp://blank"
     const val RECOVERY_URL = "https://duckduckgo.com/"
     const val MAX_DETACHED_WEBVIEW_COUNT = 20
+    const val SCHEDULED_SCAN_INTERVAL_HOURS = 12L
 }

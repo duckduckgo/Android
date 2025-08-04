@@ -119,7 +119,11 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
             if (favourites.size == newList.size) {
                 savedSitesRepository.updateWithPosition(newList.map { it })
             } else {
-                val updatedList = newList.plus(favourites.takeLast(favourites.size - newList.size))
+                val updatedList = if (favourites.size > newList.size) {
+                    newList.plus(favourites.takeLast(favourites.size - newList.size))
+                } else {
+                    newList
+                }
                 savedSitesRepository.updateWithPosition(updatedList.map { it })
             }
         }

@@ -887,4 +887,30 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Kurulumu Tamamlayın</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Merhaba.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Korumalar</b> <i>etkinleştirildi!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Merhaba.<br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[<font color=\"#F05C2B\">Fire Button</font> ile göz atma etkinliğinizi anında temizleyin]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Hemen deneyin!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ve %1$d site daha sizi burada takip etmeye çalışıyordu. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+        <item quantity="other"><![CDATA[ ve %1$d site daha sizi burada takip etmeye çalışıyordu. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyorlardı. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Daha fazla bilgi için kalkana dokunun.️</string>
+
 </resources>

@@ -887,4 +887,30 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Уиджет на началния екран</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Завършете настройките</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Здравейте.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Готови ли сте за по-бърз браузър, който осигурява защита?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Защитите са</b> <i>активирани!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Здравейте!<br/>Готови ли сте за по-бърз браузър, който ви осигурява защита?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Изпробвайте го!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ и %1$d други се опитваха да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
+        <item quantity="other"><![CDATA[ и %1$d други се опитваха да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ се опитваха да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
+        <item quantity="other"><![CDATA[ Опитваха се да те проследят тук. <font color=\"#F05C2B\">Блокирах ги!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Докоснете щита за повече информация.️</string>
+
 </resources>

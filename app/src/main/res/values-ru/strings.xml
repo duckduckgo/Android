@@ -919,4 +919,34 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Виджет для главного экрана</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Завершение настройки</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Привет!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Быстрый и надежный браузер заказывали?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Защита</b> <i>включена!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Привет!<br/>Быстрый и надежный браузер заказывали?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Кнопка <font color=\"#F05C2B\">Fire Button</font> моментально стирает данные о посещении сайтов]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Попробуйте!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ и еще %1$d сервис пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="few"><![CDATA[ и еще %1$d сервиса пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="many"><![CDATA[ и еще %1$d сервисов пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="other"><![CDATA[ и другие сервисы (%1$d) пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ пытался вести за вами слежку, <font color=\"#F05C2B\">но мы его заблокировали</font>!]]></item>
+        <item quantity="few"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="many"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+        <item quantity="other"><![CDATA[ пытались вести за вами слежку, <font color=\"#F05C2B\">но мы их заблокировали</font>!]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Нажмите на щит, чтобы узнать подробности.️</string>
+
 </resources>

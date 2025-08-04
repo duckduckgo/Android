@@ -887,4 +887,30 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Startschermwidget</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Je instelling voltooien</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hoi.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Klaar voor een snellere browser die je beschermt?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Bescherming</b> <i>geactiveerd!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hoi.<br />Klaar voor een snellere browser die je beschermt?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Wis je browse-activiteit direct met de <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Probeer het maar eens!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ en %1$d ander probeerde je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+        <item quantity="other"><![CDATA[ en %1$d anderen probeerden je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ probeerde je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+        <item quantity="other"><![CDATA[ probeerden je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tik op het pictogram voor meer informatie.️</string>
+
 </resources>

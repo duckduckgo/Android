@@ -887,4 +887,30 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget de pantalla de inicio</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Completa tu configuración</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hola.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">¿Todo listo para un navegador más rápido que mantiene tu protección?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[¡<b>Protecciones</b> <i>activadas</i>!]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hola.<br/>¿Todo listo para un navegador más rápido que mantiene tu protección?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Borra al instante tu actividad de navegación con el <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">¡Pruébalo!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ y %1$d persona más han intentado rastrearte aquí. <font color=\"#F05C2B\">¡Los he bloqueado!</font>]]></item>
+        <item quantity="other"><![CDATA[ y %1$d personas más han intentado rastrearte aquí. <font color=\"#F05C2B\">¡Los he bloqueado!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ ha intentado rastrearte aquí. <font color=\"#F05C2B\">¡Lo he bloqueado!</font>]]></item>
+        <item quantity="other"><![CDATA[ han intentado rastrearte aquí. <font color=\"#F05C2B\">¡Los he bloqueado!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Pulsa en el escudo para obtener más información.️</string>
+
 </resources>

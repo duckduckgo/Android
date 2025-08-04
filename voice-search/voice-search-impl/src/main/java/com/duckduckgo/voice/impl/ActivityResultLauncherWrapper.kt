@@ -61,7 +61,7 @@ class RealActivityResultLauncherWrapper @Inject constructor(
 ) : ActivityResultLauncherWrapper {
 
     private var permissionLauncher: ActivityResultLauncher<String>? = null
-    private lateinit var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>
+    private var voiceSearchActivityLaucher: ActivityResultLauncher<Intent>? = null
 
     override fun register(
         caller: ActivityResultCaller,
@@ -99,7 +99,7 @@ class RealActivityResultLauncherWrapper @Inject constructor(
     }
 
     private fun launchVoiceSearch() {
-        voiceSearchActivityLaucher.launch(Intent(context, VoiceSearchActivity::class.java))
+        voiceSearchActivityLaucher?.launch(Intent(context, VoiceSearchActivity::class.java))
     }
 
     private fun launchPermissionRequest() {

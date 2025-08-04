@@ -286,5 +286,7 @@
     <string name="passwords_import_promo_action">Импортиране от Google</string>
     <string name="passwords_import_promo_in_browser_title">Прехвърли паролите си от Google в DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Не ме питай повече</string>
+    <string name="passwords_import_promo_in_settings_title">Импортиране на пароли от Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Скрий</string>
 
 </resources>

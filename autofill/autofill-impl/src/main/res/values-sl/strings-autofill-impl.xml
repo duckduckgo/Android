@@ -298,5 +298,7 @@
     <string name="passwords_import_promo_action">Uvozi iz Googla</string>
     <string name="passwords_import_promo_in_browser_title">Prenesite gesla iz Googla v DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Ne vprašaj več</string>
+    <string name="passwords_import_promo_in_settings_title">Uvozi gesla iz Googla</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Skrij se</string>
 
 </resources>
