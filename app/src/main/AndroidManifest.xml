@@ -106,6 +106,21 @@
         </activity-alias>
 
         <activity-alias
+            android:name="com.duckduckgo.app.launch.LauncherPink"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_pink"
+            android:roundIcon="@mipmap/ic_launcher_pink_round"
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_BROWSER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
             android:name="com.duckduckgo.app.launch.LauncherBlue"
             android:enabled="false"
             android:exported="true"

@@ -46,6 +46,10 @@ enum class AppIcon(
         componentName = "$QUALIFIER.Launcher",
         icon = R.mipmap.ic_launcher_red_round,
     ),
+    PINK(
+        componentName = "$QUALIFIER.LauncherPink",
+        icon = R.mipmap.ic_launcher_pink_round,
+    ),
     GOLD(
         componentName = "$QUALIFIER.LauncherGold",
         icon = R.mipmap.ic_launcher_gold,
