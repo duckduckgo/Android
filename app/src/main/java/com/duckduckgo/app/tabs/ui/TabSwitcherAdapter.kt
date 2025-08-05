@@ -403,10 +403,18 @@ class TabSwitcherAdapter(
                 try {
                     glide.load(cachedWebViewPreview)
                         .transition(DrawableTransitionOptions.withCrossFade())
-                        .transform(
-                            fitAndClipBottom(),
-                            RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
-                        )
+                        .let {
+                            if (isVisualExperimentEnabled) {
+                                it.transform(
+                                    fitAndClipBottom(),
+                                    RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius))
+                                )
+                            } else {
+                                it.transform(
+                                    fitAndClipBottom()
+                                )
+                            }
+                        }
                         .into(tabPreview)
                 } catch (e: Exception) {
                     logcat(ERROR) { "Error loading tab preview for ${tab.tabId}: ${e.message}" }
