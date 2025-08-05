@@ -27,10 +27,10 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.FALLBACK_TO_DEFAULT_APPS_SCREEN_THRESHOLD_MILLIS
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.Companion.PIXEL_PARAM_KEY_STAGE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPromptsImpl.FeatureSettingsConfigModel
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageRepository
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
@@ -94,7 +94,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
     @Mock private lateinit var defaultBrowserDetectorMock: DefaultBrowserDetector
 
-    @Mock private lateinit var experimentAppUsageRepositoryMock: ExperimentAppUsageRepository
+    @Mock private lateinit var defaultBrowserPromptsAppUsageRepositoryMock: DefaultBrowserPromptsAppUsageRepository
 
     @Mock private lateinit var userStageStoreMock: UserStageStore
 
@@ -356,7 +356,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
@@ -388,7 +388,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
 
         testee.onResume(lifecycleOwnerMock)
 
@@ -414,7 +414,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(1))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(1))
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
@@ -445,7 +445,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 6,
             activeDaysUntilStop = 8,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(2))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(2))
 
         testee.onResume(lifecycleOwnerMock)
 
@@ -472,7 +472,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
                 activeDaysUntilStage3 = 6,
                 activeDaysUntilStop = 8,
             )
-            whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(2))
+            whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(2))
 
             testee.onResume(lifecycleOwnerMock)
 
@@ -498,7 +498,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
@@ -530,7 +530,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
                 activeDaysUntilStage3 = 4,
                 activeDaysUntilStop = 5,
             )
-            whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+            whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
             val action = DefaultBrowserPromptsFlowStageAction(
                 showMessageDialog = true,
                 showSetAsDefaultPopupMenuItem = false,
@@ -561,7 +561,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 6,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
 
         testee.onResume(lifecycleOwnerMock)
 
@@ -585,7 +585,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = true,
             showSetAsDefaultPopupMenuItem = false,
@@ -673,7 +673,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(1))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(1))
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_1)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
@@ -704,7 +704,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
@@ -736,7 +736,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             highlightPopupMenu = true,
             showMessage = false,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
@@ -762,7 +762,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
-        whenever(experimentAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
         whenever(stageEvaluatorMock.evaluate(any())).thenReturn(mock())
 
         testee.onResume(lifecycleOwnerMock)
@@ -863,7 +863,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(experimentAppUsageRepositoryMock).recordAppUsedNow()
+        verify(defaultBrowserPromptsAppUsageRepositoryMock).recordAppUsedNow()
     }
 
     private fun createTestee(
@@ -873,7 +873,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles = featureTogglesMock,
         defaultBrowserDetector: DefaultBrowserDetector = defaultBrowserDetectorMock,
         defaultRoleBrowserDialog: DefaultRoleBrowserDialog = defaultRoleBrowserDialogMock,
-        experimentAppUsageRepository: ExperimentAppUsageRepository = experimentAppUsageRepositoryMock,
+        defaultBrowserPromptsAppUsageRepository: DefaultBrowserPromptsAppUsageRepository = defaultBrowserPromptsAppUsageRepositoryMock,
         userStageStore: UserStageStore = userStageStoreMock,
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
         experimentStageEvaluator: DefaultBrowserPromptsFlowStageEvaluator = stageEvaluatorMock,
@@ -886,7 +886,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         defaultBrowserPromptsFeatureToggles = defaultBrowserPromptsFeatureToggles,
         defaultBrowserDetector = defaultBrowserDetector,
         defaultRoleBrowserDialog = defaultRoleBrowserDialog,
-        experimentAppUsageRepository = experimentAppUsageRepository,
+        defaultBrowserPromptsAppUsageRepository = defaultBrowserPromptsAppUsageRepository,
         userStageStore = userStageStore,
         defaultBrowserPromptsDataStore = defaultBrowserPromptsDataStore,
         stageEvaluator = experimentStageEvaluator,

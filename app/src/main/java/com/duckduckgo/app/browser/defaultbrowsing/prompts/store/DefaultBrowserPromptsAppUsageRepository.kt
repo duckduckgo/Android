@@ -16,20 +16,17 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts.store
 
-import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import java.time.format.DateTimeParseException
 
 /**
- * Tracks the days app is used to leverage for purposes related to experiments run with the [NA Experiment Framework](https://app.asana.com/0/1208889145294658/1208889101183474).
- *
- * See [Cohort.enrollmentDateET] for how the framework stores enrollment dates.
+ * Tracks the days the app is used and is part of the Default Browser Prompts flow.
  */
-interface ExperimentAppUsageRepository {
+interface DefaultBrowserPromptsAppUsageRepository {
 
     suspend fun recordAppUsedNow()
 
     /**
-     * Returns the number of active days the app has been used since enrollment.
+     * Returns the number of active days the app has been used since the user entered the  Default Browser Prompts flow.
      *
      * Crossing a dateline in local time will not increment the returned count.
      * Only if a given instant crossed dateline in ET timezone, the value will be incremented.

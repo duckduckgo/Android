@@ -28,6 +28,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.MESSAGE
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.PROMPT
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.UNKNOWN
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageRepository
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
@@ -35,7 +36,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -96,7 +96,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles,
     private val defaultBrowserDetector: DefaultBrowserDetector,
     private val defaultRoleBrowserDialog: DefaultRoleBrowserDialog,
-    private val experimentAppUsageRepository: ExperimentAppUsageRepository,
+    private val defaultBrowserPromptsAppUsageRepository: DefaultBrowserPromptsAppUsageRepository,
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
@@ -211,7 +211,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return
         }
 
-        experimentAppUsageRepository.recordAppUsedNow()
+        defaultBrowserPromptsAppUsageRepository.recordAppUsedNow()
 
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
@@ -230,7 +230,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             ENROLLED
         } else {
             logcat { "evaluate: current stage is other than NOT_ENROLLED and DuckDuckGo is NOT default browser." }
-            val appActiveDaysUsedSinceEnrollment = experimentAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
+            val appActiveDaysUsedSinceEnrollment = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
