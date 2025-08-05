@@ -407,11 +407,11 @@ class TabSwitcherAdapter(
                             if (isVisualExperimentEnabled) {
                                 it.transform(
                                     fitAndClipBottom(),
-                                    RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius))
+                                    RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
                                 )
                             } else {
                                 it.transform(
-                                    fitAndClipBottom()
+                                    fitAndClipBottom(),
                                 )
                             }
                         }
