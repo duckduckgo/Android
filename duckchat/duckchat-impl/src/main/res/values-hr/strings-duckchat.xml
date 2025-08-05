@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adresna traka</string>
     <string name="duck_chat_assist_settings_title">Postavke Assista</string>
     <string name="duck_chat_assist_settings_description">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Pretraga</string>
+    <string name="input_screen_search_hint">Pretraži ili unesi adresu</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Pitaj Duck.ai</string>
+    <string name="input_screen_user_pref_title">Eksperimentalna adresna traka</string>
+    <string name="input_screen_user_pref_description">Pretraži mrežu ili pitaj Duck.ai izravno iz adresne trake</string>
 </resources>
