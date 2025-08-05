@@ -94,25 +94,16 @@
             app:typography="h5"
             tools:text="Slashdot" />
 
-        <com.google.android.material.card.MaterialCardView
+        <ImageView
+            android:id="@+id/tabPreview"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/keyline_2"
-            app:cardElevation="@dimen/keyline_empty"
+            android:layout_height="@dimen/gridItemPreviewHeightNew"
             android:layout_marginTop="6dp"
+            android:importantForAccessibility="no"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/close">
-
-            <ImageView
-                android:id="@+id/tabPreview"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/gridItemPreviewHeightNew"
-                android:importantForAccessibility="no"
-                android:scaleType="center" />
-
-        </com.google.android.material.card.MaterialCardView>
+            app:layout_constraintTop_toBottomOf="@id/close" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
