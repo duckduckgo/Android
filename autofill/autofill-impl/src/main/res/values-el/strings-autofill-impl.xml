@@ -240,7 +240,6 @@
 
     <string name="newTabPageShortcutPasswords">Κωδικοί πρόσβασης</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Εισαγωγή κωδικών πρόσβασης Google</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από το Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d κωδικοί πρόσβασης εισήχθησαν από CSV</string>
 
@@ -250,7 +249,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Συγχρονισμός κωδικών πρόσβασης υπολογιστών</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Εισαγωγή κωδικών πρόσβασης Google που διαθέτετε</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Η Google μπορεί να σας ζητήσει να συνδεθείτε ή να εισαγάγετε τον κωδικό πρόσβασής σας για επιβεβαίωση.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Εισαγωγή από το Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Επιλογή αρχείου CSV</string>

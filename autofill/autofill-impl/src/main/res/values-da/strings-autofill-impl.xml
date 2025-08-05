@@ -240,7 +240,6 @@
 
     <string name="newTabPageShortcutPasswords">Adgangskoder</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importer Google-adgangskoder</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d adgangskoder importeret fra Google.</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d adgangskoder importeret fra CSV</string>
 
@@ -250,7 +249,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkroniser adgangskoder med pc</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synkroniser adgangskoder med pc</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importer dine Google-adgangskoder</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importer fra Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vælg en CSV-fil</string>

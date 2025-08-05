@@ -246,7 +246,6 @@
 
     <string name="newTabPageShortcutPasswords">Parole</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importă parolele de la Google</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parole importate de la Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parole importate din CSV</string>
 
@@ -256,7 +255,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizează parolele de pe desktop</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizează parolele de pe desktop</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importă parolele tale Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google îți poate solicita să te conectezi sau să completezi parola pentru a confirma.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importă din Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Alege un fișier CSV</string>

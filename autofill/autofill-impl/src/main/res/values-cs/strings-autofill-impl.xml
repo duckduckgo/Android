@@ -252,7 +252,6 @@
 
     <string name="newTabPageShortcutPasswords">Hesla</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Import hesel z Googlu</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hesel importovaných z Googlu: %1$d</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hesel importovaných z CSV: %1$d</string>
 
@@ -262,7 +261,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizovat hesla na počítači</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizovat hesla na počítači</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importuj si hesla z Googlu</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google tě může požádat o přihlášení nebo potvrzení zadáním hesla.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Import z Googlu</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vybrat soubor CSV</string>

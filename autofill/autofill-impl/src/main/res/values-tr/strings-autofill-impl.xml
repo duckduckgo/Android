@@ -240,7 +240,6 @@
 
     <string name="newTabPageShortcutPasswords">Şifreler</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Google Şifrelerini İçe Aktar</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d şifre Google\'dan içe aktarıldı</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d şifre CSV\'den içe aktarıldı</string>
 
@@ -250,7 +249,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Masaüstü Şifrelerini Senkronize Et</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Masaüstü Şifrelerini Senkronize Et</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Google Şifrelerinizi İçe Aktarın</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Google\'dan İçe Aktar</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Bir CSV dosyası seç</string>

@@ -240,7 +240,6 @@
 
     <string name="newTabPageShortcutPasswords">Contraseñas</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importar contraseñas de Google</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d contraseñas importadas de Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d contraseñas importadas de CSV</string>
 
@@ -250,7 +249,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar contraseñas de escritorio</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar contraseñas de escritorio</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importa tus contraseñas de Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google puede pedirte que inicies sesión o introduzcas tu contraseña para confirmar.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importar desde Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Elige un archivo CSV</string>

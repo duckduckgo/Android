@@ -252,7 +252,6 @@
 
     <string name="newTabPageShortcutPasswords">Hasła</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importuj hasła Google</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hasła zaimportowane z Google: %1$d</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Hasła zaimportowane z CSV: %1$d</string>
 
@@ -262,7 +261,6 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synchronizuj hasła na komputerze</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synchronizuj hasła na komputerze</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importuj swoje hasła Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importuj z Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Wybierz plik CSV</string>
