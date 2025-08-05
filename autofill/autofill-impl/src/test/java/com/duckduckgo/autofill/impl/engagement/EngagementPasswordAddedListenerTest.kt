@@ -30,21 +30,21 @@ class EngagementPasswordAddedListenerTest {
     @Test
     fun whenDaysInstalledLessThan7ThenPixelSent() {
         whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(0)
-        testee.onCredentialAdded(0)
+        testee.onCredentialAdded(listOf(0))
         verifyPixelSentOnce()
     }
 
     @Test
     fun whenDaysInstalledExactly7ThenPixelNotSent() {
         whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(7)
-        testee.onCredentialAdded(0)
+        testee.onCredentialAdded(listOf(0))
         verifyPixelNotSent()
     }
 
     @Test
     fun whenDaysInstalledAbove7ThenPixelNotSent() {
         whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(10)
-        testee.onCredentialAdded(0)
+        testee.onCredentialAdded(listOf(0))
         verifyPixelNotSent()
     }
 
@@ -52,7 +52,7 @@ class EngagementPasswordAddedListenerTest {
     fun whenCalledMultipleTimesThenOnlySendsPixelOnce() {
         whenever(userBrowserProperties.daysSinceInstalled()).thenReturn(0)
         repeat(10) {
-            testee.onCredentialAdded(0)
+            testee.onCredentialAdded(listOf(0))
         }
         verifyPixelSentOnce()
     }
