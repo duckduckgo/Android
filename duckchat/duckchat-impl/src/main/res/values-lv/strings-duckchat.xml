@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adreses josla</string>
     <string name="duck_chat_assist_settings_title">Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Meklēt</string>
+    <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Pajautā Duck.ai</string>
+    <string name="input_screen_user_pref_title">Eksperimentālā adreses josla</string>
+    <string name="input_screen_user_pref_description">Meklē tīmeklī vai jautā Duck.ai tieši adrešu joslā</string>
 </resources>
