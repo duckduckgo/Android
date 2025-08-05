@@ -35,7 +35,7 @@ class RealSubscriptionsUrlProvider @Inject constructor(
 
     override val welcomeUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/welcome"
 
-    override val activateUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/subscriptions/activation-flow"
+    override val activateUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/activation-flow"
 
     override val manageUrl: String = "${subscriptionsBaseUrl.subscriptionsBaseUrl}/manage"
 }
