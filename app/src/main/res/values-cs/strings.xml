@@ -880,7 +880,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Používej DuckDuckGo a získej větší ochranu při prohlížení internetu</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás jako výchozí prohlížeč, aby se všechny odkazy na stránky otevíraly v DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Teď ne</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Už se znovu neptat</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo není tvůj výchozí prohlížeč. Získej větší ochranu.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastavit jako výchozí</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Už se znovu neptat</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">Služba DuckDuckGo blokuje trackery, aby tě chránila při prohlížení</string>
