@@ -921,7 +921,7 @@ class BrowserTabFragment :
 
             RESULT_CANCELED -> {
                 data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
-                    omnibar.setDraftTextIfNtp(query)
+                    omnibar.setDraftTextIfNtpOrSerp(query)
                 }
             }
         }

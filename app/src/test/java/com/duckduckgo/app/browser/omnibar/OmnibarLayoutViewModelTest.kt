@@ -1628,6 +1628,61 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
+    @Test
+    fun `when set draft and current state is NTP, then draft text applied`() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+        val expected = "test"
+        testee.setDraftTextIfNtpOrSerp(expected)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(expected, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun `when set draft and current state is SERP, then draft text applied`() = runTest {
+        givenSiteLoaded(SERP_URL)
+        val expected = "test"
+        testee.setDraftTextIfNtpOrSerp(expected)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(expected, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun `when set draft and current state is a web page, then draft text not applied`() = runTest {
+        val omnibarState = OmnibarViewState(
+            navigationChange = false,
+            omnibarText = RANDOM_URL,
+            forceExpand = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = true,
+                    trackersAnimationEnabled = true,
+                    progress = 100,
+                    url = RANDOM_URL,
+                ),
+            ),
+        )
+
+        val expected = RANDOM_URL
+        testee.setDraftTextIfNtpOrSerp("some draft text")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(expected, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
     private fun givenSiteLoaded(loadedUrl: String) {
         testee.onViewModeChanged(ViewMode.Browser(loadedUrl))
         testee.onExternalStateChange(
