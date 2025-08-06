@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.internal.store.db
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 /**
@@ -35,22 +36,36 @@ data class ScanCompletedBroker(
     val isSuccess: Boolean,
 )
 
-@Entity(tableName = "pir_extracted_profiles")
+@Entity(
+    tableName = "pir_extracted_profiles",
+    indices = [
+        Index(
+            value = [
+                "profileQueryId",
+                "brokerName",
+                "name",
+                "profileUrl",
+                "identifier",
+            ],
+            unique = true,
+        ),
+    ],
+)
 data class StoredExtractedProfile(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val profileQueryId: Long, // Unique identifier for the profileQuery
     val brokerName: String, // Unique identifier for broker in which the profile was found
-    val name: String? = null,
+    val name: String = "",
     val alternativeNames: List<String> = emptyList(),
-    val age: String? = null,
+    val age: String = "",
     val addresses: List<String> = emptyList(),
     val phoneNumbers: List<String> = emptyList(),
     val relatives: List<String> = emptyList(),
-    val profileUrl: String? = null, // This can be null for some brokers
-    val identifier: String? = null, // This can be null for some brokers
-    val reportId: String? = null,
-    val email: String? = null,
-    val fullName: String? = null,
+    val profileUrl: String = "", // This can be null for some brokers
+    val identifier: String = "", // This can be null for some brokers
+    val reportId: String = "",
+    val email: String = "",
+    val fullName: String = "",
     val dateAddedInMillis: Long = 0L, // Tells us when the extracted profile has been found
     val deprecated: Boolean = false, // This should tell us if the profile is irrelevant for PIR (this is not me, profile edits)
 )
