@@ -52,4 +52,20 @@
     <string name="input_screen_chat_hint">Pergunta ao Duck.ai</string>
     <string name="input_screen_user_pref_title">Barra de endereços experimental</string>
     <string name="input_screen_user_pref_description">Pesquise na web ou pergunte diretamente ao Duck.ai na barra de endereços</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Conversa em privado com modelos de IA exclusivos para subscritores.\n<a href=\"\">Sabe mais</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Abrir Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Saiba mais</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Funcionalidades de IA</string>
+    <string name="duck_chat_settings_activity_description_rebranding">As funcionalidades de IA do DuckDuckGo são privadas e opcionais.Os teus dados não são utilizados para treinar a IA.\n<annotation type="learn_more_link">Sabe mais</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Conversa anonimamente com modelos de chat com IA populares de terceiros</string>
+    <string name="duck_chat_show_in_heading_rebranding">Atalhos Duck.ai</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Definições do Assist de pesquisa</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Escolhe a frequência com que queres que as respostas assistidas por IA apareçam nas suas pesquisas</string>
 </resources>
