@@ -22,6 +22,7 @@ object PIRWebUiConstants {
     // internal const val SCRIPT_CONTEXT_NAME = "dbpui"
     internal const val SCRIPT_FEATURE_NAME = "dbpui" // "dbpuiCommunication"
     internal const val SCRIPT_CONTEXT_NAME = "contentScopeScripts"
-    internal const val MESSAGE_CALLBACK = "dbpuiCommunication"
+    internal const val MESSAGE_CALLBACK = "messageCallback"
+    internal const val SECRET = "duckduckgo-android-messaging-secret" // "messageSecret"
     // internal const val SCRIPT_FEATURE_NAME = "brokerProtection"
 }

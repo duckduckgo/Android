@@ -44,12 +44,12 @@ class RealPirCssScriptLoader @Inject constructor(
         return withContext(dispatcherProvider.io()) {
             if (contentScopeJS.isNullOrBlank()) {
                 contentScopeJS = loadJs("contentScope.js")
-                // contentScopeJS = loadJs("brokerProtection.js").run {
-                //     this.replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
-                //         .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
-                //         .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
-                //         .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
-                // }
+                /*contentScopeJS = loadJs("brokerProtection.js").run {
+                    this.replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                        .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
+                        .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
+                        .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+                }*/
             }
             contentScopeJS!!
         }
@@ -59,7 +59,7 @@ class RealPirCssScriptLoader @Inject constructor(
 
     private fun getCallbackKeyValuePair(): String = "\"messageCallback\":\"${PIRWebUiConstants.MESSAGE_CALLBACK}\""
 
-    private fun getSecretKeyValuePair(): String = "\"messageSecret\":\"messageSecret\""
+    private fun getSecretKeyValuePair(): String = "\"messageSecret\":\"${PIRWebUiConstants.SECRET}\""
 
     private fun getContentScopeJson(): String {
         // TODO : Get this string from privacy config

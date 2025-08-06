@@ -32,6 +32,8 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import logcat.logcat
+import org.json.JSONArray
+import org.json.JSONObject
 
 class PirWebMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
@@ -79,14 +81,85 @@ class PirWebMessagingInterface @Inject constructor(
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
 
-            jsMessage?.let {
+            when (jsMessage?.method) {
+                "handshake" -> {
+                    logcat { "PIR-WEB: Handshake received" }
+                    jsMessageHelper.sendJsResponse(
+                        JsRequestResponse.Success(
+                            context = "dbpui", // PIRWebUiConstants.SCRIPT_CONTEXT_NAME,
+                            featureName = "dbpuiCommunication",
+                            method = "handshake",
+                            id = jsMessage.id ?: "",
+                            result = JSONObject().apply {
+                                put("success", true)
+                                put("version", jsMessage.params?.getInt("version") ?: 10)
+                                putOpt(
+                                    "userData",
+                                    JSONObject().apply {
+                                        put("isAuthenticatedUser", "true")
+                                    },
+                                )
+                            /* put("userData", JSONObject().apply {)
+                                 put("isAuthenticatedUser", "true")
+                             }.toString())*/
+                            },
+                        ),
+                        callbackName, secret, webView,
+                    )
+                }
+                "getCurrentUserProfile" -> {
+                    logcat { "PIR-WEB: getCurrentUserProfile received" }
+                    jsMessageHelper.sendJsResponse(
+                        JsRequestResponse.Success(
+                            context = "dbpui", // PIRWebUiConstants.SCRIPT_CONTEXT_NAME,
+                            featureName = "dbpuiCommunication",
+                            method = "getCurrentUserProfile",
+                            id = jsMessage.id ?: "",
+                            result = JSONObject().apply {
+                                put("success", false)
+                                put("version", 10) // jsMessage.params.getInt("version") ?: 10)
+                            },
+                        ),
+                        callbackName, secret, webView,
+                    )
+                }
+                "initialScanStatus" -> {
+                    logcat { "PIR-WEB: Initial scan status received" }
+                    jsMessageHelper.sendJsResponse(
+                        JsRequestResponse.Success(
+                            context = "dbpui", // PIRWebUiConstants.SCRIPT_CONTEXT_NAME,
+                            featureName = "dbpuiCommunication",
+                            method = "initialScanStatus",
+                            id = jsMessage.id ?: "",
+                            result = JSONObject().apply {
+                                put("success", false)
+                                put("version", 10) // jsMessage.params.getInt("version") ?: 10)
+                                putOpt("resultsFound", JSONArray())
+                                putOpt("scanProgress", JSONArray())
+                            },
+                        ),
+                        callbackName, secret, webView,
+                    )
+                }
+                else -> {
+                    logcat { "PIR-WEB: Unknown method ${jsMessage?.method}" }
+                    jsMessageCallback.process(
+                        featureName = jsMessage?.featureName ?: PIRWebUiConstants.SCRIPT_FEATURE_NAME,
+                        method = jsMessage?.method ?: "",
+                        id = jsMessage?.id ?: "",
+                        data = jsMessage?.params ?: JSONObject(),
+                    )
+                }
+            }
+
+            /*jsMessage?.let {
                 logcat { jsMessage.toString() }
                 if (this.secret == secret && context == jsMessage.context) {
                     handlers.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
                     }?.process(jsMessage, secret, jsMessageCallback)
                 }
-            }
+            }*/
         } catch (e: Exception) {
             logcat { "Exception is ${e.message}" }
         }
@@ -107,7 +180,7 @@ class PirWebMessagingInterface @Inject constructor(
 
     override val context: String = PIRWebUiConstants.SCRIPT_CONTEXT_NAME
     override val callbackName: String = PIRWebUiConstants.MESSAGE_CALLBACK // "dbpui" // "messageCallback"
-    override val secret: String = "messageSecret"
+    override val secret: String = PIRWebUiConstants.SECRET
     override val allowedDomains: List<String> = listOf(/*"duckduckgo.com"*/)
 
     // override val context: String = "subscriptionPages"
