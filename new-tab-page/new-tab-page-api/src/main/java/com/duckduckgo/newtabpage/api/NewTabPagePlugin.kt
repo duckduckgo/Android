@@ -29,9 +29,13 @@ interface NewTabPagePlugin : ActivePlugin {
 
     /**
      * This method returns a [View] that will be used as the NewTabPage content
+     * @param context The context to create the view with
+     * @param showLogo Whether to show the logo in the new tab page
      * @return [View]
      */
-    fun getView(context: Context): View
+    fun getView(context: Context, showLogo: Boolean = true): View {
+        return getView(context)
+    }
 
     companion object {
         const val PRIORITY_LEGACY_NTP = 0

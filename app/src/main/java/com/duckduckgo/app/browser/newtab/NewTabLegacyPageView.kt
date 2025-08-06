@@ -73,6 +73,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
+    private val showLogo: Boolean = true,
 ) : LinearLayout(context, attrs, defStyle) {
 
     @Inject
@@ -136,10 +137,15 @@ class NewTabLegacyPageView @JvmOverloads constructor(
         val isHomeBackgroundLogoVisible = (!viewState.onboardingComplete || viewState.message == null) &&
             viewState.favourites.isEmpty()
 
-        if (isHomeBackgroundLogoVisible) {
-            homeBackgroundLogo.showLogo()
+        if (!showLogo && isHomeBackgroundLogoVisible) {
+            this.gone()
         } else {
-            homeBackgroundLogo.hideLogo()
+            this.show()
+            if (isHomeBackgroundLogoVisible) {
+                homeBackgroundLogo.showLogo()
+            } else {
+                homeBackgroundLogo.hideLogo()
+            }
         }
         if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)
