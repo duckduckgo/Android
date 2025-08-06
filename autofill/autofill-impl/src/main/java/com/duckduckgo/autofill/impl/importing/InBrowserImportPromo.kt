@@ -53,7 +53,7 @@ class RealInBrowserImportPromo @Inject constructor(
                 return@withContext false
             }
 
-            if (url == null) {
+            if (url == null || url.isExcludedFromPromo()) {
                 return@withContext false
             }
 
@@ -93,6 +93,10 @@ class RealInBrowserImportPromo @Inject constructor(
         }
     }
 
+    private fun String.isExcludedFromPromo(): Boolean {
+        return this.startsWith(EMAIL_PROTECTION_SETTINGS_URL_PREFIX)
+    }
+
     private fun featureEnabled(): Boolean {
         if (autofillFeature.self().isEnabled().not()) return false
         if (autofillFeature.canPromoteImportGooglePasswordsInBrowser().isEnabled().not()) return false
@@ -102,5 +106,6 @@ class RealInBrowserImportPromo @Inject constructor(
     companion object {
         const val MAX_PROMO_SHOWN_COUNT = 5
         const val MAX_CREDENTIALS_FOR_PROMO = 25
+        private const val EMAIL_PROTECTION_SETTINGS_URL_PREFIX = "https://duckduckgo.com/email/"
     }
 }
