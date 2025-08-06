@@ -35,7 +35,7 @@ import javax.inject.Inject
 )
 class NewTabPage @Inject constructor() : NewTabPagePlugin {
 
-    override fun getView(context: Context): View {
-        return NewTabPageView(context)
+    override fun getView(context: Context, showLogo: Boolean): View {
+        return NewTabPageView(context, showLogo = showLogo)
     }
 }
