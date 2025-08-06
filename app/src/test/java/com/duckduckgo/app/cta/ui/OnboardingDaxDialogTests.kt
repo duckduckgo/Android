@@ -45,6 +45,7 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -86,6 +87,7 @@ class OnboardingDaxDialogTests {
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
     private val mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles = mock()
+    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
     val mockDisabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn false }
@@ -115,6 +117,7 @@ class OnboardingDaxDialogTests {
             mockSenseOfProtectionExperiment,
             mockOnboardingHomeScreenWidgetExperiment,
             mockOnboardingDesignExperimentToggles,
+            mockRebrandingFeatureToggle,
         )
     }
 
