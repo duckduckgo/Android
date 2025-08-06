@@ -1264,10 +1264,17 @@ sealed class DaxBubbleCta(
             binding.daxDialogOption3,
         )
 
-        if (configuration is DaxEndCta) {
-            binding.headerImage.show()
-            binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
-            binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+        when (configuration) {
+            is DaxEndCta -> {
+                binding.headerImage.show()
+                binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
+                binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+            }
+            is DaxPrivacyProCta -> {
+                binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
+                binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+            }
+            else -> Unit
         }
 
         primaryCta?.let { primaryCtaRes ->
@@ -1283,6 +1290,13 @@ sealed class DaxBubbleCta(
                 show()
                 alpha = 0f
                 text = context.getString(secondaryCtaRes)
+            }
+        }
+
+        placeholder?.let {
+            with(binding.placeholderImageView) {
+                show()
+                alpha = 0f
             }
         }
 
@@ -1311,6 +1325,7 @@ sealed class DaxBubbleCta(
             val afterAnimation = {
                 daxBubbleDialogTitle.finishAnimation()
                 dialogTextCta.finishAnimation()
+                placeholder?.let { placeholderImageView.fadeIn() }
                 primaryCta.fadeIn()
                 secondaryCta.fadeIn()
                 options?.let {
@@ -1387,6 +1402,13 @@ sealed class DaxBubbleCta(
             }
         }
 
+        placeholder?.let {
+            with(binding.placeholderImageView) {
+                show()
+                alpha = 0f
+            }
+        }
+
         options?.let { options ->
             // Buck dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
             val buckOptions = options
@@ -1432,6 +1454,7 @@ sealed class DaxBubbleCta(
 
             val afterAnimation = {
                 dialogTextCta.finishAnimation()
+                placeholder?.let { placeholderImageView.fadeIn() }
                 primaryCta.fadeIn()
                 secondaryCta.fadeIn()
                 options?.let {

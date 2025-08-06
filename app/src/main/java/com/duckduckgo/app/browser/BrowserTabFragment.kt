@@ -4479,7 +4479,10 @@ class BrowserTabFragment :
                 }
 
                 setOnPrimaryCtaClicked {
-                    if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                    if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                        newBrowserTab.buckEndAnimation.isGone = true
+                        viewModel.onUserClickCtaOkButton(configuration)
+                    } else if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
                         configuration.hideBBEndCta(
                             onAnimationEnd = {
                                 viewModel.onUserClickCtaOkButton(configuration)
