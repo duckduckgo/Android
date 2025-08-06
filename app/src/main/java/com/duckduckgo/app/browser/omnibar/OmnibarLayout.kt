@@ -1038,8 +1038,8 @@ open class OmnibarLayout @JvmOverloads constructor(
         omnibarTextListener?.onTrackersCountFinished()
     }
 
-    fun setDraftTextIfNtp(query: String) {
-        viewModel.setDraftTextIfNtp(query)
+    fun setDraftTextIfNtpOrSerp(query: String) {
+        viewModel.setDraftTextIfNtpOrSerp(query)
     }
 
     private fun enableTextInputClickCatcher(enabled: Boolean) {

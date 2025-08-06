@@ -36,6 +36,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
@@ -74,6 +75,7 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
@@ -398,10 +400,26 @@ class TabSwitcherAdapter(
                     return@launch
                 }
 
-                glide.load(cachedWebViewPreview)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .optionalTransform(fitAndClipBottom())
-                    .into(tabPreview)
+                try {
+                    glide.load(cachedWebViewPreview)
+                        .transition(DrawableTransitionOptions.withCrossFade())
+                        .let {
+                            if (isVisualExperimentEnabled) {
+                                it.transform(
+                                    fitAndClipBottom(),
+                                    RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
+                                )
+                            } else {
+                                it.transform(
+                                    fitAndClipBottom(),
+                                )
+                            }
+                        }
+                        .into(tabPreview)
+                } catch (e: Exception) {
+                    logcat(ERROR) { "Error loading tab preview for ${tab.tabId}: ${e.message}" }
+                    glide.load(AndroidR.drawable.ic_dax_icon_72).into(tabPreview)
+                }
             }
         } else {
             glide.clear(tabPreview)

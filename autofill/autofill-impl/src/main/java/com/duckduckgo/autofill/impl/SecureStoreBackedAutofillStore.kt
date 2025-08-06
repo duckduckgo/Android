@@ -183,7 +183,8 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
                 syncCredentialsListener.onCredentialAdded(it?.id!!)
                 it.id?.let { newCredentialId ->
-                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(newCredentialId) }
+                    val credentialList = listOf(newCredentialId)
+                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(credentialList) }
                 }
             }
         }
@@ -386,8 +387,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override suspend fun bulkInsert(credentials: List<LoginCredentials>): List<Long> {
         return withContext(dispatcherProvider.io()) {
             val mappedCredentials = credentials.map { it.prepareForBulkInsertion() }
-            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
-                syncCredentialsListener.onCredentialsAdded(it)
+            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also { credentialsAdded ->
+                syncCredentialsListener.onCredentialsAdded(credentialsAdded)
+                passwordStoreEventListeners.forEach { it.onCredentialAdded(credentialsAdded) }
             }
         }
     }

@@ -115,7 +115,8 @@ class CredentialsSync @Inject constructor(
             credentialsSyncMetadata.addOrUpdate(
                 CredentialsSyncMetadataEntity(syncId = remoteId, localId = autofillId, deleted_at = null, modified_at = null),
             )
-            passwordStoreEventPlugins.getPlugins().forEach { it.onCredentialAdded(autofillId) }
+            val credentialList = listOf(autofillId)
+            passwordStoreEventPlugins.getPlugins().forEach { it.onCredentialAdded(credentialList) }
         }
     }
 

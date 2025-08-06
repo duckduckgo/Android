@@ -282,5 +282,7 @@
     <string name="passwords_import_promo_action">Import From Google</string>
     <string name="passwords_import_promo_in_browser_title">Bring your passwords from Google to DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Don\'t Ask Again</string>
+    <string name="passwords_import_promo_in_settings_title">Import Passwords from Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Hide</string>
 
 </resources>

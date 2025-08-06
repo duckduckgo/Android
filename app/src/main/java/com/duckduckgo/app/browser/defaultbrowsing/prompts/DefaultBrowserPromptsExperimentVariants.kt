@@ -16,58 +16,70 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.CONVERTED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_1
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_2
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STOPPED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.CONVERTED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-data class DefaultBrowserPromptsExperimentStageAction(
+data class DefaultBrowserPromptsFlowStageAction(
     val showMessageDialog: Boolean,
     val showSetAsDefaultPopupMenuItem: Boolean,
     val highlightPopupMenu: Boolean,
+    val showMessage: Boolean,
 ) {
     companion object {
-        val disableAll = DefaultBrowserPromptsExperimentStageAction(
+        val disableAll = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
+            showMessage = false,
         )
     }
 }
 
-interface DefaultBrowserPromptsExperimentStageEvaluator {
-    suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction
+interface DefaultBrowserPromptsFlowStageEvaluator {
+    suspend fun evaluate(newStage: Stage): DefaultBrowserPromptsFlowStageAction
 }
 
 @ContributesBinding(AppScope::class)
-class DefaultBrowserPromptsExperimentStageEvaluatorImpl @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
+class DefaultBrowserPromptsFlowStageEvaluatorImpl @Inject constructor() : DefaultBrowserPromptsFlowStageEvaluator {
 
-    override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
+    override suspend fun evaluate(newStage: Stage): DefaultBrowserPromptsFlowStageAction =
         when (newStage) {
-            NOT_ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            NOT_ENROLLED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
-            ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            ENROLLED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
-            STAGE_1 -> DefaultBrowserPromptsExperimentStageAction(
+            STAGE_1 -> DefaultBrowserPromptsFlowStageAction(
                 showMessageDialog = true,
                 showSetAsDefaultPopupMenuItem = true,
                 highlightPopupMenu = true,
+                showMessage = false,
             )
 
-            STAGE_2 -> DefaultBrowserPromptsExperimentStageAction(
+            STAGE_2 -> DefaultBrowserPromptsFlowStageAction(
                 showMessageDialog = true,
                 showSetAsDefaultPopupMenuItem = true,
                 highlightPopupMenu = true,
+                showMessage = false,
             )
 
-            STOPPED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            STAGE_3 -> DefaultBrowserPromptsFlowStageAction(
+                showMessageDialog = false,
+                showSetAsDefaultPopupMenuItem = false,
+                highlightPopupMenu = false,
+                showMessage = true,
+            )
 
-            CONVERTED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            STOPPED -> DefaultBrowserPromptsFlowStageAction.disableAll
+
+            CONVERTED -> DefaultBrowserPromptsFlowStageAction.disableAll
         }
 }

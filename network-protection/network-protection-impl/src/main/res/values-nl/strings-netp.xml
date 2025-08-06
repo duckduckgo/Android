@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Apps die niet compatibel zijn met VPN\'s automatisch uitsluiten</string>
     <string name="netpExclusionListLabelAutoExclude">Niet compatibel met VPN\'s</string>
     <string name="netpExclusionListAutoExcludeDescription">Sommige apps, zoals bank- of streamingapps, werken niet goed met VPN\'s. Als je deze instelling inschakelt, sluiten we die apps automatisch uit.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">De VPN-verbinding is verbroken omdat het abonnement is verlopen. Abonneer je op DuckDuckGo om opnieuw verbinding te maken met de VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonneer je op DuckDuckGo om opnieuw verbinding te maken met de VPN.</string>
 </resources>
