@@ -16,43 +16,10 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui.tabs
 
-import android.os.Bundle
-import android.view.View
-import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.databinding.FragmentChatTabBinding
-import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
-import javax.inject.Inject
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @InjectWith(FragmentScope::class)
-class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab) {
-
-    @Inject
-    lateinit var viewModelFactory: FragmentViewModelFactory
-
-    private val viewModel: InputScreenViewModel by lazy {
-        ViewModelProvider(requireParentFragment(), viewModelFactory)[InputScreenViewModel::class.java]
-    }
-
-    private val binding: FragmentChatTabBinding by viewBinding()
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?,
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-
-        viewModel.visibilityState.onEach {
-            binding.ddgLogo.isVisible = it.showChatLogo
-        }.launchIn(lifecycleScope)
-    }
-}
+class ChatTabFragment : DuckDuckGoFragment(R.layout.fragment_chat_tab)
