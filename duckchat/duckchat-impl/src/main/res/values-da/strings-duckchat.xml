@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adresselinje</string>
     <string name="duck_chat_assist_settings_title">Assist-indstillinger</string>
     <string name="duck_chat_assist_settings_description">Vælg, hvor ofte du vil have AI-assisterede svar til at optræde i dine søgninger</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Søg</string>
+    <string name="input_screen_search_hint">Søg eller indtast adresse</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Spørg Duck.ai</string>
+    <string name="input_screen_user_pref_title">Eksperimentel adresselinje</string>
+    <string name="input_screen_user_pref_description">Søg på nettet eller spørg Duck.ai direkte fra adresselinjen</string>
 </resources>

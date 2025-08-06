@@ -43,4 +43,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Address Bar</string>
     <string name="duck_chat_assist_settings_title">Assist Settings</string>
     <string name="duck_chat_assist_settings_description">Choose how often you want AI-assisted answers to appear in your searches</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Search</string>
+    <string name="input_screen_search_hint">Search or enter address</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Ask Duck.ai</string>
+    <string name="input_screen_user_pref_title">Experimental Address Bar</string>
+    <string name="input_screen_user_pref_description">Search the web or ask Duck.ai directly from the Address Bar</string>
 </resources>
