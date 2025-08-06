@@ -30,7 +30,4 @@
     <string name="subscriptionSettingTryFreeTrialRebranding">Try Free</string>
     <string name="feedbackGeneralSubscription">Subscription</string>
 
-    <!-- Privacy Pro Rebranding-->
-    <string name="subscriptionSettingSubscribeRebranding">Protect your connection and identity with one subscription.</string>
-    <string name="removeFromDeviceDescriptionRebranding">You will no longer be able to access your subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
 </resources>
