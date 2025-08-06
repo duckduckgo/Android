@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodajte naročnino v svoje druge naprave prek Googla Play ali z uporabo e-poštnega naslova.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Uporabite zgornji e-naslov za dodajanje naročnine v drugih napravah v aplikaciji DuckDuckGo. Pojdi v Nastavitve &gt; Nastavitve naročnine &gt; Imam naročnino.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro se zdaj imenuje le naročnina DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Zaščitite svojo povezavo in identiteto z eno naročnino.</string>
+    <string name="removeFromDeviceDescriptionRebranding">V tej napravi ne boste mogli več dostopati do naročnine. S tem ne boste preklicali naročnine, ta bo ostala aktivna v drugih napravah.</string>
+
 
 </resources>

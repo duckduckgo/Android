@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Aboneliğinizi Google Play üzerinden veya bir e-posta adresi bağlayarak diğer cihazlarınıza ekleyebilirsiniz.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Abonelik Ayarları &gt; Aboneliğim Var\'a gidin.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro artık sadece DuckDuckGo aboneliği olarak adlandırılıyor</string>
+    <string name="subscriptionSettingSubscribeRebranding">Tek bir abonelikle bağlantınızı ve kimliğinizi koruyun.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu işlem aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
+
 
 </resources>
