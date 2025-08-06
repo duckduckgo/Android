@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Hinweis: Jedes Mal, wenn du mit mir browst, verliert eine gruselige Anzeige ihren Schrecken. 👌</string>
     <string name="onboardingEndDaxDialogButton">Alles erledigt!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, bevor ich es vergesse ...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo hat auch ein integriertes <b>VPN</b>!<br/><br/>Aktiviere es mit einem <b>kostenpflichtigen Privacy Pro Abonnement.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo bietet auch ein sicheres <b>VPN + 2 weitere Premium-Schutzmaßnahmen</b>, die mit einem <b>optionalen kostenpflichtigen Abonnement</b> verfügbar sind.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo bietet auch ein sicheres <b>VPN + 2 weitere Premium-Schutzmaßnahmen</b>, die mit einem <b>optionalen kostenpflichtigen Abonnement</b> verfügbar sind.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mehr erfahren</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kostenlos testen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Überspringen</string>
@@ -912,5 +911,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tippe auf das Schild, um mehr Informationen zu erhalten.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo ist das unabhängige Unternehmen im Bereich Online-Schutz für alle, die die Kontrolle über ihre persönlichen Daten zurückerlangen möchten.\n\nWir glauben, dass der beste Weg, deine persönlichen Daten vor Hackern, Betrügern und Unternehmen, die deine Privatsphäre verletzen, zu schützen, darin besteht, gar nicht erst zuzulassen, dass sie gesammelt werden. Deshalb entscheiden sich Millionen von Menschen <annotation type="chart_comparison">für DuckDuckGo anstelle von Chrome und anderen Browsern</annotation>, um online zu suchen und zu surfen. Unsere integrierte Suchmaschine ähnelt Google, trackt deine Suchanfragen jedoch nie. Und unsere Browsing-Schutzfunktionen, wie die Tracker-Blockade von Werbung und das Blockieren von Cookies, verhindern, dass andere Unternehmen deine Daten sammeln. Ach ja, und unser Browser ist kostenlos – wir verdienen unser Geld mit <annotation type="privacy_respecting_ads">datenschutzfreundlichen Suchanzeigen</annotation> und nicht durch die Ausbeutung deiner Daten.\n\nDarüber hinaus bieten wir auch ein <annotation type="ppro_help_page">DuckDuckGo-Abo</annotation>, das in unseren Browser integriert ist. Abonnenten erhalten noch mehr Datenschutz mit einem schnellen und einfachen <annotation type="vpn_help_page">VPN</annotation>, das deine Online-Aktivitäten schützt, Zugriff auf fortschrittliche KI-Modelle in unserem privaten KI-Chatdienst Duck.ai, einem Dienst, der deine persönlichen Daten in Personensuchmaschinen findet und entfernt, und einem Dienst, der deine Identität wiederherstellt, falls sie gestohlen wird.\n\nGewinne mit dem Browser, der für den Datenschutz und nicht für die Datensammlung entwickelt wurde, die Kontrolle über deine persönlichen Daten zurück.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo bietet auch ein <b>optionales kostenpflichtiges Abonnement</b> mit einem sicheren <b>VPN</b> und fortschrittlicher, privater KI.]]></string>
+    <string name="settingsDuckAiRebranding">KI-Funktionen</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

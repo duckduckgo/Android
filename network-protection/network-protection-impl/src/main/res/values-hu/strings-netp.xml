@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">A VPN-ekkel nem kompatibilis alkalmazások automatikus kizárása</string>
     <string name="netpExclusionListLabelAutoExclude">Nem kompatibilis a VPN-ekkel</string>
     <string name="netpExclusionListAutoExcludeDescription">Egyes alkalmazások, mint például a banki vagy streaming-alkalmazások, nem működnek jól a VPN-ekkel. Ha ez a beállítás engedélyezve van, automatikusan kizárjuk ezeket az alkalmazásokat.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">A VPN-kapcsolat megszakadt, mert lejárt az előfizetésed. Fizess elő a DuckDuckGóra, hogy újra csatlakozhass a VPN-hez.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Fizess elő a DuckDuckGóra, hogy újra csatlakozhass a VPN-hez.</string>
 </resources>

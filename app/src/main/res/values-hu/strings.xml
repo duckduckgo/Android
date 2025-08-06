@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
     <string name="onboardingEndDaxDialogButton">Minden kész!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo beépített <b>VPN</b>-nel is rendelkezik!<br/><br/>Az aktiválásához <b>fizess elő a Privacy Pro csomagra.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[A DuckDuckGo funkciói között <b>opcionális előfizetés</b> mellett igénybe vehető biztonságos <b>VPN és további két prémium védelem</b> is szerepel.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo funkciói között <b>opcionális előfizetés</b> mellett igénybe vehető biztonságos <b>VPN és további két prémium védelem</b> is szerepel.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
@@ -912,5 +911,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝További információkért koppints a pajzsra.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nA DuckDuckGo egy független online adatvédelmi cég, amely azoknak kínál megoldást, akik vissza kívánják venni az irányítást a személyes adataik felett.\n\nÚgy gondoljuk, hogy a legjobb módja annak, hogy megvédjük a személyes adataidat a hekkerektől, a csalóktól és az adatvédelmet sértő cégektől az, ha egyáltalán nem gyűjtjük őket. Ezért <annotation type="chart_comparison">választják emberek milliói a DuckDuckGót a Chrome és más böngészők helyett</annotation> az online kereséshez és böngészéshez. Beépített keresőmotorunk olyan, mint a Google, de sosem követi a kereséseidet. Böngészési védelmeink, mint például a hirdetéskövetők és a sütik blokkolása, segítenek megakadályozni, hogy más cégek összegyűjtsék az adataidat. Ja, és a böngészőnk ingyenes – a bevételünket az <annotation type="privacy_respecting_ads">adatvédelmet tiszteletben tartó keresési hirdetésekből</annotation> szerezzük, nem az adataid kihasználásából.\n\nEzenkívül <annotation type="ppro_help_page">DuckDuckGo-előfizetést</annotation> is kínálunk, a böngészőnkbe integrálva. Az előfizetők még nagyobb adatvédelmet élvezhetnek a következőknek köszönhetően: gyors és egyszerű <annotation type="vpn_help_page">VPN</annotation>, melynek segítségével biztonságossá tehető az online tevékenység; hozzáférés a fejlett MI-modellekhez (a privát MI alapú csevegőszolgáltatásunkban, a Duck.ai-ban); egy szolgáltatás, amely felkutatja és eltávolítja a személyes adatokat a kereshető személyadatbázis-oldalakról; illetve egy másik szolgáltatás, amely segít helyreállítani a személyazonosságot annak ellopása esetén.\n\nVedd vissza az irányítást a személyes adataid felett az adatgyűjtés helyett adatvédelemre tervezett böngészővel.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[A DuckDuckGo emellett <b>előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és fejlett, privát MI-szolgáltatás tartozik.]]></string>
+    <string name="settingsDuckAiRebranding">AI funkciók</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

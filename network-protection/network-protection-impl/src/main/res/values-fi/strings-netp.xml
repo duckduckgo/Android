@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Sulje automaattisesti pois sovellukset, jotka eivät ole yhteensopivia VPN-verkkojen kanssa</string>
     <string name="netpExclusionListLabelAutoExclude">Ei yhteensopiva VPN-verkkojen kanssa</string>
     <string name="netpExclusionListAutoExcludeDescription">Jotkin sovellukset, kuten pankki- tai suoratoistosovellukset, eivät toimi hyvin VPN-verkkojen kanssa. Kun tämä asetus on käytössä, suljemme kyseiset sovellukset automaattisesti pois.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN katkaistu vanhentuneen tilauksen takia. Tilaa DuckDuckGo, jotta voit yhdistää VPN:n uudelleen.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Tilaa DuckDuckGo, jotta voit yhdistää VPN:n uudelleen.</string>
 </resources>

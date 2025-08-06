@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
     <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka sisseehitatud <b>VPN</b>!<br/><br/>Aktiveeri see <b>tasulise Privacy Pro püsitellimusega.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo-l on ka turvaline <b>VPN + veel kaks esmaklassilist kaitset</b>, mis on saadaval <b>valikulise tasulise tellimusega</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka turvaline <b>VPN + veel kaks esmaklassilist kaitset</b>, mis on saadaval <b>valikulise tasulise tellimusega</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
@@ -912,5 +911,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Lisateabe saamiseks vajuta kilbile.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis sinu isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">DuckDuckGo Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel sinu andmeid kogumast. Ja muideks, meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte sinu andmeid ära kasutades.\n\nLisaks pakume ka <annotation type="ppro_help_page">DuckDuckGo tellimust</annotation>, mis on integreeritud meie brauserisse. Tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN-iga</annotation>, mis aitab kaitsta sinu veebitegevust, juurdepääsu täiustatud tehisintellekti mudelitele meie privaatses tehisintellekti vestlusteenuses Duck.ai, teenuse, mis otsib ja eemaldab sinu isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab sinu identiteedi, kui see varastatakse.\n\nVõta tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja täiustatud privaatset tehisintellekti.]]></string>
+    <string name="settingsDuckAiRebranding">AI funktsioonid</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

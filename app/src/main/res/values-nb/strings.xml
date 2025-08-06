@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Husk: Hver gang du surfer med meg, klippes vingene på en uhyggelig annonse. 👌</string>
     <string name="onboardingEndDaxDialogButton">Ferdig!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Før jeg glemmer det …</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en innebygd <b>VPN</b>!<br/><br/>Aktiver den med et <b>betalt Privacy Pro-abonnement.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + to premium-beskyttelser til</b>, som du får med et <b>valgfritt, betalt abonnement</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + to premium-beskyttelser til</b>, som du får med et <b>valgfritt, betalt abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Finn ut mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hopp over</string>
@@ -912,5 +911,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Trykk på skjoldet for å få mer informasjon.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo er et uavhengig selskap som gir bedre personvern til alle som ønsker å ta tilbake kontrollen over personopplysninger på nettet.\n\nVi mener at den beste måten å beskytte personopplysninger mot hackere, svindlere og selskaper som krenker personvernet på, er å hindre at de samles inn i det hele tatt. Det er derfor millioner av mennesker <annotation type="chart_comparison">velger DuckDuckGo fremfor Chrome og andre nettlesere</annotation> for å søke og surfe på nettet. Vår innebygde søkemotor er som Google, men sporer aldri søkene dine. Og surfebeskyttelsene våre, som blokkering av annonsesporing og informasjonskapsler, hindrer andre selskaper i å samle inn opplysningene dine. Og – ikke minst: Nettleseren vår er gratis. Vi tjener penger på <annotation type="privacy_respecting_ads">søkeannonser som respekterer personvernet</annotation>, ikke ved å utnytte dataene dine.\n\nI tillegg tilbyr vi også <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation> integrert i nettleseren vår. Som abonnent får du enda bedre personvern med en rask og enkel <annotation type="vpn_help_page">VPN</annotation> som bidrar til å sikre internettaktiviteten din, tilgang til avanserte AI-modeller i vår private AI-chattjeneste Duck.ai, en tjeneste som finner og fjerner personlig informasjon om deg fra personsøk på nettet, samt en tjeneste som gjenoppretter identiteten din hvis den skulle bli stjålet.\n\nTa tilbake kontrollen over personopplysningene dine med en nettleser som er utviklet for databeskyttelse, ikke datainnsamling.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har også et <b>valgfritt betalt abonnement</b>, med en sikker <b>VPN</b> og avansert, privat AI.]]></string>
+    <string name="settingsDuckAiRebranding">AI-funksjoner</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

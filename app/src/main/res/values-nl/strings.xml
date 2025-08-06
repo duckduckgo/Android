@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, voordat ik het vergeet...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een ingebouwde <b>VPN</b>!<br/><br/>Activeer deze met een <b>betaald Privacy Pro-abonnement.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo biedt ook beveiligde <b>VPN + nog 2 premiumbeveiligingen</b>, beschikbaar met een <b>optioneel betaald abonnement</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo biedt ook beveiligde <b>VPN + nog 2 premiumbeveiligingen</b>, beschikbaar met een <b>optioneel betaald abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
@@ -912,5 +911,11 @@
     </plurals>
 
     <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tik op het pictogram voor meer informatie.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo is het onafhankelijke online beveiligingsbedrijf voor iedereen die weer controle wil krijgen over zijn of haar persoonlijke gegevens.\n\nWij zijn ervan overtuigd dat de beste manier om je persoonlijke gegevens te beschermen tegen hackers, oplichters en bedrijven die je privacy schenden is om te voorkomen dat ze worden verzameld. Daarom kiezen miljoenen mensen <annotation type="chart_comparison">voor DuckDuckGo boven Chrome en andere browsers</annotation> om online te zoeken en te surfen. Onze ingebouwde zoekmachine is zoals Google, maar volgt je zoekopdrachten nooit. En met onze browsebescherming, zoals blokkering van advertentietrackers en cookieblokkering, voorkom je dat andere bedrijven je gegevens verzamelen. Bovendien is onze browser gratis - we verdienen geld met <annotation type="privacy_respecting_ads"> zoekadvertenties die de privacy respecteren</annotation>, niet door je gegevens uit te buiten.\n\nDaarnaast bieden we ook een <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation> aan dat geïntegreerd is in onze browser. Abonnees krijgen nog meer privacybescherming met een snel en eenvoudig <annotation type="vpn_help_page">VPN</annotation> die je online activiteiten helpt beveiligen, toegang tot geavanceerde AI-modellen in onze privé AI-chatservice Duck.ai, een dienst die je persoonlijke gegevens opspoort en verwijdert van zoeksites om mensen op internet te vinden, en een dienst die je identiteit herstelt als deze wordt gestolen.\n\nKrijg weer de controle over je persoonlijke gegevens met de browser die is ontworpen voor gegevensbescherming, niet voor gegevensverzameling.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo heeft ook een <b>optioneel betaald abonnement</b>, met een veilige <b>VPN</b> en geavanceerde, privé-AI.]]></string>
+    <string name="settingsDuckAiRebranding">AI-functies</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

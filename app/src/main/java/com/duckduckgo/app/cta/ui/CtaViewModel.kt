@@ -51,6 +51,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayer.DuckPlayerState
 import com.duckduckgo.duckplayer.api.PrivatePlayerMode.AlwaysAsk
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import dagger.SingleInstanceIn
 import javax.inject.Inject
@@ -88,6 +89,7 @@ class CtaViewModel @Inject constructor(
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
     private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val rebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -264,7 +266,11 @@ class CtaViewModel @Inject constructor(
             // Privacy Pro
             canShowPrivacyProCta() && !isOnboardingExperimentEnabled() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
-                val descriptionRes: Int = R.string.onboardingPrivacyProDaxDialogDescriptionRebranding
+                val descriptionRes: Int = if (rebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
+                    R.string.onboardingPrivacyProDaxDialogDescriptionRebranding
+                } else {
+                    R.string.onboardingPrivacyProDaxDialogDescription
+                }
                 val primaryCtaRes: Int = if (freeTrialCopyAvailable()) {
                     R.string.onboardingPrivacyProDaxDialogFreeTrialOkButton
                 } else {
