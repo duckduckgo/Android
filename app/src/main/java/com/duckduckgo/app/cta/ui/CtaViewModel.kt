@@ -264,7 +264,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Privacy Pro
-            canShowPrivacyProCta() && !isOnboardingExperimentEnabled() -> {
+            canShowPrivacyProCta() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
                 val descriptionRes: Int = if (rebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
                     R.string.onboardingPrivacyProDaxDialogDescriptionRebranding
@@ -299,10 +299,6 @@ class CtaViewModel @Inject constructor(
             else -> null
         }
     }
-
-    private fun isOnboardingExperimentEnabled() = onboardingDesignExperimentToggles.buckOnboarding().isEnabled() ||
-        onboardingDesignExperimentToggles.bbOnboarding().isEnabled() ||
-        onboardingDesignExperimentToggles.modifiedControl().isEnabled()
 
     @WorkerThread
     private suspend fun canShowDaxIntroCta(): Boolean = daxOnboardingActive() && !daxDialogIntroShown() && !hideTips()
