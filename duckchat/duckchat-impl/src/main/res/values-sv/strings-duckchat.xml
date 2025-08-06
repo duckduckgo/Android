@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adressfält</string>
     <string name="duck_chat_assist_settings_title">Assist-inställningar</string>
     <string name="duck_chat_assist_settings_description">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Sökning</string>
+    <string name="input_screen_search_hint">Sök eller ange adress</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Fråga Duck.ai</string>
+    <string name="input_screen_user_pref_title">Experimentell adressfält</string>
+    <string name="input_screen_user_pref_description">Sök på webben eller fråga Duck.ai direkt i adressfältet</string>
 </resources>
