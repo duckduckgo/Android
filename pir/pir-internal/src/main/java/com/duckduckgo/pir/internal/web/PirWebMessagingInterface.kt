@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.scripts
+package com.duckduckgo.pir.internal.web
 
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
@@ -33,7 +33,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import javax.inject.Inject
 import logcat.logcat
 
-class PirMessagingInterface @Inject constructor(
+class PirWebMessagingInterface @Inject constructor(
     private val jsMessageHelper: JsMessageHelper,
 ) : JsMessaging {
     private val moshi by lazy { Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build() }
@@ -44,7 +44,8 @@ class PirMessagingInterface @Inject constructor(
     private lateinit var webView: WebView
 
     override fun onResponse(response: JsCallbackData) {
-        logcat { "PIR-CSS: onResponse $response" }
+        logcat { "PIR-WEB: response=$response" }
+
         val jsResponse = JsRequestResponse.Success(
             context = context,
             featureName = response.featureName,
@@ -60,11 +61,12 @@ class PirMessagingInterface @Inject constructor(
         webView: WebView,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-CSS: register" }
+        logcat { "PIR-WEB: register 1" }
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, PIRScriptConstants.SCRIPT_FEATURE_NAME)
+        this.webView.addJavascriptInterface(this, PIRWebUiConstants.SCRIPT_FEATURE_NAME)
+        logcat { "PIR-WEB: register 2" }
     }
 
     @JavascriptInterface
@@ -72,7 +74,7 @@ class PirMessagingInterface @Inject constructor(
         message: String,
         secret: String,
     ) {
-        logcat { "PIR-CSS: process $message secret $secret" }
+        logcat { "PIR-WEB: process message=$message, secret=$secret" }
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
@@ -91,7 +93,8 @@ class PirMessagingInterface @Inject constructor(
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
-        logcat { "PIR-CSS: sendSubscriptionEvent $subscriptionEventData" }
+        logcat { "PIR-WEB: sendSubscriptionEvent data=$subscriptionEventData" }
+
         val subscriptionEvent = SubscriptionEvent(
             context,
             subscriptionEventData.featureName,
@@ -102,10 +105,15 @@ class PirMessagingInterface @Inject constructor(
         jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
     }
 
-    override val context: String = PIRScriptConstants.SCRIPT_CONTEXT_NAME
-    override val callbackName: String = "messageCallback"
+    override val context: String = PIRWebUiConstants.SCRIPT_CONTEXT_NAME
+    override val callbackName: String = PIRWebUiConstants.MESSAGE_CALLBACK // "dbpui" // "messageCallback"
     override val secret: String = "messageSecret"
-    override val allowedDomains: List<String> = emptyList()
+    override val allowedDomains: List<String> = listOf(/*"duckduckgo.com"*/)
+
+    // override val context: String = "subscriptionPages"
+    // override val callbackName: String = "messageCallback"
+    // override val secret: String = "duckduckgo-android-messaging-secret"
+    // override val allowedDomains: List<String> = listOf("duckduckgo.com")
 
     inner class BrokerProtectionMessageHandler() : JsMessageHandler {
         override fun process(
@@ -113,15 +121,35 @@ class PirMessagingInterface @Inject constructor(
             secret: String,
             jsMessageCallback: JsMessageCallback?,
         ) {
-            logcat { "PIR-CSS: BrokerProtectionMessageHandler: process $jsMessage" }
+            logcat { "PIR-WEB: BrokerProtectionMessageHandler: process $jsMessage" }
             jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id ?: "", jsMessage.params)
         }
 
-        override val allowedDomains: List<String> = emptyList()
-        override val featureName: String = PIRScriptConstants.SCRIPT_FEATURE_NAME
+        override val allowedDomains: List<String> = listOf(/*"duckduckgo.com"*/)
+        override val featureName: String = PIRWebUiConstants.SCRIPT_FEATURE_NAME
         override val methods: List<String> = listOf(
-            PIRScriptConstants.RECEIVED_METHOD_NAME_COMPLETED,
-            PIRScriptConstants.RECEIVED_METHOD_NAME_ERROR,
+            "handshake",
+            "getFeatureConfig",
+            "openSendFeedbackModal",
+            "saveProfile",
+            "getCurrentUserProfile",
+            "addNameToCurrentUserProfile",
+            "deleteUserProfileData",
+            "removeNameAtIndexFromCurrentUserProfile",
+            "setNameAtIndexInCurrentUserProfile",
+            "setBirthYearForCurrentUserProfile",
+            "addAddressToCurrentUserProfile",
+            "removeAddressAtIndexFromCurrentUserProfile",
+            "setAddressAtIndexInCurrentUserProfile",
+            "startScanAndOptOut",
+            "scanAndOptOutStatusChanged",
+            "initialScanStatus",
+            "maintenanceScanStatus",
+            "getDataBrokers",
+            "getBackgroundAgentMetadata",
+            "getVpnExclusionSetting",
+            "setVpnExclusionSetting",
+            "removeOptOutFromDashboard",
         )
     }
 }

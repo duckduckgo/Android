@@ -19,6 +19,7 @@ package com.duckduckgo.pir.internal.scripts
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.web.PIRWebUiConstants
 import com.squareup.anvil.annotations.ContributesBinding
 import java.io.BufferedReader
 import java.util.Locale
@@ -42,20 +43,21 @@ class RealPirCssScriptLoader @Inject constructor(
     override suspend fun getScript(): String {
         return withContext(dispatcherProvider.io()) {
             if (contentScopeJS.isNullOrBlank()) {
-                contentScopeJS = loadJs("brokerProtection.js").run {
-                    this.replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
-                        .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
-                        .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
-                        .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
-                }
+                contentScopeJS = loadJs("contentScope.js")
+                // contentScopeJS = loadJs("brokerProtection.js").run {
+                //     this.replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                //         .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
+                //         .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
+                //         .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+                // }
             }
             contentScopeJS!!
         }
     }
 
-    private fun getInterfaceKeyValuePair(): String = "\"javascriptInterface\":\"${PIRScriptConstants.SCRIPT_FEATURE_NAME}\""
+    private fun getInterfaceKeyValuePair(): String = "\"javascriptInterface\":\"${PIRWebUiConstants.SCRIPT_FEATURE_NAME}\""
 
-    private fun getCallbackKeyValuePair(): String = "\"messageCallback\":\"messageCallback\""
+    private fun getCallbackKeyValuePair(): String = "\"messageCallback\":\"${PIRWebUiConstants.MESSAGE_CALLBACK}\""
 
     private fun getSecretKeyValuePair(): String = "\"messageSecret\":\"messageSecret\""
 
@@ -63,7 +65,7 @@ class RealPirCssScriptLoader @Inject constructor(
         // TODO : Get this string from privacy config
         return """{
             "features":{
-                "brokerProtection" : {
+                "${PIRWebUiConstants.SCRIPT_FEATURE_NAME}" : {
                     "state": "enabled",
                     "exceptions": [],
                     "settings": {}
