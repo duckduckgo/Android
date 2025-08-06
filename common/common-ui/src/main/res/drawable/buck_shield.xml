@@ -1,0 +1,58 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="44dp"
+    android:height="44dp"
+    android:viewportWidth="44"
+    android:viewportHeight="44">
+    <path android:pathData="M43.042,9.368C42.391,6.93 40.297,5.106 37.776,4.932C37.634,4.923 37.492,4.918 37.35,4.918C36.951,4.918 36.561,4.955 36.181,5.028C35.842,5.152 35.489,5.257 35.127,5.335C34.549,5.463 33.949,5.532 33.335,5.532C31.103,5.532 29.072,4.648 27.587,3.208C27.349,2.979 27.138,2.727 26.941,2.461C26.808,2.283 26.67,2.113 26.519,1.952C25.41,0.752 23.82,0 22.06,0C20.3,0 18.714,0.752 17.609,1.948C17.458,2.113 17.311,2.287 17.178,2.47C16.981,2.741 16.761,2.997 16.523,3.231C15.038,4.661 13.017,5.546 10.789,5.546C10.015,5.546 9.267,5.44 8.557,5.239C8.456,5.207 8.351,5.175 8.245,5.147C7.732,5.005 7.191,4.927 6.632,4.927C6.563,4.927 6.49,4.927 6.421,4.927C3.822,5.014 1.618,6.866 0.949,9.382C0.807,9.918 0.678,10.464 0.568,11.009C0.197,12.829 0,14.712 0,16.642C0,29.984 9.313,41.149 21.789,43.977C21.931,44.009 22.073,44.009 22.215,43.977C34.691,41.145 44,29.984 44,16.642C44,14.699 43.803,12.801 43.427,10.968L43.051,9.377L43.042,9.368Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="43.995"
+                android:endY="21.995"
+                android:startX="-0.005"
+                android:startY="21.995"
+                android:type="linear">
+                <item
+                    android:color="#FF00C444"
+                    android:offset="0" />
+                <item
+                    android:color="#FF01C348"
+                    android:offset="0.14" />
+                <item
+                    android:color="#FF07C355"
+                    android:offset="0.28" />
+                <item
+                    android:color="#FF10C16A"
+                    android:offset="0.43" />
+                <item
+                    android:color="#FF1CC089"
+                    android:offset="0.59" />
+                <item
+                    android:color="#FF2DBEAF"
+                    android:offset="0.75" />
+                <item
+                    android:color="#FF40BBDE"
+                    android:offset="0.9" />
+                <item
+                    android:color="#FF4EBAFF"
+                    android:offset="1" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>
