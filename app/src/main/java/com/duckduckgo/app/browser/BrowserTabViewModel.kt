@@ -3938,20 +3938,6 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun onPrivacyShieldSelected() {
-        if (currentBrowserViewState().showPrivacyShield.isHighlighted()) {
-            browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = false))
-            pixel.fire(
-                pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED,
-                parameters = mapOf(
-                    "daysSinceInstall" to userBrowserProperties.daysSinceInstalled().toString(),
-                    "from_onboarding" to "true",
-                ),
-                type = Unique(),
-            )
-        }
-    }
-
     fun onOnboardingDaxTypingAnimationFinished() {
         if (currentBrowserViewState().browserShowing && currentBrowserViewState().maliciousSiteBlocked.not()) {
             browserViewState.value = currentBrowserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))

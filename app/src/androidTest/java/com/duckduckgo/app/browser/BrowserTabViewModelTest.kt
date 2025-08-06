@@ -5560,31 +5560,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenStopPulse() = runTest {
-        val cta = DaxTrackersBlockedCta(
-            onboardingStore = mockOnboardingStore,
-            appInstallStore = mockAppInstallStore,
-            trackers = emptyList(),
-            settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
-        )
-        testee.ctaViewState.value = ctaViewState().copy(cta = cta)
-
-        testee.onPrivacyShieldSelected()
-        assertTrue(!browserViewState().showPrivacyShield.isHighlighted())
-    }
-
-    @Test
-    fun givenPrivacyShieldHighlightedWhenShieldIconSelectedThenSendPixel() = runTest {
-        whenever(mockUserBrowserProperties.daysSinceInstalled()).thenReturn(0)
-        testee.browserViewState.value = browserViewState().copy(showPrivacyShield = HighlightableButton.Visible(highlighted = true))
-        val testParams = mapOf("daysSinceInstall" to "0", "from_onboarding" to "true")
-
-        testee.onPrivacyShieldSelected()
-        verify(mockPixel).fire(pixel = PrivacyDashboardPixels.PRIVACY_DASHBOARD_FIRST_TIME_OPENED, parameters = testParams, type = Unique())
-    }
-
-    @Test
     fun whenUserDismissDaxTrackersBlockedDialogThenFinishPrivacyShieldPulse() {
         val cta = DaxTrackersBlockedCta(
             onboardingStore = mockOnboardingStore,
