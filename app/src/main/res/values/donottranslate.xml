@@ -62,9 +62,4 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
-
-    <!-- Default Browser message -->
-    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo isn\'t your default browser. Get more protection.</string>
-    <string name="newTabPageDefaultBrowserMessagePrimaryCta">Set As Default</string>
-    <string name="newTabPageDefaultBrowserMessageSecondaryCta">Don\'t Ask Again</string>
 </resources>
