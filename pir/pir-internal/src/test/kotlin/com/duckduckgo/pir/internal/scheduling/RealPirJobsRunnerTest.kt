@@ -273,6 +273,55 @@ class RealPirJobsRunnerTest {
     }
 
     @Test
+    fun whenBrokerIsNotActiveThenExecutesScanJobsForValidBrokersOnly() = runTest {
+        // Given
+        val invalidBrokerJobRecord = testScanJobRecord.copy(brokerName = testBrokerName2)
+        whenever(mockPirRepository.getAllBrokersForScan()).thenReturn(listOf(testBrokerName))
+        whenever(mockPirRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(
+                testBrokerName,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(testScanJobRecord)
+        whenever(
+            mockPirSchedulingRepository.getValidScanJobRecord(
+                testBrokerName2,
+                testProfileQuery.id,
+            ),
+        ).thenReturn(invalidBrokerJobRecord)
+        whenever(mockEligibleScanJobProvider.getAllEligibleScanJobs(testCurrentTime)).thenReturn(
+            listOf(testScanJobRecord, invalidBrokerJobRecord),
+        )
+        whenever(mockPirRepository.getAllExtractedProfiles()).thenReturn(emptyList())
+        whenever(mockEligibleOptOutJobProvider.getAllEligibleOptOutJobs(testCurrentTime)).thenReturn(
+            emptyList(),
+        )
+        whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
+        whenever(
+            mockPirScan.executeScanForJobs(
+                listOf(testScanJobRecord),
+                mockContext,
+                RunType.MANUAL,
+            ),
+        ).thenReturn(Result.success(Unit))
+
+        // When
+        testee.runEligibleJobs(mockContext, MANUAL)
+
+        // Then
+        verify(mockPixelSender).reportManualScanStarted()
+        verify(mockPixelSender).reportManualScanCompleted(any())
+        verify(mockPixelSender).reportScanStats(1)
+        verify(mockPixelSender).reportOptOutStats(0)
+        verify(mockPirScan).executeScanForJobs(
+            listOf(testScanJobRecord),
+            mockContext,
+            RunType.MANUAL,
+        )
+    }
+
+    @Test
     fun whenManualExecutionTypeThenExecutesScanJobsWithManualRunType() = runTest {
         // Given
         whenever(mockPirRepository.getAllBrokersForScan()).thenReturn(testActiveBrokers)
