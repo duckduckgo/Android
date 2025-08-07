@@ -52,4 +52,20 @@
     <string name="input_screen_chat_hint">Spørg Duck.ai</string>
     <string name="input_screen_user_pref_title">Eksperimentel adresselinje</string>
     <string name="input_screen_user_pref_description">Søg på nettet eller spørg Duck.ai direkte fra adresselinjen</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chat privat med abonnent-eksklusive AI-modeller.\n<a href=\"\">Mere info</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Åbn Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Mere info</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">AI-funktioner</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI-funktioner er private og valgfrie.\nDine data bruges ikke til at træne AI.\n<annotation type="learn_more_link">Læs mere</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat anonymt med populære tredjeparts AI-chatmodeller</string>
+    <string name="duck_chat_show_in_heading_rebranding">Duck.ai-genveje</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Indstillinger for Search Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Vælg, hvor ofte du vil have AI-assisterede svar til at optræde i dine søgninger</string>
 </resources>
