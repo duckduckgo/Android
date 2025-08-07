@@ -155,7 +155,7 @@ class WelcomePageViewModelTest {
 
     @Test
     fun givenComparisonChartDialogWhenDDGIsDefaultBrowserThenFireChooseBrowserPixel() = runTest {
-    whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
         testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
 
         verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()

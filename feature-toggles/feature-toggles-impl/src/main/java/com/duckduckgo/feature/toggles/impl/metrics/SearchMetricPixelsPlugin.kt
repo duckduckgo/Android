@@ -61,7 +61,7 @@ class SearchMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                             ConversionWindow(lowerWindow = 8, upperWindow = 14),
                             ConversionWindow(lowerWindow = 8, upperWindow = 15),
                         ),
-                    ),
+                ),
                 MetricsPixel(
                     metric = "search",
                     value = "11",

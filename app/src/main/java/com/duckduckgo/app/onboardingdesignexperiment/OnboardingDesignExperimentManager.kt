@@ -188,17 +188,17 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     }
 
     override suspend fun fireInContextDialogShownPixel(cta: Cta?) {
-        when(cta) {
+        when (cta) {
             is DaxBubbleCta -> {
-                when(cta) {
+                when (cta) {
                     is DaxBubbleCta.DaxIntroSearchOptionsCta -> fireTryASearchDisplayedPixel()
                     is DaxBubbleCta.DaxIntroVisitSiteOptionsCta -> fireVisitSitePromptDisplayedNewTabPixel()
                     is DaxBubbleCta.DaxEndCta -> fireFinalOnboardingScreenDisplayedPixel()
                     is DaxBubbleCta.DaxPrivacyProCta -> Unit // No pixel for this CTA
                 }
             }
-            is OnboardingDaxDialogCta ->{
-                when(cta) {
+            is OnboardingDaxDialogCta -> {
+                when (cta) {
                     is OnboardingDaxDialogCta.DaxSerpCta -> fireMessageOnSerpDisplayedPixel()
                     is OnboardingDaxDialogCta.DaxSiteSuggestionsCta -> fireVisitSitePromptDisplayedAdjacentPixel()
                     is OnboardingDaxDialogCta.DaxTrackersBlockedCta -> fireTrackersBlockedMessageDisplayedPixel()
@@ -215,9 +215,9 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         cta: Cta,
         index: Int,
     ) {
-        when(cta) {
+        when (cta) {
             is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
-                when(index) {
+                when (index) {
                     0 -> fireFirstSearchSuggestionPixel()
                     1 -> fireSecondSearchSuggestionPixel()
                     2 -> fireThirdSearchSuggestionPixel()
@@ -225,22 +225,23 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
                 }
             }
             is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
-            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta -> fireSiteSuggestionOptionSelectedPixel(index)
+            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta,
+            -> fireSiteSuggestionOptionSelectedPixel(index)
         }
     }
 
     override suspend fun fireSiteSuggestionOptionSelectedPixel(index: Int) {
-            when(index) {
-                0 -> fireFirstSiteSuggestionPixel()
-                1 -> fireSecondSiteSuggestionPixel()
-                2 -> fireThirdSiteSuggestionPixel()
-                else -> Unit // only 3 options are available
-            }
+        when (index) {
+            0 -> fireFirstSiteSuggestionPixel()
+            1 -> fireSecondSiteSuggestionPixel()
+            2 -> fireThirdSiteSuggestionPixel()
+            else -> Unit // only 3 options are available
+        }
     }
 
     override suspend fun onWebPageFinishedLoading(url: String?) {
         if (url == null) return
-        if(duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+        if (duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
             fireSecondSerpVisitPixel()
         } else {
             fireSecondSiteVisitPixel()

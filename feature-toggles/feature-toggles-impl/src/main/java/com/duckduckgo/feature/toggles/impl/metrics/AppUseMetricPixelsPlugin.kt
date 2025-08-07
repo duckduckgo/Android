@@ -39,7 +39,7 @@ class AppUseMetricPixelsPlugin @Inject constructor(private val inventory: Featur
                             ConversionWindow(lowerWindow = 5, upperWindow = 7),
                             ConversionWindow(lowerWindow = 1, upperWindow = 4),
                             ConversionWindow(lowerWindow = 8, upperWindow = 14),
-                        )
+                        ),
                 ),
                 MetricsPixel(
                     metric = "app_use",

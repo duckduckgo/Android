@@ -66,7 +66,7 @@ class OnboardingExperimentFireAnimationHelperTest {
         assertEquals(R.raw.hero_fire_inferno, result)
     }
 
-    private class FakeOnboardDesignExperimentManager(): OnboardingDesignExperimentManager {
+    private class FakeOnboardDesignExperimentManager() : OnboardingDesignExperimentManager {
 
         var bbEnabled = false
         var buckEnabled = false
@@ -132,7 +132,7 @@ class OnboardingExperimentFireAnimationHelperTest {
 
         override suspend fun fireOptionSelectedPixel(
             cta: Cta,
-            index: Int
+            index: Int,
         ) {
             TODO("Not yet implemented")
         }

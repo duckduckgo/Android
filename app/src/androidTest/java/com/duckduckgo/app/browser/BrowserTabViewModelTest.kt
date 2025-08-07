@@ -168,8 +168,6 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
-import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_DUCK_PLAYER
 import com.duckduckgo.app.pixels.AppPixelName.DUCK_PLAYER_SETTING_ALWAYS_OVERLAY_YOUTUBE
@@ -290,9 +288,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
-import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
-import dagger.Lazy
 import java.io.File
 import java.math.BigInteger
 import java.security.cert.X509Certificate
@@ -6643,7 +6639,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingEnabledAndLightModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndLightModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
 
         testee.setOnboardingDialogBackground(lightModeEnabled = true)
@@ -6654,7 +6650,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingEnabledAndDarkModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardinAndDarkModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
 
         testee.setOnboardingDialogBackground(lightModeEnabled = false)
@@ -6937,7 +6933,6 @@ class BrowserTabViewModelTest {
 
         verify(mockOnboardingDesignExperimentManager).fireSiteSuggestionOptionSelectedPixel(1)
     }
-
 
     @Test
     fun whenUserSubmittedQueryNotSuggestedSearchOptionThenFireSearchOrNavCustomPixel() = runTest {

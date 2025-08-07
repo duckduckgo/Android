@@ -43,8 +43,8 @@ private const val KEY_SERP_VISIT_COUNT = "serp_visit_count"
 @ContributesBinding(AppScope::class)
 @SingleInstanceIn(AppScope::class)
 class SharedPreferencesOnboardingDesignExperimentCountDataStore @Inject constructor(
-        private val dispatcherProvider: DispatcherProvider,
-        @OnboardingVisitCount private val store: DataStore<Preferences>,
+    private val dispatcherProvider: DispatcherProvider,
+    @OnboardingVisitCount private val store: DataStore<Preferences>,
 ) : OnboardingDesignExperimentCountDataStore {
 
     override suspend fun increaseSiteVisitCount(): Int {

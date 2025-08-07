@@ -225,7 +225,12 @@ class CtaViewModel @Inject constructor(
     suspend fun getSiteSuggestionsDialogCta(onSiteSuggestionOptionClicked: (index: Int) -> Unit): OnboardingDaxDialogCta? {
         return withContext(dispatchers.io()) {
             if (!daxOnboardingActive() || !canShowDaxIntroVisitSiteCta()) return@withContext null
-            OnboardingDaxDialogCta.DaxSiteSuggestionsCta(onboardingStore, appInstallStore, onboardingDesignExperimentManager, onSiteSuggestionOptionClicked)
+            OnboardingDaxDialogCta.DaxSiteSuggestionsCta(
+                onboardingStore,
+                appInstallStore,
+                onboardingDesignExperimentManager,
+                onSiteSuggestionOptionClicked,
+            )
         }
     }
 

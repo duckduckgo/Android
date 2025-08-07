@@ -166,7 +166,9 @@ class OnboardingDesignExperimentManagerTest {
         whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
-        whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.MODIFIED_CONTROL.cohortName)
+        whenever(mockToggle.getCohort()!!.name).thenReturn(
+            OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.MODIFIED_CONTROL.cohortName,
+        )
 
         whenever(appBuildConfig.sdkInt).thenReturn(33)
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
@@ -383,7 +385,9 @@ class OnboardingDesignExperimentManagerTest {
 
     @Test
     fun whenFireInContextDialogShownPixelWithDaxTrackersBlockedCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, testee))
+        testee.fireInContextDialogShownPixel(
+            OnboardingDaxDialogCta.DaxTrackersBlockedCta(onboardingStore, appInstallStore, emptyList(), settingsDataStore, testee),
+        )
         verify(onboardingExperimentMetricsPixelPlugin).getTrackersBlockedMessageDisplayedMetric()
     }
 
@@ -395,7 +399,9 @@ class OnboardingDesignExperimentManagerTest {
 
     @Test
     fun whenFireInContextDialogShownPixelWithDaxMainNetworkCtaThenCorrectPixelFired() = runTest {
-        testee.fireInContextDialogShownPixel(OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", testee))
+        testee.fireInContextDialogShownPixel(
+            OnboardingDaxDialogCta.DaxMainNetworkCta(onboardingStore, appInstallStore, "Facebook", "facebook.com", testee),
+        )
         verify(onboardingExperimentMetricsPixelPlugin).getTrackerNetworkMessageDisplayedMetric()
     }
 

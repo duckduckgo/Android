@@ -447,7 +447,7 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val trackers: List<Entity>,
         val settingsDataStore: SettingsDataStore,
-        private val onboardingDesignExperimentManager : OnboardingDesignExperimentManager,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         null,
@@ -550,7 +550,7 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val network: String,
         private val siteHost: String,
-        private val onboardingDesignExperimentManager : OnboardingDesignExperimentManager,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
         null,
@@ -631,7 +631,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxNoTrackersCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentManager : OnboardingDesignExperimentManager,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
@@ -753,7 +753,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxSiteSuggestionsCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentManager : OnboardingDesignExperimentManager,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
         private val onSiteSuggestionOptionClicked: (index: Int) -> Unit, // used to fire experiment pixel
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_INTRO_VISIT_SITE,
@@ -783,7 +783,7 @@ sealed class OnboardingDaxDialogCta(
                         onSuggestedOptionClicked = { option, index ->
                             onSuggestedOptionClicked?.invoke(option)
                             onSiteSuggestionOptionClicked.invoke(index)
-                        }
+                        },
                     )
                 }
                 onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
@@ -1031,7 +1031,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxEndCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentManager : OnboardingDesignExperimentManager,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
         R.string.highlightsOnboardingEndDaxDialogDescription,
@@ -1057,7 +1057,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()-> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
