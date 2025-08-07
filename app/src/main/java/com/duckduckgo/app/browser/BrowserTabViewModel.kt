@@ -334,7 +334,6 @@ import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
@@ -1066,6 +1065,9 @@ class BrowserTabViewModel @Inject constructor(
             -> {
                 if (!ctaViewModel.isSuggestedSearchOption(query)) {
                     pixel.fire(ONBOARDING_SEARCH_CUSTOM, type = Unique())
+                    viewModelScope.launch {
+                        onboardingDesignExperimentManager.fireSearchOrNavCustomPixel()
+                    }
                 }
             }
 
@@ -1888,6 +1890,10 @@ class BrowserTabViewModel @Inject constructor(
         if (!currentBrowserViewState().maliciousSiteBlocked) {
             navigationStateChanged(webViewNavigationState)
             url?.let { prefetchFavicon(url) }
+
+            viewModelScope.launch {
+                onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
+            }
         }
     }
 
@@ -2850,6 +2856,7 @@ class BrowserTabViewModel @Inject constructor(
         val cta = ctaViewState.value?.cta ?: return
         viewModelScope.launch(dispatchers.io()) {
             ctaViewModel.onCtaShown(cta)
+            onboardingDesignExperimentManager.fireInContextDialogShownPixel(cta)
         }
     }
 
@@ -3875,7 +3882,13 @@ class BrowserTabViewModel @Inject constructor(
         return when (onboardingCta) {
             is OnboardingDaxDialogCta.DaxSerpCta -> {
                 viewModelScope.launch {
-                    val cta = withContext(dispatchers.io()) { ctaViewModel.getSiteSuggestionsDialogCta() }
+                    val cta = withContext(dispatchers.io()) {
+                        ctaViewModel.getSiteSuggestionsDialogCta(
+                            onSiteSuggestionOptionClicked = { index ->
+                                onUserSelectedOnboardingSiteSuggestionOption(index)
+                            },
+                        )
+                    }
                     ctaViewState.value = currentCtaViewState().copy(cta = cta)
                     if (cta == null) {
                         command.value = HideOnboardingDaxDialog(onboardingCta)
@@ -3934,6 +3947,9 @@ class BrowserTabViewModel @Inject constructor(
     fun onFireMenuSelected() {
         val cta = currentCtaViewState().cta
         if (cta is OnboardingDaxDialogCta.DaxFireButtonCta) {
+            viewModelScope.launch {
+                onboardingDesignExperimentManager.fireFireButtonClickedFromOnboardingPixel()
+            }
             onUserDismissedCta(cta)
             command.value = HideOnboardingDaxDialog(cta as OnboardingDaxDialogCta)
         }
@@ -4227,6 +4243,11 @@ class BrowserTabViewModel @Inject constructor(
 
     fun onOmnibarPrivacyShieldButtonPressed() {
         senseOfProtectionExperiment.firePrivacyDashboardClickedPixelIfInExperiment()
+        if (currentCtaViewState().cta is OnboardingDaxDialogCta.DaxTrackersBlockedCta) {
+            viewModelScope.launch {
+                onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()
+            }
+        }
     }
 
     fun openDuckChat(query: String?) {
@@ -4251,6 +4272,22 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setLastSubmittedUserChatQuery(query: String) {
         lastSubmittedChatQuery = query
+    }
+
+    fun onUserSelectedOnboardingDialogOption(
+        cta: Cta,
+        index: Int?,
+    ) {
+        if (index == null) return
+        viewModelScope.launch {
+            onboardingDesignExperimentManager.fireOptionSelectedPixel(cta, index)
+        }
+    }
+
+    fun onUserSelectedOnboardingSiteSuggestionOption(index: Int) {
+        viewModelScope.launch {
+            onboardingDesignExperimentManager.fireSiteSuggestionOptionSelectedPixel(index)
+        }
     }
 
     companion object {

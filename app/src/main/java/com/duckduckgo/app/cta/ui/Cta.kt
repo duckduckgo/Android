@@ -780,15 +780,19 @@ sealed class OnboardingDaxDialogCta(
                     showBuckOnboardingCta(
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = onSuggestedOptionClicked,
+                        onSuggestedOptionClicked = { option, index ->
+                            onSuggestedOptionClicked?.invoke(option)
+                            onSiteSuggestionOptionClicked.invoke(index)
+                        }
                     )
                 }
                 onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     showBBOnboardingCta(
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = { option ->
+                        onSuggestedOptionClicked = { option, index ->
                             onSuggestedOptionClicked?.invoke(option)
+                            onSiteSuggestionOptionClicked.invoke(index)
                             with(binding.includeOnboardingInContextBBDialog) {
                                 dialogTextCta.text = ""
                                 hiddenTextCta.text = ""
@@ -838,7 +842,10 @@ sealed class OnboardingDaxDialogCta(
 
                                 with(buttonView) {
                                     modifiedControlOption.setOptionView(this)
-                                    setOnClickListener { onSuggestedOptionClicked?.invoke(modifiedControlOption) }
+                                    setOnClickListener {
+                                        onSuggestedOptionClicked?.invoke(modifiedControlOption)
+                                        onSiteSuggestionOptionClicked.invoke(index)
+                                    }
                                     animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                                 }
                             }
@@ -875,7 +882,7 @@ sealed class OnboardingDaxDialogCta(
         private fun showBuckOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onTypingAnimationFinished: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption, index: Int) -> Unit)?,
         ) {
             val context = binding.root.context
             val buckDialogBinding = binding.includeOnboardingInContextBuckDialog
@@ -907,7 +914,7 @@ sealed class OnboardingDaxDialogCta(
                         options[index].setOptionView(buttonView)
                         buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                         buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index])
+                            onSuggestedOptionClicked?.invoke(options[index], index)
                             wingAnimation.gone()
                         }
                     }
@@ -955,7 +962,7 @@ sealed class OnboardingDaxDialogCta(
         private fun showBBOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onTypingAnimationFinished: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption, index: Int) -> Unit)?,
         ) {
             val binding = binding.includeOnboardingInContextBBDialog
             val context = binding.root.context
@@ -999,7 +1006,7 @@ sealed class OnboardingDaxDialogCta(
                         options[index].setOptionView(buttonView)
                         buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                         buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index])
+                            onSuggestedOptionClicked?.invoke(options[index], index)
                         }
                     }
                 }
@@ -1522,7 +1529,7 @@ sealed class DaxBubbleCta(
     fun setOnOptionClicked(
         onboardingExperimentEnabled: Boolean = false,
         configuration: DaxBubbleCta? = null,
-        onOptionClicked: (DaxDialogIntroOption) -> Unit,
+        onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
     ) {
         if (onboardingExperimentEnabled && configuration is DaxIntroVisitSiteOptionsCta) {
             val optionsWithoutRegionalNews = options?.toMutableList()?.apply {
@@ -1536,7 +1543,7 @@ sealed class DaxBubbleCta(
                     2 -> R.id.daxDialogOption3
                     else -> R.id.daxDialogOption4 // This will not be visible for the experiments
                 }
-                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option, index) } }
             }
         } else {
             options?.forEachIndexed { index, option ->
@@ -1546,7 +1553,7 @@ sealed class DaxBubbleCta(
                     2 -> R.id.daxDialogOption3
                     else -> R.id.daxDialogOption4
                 }
-                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option, index) } }
             }
         }
     }

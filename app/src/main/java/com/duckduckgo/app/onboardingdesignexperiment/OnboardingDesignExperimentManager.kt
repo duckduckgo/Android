@@ -159,10 +159,154 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         onboardingExperimentMetricsPixelPlugin.getAddressBarSetBottomMetric()?.fire()
     }
 
+    override suspend fun fireSearchOrNavCustomPixel() {
+        onboardingExperimentMetricsPixelPlugin.getSearchOrNavCustomMetric()?.fire()
+    }
 
-    override fun isAnyExperimentEnabled() =
-        onboardingDesignExperimentToggles.buckOnboarding().isEnabled() ||
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled()
+    override suspend fun firePrivacyDashClickedFromOnboardingPixel() {
+        onboardingExperimentMetricsPixelPlugin.getPrivacyDashClickedFromOnboardingMetric()?.fire()
+    }
+
+    override suspend fun fireFireButtonClickedFromOnboardingPixel() {
+        onboardingExperimentMetricsPixelPlugin.getFireButtonClickedFromOnboardingMetric()?.fire()
+    }
+
+    private suspend fun fireSecondSiteVisitPixel() {
+        onboardingDesignExperimentCountDataStore.getSiteVisitCount().takeIf { it < 2 }?.let {
+            if (onboardingDesignExperimentCountDataStore.increaseSiteVisitCount() == 2) {
+                onboardingExperimentMetricsPixelPlugin.getSecondSiteVisitMetric()?.fire()
+            }
+        }
+    }
+
+    private suspend fun fireSecondSerpVisitPixel() {
+        onboardingDesignExperimentCountDataStore.getSerpVisitCount().takeIf { it < 2 }?.let {
+            if (onboardingDesignExperimentCountDataStore.increaseSerpVisitCount() == 2) {
+                onboardingExperimentMetricsPixelPlugin.getSecondSerpVisitMetric()?.fire()
+            }
+        }
+    }
+
+    override suspend fun fireInContextDialogShownPixel(cta: Cta?) {
+        when(cta) {
+            is DaxBubbleCta -> {
+                when(cta) {
+                    is DaxBubbleCta.DaxIntroSearchOptionsCta -> fireTryASearchDisplayedPixel()
+                    is DaxBubbleCta.DaxIntroVisitSiteOptionsCta -> fireVisitSitePromptDisplayedNewTabPixel()
+                    is DaxBubbleCta.DaxEndCta -> fireFinalOnboardingScreenDisplayedPixel()
+                    is DaxBubbleCta.DaxPrivacyProCta -> Unit // No pixel for this CTA
+                }
+            }
+            is OnboardingDaxDialogCta ->{
+                when(cta) {
+                    is OnboardingDaxDialogCta.DaxSerpCta -> fireMessageOnSerpDisplayedPixel()
+                    is OnboardingDaxDialogCta.DaxSiteSuggestionsCta -> fireVisitSitePromptDisplayedAdjacentPixel()
+                    is OnboardingDaxDialogCta.DaxTrackersBlockedCta -> fireTrackersBlockedMessageDisplayedPixel()
+                    is OnboardingDaxDialogCta.DaxNoTrackersCta -> fireNoTrackersMessageDisplayedPixel()
+                    is OnboardingDaxDialogCta.DaxMainNetworkCta -> fireTrackerNetworkMessageDisplayedPixel()
+                    is OnboardingDaxDialogCta.DaxFireButtonCta -> fireFireButtonPromptDisplayedPixel()
+                    is OnboardingDaxDialogCta.DaxEndCta -> fireFinalOnboardingScreenDisplayedPixel()
+                }
+            }
+        }
+    }
+
+    override suspend fun fireOptionSelectedPixel(
+        cta: Cta,
+        index: Int,
+    ) {
+        when(cta) {
+            is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
+                when(index) {
+                    0 -> fireFirstSearchSuggestionPixel()
+                    1 -> fireSecondSearchSuggestionPixel()
+                    2 -> fireThirdSearchSuggestionPixel()
+                    else -> Unit // only 3 options are available
+                }
+            }
+            is DaxBubbleCta.DaxIntroVisitSiteOptionsCta,
+            is OnboardingDaxDialogCta.DaxSiteSuggestionsCta -> fireSiteSuggestionOptionSelectedPixel(index)
+        }
+    }
+
+    override suspend fun fireSiteSuggestionOptionSelectedPixel(index: Int) {
+            when(index) {
+                0 -> fireFirstSiteSuggestionPixel()
+                1 -> fireSecondSiteSuggestionPixel()
+                2 -> fireThirdSiteSuggestionPixel()
+                else -> Unit // only 3 options are available
+            }
+    }
+
+    override suspend fun onWebPageFinishedLoading(url: String?) {
+        if (url == null) return
+        if(duckDuckGoUrlDetector.isDuckDuckGoUrl(url)) {
+            fireSecondSerpVisitPixel()
+        } else {
+            fireSecondSiteVisitPixel()
+        }
+    }
+
+    private suspend fun fireTryASearchDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getTryASearchDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireVisitSitePromptDisplayedNewTabPixel() {
+        onboardingExperimentMetricsPixelPlugin.getVisitSitePromptDisplayedNewTabMetric()?.fire()
+    }
+
+    private suspend fun fireMessageOnSerpDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getMessageOnSerpDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireVisitSitePromptDisplayedAdjacentPixel() {
+        onboardingExperimentMetricsPixelPlugin.getVisitSitePromptDisplayedAdjacentMetric()?.fire()
+    }
+
+    private suspend fun fireTrackersBlockedMessageDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getTrackersBlockedMessageDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireNoTrackersMessageDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getNoTrackersMessageDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireTrackerNetworkMessageDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getTrackerNetworkMessageDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireFireButtonPromptDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getFireButtonPromptDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireFinalOnboardingScreenDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getFinalOnboardingScreenDisplayedMetric()?.fire()
+    }
+
+    private suspend fun fireFirstSearchSuggestionPixel() {
+        onboardingExperimentMetricsPixelPlugin.getFirstSearchSuggestionMetric()?.fire()
+    }
+
+    private suspend fun fireSecondSearchSuggestionPixel() {
+        onboardingExperimentMetricsPixelPlugin.getSecondSearchSuggestionMetric()?.fire()
+    }
+
+    private suspend fun fireThirdSearchSuggestionPixel() {
+        onboardingExperimentMetricsPixelPlugin.getThirdSearchSuggestionMetric()?.fire()
+    }
+
+    private suspend fun fireFirstSiteSuggestionPixel() {
+        onboardingExperimentMetricsPixelPlugin.getFirstSiteSuggestionMetric()?.fire()
+    }
+
+    private suspend fun fireSecondSiteSuggestionPixel() {
+        onboardingExperimentMetricsPixelPlugin.getSecondSiteSuggestionMetric()?.fire()
+    }
+
+    private suspend fun fireThirdSiteSuggestionPixel() {
+        onboardingExperimentMetricsPixelPlugin.getThirdSiteSuggestionMetric()?.fire()
+    }
+
     private suspend fun isEligibleForEnrolment(): Boolean = isAtLeastAndroid11() && !isTablet() && !isReturningUser()
 
     private fun isTablet(): Boolean =
@@ -192,4 +336,7 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         }
     }
 
+    private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
+        pixel.fire(it.pixelName, it.params)
+    }
 }

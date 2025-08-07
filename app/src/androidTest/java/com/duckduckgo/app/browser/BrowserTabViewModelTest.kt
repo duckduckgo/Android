@@ -145,6 +145,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxIntroSearchOptionsCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
+import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxMainNetworkCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxSerpCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta.DaxTrackersBlockedCta
@@ -6883,6 +6884,101 @@ class BrowserTabViewModelTest {
         testee.onMaliciousSiteUserAction(VisitSite, EXAMPLE_URL.toUri(), Feed.PHISHING, false)
 
         assertEquals(EXAMPLE_URL, omnibarViewState().queryOrFullUrl)
+    }
+
+    @Test
+    fun whenOnOmnibarPrivacyShieldButtonPressedWithTrackersBlockedCtaThenFirePrivacyDashClickedFromOnboardingPixel() = runTest {
+        val cta = DaxTrackersBlockedCta(
+            onboardingStore = mockOnboardingStore,
+            appInstallStore = mockAppInstallStore,
+            trackers = emptyList(),
+            settingsDataStore = mockSettingsDataStore,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
+        )
+        setCta(cta)
+
+        testee.onOmnibarPrivacyShieldButtonPressed()
+
+        verify(mockOnboardingDesignExperimentManager).firePrivacyDashClickedFromOnboardingPixel()
+    }
+
+    @Test
+    fun whenOnOmnibarPrivacyShieldButtonPressedWithoutTrackersBlockedCtaThenDoNotFirePrivacyDashClickedFromOnboardingPixel() = runTest {
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+        setCta(cta)
+
+        testee.onOmnibarPrivacyShieldButtonPressed()
+
+        verify(mockOnboardingDesignExperimentManager, never()).firePrivacyDashClickedFromOnboardingPixel()
+    }
+
+    @Test
+    fun whenOnUserSelectedOnboardingDialogOptionWithValidIndexThenFireOptionSelectedPixel() = runTest {
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+        val index = 2
+
+        testee.onUserSelectedOnboardingDialogOption(cta, index)
+
+        verify(mockOnboardingDesignExperimentManager).fireOptionSelectedPixel(cta, index)
+    }
+
+    @Test
+    fun whenOnUserSelectedOnboardingDialogOptionWithNullIndexThenDoNotFireOptionSelectedPixel() = runTest {
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+
+        testee.onUserSelectedOnboardingDialogOption(cta, null)
+
+        verify(mockOnboardingDesignExperimentManager, never()).fireOptionSelectedPixel(any(), any())
+    }
+
+    @Test
+    fun whenOnUserSelectedOnboardingSiteSuggestionOptionWithValidIndexThenFireOptionSelectedPixel() = runTest {
+        testee.onUserSelectedOnboardingSiteSuggestionOption(1)
+
+        verify(mockOnboardingDesignExperimentManager).fireSiteSuggestionOptionSelectedPixel(1)
+    }
+
+
+    @Test
+    fun whenUserSubmittedQueryNotSuggestedSearchOptionThenFireSearchOrNavCustomPixel() = runTest {
+        whenever(mockOmnibarConverter.convertQueryToUrl("custom query", null)).thenReturn("custom query")
+        whenever(mockOnboardingStore.getSearchOptions()).thenReturn(emptyList())
+        val cta = DaxIntroSearchOptionsCta(mockOnboardingStore, mockAppInstallStore)
+        setCta(cta)
+
+        testee.onUserSubmittedQuery("custom query")
+
+        verify(mockOnboardingDesignExperimentManager).fireSearchOrNavCustomPixel()
+    }
+
+    @Test
+    fun whenPageFinishedThenOnWebPageFinishedLoadingCalled() = runTest {
+        val url = "https://example.com"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(webViewNavState, url)
+
+        verify(mockOnboardingDesignExperimentManager).onWebPageFinishedLoading(url)
+    }
+
+    @Test
+    fun whenCtaShownThenFireInContextDialogShownPixel() = runTest {
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+        setCta(cta)
+
+        testee.onCtaShown()
+
+        verify(mockOnboardingDesignExperimentManager).fireInContextDialogShownPixel(cta)
+    }
+
+    @Test
+    fun whenFireMenuSelectedAndDaxFireButtonCtaThenFireFireButtonClickedFromOnboardingPixel() = runTest {
+        val cta = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
+        setCta(cta)
+
+        testee.onFireMenuSelected()
+
+        verify(mockOnboardingDesignExperimentManager).fireFireButtonClickedFromOnboardingPixel()
     }
 
     private fun aCredential(): LoginCredentials {

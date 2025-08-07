@@ -4438,7 +4438,10 @@ class BrowserTabFragment :
                             setOnOptionClicked(
                                 onboardingExperimentEnabled = true,
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
                     else -> {
@@ -4446,7 +4449,10 @@ class BrowserTabFragment :
                             setOnOptionClicked(
                                 onboardingExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled(),
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
                 }
