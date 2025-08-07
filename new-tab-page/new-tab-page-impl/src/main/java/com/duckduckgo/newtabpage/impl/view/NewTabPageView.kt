@@ -53,6 +53,7 @@ class NewTabPageView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     private val showLogo: Boolean = true,
+    private val onHasContent: ((Boolean) -> Unit)? = null,
 ) : LinearLayout(context, attrs, defStyle) {
 
     @Inject
@@ -98,12 +99,15 @@ class NewTabPageView @JvmOverloads constructor(
         } else {
             if (!showLogo && viewState.showDax) {
                 this.gone()
+                onHasContent?.invoke(false)
             } else {
                 this.show()
                 if (viewState.showDax) {
                     binding.ddgLogo.show()
+                    onHasContent?.invoke(false)
                 } else {
                     binding.ddgLogo.gone()
+                    onHasContent?.invoke(true)
                 }
             }
 

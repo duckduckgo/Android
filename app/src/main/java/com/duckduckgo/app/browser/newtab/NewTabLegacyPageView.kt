@@ -74,6 +74,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
     private val showLogo: Boolean = true,
+    private val onHasContent: ((Boolean) -> Unit)? = null,
 ) : LinearLayout(context, attrs, defStyle) {
 
     @Inject
@@ -138,12 +139,15 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             viewState.favourites.isEmpty()
 
         if (!showLogo && isHomeBackgroundLogoVisible) {
+            onHasContent?.invoke(false)
             this.gone()
         } else {
             this.show()
             if (isHomeBackgroundLogoVisible) {
+                onHasContent?.invoke(false)
                 homeBackgroundLogo.showLogo()
             } else {
+                onHasContent?.invoke(true)
                 homeBackgroundLogo.hideLogo()
             }
         }
