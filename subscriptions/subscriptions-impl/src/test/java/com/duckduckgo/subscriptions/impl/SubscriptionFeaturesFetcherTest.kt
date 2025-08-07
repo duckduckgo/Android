@@ -20,6 +20,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.FeaturesResponse
+import com.duckduckgo.subscriptions.impl.services.SubscriptionsCachedService
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -43,6 +44,7 @@ class SubscriptionFeaturesFetcherTest {
     private val processLifecycleOwner = TestLifecycleOwner(initialState = INITIALIZED)
     private val playBillingManager: PlayBillingManager = mock()
     private val subscriptionsService: SubscriptionsService = mock()
+    private val subscriptionsCachedService: SubscriptionsCachedService = mock()
     private val authRepository: AuthRepository = mock()
     private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
@@ -50,6 +52,7 @@ class SubscriptionFeaturesFetcherTest {
         appCoroutineScope = coroutineRule.testScope,
         playBillingManager = playBillingManager,
         subscriptionsService = subscriptionsService,
+        subscriptionsCachedService = subscriptionsCachedService,
         authRepository = authRepository,
         privacyProFeature = privacyProFeature,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -72,8 +75,28 @@ class SubscriptionFeaturesFetcherTest {
     }
 
     @Test
+    fun `when products loaded And Use Client with Cache Enabled then fetches and stores features from Cached Service`() = runTest {
+        givenIsFeaturesApiEnabled(true)
+        givenUseClientWithCacheForFeaturesEnabled(true)
+        val productDetails = mockProductDetails()
+        whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
+        whenever(authRepository.getFeatures(any())).thenReturn(emptySet())
+        whenever(subscriptionsCachedService.features(any())).thenReturn(FeaturesResponse(listOf(NETP, ITR, DUCK_AI)))
+
+        processLifecycleOwner.currentState = CREATED
+
+        verify(playBillingManager).productsFlow
+        verifyNoInteractions(subscriptionsService)
+        verify(subscriptionsCachedService).features(MONTHLY_PLAN_US)
+        verify(subscriptionsCachedService).features(YEARLY_PLAN_US)
+        verify(authRepository).setFeatures(MONTHLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+        verify(authRepository).setFeatures(YEARLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+    }
+
+    @Test
     fun `when products loaded then fetches and stores features`() = runTest {
         givenIsFeaturesApiEnabled(true)
+        givenUseClientWithCacheForFeaturesEnabled(false)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
         whenever(authRepository.getFeatures(any())).thenReturn(emptySet())
@@ -121,6 +144,7 @@ class SubscriptionFeaturesFetcherTest {
     @Test
     fun `when features already stored and refresh features FF enabled then does fetch again`() = runTest {
         givenRefreshSubscriptionPlanFeaturesEnabled(true)
+        givenUseClientWithCacheForFeaturesEnabled(false)
         givenIsFeaturesApiEnabled(true)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
@@ -144,6 +168,11 @@ class SubscriptionFeaturesFetcherTest {
     @SuppressLint("DenyListedApi")
     private fun givenRefreshSubscriptionPlanFeaturesEnabled(value: Boolean) {
         privacyProFeature.refreshSubscriptionPlanFeatures().setRawStoredState(State(value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenUseClientWithCacheForFeaturesEnabled(value: Boolean) {
+        privacyProFeature.useClientWithCacheForFeatures().setRawStoredState(State(value))
     }
 
     private fun mockProductDetails(): List<ProductDetails> {
