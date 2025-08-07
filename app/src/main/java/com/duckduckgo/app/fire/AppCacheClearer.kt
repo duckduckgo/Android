@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.file.FileDeleter
+import com.duckduckgo.subscriptions.impl.services.SubscriptionNetworkModule.Companion.SUBSCRIPTION_CACHE_FILE
 
 interface AppCacheClearer {
 
@@ -52,7 +53,10 @@ class AndroidAppCacheClearer(
          */
         private const val NETWORK_CACHE_DIR = NetworkApiCache.FILE_NAME
 
+        // TODO: We need to allow other modules to contribute this list
+        // https://app.asana.com/1/137249556945/project/1149059203486286/task/1210997578538480?focus=true
         private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
+            SUBSCRIPTION_CACHE_FILE,
             WEBVIEW_CACHE_DIR,
             WEBVIEW_CACHE_DIR_LEGACY,
             NETWORK_CACHE_DIR,
