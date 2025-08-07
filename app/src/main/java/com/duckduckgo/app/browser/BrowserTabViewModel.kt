@@ -238,6 +238,7 @@ import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
 import com.duckduckgo.app.location.data.LocationPermissionType
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
@@ -470,9 +471,9 @@ class BrowserTabViewModel @Inject constructor(
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
-    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -882,7 +883,7 @@ class BrowserTabViewModel @Inject constructor(
             viewModelScope.launch {
                 val cta = refreshCta()
                 showOrHideKeyboard(cta)
-                if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                     when (cta) {
                         is DaxBubbleCta.DaxIntroSearchOptionsCta -> {
                             // Let the keyboard show before showing the animation, using insets were problematic
@@ -4101,10 +4102,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
         when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
                 command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
@@ -4123,10 +4124,10 @@ class BrowserTabViewModel @Inject constructor(
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
         when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
             }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
             }
             else -> {

@@ -166,6 +166,7 @@ import com.duckduckgo.app.onboarding.store.AppStage.ESTABLISHED
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
@@ -268,7 +269,6 @@ import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEA
 import com.duckduckgo.privacy.dashboard.api.PrivacyProtectionTogglePlugin
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin
 import com.duckduckgo.privacy.dashboard.api.ui.ToggleReports
-import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupManager
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupUiEvent
@@ -427,8 +427,6 @@ class BrowserTabViewModelTest {
 
     private val mockRemoteMessagingRepository: RemoteMessagingRepository = mock()
 
-    private val voiceSearchAvailability: VoiceSearchAvailability = mock()
-
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger = mock()
 
     private val mockSettingsDataStore: SettingsDataStore = mock()
@@ -551,14 +549,12 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
-    private val mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
     val mockStack: WebBackForwardList = mock()
 
     private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-    private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
 
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
     private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
@@ -583,8 +579,7 @@ class BrowserTabViewModelTest {
         }
     }
 
-    private val fakeOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles =
-        FakeFeatureToggleFactory.create(OnboardingDesignExperimentToggles::class.java)
+    private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
 
     private val EXAMPLE_URL = "http://example.com"
     private val SHORT_EXAMPLE_URL = "example.com"
@@ -599,9 +594,6 @@ class BrowserTabViewModelTest {
 
         swipingTabsFeature.self().setRawStoredState(State(enable = true))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
-
-        fakeOnboardingDesignExperimentToggles.self().setRawStoredState(State(enable = true))
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
 
         db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
@@ -651,6 +643,9 @@ class BrowserTabViewModelTest {
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
         whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(false))
+        whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -672,7 +667,7 @@ class BrowserTabViewModelTest {
             brokenSitePrompt = mockBrokenSitePrompt,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
 
@@ -793,7 +788,7 @@ class BrowserTabViewModelTest {
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             subscriptionsJSHelper = mockSubscriptionsJSHelper,
-            onboardingDesignExperimentToggles = fakeOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             tabManager = tabManager,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             autoCompleteSettings = mockAutoCompleteSettings,
@@ -2751,7 +2746,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClickedDaxMainNetworkCtaOKButtonAndMaliciousSiteBlockedThenCtaIsNull() {
-        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "", mockOnboardingDesignExperimentToggles)
+        val cta = DaxMainNetworkCta(mockOnboardingStore, mockAppInstallStore, "", "", mockOnboardingDesignExperimentManager)
         setCta(cta)
 
         testee.onUserClickCtaOkButton(cta)
@@ -5500,7 +5495,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
         testee.browserViewState.value = browserViewState().copy(browserShowing = true, maliciousSiteBlocked = false)
@@ -5517,7 +5512,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
         testee.browserViewState.value = browserViewState().copy(browserShowing = false, maliciousSiteBlocked = true)
@@ -5534,7 +5529,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -5550,7 +5545,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
         )
         testee.ctaViewState.value = ctaViewState().copy(cta = cta)
 
@@ -5566,7 +5561,7 @@ class BrowserTabViewModelTest {
             appInstallStore = mockAppInstallStore,
             trackers = emptyList(),
             settingsDataStore = mockSettingsDataStore,
-            onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
         )
         setCta(cta)
 
@@ -5577,7 +5572,7 @@ class BrowserTabViewModelTest {
     @Test
     fun givenOnboardingCtaShownWhenUserSubmittedQueryThenDismissCta() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
         testee.ctaViewState.value = CtaViewState(cta = cta)
 
         testee.onUserSubmittedQuery("foo")
@@ -6385,7 +6380,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserClicksDaxSerpCtaDismissButtonThenHideOnboardingDaxDialogCommandIssuedAndPixelFired() = runTest {
-        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val cta = DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
 
         testee.onUserClickCtaDismissButton(cta)
 
@@ -6604,7 +6599,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingEnabledAndLightModeEnabledThenSetBrowserBackgroundColorCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
 
         testee.setBrowserBackground(lightModeEnabled = true)
 
@@ -6615,7 +6610,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingEnabledAndLightModeDisabledThenSetBrowserBackgroundColorCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
 
         testee.setBrowserBackground(lightModeEnabled = false)
 
@@ -6626,7 +6621,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
 
         testee.setBrowserBackground(lightModeEnabled = true)
 
@@ -6637,7 +6632,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenSetBrowserBackgroundWithBuckOnboardingDisabledAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
 
         testee.setBrowserBackground(lightModeEnabled = false)
 
@@ -6647,8 +6642,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndLightModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingEnabledAndLightModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
 
         testee.setOnboardingDialogBackground(lightModeEnabled = true)
 
@@ -6658,8 +6653,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndDarkModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = true))
+    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingEnabledAndDarkModeEnabledThenSetOnboardingDialogBackgroundColorCommandIssuedWithCorrectColor() {
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
 
         testee.setOnboardingDialogBackground(lightModeEnabled = false)
 
@@ -6669,8 +6664,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+    fun whenSetOnboardingDialogBackgroundAndLightModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
 
         testee.setOnboardingDialogBackground(lightModeEnabled = true)
 
@@ -6680,8 +6675,8 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSetOnboardingDialogBackgroundWithBuckOnboardingAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
-        fakeOnboardingDesignExperimentToggles.buckOnboarding().setRawStoredState(State(enable = false))
+    fun whenSetOnboardingDialogBackgroundAndDarkModeEnabledThenSetBrowserBackgroundCommandIssuedWithCorrectColor() {
+        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
 
         testee.setOnboardingDialogBackground(lightModeEnabled = false)
 
