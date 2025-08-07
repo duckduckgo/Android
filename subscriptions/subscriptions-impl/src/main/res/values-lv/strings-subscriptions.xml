@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pievieno savu abonementu citām ierīcēm, izmantojot Google Play vai piesaistot e-pasta adresi.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Iet uz Iestatījumi &gt; Abonementu iestatījumi &gt; Man ir abonements.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro tagad vienkārši sauc par DuckDuckGo abonementu</string>
+    <string name="subscriptionSettingSubscribeRebranding">Aizsargā savu savienojumu un identitāti ar vienu abonementu.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Šajā ierīcē vairs nevarēsi piekļūt savam abonementam. Tas neatcels tavu abonementu, un tas paliks aktīvs citās tavās ierīcēs.</string>
+
 
 </resources>
