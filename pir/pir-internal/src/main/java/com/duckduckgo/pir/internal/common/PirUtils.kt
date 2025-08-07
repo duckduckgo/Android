@@ -16,6 +16,9 @@
 
 package com.duckduckgo.pir.internal.common
 
+import com.duckduckgo.pir.internal.models.ExtractedProfile
+import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
+
 internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
     if (this.isEmpty()) {
         return emptyList()
@@ -36,4 +39,13 @@ internal fun <T> List<T>.splitIntoParts(parts: Int): List<List<T>> {
     }
 
     return result
+}
+
+internal fun ExtractedProfile.toParams(fullName: String): ExtractedProfileParams {
+    return ExtractedProfileParams(
+        name = this.name.ifEmpty { null },
+        profileUrl = this.profileUrl.ifEmpty { null },
+        fullName = fullName.ifEmpty { null },
+        email = this.email.ifEmpty { null },
+    )
 }
