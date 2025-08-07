@@ -287,34 +287,34 @@ class RealJobRecordUpdater @Inject constructor(
     private data class ExtractedProfileComparisonKey(
         val profileQueryId: Long,
         val brokerName: String,
-        val name: String?,
+        val name: String,
         val alternativeNames: List<String>,
-        val age: String?,
+        val age: String,
         val addresses: List<String>,
         val phoneNumbers: List<String>,
         val relatives: List<String>,
-        val reportId: String?,
-        val email: String?,
-        val fullName: String?,
-        val profileUrl: String?,
-        val identifier: String?,
+        val reportId: String,
+        val email: String,
+        val fullName: String,
+        val profileUrl: String,
+        val identifier: String,
     )
 
     private fun ExtractedProfile.toKey(): ExtractedProfileComparisonKey {
         return ExtractedProfileComparisonKey(
             profileQueryId = profileQueryId,
             brokerName = brokerName,
-            name = name,
+            name = name ?: "",
             alternativeNames = alternativeNames,
-            age = age,
+            age = age ?: "",
             addresses = addresses,
             phoneNumbers = phoneNumbers,
             relatives = relatives,
-            reportId = reportId,
-            email = email,
-            fullName = fullName,
-            profileUrl = profileUrl,
-            identifier = identifier,
+            reportId = reportId ?: "",
+            email = email ?: "",
+            fullName = fullName ?: "",
+            profileUrl = profileUrl ?: "",
+            identifier = identifier ?: "",
         )
     }
 }

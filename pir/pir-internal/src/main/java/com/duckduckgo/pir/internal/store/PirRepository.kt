@@ -324,7 +324,11 @@ internal class RealPirRepository(
             extractedProfiles.map {
                 it.toStoredExtractedProfile()
             }.also {
-                scanResultsDao.insertExtractedProfiles(it)
+                val updated = scanResultsDao.updateExtractedProfiles(it)
+                if (updated == 0) {
+                    // If no profiles were updated, insert them
+                    scanResultsDao.insertExtractedProfiles(it)
+                }
             }
         }
     }
