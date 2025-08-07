@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Προσθέστε τη συνδρομή σας στις άλλες συσκευές σας μέσω Google Play ή συνδέοντας μια διεύθυνση email.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Χρησιμοποιήστε το παραπάνω email για να προσθέσετε τη συνδρομή σας στις άλλες συσκευές σας στην εφαρμογή DuckDuckGo. Μεταβείτε στις Ρυθμίσεις &gt; Ρυθμίσεις συνδρομής &gt; Έχω συνδρομή.</string>
     <string name="subscriptionSettingRebrandingMessage">Το Privacy Pro ονομάζεται πλέον απλά Συνδρομή DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Προστατέψτε τη σύνδεσή σας και την ταυτότητά σας με μία συνδρομή.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Δεν θα μπορείτε πλέον να έχετε πρόσβαση στη συνδρομή σας σε αυτήν τη συσκευή. Αυτό δεν θα ακυρώσει τη συνδρομή σας και θα παραμείνει ενεργή στις υπόλοιπες συσκευές σας.</string>
+
 
 </resources>
