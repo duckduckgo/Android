@@ -62,6 +62,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
 
     @JavascriptInterface
     override fun process(message: String, secret: String) {
+        logcat { "ContentScopeScriptsJsMessaging process $message" }
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
@@ -91,13 +92,17 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
+        logcat { "ContentScopeScriptsJsMessaging register" }
+
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
         this.jsMessageCallback = jsMessageCallback
-        this.webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        this.webView.addJavascriptInterface(this, "dbpui") // Was "coreContentScopeScripts.javascriptInterface" but that doesn't work
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
+        logcat { "ContentScopeScriptsJsMessaging sendSubscriptionEvent" }
+
         val subscriptionEvent = SubscriptionEvent(
             context,
             subscriptionEventData.featureName,
@@ -108,6 +113,8 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     }
 
     override fun onResponse(response: JsCallbackData) {
+        logcat { "ContentScopeScriptsJsMessaging onResponse" }
+
         val jsResponse = JsRequestResponse.Success(
             context = context,
             featureName = response.featureName,

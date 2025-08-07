@@ -30,7 +30,18 @@ class MessageBridgeContentScopeConfigPlugin @Inject constructor(
 
     override fun config(): String {
         val featureName = MessageBridge.value
-        val config = messageBridgeRepository.messageBridgeEntity.json
+        val config = messageBridgeRepository.messageBridgeEntity.json.run {
+            // add "dbp" : "enabled" to the config if it doesn't exist
+            this.replace(
+                "\"aiChat\":\"disabled\"",
+                "\"aiChat\":\"disabled\",\"dbp\":\"enabled\",\"dbpui\":\"enabled\",\"dbpuiCommunication\":\"enabled\"",
+            )
+                .replace(
+                    "{\"op\":\"replace\",\"path\":\"\\/aiChat\",\"value\":\"enabled\"}",
+                    "{\"op\":\"replace\",\"path\":\"\\/aiChat\",\"value\":\"enabled\"},{\"op\":\"replace\",\"path\":\"\\/dbp\",\"value\":\"enabled\"},{\"op\":\"replace\",\"path\":\"\\/dbpui\",\"value\":\"enabled\"},{\"op\":\"replace\",\"path\":\"\\/dbpuiCommunication\",\"value\":\"enabled\"}",
+                )
+        }
+
         return "\"$featureName\":$config"
     }
 

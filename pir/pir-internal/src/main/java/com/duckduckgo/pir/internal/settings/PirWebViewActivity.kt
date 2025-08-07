@@ -16,16 +16,11 @@
 
 package com.duckduckgo.pir.internal.settings
 
-import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Message
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -34,15 +29,17 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.pir.internal.common.PirJobConstants.DBP_INITIAL_URL
+import com.duckduckgo.pir.impl.web.PirWebViewClient
 import com.duckduckgo.pir.internal.databinding.ActivityPirWebviewBinding
 import com.duckduckgo.pir.internal.optout.PirOptOut
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.web.PIRWebUiConstants
 import com.duckduckgo.pir.internal.web.PirWebMessagingInterface
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONObject
@@ -62,6 +59,13 @@ class PirWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirCssScriptLoader: PirCssScriptLoader
 
+    @Inject
+    @Named("ContentScopeScripts")
+    lateinit var contentScopeScripts: JsMessaging
+
+    @Inject
+    lateinit var webViewClient: PirWebViewClient
+
     private val binding: ActivityPirWebviewBinding by viewBinding()
     private val params: PirDebugWebViewResultsScreenParams?
         get() = intent.getActivityParams(PirDebugWebViewResultsScreenParams::class.java)
@@ -72,7 +76,7 @@ class PirWebViewActivity : DuckDuckGoActivity() {
         // val brokersToOptOut = params?.brokers
 
         lifecycleScope.launch {
-            val scriptToLoad = pirCssScriptLoader.getScript()
+            /*val scriptToLoad = pirCssScriptLoader.getScript()
 
             binding.pirDebugWebView.let { webView ->
                 pirWebMessagingInterface.register(
@@ -172,7 +176,7 @@ class PirWebViewActivity : DuckDuckGoActivity() {
                         ) {
                             logcat {
                                 """
-                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url} 
+                            PIR-SCAN: webview onReceivedError requestedUrl $requestedUrl for url ${request.url}
                             mainframe ${request.isForMainFrame}
                                 """.trimIndent()
                             }
@@ -194,6 +198,83 @@ class PirWebViewActivity : DuckDuckGoActivity() {
                     setSupportMultipleWindows(false)
                     setSupportZoom(true)
                 }
+            }*/
+
+            binding.pirDebugWebView.let {
+                it.webViewClient = webViewClient
+                it.webChromeClient = object : WebChromeClient() {
+                    override fun onCreateWindow(
+                        view: WebView?,
+                        isDialog: Boolean,
+                        isUserGesture: Boolean,
+                        message: Message,
+                    ): Boolean {
+                        view?.requestFocusNodeHref(message)
+                        val newWindowUrl = message?.data?.getString("url")
+                        if (newWindowUrl != null) {
+                            // startActivity(browserNav.openInNewTab(this@DuckChatWebViewActivity, newWindowUrl))
+                            return true
+                        }
+                        return false
+                        // val transport = message.obj as WebView.WebViewTransport
+                        // transport.webView = it
+                        // message.sendToTarget()
+                        // return true
+                    }
+                }
+
+                it.settings.apply {
+                    userAgentString = CUSTOM_UA
+                    javaScriptEnabled = true
+                    domStorageEnabled = true
+                    loadWithOverviewMode = true
+                    useWideViewPort = true
+                    builtInZoomControls = true
+                    displayZoomControls = false
+                    mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                    setSupportMultipleWindows(true)
+                    databaseEnabled = false
+                    setSupportZoom(true)
+                }
+
+                contentScopeScripts.register(
+                    it,
+                    object : JsMessageCallback() {
+                        override fun process(
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                        ) {
+                            logcat { "PIR-WEB-ACTIVITY process featureName=$featureName, method=$method, id=$id, data=$data" }
+                            // when (featureName) {
+                            //     DUCK_CHAT_FEATURE_NAME -> {
+                            //         appCoroutineScope.launch(dispatcherProvider.io()) {
+                            //             duckChatJSHelper.processJsCallbackMessage(featureName, method, id, data)?.let { response ->
+                            //                 withContext(dispatcherProvider.main()) {
+                            //                     contentScopeScripts.onResponse(response)
+                            //                 }
+                            //             }
+                            //         }
+                            //     }
+                            //
+                            //     SUBSCRIPTIONS_FEATURE_NAME -> {
+                            //         subscriptionsHandler.handleSubscriptionsFeature(
+                            //             featureName,
+                            //             method,
+                            //             id,
+                            //             data,
+                            //             requireActivity(),
+                            //             appCoroutineScope,
+                            //             contentScopeScripts,
+                            //         )
+                            //     }
+                            //
+                            //     else -> {}
+                            // }
+                        }
+                    },
+                )
             }
 
             binding.pirDebugWebView.loadUrl(PIRWebUiConstants.WEB_UI_URL)

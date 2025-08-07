@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
@@ -34,8 +35,15 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ) {
+        logcat { "ContentScopeScriptsJsInjectorPlugin onPageStarted 1 url=$url" }
         if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+            logcat { "ContentScopeScriptsJsInjectorPlugin onPageStarted 2 url=$url" }
+            webView.evaluateJavascript(
+                "javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}".also {
+                    logcat { "ContentScopeScriptsJsInjectorPlugin evaluateJavascript" }
+                },
+                null,
+            )
         }
     }
 

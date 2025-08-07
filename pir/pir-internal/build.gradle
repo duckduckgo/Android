@@ -32,6 +32,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':common-ui')
     implementation project(':common-utils')
+    implementation project(':content-scope-scripts-api')
     implementation project(':di')
     implementation project(':data-store-api')
     implementation project(':internal-features-api')

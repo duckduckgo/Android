@@ -43,7 +43,12 @@ class RealPirCssScriptLoader @Inject constructor(
     override suspend fun getScript(): String {
         return withContext(dispatcherProvider.io()) {
             if (contentScopeJS.isNullOrBlank()) {
-                contentScopeJS = loadJs("contentScope.js")
+                contentScopeJS = loadJs("contentScope.js")/*.run {
+                    this.replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
+                        .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
+                        .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
+                        .replace(MESSAGING_PARAMETERS, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
+                }*/
                 /*contentScopeJS = loadJs("brokerProtection.js").run {
                     this.replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson())
                         .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
