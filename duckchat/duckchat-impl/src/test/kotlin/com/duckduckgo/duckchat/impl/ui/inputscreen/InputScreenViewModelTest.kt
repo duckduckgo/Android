@@ -669,4 +669,121 @@ class InputScreenViewModelTest {
         assertEquals(SearchCommand.RestoreAutoCompleteScrollPosition(123, 456), viewModel.searchTabCommand.value)
         assertEquals(ShowKeyboard, viewModel.command.value)
     }
+
+    @Test
+    fun `when initialized with web URL then showSearchLogo should be true initially`() {
+        val viewModel = createViewModel("https://example.com")
+
+        assertTrue(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when initialized with search query then showSearchLogo should be false due to autocomplete suggestions`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        // Should be false because autocomplete suggestions are visible for search queries
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when onNewTabPageContentChanged with true then showSearchLogo should be false`() = runTest {
+        val viewModel = createViewModel()
+
+        // Initially true
+        assertTrue(viewModel.visibilityState.value.showSearchLogo)
+
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+
+        // Should become false when new tab page has content
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when onNewTabPageContentChanged with false then showSearchLogo should be true if autocomplete not visible`() = runTest {
+        val viewModel = createViewModel()
+
+        // Set new tab page to have content first
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+        // Remove content from new tab page
+        viewModel.onNewTabPageContentChanged(hasContent = false)
+
+        // Should become true again when no content and no autocomplete suggestions
+        assertTrue(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when new tab page has content and autocomplete becomes visible then showSearchLogo should remain false`() = runTest {
+        val viewModel = createViewModel()
+
+        // Set new tab page to have content
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+        // Trigger autocomplete (this would normally make showSearchLogo false anyway)
+        viewModel.onSearchInputTextChanged("test query")
+
+        // Should remain false
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when new tab page has no content but autocomplete is visible then showSearchLogo should be false`() = runTest {
+        val viewModel = createViewModel()
+
+        // Ensure new tab page has no content
+        viewModel.onNewTabPageContentChanged(hasContent = false)
+
+        // Trigger autocomplete suggestions
+        viewModel.onSearchInputTextChanged("test query")
+
+        // Should be false because autocomplete suggestions are visible
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when new tab page has no content and autocomplete is not visible then showSearchLogo should be true`() = runTest {
+        val viewModel = createViewModel("https://example.com")
+
+        // Ensure new tab page has no content
+        viewModel.onNewTabPageContentChanged(hasContent = false)
+
+        // Should be true because no content and no autocomplete suggestions (URL doesn't trigger autocomplete initially)
+        assertTrue(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when user transitions from autocomplete visible to hidden then showSearchLogo should be true if new tab page has no content`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        // Initially false due to autocomplete
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+        // Ensure new tab page has no content
+        viewModel.onNewTabPageContentChanged(hasContent = false)
+
+        // Clear text to hide autocomplete
+        viewModel.onSearchInputTextChanged("")
+
+        // Should become true when autocomplete hidden and no new tab content
+        assertTrue(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when user transitions from autocomplete visible to hidden but new tab page has content then showSearchLogo should remain false`() = runTest {
+        val viewModel = createViewModel("search query")
+
+        // Initially false due to autocomplete
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+
+        // Set new tab page to have content
+        viewModel.onNewTabPageContentChanged(hasContent = true)
+
+        // Clear text to hide autocomplete
+        viewModel.onSearchInputTextChanged("")
+
+        // Should remain false because new tab page has content
+        assertFalse(viewModel.visibilityState.value.showSearchLogo)
+    }
 }
