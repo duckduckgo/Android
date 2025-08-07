@@ -60,6 +60,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -121,11 +122,15 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         initialValue = false,
     )
 
-    override val showSetAsDefaultMessage: StateFlow<Boolean> = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.stateIn(
-        scope = appCoroutineScope,
-        started = SharingStarted.Lazily,
-        initialValue = false,
-    )
+    override val showSetAsDefaultMessage: StateFlow<Boolean> = defaultBrowserPromptsDataStore.stage
+        .combine(defaultBrowserPromptsDataStore.showSetAsDefaultMessage) { stage, showMessage ->
+            stage == STAGE_3 && showMessage
+        }
+        .stateIn(
+            scope = appCoroutineScope,
+            started = SharingStarted.Lazily,
+            initialValue = false,
+        )
 
     /**
      * Model used to parse remote config setting. All values are integer strings, for example "1" or "20".
@@ -219,12 +224,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         val currentStage = defaultBrowserPromptsDataStore.stage.firstOrNull()
         logcat { "evaluate: current stage = $currentStage" }
         val newStage = if (isDefaultBrowser) {
-            if (currentStage == STAGE_2) {
+            if (currentStage == STAGE_3) {
                 fireConversionPixel(MESSAGE)
             }
             logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED and return." }
-            defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
-            return
+            STOPPED
         } else if (currentStage == NOT_ENROLLED) {
             logcat { "evaluate: new stage is ENROLLED" }
             ENROLLED

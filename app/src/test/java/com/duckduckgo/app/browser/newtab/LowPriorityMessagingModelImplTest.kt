@@ -1,11 +1,11 @@
 import android.content.Context
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.newtab.LowPriorityMessage
 import com.duckduckgo.app.browser.newtab.LowPriorityMessagingModelImpl
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -18,7 +18,7 @@ import org.mockito.kotlin.whenever
 
 class LowPriorityMessagingModelImplTest {
 
-    private val mockDefaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = mock()
+    private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
 
     private val mockPixel: Pixel = mock()
 
@@ -29,7 +29,7 @@ class LowPriorityMessagingModelImplTest {
     @Before
     fun setup() {
         testee = LowPriorityMessagingModelImpl(
-            defaultBrowserPromptsDataStore = mockDefaultBrowserPromptsDataStore,
+            additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             pixel = mockPixel,
             context = mockContext,
         )
@@ -37,7 +37,7 @@ class LowPriorityMessagingModelImplTest {
 
     @Test
     fun `getMessage returns DefaultBrowserMessage when showSetAsDefaultMessage is true`() = runTest {
-        whenever(mockDefaultBrowserPromptsDataStore.showSetAsDefaultMessage).thenReturn(flowOf(true))
+        whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultMessage).thenReturn(MutableStateFlow(true))
         whenever(mockContext.getString(any())) doReturn "Test String"
 
         val message = testee.getMessage()
@@ -47,7 +47,7 @@ class LowPriorityMessagingModelImplTest {
 
     @Test
     fun `getMessage returns null when showSetAsDefaultMessage is false`() = runTest {
-        whenever(mockDefaultBrowserPromptsDataStore.showSetAsDefaultMessage).thenReturn(flowOf(false))
+        whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultMessage).thenReturn(MutableStateFlow(false))
 
         val message = testee.getMessage()
 
@@ -56,7 +56,7 @@ class LowPriorityMessagingModelImplTest {
 
     @Test
     fun `onMessageShown fires impression pixel`() = runTest {
-        whenever(mockDefaultBrowserPromptsDataStore.showSetAsDefaultMessage).thenReturn(flowOf(true))
+        whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultMessage).thenReturn(MutableStateFlow(true))
         whenever(mockContext.getString(any())).thenReturn("Test String")
         testee.getMessage()
 
@@ -67,7 +67,7 @@ class LowPriorityMessagingModelImplTest {
 
     @Test
     fun `getPrimaryButtonCommand returns the correct command`() = runTest {
-        whenever(mockDefaultBrowserPromptsDataStore.showSetAsDefaultMessage).thenReturn(flowOf(true))
+        whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultMessage).thenReturn(MutableStateFlow(true))
         whenever(mockContext.getString(any())).thenReturn("Test String")
         testee.getMessage()
 

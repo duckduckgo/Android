@@ -601,7 +601,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if stage 1 and browser set as default, then stop and don't do anything else`() = runTest {
+    fun `evaluate - if stage 1 and browser set as default, then set stage to STOPPED and evaluate to clean`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialStage = Stage.STAGE_1,
         )
@@ -614,11 +614,11 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
-        verify(stageEvaluatorMock, never()).evaluate(any())
+        verify(stageEvaluatorMock).evaluate(Stage.STOPPED)
     }
 
     @Test
-    fun `evaluate - if stage 2 and browser set as default, then stop and don't do anything else`() = runTest {
+    fun `evaluate - if stage 2 and browser set as default,  then set stage to STOPPED and evaluate to clean`() = runTest {
         val dataStoreMock = createDataStoreFake(
             initialStage = Stage.STAGE_2,
         )
@@ -631,7 +631,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
-        verify(stageEvaluatorMock, never()).evaluate(any())
+        verify(stageEvaluatorMock).evaluate(Stage.STOPPED)
     }
 
     @Test
