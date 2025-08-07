@@ -52,4 +52,20 @@
     <string name="input_screen_chat_hint">Pajautā Duck.ai</string>
     <string name="input_screen_user_pref_title">Eksperimentālā adreses josla</string>
     <string name="input_screen_user_pref_description">Meklē tīmeklī vai jautā Duck.ai tieši adrešu joslā</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Privāti tērzē ar abonentiem ekskluzīviem mākslīgā intelekta modeļiem.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Atver Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Uzzināt vairāk</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Mākslīgā intelekta funkcijas</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Tērzē anonīmi ar populāriem trešo personu MI tērzēšanas modeļiem</string>
+    <string name="duck_chat_show_in_heading_rebranding">Duck.ai īsceļi</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Meklēšanas Assist iestatījumi</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
 </resources>
