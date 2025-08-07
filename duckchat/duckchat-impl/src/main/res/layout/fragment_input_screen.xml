@@ -31,6 +31,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:adjustViewBounds="true"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/inputModeWidget"
+        app:srcCompat="@drawable/logo_full" />
+
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="0dp"

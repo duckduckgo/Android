@@ -102,7 +102,9 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
         // TODO: fix favorites click source to "focused state" instead of "new tab page"
         lifecycleScope.launch {
             newTabPagePlugins.getPlugins().firstOrNull()?.let { plugin ->
-                val newTabPageView = plugin.getView(requireContext())
+                val newTabPageView = plugin.getView(requireContext(), showLogo = false) { hasContent ->
+                    viewModel.onNewTabPageContentChanged(hasContent)
+                }
                 binding.newTabContainerLayout.addView(newTabPageView)
             }
         }
