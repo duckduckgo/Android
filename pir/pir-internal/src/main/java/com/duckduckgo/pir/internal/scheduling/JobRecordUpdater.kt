@@ -304,17 +304,17 @@ class RealJobRecordUpdater @Inject constructor(
         return ExtractedProfileComparisonKey(
             profileQueryId = profileQueryId,
             brokerName = brokerName,
-            name = name ?: "",
+            name = name,
             alternativeNames = alternativeNames,
-            age = age ?: "",
+            age = age,
             addresses = addresses,
             phoneNumbers = phoneNumbers,
             relatives = relatives,
-            reportId = reportId ?: "",
-            email = email ?: "",
-            fullName = fullName ?: "",
-            profileUrl = profileUrl ?: "",
-            identifier = identifier ?: "",
+            reportId = reportId,
+            email = email,
+            fullName = fullName,
+            profileUrl = profileUrl,
+            identifier = identifier,
         )
     }
 }

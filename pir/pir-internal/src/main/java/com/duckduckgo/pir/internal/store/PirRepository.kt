@@ -233,7 +233,7 @@ internal class RealPirRepository(
         return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
     }
 
-    override suspend fun getEtagForFilename(fileName: String): String? = withContext(dispatcherProvider.io()) {
+    override suspend fun getEtagForFilename(fileName: String): String = withContext(dispatcherProvider.io()) {
         return@withContext brokerJsonDao.getEtag(fileName)
     }
 
@@ -572,17 +572,17 @@ internal class RealPirRepository(
             id = this.dbId,
             profileQueryId = this.profileQueryId,
             brokerName = this.brokerName,
-            name = this.name ?: "",
+            name = this.name,
             alternativeNames = this.alternativeNames,
-            age = this.age ?: "",
+            age = this.age,
             addresses = this.addresses,
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
-            reportId = this.reportId ?: "",
-            email = this.email ?: "",
-            fullName = this.fullName ?: "",
-            profileUrl = this.profileUrl ?: "",
-            identifier = this.identifier ?: "",
+            reportId = this.reportId,
+            email = this.email,
+            fullName = this.fullName,
+            profileUrl = this.profileUrl,
+            identifier = this.identifier,
             dateAddedInMillis = if (this.dateAddedInMillis == 0L) {
                 currentTimeProvider.currentTimeMillis()
             } else {

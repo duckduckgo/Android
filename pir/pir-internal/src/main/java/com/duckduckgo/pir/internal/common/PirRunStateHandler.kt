@@ -242,19 +242,19 @@ class RealPirRunStateHandler @Inject constructor(
         when (state.pirSuccessResponse) {
             is ExtractedResponse -> state.pirSuccessResponse.response.map {
                 ExtractedProfile(
-                    profileUrl = it.profileUrl,
+                    profileUrl = it.profileUrl ?: "",
                     profileQueryId = state.profileQueryId,
                     brokerName = state.brokerName,
-                    name = it.name,
+                    name = it.name ?: "",
                     alternativeNames = it.alternativeNames,
-                    age = it.age,
+                    age = it.age ?: "",
                     addresses = it.addresses.map { item -> addressCityStateAdapter.toJson(item) },
                     phoneNumbers = it.phoneNumbers,
                     relatives = it.relatives,
-                    identifier = it.identifier,
-                    reportId = it.reportId,
-                    email = it.email,
-                    fullName = it.fullName,
+                    identifier = it.identifier ?: "",
+                    reportId = it.reportId ?: "",
+                    email = it.email ?: "",
+                    fullName = it.fullName ?: "",
                 )
             }.also {
                 if (it.isNotEmpty()) {
