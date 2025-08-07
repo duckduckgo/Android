@@ -131,6 +131,34 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     override fun isBbEnrolledAndEnabled(): Boolean = isExperimentEnabled == true &&
         onboardingDesignExperimentCohort == BB
 
+    override suspend fun fireIntroScreenDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getIntroScreenDisplayedMetric()?.fire()
+    }
+
+    override suspend fun fireComparisonScreenDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getComparisonScreenDisplayedMetric()?.fire()
+    }
+
+    override suspend fun fireChooseBrowserPixel() {
+        onboardingExperimentMetricsPixelPlugin.getChooseBrowserMetric()?.fire()
+    }
+
+    override suspend fun fireSetDefaultRatePixel() {
+        onboardingExperimentMetricsPixelPlugin.getSetDefaultRateMetric()?.fire()
+    }
+
+    override suspend fun fireSetAddressBarDisplayedPixel() {
+        onboardingExperimentMetricsPixelPlugin.getSetAddressBarDisplayedMetric()?.fire()
+    }
+
+    override suspend fun fireAddressBarSetTopPixel() {
+        onboardingExperimentMetricsPixelPlugin.getAddressBarSetTopMetric()?.fire()
+    }
+
+    override suspend fun fireAddressBarSetBottomPixel() {
+        onboardingExperimentMetricsPixelPlugin.getAddressBarSetBottomMetric()?.fire()
+    }
+
 
     override fun isAnyExperimentEnabled() =
         onboardingDesignExperimentToggles.buckOnboarding().isEnabled() ||

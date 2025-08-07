@@ -30,6 +30,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE
@@ -67,6 +68,7 @@ class WelcomePageViewModelTest {
     private val mockAppInstallStore: AppInstallStore = mock()
     private val mockSettingsDataStore: SettingsDataStore = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
+    private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
 
     private val testee: WelcomePageViewModel by lazy {
         WelcomePageViewModel(
@@ -77,6 +79,7 @@ class WelcomePageViewModelTest {
             mockSettingsDataStore,
             coroutineRule.testDispatcherProvider,
             mockAppBuildConfig,
+            mockOnboardingDesignExperimentManager,
         )
     }
 
@@ -119,6 +122,73 @@ class WelcomePageViewModelTest {
             val command = awaitItem()
             Assert.assertTrue(command is ShowComparisonChart)
         }
+    }
+
+    @Test
+    fun whenInitialDialogIsShownThenFireIntroScreenDisplayedPixel() = runTest {
+        testee.onDialogShown(PreOnboardingDialogType.INITIAL)
+
+        verify(mockOnboardingDesignExperimentManager).fireIntroScreenDisplayedPixel()
+    }
+
+    @Test
+    fun whenComparisonChartDialogIsShownThenFireComparisonScreenDisplayedPixel() = runTest {
+        testee.onDialogShown(PreOnboardingDialogType.COMPARISON_CHART)
+
+        verify(mockOnboardingDesignExperimentManager).fireComparisonScreenDisplayedPixel()
+    }
+
+    @Test
+    fun whenAddressBarPositionDialogIsShownThenFireSetAddressBarDisplayedPixel() = runTest {
+        testee.onDialogShown(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockOnboardingDesignExperimentManager).fireSetAddressBarDisplayedPixel()
+    }
+
+    @Test
+    fun givenComparisonChartDialogWhenOnPrimaryCtaClickedThenFireChooseBrowserPixel() = runTest {
+        whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(true)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
+
+        verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
+    }
+
+    @Test
+    fun givenComparisonChartDialogWhenDDGIsDefaultBrowserThenFireChooseBrowserPixel() = runTest {
+    whenever(mockDefaultRoleBrowserDialog.shouldShowDialog()).thenReturn(false)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.COMPARISON_CHART)
+
+        verify(mockOnboardingDesignExperimentManager).fireChooseBrowserPixel()
+    }
+
+    @Test
+    fun whenDefaultBrowserIsSetThenFireSetDefaultRatePixel() = runTest {
+        testee.onDefaultBrowserSet()
+
+        verify(mockOnboardingDesignExperimentManager).fireSetDefaultRatePixel()
+    }
+
+    @Test
+    fun whenBottomAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetBottomPixel() = runTest {
+        testee.onAddressBarPositionOptionSelected(false)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockOnboardingDesignExperimentManager).fireAddressBarSetBottomPixel()
+    }
+
+    @Test
+    fun whenTopAddressBarIsSelectedAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() = runTest {
+        testee.onAddressBarPositionOptionSelected(true)
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
+    }
+
+    @Test
+    fun whenDefaultAddressBarPositionIsKeptAndPrimaryCtaClickedThenFireAddressBarSetTopPixel() = runTest {
+        testee.onPrimaryCtaClicked(PreOnboardingDialogType.ADDRESS_BAR_POSITION)
+
+        verify(mockOnboardingDesignExperimentManager).fireAddressBarSetTopPixel()
     }
 
     @Test
