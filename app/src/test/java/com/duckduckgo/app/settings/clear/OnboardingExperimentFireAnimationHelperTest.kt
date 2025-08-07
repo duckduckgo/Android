@@ -55,6 +55,17 @@ class OnboardingExperimentFireAnimationHelperTest {
 
         assertEquals(R.raw.bb_experiment_fire_optimised, result)
     }
+
+    @Test
+    fun `when hero fire animation selected and modified control enabled then return stock fire animation`() {
+        fakeOnboardingDesignExperimentManager.modifiedControlEnabled = true
+        val selectedAnimation = FireAnimation.HeroFire
+
+        val result = testee.getSelectedFireAnimationResId(selectedAnimation)
+
+        assertEquals(R.raw.hero_fire_inferno, result)
+    }
+
     private class FakeOnboardDesignExperimentManager(): OnboardingDesignExperimentManager {
 
         var bbEnabled = false
