@@ -17,13 +17,14 @@
 package com.duckduckgo.app.onboardingdesignexperiment
 
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.Companion.BASE_EXPERIMENT_NAME
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "onboardingDesignExperiment",
+    featureName = BASE_EXPERIMENT_NAME,
 )
 /**
  * Interface defining feature toggles for the onboarding design experiment.
@@ -38,12 +39,20 @@ interface OnboardingDesignExperimentToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
 
-    /**
-     * Toggle for enabling or disabling the "modifiedControl" version of the design experiment.
-     * Default value: false (disabled).
-     */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun modifiedControl(): Toggle
+    fun onboardingDesignExperimentAug25(): Toggle
+
+    enum class OnboardingDesignExperimentCohort(override val cohortName: String) : Toggle.State.CohortName {
+        MODIFIED_CONTROL("modifiedControl"),
+        BUCK("buck"),
+        BB("bb"),
+    }
+
+    companion object {
+        internal const val BASE_EXPERIMENT_NAME = "onboardingDesignExperiment"
+    }
+}
+
 
     /**
      * Toggle for enabling or disabling the "buckOnboarding" design experiment.
