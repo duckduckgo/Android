@@ -20,8 +20,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:id="@+id/newTabContainerScrollView"
