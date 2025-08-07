@@ -125,13 +125,21 @@ class NewTabPageProviderTest {
     }
 
     class LegacyNewTabPlugin : NewTabPagePlugin {
-        override fun getView(context: Context, showLogo: Boolean): View {
+        override fun getView(
+            context: Context,
+            showLogo: Boolean,
+            onHasContent: ((Boolean) -> Unit)?,
+        ): View {
             return View(context)
         }
     }
 
     class NewNewTabPlugin : NewTabPagePlugin {
-        override fun getView(context: Context, showLogo: Boolean): View {
+        override fun getView(
+            context: Context,
+            showLogo: Boolean,
+            onHasContent: ((Boolean) -> Unit)?,
+        ): View {
             return View(context)
         }
     }
