@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridaj si predplatné do svojich ďalších zariadení cez Google Play alebo prepojením e-mailovej adresy.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Použi vyššie uvedený e-mail na pridanie predplatného v&amp;nbsp;iných zariadeniach v&amp;nbsp;aplikácii DuckDuckGo. Prejdi do Nastavenia &gt; Nastavenia predplatného &gt; Mám predplatné.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro sa teraz nazýva predplatné DuckDuckGo.</string>
+    <string name="subscriptionSettingSubscribeRebranding">Chráň si pripojenie a identitu s jedným predplatným.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Na tomto zariadení už nebudeš mať prístup k svojmu predplatnému. Tým sa tvoje predplatné nezruší a zostane aktívne na tvojich ostatných zariadeniach.</string>
+
 
 </resources>
