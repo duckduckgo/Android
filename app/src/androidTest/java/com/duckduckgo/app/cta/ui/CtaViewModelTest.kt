@@ -882,9 +882,7 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
+        whenever(mockOnboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()).thenReturn(false)
         whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
@@ -896,50 +894,11 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndModifiedControlOnboardingExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
+    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
         givenDaxOnboardingActive()
-        whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(true)
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
+        whenever(mockOnboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()).thenReturn(true)
         whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
-        whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
-    }
-
-    @Test
-    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndBuckOnboardingExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(true)
-        whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
-        whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
-    }
-
-    @Test
-    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndBBOnboardingExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
-        whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
+        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
