@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridėkite prenumeratą į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į Nustatymai &gt; Prenumeratos nustatymai &gt; Turiu prenumeratą.</string>
     <string name="subscriptionSettingRebrandingMessage">„Privacy Pro“ dabar tiesiog vadinama „DuckDuckGo“ prenumerata.</string>
+    <string name="subscriptionSettingSubscribeRebranding">Apsaugokite savo ryšį ir tapatybę naudodami vieną prenumeratą.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Šiame įrenginyje nebegalėsite pasiekti savo prenumeratos. Tai neatšauks jūsų prenumeratos ir ji liks aktyvi kituose įrenginiuose.</string>
+
 
 </resources>
