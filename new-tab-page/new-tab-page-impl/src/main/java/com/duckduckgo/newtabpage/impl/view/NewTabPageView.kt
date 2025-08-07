@@ -102,12 +102,11 @@ class NewTabPageView @JvmOverloads constructor(
                 onHasContent?.invoke(false)
             } else {
                 this.show()
+                onHasContent?.invoke(true)
                 if (viewState.showDax) {
                     binding.ddgLogo.show()
-                    onHasContent?.invoke(false)
                 } else {
                     binding.ddgLogo.gone()
-                    onHasContent?.invoke(true)
                 }
             }
 

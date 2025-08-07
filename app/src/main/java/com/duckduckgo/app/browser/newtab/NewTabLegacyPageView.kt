@@ -139,15 +139,14 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             viewState.favourites.isEmpty()
 
         if (!showLogo && isHomeBackgroundLogoVisible) {
-            onHasContent?.invoke(false)
             this.gone()
+            onHasContent?.invoke(false)
         } else {
             this.show()
+            onHasContent?.invoke(true)
             if (isHomeBackgroundLogoVisible) {
-                onHasContent?.invoke(false)
                 homeBackgroundLogo.showLogo()
             } else {
-                onHasContent?.invoke(true)
                 homeBackgroundLogo.hideLogo()
             }
         }
