@@ -55,7 +55,7 @@ import kotlinx.coroutines.withContext
 interface PirRepository {
     suspend fun getCurrentMainEtag(): String?
 
-    suspend fun updateMainEtag(etag: String)
+    suspend fun updateMainEtag(etag: String?)
 
     suspend fun updateBrokerJsons(brokers: Map<BrokerJson, Boolean>)
 
@@ -198,7 +198,7 @@ internal class RealPirRepository(
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
-    override suspend fun updateMainEtag(etag: String) {
+    override suspend fun updateMainEtag(etag: String?) {
         pirDataStore.mainConfigEtag = etag
     }
 

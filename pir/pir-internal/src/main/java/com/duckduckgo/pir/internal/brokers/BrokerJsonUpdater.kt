@@ -56,6 +56,7 @@ class RealBrokerJsonUpdater @Inject constructor(
      */
     override suspend fun update(): Boolean = withContext(dispatcherProvider.io()) {
         return@withContext kotlin.runCatching {
+            confirmEtagIntegrity()
             dbpService.getMainConfig(pirRepository.getCurrentMainEtag()).also {
                 logcat { "PIR-update: Main config result $it." }
                 if (it.code() == 304) {
@@ -76,6 +77,17 @@ class RealBrokerJsonUpdater @Inject constructor(
         }.getOrElse {
             logcat(ERROR) { "PIR-update: Json update failed to complete due to: $it" }
             false
+        }
+    }
+
+    private suspend fun confirmEtagIntegrity() {
+        val storedEtag = pirRepository.getCurrentMainEtag()
+        if (storedEtag != null) {
+            val storedJsons = pirRepository.getAllLocalBrokerJsons()
+            if (storedJsons.isEmpty()) {
+                // We clear etag because for some reason the store data in our db is not available anymore, making the etag unusable.
+                pirRepository.updateMainEtag(null)
+            }
         }
     }
 
