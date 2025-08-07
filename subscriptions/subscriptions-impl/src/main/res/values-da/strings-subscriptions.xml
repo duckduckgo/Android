@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Tilføj dit abonnement til dine andre enheder via Google Play eller ved at tilknytte en e-mailadresse.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Brug e-mailen ovenfor til at tilføje dit abonnement på dine andre enheder i DuckDuckGo-appen. Gå til Indstillinger &gt; Abonnementsindstillinger &gt; Jeg har et abonnement.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro kaldes nu bare DuckDuckGo-abonnementet</string>
+    <string name="subscriptionSettingSubscribeRebranding">Beskyt din forbindelse og identitet med ét abonnement.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Du vil ikke længere have adgang til abonnementet på denne enhed. Dette opsiger ikke abonnementet, og det forbliver aktivt på dine andre enheder.</string>
+
 
 </resources>
