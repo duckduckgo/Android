@@ -18,15 +18,15 @@ package com.duckduckgo.pir.internal.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_BROKER_OPT_OUT_STARTED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_COMPLETED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_BROKER_SCAN_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_CPU_USAGE
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_MANUAL_SCAN_STARTED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_RECORD_STARTED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED
-import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_BROKER_STARTED
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_OPT_OUT_STATS
+import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCAN_STATS
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_SCHEDULED
 import com.duckduckgo.pir.internal.pixels.PirPixel.PIR_INTERNAL_SCHEDULED_SCAN_STARTED
@@ -35,101 +35,98 @@ import javax.inject.Inject
 import logcat.logcat
 
 interface PirPixelSender {
-    // Manual Scan Pixels
+    /**
+     * Emits a pixel to signal that a manually initiated scan has started.
+     */
     fun reportManualScanStarted()
 
     /**
-     * Tells us the important data about the Manual scan
+     * Emits a pixel to signal that a manually initiated scan has been completed.
      *
      * @param totalTimeInMillis - how long it took for the scan to complete
-     * @param totalParallelWebViews - total number of parallel webview used.
-     * @param totalBrokerSuccess - how many didn't result to a PirError
-     * @param totalBrokerFailed - how many resulted to an error - includes timeout, failed to find
      */
     fun reportManualScanCompleted(
         totalTimeInMillis: Long,
-        totalParallelWebViews: Int,
-        totalBrokerSuccess: Int,
-        totalBrokerFailed: Int,
-    )
-
-    fun reportManualScanBrokerStarted(
-        brokerName: String,
     )
 
     /**
-     * For each broker, we will emit how long it took for the scan to be completed (status received: either error or success).
-     *
-     * @param brokerName - broker name
-     * @param totalTimeInMillis - How long it took to complete the scan for the broker.
-     * @param isSuccess - if result was not an error, it is a success. Doesn't tell us if the profile was found.
-     */
-    fun reportManualScanBrokerCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
-    )
-
-    /**
-     * Tells us how many scheduled scans were actually scheduled.
+     * Emits a pixel to signal that the scheduled scan has been scheduled.
      */
     fun reportScheduledScanScheduled()
 
     /**
-     * Tells us whenever a scheduled scan is run.
+     * Emits a pixel to signal that s scheduled scan run has started.
      */
     fun reportScheduledScanStarted()
 
     /**
-     * Tells us whenever a scheduled scan is marked as completed.
-     * This means that all brokers have been scanned and received result from.
-     *
-     * This also emits a unique pixel which tells us when the first complete scan is achieved.
+     * Emits a pixel to signal that a scheduled scan run has been completed.
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
-        totalParallelWebViews: Int,
-        totalBrokerSuccess: Int,
-        totalBrokerFailed: Int,
     )
 
-    fun reportScheduledScanBrokerStarted(
+    /**
+     * Emits a pixel to signal that a scan job for a specific broker x profile has been started.
+     *
+     * @param brokerName for which this scan job is for
+     */
+    fun reportBrokerScanStarted(
         brokerName: String,
     )
 
     /**
-     * For each broker, we will emit how long it took for the scan to be completed (status received: either error or success).
+     * Emits a pixel to signal that a scan job for a specific broker x profile has been completed (status received: either error or success).
      *
      * @param brokerName - broker name
      * @param totalTimeInMillis - How long it took to complete the scan for the broker.
      * @param isSuccess - if result was not an error, it is a success. Doesn't tell us if the profile was found.
      */
-    fun reportScheduledScanBrokerCompleted(
+    fun reportBrokerScanCompleted(
         brokerName: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
     )
 
     /**
-     * Tells us whenever an opt-out is started for a record on a broker
+     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been started.
      *
-     * @param brokerName for which the opt-out is started for
+     * @param brokerName Broker in which the ExtractedProfile being opted out was found.
      */
-    fun reportRecordOptOutStarted(
+    fun reportOptOutStarted(
         brokerName: String,
     )
 
     /**
-     * Tells us whenever an opt-out is completed - could mean that the opt-out for the record was successful or failed.
+     * Emits a pixel to signal that an opt-out job for a specific extractedProfile has been completed.
+     * It could mean that the opt-out for the record was successful or failed.
      *
      * @param brokerName for which the opt-out is for
      * @param totalTimeInMillis How long it took to complete the opt-out for the record.
      * @param isSuccess - if result was not an error, it is a success.
      */
-    fun reportRecordOptOutCompleted(
+    fun reportOptOutCompleted(
         brokerName: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
+    )
+
+    /**
+     * Emits a pixel that contains the scan related stats for the current run.
+     *
+     * @param totalScanToRun The total number of scans that are eligible for the current run.
+     */
+    fun reportScanStats(
+        totalScanToRun: Int,
+    )
+
+    /**
+     * Emits a pixel that contains the opt-out related stats for the current run.
+     *
+     * @param totalOptOutsToRun The total number of opt-outs that are eligible for the current run.
+     */
+    fun reportOptOutStats(
+        totalOptOutsToRun: Int,
     )
 
     /**
@@ -151,27 +148,21 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportManualScanCompleted(
         totalTimeInMillis: Long,
-        totalParallelWebViews: Int,
-        totalBrokerSuccess: Int,
-        totalBrokerFailed: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-            PARAM_KEY_WEBVIEW_COUNT to totalParallelWebViews.toString(),
-            PARAM_KEY_TOTAL_BROKER_SUCCESS to totalBrokerSuccess.toString(),
-            PARAM_KEY_TOTAL_BROKER_FAILED to totalBrokerFailed.toString(),
         )
         fire(PIR_INTERNAL_MANUAL_SCAN_COMPLETED, params)
     }
 
-    override fun reportManualScanBrokerStarted(brokerName: String) {
+    override fun reportBrokerScanStarted(brokerName: String) {
         val params = mapOf(
             PARAM_KEY_BROKER_NAME to brokerName,
         )
-        fire(PIR_INTERNAL_MANUAL_SCAN_BROKER_STARTED, params)
+        fire(PIR_INTERNAL_BROKER_SCAN_STARTED, params)
     }
 
-    override fun reportManualScanBrokerCompleted(
+    override fun reportBrokerScanCompleted(
         brokerName: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
@@ -181,7 +172,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
             PARAM_KEY_SUCCESS to isSuccess.toString(),
         )
-        fire(PIR_INTERNAL_MANUAL_SCAN_BROKER_COMPLETED, params)
+        fire(PIR_INTERNAL_BROKER_SCAN_COMPLETED, params)
     }
 
     override fun reportScheduledScanScheduled() {
@@ -194,20 +185,23 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
-        totalParallelWebViews: Int,
-        totalBrokerSuccess: Int,
-        totalBrokerFailed: Int,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-            PARAM_KEY_WEBVIEW_COUNT to totalParallelWebViews.toString(),
-            PARAM_KEY_TOTAL_BROKER_SUCCESS to totalBrokerSuccess.toString(),
-            PARAM_KEY_TOTAL_BROKER_FAILED to totalBrokerFailed.toString(),
         )
         fire(PIR_INTERNAL_SCHEDULED_SCAN_COMPLETED, params)
     }
 
-    override fun reportScheduledScanBrokerCompleted(
+    override fun reportOptOutStarted(
+        brokerName: String,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER_NAME to brokerName,
+        )
+        fire(PIR_INTERNAL_BROKER_OPT_OUT_STARTED, params)
+    }
+
+    override fun reportOptOutCompleted(
         brokerName: String,
         totalTimeInMillis: Long,
         isSuccess: Boolean,
@@ -217,36 +211,21 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
             PARAM_KEY_SUCCESS to isSuccess.toString(),
         )
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_BROKER_COMPLETED, params)
+        fire(PIR_INTERNAL_BROKER_OPT_OUT_COMPLETED, params)
     }
 
-    override fun reportScheduledScanBrokerStarted(brokerName: String) {
+    override fun reportScanStats(totalScanToRun: Int) {
         val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_SCAN_COUNT to totalScanToRun.toString(),
         )
-        fire(PIR_INTERNAL_SCHEDULED_SCAN_BROKER_STARTED, params)
+        fire(PIR_INTERNAL_SCAN_STATS, params)
     }
 
-    override fun reportRecordOptOutStarted(
-        brokerName: String,
-    ) {
+    override fun reportOptOutStats(totalOptOutsToRun: Int) {
         val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
+            PARAM_KEY_OPTOUT_COUNT to totalOptOutsToRun.toString(),
         )
-        fire(PIR_INTERNAL_OPT_OUT_RECORD_STARTED, params)
-    }
-
-    override fun reportRecordOptOutCompleted(
-        brokerName: String,
-        totalTimeInMillis: Long,
-        isSuccess: Boolean,
-    ) {
-        val params = mapOf(
-            PARAM_KEY_BROKER_NAME to brokerName,
-            PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
-            PARAM_KEY_SUCCESS to isSuccess.toString(),
-        )
-        fire(PIR_INTERNAL_OPT_OUT_RECORD_COMPLETED, params)
+        fire(PIR_INTERNAL_OPT_OUT_STATS, params)
     }
 
     override fun sendCPUUsageAlert(averageCpuUsagePercent: Int) {
@@ -270,9 +249,8 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_BROKER_NAME = "brokerName"
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_SUCCESS = "isSuccess"
-        private const val PARAM_KEY_WEBVIEW_COUNT = "totalParallelWebViews"
-        private const val PARAM_KEY_TOTAL_BROKER_SUCCESS = "totalBrokerSuccess"
-        private const val PARAM_KEY_TOTAL_BROKER_FAILED = "totalBrokerFailed"
+        private const val PARAM_KEY_SCAN_COUNT = "totalScanToRun"
+        private const val PARAM_KEY_OPTOUT_COUNT = "totalOptOutToRun"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
     }
 }

@@ -33,7 +33,6 @@ import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.common.splitIntoParts
 import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
-import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.store.PirRepository
 import com.duckduckgo.pir.internal.store.db.EventType
@@ -98,7 +97,6 @@ class RealPirScan @Inject constructor(
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
-    private val pixelSender: PirPixelSender,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
     callbacks: PluginPoint<PirCallbacks>,
@@ -120,7 +118,7 @@ class RealPirScan @Inject constructor(
 
         if (jobRecords.isEmpty()) {
             logcat { "PIR-SCAN: Nothing to scan here." }
-            completeScan(runType, startTimeMillis)
+            completeScan(runType)
             return@withContext Result.success(Unit)
         }
 
@@ -131,7 +129,7 @@ class RealPirScan @Inject constructor(
 
         if (processedJobRecords.isEmpty()) {
             logcat { "PIR-SCAN: No job records." }
-            completeScan(runType, startTimeMillis)
+            completeScan(runType)
             return@withContext Result.success(Unit)
         }
 
@@ -163,7 +161,7 @@ class RealPirScan @Inject constructor(
             }
         }.awaitAll()
 
-        completeScan(runType, startTimeMillis)
+        completeScan(runType)
         return@withContext Result.success(Unit)
     }
 
@@ -214,13 +212,10 @@ class RealPirScan @Inject constructor(
 
     private suspend fun completeScan(
         runType: RunType,
-        startTimeMillis: Long,
     ) {
         logcat { "PIR-SCAN: Scan completed for all runners on all profiles" }
         emitScanCompletedPixel(
             runType,
-            currentTimeProvider.currentTimeMillis() - startTimeMillis,
-            maxWebViewCount,
         )
         onJobCompleted()
     }
@@ -231,8 +226,6 @@ class RealPirScan @Inject constructor(
         runType: RunType,
     ): Result<Unit> = withContext(dispatcherProvider.io()) {
         onJobStarted()
-
-        val startTimeMillis = currentTimeProvider.currentTimeMillis()
 
         emitScanStartPixel(runType)
         cleanPreviousRun()
@@ -281,7 +274,7 @@ class RealPirScan @Inject constructor(
             }
         }.awaitAll()
 
-        completeScan(runType, startTimeMillis)
+        completeScan(runType)
         return@withContext Result.success(Unit)
     }
 
@@ -320,7 +313,6 @@ class RealPirScan @Inject constructor(
 
     private suspend fun emitScanStartPixel(runType: RunType) {
         if (runType == RunType.MANUAL) {
-            pixelSender.reportManualScanStarted()
             repository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
@@ -328,7 +320,6 @@ class RealPirScan @Inject constructor(
                 ),
             )
         } else {
-            pixelSender.reportScheduledScanStarted()
             repository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
@@ -340,16 +331,8 @@ class RealPirScan @Inject constructor(
 
     private suspend fun emitScanCompletedPixel(
         runType: RunType,
-        totalTimeInMillis: Long,
-        totalParallelWebViews: Int,
     ) {
         if (runType == RunType.MANUAL) {
-            pixelSender.reportManualScanCompleted(
-                totalTimeInMillis = totalTimeInMillis,
-                totalParallelWebViews = totalParallelWebViews,
-                totalBrokerSuccess = repository.getScanSuccessResultsCount(),
-                totalBrokerFailed = repository.getScanErrorResultsCount(),
-            )
             repository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
@@ -357,12 +340,6 @@ class RealPirScan @Inject constructor(
                 ),
             )
         } else {
-            pixelSender.reportScheduledScanCompleted(
-                totalTimeInMillis = totalTimeInMillis,
-                totalParallelWebViews = totalParallelWebViews,
-                totalBrokerSuccess = repository.getScanSuccessResultsCount(),
-                totalBrokerFailed = repository.getScanErrorResultsCount(),
-            )
             repository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),

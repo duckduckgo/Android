@@ -28,6 +28,7 @@ import com.duckduckgo.pir.internal.models.scheduling.JobRecord.OptOutJobRecord.O
 import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.internal.optout.PirOptOut
+import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scan.PirScan
 import com.duckduckgo.pir.internal.scheduling.PirExecutionType.MANUAL
 import com.duckduckgo.pir.internal.scheduling.PirExecutionType.SCHEDULED
@@ -60,6 +61,7 @@ class RealPirJobsRunnerTest {
     private val mockPirOptOut: PirOptOut = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockContext: Context = mock()
+    private val mockPixelSender: PirPixelSender = mock()
 
     @Before
     fun setUp() {
@@ -72,6 +74,7 @@ class RealPirJobsRunnerTest {
             pirScan = mockPirScan,
             pirOptOut = mockPirOptOut,
             currentTimeProvider = mockCurrentTimeProvider,
+            pixelSender = mockPixelSender,
         )
     }
 
@@ -151,6 +154,10 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
+        verify(mockPixelSender).reportManualScanStarted()
+        verify(mockPixelSender).reportScanStats(0)
+        verify(mockPixelSender).reportOptOutStats(0)
+        verify(mockPixelSender).reportManualScanCompleted(any())
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
         verifyNoInteractions(mockEligibleOptOutJobProvider)
@@ -254,6 +261,10 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
+        verify(mockPixelSender).reportManualScanStarted()
+        verify(mockPixelSender).reportScanStats(0)
+        verify(mockPixelSender).reportOptOutStats(0)
+        verify(mockPixelSender).reportManualScanCompleted(any())
         verifyNoInteractions(mockPirSchedulingRepository)
         verifyNoInteractions(mockEligibleScanJobProvider)
         verifyNoInteractions(mockEligibleOptOutJobProvider)
@@ -298,6 +309,10 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
+        verify(mockPixelSender).reportManualScanStarted()
+        verify(mockPixelSender).reportManualScanCompleted(any())
+        verify(mockPixelSender).reportScanStats(1)
+        verify(mockPixelSender).reportOptOutStats(0)
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,
@@ -342,6 +357,10 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, SCHEDULED)
 
         // Then
+        verify(mockPixelSender).reportScheduledScanStarted()
+        verify(mockPixelSender).reportScheduledScanCompleted(any())
+        verify(mockPixelSender).reportScanStats(1)
+        verify(mockPixelSender).reportOptOutStats(0)
         verify(mockPirScan).executeScanForJobs(
             listOf(testScanJobRecord),
             mockContext,
@@ -562,6 +581,7 @@ class RealPirJobsRunnerTest {
         testee.runEligibleJobs(mockContext, MANUAL)
 
         // Then
+        verify(mockPixelSender).reportOptOutStats(1)
         verify(mockPirOptOut).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
     }
 
@@ -591,6 +611,7 @@ class RealPirJobsRunnerTest {
             testee.runEligibleJobs(mockContext, MANUAL)
 
             // Then
+            verify(mockPixelSender).reportOptOutStats(0)
             verify(mockPirOptOut, never()).executeOptOutForJobs(
                 listOf(testOptOutJobRecord),
                 mockContext,
@@ -667,6 +688,7 @@ class RealPirJobsRunnerTest {
         )
         verify(mockEligibleOptOutJobProvider).getAllEligibleOptOutJobs(testCurrentTime)
         verify(mockPirRepository).getBrokersForOptOut(true)
+        verify(mockPixelSender).reportOptOutStats(1)
         verify(mockPirOptOut).executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
     }
 
