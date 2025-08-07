@@ -94,7 +94,6 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private var hasUserSeenHistoryIAM = false
 
-    private val modeState = MutableStateFlow(false)
     private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
     private val voiceInputAllowed = MutableStateFlow(true)
@@ -103,7 +102,7 @@ class InputScreenViewModel @AssistedInject constructor(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             autoCompleteSuggestionsVisible = false,
             showChatLogo = true,
-            showSearchLogo = !newTabPageHasContent.value,
+            showSearchLogo = true,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -217,11 +216,11 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }.launchIn(viewModelScope)
 
-        newTabPageHasContent.onEach { ntpHasContent ->
+        combine(newTabPageHasContent, shouldShowAutoComplete) { newTabPageHasContent, shouldShowAutoComplete ->
+            !newTabPageHasContent && !shouldShowAutoComplete
+        }.onEach { shouldShowSearchLogo ->
             _visibilityState.update {
-                it.copy(
-                    showSearchLogo = !ntpHasContent,
-                )
+                it.copy(showSearchLogo = shouldShowSearchLogo)
             }
         }.launchIn(viewModelScope)
     }
