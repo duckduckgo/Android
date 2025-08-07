@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Man ir abonements</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Sūtīt atsauksmi</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo abonements</string>
+    <string name="subscriptionSettingExpiredRebranding">Tavs DuckDuckGo abonements ir beidzies.</string>
+    <string name="privacyProFaqRebranding">Nepieciešama palīdzība saistībā ar abonēšanu?</string>
+    <string name="privacyProFaqSecondaryRebranding">Saņem atbildes uz bieži uzdotiem jautājumiem vai sazinies ar abonēšanas atbalsta dienestu mūsu palīdzības lapās. Funkciju pieejamība atšķiras atkarībā no valsts.</string>
+    <string name="restoreSubscriptionTitleRebranding">Pievieno savu abonementu šai ierīcei</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Saisti e-pasta adresi ar savu abonementu, lai pievienotu to šai ierīcei.</string>
+    <string name="activateOnOtherDevicesRebranding">Pievieno savu abonementu citām ierīcēm</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pievieno savu abonementu citām ierīcēm, izmantojot Google Play vai piesaistot e-pasta adresi.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Izmanto iepriekš norādīto e-pasta adresi, lai pievienotu abonementu citām ierīcēm DuckDuckGo lietotnē. Iet uz Iestatījumi &gt; Abonementu iestatījumi &gt; Man ir abonements.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro tagad vienkārši sauc par DuckDuckGo abonementu</string>
+
 </resources>

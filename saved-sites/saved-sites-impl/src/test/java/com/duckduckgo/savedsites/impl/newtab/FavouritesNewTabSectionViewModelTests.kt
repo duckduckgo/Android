@@ -94,13 +94,56 @@ class FavouritesNewTabSectionViewModelTests {
     }
 
     @Test
-    fun whenItemsChangedThenRepositoryUpdated() {
+    fun whenItemsChangedWithSameItemsThenRepositoryUpdated() {
         whenever(mockSavedSitesRepository.getFavoritesSync()).thenReturn(listOf(favorite1, favorite2))
         val itemsChanged = listOf(favorite2, favorite1)
 
         testee.onQuickAccessListChanged(itemsChanged)
 
         verify(mockSavedSitesRepository).updateWithPosition(itemsChanged)
+    }
+
+    @Test
+    fun whenItemsChangedSavedSitesEmptyThenRepositoryUpdated() {
+        whenever(mockSavedSitesRepository.getFavoritesSync()).thenReturn(emptyList())
+        val itemsChanged = listOf(favorite1, favorite2)
+
+        testee.onQuickAccessListChanged(itemsChanged)
+
+        verify(mockSavedSitesRepository).updateWithPosition(itemsChanged)
+    }
+
+    @Test
+    fun whenItemsChangedNewListIsEmptyThenRepositoryUpdated() {
+        val storedFavorites = listOf(favorite1, favorite2)
+        whenever(mockSavedSitesRepository.getFavoritesSync()).thenReturn(storedFavorites)
+        val itemsChanged = emptyList<Favorite>()
+
+        testee.onQuickAccessListChanged(itemsChanged)
+
+        verify(mockSavedSitesRepository).updateWithPosition(storedFavorites)
+    }
+
+    @Test
+    fun whenItemsChangedLessSavedSitesThenRepositoryUpdated() {
+        val storedFavorites = listOf(favorite1)
+        whenever(mockSavedSitesRepository.getFavoritesSync()).thenReturn(storedFavorites)
+        val itemsChanged = listOf(favorite1, favorite2)
+
+        testee.onQuickAccessListChanged(itemsChanged)
+
+        verify(mockSavedSitesRepository).updateWithPosition(itemsChanged)
+    }
+
+    @Test
+    fun whenItemsChangedMoreSavedSitesThenRepositoryUpdated() {
+        val storedFavorites = listOf(favorite1, favorite2)
+        whenever(mockSavedSitesRepository.getFavoritesSync()).thenReturn(storedFavorites)
+        val itemsChanged = listOf(favorite1)
+
+        testee.onQuickAccessListChanged(itemsChanged)
+
+        verify(mockSavedSitesRepository).updateWithPosition(listOf(favorite1, favorite2))
     }
 
     @Test

@@ -29,7 +29,6 @@ import com.duckduckgo.pir.internal.common.RealPirActionsRunner
 import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.internal.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
-import com.duckduckgo.pir.internal.pixels.PirPixelSender
 import com.duckduckgo.pir.internal.scripts.PirCssScriptLoader
 import com.duckduckgo.pir.internal.store.PirRepository
 import kotlinx.coroutines.test.runTest
@@ -54,7 +53,6 @@ class RealPirScanTest {
     private val mockBrokerStepsParser: BrokerStepsParser = mock()
     private val mockPirCssScriptLoader: PirCssScriptLoader = mock()
     private val mockPirActionsRunnerFactory: RealPirActionsRunner.Factory = mock()
-    private val mockPixelSender: PirPixelSender = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
     private val mockCallbacks: PluginPoint<PirCallbacks> = mock()
     private val mockContext: Context = mock()
@@ -69,7 +67,6 @@ class RealPirScanTest {
             brokerStepsParser = mockBrokerStepsParser,
             pirCssScriptLoader = mockPirCssScriptLoader,
             pirActionsRunnerFactory = mockPirActionsRunnerFactory,
-            pixelSender = mockPixelSender,
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             callbacks = mockCallbacks,
@@ -150,8 +147,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(emptyList(), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
@@ -171,8 +166,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
@@ -192,8 +185,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
@@ -214,8 +205,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
@@ -241,8 +230,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(jobRecordWithDefaultProfile), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verify(mockPirCssScriptLoader).getScript()
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
     }
@@ -263,8 +250,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(unknownProfileJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
@@ -283,8 +268,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(unknownBrokerJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
         verifyNoInteractions(mockPirActionsRunner)
@@ -308,8 +291,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verify(mockPirCssScriptLoader).getScript()
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.MANUAL)
         verify(mockPirActionsRunner).start(testProfileQuery, listOf(testScanStep))
@@ -337,8 +318,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(testScanJobRecord, testScanJobRecord2), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockPixelSender).reportManualScanStarted()
-        verify(mockPixelSender).reportManualScanCompleted(any(), any(), any(), any())
         verify(mockRepository).getBrokerScanSteps(testBrokerName)
         verify(mockRepository).getBrokerScanSteps(testBrokerName2)
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson)
@@ -389,8 +368,6 @@ class RealPirScanTest {
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.SCHEDULED)
 
         // Then
-        verify(mockPixelSender).reportScheduledScanStarted()
-        verify(mockPixelSender).reportScheduledScanCompleted(any(), any(), any(), any())
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, RunType.SCHEDULED)
     }
 

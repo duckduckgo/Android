@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Mám předplatné</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Odeslat zpětnou vazbu</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Předplatné DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Tvoje předplatné DuckDuckGo vypršelo</string>
+    <string name="privacyProFaqRebranding">Potřebuješ pomoc s předplatným?</string>
+    <string name="privacyProFaqSecondaryRebranding">Na našich stránkách nápovědy najdeš odpovědi na časté otázky a najdeš tam kontakt na podporu předplatného. Dostupnost se v jednotlivých zemích liší.</string>
+    <string name="restoreSubscriptionTitleRebranding">Přidej své předplatné do tohoto zařízení</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Pokud si předplatné chceš přidat do tohoto zařízení, spoj s ním svou e-mailovou adresu.</string>
+    <string name="activateOnOtherDevicesRebranding">Přidej své předplatné do jiného zařízení</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Přidej své předplatné do svých dalších zařízení přes Google Play nebo propojením e-mailové adresy.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Pomocí uvedeného e-mailu si v aplikaci DuckDuckGo přidej předplatné do ostatních zařízení. Přejdi do Nastavení &gt; Nastavení předplatného &gt; Mám předplatné.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro mění název na „předplatné DuckDuckGo“</string>
+
 </resources>

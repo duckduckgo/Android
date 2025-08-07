@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">У меня уже есть подписка</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Подписка DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Срок действия вашей подписки DuckDuckGo истек.</string>
+    <string name="privacyProFaqRebranding">Нужна помощь с подпиской?</string>
+    <string name="privacyProFaqSecondaryRebranding">На страницах справочного раздела вы найдете ответы на распространенные вопросы, а также контактную информацию по тарифам. Доступность функций зависит от страны.</string>
+    <string name="restoreSubscriptionTitleRebranding">Добавьте подписку на это устройство</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Чтобы добавить подписку на это устройство, привяжите к ней адрес электронной почты.</string>
+    <string name="activateOnOtherDevicesRebranding">Добавление подписки на другие устройства</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Подписку можно добавить на другие устройства через магазин приложений Google Play или путем привязки адреса электронной почты.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Чтобы добавить подписку на другие устройства, введите указанный выше адрес электронной почты в приложении DuckDuckGo. Для этого посетите раздел «Настройки &gt; Настройки подписки &gt; У меня уже есть подписка».</string>
+    <string name="subscriptionSettingRebrandingMessage">Пакет Privacy Pro теперь называется просто подпиской DuckDuckGo.</string>
+
 </resources>

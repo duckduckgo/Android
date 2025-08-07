@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Автоматично изключвайте приложенията, които не са съвместими с VPN</string>
     <string name="netpExclusionListLabelAutoExclude">Несъвместими с VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Някои приложения, като банкови или стрийминг приложения, не работят добре с VPN. Когато тази настройка е активирана, ние автоматично ще изключим тези приложения.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN връзката е прекъсната поради изтекъл абонамент. Абонирайте се за DuckDuckGo, за да можете отново ползвате VPN услугата.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Абонирайте се за DuckDuckGo, за да можете отново да ползвате VPN услугата.</string>
 </resources>

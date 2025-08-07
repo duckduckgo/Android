@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Ik heb een abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Verstuur feedback</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo-abonnement</string>
+    <string name="subscriptionSettingExpiredRebranding">Je DuckDuckGo-abonnement is verlopen</string>
+    <string name="privacyProFaqRebranding">Hulp nodig bij je abonnement?</string>
+    <string name="privacyProFaqSecondaryRebranding">Krijg via onze hulppagina\'s antwoorden op veelgestelde vragen of neem er contact op met de klantenservice voor abonnementen. De beschikbaarheid van functies verschilt per land.</string>
+    <string name="restoreSubscriptionTitleRebranding">Voeg je abonnement toe aan dit apparaat</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Koppel een e-mailadres aan je abonnement om het aan dit apparaat toe te voegen.</string>
+    <string name="activateOnOtherDevicesRebranding">Voeg je abonnement toe aan andere apparaten</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Voeg je abonnement toe aan je andere apparaten via Google Play of door een e-mailadres te koppelen.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Gebruik het e-mailadres hierboven om je abonnement toe te voegen op je andere apparaten in de DuckDuckGo-app. Ga naar Instellingen &gt; Abonnementsinstellingen &gt; Ik heb een abonnement.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro heet nu gewoon het DuckDuckGo-abonnement</string>
+
 </resources>

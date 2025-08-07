@@ -1,0 +1,749 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.app.onboarding.ui.page
+
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.graphics.Color
+import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
+import android.view.WindowManager
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.PathInterpolator
+import androidx.annotation.DrawableRes
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.animation.doOnEnd
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.flowWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.transition.AutoTransition
+import androidx.transition.TransitionManager
+import com.airbnb.lottie.LottieAnimationView
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.ContentOnboardingWelcomePageBbBinding
+import com.duckduckgo.app.onboarding.ui.page.BbWelcomePage.BbOnboardingBackgroundSceneManager.BackgroundTile.*
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.ADDRESS_BAR_POSITION
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.COMPARISON_CHART
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.INITIAL_REINSTALL_USER
+import com.duckduckgo.app.onboarding.ui.page.PreOnboardingDialogType.SKIP_ONBOARDING_OPTION
+import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.*
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.TypeAnimationTextView
+import com.duckduckgo.common.ui.view.toPx
+import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.FragmentViewModelFactory
+import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
+import com.duckduckgo.di.scopes.FragmentScope
+import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+@InjectWith(FragmentScope::class)
+class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_bb) {
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    @Inject
+    lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var appTheme: AppTheme
+
+    private val binding: ContentOnboardingWelcomePageBbBinding by viewBinding()
+    private val viewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[WelcomePageViewModel::class.java]
+    }
+
+    private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
+    private var daxDialogAnimationStarted = false
+    private var backgroundSceneManager: BbOnboardingBackgroundSceneManager? = null
+
+    @SuppressLint("SourceLockedOrientationActivity")
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        viewModel.commands.flowWithLifecycle(lifecycle, Lifecycle.State.STARTED).onEach {
+            when (it) {
+                is ShowInitialReinstallUserDialog -> configureDaxCta(INITIAL_REINSTALL_USER)
+                is ShowInitialDialog -> configureDaxCta(INITIAL)
+                is ShowComparisonChart -> configureDaxCta(COMPARISON_CHART)
+                is ShowSkipOnboardingOption -> configureDaxCta(SKIP_ONBOARDING_OPTION)
+                is ShowDefaultBrowserDialog -> showDefaultBrowserDialog(it.intent)
+                is ShowAddressBarPositionDialog -> configureDaxCta(ADDRESS_BAR_POSITION)
+                is Finish -> onContinuePressed()
+                is OnboardingSkipped -> onSkipPressed()
+                is SetAddressBarPositionOptions -> setAddressBarPositionOptions(it.defaultOption)
+            }
+        }.launchIn(lifecycleScope)
+    }
+
+    private fun setAddressBarPositionOptions(defaultOption: Boolean) {
+        with(binding.daxDialogCta.addressBarPosition) {
+            option1.isSelected = defaultOption
+            option2.isSelected = !defaultOption
+
+            option1Switch.isChecked = defaultOption
+            option2Switch.isChecked = !defaultOption
+
+            option1Image.isSelected = defaultOption
+            option2Image.isSelected = !defaultOption
+
+            val (visibleImage, hiddenImage) = if (defaultOption) {
+                option1Image to option2Image
+            } else {
+                option2Image to option1Image
+            }
+
+            hiddenImage.animate().alpha(0f).setDuration(ANIMATION_DURATION / 2)
+                .withEndAction { visibleImage.animate().alpha(1f).setDuration(ANIMATION_DURATION / 2) }
+        }
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.longDescriptionContainer) { _, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            binding.statusBarGuideline.setGuidelineBegin(systemBarsInsets.top)
+            binding.navigationBarGuideline.setGuidelineEnd(systemBarsInsets.bottom)
+            insets
+        }
+
+        backgroundSceneManager = BbOnboardingBackgroundSceneManager(
+            backgroundView1 = binding.background1,
+            backgroundView2 = binding.background2,
+            windStrokesAnimationView = binding.windStrokesAnimation,
+            lightModeEnabled = appTheme.isLightModeEnabled(),
+        ).also { it.initializeView() }
+
+        binding.onboardingProgress.setStepCount(3)
+        binding.onboardingProgressDots.setStepCount(3)
+
+        startWelcomeAnimation()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyFullScreenFlags()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        welcomeAnimation?.cancel()
+    }
+
+    override fun onActivityResult(
+        requestCode: Int,
+        resultCode: Int,
+        data: Intent?,
+    ) {
+        if (requestCode == DEFAULT_BROWSER_ROLE_MANAGER_DIALOG) {
+            if (resultCode == Activity.RESULT_OK) {
+                viewModel.onDefaultBrowserSet()
+            } else {
+                viewModel.onDefaultBrowserNotSet()
+            }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun configureDaxCta(onboardingDialogType: PreOnboardingDialogType) {
+        context?.let {
+            var afterTypingAnimation: () -> Unit = {}
+            viewModel.onDialogShown(onboardingDialogType)
+            when (onboardingDialogType) {
+                INITIAL_REINSTALL_USER -> {
+                    binding.daxDialogCta.root.isVisible = true
+                    binding.daxDialogCta.initial.root.isVisible = true
+
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog1SecondaryButton)
+                    binding.daxDialogCta.secondaryCta.isVisible = true
+                    binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
+
+                    showDaxDialogCardView(
+                        onAnimationEnd = {
+                            with(binding.onboardingProgress) {
+                                setCurrentStep(1)
+                                animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            with(binding.onboardingProgressDots) {
+                                setCurrentStep(1)
+                                animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
+                            binding.daxDialogCta.initial.dialogTitleInvisible.text = titleText.html(context = it)
+
+                            afterTypingAnimation = {
+                                binding.daxDialogCta.initial.dialogTitle.finishAnimation()
+                                binding.daxDialogCta.primaryCta.setOnClickListener { view ->
+                                    // delay the action so that the button can show visual feedback before we hide it
+                                    view.postDelayed(200) { viewModel.onPrimaryCtaClicked(INITIAL_REINSTALL_USER) }
+                                    view.setOnClickListener(null)
+                                }
+                                binding.daxDialogCta.secondaryCta.setOnClickListener { viewModel.onSecondaryCtaClicked(INITIAL_REINSTALL_USER) }
+
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                                binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            binding.daxDialogCta.initial.shieldImage.animate()
+                                .alpha(1.0f)
+                                .setDuration(ANIMATION_DURATION)
+                                .withEndAction {
+                                    binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
+                                        titleText,
+                                        afterAnimation = { afterTypingAnimation() },
+                                    )
+                                }
+                        },
+                    )
+                }
+
+                INITIAL -> {
+                    binding.daxDialogCta.root.isVisible = true
+                    binding.daxDialogCta.initial.root.isVisible = true
+
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog1Button)
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+
+                    showDaxDialogCardView(
+                        onAnimationEnd = {
+                            with(binding.onboardingProgress) {
+                                setCurrentStep(1)
+                                animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            with(binding.onboardingProgressDots) {
+                                setCurrentStep(1)
+                                animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
+
+                            afterTypingAnimation = {
+                                binding.daxDialogCta.initial.dialogTitle.finishAnimation()
+                                binding.daxDialogCta.primaryCta.setOnClickListener { view ->
+                                    // delay the action so that the button can show visual feedback before we hide it
+                                    view.postDelayed(200) { viewModel.onPrimaryCtaClicked(INITIAL) }
+                                    view.setOnClickListener(null)
+                                }
+
+                                binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                            }
+
+                            binding.daxDialogCta.initial.shieldImage.animate()
+                                .alpha(1.0f)
+                                .setDuration(ANIMATION_DURATION)
+                                .withEndAction {
+                                    binding.daxDialogCta.initial.dialogTitle.startTypingAnimation(
+                                        titleText,
+                                        afterAnimation = { afterTypingAnimation() },
+                                    )
+                                }
+                        },
+                    )
+                }
+
+                COMPARISON_CHART -> {
+                    binding.onboardingProgress.setCurrentStep(2)
+                    binding.onboardingProgressDots.setCurrentStep(2)
+                    TransitionManager.beginDelayedTransition(binding.daxDialogCta.cardView, AutoTransition())
+                    resetDialogContentVisibility()
+                    binding.daxDialogCta.primaryCta.visibility = View.INVISIBLE
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+                    binding.daxDialogCta.comparisonChart.root.isVisible = true
+
+                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog2Title)
+                    binding.daxDialogCta.comparisonChart.titleInvisible.text = titleText.html(context = it)
+
+                    val comparisonChartViews = with(binding.daxDialogCta.comparisonChart) {
+                        listOf(ddgLogo, chromeLogo, row1, row2, row3, row4, row5)
+                    }
+
+                    comparisonChartViews.forEach { view -> view.alpha = MIN_ALPHA }
+
+                    afterTypingAnimation = {
+                        comparisonChartViews.forEach { view ->
+                            view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                        }
+
+                        binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog2Button)
+                        if (!binding.daxDialogCta.primaryCta.isVisible) {
+                            binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                            binding.daxDialogCta.primaryCta.isVisible = true
+                        }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(COMPARISON_CHART) }
+                    }
+
+                    scheduleTypingAnimation(binding.daxDialogCta.comparisonChart.title, titleText) { afterTypingAnimation() }
+                    backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_03)
+                }
+
+                SKIP_ONBOARDING_OPTION -> {
+                    resetDialogContentVisibility()
+                    TransitionManager.beginDelayedTransition(
+                        binding.daxDialogCta.cardView,
+                        AutoTransition(),
+                    )
+                    binding.daxDialogCta.skipOnboarding.root.isVisible = true
+
+                    val titleText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Title)
+                    val descriptionText = it.getString(R.string.highlightsPreOnboardingDaxDialog3Text)
+
+                    binding.daxDialogCta.skipOnboarding.dialogTitleInvisible.text = titleText.html(context = it)
+                    binding.daxDialogCta.skipOnboarding.descriptionInvisible.text = descriptionText.html(context = it)
+
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.preOnboardingDaxDialog3Button)
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+                    binding.daxDialogCta.secondaryCta.text = it.getString(R.string.preOnboardingDaxDialog3SecondaryButton)
+                    binding.daxDialogCta.secondaryCta.alpha = MIN_ALPHA
+
+                    afterTypingAnimation = {
+                        binding.daxDialogCta.skipOnboarding.dialogTitle.finishAnimation()
+                        binding.daxDialogCta.skipOnboarding.description.finishAnimation()
+                        binding.daxDialogCta.primaryCta.setOnClickListener {
+                            viewModel.onPrimaryCtaClicked(SKIP_ONBOARDING_OPTION)
+                        }
+                        binding.daxDialogCta.secondaryCta.setOnClickListener {
+                            viewModel.onSecondaryCtaClicked(SKIP_ONBOARDING_OPTION)
+                        }
+
+                        if (binding.daxDialogCta.skipOnboarding.description.text.isEmpty()) {
+                            binding.daxDialogCta.skipOnboarding.description.text = descriptionText.html(context = it)
+                        }
+
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                        binding.daxDialogCta.secondaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                    }
+
+                    binding.daxDialogCta.skipOnboarding.dialogTitle.startTypingAnimation(
+                        titleText,
+                        afterAnimation = {
+                            binding.daxDialogCta.skipOnboarding.description.startTypingAnimation(
+                                descriptionText,
+                                afterAnimation = { afterTypingAnimation() },
+                            )
+                        },
+                    )
+                }
+
+                ADDRESS_BAR_POSITION -> {
+                    binding.onboardingProgress.setCurrentStep(3)
+                    binding.onboardingProgressDots.setCurrentStep(3)
+                    resetDialogContentVisibility()
+                    binding.daxDialogCta.secondaryCta.isVisible = false
+                    TransitionManager.beginDelayedTransition(
+                        binding.daxDialogCta.cardView,
+                        AutoTransition(),
+                    )
+                    binding.daxDialogCta.addressBarPosition.root.isVisible = true
+
+                    binding.daxDialogCta.primaryCta.text = it.getString(R.string.highlightsPreOnboardingAddressBarOkButton)
+                    binding.daxDialogCta.primaryCta.alpha = MIN_ALPHA
+
+                    val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
+                    contentViews.forEach { view -> view.alpha = MIN_ALPHA }
+                    val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
+
+                    val (topImage, bottomImage) = if (appTheme.isLightModeEnabled()) {
+                        R.drawable.bb_address_bar_top_light to R.drawable.bb_address_bar_bottom_light
+                    } else {
+                        R.drawable.bb_address_bar_top_dark to R.drawable.bb_address_bar_bottom_dark
+                    }
+
+                    binding.daxDialogCta.addressBarPosition.option1Image.setImageResource(topImage)
+                    binding.daxDialogCta.addressBarPosition.option2Image.setImageResource(bottomImage)
+
+                    afterTypingAnimation = {
+                        setAddressBarPositionOptions(true)
+
+                        binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(true)
+                        }
+                        binding.daxDialogCta.addressBarPosition.option2.setOnClickListener {
+                            viewModel.onAddressBarPositionOptionSelected(false)
+                        }
+
+                        binding.daxDialogCta.primaryCta.setOnClickListener { viewModel.onPrimaryCtaClicked(ADDRESS_BAR_POSITION) }
+
+                        binding.daxDialogCta.addressBarPosition.option1Image.animate().alpha(1f).setDuration(ANIMATION_DURATION)
+                        contentViews.forEach { view ->
+                            view.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                        }
+                        binding.daxDialogCta.primaryCta.animate().alpha(MAX_ALPHA).setDuration(ANIMATION_DURATION)
+                    }
+
+                    scheduleTypingAnimation(binding.daxDialogCta.addressBarPosition.dialogTitle, titleText) { afterTypingAnimation() }
+                    backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_04)
+                }
+            }
+            backgroundSceneManager?.setBackgroundClickListener(afterTypingAnimation)
+            binding.daxDialogCta.cardContainer.setOnClickListener { afterTypingAnimation() }
+        }
+    }
+
+    private fun resetDialogContentVisibility() {
+        binding.daxDialogCta
+            .run { listOf(initial, skipOnboarding, comparisonChart, addressBarPosition) }
+            .forEach { it.root.isVisible = false }
+    }
+
+    private fun startWelcomeAnimation() {
+        binding.daxLogo.postDelayed(400) {
+            binding.daxLogo.setMaxFrame(13)
+            binding.daxLogo.playAnimation()
+        }
+
+        binding.welcomeTitle.translationY = 32f.toPx()
+        binding.welcomeTitle.animate()
+            .alpha(MAX_ALPHA)
+            .translationY(0f)
+            .setDuration(800)
+            .setStartDelay(100)
+            .setInterpolator(STANDARD_EASING_INTERPOLATOR)
+            .withEndAction {
+                startDaxDialogAnimation()
+            }
+
+        backgroundSceneManager?.startWelcomeAnimation()
+    }
+
+    private fun startDaxDialogAnimation() {
+        if (daxDialogAnimationStarted) return
+        daxDialogAnimationStarted = true
+
+        val winkDelay = 300.milliseconds
+        val transitionDelay = 1300.milliseconds
+        val transitionDuration = SCENE_TRANSITION_DURATION
+
+        binding.daxLogo.postDelayed(winkDelay.inWholeMilliseconds) {
+            binding.daxLogo.setMaxFrame(42)
+            binding.daxLogo.resumeAnimation()
+        }
+
+        ConstraintSet().apply {
+            clone(binding.longDescriptionContainer)
+            // update dax logo constraints to set it up for transition using its start+top margins
+            clear(R.id.daxLogoContainer, ConstraintSet.END)
+            connect(
+                R.id.daxLogoContainer,
+                ConstraintSet.START,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.START,
+                binding.daxLogoContainer.x.toInt(), // adjust start margin to maintain current position
+            )
+
+            // update title text constraints to disconnect it from dax logo
+            clear(R.id.welcomeTitle, ConstraintSet.TOP)
+            connect(
+                R.id.welcomeTitle,
+                ConstraintSet.TOP,
+                R.id.statusBarGuideline,
+                ConstraintSet.BOTTOM,
+                (binding.welcomeTitle.y - binding.statusBarGuideline.y).toInt(),
+            )
+
+            applyTo(binding.longDescriptionContainer)
+        }
+
+        ValueAnimator.ofFloat(0f, 1f)
+            .apply {
+                duration = transitionDuration.inWholeMilliseconds
+                startDelay = transitionDelay.inWholeMilliseconds
+                interpolator = STANDARD_EASING_INTERPOLATOR
+
+                val daxLogoLayoutParams = binding.daxLogoContainer.layoutParams as MarginLayoutParams
+                val initialWidth = daxLogoLayoutParams.width
+                val initialHeight = daxLogoLayoutParams.height
+                val initialMarginStart = daxLogoLayoutParams.marginStart
+                val initialMarginTop = daxLogoLayoutParams.topMargin
+                val targetMarginStart = 16.toPx()
+                val targetMarginTop = 0
+                val targetWidth = 64.toPx()
+                val targetHeight = 64.toPx()
+
+                fun calculateCurrentValue(
+                    initial: Int,
+                    target: Int,
+                    progress: Float,
+                ): Int = (initial + (target - initial) * progress).toInt()
+
+                addUpdateListener { animator ->
+                    val progress = animator.animatedValue as Float
+
+                    binding.daxLogoContainer.updateLayoutParams<MarginLayoutParams> {
+                        marginStart = calculateCurrentValue(initialMarginStart, targetMarginStart, progress)
+                        topMargin = calculateCurrentValue(initialMarginTop, targetMarginTop, progress)
+                        width = calculateCurrentValue(initialWidth, targetWidth, progress)
+                        height = calculateCurrentValue(initialHeight, targetHeight, progress)
+                    }
+                }
+            }
+            .start()
+
+        binding.welcomeTitle.animate()
+            .translationX(-resources.displayMetrics.widthPixels.toFloat())
+            .setDuration(transitionDuration.inWholeMilliseconds)
+            .setStartDelay(transitionDelay.inWholeMilliseconds)
+            .withStartAction {
+                backgroundSceneManager?.transitionToNextTile(expectedTile = TILE_02)
+            }
+            .withEndAction {
+                binding.welcomeTitle.isVisible = false
+                viewModel.loadDaxDialog()
+            }
+    }
+
+    private fun showDaxDialogCardView(onAnimationEnd: () -> Unit) {
+        val animationDuration = 600.milliseconds
+        val rotationDelay = 67.milliseconds
+        val scaleValues = floatArrayOf(0.14f, 1.03f, 0.99f, 1.0f)
+        val rotationValues = floatArrayOf(5f, -1f, 0.5f, 0f)
+
+        val dialogCardView = binding.daxDialogCta.cardView
+            .apply {
+                pivotX = 0f
+                pivotY = 0f
+                scaleX = scaleValues.first()
+                scaleY = scaleValues.first()
+                rotation = rotationValues.first()
+            }
+
+        val scaleXAnimator = ObjectAnimator.ofFloat(dialogCardView, "scaleX", *scaleValues)
+        val scaleYAnimator = ObjectAnimator.ofFloat(dialogCardView, "scaleY", *scaleValues)
+
+        val rotationAnimator = ObjectAnimator.ofFloat(dialogCardView, "rotation", *rotationValues)
+            .apply { startDelay = rotationDelay.inWholeMilliseconds }
+
+        AnimatorSet().run {
+            playTogether(scaleXAnimator, scaleYAnimator, rotationAnimator)
+            setDuration(animationDuration.inWholeMilliseconds)
+            doOnEnd { onAnimationEnd() }
+            start()
+        }
+    }
+
+    private fun scheduleTypingAnimation(textView: TypeAnimationTextView, text: String, afterAnimation: () -> Unit = {}) {
+        textView.postDelayed(
+            { textView.startTypingAnimation(text, afterAnimation = afterAnimation) },
+            ANIMATION_DURATION,
+        )
+    }
+
+    private fun showDefaultBrowserDialog(intent: Intent) {
+        startActivityForResult(intent, DEFAULT_BROWSER_ROLE_MANAGER_DIALOG)
+    }
+
+    private fun applyFullScreenFlags() {
+        activity?.window?.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            WindowCompat.setDecorFitsSystemWindows(this, false)
+            statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.TRANSPARENT
+        }
+        ViewCompat.requestApplyInsets(binding.longDescriptionContainer)
+    }
+
+    companion object {
+        private const val MIN_ALPHA = 0f
+        private const val MAX_ALPHA = 1f
+        private const val ANIMATION_DURATION = 400L
+        private val SCENE_TRANSITION_DURATION = 800.milliseconds
+
+        private const val DEFAULT_BROWSER_ROLE_MANAGER_DIALOG = 101
+
+        // https://m3.material.io/styles/motion/easing-and-duration/tokens-specs#7e37d374-0c1b-4007-8187-6f29bb1fb3e7
+        private val STANDARD_EASING_INTERPOLATOR = PathInterpolator(0.2f, 0f, 0f, 1f)
+    }
+
+    private class BbOnboardingBackgroundSceneManager(
+        backgroundView1: View,
+        backgroundView2: View,
+        val windStrokesAnimationView: LottieAnimationView,
+        val lightModeEnabled: Boolean,
+    ) {
+        private val screenWidth =
+            backgroundView1.context.resources.displayMetrics.widthPixels.toFloat()
+
+        private var currentBackgroundView = backgroundView1
+        private var nextBackgroundView = backgroundView2
+        private var transitionInProgress = false
+        private var currentTile = TILE_01
+
+        private val nextTile: BackgroundTile?
+            get() {
+                return with(BackgroundTile.entries) {
+                    val nextTileIndex = indexOf(currentTile) + 1
+                    if (nextTileIndex in indices) get(nextTileIndex) else null
+                }
+            }
+
+        fun initializeView() {
+            currentBackgroundView.setBackgroundResource(getBackgroundResource(currentTile))
+            currentBackgroundView.scaleX = 1.0f
+            currentBackgroundView.scaleY = 1.0f
+            currentBackgroundView.isVisible = true
+            nextTile?.let { nextBackgroundView.setBackgroundResource(getBackgroundResource(it)) }
+            nextBackgroundView.translationX = screenWidth
+            nextBackgroundView.isVisible = false
+        }
+
+        fun startWelcomeAnimation() {
+            if (transitionInProgress) return
+            transitionInProgress = true
+
+            currentBackgroundView.animate()
+                .scaleX(BACKGROUND_TARGET_SCALE)
+                .scaleY(BACKGROUND_TARGET_SCALE)
+                .setDuration(SCENE_TRANSITION_DURATION.inWholeMilliseconds)
+                .setInterpolator(DecelerateInterpolator())
+                .withEndAction {
+                    transitionInProgress = false
+                }
+
+            nextBackgroundView.scaleX = BACKGROUND_TARGET_SCALE
+            nextBackgroundView.scaleY = BACKGROUND_TARGET_SCALE
+            nextBackgroundView.translationX = screenWidth * BACKGROUND_TARGET_SCALE
+        }
+
+        fun transitionToNextTile(expectedTile: BackgroundTile) {
+            if (transitionInProgress || nextTile != expectedTile) return
+
+            currentTile = expectedTile
+            transitionInProgress = true
+            nextBackgroundView.isVisible = true
+
+            val currentSlideOut = ObjectAnimator.ofFloat(
+                currentBackgroundView,
+                "translationX",
+                0f,
+                -screenWidth * BACKGROUND_TARGET_SCALE,
+            )
+
+            val nextSlideIn = ObjectAnimator.ofFloat(
+                nextBackgroundView,
+                "translationX",
+                screenWidth * BACKGROUND_TARGET_SCALE,
+                0f,
+            )
+
+            // Execute animation
+            AnimatorSet().apply {
+                playTogether(currentSlideOut, nextSlideIn)
+                duration = SCENE_TRANSITION_DURATION.inWholeMilliseconds
+
+                doOnEnd { completeTransition() }
+            }.start()
+
+            if (currentTile == TILE_02) {
+                windStrokesAnimationView.isVisible = true
+                windStrokesAnimationView.alpha = if (lightModeEnabled) 1.0f else 0.4f
+                windStrokesAnimationView.playAnimation()
+            }
+        }
+
+        fun setBackgroundClickListener(onClick: () -> Unit) {
+            currentBackgroundView.setOnClickListener { onClick() }
+            nextBackgroundView.setOnClickListener { onClick() }
+        }
+
+        private fun completeTransition() {
+            val temp = currentBackgroundView
+            currentBackgroundView = nextBackgroundView
+            nextBackgroundView = temp
+
+            // Hide the off-screen view
+            nextBackgroundView.isVisible = false
+
+            // Prepare next tile if available
+            nextTile?.let { tile ->
+                nextBackgroundView.setBackgroundResource(getBackgroundResource(tile))
+                nextBackgroundView.translationX = screenWidth * BACKGROUND_TARGET_SCALE
+            }
+
+            transitionInProgress = false
+        }
+
+        @DrawableRes
+        private fun getBackgroundResource(tile: BackgroundTile): Int {
+            return if (lightModeEnabled) tile.drawableLight else tile.drawableDark
+        }
+
+        enum class BackgroundTile(
+            @DrawableRes val drawableLight: Int,
+            @DrawableRes val drawableDark: Int,
+        ) {
+            TILE_01(
+                drawableLight = R.drawable.bb_onboarding_background_01_light,
+                drawableDark = R.drawable.bb_onboarding_background_01_dark,
+            ),
+            TILE_02(
+                drawableLight = R.drawable.bb_onboarding_background_02_light,
+                drawableDark = R.drawable.bb_onboarding_background_02_dark,
+            ),
+            TILE_03(
+                drawableLight = R.drawable.bb_onboarding_background_03_light,
+                drawableDark = R.drawable.bb_onboarding_background_03_dark,
+            ),
+            TILE_04(
+                drawableLight = R.drawable.bb_onboarding_background_04_light,
+                drawableDark = R.drawable.bb_onboarding_background_04_dark,
+            ),
+            ;
+        }
+
+        private companion object {
+            const val BACKGROUND_TARGET_SCALE = 1.15f
+        }
+    }
+}

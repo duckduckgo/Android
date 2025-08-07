@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adresszeile</string>
     <string name="duck_chat_assist_settings_title">Assist-Einstellungen</string>
     <string name="duck_chat_assist_settings_description">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Suche</string>
+    <string name="input_screen_search_hint">Adresse suchen oder eingeben</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Frag Duck.ai</string>
+    <string name="input_screen_user_pref_title">Experimentelle Adressleiste</string>
+    <string name="input_screen_user_pref_description">Suche im Web oder frag Duck.ai direkt über die Adressleiste</string>
 </resources>

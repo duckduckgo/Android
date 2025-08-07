@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Címsor</string>
     <string name="duck_chat_assist_settings_title">Assist-beállítások</string>
     <string name="duck_chat_assist_settings_description">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Keresés</string>
+    <string name="input_screen_search_hint">Keresés vagy cím megadása</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Duck.ai kérdezése</string>
+    <string name="input_screen_user_pref_title">Kísérleti címsor</string>
+    <string name="input_screen_user_pref_description">Keresés a weben vagy a Duck.ai megkérdezése közvetlenül a címsorból</string>
 </resources>

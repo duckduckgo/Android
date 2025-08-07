@@ -171,7 +171,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerManualScanStarted(state: BrokerManualScanStarted) {
-        pixelSender.reportManualScanBrokerStarted(state.brokerName)
+        pixelSender.reportBrokerScanStarted(state.brokerName)
         repository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -183,7 +183,11 @@ class RealPirRunStateHandler @Inject constructor(
 
     private suspend fun handleBrokerManualScanCompleted(state: BrokerManualScanCompleted) {
         handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
-
+        pixelSender.reportBrokerScanCompleted(
+            brokerName = state.brokerName,
+            totalTimeInMillis = state.totalTimeMillis,
+            isSuccess = state.isSuccess,
+        )
         repository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -198,16 +202,10 @@ class RealPirRunStateHandler @Inject constructor(
             endTimeInMillis = state.eventTimeInMillis,
             isSuccess = state.isSuccess,
         )
-
-        pixelSender.reportManualScanBrokerCompleted(
-            brokerName = state.brokerName,
-            totalTimeInMillis = state.totalTimeMillis,
-            isSuccess = state.isSuccess,
-        )
     }
 
     private suspend fun handleBrokerScheduledScanStarted(state: BrokerScheduledScanStarted) {
-        pixelSender.reportScheduledScanBrokerStarted(state.brokerName)
+        pixelSender.reportBrokerScanStarted(state.brokerName)
         repository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -218,7 +216,8 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScheduledScanCompleted(state: BrokerScheduledScanCompleted) {
-        pixelSender.reportScheduledScanBrokerCompleted(
+        handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
+        pixelSender.reportBrokerScanCompleted(
             brokerName = state.brokerName,
             totalTimeInMillis = state.totalTimeMillis,
             isSuccess = state.isSuccess,
@@ -237,8 +236,6 @@ class RealPirRunStateHandler @Inject constructor(
             endTimeInMillis = state.eventTimeInMillis,
             isSuccess = state.isSuccess,
         )
-
-        handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
     }
 
     private suspend fun handleBrokerScanActionSucceeded(state: BrokerScanActionSucceeded) {
@@ -280,26 +277,24 @@ class RealPirRunStateHandler @Inject constructor(
     private suspend fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {
         jobRecordUpdater.markOptOutAsAttempted(state.extractedProfile.dbId)
 
-        pixelSender.reportRecordOptOutStarted(
+        pixelSender.reportOptOutStarted(
             brokerName = state.brokerName,
         )
     }
 
     private suspend fun handleRecordOptOutCompleted(state: BrokerRecordOptOutCompleted) {
         updateOptOutRecord(state.isSubmitSuccess, state.extractedProfile.dbId)
-
+        pixelSender.reportOptOutCompleted(
+            brokerName = state.brokerName,
+            totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
+            isSuccess = state.isSubmitSuccess,
+        )
         repository.saveOptOutCompleted(
             brokerName = state.brokerName,
             extractedProfile = state.extractedProfile,
             startTimeInMillis = state.startTimeInMillis,
             endTimeInMillis = state.endTimeInMillis,
             isSubmitSuccess = state.isSubmitSuccess,
-        )
-
-        pixelSender.reportRecordOptOutCompleted(
-            brokerName = state.brokerName,
-            totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
-            isSuccess = state.isSubmitSuccess,
         )
     }
 

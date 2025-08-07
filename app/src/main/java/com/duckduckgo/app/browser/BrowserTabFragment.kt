@@ -921,7 +921,7 @@ class BrowserTabFragment :
 
             RESULT_CANCELED -> {
                 data.getStringExtra(InputScreenActivityResultParams.CANCELED_DRAFT_PARAM)?.let { query ->
-                    omnibar.setDraftTextIfNtp(query)
+                    omnibar.setDraftTextIfNtpOrSerp(query)
                 }
             }
         }
@@ -4439,7 +4439,10 @@ class BrowserTabFragment :
                     }
                     else -> {
                         showCta(daxDialogIntroBubble.daxCtaContainer) {
-                            setOnOptionClicked { userEnteredQuery(it.link) }
+                            setOnOptionClicked(
+                                onboardingExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled(),
+                                configuration = configuration,
+                            ) { userEnteredQuery(it.link) }
                         }
                     }
                 }

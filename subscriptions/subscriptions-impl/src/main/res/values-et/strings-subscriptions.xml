@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Mul on tellimus</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Saada tagasisidet</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo tellimus</string>
+    <string name="subscriptionSettingExpiredRebranding">Sinu DuckDuckGo tellimus aegus</string>
+    <string name="privacyProFaqRebranding">Kas vajad abi oma tellimusega?</string>
+    <string name="privacyProFaqSecondaryRebranding">Saa vastused korduma kippuvatele küsimustele või võta ühendust tellimuse toega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
+    <string name="restoreSubscriptionTitleRebranding">Lisa oma tellimus sellele seadmele</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Seo e-posti aadress oma tellimusega, et lisada see sellesse seadmesse.</string>
+    <string name="activateOnOtherDevicesRebranding">Lisage oma tellimus teistele seadmetele</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisa oma tellimus oma teistesse seadmetesse Google Play kaudu või e-posti aadressi sidumisega.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Kasuta ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Mine jaotisse Seaded &gt; Tellimisseaded &gt; Mul on tellimus.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kannab nüüd lihtsalt nime DuckDuckGo tellimus</string>
+
 </resources>

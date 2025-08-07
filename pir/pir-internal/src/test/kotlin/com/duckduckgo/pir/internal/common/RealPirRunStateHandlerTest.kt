@@ -135,7 +135,7 @@ class RealPirRunStateHandlerTest {
             endTimeInMillis = testEventTimeInMillis,
             isSuccess = true,
         )
-        verify(mockPixelSender).reportManualScanBrokerCompleted(
+        verify(mockPixelSender).reportBrokerScanCompleted(
             brokerName = testBrokerName,
             totalTimeInMillis = testTotalTimeMillis,
             isSuccess = true,
@@ -170,7 +170,7 @@ class RealPirRunStateHandlerTest {
             endTimeInMillis = testEventTimeInMillis,
             isSuccess = false,
         )
-        verify(mockPixelSender).reportManualScanBrokerCompleted(
+        verify(mockPixelSender).reportBrokerScanCompleted(
             brokerName = testBrokerName,
             totalTimeInMillis = testTotalTimeMillis,
             isSuccess = false,
@@ -191,7 +191,7 @@ class RealPirRunStateHandlerTest {
 
         testee.handleState(state)
 
-        verify(mockPixelSender).reportScheduledScanBrokerCompleted(
+        verify(mockPixelSender).reportBrokerScanCompleted(
             brokerName = testBrokerName,
             totalTimeInMillis = testTotalTimeMillis,
             isSuccess = true,
@@ -226,7 +226,7 @@ class RealPirRunStateHandlerTest {
 
         testee.handleState(state)
 
-        verify(mockPixelSender).reportScheduledScanBrokerCompleted(
+        verify(mockPixelSender).reportBrokerScanCompleted(
             brokerName = testBrokerName,
             totalTimeInMillis = testTotalTimeMillis,
             isSuccess = false,
@@ -341,7 +341,7 @@ class RealPirRunStateHandlerTest {
         testee.handleState(state)
 
         verify(mockJobRecordUpdater).markOptOutAsAttempted(testExtractedProfileId)
-        verify(mockPixelSender).reportRecordOptOutStarted(brokerName = testBrokerName)
+        verify(mockPixelSender).reportOptOutStarted(brokerName = testBrokerName)
     }
 
     @Test
@@ -364,7 +364,7 @@ class RealPirRunStateHandlerTest {
             endTimeInMillis = testEventTimeInMillis,
             isSubmitSuccess = true,
         )
-        verify(mockPixelSender).reportRecordOptOutCompleted(
+        verify(mockPixelSender).reportOptOutCompleted(
             brokerName = testBrokerName,
             totalTimeInMillis = testEventTimeInMillis - testStartTimeInMillis,
             isSuccess = true,
@@ -391,7 +391,7 @@ class RealPirRunStateHandlerTest {
             endTimeInMillis = testEventTimeInMillis,
             isSubmitSuccess = false,
         )
-        verify(mockPixelSender).reportRecordOptOutCompleted(
+        verify(mockPixelSender).reportOptOutCompleted(
             brokerName = testBrokerName,
             totalTimeInMillis = testEventTimeInMillis - testStartTimeInMillis,
             isSuccess = false,

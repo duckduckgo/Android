@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Ich habe ein Abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Rückmeldung senden</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo Abonnement</string>
+    <string name="subscriptionSettingExpiredRebranding">Dein DuckDuckGo-Abo ist abgelaufen</string>
+    <string name="privacyProFaqRebranding">Benötigst du Hilfe bei deinem Abonnement?</string>
+    <string name="privacyProFaqSecondaryRebranding">Erhalte Antworten auf häufig gestellte Fragen oder kontaktiere den Abonnement-Support über unsere Hilfeseiten. Die Verfügbarkeit von Funktionen variiert je nach Land.</string>
+    <string name="restoreSubscriptionTitleRebranding">Füge dein Abonnement zu diesem Gerät hinzu</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Verknüpfe eine E-Mail-Adresse mit deinem Abonnement, um es zu diesem Gerät hinzuzufügen.</string>
+    <string name="activateOnOtherDevicesRebranding">Füge dein Abonnement zu anderen Geräten hinzu</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Füge dein Abonnement über Google Play oder durch Verknüpfung einer E-Mail-Adresse zu deinen anderen Geräten hinzu.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Verwende die oben angegebene E-Mail-Adresse, um dein Abonnement auf deinen anderen Geräten in der DuckDuckGo-App hinzuzufügen. Gehe zu Einstellungen &gt; Abonnementeinstellungen &gt; Ich habe ein Abonnement.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro heißt jetzt einfach DuckDuckGo-Abo</string>
+
 </resources>

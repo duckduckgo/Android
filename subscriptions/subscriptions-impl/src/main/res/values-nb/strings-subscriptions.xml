@@ -168,4 +168,17 @@
     <string name="activityActivateSubscription">Jeg har et abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send tilbakemelding</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo-abonnement</string>
+    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo-abonnementet er utløpt</string>
+    <string name="privacyProFaqRebranding">Trenger du hjelp med abonnementet ditt?</string>
+    <string name="privacyProFaqSecondaryRebranding">Få svar på ofte stilte spørsmål eller kontakt abonnementsstøtte via hjelpesidene våre. Tilgjengelige funksjoner varierer fra land til land.</string>
+    <string name="restoreSubscriptionTitleRebranding">Legg til abonnementet på denne enheten</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Koble en e-postadresse til abonnementet ditt for å legge det til på denne enheten.</string>
+    <string name="activateOnOtherDevicesRebranding">Legg til abonnementet ditt på andre enheter</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Legg til abonnementet på de andre enhetene dine via Google Play eller ved å koble til en e-postadresse.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Bruk e-postadressen ovenfor til å legge til abonnementet ditt på andre enheter i DuckDuckGo-appen. Gå til Innstillinger &gt; Abonnementsinnstillinger &gt; Jeg har et abonnement.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kalles nå bare DuckDuckGo-abonnementet</string>
+
 </resources>

@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Barra de direcciones</string>
     <string name="duck_chat_assist_settings_title">Ajustes de Assist</string>
     <string name="duck_chat_assist_settings_description">Elige con qué frecuencia deseas que las respuestas asistidas por IA aparezcan en tus búsquedas</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Buscar</string>
+    <string name="input_screen_search_hint">Buscar o introducir dirección</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Pregúntale a Duck.ai</string>
+    <string name="input_screen_user_pref_title">Barra de direcciones experimental</string>
+    <string name="input_screen_user_pref_description">Busca en la web o pregúntale a Duck.ai directamente desde la barra de direcciones</string>
 </resources>

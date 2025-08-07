@@ -70,6 +70,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -128,8 +129,8 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
             option1Switch.isChecked = defaultOption
             option2Switch.isChecked = !defaultOption
 
-            option1Image.isSelected = defaultOption
-            option2Image.isSelected = !defaultOption
+            option1Icon.isSelected = defaultOption
+            option2Icon.isSelected = !defaultOption
 
             option1Body.isSelected = defaultOption
             option2Body.isSelected = !defaultOption
@@ -368,7 +369,7 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
 
                             val contentViews = with(binding.daxDialogCta.addressBarPosition) { listOf(option1, option2) }
                             contentViews.forEach { view -> view.alpha = MIN_ALPHA }
-                            val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle)
+                            val titleText = getString(R.string.highlightsPreOnboardingAddressBarTitle).preventWidows()
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.addressBarPosition.option1.setOnClickListener {

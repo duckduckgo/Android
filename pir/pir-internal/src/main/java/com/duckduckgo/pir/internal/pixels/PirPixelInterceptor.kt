@@ -35,7 +35,6 @@ import org.json.JSONObject
 class PirPixelInterceptor @Inject constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
-    private val networkInfoProvider: NetworkInfoProvider,
 ) : PixelInterceptorPlugin, Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
@@ -49,7 +48,6 @@ class PirPixelInterceptor @Inject constructor(
                         .put("os", appBuildConfig.sdkInt)
                         .put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
                         .put("man", appBuildConfig.manufacturer)
-                        .put("networkInfo", networkInfoProvider.getCurrentNetworkInfo())
                         .toString().toByteArray().run {
                             Base64.encodeToString(this, Base64.NO_WRAP or Base64.NO_PADDING or Base64.URL_SAFE)
                         },

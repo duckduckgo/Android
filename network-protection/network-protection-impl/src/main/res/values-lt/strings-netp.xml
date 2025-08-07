@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Automatiškai išskirk programas, nesuderinamas su VPN.</string>
     <string name="netpExclusionListLabelAutoExclude">Nesuderinama su VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Kai kurios programėlės, pavyzdžiui, bankininkystės ar transliacijos programėlės, neveikia gerai su VPN. Įjungus šį nustatymą, mes automatiškai pašalinsime tas programas.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN atjungtas dėl pasibaigusios prenumeratos. Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
 </resources>

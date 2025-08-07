@@ -15,7 +15,7 @@
   -->
 
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="@integer/slide_animation_duration_ms">
+    android:duration="@integer/input_screen_slide_animation_duration_ms">
 
     <alpha
         android:fromAlpha="1.0"

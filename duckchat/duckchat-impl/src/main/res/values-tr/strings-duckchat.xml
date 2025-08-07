@@ -44,4 +44,12 @@
     <string name="duck_chat_address_bar_visibility_setting">Adres Çubuğu</string>
     <string name="duck_chat_assist_settings_title">Assist Ayarları</string>
     <string name="duck_chat_assist_settings_description">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Arama yap</string>
+    <string name="input_screen_search_hint">Adres ara veya gir</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Duck.ai\'a sor</string>
+    <string name="input_screen_user_pref_title">Deneysel Adres Çubuğu</string>
+    <string name="input_screen_user_pref_description">Web\'de arama yapın veya doğrudan Adres Çubuğundan Duck.ai\'a sorun</string>
 </resources>
