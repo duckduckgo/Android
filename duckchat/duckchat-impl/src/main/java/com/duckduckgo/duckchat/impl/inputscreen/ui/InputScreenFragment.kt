@@ -205,18 +205,24 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onSearchSelected = {
             binding.viewPager.setCurrentItem(0, true)
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
-            binding.ddgLogo.isVisible = viewModel.visibilityState.value.showSearchLogo
+            binding.ddgLogo.apply {
+                setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
+                isVisible = viewModel.visibilityState.value.showSearchLogo
+            }
         }
         onChatSelected = {
             binding.viewPager.setCurrentItem(1, true)
             viewModel.onChatSelected()
             viewModel.onChatInputTextChanged(binding.inputModeWidget.text)
-            binding.ddgLogo.setImageResource(R.drawable.logo_full_ai)
-            binding.ddgLogo.isVisible = viewModel.visibilityState.value.showChatLogo
-            if (viewModel.visibilityState.value.showChatLogo && !viewModel.visibilityState.value.showSearchLogo) {
-                binding.ddgLogo.alpha = 0f
-                binding.ddgLogo.animate().alpha(1f).setDuration(200L).start()
+            binding.ddgLogo.apply {
+                setImageResource(R.drawable.logo_full_ai)
+                val showChatLogo = viewModel.visibilityState.value.showChatLogo
+                val showSearchLogo = viewModel.visibilityState.value.showSearchLogo
+                isVisible = showChatLogo
+                if (showChatLogo && !showSearchLogo) {
+                    alpha = 0f
+                    animate().alpha(1f).setDuration(200L).start()
+                }
             }
         }
         onSubmitMessageAvailable = { isAvailable ->
