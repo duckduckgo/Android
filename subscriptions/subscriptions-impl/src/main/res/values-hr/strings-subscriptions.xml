@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodaj svoju pretplatu na svoje druge uređaje putem Google Playa ili povezivanjem adrese e-pošte.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Koristi gore navedenu adresu e-pošte za dodavanje pretplate na svoje druge uređaje u aplikaciji DuckDuckGo. Idi na Postavke &gt; Postavke pretplate &gt; Imam pretplatu.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro sada se jednostavno zove DuckDuckGo pretplata</string>
+    <string name="subscriptionSettingSubscribeRebranding">Zaštiti svoju vezu i identitet jednom pretplatom.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Više nećeš moći pristupiti svojoj pretplati na ovom uređaju. Ovo neće otkazati tvoju pretplatu i ostat će aktivna na tvojim drugim uređajima.</string>
+
 
 </resources>

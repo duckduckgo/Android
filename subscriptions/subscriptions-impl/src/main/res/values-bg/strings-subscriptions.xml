@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Добавете абонамента си към други устройства чрез Google Play или чрез свързване с имейл адрес.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Използвайте имейла по-горе, за да добавите абонамента си на други устройства в приложението DuckDuckGo. Отидете в Настройки &gt; Настройки на абонамента &gt; Имам абонамент.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro вече се нарича просто абонамент за DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Защитете връзката и самоличността си с един абонамент.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Вече няма да имате достъп до абонамента си на това устройство. Това няма да отмени абонамента и той ще остане активен на останалите устройства.</string>
+
 
 </resources>
