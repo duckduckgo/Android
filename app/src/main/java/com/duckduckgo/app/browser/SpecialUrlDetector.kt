@@ -24,6 +24,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
@@ -177,7 +178,8 @@ class SpecialUrlDetectorImpl(
     private fun isBrowserFilter(filter: IntentFilter) =
         filter.countDataAuthorities() == 0 && filter.countDataPaths() == 0
 
-    private fun checkForIntent(
+    @VisibleForTesting
+    internal fun checkForIntent(
         scheme: String,
         uriString: String,
         intentFlags: Int,
