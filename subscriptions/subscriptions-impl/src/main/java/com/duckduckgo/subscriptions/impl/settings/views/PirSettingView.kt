@@ -32,7 +32,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.pir.api.dashboard.PirDashboardScreen
+import com.duckduckgo.pir.api.ui.PirWebViewScreen
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
@@ -126,7 +126,7 @@ class PirSettingView @JvmOverloads constructor(
             }
 
             OpenPirDashboard -> {
-                globalActivityStarter.start(context, PirDashboardScreen)
+                globalActivityStarter.start(context, PirWebViewScreen)
             }
         }
     }

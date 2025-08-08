@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.dashboard
+package com.duckduckgo.pir.impl.ui
 
 import android.os.Bundle
 import android.webkit.WebViewClient
@@ -24,18 +24,18 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.api.dashboard.PirDashboardScreen
-import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardBinding
+import com.duckduckgo.pir.api.ui.PirWebViewScreen
+import com.duckduckgo.pir.impl.databinding.ActivityPirWebviewBinding
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDashboardScreen::class)
-class PirDashboardActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(PirWebViewScreen::class)
+class PirWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTheme: AppTheme
 
-    private val binding: ActivityPirDashboardBinding by viewBinding()
+    private val binding: ActivityPirWebviewBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
