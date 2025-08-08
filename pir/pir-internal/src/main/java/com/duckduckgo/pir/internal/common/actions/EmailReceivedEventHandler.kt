@@ -23,7 +23,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Ev
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.EmailReceived
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event.ExecuteBrokerStepAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
+import com.duckduckgo.pir.internal.common.toParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -64,14 +64,7 @@ class EmailReceivedEventHandler @Inject constructor() : EventHandler {
             nextEvent = ExecuteBrokerStepAction(
                 actionRequestData = UserProfile(
                     userProfile = state.profileQuery,
-                    extractedProfile = updatedProfileWithEmail.run {
-                        ExtractedProfileParams(
-                            name = this.name,
-                            profileUrl = this.profileUrl,
-                            fullName = state.profileQuery.fullName,
-                            email = this.email,
-                        )
-                    },
+                    extractedProfile = updatedProfileWithEmail.toParams(state.profileQuery.fullName),
                 ),
             ),
         )

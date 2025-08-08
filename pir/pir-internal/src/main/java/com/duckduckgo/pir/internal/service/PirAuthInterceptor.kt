@@ -42,7 +42,7 @@ class PirAuthInterceptor @Inject constructor(
 
         val authRequired = request.tag(Invocation::class.java)
             ?.method()
-            ?.isAnnotationPresent(AuthRequired::class.java) == true
+            ?.isAnnotationPresent(PirAuthRequired::class.java) == true
 
         return if (authRequired) {
             val accessToken = runBlocking { subscriptions.getAccessToken() }
@@ -61,4 +61,4 @@ class PirAuthInterceptor @Inject constructor(
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class AuthRequired
+annotation class PirAuthRequired

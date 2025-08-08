@@ -62,7 +62,6 @@ class PirModule {
         return Room.databaseBuilder(context, PirDatabase::class.java, "pir.db")
             .enableMultiInstanceInvalidation()
             .fallbackToDestructiveMigration()
-            .addMigrations(*PirDatabase.ALL_MIGRATIONS.toTypedArray())
             .build()
     }
 

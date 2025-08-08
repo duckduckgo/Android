@@ -46,13 +46,16 @@ interface ScanResultsDao {
     fun getExtractedProfilesForBroker(brokerName: String): List<StoredExtractedProfile>
 
     @Query("SELECT * FROM pir_extracted_profiles WHERE brokerName = :brokerName AND profileQueryId = :profileQueryId ORDER BY dateAddedInMillis")
-    fun getExtractedProfilesForBrokerAndProfile(brokerName: String, profileQueryId: Long): List<StoredExtractedProfile>
+    fun getExtractedProfilesForBrokerAndProfile(
+        brokerName: String,
+        profileQueryId: Long,
+    ): List<StoredExtractedProfile>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertExtractedProfile(extractedProfile: StoredExtractedProfile)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertNewExtractedProfile(extractedProfile: StoredExtractedProfile)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insertNewExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertScanCompletedBroker(scanCompletedBroker: ScanCompletedBroker)

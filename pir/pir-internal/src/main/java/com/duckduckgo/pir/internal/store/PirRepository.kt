@@ -55,11 +55,13 @@ import kotlinx.coroutines.withContext
 interface PirRepository {
     suspend fun getCurrentMainEtag(): String?
 
-    suspend fun updateMainEtag(etag: String)
+    suspend fun updateMainEtag(etag: String?)
 
     suspend fun updateBrokerJsons(brokers: Map<BrokerJson, Boolean>)
 
     suspend fun getAllLocalBrokerJsons(): Map<BrokerJson, Boolean>
+
+    suspend fun getStoredBrokersCount(): Int
 
     suspend fun getActiveBrokerJsons(): List<BrokerJson>
 
@@ -87,7 +89,11 @@ interface PirRepository {
      */
     suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String>
 
-    suspend fun saveExtractedProfile(
+    /**
+     * This method saves the new extracted profiles to the database.
+     * Any existing profiles (see indices of the table), we ignore them
+     */
+    suspend fun saveNewExtractedProfiles(
         extractedProfiles: List<ExtractedProfile>,
     )
 
@@ -198,7 +204,7 @@ internal class RealPirRepository(
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
-    override suspend fun updateMainEtag(etag: String) {
+    override suspend fun updateMainEtag(etag: String?) {
         pirDataStore.mainConfigEtag = etag
     }
 
@@ -225,6 +231,10 @@ internal class RealPirRepository(
         }
     }
 
+    override suspend fun getStoredBrokersCount(): Int = withContext(dispatcherProvider.io()) {
+        return@withContext brokerJsonDao.getAllBrokersCount()
+    }
+
     override suspend fun getActiveBrokerJsons(): List<BrokerJson> = withContext(dispatcherProvider.io()) {
         return@withContext brokerJsonDao.getAllActiveBrokers().map { BrokerJson(fileName = it.fileName, etag = it.etag) }
     }
@@ -233,7 +243,7 @@ internal class RealPirRepository(
         return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
     }
 
-    override suspend fun getEtagForFilename(fileName: String): String? = withContext(dispatcherProvider.io()) {
+    override suspend fun getEtagForFilename(fileName: String): String = withContext(dispatcherProvider.io()) {
         return@withContext brokerJsonDao.getEtag(fileName)
     }
 
@@ -317,14 +327,14 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun saveExtractedProfile(
+    override suspend fun saveNewExtractedProfiles(
         extractedProfiles: List<ExtractedProfile>,
     ) {
         withContext(dispatcherProvider.io()) {
             extractedProfiles.map {
                 it.toStoredExtractedProfile()
             }.also {
-                scanResultsDao.insertExtractedProfiles(it)
+                scanResultsDao.insertNewExtractedProfiles(it)
             }
         }
     }

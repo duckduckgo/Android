@@ -29,6 +29,7 @@ import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Si
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.GetEmailForProfile
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect.PushJsAction
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
+import com.duckduckgo.pir.internal.common.toParams
 import com.duckduckgo.pir.internal.models.ProfileQuery
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Click
@@ -36,7 +37,6 @@ import com.duckduckgo.pir.internal.scripts.models.BrokerAction.EmailConfirmation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.internal.scripts.models.BrokerAction.SolveCaptcha
 import com.duckduckgo.pir.internal.scripts.models.DataSource.EXTRACTED_PROFILE
-import com.duckduckgo.pir.internal.scripts.models.ExtractedProfileParams
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.internal.scripts.models.PirScriptRequestData.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -151,12 +151,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
 
             UserProfile(
                 userProfile = requestData.userProfile,
-                extractedProfile = ExtractedProfileParams(
-                    name = extractedProfile.name,
-                    profileUrl = extractedProfile.profileUrl,
-                    fullName = profileQuery.fullName,
-                    email = extractedProfile.email,
-                ),
+                extractedProfile = extractedProfile.toParams(profileQuery.fullName),
             )
         } else {
             requestData

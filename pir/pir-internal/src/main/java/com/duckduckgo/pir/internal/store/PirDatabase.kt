@@ -21,7 +21,6 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.pir.internal.store.db.Broker
 import com.duckduckgo.pir.internal.store.db.BrokerDao
 import com.duckduckgo.pir.internal.store.db.BrokerJsonDao
@@ -49,7 +48,7 @@ import com.squareup.moshi.Types
 
 @Database(
     exportSchema = true,
-    version = 5,
+    version = 6,
     entities = [
         BrokerJsonEtag::class,
         Broker::class,
@@ -78,51 +77,7 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun jobSchedulingDao(): JobSchedulingDao
 
     companion object {
-        val ALL_MIGRATIONS: List<Migration>
-            get() = listOf(
-                MIGRATION_3_TO_4,
-                MIGRATION_4_TO_5,
-            )
-
-        private val MIGRATION_3_TO_4: Migration = object : Migration(3, 4) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("DROP TABLE IF EXISTS `pir_scan_complete_brokers`")
-                db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `pir_scan_complete_brokers` (`brokerName` TEXT NOT NULL, " +
-                        "`profileQueryId` INTEGER NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, " +
-                        "`isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`, `profileQueryId`))",
-                )
-                db.execSQL(
-                    "CREATE TABLE IF NOT EXISTS `pir_extracted_profiles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
-                        "`profileQueryId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `name` TEXT," +
-                        " `alternativeNames` TEXT NOT NULL, `age` TEXT, `addresses` TEXT NOT NULL," +
-                        " `phoneNumbers` TEXT NOT NULL, `relatives` TEXT NOT NULL, `profileUrl` TEXT," +
-                        " `identifier` TEXT, `reportId` TEXT, `email` TEXT, `fullName` TEXT, `dateAddedInMillis` INTEGER NOT NULL," +
-                        " `deprecated` INTEGER NOT NULL)",
-                )
-                db.execSQL("DROP TABLE IF EXISTS `pir_scan_extracted_profile`")
-                db.execSQL("DROP TABLE IF EXISTS `pir_scan_navigate_results`")
-                db.execSQL("DROP TABLE IF EXISTS `pir_scan_error`")
-            }
-        }
-
-        private val MIGRATION_4_TO_5: Migration = object : Migration(4, 5) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL(
-                    """
-                    CREATE TABLE IF NOT EXISTS `pir_scan_job_record` (`brokerName` TEXT NOT NULL, `userProfileId` INTEGER NOT NULL, 
-                    `status` TEXT NOT NULL, `lastScanDateInMillis` INTEGER, PRIMARY KEY(`brokerName`, `userProfileId`))
-                    """.trimIndent(),
-                )
-                db.execSQL(
-                    """
-                    CREATE TABLE IF NOT EXISTS `pir_optout_job_record` (`extractedProfileId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, 
-                    `userProfileId` INTEGER NOT NULL, `status` TEXT NOT NULL, `attemptCount` INTEGER NOT NULL, `lastOptOutAttemptDate` INTEGER, 
-                    `optOutRequestedDate` INTEGER NOT NULL, `optOutRemovedDate` INTEGER NOT NULL, PRIMARY KEY(`extractedProfileId`))
-                    """.trimIndent(),
-                )
-            }
-        }
+        val ALL_MIGRATIONS: List<Migration> = emptyList()
     }
 }
 

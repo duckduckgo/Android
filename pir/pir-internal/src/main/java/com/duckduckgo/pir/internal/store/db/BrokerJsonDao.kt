@@ -30,8 +30,11 @@ interface BrokerJsonDao {
     @Query("SELECT * from pir_broker_json_etag where isActive = 1 ")
     fun getAllActiveBrokers(): List<BrokerJsonEtag>
 
-    @Query("SELECT * from pir_broker_json_etag where isActive = 1 ")
+    @Query("SELECT * from pir_broker_json_etag")
     fun getAllBrokers(): List<BrokerJsonEtag>
+
+    @Query("SELECT COUNT(*) from pir_broker_json_etag")
+    fun getAllBrokersCount(): Int
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBrokerJsonEtags(etags: List<BrokerJsonEtag>)

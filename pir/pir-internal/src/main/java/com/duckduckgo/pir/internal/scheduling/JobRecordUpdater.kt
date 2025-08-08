@@ -96,7 +96,7 @@ interface JobRecordUpdater {
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
      */
-    suspend fun markRemovedProfiles(
+    suspend fun markRemovedOptOutJobRecords(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
@@ -199,7 +199,7 @@ class RealJobRecordUpdater @Inject constructor(
         }
     }
 
-    override suspend fun markRemovedProfiles(
+    override suspend fun markRemovedOptOutJobRecords(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
@@ -287,17 +287,17 @@ class RealJobRecordUpdater @Inject constructor(
     private data class ExtractedProfileComparisonKey(
         val profileQueryId: Long,
         val brokerName: String,
-        val name: String?,
+        val name: String,
         val alternativeNames: List<String>,
-        val age: String?,
+        val age: String,
         val addresses: List<String>,
         val phoneNumbers: List<String>,
         val relatives: List<String>,
-        val reportId: String?,
-        val email: String?,
-        val fullName: String?,
-        val profileUrl: String?,
-        val identifier: String?,
+        val reportId: String,
+        val email: String,
+        val fullName: String,
+        val profileUrl: String,
+        val identifier: String,
     )
 
     private fun ExtractedProfile.toKey(): ExtractedProfileComparisonKey {

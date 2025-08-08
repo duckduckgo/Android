@@ -76,7 +76,7 @@ class RealPirJobsRunner @Inject constructor(
         emitStartPixel(executionType)
 
         // This should be all brokers since all brokers have scan steps and inactive brokers are removed
-        val activeBrokers = pirRepository.getAllBrokersForScan()
+        val activeBrokers = pirRepository.getAllBrokersForScan().toHashSet()
 
         // Multiple profile support
         val profileQueries = obtainProfiles()
@@ -97,7 +97,7 @@ class RealPirJobsRunner @Inject constructor(
         }
 
         attemptCreateScanJobs(activeBrokers, profileQueries)
-        executeScanJobs(context, executionType)
+        executeScanJobs(context, executionType, activeBrokers)
         attemptCreateOptOutJobs(activeBrokers)
         executeOptOutJobs(context)
 
@@ -133,7 +133,7 @@ class RealPirJobsRunner @Inject constructor(
     }
 
     private suspend fun attemptCreateScanJobs(
-        activeBrokers: List<String>,
+        activeBrokers: Set<String>,
         profileQueries: List<ProfileQuery>,
     ) {
         logcat { "PIR-JOB-RUNNER: Attempting to create new scan jobs" }
@@ -166,8 +166,10 @@ class RealPirJobsRunner @Inject constructor(
     private suspend fun executeScanJobs(
         context: Context,
         executionType: PirExecutionType,
+        activeBrokers: Set<String>,
     ) {
         eligibleScanJobProvider.getAllEligibleScanJobs(currentTimeProvider.currentTimeMillis())
+            .filter { it.brokerName in activeBrokers }
             .also {
                 val runType = if (executionType == MANUAL) {
                     RunType.MANUAL
@@ -185,7 +187,7 @@ class RealPirJobsRunner @Inject constructor(
             }
     }
 
-    private suspend fun attemptCreateOptOutJobs(activeBrokers: List<String>) {
+    private suspend fun attemptCreateOptOutJobs(activeBrokers: Set<String>) {
         val toCreate = mutableListOf<OptOutJobRecord>()
         val extractedProfiles = pirRepository.getAllExtractedProfiles()
 

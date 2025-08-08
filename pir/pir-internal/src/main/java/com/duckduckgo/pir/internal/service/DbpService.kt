@@ -30,39 +30,39 @@ import retrofit2.http.Streaming
 
 @ContributesServiceApi(AppScope::class)
 interface DbpService {
-    @AuthRequired
+    @PirAuthRequired
     @GET("$BASE_URL/remote/v0/main_config.json")
     suspend fun getMainConfig(
         @Header("If-None-Match") etag: String?,
     ): Response<PirMainConfig>
 
-    @AuthRequired
+    @PirAuthRequired
     @GET("$BASE_URL/remote/v0?name=all.zip&type=spec")
     @Streaming
     suspend fun getBrokerJsonFiles(): ResponseBody
 
-    @AuthRequired
+    @PirAuthRequired
     @GET("$BASE_URL/em/v0/generate")
     suspend fun getEmail(
         @Query("dataBroker") dataBrokerUrl: String,
         @Query("attemptId") attemptId: String? = null,
     ): PirGetEmailResponse
 
-    @AuthRequired
+    @PirAuthRequired
     @GET("$BASE_URL/em/v0/links")
     suspend fun getEmailStatus(
         @Query("e") emailAddress: String,
         @Query("attemptId") attemptId: String? = null,
     ): PirGetEmailStatusResponse
 
-    @AuthRequired
+    @PirAuthRequired
     @POST("$BASE_URL/captcha/v0/submit")
     suspend fun submitCaptchaInformation(
         @Body body: PirStartCaptchaSolutionBody,
         @Query("attemptId") attemptId: String? = null,
     ): PirStartCaptchaSolutionResponse
 
-    @AuthRequired
+    @PirAuthRequired
     @GET("$BASE_URL/captcha/v0/result")
     suspend fun getCaptchaSolution(
         @Query("transactionId") transactionId: String,
