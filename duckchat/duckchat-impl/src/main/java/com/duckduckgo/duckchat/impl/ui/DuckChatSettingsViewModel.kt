@@ -40,8 +40,6 @@ import kotlinx.coroutines.launch
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
-    private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel() {
 
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
@@ -55,7 +53,6 @@ class DuckChatSettingsViewModel @Inject constructor(
         val shouldShowInputScreenToggle: Boolean = false,
         val shouldShowBrowserMenuToggle: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
-        val isRebrandingAiFeaturesEnabled: Boolean = false,
     )
 
     val viewState = combine(
@@ -72,7 +69,6 @@ class DuckChatSettingsViewModel @Inject constructor(
             shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
             shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
             shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
-            isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
 

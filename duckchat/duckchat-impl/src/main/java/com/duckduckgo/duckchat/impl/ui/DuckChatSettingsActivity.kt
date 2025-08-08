@@ -41,6 +41,7 @@ import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -81,12 +82,23 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pixel: Pixel
 
+    @Inject
+    lateinit var subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle
+
+    private var duckAiSettingsContentLayout: DuckAiSettingsContentLayout? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
 
         setupToolbar(binding.includeToolbar.toolbar)
+
+        if (subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()) {
+            duckAiSettingsContentLayout = // todo inflate the rebranded layout and add it to duckAiSettingsContentContainer
+        } else {
+            duckAiSettingsContentLayout = // todo inflate the regular layout and add it to duckAiSettingsContentContainer
+        }
 
         observeViewModel()
 
@@ -106,6 +118,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
+        // todo remove isRebrandingAiFeaturesEnabled if-check below, the new layouts should each incorporate the correct values
         if (viewState.isRebrandingAiFeaturesEnabled) {
             binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)

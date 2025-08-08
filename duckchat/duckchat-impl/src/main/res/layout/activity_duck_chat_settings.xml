@@ -26,10 +26,12 @@
         layout="@layout/include_default_toolbar"/>
 
     <ScrollView
+        android:id="@+id/duckAiSettingsContentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+        <!--TODO extract the changes below into regular and rebranded layouts-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
