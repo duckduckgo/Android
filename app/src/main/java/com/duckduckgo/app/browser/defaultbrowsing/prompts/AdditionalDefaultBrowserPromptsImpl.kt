@@ -30,6 +30,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger.UNKNOWN
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageRepository
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
@@ -139,16 +140,20 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
      */
     @VisibleForTesting
     data class FeatureSettingsConfigModel(
-        val activeDaysUntilStage1: String,
-        val activeDaysUntilStage2: String,
-        val activeDaysUntilStage3: String,
+        val newUserActiveDaysUntilStage1: String,
+        val newUserActiveDaysUntilStage2: String,
+        val newUserActiveDaysUntilStage3: String,
+        val existingUserActiveDaysUntilStage1: String,
+        val existingUserActiveDaysUntilStage3: String,
         val activeDaysUntilStop: String,
     )
 
     private data class FeatureSettings(
-        val activeDaysUntilStage1: Int,
-        val activeDaysUntilStage2: Int,
-        val activeDaysUntilStage3: Int,
+        val newUserActiveDaysUntilStage1: Int,
+        val newUserActiveDaysUntilStage2: Int,
+        val newUserActiveDaysUntilStage3: Int,
+        val existingUserActiveDaysUntilStage1: Int,
+        val existingUserActiveDaysUntilStage3: Int,
         val activeDaysUntilStop: Int,
     )
 
@@ -225,6 +230,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
         val currentStage = defaultBrowserPromptsDataStore.stage.firstOrNull()
         logcat { "evaluate: current stage = $currentStage" }
+
         val newStage = if (isDefaultBrowser) {
             if (currentStage == STAGE_3) {
                 fireConversionPixel(MESSAGE)
@@ -253,53 +259,19 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
                 return
             }
 
-            when (currentStage) {
-                ENROLLED -> {
-                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage1) {
-                        STAGE_1
-                    } else {
-                        null
-                    }
+            when (userType) {
+                DefaultBrowserPromptsDataStore.UserType.NEW -> {
+                    logcat { "evaluate: user is new" }
+                    getNewStageForNewUser(currentStage, appActiveDaysUsedSinceEnrollment, configSettings)
                 }
-
-                STAGE_1 -> {
-                    // New users go from STAGE_1 to STAGE_2.
-                    // Existing users skip STAGE_2 and go from STAGE_1 to STAGE_3.
-                    if (userType == DefaultBrowserPromptsDataStore.UserType.EXISTING &&
-                        (
-                            appActiveDaysUsedSinceEnrollment >=
-                                (configSettings.activeDaysUntilStage3 - configSettings.activeDaysUntilStage2 + configSettings.activeDaysUntilStage1)
-                            )
-                    ) {
-                        logcat { "evaluate: user is existing, got to STAGE_3" }
-                        STAGE_3
-                    } else if (userType == DefaultBrowserPromptsDataStore.UserType.NEW &&
-                        appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage2
-                    ) {
-                        STAGE_2
-                    } else {
-                        null
-                    }
+                DefaultBrowserPromptsDataStore.UserType.EXISTING -> {
+                    logcat { "evaluate: user is existing" }
+                    getNewStageForExistingUser(currentStage, appActiveDaysUsedSinceEnrollment, configSettings)
                 }
-
-                STAGE_2 -> {
-                    if (appActiveDaysUsedSinceEnrollment >= configSettings.activeDaysUntilStage3) {
-                        STAGE_3
-                    } else {
-                        null
-                    }
+                else -> {
+                    logcat { "evaluate: user type is not known, skipping evaluation" }
+                    return
                 }
-
-                STAGE_3 -> {
-                    val stage3Finished = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == false
-                    if (stage3Finished) {
-                        STOPPED
-                    } else {
-                        null
-                    }
-                }
-
-                else -> null
             }
         }
 
@@ -425,6 +397,93 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         return storedUserType
     }
 
+    private suspend fun getNewStageForNewUser(
+        currentStage: Stage?,
+        appActiveDaysUsedSinceEnrollment: Long,
+        configSettings: FeatureSettings,
+    ): Stage? {
+        return when (currentStage) {
+            ENROLLED -> {
+                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage1) {
+                    STAGE_1
+                } else {
+                    null
+                }
+            }
+
+            STAGE_1 -> {
+                // New users go from STAGE_1 to STAGE_2.
+                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage2) {
+                    STAGE_2
+                } else {
+                    null
+                }
+            }
+
+            STAGE_2 -> {
+                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage3) {
+                    STAGE_3
+                } else {
+                    null
+                }
+            }
+
+            STAGE_3 -> {
+                val stage3Finished = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == false
+                if (stage3Finished) {
+                    STOPPED
+                } else {
+                    null
+                }
+            }
+
+            else -> null
+        }
+    }
+
+    private suspend fun getNewStageForExistingUser(
+        currentStage: Stage?,
+        appActiveDaysUsedSinceEnrollment: Long,
+        configSettings: FeatureSettings,
+    ): Stage? {
+        return when (currentStage) {
+            ENROLLED -> {
+                if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage1) {
+                    STAGE_1
+                } else {
+                    null
+                }
+            }
+
+            STAGE_1 -> {
+                // Existing users skip STAGE_2 and go from STAGE_1 to STAGE_3.
+                if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage3) {
+                    logcat { "evaluate: user is existing, go from STAGE_1 to STAGE_3" }
+                    STAGE_3
+                } else {
+                    null
+                }
+            }
+
+            STAGE_2 -> {
+                // no-op
+                logcat { "evaluate: user is existing, STAGE_2 should not be reached" }
+                null
+            }
+
+            STAGE_3 -> {
+                val stage3Finished = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == false
+                if (stage3Finished) {
+                    STOPPED
+                } else {
+                    null
+                }
+            }
+
+            else -> null
+        }
+    }
+
     private fun launchBestSelectionWindow(trigger: SetAsDefaultActionTrigger) {
         val command = defaultRoleBrowserDialog.createIntent(applicationContext)?.let {
             Command.OpenSystemDefaultBrowserDialog(intent = it, trigger)
@@ -478,9 +537,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     @Throws(NumberFormatException::class)
     private fun FeatureSettingsConfigModel.toFeatureSettings() = FeatureSettings(
-        activeDaysUntilStage1 = activeDaysUntilStage1.toInt(),
-        activeDaysUntilStage2 = activeDaysUntilStage2.toInt(),
-        activeDaysUntilStage3 = activeDaysUntilStage3.toInt(),
+        newUserActiveDaysUntilStage1 = newUserActiveDaysUntilStage1.toInt(),
+        newUserActiveDaysUntilStage2 = newUserActiveDaysUntilStage2.toInt(),
+        newUserActiveDaysUntilStage3 = newUserActiveDaysUntilStage3.toInt(),
+        existingUserActiveDaysUntilStage1 = existingUserActiveDaysUntilStage1.toInt(),
+        existingUserActiveDaysUntilStage3 = existingUserActiveDaysUntilStage3.toInt(),
         activeDaysUntilStop = activeDaysUntilStop.toInt(),
     )
 
