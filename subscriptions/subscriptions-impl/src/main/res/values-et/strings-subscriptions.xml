@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Kaitse oma ühendust ja identiteeti ühe tellimusega.</string>
     <string name="removeFromDeviceDescriptionRebranding">Sa ei pääse enam selles seadmes oma tellimusele ligi. See ei tühista sinu tellimust ja see jääb teistel seadmetel aktiivseks.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenuse Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Ei pääse ainult tellijatele mõeldud Duck.ai mudelitele ligi</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ei pääse Duck.ai-le teistes brauserites oma tellimusega ligi</string>
+    <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai tagasiside</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
+
+    <string name="subscriptionSettingGetRebranding">Telli DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Proovi tasuta</string>
+    <string name="feedbackGeneralSubscription">Püsitellimus</string>
 
 </resources>

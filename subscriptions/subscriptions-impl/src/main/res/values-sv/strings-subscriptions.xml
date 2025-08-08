@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Skydda din anslutning och identitet med ett abonnemang.</string>
     <string name="removeFromDeviceDescriptionRebranding">Du kommer inte längre att kunna komma åt ditt abonnemang på den här enheten. Det här kommer inte att avsluta ditt abonnemang utan det förblir aktivt på dina andra enheter.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vårt VPN och avancerade AI-modeller i Duck.ai, Personal Information Removal och Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenter får vårt VPN, avancerade AI-modeller i Duck.ai och Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Det går inte att komma åt Duck.ai-modellerna för prenumeranter</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Det går inte att komma åt Duck.ai med mitt abonnemang i andra webbläsare</string>
+    <string name="feedbackSubCategoryDuckAiOther">Annan feedback om Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Säkra ditt Wi-Fi och chatta privat med avancerade AI-modeller</string>
+
+    <string name="subscriptionSettingGetRebranding">Prenumerera på DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Prova gratis</string>
+    <string name="feedbackGeneralSubscription">Abonnemang</string>
 
 </resources>

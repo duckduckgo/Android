@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Zaščitite svojo povezavo in identiteto z eno naročnino.</string>
     <string name="removeFromDeviceDescriptionRebranding">V tej napravi ne boste mogli več dostopati do naročnine. S tem ne boste preklicali naročnine, ta bo ostala aktivna v drugih napravah.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai ter zaščiti Personal Information Removal in Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Naročnikom so na voljo naš VPN, napredni modeli umetne inteligence v Duck.ai in zaščita Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Ni mogoče dostopati do modelov Duck.ai, ki so na voljo samo naročnikom.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">V drugih brskalnikih ne morem dostopati do Duck.ai s svojo naročnino</string>
+    <string name="feedbackSubCategoryDuckAiOther">Druge povratne informacije o Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Zagotovite varnost omrežja Wi-Fi in se zasebno pogovarjajte z naprednimi modeli umetne inteligence</string>
+
+    <string name="subscriptionSettingGetRebranding">Naročite se na DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Poskusite brezplačno</string>
+    <string name="feedbackGeneralSubscription">Naročnina</string>
 
 </resources>

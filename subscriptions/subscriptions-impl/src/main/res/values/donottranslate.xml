@@ -15,19 +15,4 @@
   -->
 
 <resources>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subscribers get our VPN, advanced AI models in Duck.ai, Personal Information Removal, and Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Subscribers get our VPN, advanced AI models in Duck.ai, and Identity Theft Restoration.</string>
-
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Unable to access the subscriber-only Duck.ai models</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Can\'t access Duck.ai with my subscription in other browsers</string>
-    <string name="feedbackSubCategoryDuckAiOther">Other Duck.ai feedback</string>
-
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
-    <string name="subscriptionSettingSubscribeSecure">Secure your Wi-Fi, and chat privately with advanced AI models</string>
-
-    <string name="subscriptionSettingGetRebranding">Subscribe to DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Try Free</string>
-    <string name="feedbackGeneralSubscription">Subscription</string>
-
 </resources>

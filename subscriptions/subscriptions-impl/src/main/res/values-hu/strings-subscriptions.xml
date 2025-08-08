@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Védd a kapcsolatodat és a személyazonosságodat egyetlen előfizetés segítségével.</string>
     <string name="removeFromDeviceDescriptionRebranding">Ezen az eszközön többé nem férhetsz hozzá az előfizetésedhez. Ez nem szünteti meg az előfizetésedet, amely a többi eszközödön aktív marad.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nem tudok hozzáférni a csak előfizetőknek szóló Duck.ai modellekhez</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Más böngészőkben nem tudok hozzáférni a Duck.ai szolgáltatáshoz az előfizetésemmel.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Egyéb Duck.ai visszajelzés</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">A Wi-Fi biztonságossá tétele, és privát csevegés a fejlett AI-modellekkel</string>
+
+    <string name="subscriptionSettingGetRebranding">Előfizetés a DuckDuckGóra</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Ingyenes próba</string>
+    <string name="feedbackGeneralSubscription">Előfizetés</string>
 
 </resources>
