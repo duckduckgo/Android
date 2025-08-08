@@ -149,4 +149,13 @@ interface AndroidBrowserConfigFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun newThreatProtectionSettings(): Toggle
+
+    /**
+     * Kill switch for INTENT_SCHEME handling in SpecialUrlDetector
+     * @return `true` when the remote config has the global "handleIntentScheme" androidBrowserConfig
+     * sub-feature flag enabled
+     * If the remote feature is not present defaults to `true`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun handleIntentScheme(): Toggle
 }

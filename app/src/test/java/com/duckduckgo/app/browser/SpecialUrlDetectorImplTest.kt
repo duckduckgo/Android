@@ -29,6 +29,7 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -73,6 +74,8 @@ class SpecialUrlDetectorImplTest {
 
     val mockAIChatQueryDetectionFeatureToggle: Toggle = mock()
 
+    val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+
     @Before
     fun setup() = runTest {
         testee = SpecialUrlDetectorImpl(
@@ -84,11 +87,14 @@ class SpecialUrlDetectorImplTest {
             duckPlayer = mockDuckPlayer,
             duckChat = mockDuckChat,
             aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
+            androidBrowserConfigFeature = androidBrowserConfigFeature,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
+        whenever(androidBrowserConfigFeature.handleIntentScheme()).thenReturn(mockToggle)
+        whenever(mockToggle.isEnabled()).thenReturn(true)
     }
 
     @Test

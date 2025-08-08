@@ -28,6 +28,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.config.api.AmpLinkType
@@ -48,6 +49,7 @@ class SpecialUrlDetectorImpl(
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
     private val aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
 ) : SpecialUrlDetector {
 
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
@@ -63,7 +65,6 @@ class SpecialUrlDetectorImpl(
             JAVASCRIPT_SCHEME, ABOUT_SCHEME, FILE_SCHEME, SITE_SCHEME, BLOB_SCHEME -> UrlType.SearchQuery(uriString)
             FILETYPE_SCHEME, IN_TITLE_SCHEME, IN_URL_SCHEME -> UrlType.SearchQuery(uriString)
             DUCK_SCHEME -> UrlType.DuckScheme(uriString)
-            INTENT_SCHEME -> checkForIntent(scheme, uriString, URI_INTENT_SCHEME)
             null -> {
                 if (subscriptions.shouldLaunchPrivacyProForUrl("https://$uriString")) {
                     UrlType.ShouldLaunchPrivacyProLink
@@ -73,7 +74,14 @@ class SpecialUrlDetectorImpl(
                     UrlType.SearchQuery(uriString)
                 }
             }
-            else -> checkForIntent(scheme, uriString, URI_ANDROID_APP_SCHEME)
+            else -> {
+                val intentFlags = if (scheme == INTENT_SCHEME && androidBrowserConfigFeature.handleIntentScheme().isEnabled()) {
+                    URI_INTENT_SCHEME
+                } else {
+                    URI_ANDROID_APP_SCHEME
+                }
+                checkForIntent(scheme, uriString, intentFlags)
+            }
         }
     }
 

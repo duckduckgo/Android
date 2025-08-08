@@ -199,6 +199,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -578,6 +579,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2479,22 +2483,21 @@ class BrowserTabFragment :
             val activities = pm.queryIntentActivities(intent, 0)
 
             if (activities.isEmpty()) {
-                if (fallbackIntent == null && fallbackUrl == null) {
-                    intent.`package`?.let { pkg ->
-                        val playIntent = Intent(
-                            Intent.ACTION_VIEW,
-                            "market://details?id=$pkg".toUri(),
-                        ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
+                when {
+                    fallbackIntent == null && fallbackUrl == null && androidBrowserConfigFeature.handleIntentScheme().isEnabled() -> {
+                        intent.`package`?.let { pkg ->
+                            val playIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                "market://details?id=$pkg".toUri(),
+                            ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
 
-                        if (pm.resolveActivity(playIntent, 0) != null) {
-                            kotlin.runCatching {
+                            if (pm.resolveActivity(playIntent, 0) != null) {
                                 launchDialogForIntent(it, pm, playIntent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
                                 return
                             }
                         }
                     }
-                }
-                when {
+
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
                         launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
