@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.duckduckgo.autofill.impl">
 
+    <uses-permission android:name="android.permission.CREDENTIAL_MANAGER_SET_ORIGIN" />
+
     <application>
         <activity
             android:name=".ui.credential.management.importpassword.ImportPasswordsActivity"
