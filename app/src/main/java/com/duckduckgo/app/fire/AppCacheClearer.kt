@@ -18,9 +18,10 @@ package com.duckduckgo.app.fire
 
 import android.content.Context
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
+import com.duckduckgo.app.fire.model.AppCacheExclusionPlugin
 import com.duckduckgo.app.global.api.NetworkApiCache
 import com.duckduckgo.app.global.file.FileDeleter
-import com.duckduckgo.subscriptions.impl.services.SubscriptionNetworkModule.Companion.SUBSCRIPTION_CACHE_FILE
+import com.duckduckgo.common.utils.plugins.PluginPoint
 
 interface AppCacheClearer {
 
@@ -30,10 +31,13 @@ interface AppCacheClearer {
 class AndroidAppCacheClearer(
     private val context: Context,
     private val fileDeleter: FileDeleter,
+    private val exclusionPlugins: PluginPoint<AppCacheExclusionPlugin>,
 ) : AppCacheClearer {
 
     override suspend fun clearCache() {
-        fileDeleter.deleteContents(context.cacheDir, FILENAMES_EXCLUDED_FROM_DELETION)
+        val pluginExclusions = exclusionPlugins.getPlugins().flatMap { it.filenamesExcludedFromDeletion() }
+        val exclusions = (FILENAMES_EXCLUDED_FROM_DELETION + pluginExclusions).distinct()
+        fileDeleter.deleteContents(context.cacheDir, exclusions)
     }
 
     companion object {
@@ -53,10 +57,7 @@ class AndroidAppCacheClearer(
          */
         private const val NETWORK_CACHE_DIR = NetworkApiCache.FILE_NAME
 
-        // TODO: We need to allow other modules to contribute this list
-        // https://app.asana.com/1/137249556945/project/1149059203486286/task/1210997578538480?focus=true
         private val FILENAMES_EXCLUDED_FROM_DELETION = listOf(
-            SUBSCRIPTION_CACHE_FILE,
             WEBVIEW_CACHE_DIR,
             WEBVIEW_CACHE_DIR_LEGACY,
             NETWORK_CACHE_DIR,
