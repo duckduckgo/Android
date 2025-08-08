@@ -1263,6 +1263,7 @@ sealed class DaxBubbleCta(
                 binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
             }
             is DaxPrivacyProCta -> {
+                binding.headerImage.gone()
                 binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
                 binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
             }
