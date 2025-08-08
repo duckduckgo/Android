@@ -40,6 +40,7 @@ import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK
 import com.duckduckgo.app.pixels.AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -99,6 +100,8 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Mock private lateinit var userStageStoreMock: UserStageStore
 
     @Mock private lateinit var stageEvaluatorMock: DefaultBrowserPromptsFlowStageEvaluator
+
+    @Mock private lateinit var userBrowserPropertiesMock: UserBrowserProperties
 
     @Mock private lateinit var moshiMock: Moshi
 
@@ -296,41 +299,27 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if user new, not enrolled, browser not set as default, then save user type as new and enroll`() = runTest {
+    fun `evaluate - if user new, not enrolled, browser not set as default, then don't enroll`() = runTest {
         val testee = createTestee()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.NEW)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeUserType(UserType.NEW)
-        verify(dataStoreMock).storeExperimentStage(Stage.ENROLLED)
-        assertEquals(Stage.ENROLLED, dataStoreMock.stage.first())
+        verify(dataStoreMock, never()).storeExperimentStage(any())
+        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
     }
 
     @Test
-    fun `evaluate - if user onboarding, browser not set as default, then save user type as new and enroll`() = runTest {
+    fun `evaluate - if user onboarding, browser not set as default, then don't enroll`() = runTest {
         val testee = createTestee()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeUserType(UserType.NEW)
-        verify(dataStoreMock).storeExperimentStage(Stage.ENROLLED)
-        assertEquals(Stage.ENROLLED, dataStoreMock.stage.first())
-    }
-
-    @Test
-    fun `evaluate - if user onboarding, browser already set as default, then don't enroll and marked stopped`() = runTest {
-        val testee = createTestee()
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
-        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(true)
-
-        testee.onResume(lifecycleOwnerMock)
-
-        verify(dataStoreMock, atMostOnce()).storeExperimentStage(Stage.STOPPED)
-        assertEquals(Stage.STOPPED, dataStoreMock.stage.first())
+        verify(dataStoreMock, never()).storeExperimentStage(any())
+        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -346,7 +335,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     }
 
     @Test
-    fun `evaluate - if user established, browser not set as default, then set user type existing and  enroll`() = runTest {
+    fun `evaluate - if user established, browser not set as default, then set user type existing and enroll`() = runTest {
         val testee = createTestee()
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
@@ -356,6 +345,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             activeDaysUntilStage3 = 4,
             activeDaysUntilStop = 5,
         )
+        whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(5)
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(0))
         val action = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
@@ -490,7 +480,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
         )
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         mockFeatureSettings(
             activeDaysUntilStage1 = 1,
@@ -505,6 +495,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             highlightPopupMenu = false,
             showMessage = false,
         )
+        whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(1)
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
@@ -537,6 +528,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
                 highlightPopupMenu = false,
                 showMessage = false,
             )
+            whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(5)
             whenever(stageEvaluatorMock.evaluate(Stage.STAGE_3)).thenReturn(action)
 
             testee.onResume(lifecycleOwnerMock)
@@ -690,7 +682,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
         )
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         mockFeatureSettings(
             activeDaysUntilStage1 = 1,
@@ -705,6 +697,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             showMessage = false,
         )
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+        whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(1)
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
@@ -722,7 +715,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
         )
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.DAX_ONBOARDING)
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
         mockFeatureSettings(
             activeDaysUntilStage1 = 1,
@@ -737,6 +730,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
             showMessage = false,
         )
         whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(3))
+        whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(1)
         whenever(stageEvaluatorMock.evaluate(Stage.STAGE_2)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
@@ -877,6 +871,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         userStageStore: UserStageStore = userStageStoreMock,
         defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore = dataStoreMock,
         experimentStageEvaluator: DefaultBrowserPromptsFlowStageEvaluator = stageEvaluatorMock,
+        userBrowserProperties: UserBrowserProperties = userBrowserPropertiesMock,
         pixel: Pixel = pixelMock,
         moshi: Moshi = moshiMock,
     ) = AdditionalDefaultBrowserPromptsImpl(
@@ -890,6 +885,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         userStageStore = userStageStore,
         defaultBrowserPromptsDataStore = defaultBrowserPromptsDataStore,
         stageEvaluator = experimentStageEvaluator,
+        userBrowserProperties = userBrowserProperties,
         pixel = pixel,
         moshi = moshi,
     )

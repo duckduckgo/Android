@@ -43,6 +43,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -101,6 +102,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val userStageStore: UserStageStore,
     private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
+    private val userBrowserProperties: UserBrowserProperties,
     private val pixel: Pixel,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
@@ -402,13 +404,18 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return DefaultBrowserPromptsDataStore.UserType.UNKNOWN
         }
 
+        val userAppStage = userStageStore.getUserAppStage()
+        if (userAppStage != AppStage.ESTABLISHED) {
+            return DefaultBrowserPromptsDataStore.UserType.UNKNOWN
+        }
+
         if (storedUserType == DefaultBrowserPromptsDataStore.UserType.UNKNOWN) {
-            val userAppStage = userStageStore.getUserAppStage()
-            val userType = if (userAppStage == AppStage.ESTABLISHED) {
-                logcat { "evaluate: user is established, setting initial stage to EXISTING" }
+            val daysSinceInstalled = userBrowserProperties.daysSinceInstalled()
+            val userType = if (daysSinceInstalled > 4) {
+                logcat { "evaluate: setting initial user stage to EXISTING" }
                 DefaultBrowserPromptsDataStore.UserType.EXISTING
             } else {
-                logcat { "evaluate: user is new, setting initial stage to NEW" }
+                logcat { "evaluate: setting initial user stage to NEW" }
                 DefaultBrowserPromptsDataStore.UserType.NEW
             }
             defaultBrowserPromptsDataStore.storeUserType(userType)
