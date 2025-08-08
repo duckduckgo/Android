@@ -44,4 +44,28 @@
     <string name="duck_chat_address_bar_visibility_setting">Pasek adresu</string>
     <string name="duck_chat_assist_settings_title">Ustawienia Assist</string>
     <string name="duck_chat_assist_settings_description">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Szukaj</string>
+    <string name="input_screen_search_hint">Wyszukaj lub wprowadź adres</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Zapytaj Duck.ai</string>
+    <string name="input_screen_user_pref_title">Eksperymentalny Pasek Adresu</string>
+    <string name="input_screen_user_pref_description">Wyszukaj w Internecie lub zapytaj Duck.ai bezpośrednio z paska adresu</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Czatuj prywatnie z modelami AI dostępnymi wyłącznie dla subskrybentów.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Otwórz Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Dowiedz się więcej</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Funkcje AI</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Funkcje sztucznej inteligencji DuckDuckGo są prywatne i opcjonalne.Twoje dane nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Czatuj anonimowo z popularnymi modelami czatu AI innych firm</string>
+    <string name="duck_chat_show_in_heading_rebranding">Skróty Duck.ai</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Ustawienia wyszukiwania Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję</string>
 </resources>

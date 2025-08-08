@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Husk: hver gang du browser med mig, mister en uhyggelig annonce sine vinger. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helt færdig!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Åh, før jeg glemmer det...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en indbygget <b>VPN</b>!<br/><br/>Aktiver den med et <b>betalt Privacy Pro-abonnement.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + 2 ekstra premium-beskyttelser</b>, tilgængelige med et <b>valgfrit betalt abonnement</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har også en sikker <b>VPN + 2 ekstra premium-beskyttelser</b>, tilgængelige med et <b>valgfrit betalt abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Mere info</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prøv gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Spring over</string>
@@ -848,7 +847,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lad DuckDuckGo beskytte mere af det, du foretager dig online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gør os til din standardbrowser, så alle links åbner i DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Ikke nu</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Spørg ikke igen</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo er ikke din standardbrowser. Få mere beskyttelse.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Angiv som standard</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Spørg ikke igen</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokerer trackere for at beskytte din browsing</string>
@@ -887,4 +891,36 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Startskærmswidget</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Færdiggør opsætningen</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hej</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Er du klar til en hurtigere browser, der holder dig beskyttet?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Beskyttelse</b> <i>aktiveret!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hej<br/>Er du klar til en hurtigere browser, der holder dig beskyttet?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Ryd din browseraktivitet på et øjeblik med <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Prøv det!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ og %1$d nogen forsøgte at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ og %1$d nogen forsøgte at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ prøvede at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ prøvede at spore dig her. <font color=\"#F05C2B\">Jeg blokerede dem!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tryk på skjoldet for at få mere information.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo er den uafhængige online-beskyttelsesvirksomhed for alle, der vil tage kontrollen over deres personlige oplysninger tilbage.\n\nVi mener, at den bedste måde at beskytte dine personlige oplysninger mod hackere, svindlere og virksomheder, der krænker privatlivets fred, er at forhindre, at de overhovedet bliver indsamlet. Derfor vælger millioner af mennesker <annotation type="chart_comparison">DuckDuckGo frem for Chrome og andre browsere</annotation> til at søge og surfe på nettet. Vores indbyggede søgemaskine er som Google, men sporer aldrig dine søgninger. Og vores browserbeskyttelse, som f.eks. blokering af reklametrackere og cookies, hjælper med at forhindre andre virksomheder i at indsamle dine data. Forresten er vores browser gratis — vi tjener penge på <annotation type="privacy_respecting_ads">søgeannoncer, der respekterer privatlivets fred</annotation>, ikke ved at udnytte dine data.Derudover tilbyder vi også et <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation>, der er integreret i vores browser. Abonnenter får endnu mere beskyttelse af privatlivet med en hurtig og enkel <annotation type="vpn_help_page">VPN</annotation>, der hjælper med at sikre din onlineaktivitet, adgang til avancerede AI-modeller i vores private AI-chattjeneste Duck.ai, en tjeneste, der finder og fjerner dine personlige oplysninger fra personfinderwebsteder, og en tjeneste, der gendanner din identitet, hvis den bliver stjålet.\n\nTag kontrollen over dine personlige oplysninger tilbage med browseren, der er designet til databeskyttelse, ikke dataindsamling.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har også et <b>valgfrit betalt abonnement</b> med en sikker <b>VPN</b> og <b>avanceret, privat AI</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI-funktioner</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>

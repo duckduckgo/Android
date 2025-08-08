@@ -44,4 +44,28 @@
     <string name="duck_chat_address_bar_visibility_setting">Riadok adresy</string>
     <string name="duck_chat_assist_settings_title">Nastavenia Assist</string>
     <string name="duck_chat_assist_settings_description">Vyber, ako často chceš, aby sa vo vyhľadávaní zobrazovali odpovede podporované AI</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Vyhľadávať</string>
+    <string name="input_screen_search_hint">Vyhľadajte alebo zadajte adresu</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Spýtaj sa Duck.ai</string>
+    <string name="input_screen_user_pref_title">Experimentálny riadok adresy</string>
+    <string name="input_screen_user_pref_description">Vyhľadaj na webe alebo sa opýtaj Duck.ai priamo z riadku pre adresu</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chatuj súkromne s modelmi umelej inteligencie exkluzívne pre predplatiteľov.\n<a href=\"\">Zisti viac</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Otvoriť Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Zistite viac</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Funkcie AI</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Funkcie DuckDuckGo AI sú súkromné a voliteľné.\nTvoje údaje sa nepoužívajú na trénovanie umelej inteligencie.\n<annotation type="learn_more_link">Viac informácií</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatuj anonymne s populárnymi AI modelmi chatu tretích strán</string>
+    <string name="duck_chat_show_in_heading_rebranding">Skratky Duck.ai</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Nastavenia Assist vyhľadávania</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Vyber, ako často chceš, aby sa vo vyhľadávaní zobrazovali odpovede podporované AI</string>
 </resources>

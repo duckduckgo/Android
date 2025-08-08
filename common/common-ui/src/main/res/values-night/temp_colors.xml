@@ -45,4 +45,33 @@
     <color name="buckColorCheckBoxCheckedIcon">@color/white</color>
     <color name="buckColorCheckBoxUncheckedBackground">@color/white3</color>
     <color name="buckColorCheckBoxUncheckedOutline">@color/white18</color>
+
+    <color name="bbSurfaceColor">#161615</color>
+
+    <color name="bbColorPrimaryText">#EDEDEC</color>
+    <color name="bbColorSecondaryText">#A1A09A</color>
+
+    <color name="bbColorButtonSecondaryText">#EDEDEC</color>
+    <color name="bbColorButtonOptionPressed">@color/white12</color>
+
+    <color name="bbColorButtonOptionContainer">#232320</color>
+    <color name="bbColorButtonOptionText">#EDEDEC</color>
+
+    <color name="bbColorButtonFAB">#272727</color>
+
+    <color name="bbFeatherOutline">#EDEDEC</color>
+    <color name="bbFeatherFill">#5D6167</color>
+    <color name="bbFeatherWhisps">#656871</color>
+
+    <color name="bbColorComparisonChartItemBackground">#242423</color>
+    <color name="bbColorComparisonChartDivider">#2E2E2B</color>
+    <color name="bbColorComparisonChartCrossIcon">#7B7B7B</color>
+
+    <color name="bbColorPreonboardingOptionOutline">#2E2E2B</color>
+    <color name="bbColorPreonboardingOptionOutlineSelected">#802373D5</color>
+    <color name="bbColorPreonboardingOptionBackground">#00000000</color>
+    <color name="bbColorPreonboardingOptionBackgroundSelected">#3B6FA3E6</color>
+    <color name="bbColorPreonboardingOptionIconSelected">#4E9EFF</color>
+    <color name="bbColorPreonboardingOptionIcon">#EDEDEC</color>
+
 </resources>

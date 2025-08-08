@@ -164,7 +164,7 @@ import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -186,7 +186,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
@@ -457,14 +456,13 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
     private val duckChatJSHelper: DuckChatJSHelper,
     private val refreshPixelSender: RefreshPixelSender,
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
     private val privacyProtectionTogglePlugin: PluginPoint<PrivacyProtectionTogglePlugin>,
     private val showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler,
     private val customHeadersProvider: CustomHeadersProvider,
     private val toggleReports: ToggleReports,
     private val brokenSitePrompt: BrokenSitePrompt,
     private val tabStatsBucketing: TabStatsBucketing,
-    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment,
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val swipingTabsFeature: SwipingTabsFeatureProvider,
     private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val siteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch,
@@ -725,7 +723,7 @@ class BrowserTabViewModel @Inject constructor(
             .flowOn(dispatchers.main())
             .launchIn(viewModelScope)
 
-        defaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem
+        additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
             }
@@ -2707,7 +2705,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserSelected() {
-        defaultBrowserPromptsExperiment.onSetAsDefaultPopupMenuItemSelected()
+        additionalDefaultBrowserPrompts.onSetAsDefaultPopupMenuItemSelected()
     }
 
     fun onShareSelected() {
@@ -2821,7 +2819,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPopupMenuLaunched() {
-        defaultBrowserPromptsExperiment.onPopupMenuLaunched()
+        additionalDefaultBrowserPrompts.onPopupMenuLaunched()
     }
 
     fun onNewTabMenuItemClicked(
@@ -3971,13 +3969,6 @@ class BrowserTabViewModel @Inject constructor(
         omnibarViewState.value = currentOmnibarViewState().copy(
             navigationChange = true,
         )
-
-        // the new omnibar deals with this properly
-        if (!changeOmnibarPositionFeature.refactor().isEnabled()) {
-            omnibarViewState.value = currentOmnibarViewState().copy(
-                navigationChange = false,
-            )
-        }
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
@@ -4123,10 +4114,17 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun setBrowserBackground(lightModeEnabled: Boolean) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-        } else {
-            command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+        when {
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                command.value = SetBrowserBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                // TODO if BB wins the we should rename the function to SetBubbleDialogBackground
+                command.value = Command.SetBubbleDialogBackground(getBBBackgroundResource(lightModeEnabled))
+            }
+            else -> {
+                command.value = SetBrowserBackground(getBackgroundResource(lightModeEnabled))
+            }
         }
     }
 
@@ -4138,10 +4136,16 @@ class BrowserTabViewModel @Inject constructor(
         }
 
     fun setOnboardingDialogBackground(lightModeEnabled: Boolean) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
-        } else {
-            command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+        when {
+            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                command.value = SetOnboardingDialogBackgroundColor(getBuckOnboardingExperimentBackgroundColor(lightModeEnabled))
+            }
+            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                command.value = SetOnboardingDialogBackground(getBBBackgroundResource(lightModeEnabled))
+            }
+            else -> {
+                command.value = SetOnboardingDialogBackground(getBackgroundResource(lightModeEnabled))
+            }
         }
     }
 
@@ -4150,6 +4154,13 @@ class BrowserTabViewModel @Inject constructor(
             R.drawable.onboarding_background_bitmap_light
         } else {
             R.drawable.onboarding_background_bitmap_dark
+        }
+
+    private fun getBBBackgroundResource(lightModeEnabled: Boolean): Int =
+        if (lightModeEnabled) {
+            R.drawable.onboarding_background_bb_bitmap_light
+        } else {
+            R.drawable.onboarding_background_bb_bitmap_dark
         }
 
     private fun onUserSwitchedToTab(tabId: String) {

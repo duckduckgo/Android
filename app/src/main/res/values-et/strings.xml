@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Pea meeles: iga kord kui minuga sirvid, kaotab jube reklaam oma tiivad. 👌</string>
     <string name="onboardingEndDaxDialogButton">Kõik valmis!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ja enne kui ma unustan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka sisseehitatud <b>VPN</b>!<br/><br/>Aktiveeri see <b>tasulise Privacy Pro püsitellimusega.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo-l on ka turvaline <b>VPN + veel kaks esmaklassilist kaitset</b>, mis on saadaval <b>valikulise tasulise tellimusega</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo-l on ka turvaline <b>VPN + veel kaks esmaklassilist kaitset</b>, mis on saadaval <b>valikulise tasulise tellimusega</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Loe edasi</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Proovi tasuta!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Jäta vahele</string>
@@ -848,7 +847,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Muutke meid oma vaikebrauseriks, et kõik saidilingid avaneksid DuckDuckGos.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Mitte praegu</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ära enam küsi</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ei ole sinu vaikebrauser. Saa rohkem kaitset.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Määra vaikebrauseriks</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ära enam küsi</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokeerib jälgurid, et kaitsta sinu sirvimist</string>
@@ -887,4 +891,36 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Avakuva vidin</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Vii seadistamine lõpule</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Tere!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Kaitsed</b> <i>aktiveeritud!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Tere!<br/>Kas oled valmis kasutama kiiremat brauserit, mis hoiab sind kaitstud?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Tühjenda oma sirvimistegevus hetkega nupuga <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Proovi ära!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ja %1$d teine üritasid sind siin jälgida. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+        <item quantity="other"><![CDATA[ ja %1$d teist üritasid sind siin jälgida. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ üritas sind siin jälitada. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+        <item quantity="other"><![CDATA[ üritasid sind siin jälitada. <font color=\"#F05C2B\">Ma blokeerisin need!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Lisateabe saamiseks vajuta kilbile.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo on sõltumatu veebikaitseettevõte kõikidele, kes tahavad oma isikliku teabe üle kontrolli tagasi saada.\n\nUsume, et parim viis sinu isikuandmete kaitsmiseks häkkerite, petturite ja eraelu puutumatust rikkuvate ettevõtete eest on nende kogumise täielik vältimine. Seetõttu valivad miljonid inimesed <annotation type="chart_comparison">DuckDuckGo Chrome\'i ja teiste brauserite asemel</annotation>, et otsida ja sirvida internetis. Meie sisseehitatud otsingumootor on nagu Google, kuid ei jälgi kunagi teie otsinguid. Ja meie sirvimiskaitsed, nagu reklaamijälgijate ja küpsiste blokeerimine, aitavad takistada teistel ettevõtetel sinu andmeid kogumast. Ja muideks, meie brauser on tasuta — teenime raha <annotation type="privacy_respecting_ads">privaatsust austavate otsingureklaamidega</annotation>, mitte sinu andmeid ära kasutades.\n\nLisaks pakume ka <annotation type="ppro_help_page">DuckDuckGo tellimust</annotation>, mis on integreeritud meie brauserisse. Tellijad saavad veelgi tõhusama privaatsuse kaitse kiire ja lihtsa <annotation type="vpn_help_page">VPN-iga</annotation>, mis aitab kaitsta sinu veebitegevust, juurdepääsu täiustatud tehisintellekti mudelitele meie privaatses tehisintellekti vestlusteenuses Duck.ai, teenuse, mis otsib ja eemaldab sinu isikuandmeid inimesteotsingu saitidelt, ning teenuse, mis taastab sinu identiteedi, kui see varastatakse.\n\nVõta tagasi kontroll oma isikuandmete üle brauseriga, mis on loodud andmete kaitsmiseks ja mitte nende kogumiseks.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo-l on ka <b>valikuline tasuline tellimus</b>, mis sisaldab turvalist <b>VPN-i</b> ja <b>täiustatud privaatset tehisintellekti</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI funktsioonid</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>

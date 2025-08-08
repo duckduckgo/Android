@@ -168,4 +168,34 @@
     <string name="activityActivateSubscription">Minulla on tilaus</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Lähetä palautetta</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo-tilaus</string>
+    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo-tilauksesi on päättynyt</string>
+    <string name="privacyProFaqRebranding">Tarvitsetko apua tilauksesi kanssa?</string>
+    <string name="privacyProFaqSecondaryRebranding">Katso vastaukset usein kysyttyihin kysymyksiin tai ota yhteyttä tilaustukeen ohjesivujemme kautta. Ominaisuuden saatavuus vaihtelee maittain.</string>
+    <string name="restoreSubscriptionTitleRebranding">Lisää tilauksesi tähän laitteeseen</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Liitä sähköpostiosoite tilaukseesi lisätäksesi sen tähän laitteeseen.</string>
+    <string name="activateOnOtherDevicesRebranding">Lisää tilauksesi muihin laitteisiin</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisää tilauksesi muihin laitteisiisi Google Playn kautta tai liittämällä sähköpostiosoite.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Tilausasetukset &gt; Minulla on tilaus.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro on nyt nimeltään DuckDuckGo-tilaus</string>
+    <string name="subscriptionSettingSubscribeRebranding">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muissa laitteissasi.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Duck.ai:ssa ja Identity Theft Restorationin.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">En voi käyttää tilaajille tarkoitettuja Duck.ai-malleja.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">En voi käyttää Duck.ai:ta muissa selaimissa tilauksellani.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai -palaute</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
+
+    <string name="subscriptionSettingGetRebranding">Tilaa DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Kokeile maksutta</string>
+    <string name="feedbackGeneralSubscription">Tilaus</string>
+
 </resources>

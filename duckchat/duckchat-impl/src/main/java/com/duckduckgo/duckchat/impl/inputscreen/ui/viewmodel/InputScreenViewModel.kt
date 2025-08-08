@@ -94,6 +94,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private var hasUserSeenHistoryIAM = false
 
+    private val newTabPageHasContent = MutableStateFlow(false)
     private val voiceServiceAvailable = MutableStateFlow(voiceSearchAvailability.isVoiceSearchAvailable)
     private val voiceInputAllowed = MutableStateFlow(true)
     private val _visibilityState = MutableStateFlow(
@@ -101,6 +102,7 @@ class InputScreenViewModel @AssistedInject constructor(
             voiceInputButtonVisible = voiceServiceAvailable.value && voiceInputAllowed.value,
             autoCompleteSuggestionsVisible = false,
             showChatLogo = true,
+            showSearchLogo = true,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -211,6 +213,14 @@ class InputScreenViewModel @AssistedInject constructor(
         shouldShowAutoComplete.onEach { showAutoComplete ->
             _visibilityState.update {
                 it.copy(autoCompleteSuggestionsVisible = showAutoComplete)
+            }
+        }.launchIn(viewModelScope)
+
+        combine(newTabPageHasContent, shouldShowAutoComplete) { newTabPageHasContent, shouldShowAutoComplete ->
+            !newTabPageHasContent && !shouldShowAutoComplete
+        }.onEach { shouldShowSearchLogo ->
+            _visibilityState.update {
+                it.copy(showSearchLogo = shouldShowSearchLogo)
             }
         }.launchIn(viewModelScope)
     }
@@ -375,6 +385,10 @@ class InputScreenViewModel @AssistedInject constructor(
             itemOffsetTop = autoCompleteScrollState.itemOffsetTop,
         )
         showKeyboard()
+    }
+
+    fun onNewTabPageContentChanged(hasContent: Boolean) {
+        newTabPageHasContent.value = hasContent
     }
 
     private fun checkMovedBeyondInitialUrl(searchInput: String): Boolean {

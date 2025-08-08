@@ -292,5 +292,7 @@
     <string name="passwords_import_promo_action">Importă din Google</string>
     <string name="passwords_import_promo_in_browser_title">Importă parolele tale din Google în DuckDuckGo</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Nu întreba din nou</string>
+    <string name="passwords_import_promo_in_settings_title">Importă parole de la Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Ascunde</string>
 
 </resources>

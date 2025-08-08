@@ -19,5 +19,5 @@ package com.duckduckgo.contentscopescripts.api.contentscopeExperiments
 import com.duckduckgo.feature.toggles.api.Toggle
 
 interface ContentScopeExperiments {
-    fun getActiveExperiments(): List<Toggle>
+    suspend fun getActiveExperiments(): List<Toggle>
 }

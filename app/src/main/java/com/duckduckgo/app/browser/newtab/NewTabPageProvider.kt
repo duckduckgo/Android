@@ -51,8 +51,12 @@ class RealNewTabPageProvider @Inject constructor(
 )
 class NewTabLegacyPage @Inject constructor() : NewTabPagePlugin {
 
-    override fun getView(context: Context): View {
-        return NewTabLegacyPageView(context)
+    override fun getView(
+        context: Context,
+        showLogo: Boolean,
+        onHasContent: ((Boolean) -> Unit)?,
+    ): View {
+        return NewTabLegacyPageView(context, showLogo = showLogo, onHasContent = onHasContent)
     }
 }
 

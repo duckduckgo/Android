@@ -44,4 +44,28 @@
     <string name="duck_chat_address_bar_visibility_setting">Adresna traka</string>
     <string name="duck_chat_assist_settings_title">Postavke Assista</string>
     <string name="duck_chat_assist_settings_description">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Pretraga</string>
+    <string name="input_screen_search_hint">Pretraži ili unesi adresu</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Pitaj Duck.ai</string>
+    <string name="input_screen_user_pref_title">Eksperimentalna adresna traka</string>
+    <string name="input_screen_user_pref_description">Pretraži mrežu ili pitaj Duck.ai izravno iz adresne trake</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Privatno čavrljaj s AI modelima ekskluzivnim za pretplatnike.\n<a href=\"\">Saznaj više</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Otvori Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Saznajte više</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">AI značajke</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI značajke privatne su i neobavezne.Tvoji podaci se ne koriste za obuku umjetne inteligencije.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Anonimno čavrljaj s popularnim modelima umjetne inteligencije trećih strana</string>
+    <string name="duck_chat_show_in_heading_rebranding">Duck.ai prečaci</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Pretraži postavke Assista</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
 </resources>

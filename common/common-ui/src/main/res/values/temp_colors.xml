@@ -70,6 +70,41 @@
     <color name="daxOnboardingDialogBackgroundColorLight">#FEFEFE</color>
     <color name="daxOnboardingDialogBackgroundColorDark">#011D34</color>
 
+    <color name="bbSurfaceColor">#FBFBFA</color>
+    <color name="bbPulseOrange">#F05C2B</color>
+
+    <color name="bbColorPrimaryText">#27251F</color>
+    <color name="bbColorSecondaryText">#646153</color>
+
+    <color name="bbColorButtonPrimaryContainer">#F05C2B</color>
+    <color name="bbColorButtonPrimaryContainerPressed">#993A18</color>
+    <color name="bbColorButtonPrimaryText">#FBFBFA</color>
+
+    <color name="bbColorButtonSecondaryText">#27251F</color>
+    <color name="bbColorButtonOptionPressed">@color/black6</color>
+
+    <color name="bbColorButtonOptionContainer">#EEEEEA</color>
+    <color name="bbColorButtonOptionText">#27251F</color>
+
+    <color name="bbColorButtonFAB">@color/white</color>
+
+    <color name="bbFeatherOutline">#000000</color>
+    <color name="bbFeatherFill">#FFFFFF</color>
+    <color name="bbFeatherWhisps">#000000</color>
+
+    <color name="bbColorComparisonChartItemBackground">#F1F1EE</color>
+    <color name="bbColorComparisonChartItemIcon">@color/bbColorPrimaryText</color>
+    <color name="bbColorComparisonChartDivider">#D7D5C9</color>
+    <color name="bbColorComparisonChartCheckIcon">#399F29</color>
+    <color name="bbColorComparisonChartCrossIcon">#888888</color>
+
+    <color name="bbColorPreonboardingOptionOutline">#D7D5C9</color>
+    <color name="bbColorPreonboardingOptionOutlineSelected">#802373D5</color>
+    <color name="bbColorPreonboardingOptionBackground">#EEEEEA</color>
+    <color name="bbColorPreonboardingOptionBackgroundSelected">#E0EAFF</color>
+    <color name="bbColorPreonboardingOptionIconSelected">#2373D5</color>
+    <color name="bbColorPreonboardingOptionIcon">#27251F</color>
+
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
     <color name="daxColorBackdropLight">#E0E0E0</color>

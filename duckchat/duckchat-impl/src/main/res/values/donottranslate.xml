@@ -15,38 +15,4 @@
   -->
 
 <resources>
-    <!-- Input Screen PoC strings -->
-    <string name="input_screen_search_tab">Search</string>
-    <string name="input_screen_search_hint">Search or enter address</string>
-    <string name="input_screen_chat_tab">Duck.ai</string>
-    <string name="input_screen_chat_hint">Ask Duck.ai</string>
-    <string name="input_screen_user_pref_title">Search Input</string>
-    <string name="input_screen_user_pref_description">Search the web or ask Duck.ai directly from the Address Bar</string>
-
-    <!-- AutoComplete Suggestions -->
-    <string name="editQueryBeforeSubmitting">Edit query before searching</string>
-    <string name="autocompleteRemoveItemTitle">Remove search suggestion?</string>
-    <string name="autocompleteRemoveItemCancel">Cancel</string>
-    <string name="autocompleteRemoveItemRemove">Remove</string>
-    <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Switch to Tab · %1$s</string>
-
-    <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
-    <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
-    <string name="openAutoCompleteSettings">Open Settings</string>
-
-    <!-- Duck.ai Pro settings -->
-    <string name="duck_ai_paid_settings_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
-    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chat privately with subscriber-exclusive AI models.\n<a href="">Learn More</a>]]></string>
-    <string name="duck_ai_paid_settings_open_duck_ai">Open Duck.ai</string>
-    <string name="duck_ai_paid_settings_learn_more_title">Learn more</string>
-
-    <!-- Rebranding-->
-    <string name="duck_chat_title_rebranding">AI Features</string>
-    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI features are private and optional.\nYour data is not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
-    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat anonymously with popular 3rd-party AI chat models</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai Shortcuts</string>
-    <string name="duck_chat_assist_settings_title_rebranding">Search Assist Settings</string>
-    <string name="duck_chat_assist_settings_description_rebranding">Choose how often you want AI-Assisted answers to appear in your searches</string>
 </resources>

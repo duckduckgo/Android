@@ -19,6 +19,11 @@ android {
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -57,4 +62,17 @@ dependencies {
     implementation AndroidX.work.runtimeKtx
     implementation "androidx.work:work-multiprocess:_"
 
+    // Testing dependencies
+    testImplementation project(':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation (KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
 }

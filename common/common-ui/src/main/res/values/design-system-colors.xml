@@ -247,6 +247,7 @@
     <color name="ic_launcher_purple_background">#7A4BDC</color>
     <color name="ic_launcher_blue_background">#4179ED</color>
     <color name="ic_launcher_black_background">#262626</color>
+    <color name="ic_launcher_pink_background">#E37089</color>
 </resources>
 
     <!-- Opacity Prefixes

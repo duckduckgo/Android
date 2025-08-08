@@ -28,10 +28,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.pir.internal.checker.PirWorkHandler
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.store.PirRepository
 import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
@@ -45,6 +47,9 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var pirWorkHandler: PirWorkHandler
 
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
@@ -73,7 +78,10 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
 
     private fun bindViews() {
         lifecycleScope.launch {
-            binding.pirDebugOptOut.isEnabled = repository.getBrokersForOptOut(true).isNotEmpty()
+            pirWorkHandler.canRunPir().collectLatest { canRunPir ->
+                binding.pirDebugScan.isEnabled = canRunPir
+                binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
+            }
         }
     }
 

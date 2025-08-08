@@ -22,12 +22,11 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageRepository.UserNotEnrolledException
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -51,19 +50,26 @@ class ExperimentAppUsageRepositoryImpl @Inject constructor(
         experimentAppUsageDao.insert(ExperimentAppUsageEntity(isoDateET))
     }
 
-    override suspend fun getActiveDaysUsedSinceEnrollment(toggle: Toggle): Result<Long> = withContext(dispatchers.io()) {
-        toggle.getCohort()?.enrollmentDateET?.let { enrollmentZonedDateTimeETString ->
-            try {
-                val isoDateET = ZonedDateTime.parse(enrollmentZonedDateTimeETString)
-                    .truncatedTo(ChronoUnit.DAYS)
-                    .format(DateTimeFormatter.ISO_LOCAL_DATE)
-
-                val daysUsed = experimentAppUsageDao.getNumberOfDaysAppUsedSinceDateET(isoDateET)
-                Result.success(daysUsed)
-            } catch (ex: DateTimeParseException) {
-                Result.failure(ex)
+    override suspend fun getActiveDaysUsedSinceEnrollment(): Result<Long> = withContext(dispatchers.io()) {
+        try {
+            // enrollmentDateET is already a String like "2025-07-23"
+            val enrollmentDateETString = experimentAppUsageDao.getFirstDay()
+            if (enrollmentDateETString == null) {
+                return@withContext Result.failure(IllegalStateException("Date is missing"))
             }
-        } ?: Result.failure(UserNotEnrolledException())
+            val parsedDate = LocalDate.parse(enrollmentDateETString, DateTimeFormatter.ISO_LOCAL_DATE)
+            val isoDateET = parsedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+
+            val daysUsed = experimentAppUsageDao.getNumberOfDaysAppUsedSinceDateET(isoDateET)
+            Result.success(daysUsed)
+        } catch (ex: DateTimeParseException) {
+            // This catch block will now correctly handle if getFirstDay() returns
+            // a string that is not a valid ISO_LOCAL_DATE.
+            Result.failure(ex)
+        } catch (e: Exception) {
+            // Catch other potential exceptions from DAO or other operations
+            Result.failure(e)
+        }
     }
 }
 
@@ -75,6 +81,9 @@ abstract class ExperimentAppUsageDao {
 
     @Query("SELECT COUNT(*) from experiment_app_usage_entity WHERE isoDateET > :isoDateET")
     abstract fun getNumberOfDaysAppUsedSinceDateET(isoDateET: String): Long
+
+    @Query("SELECT isoDateET FROM experiment_app_usage_entity ORDER BY isoDateET ASC LIMIT 1")
+    abstract fun getFirstDay(): String?
 }
 
 @Entity(tableName = "experiment_app_usage_entity")

@@ -813,8 +813,7 @@
     <string name="onboardingEndDaxDialogDescription">Atceries: katru reizi, kad pārlūkosi kopā ar mani, uzmācīgās reklāmas zaudēs savu spēku! 👌</string>
     <string name="onboardingEndDaxDialogButton">Viss pabeigts!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ak, pirms es aizmirsu...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ir arī iebūvēts <b>VPN</b>!<br/><br/>Aktivizējiet to, izmantojot <b>maksas Privacy Pro abonementu.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo piedāvā arī drošu <b>VPN + vēl 2 premium aizsardzības</b>, pieejamu ar <b>izvēles maksas abonementu</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Uzzināt vairāk</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Izmēģini bez maksas!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Izlaist</string>
@@ -864,7 +863,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Ne tagad</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Vairs nejautāt</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nav tava noklusējuma pārlūkprogramma. Iegūsti vairāk aizsardzības.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Iestatīt kā noklusējumu</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Vairs nejautāt</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloķē izsekotājus, lai aizsargātu tavu pārlūkošanu</string>
@@ -903,4 +907,38 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Sākuma ekrāna logrīks</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Pabeidz iestatīšanu</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Sveiki!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Aizsardzība ir</b> <i>aktivizēta!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Sveiki!<br/>Vai esi gatavs ātrākai pārlūkprogrammai, kas tevi aizsargā?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Nekavējoties notīri savu pārlūkošanas vēsturi, izmantojot <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Izmēģini!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="zero"><![CDATA[ un %1$d citi mēģināja tevi šeit izsekot. <font color=\"#F05C2B\">Es viņus nobloķēju!</font>]]></item>
+        <item quantity="one"><![CDATA[ un %1$d cits mēģināja tevi šeit izsekot. <font color=\"#F05C2B\">Es viņus nobloķēju!</font>]]></item>
+        <item quantity="other"><![CDATA[ un %1$d citi mēģināja tevi šeit izsekot. <font color=\"#F05C2B\">Es viņus nobloķēju!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="zero"><![CDATA[ mēģināja tevi šeit izsekot. <font color=\"#F05C2B\">Es viņus nobloķēju!</font>]]></item>
+        <item quantity="one"><![CDATA[ mēģināja tevi šeit izsekot. <font color=\"#F05C2B\">Es viņus nobloķēju!</font>]]></item>
+        <item quantity="other"><![CDATA[ mēģināja tevi šeit izsekot. <font color=\"#F05C2B\">Es viņus nobloķēju!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Pieskaries vairogam, lai iegūtu papildinformāciju.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo ir neatkarīgs tiešsaistes aizsardzības uzņēmums ikvienam, kurš vēlas atgūt kontroli pār savu personisko informāciju.\n\nMēs uzskatām, ka labākais veids, kā aizsargāt savu personisko informāciju no hakeriem, krāpniekiem un privātumu apdraudošiem uzņēmumiem, ir to neievākt vispār. Tāpēc miljoniem cilvēku <annotation type="chart_comparison">izvēlas DuckDuckGo, nevis Chrome un citas pārlūkprogrammas</annotation> meklēšanai un pārlūkošanai tiešsaistē. Mūsu iebūvētā meklētājprogramma ir līdzīga Google, taču tā neizseko jūsu meklēšanas vaicājumus. Mūsu pārlūkošanas aizsardzība, piemēram, reklāmu izsekotāju bloķēšana un sīkfailu bloķēšana neļauj citiem uzņēmumiem ievākt tavus datus. Turklāt mūsu pārlūkprogramma ir bez maksas — mēs pelnām ar <annotation type="privacy_respecting_ads">meklēšanas laikā rādītām reklāmām, kas ievēro privātumu</annotation>, nevis izmantojot tavus datus.Turklāt mēs piedāvājam arī <annotation type="ppro_help_page">DuckDuckGo abonementu</annotation>, kas ir integrēts mūsu pārlūkprogrammā. Abonenti saņem vēl lielāku privātuma aizsardzību ar ātru un vienkāršu <annotation type="vpn_help_page">VPN</annotation>, kas palīdz pasargāt tavas darbības tiešsaistē, piekļuvi uzlabotiem MI modeļiem mūsu privātajā MI tērzēšanas pakalpojumā Duck.ai, pakalpojumu, kas atrod un izdzēš tavu personisko informāciju no cilvēku meklētāju vietnēm, un pakalpojumu, kas atjauno tavu identitāti, ja tā tiek nozagta.\n\nAtgūsti kontroli pār savu personisko informāciju ar pārlūkprogrammu, kas paredzēta datu aizsardzībai, nevis datu apkopošanai.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un <b>uzlabotu, privātu mākslīgo intelektu</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Mākslīgā intelekta funkcijas</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>

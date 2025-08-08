@@ -168,4 +168,34 @@
     <string name="activityActivateSubscription">Van előfizetésem</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Visszajelzés küldése</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo-előfizetés</string>
+    <string name="subscriptionSettingExpiredRebranding">A DuckDuckGo-előfizetésed lejárt</string>
+    <string name="privacyProFaqRebranding">Segítségre van szükséged az előfizetéssel kapcsolatban?</string>
+    <string name="privacyProFaqSecondaryRebranding">A súgóoldalainkon választ kaphatsz a gyakran ismételt kérdésekre, vagy felveheted a kapcsolatot az előfizetési támogatást nyújtó ügyfélszolgálattal. A funkciók elérhetősége országonként változik.</string>
+    <string name="restoreSubscriptionTitleRebranding">Add hozzá az előfizetésedet ezen az eszközön</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Az előfizetés hozzáadásához társíts hozzá egy e-mail-címet.</string>
+    <string name="activateOnOtherDevicesRebranding">Előfizetésed hozzáadása más eszközökhöz</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Add hozzá az előfizetésedet a többi eszközödön is a Google Play-en keresztül, vagy e-mail-cím társításával.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">A DuckDuckGo-alkalmazásban hozzáadhatod az előfizetésedet a többi eszközödön a fenti e-mail-cím használatával. Lépj a Beállítások &gt; Előfizetési beállítások &gt; Van előfizetésem menüpontra.</string>
+    <string name="subscriptionSettingRebrandingMessage">A Privacy Pro mostantól egyszerűen DuckDuckGo-előfizetés néven fut</string>
+    <string name="subscriptionSettingSubscribeRebranding">Védd a kapcsolatodat és a személyazonosságodat egyetlen előfizetés segítségével.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Ezen az eszközön többé nem férhetsz hozzá az előfizetésedhez. Ez nem szünteti meg az előfizetésedet, amely a többi eszközödön aktív marad.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit, a személyes adatok eltávolítására szolgáló Personal Information Removal és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Az előfizetők megkapják a VPN-megoldásunkat, a Duck.ai fejlett AI-modelljeit és a személyazonosság helyreállításához használható Identity Theft Restoration funkciókat.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nem tudok hozzáférni a csak előfizetőknek szóló Duck.ai modellekhez</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Más böngészőkben nem tudok hozzáférni a Duck.ai szolgáltatáshoz az előfizetésemmel.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Egyéb Duck.ai visszajelzés</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">A Wi-Fi biztonságossá tétele, és privát csevegés a fejlett AI-modellekkel</string>
+
+    <string name="subscriptionSettingGetRebranding">Előfizetés a DuckDuckGóra</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Ingyenes próba</string>
+    <string name="feedbackGeneralSubscription">Előfizetés</string>
+
 </resources>

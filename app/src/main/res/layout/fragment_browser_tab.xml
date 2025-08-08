@@ -104,6 +104,11 @@
                 android:visibility="gone" />
 
             <include
+                android:id="@+id/includeOnboardingInContextBBDialog"
+                layout="@layout/include_onboarding_in_context_bb_dialog"
+                android:visibility="gone" />
+
+            <include
                 android:id="@+id/includeBrokenSitePromptDialog"
                 layout="@layout/prompt_broken_site"
                 android:visibility="gone" />

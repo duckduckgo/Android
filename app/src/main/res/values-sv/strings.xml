@@ -797,8 +797,7 @@
     <string name="onboardingEndDaxDialogDescription">Kom ihåg: varje gång du surfar med mig förlorar en läskig annons sina vingar. 👌</string>
     <string name="onboardingEndDaxDialogButton">Allt klart!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Innan jag glömmer det ...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett inbyggt <b>VPN</b>!<br/><br/>Aktivera det med en <b>betald prenumeration på Privacy Pro.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo har också ett säkert <b>VPN + 2 premiumskydd till</b> som är tillgängliga med <b>valfritt betalt abonnemang</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo har också ett säkert <b>VPN + 2 premiumskydd till</b> som är tillgängliga med <b>valfritt betalt abonnemang</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Läs mer</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Prova gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Hoppa över</string>
@@ -848,7 +847,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Inte nu</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Fråga inte igen</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo är inte din standardwebbläsare. Få mer skydd.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Ställ in som standard</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Fråga inte igen</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blockerar spårare för att skydda ditt surfande</string>
@@ -887,4 +891,36 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget på startsidan</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Slutför din inställning</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hej!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Är du redo för en snabbare webbläsare som också skyddar dig?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Skydd</b> <i>är aktiverade!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hej!<br/>Är du redo för en snabbare webbläsare som också skyddar dig?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Rensa omedelbart din surfaktivitet med <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Prova det!</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ och %1$d till försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ och %1$d till försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+        <item quantity="other"><![CDATA[ försökte spåra dig här. <font color=\"#F05C2B\">Jag blockerade dem!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tryck på skölden för mer info.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo är ett oberoende företag för onlineskydd för alla som vill återta kontrollen över sin personliga information.\n\nVi vill skydda din personliga information från hackare, bedragare och integritetskränkande företag – och den bästa metoden är att förhindra att den samlas in överhuvudtaget. Det är därför som miljontals människor <annotation type="chart_comparison">väljer DuckDuckGo framför Chrome och andra webbläsare</annotation> för att söka och surfa online. Vår inbyggda sökmotor är som Google men spårar aldrig dina sökningar. Och våra surfskydd, som spårningsblockering och blockering av cookies, hjälper till att stoppa andra företag från att samla in dina data. Vår webbläsare är dessutom gratis – vi tjänar pengar på <annotation type="privacy_respecting_ads">sökannonser som respekterar din integritet</annotation>, inte genom att utnyttja dina data.Vi erbjuder också en <annotation type="ppro_help_page">DuckDuckGo-prenumeration</annotation> som är integrerad i vår webbläsare. Prenumeranter får ännu mer integritetsskydd med ett snabbt och enkelt <annotation type="vpn_help_page">VPN</annotation> som hjälper till att skydda din onlineaktivitet, tillgång till avancerade AI-modeller i den privata AI-chattjänsten Duck.ai, en tjänst som hittar och tar bort din personliga information från webbplatser som är till för att hitta människor, samt en tjänst som återställer din identitet om den skulle bli stulen\n\nTa tillbaka kontrollen över din personliga information med webbläsaren som är utformad för dataskydd, inte datainsamling.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har också en <b>valfri betald prenumeration</b> med ett säkert <b>VPN</b> och <b>avancerad, privat AI</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI-funktioner</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>

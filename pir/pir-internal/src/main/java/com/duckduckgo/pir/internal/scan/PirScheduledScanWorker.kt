@@ -23,8 +23,11 @@ import androidx.work.multiprocess.RemoteCoroutineWorker
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pir.internal.common.PirJob.RunType.SCHEDULED
+import com.duckduckgo.pir.internal.checker.PirWorkHandler
+import com.duckduckgo.pir.internal.scheduling.PirExecutionType
+import com.duckduckgo.pir.internal.scheduling.PirJobsRunner
 import javax.inject.Inject
+import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
 
 @ContributesWorker(AppScope::class)
@@ -33,20 +36,36 @@ class PirScheduledScanRemoteWorker(
     workerParameters: WorkerParameters,
 ) : RemoteCoroutineWorker(context, workerParameters) {
     @Inject
-    lateinit var pirScan: PirScan
+    lateinit var pirJobsRunner: PirJobsRunner
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var pirWorkHandler: PirWorkHandler
+
     override suspend fun doRemoteWork(): Result {
         logcat { "PIR-WORKER ($this}: doRemoteWork ${Process.myPid()}" }
-        val result = pirScan.executeAllBrokers(context.applicationContext, SCHEDULED)
+        return try {
+            if (pirWorkHandler.canRunPir().firstOrNull() == false) {
+                logcat { "PIR-WORKER ($this}: PIR not allowed to run!" }
+                pirWorkHandler.cancelWork()
+                return Result.failure()
+            }
 
-        return if (result.isSuccess) {
-            logcat { "PIR-WORKER ($this}: Successfully completed!" }
-            Result.success()
-        } else {
-            logcat { "PIR-WORKER ($this}: Failed to complete." }
+            val result = pirJobsRunner.runEligibleJobs(context.applicationContext, PirExecutionType.SCHEDULED)
+
+            if (result.isSuccess) {
+                logcat { "PIR-WORKER ($this}: Successfully completed!" }
+                Result.success()
+            } else {
+                logcat { "PIR-WORKER ($this}: Failed to complete." }
+                Result.failure()
+            }
+        } catch (_: Exception) {
+            // this can happen as a result of scanning error or cancellation because PIR is no longer enabled
+            logcat { "PIR-WORKER ($this}: Exception occurred, stopping all work!" }
+            pirJobsRunner.stop()
             Result.failure()
         }
     }

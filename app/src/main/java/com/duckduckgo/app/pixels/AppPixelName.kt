@@ -431,10 +431,16 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     BLOCKLIST_TDS_FAILURE("blocklist_experiment_tds_download_failure"),
 
+    SET_AS_DEFAULT_SYSTEM_DIALOG_IMPRESSION("m_set-as-default_system-dialog_impression"),
+    SET_AS_DEFAULT_SYSTEM_DIALOG_CLICK("m_set-as-default_system-dialog_click"),
+    SET_AS_DEFAULT_SYSTEM_DIALOG_DISMISSED("m_set-as-default_system-dialog_dismissed"),
     SET_AS_DEFAULT_PROMPT_IMPRESSION("m_set-as-default_prompt_impression"),
     SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
     SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
+    SET_AS_DEFAULT_MESSAGE_IMPRESSION("m_set-as-default_message_impression"),
+    SET_AS_DEFAULT_MESSAGE_CLICK("m_set-as-default_message_click"),
+    SET_AS_DEFAULT_MESSAGE_DISMISSED("m_set-as-default_message_dismissed"),
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
 

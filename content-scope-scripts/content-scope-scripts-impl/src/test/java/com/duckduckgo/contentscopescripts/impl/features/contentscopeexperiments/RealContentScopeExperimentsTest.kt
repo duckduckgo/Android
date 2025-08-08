@@ -1,6 +1,7 @@
 package com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments
 
 import android.annotation.SuppressLint
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperimentsFeature.Cohorts.CONTROL
 import com.duckduckgo.contentscopescripts.impl.features.contentscopeexperiments.ContentScopeExperimentsFeature.Cohorts.TREATMENT
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -9,6 +10,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.Rule
 import org.junit.Test
 
 @SuppressLint("DenyListedApi")
@@ -17,13 +19,17 @@ class RealContentScopeExperimentsTest {
     private val fakeContentScopeExperimentsFeature = FakeFeatureToggleFactory.create(ContentScopeExperimentsFeature::class.java)
     private val mockFeatureTogglesInventory: FeatureTogglesInventory = FakeFeatureTogglesInventory(fakeContentScopeExperimentsFeature)
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val testee = RealContentScopeExperiments(
         contentScopeExperimentsFeature = fakeContentScopeExperimentsFeature,
         featureTogglesInventory = mockFeatureTogglesInventory,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
 
     @Test
-    fun whenContentScopeExperimentsFeatureIsDisabledThenGetExperimentsReturnsEmptyList() {
+    fun whenContentScopeExperimentsFeatureIsDisabledThenGetExperimentsReturnsEmptyList() = runTest {
         fakeContentScopeExperimentsFeature.self().setRawStoredState(Toggle.State(false))
         val experiments = testee.getActiveExperiments()
         assertEquals(listOf<Toggle>(), experiments)

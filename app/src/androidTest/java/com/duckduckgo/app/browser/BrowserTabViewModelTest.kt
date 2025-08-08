@@ -90,7 +90,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowKeyboard
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.commands.NavigationCommand.Navigate
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
@@ -112,7 +112,6 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter.QuickAccessFavorite
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.*
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
@@ -286,6 +285,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
@@ -539,7 +539,6 @@ class BrowserTabViewModelTest {
     private val mockExtendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles = mock()
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature = mock()
     private val protectionTogglePlugin = FakePrivacyProtectionTogglePlugin()
     private val protectionTogglePluginPoint = FakePluginPoint(protectionTogglePlugin)
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
@@ -555,7 +554,7 @@ class BrowserTabViewModelTest {
     private val mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
-    private val mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+    private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
     val mockStack: WebBackForwardList = mock()
 
     private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
@@ -568,6 +567,7 @@ class BrowserTabViewModelTest {
     private val mockSubscriptionsJSHelper: SubscriptionsJSHelper = mock()
     private val mockReactivateUsersExperiment: ReactivateUsersExperiment = mock()
     private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
+    private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private val tabManager: TabManager = mock()
 
     private val mockAddressDisplayFormatter: AddressDisplayFormatter by lazy {
@@ -644,7 +644,6 @@ class BrowserTabViewModelTest {
         whenever(mockDuckPlayer.isSimulatedYoutubeNoCookie(any())).thenReturn(false)
         whenever(mockDuckPlayer.isDuckPlayerUri(anyString())).thenReturn(false)
         whenever(mockDuckPlayer.getDuckPlayerState()).thenReturn(ENABLED)
-        whenever(changeOmnibarPositionFeature.refactor()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
         whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
         whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
@@ -674,6 +673,7 @@ class BrowserTabViewModelTest {
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
             onboardingDesignExperimentToggles = mockOnboardingDesignExperimentToggles,
+            rebrandingFeatureToggle = mockRebrandingFeatureToggle,
         )
 
         val siteFactory = SiteFactoryImpl(
@@ -707,7 +707,7 @@ class BrowserTabViewModelTest {
         whenever(mockPrivacyProtectionsPopupManager.viewState).thenReturn(flowOf(PrivacyProtectionsPopupViewState.Gone))
         whenever(mockAppBuildConfig.buildType).thenReturn("debug")
         whenever(mockDuckPlayer.observeUserPreferences()).thenReturn(flowOf(UserPreferences(false, AlwaysAsk)))
-        whenever(mockDefaultBrowserPromptsExperiment.showSetAsDefaultPopupMenuItem).thenReturn(
+        whenever(mockAdditionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem).thenReturn(
             defaultBrowserPromptsExperimentShowPopupMenuItemFlow,
         )
 
@@ -779,14 +779,13 @@ class BrowserTabViewModelTest {
             ),
             duckChatJSHelper = mockDuckChatJSHelper,
             refreshPixelSender = refreshPixelSender,
-            changeOmnibarPositionFeature = changeOmnibarPositionFeature,
             privacyProtectionTogglePlugin = protectionTogglePluginPoint,
             showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
             customHeadersProvider = fakeCustomHeadersPlugin,
             toggleReports = mockToggleReports,
             brokenSitePrompt = mockBrokenSitePrompt,
             tabStatsBucketing = mockTabStatsBucketing,
-            defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
+            additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
             experimentalThemingDataStore = mockExperimentalThemingDataStore,
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
@@ -6122,13 +6121,13 @@ class BrowserTabViewModelTest {
     @Test
     fun whenDefaultBrowserMenuButtonClickedThenNotifyExperiment() = runTest {
         testee.onSetDefaultBrowserSelected()
-        verify(mockDefaultBrowserPromptsExperiment).onSetAsDefaultPopupMenuItemSelected()
+        verify(mockAdditionalDefaultBrowserPrompts).onSetAsDefaultPopupMenuItemSelected()
     }
 
     @Test
     fun whenPopupMenuLaunchedThenNotifyDefaultBrowserPromptsExperiment() = runTest {
         testee.onPopupMenuLaunched()
-        verify(mockDefaultBrowserPromptsExperiment).onPopupMenuLaunched()
+        verify(mockAdditionalDefaultBrowserPrompts).onPopupMenuLaunched()
     }
 
     private fun givenTabManagerData() = runTest {

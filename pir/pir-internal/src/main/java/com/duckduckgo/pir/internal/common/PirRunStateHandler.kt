@@ -31,6 +31,7 @@ import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerS
 import com.duckduckgo.pir.internal.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
 import com.duckduckgo.pir.internal.models.ExtractedProfile
 import com.duckduckgo.pir.internal.pixels.PirPixelSender
+import com.duckduckgo.pir.internal.scheduling.JobRecordUpdater
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.internal.scripts.models.PirSuccessResponse.ExpectationResponse
@@ -134,11 +135,9 @@ class RealPirRunStateHandler @Inject constructor(
     private val repository: PirRepository,
     private val pixelSender: PirPixelSender,
     private val dispatcherProvider: DispatcherProvider,
+    private val jobRecordUpdater: JobRecordUpdater,
 ) : PirRunStateHandler {
-
-    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(ScriptAddressCityState::class.java) }
-
-    private val pirSuccessAdapter by lazy {
+    private val moshi: Moshi by lazy {
         Moshi.Builder().add(
             PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
                 .withSubtype(NavigateResponse::class.java, "navigate")
@@ -149,8 +148,11 @@ class RealPirRunStateHandler @Inject constructor(
                 .withSubtype(ExpectationResponse::class.java, "expectation")
                 .withSubtype(FillFormResponse::class.java, "fillForm"),
         ).add(KotlinJsonAdapterFactory())
-            .build().adapter(PirSuccessResponse::class.java)
+            .build()
     }
+    private val addressCityStateAdapter by lazy { moshi.adapter(ScriptAddressCityState::class.java) }
+
+    private val pirSuccessAdapter by lazy { moshi.adapter(PirSuccessResponse::class.java) }
 
     override suspend fun handleState(pirRunState: PirRunState) = withContext(dispatcherProvider.io()) {
         when (pirRunState) {
@@ -169,7 +171,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerManualScanStarted(state: BrokerManualScanStarted) {
-        pixelSender.reportManualScanBrokerStarted(state.brokerName)
+        pixelSender.reportBrokerScanStarted(state.brokerName)
         repository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -180,7 +182,8 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerManualScanCompleted(state: BrokerManualScanCompleted) {
-        pixelSender.reportManualScanBrokerCompleted(
+        handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
+        pixelSender.reportBrokerScanCompleted(
             brokerName = state.brokerName,
             totalTimeInMillis = state.totalTimeMillis,
             isSuccess = state.isSuccess,
@@ -202,7 +205,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScheduledScanStarted(state: BrokerScheduledScanStarted) {
-        pixelSender.reportScheduledScanBrokerStarted(state.brokerName)
+        pixelSender.reportBrokerScanStarted(state.brokerName)
         repository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -213,7 +216,8 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScheduledScanCompleted(state: BrokerScheduledScanCompleted) {
-        pixelSender.reportScheduledScanBrokerCompleted(
+        handleScanError(state.isSuccess, state.brokerName, state.profileQueryId)
+        pixelSender.reportBrokerScanCompleted(
             brokerName = state.brokerName,
             totalTimeInMillis = state.totalTimeMillis,
             isSuccess = state.isSuccess,
@@ -253,7 +257,13 @@ class RealPirRunStateHandler @Inject constructor(
                     fullName = it.fullName,
                 )
             }.also {
-                repository.saveExtractedProfile(it)
+                if (it.isNotEmpty()) {
+                    jobRecordUpdater.markRemovedProfiles(it, state.brokerName, state.profileQueryId)
+                    repository.saveExtractedProfile(it)
+                    jobRecordUpdater.updateScanMatchesFound(state.brokerName, state.profileQueryId)
+                } else {
+                    jobRecordUpdater.updateScanNoMatchFound(state.brokerName, state.profileQueryId)
+                }
             }
 
             else -> {}
@@ -264,14 +274,17 @@ class RealPirRunStateHandler @Inject constructor(
         // TODO: remove if not needed later, might be used for stages
     }
 
-    private fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {
-        pixelSender.reportRecordOptOutStarted(
+    private suspend fun handleRecordOptOutStarted(state: BrokerRecordOptOutStarted) {
+        jobRecordUpdater.markOptOutAsAttempted(state.extractedProfile.dbId)
+
+        pixelSender.reportOptOutStarted(
             brokerName = state.brokerName,
         )
     }
 
     private suspend fun handleRecordOptOutCompleted(state: BrokerRecordOptOutCompleted) {
-        pixelSender.reportRecordOptOutCompleted(
+        updateOptOutRecord(state.isSubmitSuccess, state.extractedProfile.dbId)
+        pixelSender.reportOptOutCompleted(
             brokerName = state.brokerName,
             totalTimeInMillis = state.endTimeInMillis - state.startTimeInMillis,
             isSuccess = state.isSubmitSuccess,
@@ -305,5 +318,26 @@ class RealPirRunStateHandler @Inject constructor(
             isError = true,
             result = "${state.actionID}: ${state.message}}",
         )
+    }
+
+    private suspend fun handleScanError(
+        isSuccess: Boolean,
+        brokerName: String,
+        profileQueryId: Long,
+    ) {
+        if (!isSuccess) {
+            jobRecordUpdater.updateScanError(brokerName, profileQueryId)
+        }
+    }
+
+    private suspend fun updateOptOutRecord(
+        isSubmitted: Boolean,
+        extractedProfileId: Long,
+    ) {
+        if (isSubmitted) {
+            jobRecordUpdater.updateOptOutRequested(extractedProfileId)
+        } else {
+            jobRecordUpdater.updateOptOutError(extractedProfileId)
+        }
     }
 }

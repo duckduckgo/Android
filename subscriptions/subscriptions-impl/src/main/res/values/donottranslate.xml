@@ -15,32 +15,4 @@
   -->
 
 <resources>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Subscribers get our VPN, advanced AI models in Duck.ai, Personal Information Removal, and Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Subscribers get our VPN, advanced AI models in Duck.ai, and Identity Theft Restoration.</string>
-
-    <string name="feedbackCategoryDuckAi">Duck.ai</string>
-    <string name="feedbackSubCategoryDuckAiSubscriberModels">Unable to access the subscriber-only Duck.ai models</string>
-    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Can\'t access Duck.ai with my subscription in other browsers</string>
-    <string name="feedbackSubCategoryDuckAiOther">Other Duck.ai feedback</string>
-
-    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
-    <string name="subscriptionSettingSubscribeSecure">Secure your Wi-Fi, and chat privately with advanced AI models</string>
-
-    <string name="subscriptionSettingGetRebranding">Subscribe to DuckDuckGo</string>
-    <string name="subscriptionSettingTryFreeTrialRebranding">Try Free</string>
-    <string name="feedbackGeneralSubscription">Subscription</string>
-
-    <!-- Privacy Pro Rebranding-->
-    <string name="privacyProRebranding">DuckDuckGo Subscription</string>
-    <string name="subscriptionSettingExpiredRebranding">Your DuckDuckGo subscription expired</string>
-    <string name="privacyProFaqRebranding">Need help with your subscription?</string>
-    <string name="privacyProFaqSecondaryRebranding">Get answers to frequently asked questions or contact subscription support from our help pages. Feature availability varies by country.</string>
-    <string name="restoreSubscriptionTitleRebranding">Add your subscription to this device</string>
-    <string name="restoreSubscriptionEmailDescriptionRebranding">Link an email address to your subscription to add it to this device.</string>
-    <string name="activateOnOtherDevicesRebranding">Add Your Subscription to Other Devices</string>
-    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Add your subscription to your other devices via Google Play or by linking an email address.</string>
-    <string name="addToDeviceSecondaryTextWithEmailRebranding">Use the email above to add your subscription on your other devices in the DuckDuckGo app. Go to Settings > Subscription Settings > I Have a Subscription.</string>
-    <string name="subscriptionSettingRebrandingMessage">Privacy Pro is now just called the DuckDuckGo subscription</string>"
-    <string name="subscriptionSettingSubscribeRebranding">Protect your connection and identity with one subscription.</string>
-    <string name="removeFromDeviceDescriptionRebranding">You will no longer be able to access your subscription on this device. This will not cancel your subscription, and it will remain active on your other devices.</string>
 </resources>

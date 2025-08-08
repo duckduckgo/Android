@@ -168,4 +168,34 @@
     <string name="activityActivateSubscription">Jeg har et abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Send tilbagemelding</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo-abonnement</string>
+    <string name="subscriptionSettingExpiredRebranding">Dit DuckDuckGo-abonnement er udløbet</string>
+    <string name="privacyProFaqRebranding">Har du brug for hjælp til dit abonnement?</string>
+    <string name="privacyProFaqSecondaryRebranding">Få svar på ofte stillede spørgsmål, eller kontakt abonnementssupport fra vores hjælpesider. Tilgængeligheden af funktioner varierer fra land til land.</string>
+    <string name="restoreSubscriptionTitleRebranding">Tilføj dit abonnement til denne enhed</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Knyt en e-mailadresse til dit abonnement for at føje det til denne enhed.</string>
+    <string name="activateOnOtherDevicesRebranding">Tilføj dit abonnement til andre enheder</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Tilføj dit abonnement til dine andre enheder via Google Play eller ved at tilknytte en e-mailadresse.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Brug e-mailen ovenfor til at tilføje dit abonnement på dine andre enheder i DuckDuckGo-appen. Gå til Indstillinger &gt; Abonnementsindstillinger &gt; Jeg har et abonnement.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kaldes nu bare DuckDuckGo-abonnementet</string>
+    <string name="subscriptionSettingSubscribeRebranding">Beskyt din forbindelse og identitet med ét abonnement.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Du vil ikke længere have adgang til abonnementet på denne enhed. Dette opsiger ikke abonnementet, og det forbliver aktivt på dine andre enheder.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnenter får vores VPN og avancerede AI-modeller i Duck.ai, Personal Information Removal og Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnenter får vores VPN, avancerede AI-modeller i Duck.ai og Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Kan ikke tilgå Duck.ai-modellerne kun for abonnenter.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Kan ikke få adgang til Duck.ai med mit abonnement i andre browsere</string>
+    <string name="feedbackSubCategoryDuckAiOther">Anden Duck.ai-feedback</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Beskyt dit Wi-Fi, og chat privat med avancerede AI-modeller</string>
+
+    <string name="subscriptionSettingGetRebranding">Abonner på DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Prøv gratis</string>
+    <string name="feedbackGeneralSubscription">Abonnement</string>
+
 </resources>

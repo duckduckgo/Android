@@ -32,6 +32,7 @@ dependencies {
     implementation project(':common-ui')
     implementation project(':common-utils')
     implementation project(':navigation-api')
+    implementation project(':subscriptions-api')
     ksp AndroidX.room.compiler
 
     implementation AndroidX.appCompat

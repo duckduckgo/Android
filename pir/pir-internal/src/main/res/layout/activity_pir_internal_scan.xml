@@ -47,8 +47,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/keyline_4"
-            android:paddingBottom="@dimen/keyline_4"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingBottom="@dimen/keyline_4">
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="wrap_content"
@@ -147,6 +147,25 @@
                 android:text="@string/pirDevForceKillScan"
                 app:editable="true"
                 app:type="single_line" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/debugResetAll"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevResetAll"
+                app:editable="true"
+                app:type="single_line" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/debugResetOptOut"
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/pirDevResetOptOutOnly"
+                app:editable="true"
+                app:type="single_line" />
+
 
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
                 android:layout_width="wrap_content"

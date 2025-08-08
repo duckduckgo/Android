@@ -16,6 +16,8 @@
 
 package com.duckduckgo.pir.internal.scripts.models
 
+import com.duckduckgo.pir.internal.models.ProfileQuery
+
 data class PirResult(
     val result: PirScriptResultResponse?,
 )

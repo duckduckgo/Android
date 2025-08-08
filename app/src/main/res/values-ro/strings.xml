@@ -813,8 +813,7 @@
     <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
     <string name="onboardingEndDaxDialogButton">Gata!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, înainte să uit...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN</b> încorporat!<br/><br/>Activează-l cu un <b>abonament plătit Privacy Pro.</b>]]></string>
-    <string name="onboardingPrivacyProDaxDialogFreeTrialDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo are și un <b>VPN securizat + 2 protecții premium suplimentare</b>, disponibile cu un <b>abonament opțional cu plată</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Află mai multe</string>
     <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Încearcă gratuit!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ignorare</string>
@@ -864,7 +863,12 @@
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Lasă DuckDuckGo să protejeze mai mult din ceea ce faci online</string>
     <string name="defaultBrowserBottomSheetDialogSubTitle">Transformă-ne în browserul tău implicit, astfel încât toate linkurile de pe site să se deschidă în DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Nu acum</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Nu întreba din nou</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nu este browserul tău implicit. Obține mai multă protecție.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Setează ca implicit</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nu întreba din nou</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blochează tehnologiile de urmărire pentru a-ți proteja navigarea</string>
@@ -903,4 +907,38 @@
 
     <!-- Change under remote feature flag: Widget as a Protection -->
     <string name="settingsAddHomeWidgetTitle">Widget pe ecranul de pornire</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Finalizează configurarea</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Salut!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ești gata pentru un browser mai rapid care îți asigură protecția?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Mecanismele de protecție</b> <i>au fost activate!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Salut!<br/>Ești gata pentru un browser mai rapid care îți asigură protecție?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Șterge-ți instantaneu activitatea de navigare cu <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Încearcă!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+        <item quantity="few"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+        <item quantity="other"><![CDATA[ și încă %1$d încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <font color=\"#F05C2B\">L-am blocat!</font>]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <font color=\"#F05C2B\">I-am blocat!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Atinge scutul pentru mai multe informații.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo este o companie independentă din domeniul protecției online care se adresează oricărei persoane ce dorește să recâștige controlul asupra informațiilor sale personale.\n\nCredem că cel mai bun mod de a-ți proteja datele cu caracter personal împotriva hackerilor, a escrocilor și a companiilor care încalcă viața privată este să împiedici colectarea lor. De aceea, milioane de oameni <annotation type="chart_comparison">aleg DuckDuckGo în locul Chrome și al altor browsere</annotation> pentru a căuta și naviga online. Motorul nostru de căutare încorporat este asemănător cu Google, dar nu îți urmărește niciodată căutările. Iar mecanismele noastre de protecție pentru navigare, cum ar fi blocarea tehnologiilor de urmărire a reclamelor și blocarea modulelor cookie, contribuie la împiedicarea colectării datelor tale de alte companii. De asemenea, browserul nostru este gratuit ‑ obținem câștiguri din <annotation type="privacy_respecting_ads">anunțurile de căutare care respectă viața privată</annotation>, nu din exploatarea datelor tale.În plus, oferim și <annotation type="ppro_help_page">abonamentul DuckDuckGo</annotation> integrat în browserul nostru. Abonații beneficiază de și mai multă protecție a vieții private, cu un <annotation type="vpn_help_page">VPN</annotation> rapid și simplu care contribuie la securizarea activității tale online, acces la modele de inteligență artificială avansate în serviciul nostru privat de chat cu inteligență artificială Duck.ai, un serviciu care găsește și elimină datele tale cu caracter personal de pe site-urile de căutare a persoanelor și un serviciu care îți restabilește identitatea în cazul în care aceasta este sustrasă.\n\nPreia din nou controlul asupra datelor tale cu caracter personal cu browserul conceput pentru protecția datelor, nu pentru colectarea lor.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo are și un <b>abonament opțional cu plată</b>, cu un <b>VPN</b> securizat și <b>IA avansată, privată</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Caracteristici AI</string>
+    <string name="settingsDuckAi">Duck.ai</string>
+
 </resources>

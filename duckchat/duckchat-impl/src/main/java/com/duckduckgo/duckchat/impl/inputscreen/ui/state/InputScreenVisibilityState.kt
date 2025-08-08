@@ -20,4 +20,5 @@ data class InputScreenVisibilityState(
     val voiceInputButtonVisible: Boolean,
     val autoCompleteSuggestionsVisible: Boolean,
     val showChatLogo: Boolean,
+    val showSearchLogo: Boolean,
 )

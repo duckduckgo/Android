@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Автоматически исключать приложения, несовместимые с VPN</string>
     <string name="netpExclusionListLabelAutoExclude">Несовместимые с VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Банковские, стриминговые и некоторые другие приложения плохо работают с VPN. При активации этой настройки такие приложения будут исключаться автоматически.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN отключен ввиду окончания подписки. Оформите подписку, чтобы подключиться снова.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Оформите подписку, чтобы подключиться снова.</string>
 </resources>

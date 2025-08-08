@@ -16,131 +16,70 @@
 
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles.AdditionalPromptsCohortName
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.CONVERTED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_1
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STAGE_2
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.STOPPED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.CONVERTED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-data class DefaultBrowserPromptsExperimentStageAction(
+data class DefaultBrowserPromptsFlowStageAction(
     val showMessageDialog: Boolean,
     val showSetAsDefaultPopupMenuItem: Boolean,
     val highlightPopupMenu: Boolean,
+    val showMessage: Boolean,
 ) {
     companion object {
-        val disableAll = DefaultBrowserPromptsExperimentStageAction(
+        val disableAll = DefaultBrowserPromptsFlowStageAction(
             showMessageDialog = false,
             showSetAsDefaultPopupMenuItem = false,
             highlightPopupMenu = false,
+            showMessage = false,
         )
     }
 }
 
-@ContributesPluginPoint(scope = AppScope::class)
-interface DefaultBrowserPromptsExperimentStageEvaluator {
-    val targetCohort: AdditionalPromptsCohortName
-    suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction
+interface DefaultBrowserPromptsFlowStageEvaluator {
+    suspend fun evaluate(newStage: Stage): DefaultBrowserPromptsFlowStageAction
+}
 
-    @ContributesMultibinding(scope = AppScope::class)
-    class Control @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
+@ContributesBinding(AppScope::class)
+class DefaultBrowserPromptsFlowStageEvaluatorImpl @Inject constructor() : DefaultBrowserPromptsFlowStageEvaluator {
 
-        override val targetCohort = AdditionalPromptsCohortName.CONTROL
+    override suspend fun evaluate(newStage: Stage): DefaultBrowserPromptsFlowStageAction =
+        when (newStage) {
+            NOT_ENROLLED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
-        override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
-            DefaultBrowserPromptsExperimentStageAction.disableAll
-    }
+            ENROLLED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
-    @ContributesMultibinding(scope = AppScope::class)
-    class Variant1 @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
+            STAGE_1 -> DefaultBrowserPromptsFlowStageAction(
+                showMessageDialog = true,
+                showSetAsDefaultPopupMenuItem = true,
+                highlightPopupMenu = true,
+                showMessage = false,
+            )
 
-        override val targetCohort = AdditionalPromptsCohortName.VARIANT_1
+            STAGE_2 -> DefaultBrowserPromptsFlowStageAction(
+                showMessageDialog = true,
+                showSetAsDefaultPopupMenuItem = true,
+                highlightPopupMenu = true,
+                showMessage = false,
+            )
 
-        override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
-            when (newStage) {
-                NOT_ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            STAGE_3 -> DefaultBrowserPromptsFlowStageAction(
+                showMessageDialog = false,
+                showSetAsDefaultPopupMenuItem = false,
+                highlightPopupMenu = false,
+                showMessage = true,
+            )
 
-                ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
+            STOPPED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
-                STAGE_1 -> DefaultBrowserPromptsExperimentStageAction(
-                    showMessageDialog = true,
-                    showSetAsDefaultPopupMenuItem = false,
-                    highlightPopupMenu = false,
-                )
-
-                STAGE_2 -> DefaultBrowserPromptsExperimentStageAction(
-                    showMessageDialog = true,
-                    showSetAsDefaultPopupMenuItem = false,
-                    highlightPopupMenu = false,
-                )
-
-                STOPPED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                CONVERTED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-            }
-    }
-
-    @ContributesMultibinding(scope = AppScope::class)
-    class Variant2 @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
-
-        override val targetCohort = AdditionalPromptsCohortName.VARIANT_2
-
-        override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
-            when (newStage) {
-                NOT_ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                STAGE_1 -> DefaultBrowserPromptsExperimentStageAction(
-                    showMessageDialog = true,
-                    showSetAsDefaultPopupMenuItem = false,
-                    highlightPopupMenu = false,
-                )
-
-                STAGE_2 -> DefaultBrowserPromptsExperimentStageAction(
-                    showMessageDialog = false,
-                    showSetAsDefaultPopupMenuItem = true,
-                    highlightPopupMenu = true,
-                )
-
-                STOPPED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                CONVERTED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-            }
-    }
-
-    @ContributesMultibinding(scope = AppScope::class)
-    class Variant3 @Inject constructor() : DefaultBrowserPromptsExperimentStageEvaluator {
-
-        override val targetCohort = AdditionalPromptsCohortName.VARIANT_3
-
-        override suspend fun evaluate(newStage: ExperimentStage): DefaultBrowserPromptsExperimentStageAction =
-            when (newStage) {
-                NOT_ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                ENROLLED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                STAGE_1 -> DefaultBrowserPromptsExperimentStageAction(
-                    showMessageDialog = true,
-                    showSetAsDefaultPopupMenuItem = true,
-                    highlightPopupMenu = true,
-                )
-
-                STAGE_2 -> DefaultBrowserPromptsExperimentStageAction(
-                    showMessageDialog = true,
-                    showSetAsDefaultPopupMenuItem = true,
-                    highlightPopupMenu = true,
-                )
-
-                STOPPED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-
-                CONVERTED -> DefaultBrowserPromptsExperimentStageAction.disableAll
-            }
-    }
+            CONVERTED -> DefaultBrowserPromptsFlowStageAction.disableAll
+        }
 }

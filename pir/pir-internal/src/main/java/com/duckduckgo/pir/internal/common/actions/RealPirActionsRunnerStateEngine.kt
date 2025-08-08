@@ -24,7 +24,7 @@ import com.duckduckgo.pir.internal.common.PirJob.RunType
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.Event
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.SideEffect
 import com.duckduckgo.pir.internal.common.actions.PirActionsRunnerStateEngine.State
-import com.duckduckgo.pir.internal.scripts.models.ProfileQuery
+import com.duckduckgo.pir.internal.models.ProfileQuery
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow

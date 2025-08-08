@@ -168,4 +168,34 @@
     <string name="activityActivateSubscription">Turiu prenumeratą</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Siųsti atsiliepimą</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">„DuckDuckGo“ prenumerata</string>
+    <string name="subscriptionSettingExpiredRebranding">Jūsų „DuckDuckGo“ prenumerata baigėsi</string>
+    <string name="privacyProFaqRebranding">Reikia pagalbos su prenumerata?</string>
+    <string name="privacyProFaqSecondaryRebranding">Gauk atsakymus į dažniausiai užduodamus klausimus arba susisiek su prenumeratos palaikymo tarnyba mūsų pagalbos puslapiuose. Funkcijų prieinamumas skiriasi atsižvelgiant į šalį.</string>
+    <string name="restoreSubscriptionTitleRebranding">Pridėkite savo prenumeratą prie šio įrenginio</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Susiekite el. pašto adresą su prenumerata, kad pridėtumėte jį prie šio įrenginio.</string>
+    <string name="activateOnOtherDevicesRebranding">Pridėkite savo prenumeratą prie kitų įrenginių</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Pridėkite prenumeratą į kitus įrenginius per „Google Play“ arba susiedami el. pašto adresą.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Naudokite pirmiau nurodytą el. paštą prenumeratą kituose savo įrenginiuose programėlėje „DuckDuckGo“ pridėti. Eikite į Nustatymai &gt; Prenumeratos nustatymai &gt; Turiu prenumeratą.</string>
+    <string name="subscriptionSettingRebrandingMessage">„Privacy Pro“ dabar tiesiog vadinama „DuckDuckGo“ prenumerata.</string>
+    <string name="subscriptionSettingSubscribeRebranding">Apsaugokite savo ryšį ir tapatybę naudodami vieną prenumeratą.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Šiame įrenginyje nebegalėsite pasiekti savo prenumeratos. Tai neatšauks jūsų prenumeratos ir ji liks aktyvi kituose įrenginiuose.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“, asmens duomenų šalinimas ir tapatybės vagystės duomenų atkūrimas.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Prenumeratoriai gauna mūsų VPN, pažangius dirbtinio intelekto modelius „Duck.ai“ platformoje ir tapatybės vagystės atkūrimo paslaugą.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nepavyksta pasiekti tik prenumeratoriams skirtų „Duck.ai“ modelių.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Negaliu pasiekti „Duck.ai“ su savo prenumerata kitose naršyklėse.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Kiti „Duck.ai“ atsiliepimai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Apsaugok savo Wi-Fi ir kalbėkis privačiai su pažangiais DI modeliais</string>
+
+    <string name="subscriptionSettingGetRebranding">Prenumeruok „DuckDuckGo“</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Išbandyk nemokamai</string>
+    <string name="feedbackGeneralSubscription">Prenumerata</string>
+
 </resources>

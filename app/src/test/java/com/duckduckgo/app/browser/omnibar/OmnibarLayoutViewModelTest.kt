@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetectorImpl
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.ChangeCustomTabTitle
@@ -78,7 +78,7 @@ class OmnibarLayoutViewModelTest {
     private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
-    private val defaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment = mock()
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
 
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val duckChat: DuckChat = mock()
@@ -106,7 +106,7 @@ class OmnibarLayoutViewModelTest {
 
     @Before
     fun before() {
-        whenever(defaultBrowserPromptsExperiment.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
+        whenever(additionalDefaultBrowserPrompts.highlightPopupMenu).thenReturn(defaultBrowserPromptsExperimentHighlightOverflowMenuFlow)
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
@@ -150,7 +150,7 @@ class OmnibarLayoutViewModelTest {
             pixel = pixel,
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
-            defaultBrowserPromptsExperiment = defaultBrowserPromptsExperiment,
+            additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
             experimentalThemingDataStore = mockExperimentalThemingDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
@@ -1625,6 +1625,61 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.showFindInPage)
+        }
+    }
+
+    @Test
+    fun `when set draft and current state is NTP, then draft text applied`() = runTest {
+        testee.onViewModeChanged(ViewMode.NewTab)
+        val expected = "test"
+        testee.setDraftTextIfNtpOrSerp(expected)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(expected, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun `when set draft and current state is SERP, then draft text applied`() = runTest {
+        givenSiteLoaded(SERP_URL)
+        val expected = "test"
+        testee.setDraftTextIfNtpOrSerp(expected)
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(expected, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun `when set draft and current state is a web page, then draft text not applied`() = runTest {
+        val omnibarState = OmnibarViewState(
+            navigationChange = false,
+            omnibarText = RANDOM_URL,
+            forceExpand = false,
+        )
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarState))
+        testee.onExternalStateChange(
+            StateChange.LoadingStateChange(
+                LoadingViewState(
+                    isLoading = true,
+                    trackersAnimationEnabled = true,
+                    progress = 100,
+                    url = RANDOM_URL,
+                ),
+            ),
+        )
+
+        val expected = RANDOM_URL
+        testee.setDraftTextIfNtpOrSerp("some draft text")
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertEquals(expected, viewState.omnibarText)
+            assertTrue(viewState.updateOmnibarText)
         }
     }
 

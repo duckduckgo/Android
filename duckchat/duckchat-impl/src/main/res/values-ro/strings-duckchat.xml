@@ -44,4 +44,28 @@
     <string name="duck_chat_address_bar_visibility_setting">Bara de adrese</string>
     <string name="duck_chat_assist_settings_title">Setări Assist</string>
     <string name="duck_chat_assist_settings_description">Alege cât de des vrei să apară răspunsurile asistate de IA în căutările tale</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Căutare</string>
+    <string name="input_screen_search_hint">Caută sau introdu adresa</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Întreabă Duck.ai</string>
+    <string name="input_screen_user_pref_title">Bară de adrese experimentală</string>
+    <string name="input_screen_user_pref_description">Caută pe web sau întreabă Duck.ai direct din bara de adrese</string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Fă chat în privat cu modele AI exclusive pentru abonați.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Deschide Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Află mai multe</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Caracteristici AI</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Funcțiile IA ale DuckDuckGo sunt private și opționale.Datele tale nu sunt folosite pentru a antrena IA.\n<annotation type="learn_more_link">Află mai multe</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Discută anonim cu modele populare de chat IA de la terțe părți</string>
+    <string name="duck_chat_show_in_heading_rebranding">Comenzi rapide Duck.ai</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Setări Search Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Alege cât de des vrei să apară răspunsurile asistate de IA în căutările tale</string>
 </resources>

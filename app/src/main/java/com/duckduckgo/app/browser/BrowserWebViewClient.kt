@@ -439,16 +439,19 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        val activeExperiments = contentScopeExperiments.getActiveExperiments()
-        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+            jsPlugins.getPlugins().forEach {
+                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+            }
+        }
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-        jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
-        }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 

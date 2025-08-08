@@ -298,5 +298,7 @@
     <string name="passwords_import_promo_action">Importuok iš „Google“</string>
     <string name="passwords_import_promo_in_browser_title">Perkelk savo slaptažodžius iš „Google“ į „DuckDuckGo“</string>
     <string name="passwords_import_promo_in_browser_secondary_action_button">Neklausk dar kartą</string>
+    <string name="passwords_import_promo_in_settings_title">Importuok slaptažodžius iš „Google“</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Slėpti</string>
 
 </resources>

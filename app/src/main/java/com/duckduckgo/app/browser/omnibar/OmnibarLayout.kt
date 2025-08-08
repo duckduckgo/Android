@@ -199,7 +199,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private val pulseAnimation: PulseAnimation by lazy {
-        PulseAnimation(lifecycleOwner)
+        PulseAnimation(lifecycleOwner, onboardingDesignExperimentToggles)
     }
 
     private var omnibarTextListener: Omnibar.TextListener? = null
@@ -817,7 +817,6 @@ open class OmnibarLayout @JvmOverloads constructor(
                     targetView = targetView,
                     isSenseOfProtectionExperimentAndShieldView = isPrivacyShieldAnimation &&
                         runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() },
-                    isBuckOnboardingExperiment = onboardingDesignExperimentToggles.buckOnboarding().isEnabled(),
                 )
             }
         } else {
@@ -1039,8 +1038,8 @@ open class OmnibarLayout @JvmOverloads constructor(
         omnibarTextListener?.onTrackersCountFinished()
     }
 
-    fun setDraftTextIfNtp(query: String) {
-        viewModel.setDraftTextIfNtp(query)
+    fun setDraftTextIfNtpOrSerp(query: String) {
+        viewModel.setDraftTextIfNtpOrSerp(query)
     }
 
     private fun enableTextInputClickCatcher(enabled: Boolean) {
