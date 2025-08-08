@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisa oma tellimus oma teistesse seadmetesse Google Play kaudu või e-posti aadressi sidumisega.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Kasuta ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Mine jaotisse Seaded &gt; Tellimisseaded &gt; Mul on tellimus.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro kannab nüüd lihtsalt nime DuckDuckGo tellimus</string>
+    <string name="subscriptionSettingSubscribeRebranding">Kaitse oma ühendust ja identiteeti ühe tellimusega.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Sa ei pääse enam selles seadmes oma tellimusele ligi. See ei tühista sinu tellimust ja see jääb teistel seadmetel aktiivseks.</string>
+
 
 </resources>

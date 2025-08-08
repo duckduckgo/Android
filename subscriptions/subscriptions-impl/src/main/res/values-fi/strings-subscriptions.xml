@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisää tilauksesi muihin laitteisiisi Google Playn kautta tai liittämällä sähköpostiosoite.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Lisää tilauksesi muihin laitteisiisi DuckDuckGo-sovelluksessa käyttämällä yllä olevaa sähköpostiosoitetta. Siirry kohtaan Asetukset &gt; Tilausasetukset &gt; Minulla on tilaus.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro on nyt nimeltään DuckDuckGo-tilaus</string>
+    <string name="subscriptionSettingSubscribeRebranding">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muissa laitteissasi.</string>
+
 
 </resources>

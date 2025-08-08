@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Adaugă abonamentul pe celelalte dispozitive ale tale prin Google Play sau prin asocierea unei adrese de e-mail.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Folosește adresa de e-mail de mai sus pentru a-ți adăuga abonamentul pe celelalte dispozitive în aplicația DuckDuckGo. Accesează Setări &gt; Setări abonament &gt; Am un abonament.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro se numește acum doar abonament DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Protejează-ți conexiunea și identitatea cu un singur abonament.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Nu vei mai putea accesa abonamentul tău pe acest dispozitiv. Acest lucru nu îți va anula abonamentul, care va rămâne activ pe celelalte dispozitive.</string>
+
 
 </resources>

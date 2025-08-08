@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Přidej své předplatné do svých dalších zařízení přes Google Play nebo propojením e-mailové adresy.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Pomocí uvedeného e-mailu si v aplikaci DuckDuckGo přidej předplatné do ostatních zařízení. Přejdi do Nastavení &gt; Nastavení předplatného &gt; Mám předplatné.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro mění název na „předplatné DuckDuckGo“</string>
+    <string name="subscriptionSettingSubscribeRebranding">Chraň své připojení a identitu s jedním předplatným.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Na tomto zařízení už nebudeš mít přístup ke svému předplatnému. Tím se tvoje předplatné nezruší, na tvých ostatních zařízeních zůstane aktivní.</string>
+
 
 </resources>

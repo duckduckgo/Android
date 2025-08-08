@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Füge dein Abonnement über Google Play oder durch Verknüpfung einer E-Mail-Adresse zu deinen anderen Geräten hinzu.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Verwende die oben angegebene E-Mail-Adresse, um dein Abonnement auf deinen anderen Geräten in der DuckDuckGo-App hinzuzufügen. Gehe zu Einstellungen &gt; Abonnementeinstellungen &gt; Ich habe ein Abonnement.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro heißt jetzt einfach DuckDuckGo-Abo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Schütze deine Verbindung und Identität mit einem Abonnement.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Dies hat zur Folge, dass du mit diesem Gerät nicht mehr auf dein Abo zugreifen kannst. Dein Abo wird dadurch nicht gekündigt; es bleibt auf deinen anderen Geräten aktiv.</string>
+
 
 </resources>

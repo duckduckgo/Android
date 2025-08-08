@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Dodaj subskrypcję do innych urządzeń za pośrednictwem Google Play lub połączenia adresu e-mail.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">Użyj powyższego adresu e-mail, aby dodać subskrypcję na innych urządzeniach w aplikacji DuckDuckGo. Wybierz kolejno Ustawienia &gt; Ustawienia subskrypcji &gt; Mam subskrypcję.</string>
     <string name="subscriptionSettingRebrandingMessage">Privacy Pro jest teraz po prostu nazywane subskrypcją DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Chroń połączenie i tożsamość za pomocą jednej subskrypcji.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Nie będziesz już mieć dostępu do subskrypcji na tym urządzeniu. Nie spowoduje to anulowania Twojej subskrypcji, która pozostanie aktywna na pozostałych urządzeniach.</string>
+
 
 </resources>

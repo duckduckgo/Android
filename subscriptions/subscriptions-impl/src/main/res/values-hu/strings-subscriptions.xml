@@ -180,5 +180,8 @@
     <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Add hozzá az előfizetésedet a többi eszközödön is a Google Play-en keresztül, vagy e-mail-cím társításával.</string>
     <string name="addToDeviceSecondaryTextWithEmailRebranding">A DuckDuckGo-alkalmazásban hozzáadhatod az előfizetésedet a többi eszközödön a fenti e-mail-cím használatával. Lépj a Beállítások &gt; Előfizetési beállítások &gt; Van előfizetésem menüpontra.</string>
     <string name="subscriptionSettingRebrandingMessage">A Privacy Pro mostantól egyszerűen DuckDuckGo-előfizetés néven fut</string>
+    <string name="subscriptionSettingSubscribeRebranding">Védd a kapcsolatodat és a személyazonosságodat egyetlen előfizetés segítségével.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Ezen az eszközön többé nem férhetsz hozzá az előfizetésedhez. Ez nem szünteti meg az előfizetésedet, amely a többi eszközödön aktív marad.</string>
+
 
 </resources>
