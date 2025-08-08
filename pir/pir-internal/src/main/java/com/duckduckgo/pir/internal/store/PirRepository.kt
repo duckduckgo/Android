@@ -61,6 +61,8 @@ interface PirRepository {
 
     suspend fun getAllLocalBrokerJsons(): Map<BrokerJson, Boolean>
 
+    suspend fun getStoredBrokersCount(): Int
+
     suspend fun getActiveBrokerJsons(): List<BrokerJson>
 
     suspend fun getAllBrokersForScan(): List<String>
@@ -223,6 +225,10 @@ internal class RealPirRepository(
                 etag = it.etag,
             ) to it.isActive
         }
+    }
+
+    override suspend fun getStoredBrokersCount(): Int = withContext(dispatcherProvider.io()) {
+        return@withContext brokerJsonDao.getAllBrokersCount()
     }
 
     override suspend fun getActiveBrokerJsons(): List<BrokerJson> = withContext(dispatcherProvider.io()) {
