@@ -124,6 +124,7 @@ class PrivacyConfigGlobalExceptionsReferenceTest(private val testCase: TestCase)
             referenceTestUtilities.privacyRepository,
             db,
             InMemorySharedPreferences(),
+            mock(),
         )
         privacyConfigPersister.persistPrivacyConfig(
             referenceTestUtilities.getJsonPrivacyConfig(

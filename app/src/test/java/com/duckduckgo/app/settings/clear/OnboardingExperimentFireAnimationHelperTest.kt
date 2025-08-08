@@ -144,5 +144,17 @@ class OnboardingExperimentFireAnimationHelperTest {
         override suspend fun onWebPageFinishedLoading(url: String?) {
             TODO("Not yet implemented")
         }
+
+        override fun getCohort(): String? {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun waitForPrivacyConfig(): Boolean {
+            TODO("Not yet implemented")
+        }
     }
 }

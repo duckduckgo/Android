@@ -25,3 +25,12 @@ interface PrivacyConfigCallbackPlugin {
      */
     fun onPrivacyConfigDownloaded()
 }
+
+/** Public interface for privacy config persisting related callbacks **/
+interface PrivacyConfigPersisterCallbackPlugin {
+    /**
+     * Notifies that onPrivacyConfigPersisted event occurred.
+     * This method will be called every time it persists a new version of the privacy config.
+     */
+    fun onPrivacyConfigPersisted()
+}

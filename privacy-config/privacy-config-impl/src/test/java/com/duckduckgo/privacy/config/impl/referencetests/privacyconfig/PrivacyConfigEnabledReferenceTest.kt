@@ -85,6 +85,7 @@ class PrivacyConfigEnabledReferenceTest(private val testCase: TestCase) {
             referenceTestUtilities.privacyRepository,
             db,
             InMemorySharedPreferences(),
+            mock(),
         )
     }
 
