@@ -85,7 +85,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle
 
-    private var duckAiSettingsContentLayout: DuckAiSettingsContentLayout? = null
+    private lateinit var duckAiSettingsContentLayout: InflatedDuckAiSettingsContentLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,14 +94,13 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         setupToolbar(binding.includeToolbar.toolbar)
 
-        val container: ScrollView = binding.duckAiSettingsContentContainer
+        val container = binding.duckAiSettingsContentContainer
         val inflater = LayoutInflater.from(this)
         val contentRoot = if (subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()) {
             inflater.inflate(R.layout.duck_ai_settings_content_rebranding, container, false)
         } else {
             inflater.inflate(R.layout.duck_ai_settings_content_regular, container, false)
         }
-        container.removeAllViews()
         container.addView(contentRoot)
         duckAiSettingsContentLayout = InflatedDuckAiSettingsContentLayout(contentRoot)
 
@@ -123,7 +122,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        val content = duckAiSettingsContentLayout ?: return
+        val content = duckAiSettingsContentLayout
         content.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
         content.duckChatSettingsText.addClickableSpan(

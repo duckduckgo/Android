@@ -43,7 +43,7 @@
         app:typography="h2" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
-        android:id="@+id/duckChatSettingsText"
+        android:id="@+id/duckChatSettingsSubtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_5"

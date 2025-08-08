@@ -22,21 +22,13 @@ import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
 
 class InflatedDuckAiSettingsContentLayout(
-    override val root: View,
-) : DuckAiSettingsContentLayout {
-
-    override val duckChatSettingsText: DaxTextView = root.findViewById(R.id.duckChatSettingsText)
-
-    override val userEnabledDuckChatToggle: DaxListItem = root.findViewById(R.id.userEnabledDuckChatToggle)
-
-    override val duckAiInputScreenEnabledToggle: DaxListItem = root.findViewById(R.id.duckAiInputScreenEnabledToggle)
-
-    override val duckChatToggleSettingsTitle: View = root.findViewById(R.id.duckChatToggleSettingsTitle)
-
-    override val showDuckChatInMenuToggle: DaxListItem = root.findViewById(R.id.showDuckChatInMenuToggle)
-    override val showDuckChatInAddressBarToggle: DaxListItem = root.findViewById(R.id.showDuckChatInAddressBarToggle)
-
-    override val showDuckChatSearchSettingsLink: DaxListItem = root.findViewById(R.id.showDuckChatSearchSettingsLink)
+    val root: View,
+) {
+    val duckChatSettingsText: DaxTextView = root.findViewById(R.id.duckChatSettingsSubtitle)
+    val userEnabledDuckChatToggle: DaxListItem = root.findViewById(R.id.userEnabledDuckChatToggle)
+    val duckAiInputScreenEnabledToggle: DaxListItem = root.findViewById(R.id.duckAiInputScreenEnabledToggle)
+    val duckChatToggleSettingsTitle: View = root.findViewById(R.id.duckChatToggleSettingsTitle)
+    val showDuckChatInMenuToggle: DaxListItem = root.findViewById(R.id.showDuckChatInMenuToggle)
+    val showDuckChatInAddressBarToggle: DaxListItem = root.findViewById(R.id.showDuckChatInAddressBarToggle)
+    val showDuckChatSearchSettingsLink: DaxListItem = root.findViewById(R.id.showDuckChatSearchSettingsLink)
 }
-
-
