@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.api.ui
+package com.duckduckgo.pir.api.dashboard
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
- * Use this model to launch the PIR WebView screen.
+ * Use this model to launch the PIR Dashboard WebView screen.
  */
-data object PirWebViewScreen : GlobalActivityStarter.ActivityParams
+data object PirDashboardWebViewScreen : GlobalActivityStarter.ActivityParams
