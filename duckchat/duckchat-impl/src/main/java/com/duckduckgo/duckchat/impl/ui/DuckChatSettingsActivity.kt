@@ -86,17 +86,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
 
-        binding.duckChatSettingsText.addClickableSpan(
-            textSequence = getText(R.string.duck_chat_settings_activity_description),
-            spans = listOf(
-                "learn_more_link" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.duckChatLearnMoreClicked()
-                    }
-                },
-            ),
-        )
-
         setupToolbar(binding.includeToolbar.toolbar)
 
         observeViewModel()
@@ -120,7 +109,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         if (viewState.isRebrandingAiFeaturesEnabled) {
             binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
-            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_settings_activity_description_rebranding)
             binding.userEnabledDuckChatToggle.gone()
             binding.userEnabledDuckChatToggleRebranding.show()
             binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading_rebranding)
@@ -129,13 +117,27 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         } else {
             binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
-            binding.duckChatSettingsText.setText(R.string.duck_chat_settings_activity_description)
             binding.userEnabledDuckChatToggle.show()
             binding.userEnabledDuckChatToggleRebranding.gone()
             binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading)
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
         }
+
+        binding.duckChatSettingsText.addClickableSpan(
+            textSequence = if (viewState.isRebrandingAiFeaturesEnabled) {
+                getText(R.string.duck_chat_settings_activity_description_rebranding)
+            } else {
+                getText(R.string.duck_chat_settings_activity_description)
+            },
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.duckChatLearnMoreClicked()
+                    }
+                },
+            ),
+        )
 
         binding.duckAiInputScreenEnabledToggle.apply {
             isVisible = viewState.shouldShowInputScreenToggle
