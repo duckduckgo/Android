@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Suojaa yhteytesi ja henkilöllisyytesi yhdellä tilauksella.</string>
     <string name="removeFromDeviceDescriptionRebranding">Et voi enää käyttää tilaustasi tällä laitteella. Tämä ei peruuta tilaustasi, vaan se pysyy aktiivisena muissa laitteissasi.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tilaajat saavat VPN:n ja edistyneet tekoälymallit Duck.ai:ssa, Personal Information Removalin ja Identity Theft Restorationin.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tilaajat saavat VPN:n, edistyneet tekoälymallit Duck.ai:ssa ja Identity Theft Restorationin.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">En voi käyttää tilaajille tarkoitettuja Duck.ai-malleja.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">En voi käyttää Duck.ai:ta muissa selaimissa tilauksellani.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai -palaute</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Suojaa WiFi-yhteytesi ja keskustele yksityisesti edistyneiden tekoälymallien kanssa</string>
+
+    <string name="subscriptionSettingGetRebranding">Tilaa DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Kokeile maksutta</string>
+    <string name="feedbackGeneralSubscription">Tilaus</string>
 
 </resources>

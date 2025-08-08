@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Chraň své připojení a identitu s jedním předplatným.</string>
     <string name="removeFromDeviceDescriptionRebranding">Na tomto zařízení už nebudeš mít přístup ke svému předplatnému. Tím se tvoje předplatné nezruší, na tvých ostatních zařízeních zůstane aktivní.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Předplatitelé získají naši VPN, pokročilé modely AI ve funkci Duck.ai, službu Personal Information Removal a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Předplatitelé získají naši VPN, pokročilé modely umělé inteligence ve funkci Duck.ai a službu Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nemám přístup k modelům Duck.ai, které jsou jen pro předplatitele</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nemám se svým předplatným přístup k Duck.ai v jiných prohlížečích</string>
+    <string name="feedbackSubCategoryDuckAiOther">Další zpětná vazba k Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Zabezpeč si Wi-Fi a chatuj soukromě s pokročilými modely AI</string>
+
+    <string name="subscriptionSettingGetRebranding">Předplatit si DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Vyzkoušet zdarma</string>
+    <string name="feedbackGeneralSubscription">Předplatné</string>
 
 </resources>

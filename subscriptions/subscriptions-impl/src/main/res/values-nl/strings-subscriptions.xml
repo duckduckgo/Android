@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Bescherm je verbinding en identiteit met één abonnement.</string>
     <string name="removeFromDeviceDescriptionRebranding">Je hebt niet langer toegang tot je abonnement op dit apparaat. Je abonnement wordt niet opgezegd en het blijft actief op je andere apparaten.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonnees krijgen onze VPN en geavanceerde AI-modellen in Duck.ai, Personal Information Removal en Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonnees krijgen onze VPN, geavanceerde AI-modellen in Duck.ai en Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Geen toegang tot de alleen voor abonnees beschikbare Duck.ai-modellen</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ik kan Duck.ai niet openen met mijn abonnement in andere browsers.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Andere feedback over Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Beveilig je wifi en chat privé met geavanceerde AI-modellen</string>
+
+    <string name="subscriptionSettingGetRebranding">Abonneren op DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Probeer gratis</string>
+    <string name="feedbackGeneralSubscription">Abonnement</string>
 
 </resources>

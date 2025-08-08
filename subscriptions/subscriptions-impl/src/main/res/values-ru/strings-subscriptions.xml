@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Защита соединения и личных данных по одной подписке</string>
     <string name="removeFromDeviceDescriptionRebranding">Вы утратите доступ к преимуществам подписки на этом устройстве. Сама же подписка не отменяется и по-прежнему будет работать на других устройствах.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai, а также функциям удаления личной информации и восстановления после кражи данных.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai и функции восстановления после кражи данных.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Нет доступа к моделям Duck.ai, предоставляемым только по подписке</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Не могу воспользоваться Duck.ai по подписке в других браузерах</string>
+    <string name="feedbackSubCategoryDuckAiOther">Другие отзывы о Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>
+
+    <string name="subscriptionSettingGetRebranding">Подписаться на DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Попробуйте бесплатно</string>
+    <string name="feedbackGeneralSubscription">По подписке</string>
 
 </resources>

@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Защитете връзката и самоличността си с един абонамент.</string>
     <string name="removeFromDeviceDescriptionRebranding">Вече няма да имате достъп до абонамента си на това устройство. Това няма да отмени абонамента и той ще остане активен на останалите устройства.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Абонатите получават VPN и усъвършенствани AI модели в Duck.ai. Personal Information Removal и Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Абонатите получават VPN, усъвършенствани AI модели в Duck.ai и Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Няма достъп до моделите на Duck.ai, достъпни само за абонати</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Не мога да вляза в Duck.ai с абонамента си в други браузъри.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Други отзиви за Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Сигурна Wi-Fi мрежа и поверителен чат с усъвършенствани AI модели</string>
+
+    <string name="subscriptionSettingGetRebranding">Абонирайте се за DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Пробвайте безплатно</string>
+    <string name="feedbackGeneralSubscription">Абонамент</string>
 
 </resources>

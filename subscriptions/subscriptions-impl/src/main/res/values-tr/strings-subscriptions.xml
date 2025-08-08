@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Tek bir abonelikle bağlantınızı ve kimliğinizi koruyun.</string>
     <string name="removeFromDeviceDescriptionRebranding">Aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu işlem aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Aboneler VPN, Duck.ai\'daki gelişmiş yapay zeka modelleri ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Abonelere özel Duck.ai modellerine erişilemiyor.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Aboneliğimle diğer tarayıcılarda Duck.ai\'a erişemiyorum.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Diğer Duck.ai geri bildirimleri</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>
+
+    <string name="subscriptionSettingGetRebranding">DuckDuckGo\'ya abone olun</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Ücretsiz Deneyin</string>
+    <string name="feedbackGeneralSubscription">Abonelik</string>
 
 </resources>

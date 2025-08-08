@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Protégez votre connexion et votre identité avec un seul abonnement.</string>
     <string name="removeFromDeviceDescriptionRebranding">Vous ne pourrez plus accéder à votre abonnement sur cet appareil. Cela n\'annulera pas votre abonnement et il restera actif sur vos autres appareils.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai, de Personal Information Removal et d\'Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai et d\'Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Impossible d\'accéder aux modèles Duck.ai réservés aux abonnés</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Je n\'arrive pas à accéder à Duck.ai dans d\'autres navigateurs avec mon abonnement</string>
+    <string name="feedbackSubCategoryDuckAiOther">Autres commentaires sur Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>
+
+    <string name="subscriptionSettingGetRebranding">S\'abonner à DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Essayer gratuitement</string>
+    <string name="feedbackGeneralSubscription">Abonnement</string>
 
 </resources>

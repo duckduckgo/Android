@@ -183,5 +183,19 @@
     <string name="subscriptionSettingSubscribeRebranding">Aizsargā savu savienojumu un identitāti ar vienu abonementu.</string>
     <string name="removeFromDeviceDescriptionRebranding">Šajā ierīcē vairs nevarēsi piekļūt savam abonementam. Tas neatcels tavu abonementu, un tas paliks aktīvs citās tavās ierīcēs.</string>
 
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonenti saņem mūsu VPN un uzlabotus mākslīgā intelekta modeļus Duck.ai. Personal Information Removal un Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonenti saņem mūsu VPN, uzlabotus MI modeļus Duck.ai un Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nevaru piekļūt tikai abonentiem paredzētajiem Duck.ai modeļiem.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nevaru piekļūt Duck.ai ar savu abonementu citās pārlūkprogrammās.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Citas Duck.ai atsauksmes</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Nodrošini sava Wi-Fi drošību un privāti tērzē ar uzlabotiem mākslīgā intelekta modeļiem</string>
+
+    <string name="subscriptionSettingGetRebranding">Abonē DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Izmēģini bez maksas</string>
+    <string name="feedbackGeneralSubscription">Abonements</string>
 
 </resources>
