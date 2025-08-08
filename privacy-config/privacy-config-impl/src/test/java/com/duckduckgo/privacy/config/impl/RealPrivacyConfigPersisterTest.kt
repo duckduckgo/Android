@@ -25,6 +25,7 @@ import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.duckduckgo.privacy.config.api.PrivacyConfigPersisterCallbackPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeatureName
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.models.JsonPrivacyConfig
@@ -61,6 +62,8 @@ class RealPrivacyConfigPersisterTest {
     private lateinit var privacyRepository: PrivacyConfigRepository
     private lateinit var unprotectedTemporaryRepository: UnprotectedTemporaryRepository
     private val pluginPoint = FakePrivacyFeaturePluginPoint(listOf(FakePrivacyFeaturePlugin()))
+    private val callback = FakePrivacyConfigPersisterCallbackPlugin()
+    private val persisterPluginPoint = FakePrivacyConfigPersisterCallbackPluginPoint(listOf(callback))
     private val variantManagerPlugin = FakePrivacyVariantManagerPlugin()
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -84,6 +87,7 @@ class RealPrivacyConfigPersisterTest {
                 privacyRepository,
                 db,
                 sharedPreferences,
+                persisterPluginPoint,
             )
     }
 
@@ -167,6 +171,7 @@ class RealPrivacyConfigPersisterTest {
                     privacyRepository,
                     db,
                     sharedPreferences,
+                    persisterPluginPoint,
                 )
             testee.persistPrivacyConfig(getJsonPrivacyConfig())
 
@@ -242,6 +247,18 @@ class RealPrivacyConfigPersisterTest {
             assertEquals(2, privacyRepository.get()!!.version)
         }
 
+    @Test
+    fun whenPersistPrivacyConfigThenExecutePlugins() =
+        runTest {
+            assertEquals(0, callback.count)
+
+            privacyRepository.insert(PrivacyConfig(version = 1, readme = "readme", eTag = "eTag", timestamp = "2023-01-02"))
+
+            testee.persistPrivacyConfig(getJsonPrivacyConfig())
+
+            assertEquals(1, callback.count)
+        }
+
     private fun getJsonPrivacyConfig(): JsonPrivacyConfig {
         return JsonPrivacyConfig(
             version = 2,
@@ -315,6 +332,22 @@ class RealPrivacyConfigPersisterTest {
 
         override fun onPrivacyConfigDownloaded() {
             downloadCallCount++
+        }
+    }
+
+    class FakePrivacyConfigPersisterCallbackPluginPoint(
+        private val plugins: List<PrivacyConfigPersisterCallbackPlugin>,
+    ) : PluginPoint<PrivacyConfigPersisterCallbackPlugin> {
+        override fun getPlugins(): Collection<PrivacyConfigPersisterCallbackPlugin> {
+            return plugins
+        }
+    }
+
+    internal class FakePrivacyConfigPersisterCallbackPlugin : PrivacyConfigPersisterCallbackPlugin {
+        var count = 0
+
+        override fun onPrivacyConfigPersisted() {
+            count++
         }
     }
 
