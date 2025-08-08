@@ -42,5 +42,4 @@ data class ExtractedProfile(
     val identifier: String = "",
     val dateAddedInMillis: Long = 0L,
     val deprecated: Boolean = false,
-    val removedDate: String = "",
 )

@@ -284,12 +284,12 @@ class RealPirRunStateHandlerTest {
         // 3. Update scan status last - updates job record to indicate matches were found
         // This order ensures data consistency and proper state management
         val inOrder = inOrder(mockJobRecordUpdater, mockRepository)
-        inOrder.verify(mockJobRecordUpdater).markRemovedProfiles(
+        inOrder.verify(mockJobRecordUpdater).markRemovedOptOutJobRecords(
             newExtractedProfiles = listOf(expectedExtractedProfile),
             brokerName = testBrokerName,
             profileQueryId = testProfileQueryId,
         )
-        inOrder.verify(mockRepository).saveExtractedProfile(listOf(expectedExtractedProfile))
+        inOrder.verify(mockRepository).saveNewExtractedProfiles(listOf(expectedExtractedProfile))
         inOrder.verify(mockJobRecordUpdater).updateScanMatchesFound(testBrokerName, testProfileQueryId)
     }
 

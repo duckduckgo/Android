@@ -236,7 +236,7 @@ class RealJobRecordUpdaterTest {
         whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
             .thenReturn(optOutJobRecord2)
 
-        toTest.markRemovedProfiles(newProfiles, testBrokerName, testProfileQueryId)
+        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
 
         // Verify the order of operations:
         // 1. Get current time first
@@ -269,7 +269,7 @@ class RealJobRecordUpdaterTest {
         whenever(mockRepository.getExtractedProfiles(testBrokerName, testProfileQueryId))
             .thenReturn(storedProfiles)
 
-        toTest.markRemovedProfiles(newProfiles, testBrokerName, testProfileQueryId)
+        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
 
         verify(mockRepository).getExtractedProfiles(testBrokerName, testProfileQueryId)
         // Should not call getValidOptOutJobRecord or saveOptOutJobRecord since no profiles were removed
@@ -294,7 +294,7 @@ class RealJobRecordUpdaterTest {
         whenever(mockSchedulingRepository.getValidOptOutJobRecord(200L))
             .thenReturn(optOutJobRecord2)
 
-        toTest.markRemovedProfiles(newProfiles, testBrokerName, testProfileQueryId)
+        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
 
         verify(mockSchedulingRepository).saveOptOutJobRecord(
             optOutJobRecord1.copy(
@@ -321,7 +321,7 @@ class RealJobRecordUpdaterTest {
         whenever(mockSchedulingRepository.getValidOptOutJobRecord(100L))
             .thenReturn(null) // No job record exists
 
-        toTest.markRemovedProfiles(newProfiles, testBrokerName, testProfileQueryId)
+        toTest.markRemovedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
 
         verify(mockSchedulingRepository).getValidOptOutJobRecord(100L)
         // Should not call saveOptOutJobRecord since no job record exists

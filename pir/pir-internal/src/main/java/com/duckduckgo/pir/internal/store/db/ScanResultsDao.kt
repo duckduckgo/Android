@@ -20,7 +20,6 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -47,16 +46,16 @@ interface ScanResultsDao {
     fun getExtractedProfilesForBroker(brokerName: String): List<StoredExtractedProfile>
 
     @Query("SELECT * FROM pir_extracted_profiles WHERE brokerName = :brokerName AND profileQueryId = :profileQueryId ORDER BY dateAddedInMillis")
-    fun getExtractedProfilesForBrokerAndProfile(brokerName: String, profileQueryId: Long): List<StoredExtractedProfile>
+    fun getExtractedProfilesForBrokerAndProfile(
+        brokerName: String,
+        profileQueryId: Long,
+    ): List<StoredExtractedProfile>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertExtractedProfile(extractedProfile: StoredExtractedProfile)
+    fun insertNewExtractedProfile(extractedProfile: StoredExtractedProfile)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
-
-    @Update
-    fun updateExtractedProfiles(profiles: List<StoredExtractedProfile>): Int
+    fun insertNewExtractedProfiles(extractedProfiles: List<StoredExtractedProfile>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertScanCompletedBroker(scanCompletedBroker: ScanCompletedBroker)

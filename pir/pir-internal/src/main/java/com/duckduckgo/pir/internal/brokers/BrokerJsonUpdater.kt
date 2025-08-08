@@ -83,8 +83,8 @@ class RealBrokerJsonUpdater @Inject constructor(
     private suspend fun confirmEtagIntegrity() {
         val storedEtag = pirRepository.getCurrentMainEtag()
         if (storedEtag != null) {
-            val storedJsons = pirRepository.getStoredBrokersCount()
-            if (storedJsons == 0) {
+            val count = pirRepository.getStoredBrokersCount()
+            if (count == 0) {
                 // We clear etag because for some reason the store data in our db is not available anymore, making the etag unusable.
                 pirRepository.updateMainEtag(null)
             }

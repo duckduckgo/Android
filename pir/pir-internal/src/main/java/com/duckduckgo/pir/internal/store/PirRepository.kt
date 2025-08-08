@@ -89,7 +89,11 @@ interface PirRepository {
      */
     suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String>
 
-    suspend fun saveExtractedProfile(
+    /**
+     * This method saves the new extracted profiles to the database.
+     * Any existing profiles (see indices of the table), we ignore them
+     */
+    suspend fun saveNewExtractedProfiles(
         extractedProfiles: List<ExtractedProfile>,
     )
 
@@ -323,18 +327,14 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun saveExtractedProfile(
+    override suspend fun saveNewExtractedProfiles(
         extractedProfiles: List<ExtractedProfile>,
     ) {
         withContext(dispatcherProvider.io()) {
             extractedProfiles.map {
                 it.toStoredExtractedProfile()
             }.also {
-                val updated = scanResultsDao.updateExtractedProfiles(it)
-                if (updated == 0) {
-                    // If no profiles were updated, insert them
-                    scanResultsDao.insertExtractedProfiles(it)
-                }
+                scanResultsDao.insertNewExtractedProfiles(it)
             }
         }
     }

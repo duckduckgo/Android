@@ -96,7 +96,7 @@ interface JobRecordUpdater {
      * @param brokerName The name of the broker associated with the scan job.
      * @param profileQueryId The ID of the [ProfileQuery] related to the scan job.
      */
-    suspend fun markRemovedProfiles(
+    suspend fun markRemovedOptOutJobRecords(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,
@@ -199,7 +199,7 @@ class RealJobRecordUpdater @Inject constructor(
         }
     }
 
-    override suspend fun markRemovedProfiles(
+    override suspend fun markRemovedOptOutJobRecords(
         newExtractedProfiles: List<ExtractedProfile>,
         brokerName: String,
         profileQueryId: Long,

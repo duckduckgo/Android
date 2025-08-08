@@ -258,8 +258,14 @@ class RealPirRunStateHandler @Inject constructor(
                 )
             }.also {
                 if (it.isNotEmpty()) {
-                    jobRecordUpdater.markRemovedProfiles(it, state.brokerName, state.profileQueryId)
-                    repository.saveExtractedProfile(it)
+                    /**
+                     * For every locally stored extractedProfile for the broker x profile that is not part of the newly received extracted Profiles,
+                     * - We update the optOut status to REMOVED
+                     * - We store the new extracted profiles. We ignore the ones that already exist.
+                     * - Update the corresponding ScanJobRecord
+                     */
+                    jobRecordUpdater.markRemovedOptOutJobRecords(it, state.brokerName, state.profileQueryId)
+                    repository.saveNewExtractedProfiles(it)
                     jobRecordUpdater.updateScanMatchesFound(state.brokerName, state.profileQueryId)
                 } else {
                     jobRecordUpdater.updateScanNoMatchFound(state.brokerName, state.profileQueryId)
