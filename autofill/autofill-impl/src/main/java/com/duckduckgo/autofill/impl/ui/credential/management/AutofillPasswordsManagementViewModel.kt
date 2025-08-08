@@ -66,7 +66,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserUsernameCopied
@@ -198,12 +197,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                 showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
             )
 
-            val command = if (autofillFeature.newScrollBehaviourInPasswordManagementScreen().isEnabled()) {
-                ShowListMode
-            } else {
-                ShowListModeLegacy
-            }
-            addCommand(command)
+            addCommand(ShowListMode)
         }
     }
 
@@ -879,7 +873,6 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
         class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
-        object ShowListModeLegacy : Command()
         object ShowListMode : Command()
         object ShowCredentialMode : Command()
         object ShowDisabledMode : Command()
