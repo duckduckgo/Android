@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/keyline_5">
+
+    <ImageView
+        android:id="@+id/duckChatSettingsIcon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="24dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_ai_128" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/duckChatSettingsTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:gravity="center"
+        android:text="@string/duck_chat_title_rebranding"
+        app:typography="h2" />
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/duckChatSettingsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_5"
+        android:layout_marginTop="@dimen/keyline_2"
+        android:layout_marginBottom="@dimen/keyline_6"
+        android:gravity="center"
+        android:text="@string/duck_chat_settings_activity_description_rebranding"
+        app:typography="body2" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/userEnabledDuckChatToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_ai_chat_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/duck_chat_enable_duck_ai_setting_rebranding"
+        app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description_rebranding"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/duckAiInputScreenEnabledToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/input_screen_user_pref_title"
+        app:secondaryText="@string/input_screen_user_pref_description"
+        app:showBetaPill="true"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+        android:id="@+id/duckChatToggleSettingsTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/duck_chat_show_in_heading_rebranding" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/showDuckChatInMenuToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/duck_chat_visibility_setting"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+        android:id="@+id/showDuckChatInAddressBarToggle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:primaryText="@string/duck_chat_address_bar_visibility_setting"
+        app:showSwitch="true" />
+
+    <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+        android:id="@+id/divider2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+        android:id="@+id/showDuckChatSearchSettingsLink"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:leadingIcon="@drawable/ic_assist_24"
+        app:leadingIconBackground="circular"
+        app:primaryText="@string/duck_chat_assist_settings_title_rebranding"
+        app:secondaryText="@string/duck_chat_assist_settings_description_rebranding"
+        app:showSwitch="false" />
+
+</LinearLayout>
+
+

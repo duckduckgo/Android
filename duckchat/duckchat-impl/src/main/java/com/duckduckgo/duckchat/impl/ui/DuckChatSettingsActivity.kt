@@ -20,6 +20,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.view.isVisible
+import android.view.LayoutInflater
+import android.widget.ScrollView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -31,8 +33,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
-import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
@@ -94,11 +94,16 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         setupToolbar(binding.includeToolbar.toolbar)
 
-        if (subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()) {
-            duckAiSettingsContentLayout = // todo inflate the rebranded layout and add it to duckAiSettingsContentContainer
+        val container: ScrollView = binding.duckAiSettingsContentContainer
+        val inflater = LayoutInflater.from(this)
+        val contentRoot = if (subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()) {
+            inflater.inflate(R.layout.duck_ai_settings_content_rebranding, container, false)
         } else {
-            duckAiSettingsContentLayout = // todo inflate the regular layout and add it to duckAiSettingsContentContainer
+            inflater.inflate(R.layout.duck_ai_settings_content_regular, container, false)
         }
+        container.removeAllViews()
+        container.addView(contentRoot)
+        duckAiSettingsContentLayout = InflatedDuckAiSettingsContentLayout(contentRoot)
 
         observeViewModel()
 
@@ -118,27 +123,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        // todo remove isRebrandingAiFeaturesEnabled if-check below, the new layouts should each incorporate the correct values
-        if (viewState.isRebrandingAiFeaturesEnabled) {
-            binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
-            binding.userEnabledDuckChatToggle.gone()
-            binding.userEnabledDuckChatToggleRebranding.show()
-            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading_rebranding)
-            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
-            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
-        } else {
-            binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
-            binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
-            binding.userEnabledDuckChatToggle.show()
-            binding.userEnabledDuckChatToggleRebranding.gone()
-            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading)
-            binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
-            binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
-        }
+        val content = duckAiSettingsContentLayout ?: return
+        content.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
 
-        binding.duckChatSettingsText.addClickableSpan(
-            textSequence = if (viewState.isRebrandingAiFeaturesEnabled) {
+        content.duckChatSettingsText.addClickableSpan(
+            textSequence = if (subscriptionRebrandingFeatureToggle.isAIFeaturesRebrandingEnabled()) {
                 getText(R.string.duck_chat_settings_activity_description_rebranding)
             } else {
                 getText(R.string.duck_chat_settings_activity_description)
@@ -152,22 +141,22 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.duckAiInputScreenEnabledToggle.apply {
+        content.duckAiInputScreenEnabledToggle.apply {
             isVisible = viewState.shouldShowInputScreenToggle
             quietlySetIsChecked(viewState.isInputScreenEnabled, inputScreenToggleListener)
         }
 
-        binding.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
+        content.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
 
-        binding.showDuckChatInMenuToggle.apply {
+        content.showDuckChatInMenuToggle.apply {
             isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
         }
-        binding.showDuckChatInAddressBarToggle.apply {
+        content.showDuckChatInAddressBarToggle.apply {
             isVisible = viewState.shouldShowAddressBarToggle
             quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
         }
-        binding.showDuckChatSearchSettingsLink.setOnClickListener {
+        content.showDuckChatSearchSettingsLink.setOnClickListener {
             viewModel.duckChatSearchAISettingsClicked()
         }
     }

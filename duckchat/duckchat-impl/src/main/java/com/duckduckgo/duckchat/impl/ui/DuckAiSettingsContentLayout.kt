@@ -16,6 +16,23 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
-interface DuckAiSettingsContentLayout {
+import android.view.View
+import android.view.ViewGroup
+import com.duckduckgo.common.ui.view.listitem.DaxListItem
+import com.duckduckgo.common.ui.view.text.DaxTextView
 
+interface DuckAiSettingsContentLayout {
+    val root: View
+
+    val duckChatSettingsText: DaxTextView
+
+    val userEnabledDuckChatToggle: DaxListItem
+    val duckAiInputScreenEnabledToggle: DaxListItem
+
+    val duckChatToggleSettingsTitle: View
+
+    val showDuckChatInMenuToggle: DaxListItem
+    val showDuckChatInAddressBarToggle: DaxListItem
+
+    val showDuckChatSearchSettingsLink: DaxListItem
 }
