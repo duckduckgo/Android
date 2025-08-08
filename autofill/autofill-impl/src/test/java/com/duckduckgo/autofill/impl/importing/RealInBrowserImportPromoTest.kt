@@ -292,6 +292,20 @@ class RealInBrowserImportPromoParameterizedTest(
                     expected = true,
                     description = "eligible: promo not previously shown for url",
                 ),
+                CanShowPromoTestCase(
+                    credentialsAvailableForCurrentPage = false,
+                    url = "https://duckduckgo.com/email/login",
+                    inBrowserPromoFeatureEnabled = true,
+                    autofillFeatureEnabled = true,
+                    hasEverImportedPasswords = false,
+                    hasDeclinedPromo = false,
+                    credentialCount = 0,
+                    promoShownCount = 0,
+                    webViewSupportsImportingPasswords = true,
+                    promoPreviouslyShownForUrl = false,
+                    expected = false,
+                    description = "ineligible: promo won't show for Email Protection URLs",
+                ),
             )
         }
 
