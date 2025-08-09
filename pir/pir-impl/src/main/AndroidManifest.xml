@@ -20,7 +20,7 @@
 
     <application>
         <activity
-            android:name=".dashboard.PirDashboardActivity"
+            android:name=".dashboard.PirDashboardWebViewActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/activityPirDashboard" />
     </application>

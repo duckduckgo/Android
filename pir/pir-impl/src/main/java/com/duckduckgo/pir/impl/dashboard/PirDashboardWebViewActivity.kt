@@ -24,18 +24,18 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.api.dashboard.PirDashboardScreen
-import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardBinding
+import com.duckduckgo.pir.api.dashboard.PirDashboardWebViewScreen
+import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDashboardScreen::class)
-class PirDashboardActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(PirDashboardWebViewScreen::class)
+class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var appTheme: AppTheme
 
-    private val binding: ActivityPirDashboardBinding by viewBinding()
+    private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

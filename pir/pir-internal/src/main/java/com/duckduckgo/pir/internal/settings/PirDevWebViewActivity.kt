@@ -26,23 +26,23 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.pir.internal.databinding.ActivityPirWebviewBinding
+import com.duckduckgo.pir.internal.databinding.ActivityPirInternalWebviewBinding
 import com.duckduckgo.pir.internal.optout.PirOptOut
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(PirDebugWebViewResultsScreenParams::class)
-class PirWebViewActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(PirDevWebViewResultsScreenParams::class)
+class PirDevWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirOptOut: PirOptOut
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
 
-    private val binding: ActivityPirWebviewBinding by viewBinding()
-    private val params: PirDebugWebViewResultsScreenParams?
-        get() = intent.getActivityParams(PirDebugWebViewResultsScreenParams::class.java)
+    private val binding: ActivityPirInternalWebviewBinding by viewBinding()
+    private val params: PirDevWebViewResultsScreenParams?
+        get() = intent.getActivityParams(PirDevWebViewResultsScreenParams::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +50,7 @@ class PirWebViewActivity : DuckDuckGoActivity() {
         val brokersToOptOut = params?.brokers
         lifecycleScope.launch {
             if (!brokersToOptOut.isNullOrEmpty()) {
-                pirOptOut.debugExecute(brokersToOptOut, binding.pirDebugWebView).also {
+                pirOptOut.debugExecute(brokersToOptOut, binding.pirDevWebView).also {
                     finish()
                 }
             } else {
@@ -65,4 +65,4 @@ class PirWebViewActivity : DuckDuckGoActivity() {
     }
 }
 
-data class PirDebugWebViewResultsScreenParams(val brokers: List<String>) : ActivityParams
+data class PirDevWebViewResultsScreenParams(val brokers: List<String>) : ActivityParams
