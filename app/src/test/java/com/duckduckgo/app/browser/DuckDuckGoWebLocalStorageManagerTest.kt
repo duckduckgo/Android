@@ -24,6 +24,7 @@ import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageSettingsJsonPar
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import dagger.Lazy
@@ -52,6 +53,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
     private val mockWebLocalStorageToggle: Toggle = mock()
     private val mockFireproofedWebLocalStorageToggle: Toggle = mock()
     private val mockFireproofWebsiteRepository: FireproofWebsiteRepository = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
 
     private val testee = DuckDuckGoWebLocalStorageManager(
         mockDatabaseProvider,
@@ -59,6 +61,7 @@ class DuckDuckGoWebLocalStorageManagerTest {
         mockWebLocalStorageSettingsJsonParser,
         mockFireproofWebsiteRepository,
         coroutineRule.testDispatcherProvider,
+        mockSettingsDataStore,
     )
 
     @Before
