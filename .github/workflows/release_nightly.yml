@@ -97,20 +97,20 @@ jobs:
       - name: Clean project
         if: steps.check_for_changes.outputs.has_changes == 'true'
         run: |
-          gradle clean          
+          ./gradlew clean          
 
       - name: Assemble the bundle
         env:
           NETP_DEBUG_SERVER_TOKEN: ${{ secrets.NETP_DEBUG_SERVER_TOKEN }}
           MALICIOUS_SITE_PROTECTION_AUTH_TOKEN: ${{ secrets.MALICIOUS_SITE_PROTECTION_AUTH_TOKEN }}
         if: steps.check_for_changes.outputs.has_changes == 'true'
-        run: gradle bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
+        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-nightly -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
 
       - name: Generate nightly version name
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: generate_version_name
         run: |
-          output=$(gradle getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
+          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Capture App Bundle Path
