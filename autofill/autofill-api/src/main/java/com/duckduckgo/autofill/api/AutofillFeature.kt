@@ -154,4 +154,7 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canShowImportOptionInAppSettings(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun passkeySupport(): Toggle
 }

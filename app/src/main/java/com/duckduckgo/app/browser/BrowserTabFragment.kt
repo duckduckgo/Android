@@ -176,6 +176,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
@@ -578,6 +579,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
+
+    @Inject
+    lateinit var passkeyInitializer: WebViewPasskeyInitializer
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -3091,6 +3095,10 @@ class BrowserTabFragment :
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+
+        lifecycleScope.launch(dispatchers.main()) {
+            webView?.let { passkeyInitializer.configurePasskeySupport(it) }
+        }
     }
 
     private fun screenLock(data: JsCallbackData) {
