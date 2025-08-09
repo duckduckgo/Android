@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.mobile.android.vpn.ui.report
+package com.duckduckgo.mobile.android.vpn.ui.privacyreport
 
 import android.app.ActivityOptions
 import android.os.Bundle
@@ -38,15 +38,15 @@ import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnRunningState.ENABLED
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REVOKED
-import com.duckduckgo.mobile.android.vpn.ui.report.PrivacyReportViewModel.PrivacyReportView.ViewState
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.TrackersBlocked
+import com.duckduckgo.mobile.android.vpn.ui.privacyreport.PrivacyReportViewModel.PrivacyReportView.ViewState
 import com.duckduckgo.mobile.android.vpn.ui.tracker_activity.DeviceShieldTrackerActivity
-import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class DeviceShieldFragment : DuckDuckGoFragment() {
-
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -57,8 +57,7 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
     private lateinit var deviceShieldCtaHeaderTextView: TextView
     private lateinit var deviceShieldCtaImageView: ImageView
 
-    private inline fun <reified V : ViewModel> bindViewModel() =
-        lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
+    private inline fun <reified V : ViewModel> bindViewModel() = lazy { ViewModelProvider(this, viewModelFactory).get(V::class.java) }
 
     private val viewModel: PrivacyReportViewModel by bindViewModel()
 
@@ -139,50 +138,57 @@ class DeviceShieldFragment : DuckDuckGoFragment() {
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_warning)
     }
 
-    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: PrivacyReportViewModel.PrivacyReportView.TrackersBlocked) {
+    private fun renderTrackersBlockedWhenEnabled(trackerBlocked: TrackersBlocked) {
         val trackersBlocked = trackerBlocked.trackers
         val lastTrackingApp = trackerBlocked.latestApp
         val otherApps = trackerBlocked.otherAppsSize
 
-        val textToStyle = if (trackersBlocked == 1) {
-            when (otherApps) {
-                0 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                1 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                else -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                    otherApps,
-                )
+        val textToStyle =
+            if (trackersBlocked == 1) {
+                when (otherApps) {
+                    0 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeZeroOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    1 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeOneOtherApp,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    else ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOneTimeMoreOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                            otherApps,
+                        )
+                }
+            } else {
+                when (otherApps) {
+                    0 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    1 ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
+                            trackersBlocked,
+                            lastTrackingApp,
+                        )
+                    else ->
+                        resources.getString(
+                            R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
+                            trackersBlocked,
+                            lastTrackingApp,
+                            otherApps,
+                        )
+                }
             }
-        } else {
-            when (otherApps) {
-                0 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesZeroOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                1 -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesOneOtherApp,
-                    trackersBlocked,
-                    lastTrackingApp,
-                )
-                else -> resources.getString(
-                    R.string.atp_DailyLastCompanyBlockedHomeTabOtherTimesMoreOtherApps,
-                    trackersBlocked,
-                    lastTrackingApp,
-                    otherApps,
-                )
-            }
-        }
 
         deviceShieldCtaHeaderTextView.text = HtmlCompat.fromHtml(textToStyle, HtmlCompat.FROM_HTML_MODE_LEGACY)
         deviceShieldCtaImageView.setImageResource(R.drawable.ic_apptp_default)
