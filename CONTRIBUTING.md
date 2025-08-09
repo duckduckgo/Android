@@ -50,6 +50,5 @@ If your PR is failing because of that, please make sure that you follow our [sty
 You can also trigger an automatic code formatting of the code by executing:
 
 ```
-./gradleW code_format_checks
-./gradleW formatKotlin
+./gradleW app:spotlessApply
 ```
