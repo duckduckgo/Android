@@ -391,12 +391,12 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `when onSetDefaultBrowserNotNowButtonClicked called, then pass that information to the experiment and dismiss dialog`() {
-        testee.onSetDefaultBrowserNotNowButtonClicked()
+    fun `when onSetDefaultBrowserDoNotAskAgainButtonClicked called, then pass that information to the experiment and dismiss dialog`() {
+        testee.onSetDefaultBrowserDoNotAskAgainButtonClicked()
 
-        verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogNotNowButtonClicked()
+        verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogDoNotAskAgainButtonClicked()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.DismissSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+        assertEquals(Command.DoNotAskAgainSetAsDefaultBrowserDialog, commandCaptor.lastValue)
     }
 
     @Test

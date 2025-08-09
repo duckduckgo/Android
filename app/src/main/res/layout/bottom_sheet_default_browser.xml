@@ -21,24 +21,30 @@
     android:layout_height="match_parent"
     android:paddingTop="12dp">
 
-    <!--We require 20dp top padding but it's split to
-    12dp padding on the scrollview so that the scrollbar goes
-    only up to the rounded corner's start,
-    and the rest is added to the layout below.-->
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/rounded_top_corners_bottom_sheet_drawable"
         android:orientation="vertical"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
         android:paddingBottom="16dp">
+
+        <ImageView
+            android:id="@+id/defaultBrowserBottomSheetDialogCloseButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="?selectableItemBackground"
+            android:padding="10dp"
+            android:visibility="visible"
+            android:layout_marginHorizontal="2dp"
+            app:srcCompat="@drawable/ic_close_24"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginTop="20dp"
             app:srcCompat="@drawable/ic_device_mobile_default_128"
             tools:ignore="ContentDescription" />
 
@@ -46,6 +52,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
             android:gravity="center"
             android:text="@string/defaultBrowserBottomSheetDialogTitle"
             app:textType="primary"
@@ -55,6 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
+            android:paddingHorizontal="24dp"
             android:gravity="center"
             android:text="@string/defaultBrowserBottomSheetDialogSubTitle"
             app:textType="primary"
@@ -65,6 +73,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="36dp"
+            android:layout_marginHorizontal="24dp"
             android:text="@string/setAsDefaultBrowser"
             app:daxButtonSize="large" />
 
@@ -73,6 +82,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="24dp"
             android:text="@string/defaultBrowserBottomSheetDialogGhostButton"
             app:daxButtonSize="large" />
 

@@ -33,7 +33,7 @@ interface AdditionalDefaultBrowserPrompts {
     fun onMessageDialogShown()
     fun onMessageDialogCanceled()
     fun onMessageDialogConfirmationButtonClicked()
-    fun onMessageDialogNotNowButtonClicked()
+    fun onMessageDialogDoNotAskAgainButtonClicked()
 
     fun onSystemDefaultBrowserDialogShown()
     fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger)
@@ -55,8 +55,9 @@ interface AdditionalDefaultBrowserPrompts {
     }
 
     enum class SetAsDefaultActionTrigger {
-        DIALOG,
+        PROMPT,
         MENU,
+        MESSAGE,
         UNKNOWN,
     }
 }

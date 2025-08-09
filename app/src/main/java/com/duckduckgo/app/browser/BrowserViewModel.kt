@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
+import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.BrowserViewModel.Command.OpenDuckChat
 import com.duckduckgo.app.browser.BrowserViewModel.Command.ShowUndoDeleteTabsMessage
@@ -129,6 +130,7 @@ class BrowserViewModel @Inject constructor(
         data class OpenSavedSite(val url: String) : Command()
         data object ShowSetAsDefaultBrowserDialog : Command()
         data object DismissSetAsDefaultBrowserDialog : Command()
+        data object DoNotAskAgainSetAsDefaultBrowserDialog : Command()
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
@@ -399,6 +401,7 @@ class BrowserViewModel @Inject constructor(
     }
 
     fun onSetDefaultBrowserDialogCanceled() {
+        command.value = DismissSetAsDefaultBrowserDialog
         additionalDefaultBrowserPrompts.onMessageDialogCanceled()
     }
 
@@ -407,9 +410,9 @@ class BrowserViewModel @Inject constructor(
         additionalDefaultBrowserPrompts.onMessageDialogConfirmationButtonClicked()
     }
 
-    fun onSetDefaultBrowserNotNowButtonClicked() {
-        command.value = DismissSetAsDefaultBrowserDialog
-        additionalDefaultBrowserPrompts.onMessageDialogNotNowButtonClicked()
+    fun onSetDefaultBrowserDoNotAskAgainButtonClicked() {
+        command.value = DoNotAskAgainSetAsDefaultBrowserDialog
+        additionalDefaultBrowserPrompts.onMessageDialogDoNotAskAgainButtonClicked()
     }
 
     fun onSystemDefaultBrowserDialogShown() {

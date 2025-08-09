@@ -18,8 +18,7 @@ package com.duckduckgo.app.browser.newtab
 
 import android.content.Context
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsFeatureToggles
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.app.browser.newtab.LowPriorityMessage.DefaultBrowserMessage
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchDefaultBrowser
@@ -33,8 +32,7 @@ import kotlinx.coroutines.flow.firstOrNull
 
 @ContributesBinding(AppScope::class)
 class LowPriorityMessagingModelImpl @Inject constructor(
-    private val defaultBrowserPromptsFeatureToggles: DefaultBrowserPromptsFeatureToggles,
-    private val defaultBrowserPromptsDataStore: DefaultBrowserPromptsDataStore,
+    private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
     private val pixel: Pixel,
     private val context: Context,
 ) : LowPriorityMessagingModel {
@@ -57,9 +55,7 @@ class LowPriorityMessagingModelImpl @Inject constructor(
 
     private suspend fun determineLowPriorityMessage(): LowPriorityMessage? {
         return when {
-            defaultBrowserPromptsFeatureToggles.self().isEnabled() &&
-                defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled() &&
-                defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == true -> {
+            additionalDefaultBrowserPrompts.showSetAsDefaultMessage.firstOrNull() == true -> {
                 DefaultBrowserMessage(
                     Message(
                         topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_device_mobile_default,
@@ -69,15 +65,12 @@ class LowPriorityMessagingModelImpl @Inject constructor(
                     ),
                     onPrimaryAction = {
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_CLICK)
-                        defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
                     },
                     onSecondaryAction = {
-                        pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DISMISSED)
-                        defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
+                        pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DO_NOT_ASK_AGAIN_CLICK)
                     },
                     onClose = {
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DISMISSED)
-                        defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
                     },
                     onShown = {
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_IMPRESSION)
