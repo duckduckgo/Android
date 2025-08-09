@@ -141,6 +141,17 @@
                         tools:ignore="InvalidColorAttribute" />
                 </FrameLayout>
 
+                <ImageView
+                    android:id="@+id/placeholderImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="66dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    android:layout_marginBottom="@dimen/keyline_2"
+                    app:srcCompat="@drawable/bb_shield"
+                    tools:visibility="visible" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/daxDialogOption1"
                     style="@style/Widget.DuckDuckGo.BBButton.Option"
