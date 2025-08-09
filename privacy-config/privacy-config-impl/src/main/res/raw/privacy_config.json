@@ -947,6 +947,28 @@
                     "reason": "Site breakage"
                 }
             ]
+        },
+        "onboardingDesignExperiment": {
+            "state": "disabled",
+            "features": {
+                "onboardingDesignExperimentAug25": {
+                    "state": "disabled",
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 0
+                        },
+                        {
+                            "name": "buck",
+                            "weight": 0
+                        },
+                        {
+                            "name": "bb",
+                            "weight": 0
+                        }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": []

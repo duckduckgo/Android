@@ -32,6 +32,8 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePage
 interface OnboardingPageManager {
     fun pageCount(): Int
     fun buildPageBlueprints()
+    fun buildPageBlueprintsBb()
+    fun buildPageBlueprintsBuck()
     fun buildPage(position: Int): OnboardingPageFragment?
 }
 
@@ -53,6 +55,16 @@ class OnboardingPageManagerWithTrackerBlocking(
         if (shouldShowDefaultBrowserPage()) {
             pages.add((DefaultBrowserBlueprint))
         }
+    }
+
+    override fun buildPageBlueprintsBb() {
+        pages.clear()
+        pages += BbWelcomePageBlueprint
+    }
+
+    override fun buildPageBlueprintsBuck() {
+        pages.clear()
+        pages += BuckWelcomePageBlueprint
     }
 
     override fun buildPage(position: Int): OnboardingPageFragment? {

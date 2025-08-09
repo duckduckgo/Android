@@ -25,7 +25,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -34,7 +34,6 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
-import com.duckduckgo.feature.toggles.api.Toggle
 import java.util.concurrent.TimeUnit
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -44,7 +43,6 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
@@ -66,16 +64,13 @@ class CtaTest {
     private lateinit var mockSettingsDataStore: SettingsDataStore
 
     @Mock
-    private lateinit var mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
-
-    val mockEnabledToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
-    val mockDisabledToggle: Toggle = mock { on { it.isEnabled() } doReturn false }
+    private lateinit var mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
 
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockDisabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
 
         whenever(mockActivity.resources).thenReturn(mockResources)
         whenever(mockResources.getQuantityString(any(), any())).thenReturn("withZero")
@@ -245,7 +240,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsDialogTypeReturnCorrectCancelParameters() {
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
 
         val value = testee.pixelCancelParameters()
         assertEquals(1, value.size)
@@ -255,7 +250,7 @@ class CtaTest {
 
     @Test
     fun whenCtaIsDialogTypeReturnCorrectOkParameters() {
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
 
         val value = testee.pixelOkParameters()
         assertEquals(1, value.size)
@@ -267,7 +262,7 @@ class CtaTest {
     fun whenCtaIsDialogTypeReturnCorrectShownParameters() {
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(null)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
         val expectedValue = "${testee.ctaPixelParam}:0"
 
         val value = testee.pixelShownParameters()
@@ -281,7 +276,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val testee = OnboardingDaxDialogCta.DaxSerpCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()
@@ -301,7 +296,7 @@ class CtaTest {
             mockAppInstallStore,
             trackers,
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
@@ -310,7 +305,7 @@ class CtaTest {
 
     @Test
     fun whenMoreThanTwoTrackersBlockedAndBBExperimentEnabledReturnFirstTwoWithMultipleString() {
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
         val trackers = listOf(
             TestingEntity("Facebook", "Facebook", 9.0),
@@ -323,7 +318,7 @@ class CtaTest {
             mockAppInstallStore,
             trackers,
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
@@ -342,7 +337,7 @@ class CtaTest {
             mockAppInstallStore,
             trackers,
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
@@ -351,7 +346,7 @@ class CtaTest {
 
     @Test
     fun whenTwoTrackersBlockedAndBBExperimentEnabledReturnThemWithZeroString() {
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
         val trackers = listOf(
             TestingEntity("Facebook", "Facebook", 9.0),
@@ -363,7 +358,7 @@ class CtaTest {
             mockAppInstallStore,
             trackers,
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
@@ -400,7 +395,7 @@ class CtaTest {
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
                 mockSettingsDataStore,
-                mockOnboardingDesignExperimentToggles,
+                mockOnboardingDesignExperimentManager,
             )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -409,7 +404,7 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedAndBBExperimentEnabledReturnThemSortingByPrevalence() {
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
         val trackers = listOf(
             TrackingEvent(
@@ -439,7 +434,7 @@ class CtaTest {
                 mockAppInstallStore,
                 site.orderedTrackerBlockedEntities(),
                 mockSettingsDataStore,
-                mockOnboardingDesignExperimentToggles,
+                mockOnboardingDesignExperimentManager,
             )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -475,7 +470,7 @@ class CtaTest {
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -484,7 +479,7 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedAndBBExperimentEnabledReturnOnlyTrackersWithDisplayName() {
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
         val trackers = listOf(
             TrackingEvent(
@@ -513,7 +508,7 @@ class CtaTest {
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -549,7 +544,7 @@ class CtaTest {
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -558,7 +553,7 @@ class CtaTest {
 
     @Test
     fun whenTrackersBlockedAndBBExperimentEnabledReturnOnlyTrackersBlocked() {
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
         val trackers = listOf(
             TrackingEvent(
@@ -587,7 +582,7 @@ class CtaTest {
             mockAppInstallStore,
             site.orderedTrackerBlockedEntities(),
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, site.orderedTrackerBlockedEntities())
 
@@ -607,7 +602,7 @@ class CtaTest {
             mockAppInstallStore,
             trackers,
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
@@ -616,7 +611,7 @@ class CtaTest {
 
     @Test
     fun whenMultipleTrackersFromSameNetworkBlockedAndBBExperimentEnabledReturnOnlyOneWithZeroString() {
-        whenever(mockOnboardingDesignExperimentToggles.bbOnboarding()).thenReturn(mockEnabledToggle)
+        whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(true)
 
         val trackers = listOf(
             TestingEntity("Facebook", "Facebook", 9.0),
@@ -629,7 +624,7 @@ class CtaTest {
             mockAppInstallStore,
             trackers,
             mockSettingsDataStore,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
         )
         val value = testee.getTrackersDescription(mockActivity, trackers)
 
@@ -641,7 +636,7 @@ class CtaTest {
         val existingJourney = "s:0-t:1"
         whenever(mockOnboardingStore.onboardingDialogJourney).thenReturn(existingJourney)
         whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(1))
-        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentToggles)
+        val testee = OnboardingDaxDialogCta.DaxFireButtonCta(mockOnboardingStore, mockAppInstallStore, mockOnboardingDesignExperimentManager)
         val expectedValue = "$existingJourney-${testee.ctaPixelParam}:1"
 
         val value = testee.pixelShownParameters()

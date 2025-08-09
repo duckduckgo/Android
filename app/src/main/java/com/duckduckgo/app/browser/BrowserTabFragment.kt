@@ -197,7 +197,7 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -571,7 +571,7 @@ class BrowserTabFragment :
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
-    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var omnibarTypeResolver: OmnibarTypeResolver
@@ -2222,7 +2222,7 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
             bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
         } else {
             daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
@@ -2230,7 +2230,7 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
         } else {
             daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
@@ -2967,7 +2967,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        if (!onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (!onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
             binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
@@ -3116,10 +3116,10 @@ class BrowserTabFragment :
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
         when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 onboardingCta.hideBuckOnboardingCta(binding)
             }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 onboardingCta.hideBBOnboardingCta(binding)
             }
             else -> {
@@ -3135,7 +3135,7 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
                 hideBuckEndAnimation()
             }
@@ -3145,7 +3145,7 @@ class BrowserTabFragment :
     }
 
     private fun hideDaxBubbleCta() {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             newBrowserTab.newTabLayout.setBackgroundColor(
                 requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
@@ -4399,7 +4399,7 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
-                        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                             hideBuckEndAnimation()
                         }
                         showNewTab()
@@ -4421,34 +4421,43 @@ class BrowserTabFragment :
             hideNewTab()
             configuration.apply {
                 when {
-                    onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                         showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
                             setOnOptionClicked(
                                 onboardingExperimentEnabled = true,
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
-                    onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                         showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
                             setOnOptionClicked(
                                 onboardingExperimentEnabled = true,
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
                     else -> {
                         showCta(daxDialogIntroBubble.daxCtaContainer) {
                             setOnOptionClicked(
-                                onboardingExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled(),
+                                onboardingExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled(),
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
                 }
 
                 setOnPrimaryCtaClicked {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                    if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
                         configuration.hideBBEndCta(
                             onAnimationEnd = {
                                 viewModel.onUserClickCtaOkButton(configuration)
@@ -4467,7 +4476,7 @@ class BrowserTabFragment :
                 }
             }
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                 if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
                     lifecycleScope.launch {
                         with(newBrowserTab.wingAnimation) {
@@ -4642,7 +4651,7 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                 buckDialogInContext.root.gone()
             } else {
                 daxDialogInContext.dialogTextCta.cancelAnimation()

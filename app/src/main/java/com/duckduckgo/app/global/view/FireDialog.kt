@@ -32,7 +32,6 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import com.airbnb.lottie.RenderMode
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SheetFireClearDataBinding
 import com.duckduckgo.app.firebutton.FireButtonStore
 import com.duckduckgo.app.global.events.db.UserEventKey
@@ -142,7 +141,7 @@ class FireDialog(
     }
 
     private fun configureFireAnimationView() {
-        if (onboardingDesignExperimentManager.isAnyExperimentEnabled()) {
+        if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
             val selectedFireAnimation = settingsDataStore.selectedFireAnimation
             val resId = onboardingExperimentFireAnimationHelper.getSelectedFireAnimationResId(selectedFireAnimation)
 
