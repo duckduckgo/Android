@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Spør Duck.ai</string>
     <string name="input_screen_user_pref_title">Eksperimentell adresselinje</string>
-    <string name="input_screen_user_pref_description">Søk på nettet eller spør Duck.ai direkte fra adressefeltet</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

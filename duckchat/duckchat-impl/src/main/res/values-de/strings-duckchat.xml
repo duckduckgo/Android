@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Frag Duck.ai</string>
     <string name="input_screen_user_pref_title">Experimentelle Adressleiste</string>
-    <string name="input_screen_user_pref_description">Suche im Web oder frag Duck.ai direkt über die Adressleiste</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

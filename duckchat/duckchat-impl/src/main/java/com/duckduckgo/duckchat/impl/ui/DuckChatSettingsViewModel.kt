@@ -87,12 +87,6 @@ class DuckChatSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onDuckAiInputScreenToggled(checked: Boolean) {
-        viewModelScope.launch {
-            duckChat.setInputScreenUserSetting(checked)
-        }
-    }
-
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
         viewModelScope.launch {
             duckChat.setShowInBrowserMenuUserSetting(checked)

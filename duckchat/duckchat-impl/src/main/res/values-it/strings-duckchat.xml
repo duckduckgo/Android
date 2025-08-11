@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Chiedi a Duck.ai</string>
     <string name="input_screen_user_pref_title">Barra degli indirizzi sperimentale</string>
-    <string name="input_screen_user_pref_description">Cerca sul web o chiedi a Duck.ai direttamente dalla barra degli indirizzi</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
