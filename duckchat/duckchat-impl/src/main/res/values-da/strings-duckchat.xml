@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai er en valgfri funktion, der giver dig mulighed for at chatte anonymt med populære tredjeparts AI-chatmodeller. Dine chats bruges ikke til at træne AI.\n<annotation type="learn_more_link">Læs mere</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Aktiver Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Genveje</string>
     <string name="duck_chat_visibility_setting">Browsermenu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresselinje</string>
     <string name="duck_chat_assist_settings_title">Assist-indstillinger</string>
@@ -50,8 +49,6 @@
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Spørg Duck.ai</string>
-    <string name="input_screen_user_pref_title">Eksperimentel adresselinje</string>
-    <string name="input_screen_user_pref_description">Søg på nettet eller spørg Duck.ai direkte fra adresselinjen</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -64,7 +61,6 @@
     <string name="duck_chat_title_rebranding">AI-funktioner</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI-funktioner er private og valgfrie.\nDine data bruges ikke til at træne AI.\n<annotation type="learn_more_link">Læs mere</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai-genveje</string>
     <string name="duck_chat_assist_settings_title_rebranding">Indstillinger for Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vælg, hvor ofte du vil have AI-assisterede svar til at optræde i dine søgninger</string>
 </resources>

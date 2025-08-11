@@ -1,0 +1,38 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="128dp"
+    android:height="72dp"
+    android:viewportWidth="128"
+    android:viewportHeight="72">
+  <path
+      android:pathData="M0,12C0,5.37 5.37,0 12,0h104c6.63,0 12,5.37 12,12v60H0V12Z"
+      android:fillColor="?attr/daxColorWindow"/>
+  <path
+      android:pathData="M112,28a8,8 0,0 1,8 8v8a8,8 0,0 1,-8 8H16a8,8 0,0 1,-8 -8v-8a8,8 0,0 1,8 -8h96Z"
+      android:fillColor="?attr/daxColorControlFillPrimary"/>
+  <group>
+    <clip-path
+        android:pathData="M0,12C0,5.37 5.37,0 12,0h104c6.63,0 12,5.37 12,12v60H0V12Z"/>
+    <path
+        android:pathData="M-1,12C-1,4.82 4.82,-1 12,-1h104c7.18,0 13,5.82 13,13h-2c0,-6.07 -4.93,-11 -11,-11L12,1C5.93,1 1,5.93 1,12h-2ZM128,72L0,72h128ZM-1,72L-1,12C-1,4.82 4.82,-1 12,-1v2C5.93,1 1,5.93 1,12v60h-2ZM116,-1c7.18,0 13,5.82 13,13v60h-2L127,12c0,-6.07 -4.93,-11 -11,-11v-2Z"
+        android:fillColor="?attr/daxColorAccentBlue"/>
+  </group>
+  <path
+      android:pathData="M112.41,28.01A8,8 0,0 1,120 36v8a8,8 0,0 1,-7.59 7.99L112,52L16,52a8,8 0,0 1,-7.99 -7.59L8,44v-8a8,8 0,0 1,8 -8h96l0.41,0.01ZM16,29a7,7 0,0 0,-7 7v8a7,7 0,0 0,7 7h96a7,7 0,0 0,7 -7v-8a7,7 0,0 0,-7 -7L16,29ZM19.25,34a5.25,5.25 0,0 1,4.05 8.59l2.56,2.56 0.06,0.08a0.5,0.5 0,0 1,-0.69 0.69l-0.08,-0.06 -2.55,-2.55A5.25,5.25 0,1 1,19.25 34ZM19.25,35a4.25,4.25 0,1 0,0 8.5,4.25 4.25,0 0,0 0,-8.5Z"
+      android:fillColor="?attr/daxColorAccentBlue"/>
+</vector>
