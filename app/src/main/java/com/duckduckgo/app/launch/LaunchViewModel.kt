@@ -21,6 +21,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.store.isNewUser
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener.Companion.MAX_REFERRER_WAIT_TIME_MS
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -31,6 +32,8 @@ import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_DUCKPLAYER
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 
@@ -40,6 +43,7 @@ class LaunchViewModel @Inject constructor(
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
     private val daxPrompts: DaxPrompts,
     private val appInstallStore: AppInstallStore,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) :
     ViewModel() {
 
@@ -55,7 +59,19 @@ class LaunchViewModel @Inject constructor(
     }
 
     suspend fun determineViewToShow() {
-        waitForReferrerData()
+        if (onboardingDesignExperimentManager.isWaitForLocalPrivacyConfigEnabled()) {
+            withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
+                val referrerJob = async {
+                    waitForReferrerData()
+                }
+                val configJob = async {
+                    onboardingDesignExperimentManager.waitForPrivacyConfig()
+                }
+                awaitAll(referrerJob, configJob)
+            }
+        } else {
+            waitForReferrerData()
+        }
 
         when (daxPrompts.evaluate()) {
             SHOW_CONTROL, NONE -> {

@@ -2,6 +2,28 @@
     "readme": "https://github.com/duckduckgo/privacy-configuration",
     "version": 1652275711516,
     "features": {
+        "onboardingDesignExperiment": {
+            "state": "enabled",
+            "features": {
+                "onboardingDesignExperimentAug25": {
+                    "state": "enabled",
+                    "cohorts": [
+                        {
+                            "name": "modifiedControl",
+                            "weight": 1
+                        },
+                        {
+                            "name": "bb",
+                            "weight": 1
+                        },
+                        {
+                            "name": "buck",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
+        },
         "ampLinks": {
             "exceptions": [
                 {
@@ -947,28 +969,6 @@
                     "reason": "Site breakage"
                 }
             ]
-        },
-        "onboardingDesignExperiment": {
-            "state": "disabled",
-            "features": {
-                "onboardingDesignExperimentAug25": {
-                    "state": "disabled",
-                    "cohorts": [
-                        {
-                            "name": "modifiedControl",
-                            "weight": 0
-                        },
-                        {
-                            "name": "buck",
-                            "weight": 0
-                        },
-                        {
-                            "name": "bb",
-                            "weight": 0
-                        }
-                    ]
-                }
-            }
         }
     },
     "unprotectedTemporary": []
