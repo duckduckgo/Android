@@ -20,7 +20,7 @@
             android:label="@string/pirDevOptOutTitle" />
 
         <activity
-            android:name=".settings.PirWebViewActivity"
+            android:name=".settings.PirDevWebViewActivity"
             android:label="@string/pirDevDebugOptOutTitle" />
 
         <service

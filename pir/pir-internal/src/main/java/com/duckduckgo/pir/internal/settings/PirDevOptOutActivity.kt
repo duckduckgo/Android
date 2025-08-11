@@ -88,7 +88,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             if (selectedBroker != null) {
                 globalActivityStarter.start(
                     this,
-                    PirDebugWebViewResultsScreenParams(listOf(selectedBroker!!)),
+                    PirDevWebViewResultsScreenParams(listOf(selectedBroker!!)),
                 )
             }
         }

@@ -19,6 +19,6 @@ package com.duckduckgo.pir.api.dashboard
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 
 /**
- * Use this model to launch the PIR Dashboard screen.
+ * Use this model to launch the PIR Dashboard WebView screen.
  */
-data object PirDashboardScreen : GlobalActivityStarter.ActivityParams
+data object PirDashboardWebViewScreen : GlobalActivityStarter.ActivityParams
