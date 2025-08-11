@@ -16,10 +16,7 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
-import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
-import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 
 /**
@@ -35,20 +32,6 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
  * ```
  */
 abstract class PirWebJsMessageHandler : JsMessageHandler {
-
-    override fun process(
-        jsMessage: JsMessage,
-        secret: String,
-        jsMessageCallback: JsMessageCallback?,
-    ) {
-        // Use the new process method instead
-    }
-
-    abstract fun process(
-        jsMessage: JsMessage,
-        jsMessaging: JsMessaging,
-        jsMessageCallback: JsMessageCallback?,
-    )
 
     override val allowedDomains: List<String> = emptyList()
     override val featureName: String = PirDashboardWebConstants.SCRIPT_FEATURE_NAME
