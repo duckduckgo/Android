@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.messaging
+package com.duckduckgo.pir.impl.dashboard.messaging
 
 object PirDashboardWebConstants {
     const val WEB_UI_URL = "https://duckduckgo.com/dbp"

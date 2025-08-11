@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.messaging.handlers
+package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.pir.impl.messaging.PirDashboardWebConstants
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 
 /**
  * Implement this class and contribute it as a multibinding to handle specific messages that are received from the PIR webview.

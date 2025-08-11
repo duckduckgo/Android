@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.messaging
+package com.duckduckgo.pir.impl.dashboard.messaging
 
 enum class PirDashboardWebMessages(val messageName: String) {
     HANDSHAKE("handshake"),

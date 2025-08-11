@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.messaging.handlers
+package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.pir.impl.messaging.PirDashboardWebConstants
-import com.duckduckgo.pir.impl.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
+import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat

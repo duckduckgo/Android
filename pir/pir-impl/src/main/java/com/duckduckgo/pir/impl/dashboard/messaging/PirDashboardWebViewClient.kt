@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.messaging.handlers
+package com.duckduckgo.pir.impl.dashboard.messaging
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.di.scopes.AppScope
+import android.webkit.WebViewClient
+import javax.inject.Inject
 
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = PirWebJsMessageHandler::class,
-)
-@Suppress("unused")
-interface PirWebJsMessageHandlersPluginPoint
+/**
+ * Custom implementation of [WebViewClient] specific to PIR
+ */
+class PirDashboardWebViewClient @Inject constructor() : WebViewClient()
