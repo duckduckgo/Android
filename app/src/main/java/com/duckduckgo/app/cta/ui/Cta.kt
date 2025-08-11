@@ -46,7 +46,7 @@ import com.duckduckgo.app.cta.ui.DaxCta.Companion.MAX_DAYS_ALLOWED
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.app.onboarding.store.OnboardingStore
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.SITE_NOT_WORKING_WEBSITE_BROKEN
@@ -385,7 +385,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxSerpCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_SERP,
         R.string.highlightsOnboardingSerpDaxDialogDescription,
@@ -409,7 +409,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -418,7 +418,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         description = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -447,7 +447,7 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val trackers: List<Entity>,
         val settingsDataStore: SettingsDataStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_TRACKERS_FOUND,
         null,
@@ -471,7 +471,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = getTrackersDescription(context, trackers),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -482,7 +482,7 @@ sealed class OnboardingDaxDialogCta(
                     )
                 }
 
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         title = getTrackersDescription(context, trackers),
                         description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
@@ -521,7 +521,7 @@ sealed class OnboardingDaxDialogCta(
             val size = trackers.size - trackersFiltered.size
             val quantityString =
                 if (size == 0) {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                    if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
                         context.resources.getQuantityString(R.plurals.bbOnboardingTrackersBlockedZeroDialogTitle, trackersFiltered.size)
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     } else {
@@ -529,7 +529,7 @@ sealed class OnboardingDaxDialogCta(
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     }
                 } else {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+                    if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
                         context.resources.getQuantityString(R.plurals.bbOnboardingTrackersBlockedDialogTitle, size, size)
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     } else {
@@ -537,7 +537,7 @@ sealed class OnboardingDaxDialogCta(
                             .getStringForOmnibarPosition(settingsDataStore.omnibarPosition)
                     }
                 }
-            return if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+            return if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
                 "$trackersText$quantityString"
             } else {
                 "<b>$trackersText</b>$quantityString"
@@ -550,7 +550,7 @@ sealed class OnboardingDaxDialogCta(
         override val appInstallStore: AppInstallStore,
         val network: String,
         private val siteHost: String,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_NETWORK,
         null,
@@ -574,7 +574,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = getTrackersDescription(context),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -583,7 +583,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         description = getTrackersDescription(context),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -631,7 +631,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxNoTrackersCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_DIALOG_OTHER,
         R.string.daxNonSerpCtaText,
@@ -655,7 +655,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -664,7 +664,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         description = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -691,7 +691,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxFireButtonCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_FIRE_BUTTON,
         R.string.onboardingFireButtonDaxDialogDescription,
@@ -715,7 +715,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = context.getString(R.string.onboardingFireButtonDaxDialogOkButton),
@@ -724,7 +724,7 @@ sealed class OnboardingDaxDialogCta(
                         onDismissCtaClicked = onDismissCtaClicked,
                     )
                 }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         title = context.getString(R.string.bbOnboardingFireButtonDaxDialogTitle),
                         leadingDescriptionIconRes = CommonR.drawable.ic_fire_24,
@@ -753,7 +753,8 @@ sealed class OnboardingDaxDialogCta(
     class DaxSiteSuggestionsCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        private val onSiteSuggestionOptionClicked: (index: Int) -> Unit, // used to fire experiment pixel
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_INTRO_VISIT_SITE,
         R.string.onboardingSitesDaxDialogDescription,
@@ -775,19 +776,23 @@ sealed class OnboardingDaxDialogCta(
             onDismissCtaClicked: () -> Unit,
         ) {
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     showBuckOnboardingCta(
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = onSuggestedOptionClicked,
+                        onSuggestedOptionClicked = { option, index ->
+                            onSuggestedOptionClicked?.invoke(option)
+                            onSiteSuggestionOptionClicked.invoke(index)
+                        },
                     )
                 }
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     showBBOnboardingCta(
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
-                        onSuggestedOptionClicked = { option ->
+                        onSuggestedOptionClicked = { option, index ->
                             onSuggestedOptionClicked?.invoke(option)
+                            onSiteSuggestionOptionClicked.invoke(index)
                             with(binding.includeOnboardingInContextBBDialog) {
                                 dialogTextCta.text = ""
                                 hiddenTextCta.text = ""
@@ -807,7 +812,7 @@ sealed class OnboardingDaxDialogCta(
                     daxDialog.suggestionsDialogTextCta.text = ""
                     daxDialog.suggestionsHiddenTextCta.text = daxText.html(context)
 
-                    val isModifiedControlExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled()
+                    val isModifiedControlExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()
 
                     if (isModifiedControlExperimentEnabled) {
                         daxDialog.daxDialogOption4.gone()
@@ -837,7 +842,10 @@ sealed class OnboardingDaxDialogCta(
 
                                 with(buttonView) {
                                     modifiedControlOption.setOptionView(this)
-                                    setOnClickListener { onSuggestedOptionClicked?.invoke(modifiedControlOption) }
+                                    setOnClickListener {
+                                        onSuggestedOptionClicked?.invoke(modifiedControlOption)
+                                        onSiteSuggestionOptionClicked.invoke(index)
+                                    }
                                     animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                                 }
                             }
@@ -874,7 +882,7 @@ sealed class OnboardingDaxDialogCta(
         private fun showBuckOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onTypingAnimationFinished: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption, index: Int) -> Unit)?,
         ) {
             val context = binding.root.context
             val buckDialogBinding = binding.includeOnboardingInContextBuckDialog
@@ -906,7 +914,7 @@ sealed class OnboardingDaxDialogCta(
                         options[index].setOptionView(buttonView)
                         buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                         buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index])
+                            onSuggestedOptionClicked?.invoke(options[index], index)
                             wingAnimation.gone()
                         }
                     }
@@ -954,7 +962,7 @@ sealed class OnboardingDaxDialogCta(
         private fun showBBOnboardingCta(
             binding: FragmentBrowserTabBinding,
             onTypingAnimationFinished: () -> Unit,
-            onSuggestedOptionClicked: ((DaxDialogIntroOption) -> Unit)?,
+            onSuggestedOptionClicked: ((DaxDialogIntroOption, index: Int) -> Unit)?,
         ) {
             val binding = binding.includeOnboardingInContextBBDialog
             val context = binding.root.context
@@ -998,7 +1006,7 @@ sealed class OnboardingDaxDialogCta(
                         options[index].setOptionView(buttonView)
                         buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
                         buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index])
+                            onSuggestedOptionClicked?.invoke(options[index], index)
                         }
                     }
                 }
@@ -1023,7 +1031,7 @@ sealed class OnboardingDaxDialogCta(
     class DaxEndCta(
         override val onboardingStore: OnboardingStore,
         override val appInstallStore: AppInstallStore,
-        val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+        private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ) : OnboardingDaxDialogCta(
         CtaId.DAX_END,
         R.string.highlightsOnboardingEndDaxDialogDescription,
@@ -1049,7 +1057,7 @@ sealed class OnboardingDaxDialogCta(
             val context = binding.root.context
 
             when {
-                onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                     setBuckOnboardingDialogView(
                         message = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -1059,7 +1067,7 @@ sealed class OnboardingDaxDialogCta(
                     )
                 }
 
-                onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         description = description?.let { context.getString(it) }.orEmpty(),
                         primaryCtaText = buttonText?.let { context.getString(it) },
@@ -1521,7 +1529,7 @@ sealed class DaxBubbleCta(
     fun setOnOptionClicked(
         onboardingExperimentEnabled: Boolean = false,
         configuration: DaxBubbleCta? = null,
-        onOptionClicked: (DaxDialogIntroOption) -> Unit,
+        onOptionClicked: (DaxDialogIntroOption, index: Int?) -> Unit,
     ) {
         if (onboardingExperimentEnabled && configuration is DaxIntroVisitSiteOptionsCta) {
             val optionsWithoutRegionalNews = options?.toMutableList()?.apply {
@@ -1535,7 +1543,7 @@ sealed class DaxBubbleCta(
                     2 -> R.id.daxDialogOption3
                     else -> R.id.daxDialogOption4 // This will not be visible for the experiments
                 }
-                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option, index) } }
             }
         } else {
             options?.forEachIndexed { index, option ->
@@ -1545,7 +1553,7 @@ sealed class DaxBubbleCta(
                     2 -> R.id.daxDialogOption3
                     else -> R.id.daxDialogOption4
                 }
-                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option) } }
+                option.let { ctaView?.findViewById<MaterialButton>(optionView)?.setOnClickListener { onOptionClicked.invoke(option, index) } }
             }
         }
     }
@@ -1573,7 +1581,7 @@ sealed class DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO,
         title = R.string.onboardingSearchDaxDialogTitle,
         description = R.string.highlightsOnboardingSearchDaxDialogDescription,
-        options = onboardingStore.getExperimentSearchOptions(),
+        options = onboardingStore.getSearchOptions(),
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,

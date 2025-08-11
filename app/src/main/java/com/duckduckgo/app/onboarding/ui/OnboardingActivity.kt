@@ -19,9 +19,11 @@ package com.duckduckgo.app.onboarding.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.lifecycle.Lifecycle.State.CREATED
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
@@ -49,9 +51,14 @@ class OnboardingActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
-        configurePager()
         configureSkipButton()
         observeViewModel()
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(CREATED) {
+                configurePager()
+            }
+        }
     }
 
     fun onContinueClicked() {
@@ -75,7 +82,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    private fun configurePager() {
+    private suspend fun configurePager() {
         viewModel.initializePages()
 
         viewPageAdapter = PagerAdapter(supportFragmentManager, viewModel)

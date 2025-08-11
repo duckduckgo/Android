@@ -29,7 +29,7 @@ import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.view.setAllParentsClip
 import com.duckduckgo.common.utils.ConflatedJob
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(
     private val lifecycleOwner: LifecycleOwner,
-    private val onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : DefaultLifecycleObserver {
 
     private var pulseAnimation: AnimatorSet = AnimatorSet()
@@ -146,11 +146,11 @@ class PulseAnimation(
                 highlightImageView.setImageResource(R.drawable.ic_circle_pulse_green)
                 gravity = Gravity.START
             }
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 highlightImageView.setImageResource(R.drawable.ic_circle_pulse_buck)
                 gravity = Gravity.CENTER
             }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 highlightImageView.setImageResource(R.drawable.ic_circle_pulse_bb)
                 gravity = Gravity.CENTER
             }
