@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai on valinnainen ominaisuus, jonka avulla voit keskustella anonyymisti suosittujen kolmannen osapuolen tekoälykeskustelumallien kanssa. Keskustelujasi ei käytetä tekoälyn kouluttamiseen.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Ota Duck.ai käyttöön</string>
-    <string name="duck_chat_show_in_heading">Pikavalinnat</string>
     <string name="duck_chat_visibility_setting">Selainvalikko</string>
     <string name="duck_chat_address_bar_visibility_setting">Osoitekenttä</string>
     <string name="duck_chat_assist_settings_title">Assist-asetukset</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGon tekoälyominaisuudet ovat yksityisiä ja valinnaisia.\nTietojasi ei käytetä tekoälyn kouluttamiseen.\n<annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Keskustele nimettömästi suosittujen kolmannen osapuolen tekoälykeskustelumallien kanssa</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai-pikakuvakkeet</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist -asetukset</string>
     <string name="duck_chat_assist_settings_description_rebranding">Valitse, kuinka usein haluat tekoälyavusteisten vastausten näkyvän hauissasi</string>
 </resources>

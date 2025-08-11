@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai izborna je značajka koja ti omogućuje anonimno čavrljanje s popularnim AI modelima \'chata\' trećih strana. Tvoja čavrljanja se ne koriste za obuku AI-a.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Omogući Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Prečaci</string>
     <string name="duck_chat_visibility_setting">Izbornik preglednika</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresna traka</string>
     <string name="duck_chat_assist_settings_title">Postavke Assista</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI značajke privatne su i neobavezne.Tvoji podaci se ne koriste za obuku umjetne inteligencije.\n<annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Anonimno čavrljaj s popularnim modelima umjetne inteligencije trećih strana</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai prečaci</string>
     <string name="duck_chat_assist_settings_title_rebranding">Pretraži postavke Assista</string>
     <string name="duck_chat_assist_settings_description_rebranding">Odaberi koliko često želiš da se odgovori potpomognuti umjetnom inteligencijom pojavljuju u tvojim pretraživanjima</string>
 </resources>

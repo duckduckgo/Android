@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.DuckChatSettingsActivity">
+    tools:context=".ui.settings.DuckChatSettingsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -88,6 +88,14 @@
                 app:primaryText="@string/duck_chat_enable_duck_ai_setting_rebranding"
                 app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description_rebranding"
                 app:showSwitch="true" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiShortcuts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duck_ai_shortcut_settings_title"
+                app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
             <!--TODO add beta pill-->
             <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
@@ -169,26 +177,6 @@
                 </LinearLayout>
 
             </LinearLayout>
-
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/duckChatToggleSettingsTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_show_in_heading" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showDuckChatInMenuToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_visibility_setting"
-                app:showSwitch="true"/>
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showDuckChatInAddressBarToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_address_bar_visibility_setting"
-                app:showSwitch="true"/>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"

@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai to opcjonalna funkcja, która umożliwia prowadzenie anonimowych rozmów z popularnymi modelami czatu AI innych firm. Twoje czaty nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Włącz Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Skróty</string>
     <string name="duck_chat_visibility_setting">Menu przeglądarki</string>
     <string name="duck_chat_address_bar_visibility_setting">Pasek adresu</string>
     <string name="duck_chat_assist_settings_title">Ustawienia Assist</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_settings_activity_description_rebranding">Funkcje sztucznej inteligencji DuckDuckGo są prywatne i opcjonalne.Twoje dane nie są używane do trenowania AI.\n<annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Czatuj anonimowo z popularnymi modelami czatu AI innych firm</string>
-    <string name="duck_chat_show_in_heading_rebranding">Skróty Duck.ai</string>
     <string name="duck_chat_assist_settings_title_rebranding">Ustawienia wyszukiwania Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Wybierz, jak często w wyszukiwaniach mają pojawiać się odpowiedzi wspomagane przez sztuczną inteligencję</string>
 </resources>

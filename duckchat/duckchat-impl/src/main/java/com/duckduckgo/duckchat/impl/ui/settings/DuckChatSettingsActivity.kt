@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -41,7 +42,7 @@ import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.ViewState
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
@@ -113,7 +114,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
             binding.userEnabledDuckChatToggle.gone()
             binding.userEnabledDuckChatToggleRebranding.show()
-            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading_rebranding)
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
         } else {
@@ -122,7 +122,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
             binding.userEnabledDuckChatToggle.show()
             binding.userEnabledDuckChatToggleRebranding.gone()
-            binding.duckChatToggleSettingsTitle.setText(R.string.duck_chat_show_in_heading)
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
         }
@@ -191,16 +190,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             )
         }
 
-        binding.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
+        binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
+        binding.duckAiShortcuts.setOnClickListener {
+            viewModel.onDuckAiShortcutsClicked()
+        }
 
-        binding.showDuckChatInMenuToggle.apply {
-            isVisible = viewState.shouldShowAddressBarToggle
-            quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
-        }
-        binding.showDuckChatInAddressBarToggle.apply {
-            isVisible = viewState.shouldShowAddressBarToggle
-            quietlySetIsChecked(viewState.showInAddressBar, addressBarToggleListener)
-        }
         binding.showDuckChatSearchSettingsLink.setOnClickListener {
             viewModel.duckChatSearchAISettingsClicked()
         }
@@ -225,6 +219,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             }
             is DuckChatSettingsViewModel.Command.OpenLinkInNewTab -> {
                 startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
+            }
+
+            is DuckChatSettingsViewModel.Command.OpenShortcutSettings -> {
+                val intent = Intent(this, DuckAiShortcutSettingsActivity::class.java)
+                startActivity(intent)
             }
         }
     }

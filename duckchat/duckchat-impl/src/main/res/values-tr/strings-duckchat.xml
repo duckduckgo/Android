@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai, popüler 3. taraf yapay zeka sohbet modelleriyle anonim olarak sohbet etmenizi sağlayan isteğe bağlı bir özelliktir. Sohbetler yapay zekayı eğitmek için kullanılmaz.\n<annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Duck.ai\'ı etkinleştir</string>
-    <string name="duck_chat_show_in_heading">Kısayollar</string>
     <string name="duck_chat_visibility_setting">Tarayıcı menüsü</string>
     <string name="duck_chat_address_bar_visibility_setting">Adres Çubuğu</string>
     <string name="duck_chat_assist_settings_title">Assist Ayarları</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI özellikleri gizli ve isteğe bağlıdır.\nVerileriniz yapay zekayı eğitmek için kullanılmaz.\n<annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Popüler üçüncü taraf AI sohbet modelleriyle anonim olarak sohbet edin</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai Kısayolları</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist Ayarları</string>
     <string name="duck_chat_assist_settings_description_rebranding">Yapay zeka destekli yanıtların aramalarınızda ne sıklıkta görünmesini istediğinizi seçin</string>
 </resources>
