@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.brokers
+package com.duckduckgo.pir.impl.brokers
 
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonReader
@@ -41,7 +41,7 @@ class StepsAsStringAdapter {
     }
 }
 
-internal class JSONObjectAdapter {
+class JSONObjectAdapter {
 
     @FromJson
     fun fromJson(reader: JsonReader): JSONObject? {

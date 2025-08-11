@@ -19,6 +19,7 @@ package com.duckduckgo.pir.internal.brokers
 import android.content.Context
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.brokers.StepsAsStringAdapter
 import com.duckduckgo.pir.internal.service.DbpService
 import com.duckduckgo.pir.internal.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.internal.store.PirRepository
