@@ -27,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -59,9 +58,6 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     lateinit var pirWebJsMessaging: JsMessaging
 
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
 
