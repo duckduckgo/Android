@@ -64,16 +64,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             viewModel.onDuckChatUserEnabledToggled(isChecked)
         }
 
-    private val menuToggleListener =
-        CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            viewModel.onShowDuckChatInMenuToggled(isChecked)
-        }
-
-    private val addressBarToggleListener =
-        CompoundButton.OnCheckedChangeListener { _, isChecked ->
-            viewModel.onShowDuckChatInAddressBarToggled(isChecked)
-        }
-
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
@@ -141,6 +131,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
+        // todo add active/inactive backgrounds around pictograms
         binding.duckAiInputScreenHeader.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenContent.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {
@@ -152,6 +143,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_ondark)
                 }
             )
+            binding.duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(R.drawable.searchbox_background)
             binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
                 ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
             )
@@ -163,6 +155,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active_ondark)
                 }
             )
+            binding.duckAiInputScreenToggleWithAiImage.setBackgroundResource(R.drawable.searchbox_background_active)
             binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
                 ContextCompat.getDrawable(this, CommonR.drawable.ic_check_blue_round_24)
             )
@@ -175,6 +168,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active_ondark)
                 }
             )
+            binding.duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(R.drawable.searchbox_background_active)
             binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
                 ContextCompat.getDrawable(this, CommonR.drawable.ic_check_blue_round_24)
             )
@@ -186,6 +180,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                     ContextCompat.getDrawable(this, R.drawable.searchbox_withai_ondark)
                 }
             )
+            binding.duckAiInputScreenToggleWithAiImage.setBackgroundResource(R.drawable.searchbox_background)
             binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
                 ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
             )

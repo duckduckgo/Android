@@ -109,13 +109,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_4"
+                android:gravity="center_horizontal"
                 android:orientation="horizontal">
 
                 <LinearLayout
                     android:id="@+id/duckAiInputScreenWithoutAiContainer"
                     android:layout_width="wrap_content"
-                    android:background="@drawable/selectable_item_experimental_background"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/selectable_item_experimental_background"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -123,6 +124,11 @@
                         android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/searchbox_background_active"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="1dp"
                         android:src="@drawable/searchbox_withoutai_active_ondark" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -147,8 +153,8 @@
                     android:id="@+id/duckAiInputScreenWithAiContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/selectable_item_experimental_background"
                     android:layout_marginStart="16dp"
+                    android:background="@drawable/selectable_item_experimental_background"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -156,6 +162,11 @@
                         android:id="@+id/duckAiInputScreenToggleWithAiImage"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@drawable/searchbox_background"
+                        android:paddingStart="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingBottom="1dp"
                         android:src="@drawable/searchbox_withai_ondark" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
