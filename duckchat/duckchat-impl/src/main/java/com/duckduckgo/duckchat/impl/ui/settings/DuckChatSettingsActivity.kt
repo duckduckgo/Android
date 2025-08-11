@@ -141,6 +141,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
+        // todo add active/inactive backgrounds around pictograms
         binding.duckAiInputScreenHeader.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenContent.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {
