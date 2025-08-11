@@ -21,7 +21,6 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.global.install.AppInstallStore
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentCountDataStore
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
@@ -85,7 +84,7 @@ class OnboardingDesignExperimentManagerTest {
     }
 
     @Test
-    fun whenLifecycleOwnerCreatedThenCachedPropertiesAreSet() = runTest {
+    fun whenPrivacyConfigPersistedCreatedThenCachedPropertiesAreSet() = runTest {
         val mockToggle = mock<Toggle>()
         val mockCohort = mock<Toggle.State.Cohort>()
 
@@ -94,8 +93,8 @@ class OnboardingDesignExperimentManagerTest {
         whenever(mockToggle.getCohort()).thenReturn(mockCohort)
         whenever(mockToggle.getCohort()!!.name).thenReturn(OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK.cohortName)
 
-        val lifecycleObserver = testee as MainProcessLifecycleObserver
-        lifecycleObserver.onCreate(mock())
+        val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
+        lifecycleObserver.onPrivacyConfigPersisted()
 
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
@@ -104,14 +103,14 @@ class OnboardingDesignExperimentManagerTest {
     }
 
     @Test
-    fun whenLifecycleOwnerCreatedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() = runTest {
+    fun whenPrivacyConfigPersistedWithDisabledExperimentThenCachedPropertiesReflectDisabledState() = runTest {
         val mockToggle = mock<Toggle>()
 
         whenever(onboardingDesignExperimentToggles.onboardingDesignExperimentAug25()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(false)
 
-        val lifecycleObserver = testee as MainProcessLifecycleObserver
-        lifecycleObserver.onCreate(mock())
+        val lifecycleObserver = testee as PrivacyConfigCallbackPlugin
+        lifecycleObserver.onPrivacyConfigPersisted()
 
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
