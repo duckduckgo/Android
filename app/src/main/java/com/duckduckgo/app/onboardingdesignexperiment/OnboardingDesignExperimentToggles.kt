@@ -47,6 +47,9 @@ interface OnboardingDesignExperimentToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun onboardingDesignExperimentAug25(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun waitForLocalPrivacyConfig(): Toggle
+
     enum class OnboardingDesignExperimentCohort(override val cohortName: String) : Toggle.State.CohortName {
         MODIFIED_CONTROL("modifiedControl"),
         BUCK("buck"),
