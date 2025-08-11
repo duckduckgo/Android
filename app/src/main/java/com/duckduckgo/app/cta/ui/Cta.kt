@@ -1581,7 +1581,7 @@ sealed class DaxBubbleCta(
         ctaId = CtaId.DAX_INTRO,
         title = R.string.onboardingSearchDaxDialogTitle,
         description = R.string.highlightsOnboardingSearchDaxDialogDescription,
-        options = onboardingStore.getExperimentSearchOptions(),
+        options = onboardingStore.getSearchOptions(),
         shownPixel = AppPixelName.ONBOARDING_DAX_CTA_SHOWN,
         okPixel = AppPixelName.ONBOARDING_DAX_CTA_OK_BUTTON,
         ctaPixelParam = Pixel.PixelValues.DAX_INITIAL_CTA,
