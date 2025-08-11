@@ -29,6 +29,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class LowPriorityMessagingModelImpl @Inject constructor(
@@ -54,8 +55,10 @@ class LowPriorityMessagingModelImpl @Inject constructor(
     }
 
     private suspend fun determineLowPriorityMessage(): LowPriorityMessage? {
+        logcat { "evaluate: determining low priority message" }
         return when {
             additionalDefaultBrowserPrompts.showSetAsDefaultMessage.firstOrNull() == true -> {
+                logcat { "evaluate: show low priority message" }
                 DefaultBrowserMessage(
                     Message(
                         topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_device_mobile_default,
@@ -64,12 +67,15 @@ class LowPriorityMessagingModelImpl @Inject constructor(
                         action2 = context.getString(R.string.newTabPageDefaultBrowserMessageSecondaryCta),
                     ),
                     onPrimaryAction = {
+                        additionalDefaultBrowserPrompts.onUserMessageInteraction()
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_CLICK)
                     },
                     onSecondaryAction = {
+                        additionalDefaultBrowserPrompts.onUserMessageInteraction(doNotShowAgain = true)
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DO_NOT_ASK_AGAIN_CLICK)
                     },
                     onClose = {
+                        additionalDefaultBrowserPrompts.onUserMessageInteraction()
                         pixel.fire(AppPixelName.SET_AS_DEFAULT_MESSAGE_DISMISSED)
                     },
                     onShown = {

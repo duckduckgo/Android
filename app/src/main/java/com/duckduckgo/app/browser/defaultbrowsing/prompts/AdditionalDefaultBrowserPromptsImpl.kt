@@ -203,6 +203,15 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         }
     }
 
+    override fun onUserMessageInteraction(doNotShowAgain: Boolean) {
+        appCoroutineScope.launch {
+            defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
+            if (doNotShowAgain) {
+                defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
+            }
+        }
+    }
+
     private suspend fun evaluate() = evaluationMutex.withLock {
         val isEnabled =
             defaultBrowserPromptsFeatureToggles.self().isEnabled() && defaultBrowserPromptsFeatureToggles.defaultBrowserPrompts25().isEnabled()
@@ -235,7 +244,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             if (currentStage == STAGE_3) {
                 fireConversionPixel(MESSAGE)
             }
-            logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED and return." }
+            logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED." }
             STOPPED
         } else if (currentStage == NOT_ENROLLED) {
             logcat { "evaluate: new stage is ENROLLED" }
@@ -383,7 +392,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
         if (storedUserType == DefaultBrowserPromptsDataStore.UserType.UNKNOWN) {
             val daysSinceInstalled = userBrowserProperties.daysSinceInstalled()
-            val userType = if (daysSinceInstalled > 4) {
+            val userType = if (daysSinceInstalled >= 4) {
                 logcat { "evaluate: setting initial user stage to EXISTING" }
                 DefaultBrowserPromptsDataStore.UserType.EXISTING
             } else {
@@ -397,7 +406,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         return storedUserType
     }
 
-    private suspend fun getNewStageForNewUser(
+    private fun getNewStageForNewUser(
         currentStage: Stage?,
         appActiveDaysUsedSinceEnrollment: Long,
         configSettings: FeatureSettings,
@@ -405,6 +414,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         return when (currentStage) {
             ENROLLED -> {
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage1) {
+                    logcat { "evaluate: user is new, go from ENROLLED to STAGE_1." }
                     STAGE_1
                 } else {
                     null
@@ -412,8 +422,8 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_1 -> {
-                // New users go from STAGE_1 to STAGE_2.
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage2) {
+                    logcat { "evaluate: user is new, go from STAGE_1 to STAGE_2." }
                     STAGE_2
                 } else {
                     null
@@ -422,6 +432,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
             STAGE_2 -> {
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage3) {
+                    logcat { "evaluate: user is new, go from STAGE_2 to STAGE_3." }
                     STAGE_3
                 } else {
                     null
@@ -429,19 +440,18 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_3 -> {
-                val stage3Finished = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == false
-                if (stage3Finished) {
-                    STOPPED
-                } else {
-                    null
+                logcat {
+                    "evaluate: user is new, and remains in STAGE_3 because " +
+                        "they haven't set the browser as the default or opted to stop receiving the prompts."
                 }
+                STAGE_3
             }
 
             else -> null
         }
     }
 
-    private suspend fun getNewStageForExistingUser(
+    private fun getNewStageForExistingUser(
         currentStage: Stage?,
         appActiveDaysUsedSinceEnrollment: Long,
         configSettings: FeatureSettings,
@@ -449,6 +459,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         return when (currentStage) {
             ENROLLED -> {
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage1) {
+                    logcat { "evaluate: user is existing, go from ENROLLED to STAGE_1." }
                     STAGE_1
                 } else {
                     null
@@ -456,9 +467,8 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_1 -> {
-                // Existing users skip STAGE_2 and go from STAGE_1 to STAGE_3.
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage3) {
-                    logcat { "evaluate: user is existing, go from STAGE_1 to STAGE_3" }
+                    logcat { "evaluate: user is existing, skip STAGE_2 and go from STAGE_1 to STAGE_3." }
                     STAGE_3
                 } else {
                     null
@@ -466,18 +476,16 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_2 -> {
-                // no-op
                 logcat { "evaluate: user is existing, STAGE_2 should not be reached" }
                 null
             }
 
             STAGE_3 -> {
-                val stage3Finished = defaultBrowserPromptsDataStore.showSetAsDefaultMessage.firstOrNull() == false
-                if (stage3Finished) {
-                    STOPPED
-                } else {
-                    null
+                logcat {
+                    "evaluate: user is existing, and remains in STAGE_3 because " +
+                        "they haven't set the browser as the default or opted to stop receiving the prompts."
                 }
+                STAGE_3
             }
 
             else -> null

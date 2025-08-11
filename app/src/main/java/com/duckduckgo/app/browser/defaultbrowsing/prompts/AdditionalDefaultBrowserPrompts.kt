@@ -41,6 +41,8 @@ interface AdditionalDefaultBrowserPrompts {
 
     fun onSystemDefaultAppsActivityClosed(trigger: SetAsDefaultActionTrigger)
 
+    fun onUserMessageInteraction(doNotShowAgain: Boolean = false)
+
     sealed class Command {
         data object OpenMessageDialog : Command()
         data class OpenSystemDefaultBrowserDialog(
