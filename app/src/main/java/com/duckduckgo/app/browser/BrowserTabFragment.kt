@@ -2488,7 +2488,7 @@ class BrowserTabFragment :
                         intent.`package`?.let { pkg ->
                             val playIntent = Intent(
                                 Intent.ACTION_VIEW,
-                                "market://details?id=$pkg".toUri(),
+                                "$STORE_PREFIX$pkg".toUri(),
                             ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
 
                             if (pm.resolveActivity(playIntent, 0) != null) {
@@ -4110,6 +4110,8 @@ class BrowserTabFragment :
         private const val AUTOCOMPLETE_PADDING_DP = 6
 
         private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
+
+        private const val STORE_PREFIX = "market://details?id="
 
         fun newInstance(
             tabId: String,
