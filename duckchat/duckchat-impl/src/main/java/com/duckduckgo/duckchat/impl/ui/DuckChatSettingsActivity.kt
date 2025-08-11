@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.ui
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -30,6 +31,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -44,6 +46,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duckai.settings")
@@ -51,6 +54,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -144,6 +150,55 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             quietlySetIsChecked(viewState.isInputScreenEnabled, inputScreenToggleListener)
         }
 
+        binding.duckAiInputScreenContent.isVisible = viewState.shouldShowInputScreenToggle
+        if (viewState.isInputScreenEnabled) {
+            // disable without ai container
+            binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
+                if (appTheme.isLightModeEnabled()) {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai)
+                } else {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_ondark)
+                }
+            )
+            binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
+                ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
+            )
+            // enable with ai container
+            binding.duckAiInputScreenToggleWithAiImage.setImageDrawable(
+                if (appTheme.isLightModeEnabled()) {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active)
+                } else {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active_ondark)
+                }
+            )
+            binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
+                ContextCompat.getDrawable(this, CommonR.drawable.ic_check_blue_round_24)
+            )
+        } else {
+            // enable without ai container
+            binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
+                if (appTheme.isLightModeEnabled()) {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active)
+                } else {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active_ondark)
+                }
+            )
+            binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
+                ContextCompat.getDrawable(this, CommonR.drawable.ic_check_blue_round_24)
+            )
+            // enable with ai container
+            binding.duckAiInputScreenToggleWithAiImage.setImageDrawable(
+                if (appTheme.isLightModeEnabled()) {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai)
+                } else {
+                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai_ondark)
+                }
+            )
+            binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
+                ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
+            )
+        }
+
         binding.duckChatToggleSettingsTitle.isVisible = viewState.isDuckChatUserEnabled
 
         binding.showDuckChatInMenuToggle.apply {
@@ -156,6 +211,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         }
         binding.showDuckChatSearchSettingsLink.setOnClickListener {
             viewModel.duckChatSearchAISettingsClicked()
+        }
+        binding.duckAiInputScreenWithoutAiContainer.setOnClickListener {
+            viewModel.onDuckAiInputScreenWithoutAiSelected()
+        }
+        binding.duckAiInputScreenWithAiContainer.setOnClickListener {
+            viewModel.onDuckAiInputScreenWithAiSelected()
         }
     }
 
