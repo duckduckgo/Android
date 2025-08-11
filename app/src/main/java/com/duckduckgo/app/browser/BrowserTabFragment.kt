@@ -1579,9 +1579,11 @@ class BrowserTabFragment :
         )
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
-                    if (!result) {
-                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                    activity?.let {
+                        val result = downloadsFileActions.openFile(it, File(command.filePath))
+                        if (!result) {
+                            view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
