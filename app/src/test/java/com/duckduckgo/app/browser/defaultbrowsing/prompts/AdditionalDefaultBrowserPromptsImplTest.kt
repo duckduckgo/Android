@@ -444,7 +444,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
             mockFeatureSettings(
                 existingUserActiveDaysUntilStage1 = 1,
                 existingUserActiveDaysUntilStage3 = 6,
-                activeDaysUntilStop = 8,
             )
             whenever(userBrowserPropertiesMock.daysSinceInstalled()).thenReturn(5)
             whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(2))
@@ -511,53 +510,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
             verify(dataStoreMock).storeExperimentStage(Stage.STAGE_3)
             verify(stageEvaluatorMock).evaluate(Stage.STAGE_3)
         }
-
-    @Test
-    fun `evaluate - if enrolled, browser not set as default, and not enough active days until stop, then do nothing`() = runTest {
-        val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.STAGE_3,
-        )
-        val testee = createTestee(
-            defaultBrowserPromptsDataStore = dataStoreMock,
-        )
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        mockFeatureSettings(
-            activeDaysUntilStop = 6,
-        )
-        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
-
-        testee.onResume(lifecycleOwnerMock)
-
-        verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
-        verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
-    }
-
-    @Test
-    fun `evaluate - if enrolled, browser not set as default, and enough active days until stop, then move to stopped`() = runTest {
-        val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.STAGE_3,
-        )
-        val testee = createTestee(
-            defaultBrowserPromptsDataStore = dataStoreMock,
-        )
-        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
-        whenever(defaultBrowserDetectorMock.isDefaultBrowser()).thenReturn(false)
-        mockFeatureSettings()
-        whenever(defaultBrowserPromptsAppUsageRepositoryMock.getActiveDaysUsedSinceEnrollment()).thenReturn(Result.success(5))
-        val action = DefaultBrowserPromptsFlowStageAction(
-            showMessageDialog = true,
-            showSetAsDefaultPopupMenuItem = false,
-            highlightPopupMenu = false,
-            showMessage = false,
-        )
-        whenever(stageEvaluatorMock.evaluate(Stage.STOPPED)).thenReturn(action)
-
-        testee.onResume(lifecycleOwnerMock)
-
-        verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
-        verify(stageEvaluatorMock).evaluate(Stage.STOPPED)
-    }
 
     @Test
     fun `evaluate - if stage 1 and browser set as default, then set stage to STOPPED and evaluate to clean`() = runTest {
@@ -859,7 +811,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
         newUserActiveDaysUntilStage3: Int = 4,
         existingUserActiveDaysUntilStage1: Int = 1,
         existingUserActiveDaysUntilStage3: Int = 4,
-        activeDaysUntilStop: Int = 5,
     ) {
         val settings = FeatureSettingsConfigModel(
             newUserActiveDaysUntilStage1 = newUserActiveDaysUntilStage1.toString(),
@@ -867,7 +818,6 @@ class AdditionalDefaultBrowserPromptsImplTest {
             newUserActiveDaysUntilStage3 = newUserActiveDaysUntilStage3.toString(),
             existingUserActiveDaysUntilStage1 = existingUserActiveDaysUntilStage1.toString(),
             existingUserActiveDaysUntilStage3 = existingUserActiveDaysUntilStage3.toString(),
-            activeDaysUntilStop = activeDaysUntilStop.toString(),
         )
         whenever(additionalPromptsToggleMock.getSettings()).thenReturn(additionalPromptsFeatureSettingsFake)
         whenever(featureSettingsJsonAdapterMock.fromJson(additionalPromptsFeatureSettingsFake)).thenReturn(settings)

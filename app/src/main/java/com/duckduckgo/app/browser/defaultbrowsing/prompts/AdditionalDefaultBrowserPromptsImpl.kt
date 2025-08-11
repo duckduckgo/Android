@@ -145,7 +145,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         val newUserActiveDaysUntilStage3: String,
         val existingUserActiveDaysUntilStage1: String,
         val existingUserActiveDaysUntilStage3: String,
-        val activeDaysUntilStop: String,
     )
 
     private data class FeatureSettings(
@@ -154,7 +153,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         val newUserActiveDaysUntilStage3: Int,
         val existingUserActiveDaysUntilStage1: Int,
         val existingUserActiveDaysUntilStage3: Int,
-        val activeDaysUntilStop: Int,
     )
 
     private val featureSettingsJsonAdapter = moshi.adapter(FeatureSettingsConfigModel::class.java)
@@ -550,7 +548,6 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         newUserActiveDaysUntilStage3 = newUserActiveDaysUntilStage3.toInt(),
         existingUserActiveDaysUntilStage1 = existingUserActiveDaysUntilStage1.toInt(),
         existingUserActiveDaysUntilStage3 = existingUserActiveDaysUntilStage3.toInt(),
-        activeDaysUntilStop = activeDaysUntilStop.toInt(),
     )
 
     companion object {
