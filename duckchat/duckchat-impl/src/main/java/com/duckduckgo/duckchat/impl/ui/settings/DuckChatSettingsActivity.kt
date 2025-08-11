@@ -141,6 +141,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
+        binding.duckAiInputScreenHeader.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenContent.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {
             // disable without ai container
