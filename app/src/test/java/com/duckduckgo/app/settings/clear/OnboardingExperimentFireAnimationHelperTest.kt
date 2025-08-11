@@ -72,10 +72,6 @@ class OnboardingExperimentFireAnimationHelperTest {
         var buckEnabled = false
         var modifiedControlEnabled = false
 
-        override fun getCohort(): String? {
-            TODO("Not yet implemented")
-        }
-
         override suspend fun enroll() {
             TODO("Not yet implemented")
         }
