@@ -57,11 +57,13 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
         val factoryClassName = "${vmClass.shortName}_ViewModelFactory"
         val scope = vmClass.annotations.first { it.fqName == ContributesViewModel::class.fqName }.scopeOrNull(0)
         val isSingleInstanceInScope = vmClass.isAnnotatedWith(singleInstanceAnnotationFqName)
+        val singletonScope = vmClass.annotations.firstOrNull { it.fqName == singleInstanceAnnotationFqName }?.scopeOrNull(0)
+        val isActivityScope = singletonScope?.shortName == "ActivityScope"
         val constructor = vmClass.constructors.singleOrNull { it.isAnnotatedWith(Inject::class.fqName) }
         val defaultParameterValues = constructor?.parameters?.any { it.parameter.hasDefaultValue() } ?: false
-        if (isSingleInstanceInScope) {
+        if (isSingleInstanceInScope && !isActivityScope) {
             throw AnvilCompilationException(
-                "${vmClass.fqName} cannot be annotated with @SingleInstanceIn",
+                "${vmClass.fqName} cannot be annotated with @SingleInstanceIn and not be scoped by ActivityScope",
                 element = vmClass.clazz.identifyingElement,
             )
         }

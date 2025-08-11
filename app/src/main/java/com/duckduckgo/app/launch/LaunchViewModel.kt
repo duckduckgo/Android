@@ -31,13 +31,20 @@ import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_CONTROL
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_BROWSER_COMPARISON
 import com.duckduckgo.daxprompts.api.DaxPrompts.ActionType.SHOW_VARIANT_DUCKPLAYER
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
+import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 
+@ContributesMultibinding(
+    scope = ActivityScope::class,
+    boundType = PrivacyConfigCallbackPlugin::class,
+)
 @ContributesViewModel(ActivityScope::class)
+@SingleInstanceIn(ActivityScope::class)
 class LaunchViewModel @Inject constructor(
     private val userStageStore: UserStageStore,
     private val appReferrerStateListener: AppInstallationReferrerStateListener,
@@ -45,7 +52,7 @@ class LaunchViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) :
-    ViewModel() {
+    ViewModel(), PrivacyConfigCallbackPlugin {
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
 
@@ -58,16 +65,29 @@ class LaunchViewModel @Inject constructor(
         data object CloseDaxPrompt : Command()
     }
 
+    var configPersisted = false
+
+    override fun onPrivacyConfigDownloaded() {
+        // NOOP
+    }
+
+    override fun onPrivacyConfigPersisted() {
+        configPersisted = true
+    }
+
     suspend fun determineViewToShow() {
         if (onboardingDesignExperimentManager.isWaitForLocalPrivacyConfigEnabled()) {
             withTimeoutOrNull(MAX_REFERRER_WAIT_TIME_MS) {
-                val referrerJob = async {
-                    waitForReferrerData()
+                while (!configPersisted) {
+                    delay(10)
                 }
-                val configJob = async {
-                    onboardingDesignExperimentManager.waitForPrivacyConfig()
-                }
-                awaitAll(referrerJob, configJob)
+                // val referrerJob = async {
+                //     waitForReferrerData()
+                // }
+                // val configJob = async {
+                //     onboardingDesignExperimentManager.waitForPrivacyConfig()
+                // }
+                // awaitAll(referrerJob, configJob)
             }
         } else {
             waitForReferrerData()

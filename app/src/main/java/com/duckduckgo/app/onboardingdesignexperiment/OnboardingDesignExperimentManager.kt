@@ -38,7 +38,6 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -63,7 +62,6 @@ interface OnboardingDesignExperimentManager {
     suspend fun fireSiteSuggestionOptionSelectedPixel(index: Int)
     suspend fun onWebPageFinishedLoading(url: String?)
     fun getCohort(): String?
-    suspend fun waitForPrivacyConfig(): Boolean
     suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean
 }
 
@@ -93,19 +91,11 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
 
     private var privacyPersisted: Boolean = false
 
-    override suspend fun waitForPrivacyConfig(): Boolean {
-        while (!privacyPersisted) {
-            delay(10)
-        }
-        return true
-    }
-
     override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean {
         return onboardingDesignExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
     }
 
     override fun onPrivacyConfigPersisted() {
-        privacyPersisted = true
         coroutineScope.launch {
             setCachedProperties()
         }
