@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai je voliteľná funkcia, ktorá ti umožňuje anonymne chatovať s obľúbenými modelmi chatu s umelou inteligenciou tretích strán. Tvoje chaty sa nepoužívajú na trénovanie AI.\n<annotation type="learn_more_link">Viac informácií</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Povoliť Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Skratky</string>
     <string name="duck_chat_visibility_setting">Ponuka prehliadača</string>
     <string name="duck_chat_address_bar_visibility_setting">Riadok adresy</string>
     <string name="duck_chat_assist_settings_title">Nastavenia Assist</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_settings_activity_description_rebranding">Funkcie DuckDuckGo AI sú súkromné a voliteľné.\nTvoje údaje sa nepoužívajú na trénovanie umelej inteligencie.\n<annotation type="learn_more_link">Viac informácií</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatuj anonymne s populárnymi AI modelmi chatu tretích strán</string>
-    <string name="duck_chat_show_in_heading_rebranding">Skratky Duck.ai</string>
     <string name="duck_chat_assist_settings_title_rebranding">Nastavenia Assist vyhľadávania</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vyber, ako často chceš, aby sa vo vyhľadávaní zobrazovali odpovede podporované AI</string>
 </resources>

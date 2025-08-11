@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui
+package com.duckduckgo.duckchat.impl.ui.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,8 +24,9 @@ import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingData
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
@@ -50,8 +51,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     data class ViewState(
         val isDuckChatUserEnabled: Boolean = false,
         val isInputScreenEnabled: Boolean = false,
-        val showInBrowserMenu: Boolean = false,
-        val showInAddressBar: Boolean = false,
+        val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
         val shouldShowBrowserMenuToggle: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
@@ -67,8 +67,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         ViewState(
             isDuckChatUserEnabled = isDuckChatUserEnabled,
             isInputScreenEnabled = isInputScreenEnabled,
-            showInBrowserMenu = showInBrowserMenu,
-            showInAddressBar = showInAddressBar,
+            shouldShowShortcuts = isDuckChatUserEnabled,
             shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
             shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
             shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
@@ -79,6 +78,7 @@ class DuckChatSettingsViewModel @Inject constructor(
     sealed class Command {
         data class OpenLink(val link: String) : Command()
         data class OpenLinkInNewTab(val link: String) : Command()
+        data object OpenShortcutSettings : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -109,6 +109,12 @@ class DuckChatSettingsViewModel @Inject constructor(
         viewModelScope.launch {
             commandChannel.send(OpenLinkInNewTab(DUCK_CHAT_SEARCH_AI_SETTINGS_LINK))
             pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
+        }
+    }
+
+    fun onDuckAiShortcutsClicked() {
+        viewModelScope.launch {
+            commandChannel.send(OpenShortcutSettings)
         }
     }
 

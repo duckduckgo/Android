@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">„Duck.ai“ yra pasirenkama funkcija, leidžianti anonimiškai kalbėtis su populiariais trečiųjų šalių DI pokalbių modeliais. Tavo pokalbiai nenaudojami dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinok daugiau</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Įjungti „Duck.ai“</string>
-    <string name="duck_chat_show_in_heading">Šaukiniai</string>
     <string name="duck_chat_visibility_setting">Naršyklės meniu</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreso juosta</string>
     <string name="duck_chat_assist_settings_title">„Assist“ nustatymai</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_settings_activity_description_rebranding">„DuckDuckGo“ DI funkcijos yra privačios ir neprivalomos.Nenaudojame jūsų duomenų dirbtinio intelekto mokymui.\n<annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
     <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Kalbėkitės anonimiškai su populiariais trečiųjų šalių DI pokalbių modeliais</string>
-    <string name="duck_chat_show_in_heading_rebranding">„Duck.ai“ spartieji klavišai</string>
     <string name="duck_chat_assist_settings_title_rebranding">„Assist“ paieškos nustatymai</string>
     <string name="duck_chat_assist_settings_description_rebranding">Pasirink, kaip dažnai nori, kad tavo paieškose būtų rodomi DI generuojami atsakymai</string>
 </resources>

@@ -22,8 +22,9 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLink
-import com.duckduckgo.duckchat.impl.ui.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.flowOf
