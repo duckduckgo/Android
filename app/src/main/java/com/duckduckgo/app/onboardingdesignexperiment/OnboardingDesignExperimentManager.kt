@@ -63,6 +63,7 @@ interface OnboardingDesignExperimentManager {
     suspend fun fireOptionSelectedPixel(cta: Cta, index: Int)
     suspend fun fireSiteSuggestionOptionSelectedPixel(index: Int)
     suspend fun onWebPageFinishedLoading(url: String?)
+    fun getCohort(): String?
 }
 
 @ContributesMultibinding(
@@ -103,6 +104,10 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
         coroutineScope.launch {
             setCachedProperties()
         }
+    }
+
+    override fun getCohort(): String? {
+        return onboardingDesignExperimentCohort?.cohortName
     }
 
     /**

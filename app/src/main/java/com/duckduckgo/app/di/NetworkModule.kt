@@ -22,6 +22,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.api.*
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -172,6 +173,7 @@ class NetworkModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
         dispatcherProvider: DispatcherProvider,
+        onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ): FeedbackSubmitter =
         FireAndForgetFeedbackSubmitter(
             feedbackService,
@@ -182,6 +184,7 @@ class NetworkModule {
             appCoroutineScope,
             appBuildConfig,
             dispatcherProvider,
+            onboardingDesignExperimentManager,
         )
 
     companion object {
