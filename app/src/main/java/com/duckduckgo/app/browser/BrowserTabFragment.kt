@@ -199,6 +199,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -578,6 +579,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2480,6 +2484,20 @@ class BrowserTabFragment :
 
             if (activities.isEmpty()) {
                 when {
+                    fallbackIntent == null && fallbackUrl == null && androidBrowserConfigFeature.handleIntentScheme().isEnabled() -> {
+                        intent.`package`?.let { pkg ->
+                            val playIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                "$STORE_PREFIX$pkg".toUri(),
+                            ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
+
+                            if (pm.resolveActivity(playIntent, 0) != null) {
+                                launchDialogForIntent(it, pm, playIntent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                                return
+                            }
+                        }
+                    }
+
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
                         launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
@@ -4092,6 +4110,8 @@ class BrowserTabFragment :
         private const val AUTOCOMPLETE_PADDING_DP = 6
 
         private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
+
+        private const val STORE_PREFIX = "market://details?id="
 
         fun newInstance(
             tabId: String,

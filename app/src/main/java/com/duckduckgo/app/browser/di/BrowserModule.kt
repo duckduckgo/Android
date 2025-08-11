@@ -182,6 +182,7 @@ class BrowserModule {
         duckPlayer: DuckPlayer,
         duckChat: DuckChat,
         aiChatQueryDetectionFeature: AIChatQueryDetectionFeature,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): SpecialUrlDetector = SpecialUrlDetectorImpl(
         packageManager,
         ampLinks,
@@ -191,6 +192,7 @@ class BrowserModule {
         duckPlayer,
         duckChat,
         aiChatQueryDetectionFeature,
+        androidBrowserConfigFeature,
     )
 
     @Provides
