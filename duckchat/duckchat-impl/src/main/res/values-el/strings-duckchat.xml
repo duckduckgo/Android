@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Ρωτήστε το Duck.ai</string>
     <string name="input_screen_user_pref_title">Πειραματική γραμμή διευθύνσεων</string>
-    <string name="input_screen_user_pref_description">Κάντε αναζήτηση στο διαδίκτυο ή ρωτήστε το Duck.ai απευθείας από τη Γραμμή διευθύνσεων</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

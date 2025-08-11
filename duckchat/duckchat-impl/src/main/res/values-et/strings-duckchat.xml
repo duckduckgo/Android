@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Küsi Duck.ai käest</string>
     <string name="input_screen_user_pref_title">Eksperimentaalne aadressiriba</string>
-    <string name="input_screen_user_pref_description">Otsi veebist või küsi Duck.ai-lt otse aadressiribal</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

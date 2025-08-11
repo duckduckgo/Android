@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Pitaj Duck.ai</string>
     <string name="input_screen_user_pref_title">Eksperimentalna adresna traka</string>
-    <string name="input_screen_user_pref_description">Pretraži mrežu ili pitaj Duck.ai izravno iz adresne trake</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

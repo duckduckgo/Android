@@ -51,7 +51,6 @@
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Kysy Duck.ai:lta</string>
     <string name="input_screen_user_pref_title">Kokeellinen osoitekenttä</string>
-    <string name="input_screen_user_pref_description">Hae verkosta tai kysy Duck.ai:lta kirjoittamalla suoraan osoiteriville</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
