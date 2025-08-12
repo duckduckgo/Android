@@ -79,6 +79,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         data class OpenLink(val link: String) : Command()
         data class OpenLinkInNewTab(val link: String) : Command()
         data object OpenShortcutSettings : Command()
+        data object LaunchFeedback : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -127,6 +128,12 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun onDuckAiInputScreenWithAiSelected() {
         viewModelScope.launch {
             duckChat.setInputScreenUserSetting(enabled = true)
+        }
+    }
+
+    fun duckAiShareFeedbackCLicked() {
+        viewModelScope.launch {
+            commandChannel.send(Command.LaunchFeedback)
         }
     }
 

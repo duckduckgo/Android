@@ -29,10 +29,10 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
-import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -55,9 +55,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private val viewModel: DuckChatSettingsViewModel by bindViewModel()
     private val binding: ActivityDuckChatSettingsBinding by viewBinding()
-
-    @Inject
-    lateinit var appTheme: AppTheme
 
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
@@ -132,7 +129,8 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         )
 
         binding.duckAiInputScreenHeader.isVisible = viewState.shouldShowInputScreenToggle
-        binding.duckAiInputScreenContent.isVisible = viewState.shouldShowInputScreenToggle
+        binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
+        binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {
             // disable without ai container
             binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
@@ -168,6 +166,16 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
             )
         }
+        binding.duckAiInputScreenDescription.addClickableSpan(
+            textSequence = getText(R.string.input_screen_user_pref_description),
+            spans = listOf(
+                "share_feedback" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.duckAiShareFeedbackCLicked()
+                    }
+                },
+            ),
+        )
 
         binding.duckAiShortcuts.isVisible = viewState.shouldShowShortcuts
         binding.duckAiShortcuts.setOnClickListener {
@@ -203,6 +211,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             is DuckChatSettingsViewModel.Command.OpenShortcutSettings -> {
                 val intent = Intent(this, DuckAiShortcutSettingsActivity::class.java)
                 startActivity(intent)
+            }
+
+            is DuckChatSettingsViewModel.Command.LaunchFeedback -> {
+                globalActivityStarter.start(this, FeedbackActivityWithEmptyParams)
             }
         }
     }

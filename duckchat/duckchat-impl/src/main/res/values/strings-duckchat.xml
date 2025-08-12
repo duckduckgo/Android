@@ -53,6 +53,7 @@
     <string name="input_screen_user_pref_title">Experimental Address Bar</string>
     <string name="input_screen_user_pref_without_ai">Search Only\n(Default)</string>
     <string name="input_screen_user_pref_with_ai">Search &amp; Duck.ai\n(Experimental)</string>
+    <string name="input_screen_user_pref_description">Search the web or ask Duck.ai directly from the Address Bar.\n<annotation type="share_feedback">Share Feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

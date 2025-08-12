@@ -105,7 +105,7 @@
                 app:primaryText="@string/input_screen_user_pref_title" />
 
             <LinearLayout
-                android:id="@+id/duckAiInputScreenContent"
+                android:id="@+id/duckAiInputScreenToggleContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/keyline_4"
@@ -188,6 +188,16 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/duckAiInputScreenDescription"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/input_screen_user_pref_description"
+                app:typography="body2"/>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
