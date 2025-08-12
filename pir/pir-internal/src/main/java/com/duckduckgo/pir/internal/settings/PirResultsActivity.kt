@@ -29,12 +29,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.R
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalResultsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirOptOutResultsScreen
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirScanResultsScreen
-import com.duckduckgo.pir.internal.store.PirRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

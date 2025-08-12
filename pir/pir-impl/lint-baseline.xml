@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +14,15 @@
   ~ limitations under the License.
   -->
 
-<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.1)" variant="all" version="8.5.1">
+<issues format="6" by="lint 8.5.1" type="baseline" client="gradle" dependencies="false"
+    name="AGP (8.5.1)" variant="all" version="8.5.1">
+
+    <issue id="SetJavaScriptEnabled"
+        message="Using `setJavaScriptEnabled` can introduce XSS vulnerabilities into your application, review carefully"
+        errorLine1="                javaScriptEnabled = true"
+        errorLine2="                ~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location file="src/main/java/com/duckduckgo/pir/impl/common/PirDetachedWebViewProvider.kt"
+            line="158" column="17" />
+    </issue>
 
 </issues>
