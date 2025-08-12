@@ -129,7 +129,7 @@
                         android:paddingTop="16dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="1dp"
-                        android:src="@drawable/searchbox_withoutai_active_ondark" />
+                        android:src="@drawable/searchbox_withoutai_active" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:layout_width="wrap_content"
@@ -167,7 +167,7 @@
                         android:paddingTop="16dp"
                         android:paddingEnd="16dp"
                         android:paddingBottom="1dp"
-                        android:src="@drawable/searchbox_withai_ondark" />
+                        android:src="@drawable/searchbox_withai" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:layout_width="wrap_content"

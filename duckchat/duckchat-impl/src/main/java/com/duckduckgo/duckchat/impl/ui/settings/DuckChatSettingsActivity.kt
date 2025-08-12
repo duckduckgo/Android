@@ -131,17 +131,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        // todo add active/inactive backgrounds around pictograms
         binding.duckAiInputScreenHeader.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenContent.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {
             // disable without ai container
             binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
-                if (appTheme.isLightModeEnabled()) {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai)
-                } else {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_ondark)
-                }
+                ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai)
             )
             binding.duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(R.drawable.searchbox_background)
             binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
@@ -149,11 +144,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             )
             // enable with ai container
             binding.duckAiInputScreenToggleWithAiImage.setImageDrawable(
-                if (appTheme.isLightModeEnabled()) {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active)
-                } else {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active_ondark)
-                }
+                ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active)
             )
             binding.duckAiInputScreenToggleWithAiImage.setBackgroundResource(R.drawable.searchbox_background_active)
             binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
@@ -162,11 +153,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         } else {
             // enable without ai container
             binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
-                if (appTheme.isLightModeEnabled()) {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active)
-                } else {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active_ondark)
-                }
+                ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active)
             )
             binding.duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(R.drawable.searchbox_background_active)
             binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
@@ -174,11 +161,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             )
             // enable with ai container
             binding.duckAiInputScreenToggleWithAiImage.setImageDrawable(
-                if (appTheme.isLightModeEnabled()) {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai)
-                } else {
-                    ContextCompat.getDrawable(this, R.drawable.searchbox_withai_ondark)
-                }
+                ContextCompat.getDrawable(this, R.drawable.searchbox_withai)
             )
             binding.duckAiInputScreenToggleWithAiImage.setBackgroundResource(R.drawable.searchbox_background)
             binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
