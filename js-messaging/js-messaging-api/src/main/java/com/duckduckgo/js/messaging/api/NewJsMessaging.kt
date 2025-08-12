@@ -17,6 +17,7 @@
 package com.duckduckgo.js.messaging.api
 
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
 
 interface NewJsMessaging {
 
@@ -38,10 +39,13 @@ interface NewJsMessaging {
 
 interface NewJsMessageHandler {
     /**
-     * This method processes a [JsMessage] and can return a JsRequestResponse to reply to the message if needed
-     * @return `JsRequestResponse` or `null`
+     * This method processes a [JsMessage]
      */
-    fun process(jsMessage: JsMessage, jsMessageCallback: JsMessageCallback?)
+    fun process(
+        jsMessage: JsMessage,
+        jsMessageCallback: JsMessageCallback?,
+        replyProxy: JavaScriptReplyProxy,
+    )
 
     /**
      * Name of the feature

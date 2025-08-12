@@ -34,7 +34,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private var script: ScriptHandler? = null
     private var currentScriptString: String? = null
 
-    // TODO: Remove params
     private fun reloadJSIfNeeded(
         webView: WebView,
         activeExperiments: List<Toggle>,
@@ -79,7 +78,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         url: String?,
         activeExperiments: List<Toggle>,
     ) {
-        // TODO: Check
         reloadJSIfNeeded(webView, activeExperiments)
     }
 }

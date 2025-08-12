@@ -17,9 +17,11 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.GlobalContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.NewContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -37,6 +39,7 @@ import logcat.logcat
 @Named("AdsJsContentScopeScripts")
 class AdsJsContentScopeMessaging @Inject constructor(
     private val handlers: PluginPoint<NewContentScopeJsMessageHandlersPlugin>,
+    private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
 ) : NewJsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -46,26 +49,29 @@ class AdsJsContentScopeMessaging @Inject constructor(
     override val context: String = "contentScopeScripts"
     override val allowedDomains: Set<String> = setOf("*")
 
-    private fun process(message: String, jsMessageCallback: JsMessageCallback) {
+    private fun process(
+        message: String,
+        jsMessageCallback: JsMessageCallback,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
             val jsMessage = adapter.fromJson(message)
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
-                    if (jsMessage.method == "addDebugFlag") {
-                        // If method is addDebugFlag, we want to handle it for all features
-                        jsMessageCallback.process(
-                            featureName = jsMessage.featureName,
-                            method = jsMessage.method,
-                            id = jsMessage.id,
-                            data = jsMessage.params,
-                        )
-                    }
+                    // Process global handlers first (always processed regardless of feature handlers)
+                    globalHandlers.getPlugins()
+                        .map { it.getGlobalJsMessageHandler() }
+                        .filter { it.method == jsMessage.method }
+                        .forEach { handler ->
+                            handler.process(jsMessage, jsMessageCallback, replyProxy)
+                        }
 
+                    // Process with feature handlers
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, jsMessageCallback)
+                    }?.process(jsMessage, jsMessageCallback, replyProxy)
                 }
             }
         } catch (e: Exception) {
@@ -84,11 +90,11 @@ class AdsJsContentScopeMessaging @Inject constructor(
                     webView,
                     "contentScopeAdsjs",
                     allowedDomains,
-                ) { view, message, _, _, _ ->
+                ) { _, message, _, _, replyProxy ->
                     process(
-                        message.data
-                            ?: "",
+                        message.data ?: "",
                         jsMessageCallback,
+                        replyProxy,
                     )
                 }
                 true

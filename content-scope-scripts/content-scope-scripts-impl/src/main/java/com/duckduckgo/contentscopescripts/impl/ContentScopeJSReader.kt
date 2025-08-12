@@ -24,9 +24,6 @@ import javax.inject.Inject
 import javax.inject.Named
 
 interface ContentScopeJSReader {
-    /**
-     * Returns the content scope JavaScript as a String.
-     */
     fun getContentScopeJS(): String
 }
 
