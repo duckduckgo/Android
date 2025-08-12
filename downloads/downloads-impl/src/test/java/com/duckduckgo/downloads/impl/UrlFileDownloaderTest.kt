@@ -16,9 +16,13 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.impl.feature.FileDownloadFeature
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import java.io.File
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
@@ -31,6 +35,7 @@ import org.mockito.kotlin.*
 import retrofit2.Call
 import retrofit2.Response
 
+@SuppressLint("DenyListedApi")
 class UrlFileDownloaderTest {
     @get:Rule
     @Suppress("unused")
@@ -42,15 +47,18 @@ class UrlFileDownloaderTest {
 
     private lateinit var urlFileDownloader: UrlFileDownloader
 
+    private val fileDownloadFeature = FakeFeatureToggleFactory.create(FileDownloadFeature::class.java)
+
     @Before
     fun setup() {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
-        whenever(downloadFileService.downloadFile(anyString(), anyString())).thenReturn(call)
+        whenever(downloadFileService.downloadFile(anyOrNull(), anyString())).thenReturn(call)
 
         urlFileDownloader = UrlFileDownloader(
             downloadFileService,
             realFileDownloadManager,
             FakeCookieManagerWrapper(),
+            fileDownloadFeature = fileDownloadFeature,
         )
     }
 
@@ -171,6 +179,60 @@ class UrlFileDownloaderTest {
         verify(downloadCallback, never()).onError(eq(pendingFileDownload.url), any(), eq(DownloadFailReason.ConnectionRefused))
     }
 
+    @Test
+    fun whenFeatureFlagEnabledThenCookieHeaderOmittedForEmptyCookies() = runTest {
+        fileDownloadFeature.omitEmptyCookieHeader().setRawStoredState(Toggle.State(enable = true))
+
+        val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
+        urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(cookie = eq(null), urlString = any())
+    }
+
+    @Test
+    fun whenFeatureFlagDisabledThenCookieHeaderEmptyStringForEmptyCookies() = runTest {
+        fileDownloadFeature.omitEmptyCookieHeader().setRawStoredState(Toggle.State(enable = false))
+
+        val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
+        urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(cookie = eq(""), urlString = any())
+    }
+
+    @Test
+    fun whenFeatureFlagEnabledAndCookieNotNullThenCookieHeaderIncluded() = runTest {
+        fileDownloadFeature.omitEmptyCookieHeader().setRawStoredState(Toggle.State(enable = true))
+
+        val urlFileDownloader = UrlFileDownloader(
+            downloadFileService,
+            realFileDownloadManager,
+            FakeCookieManagerWrapper("session=abc123; token=xyz"),
+            fileDownloadFeature = fileDownloadFeature,
+        )
+
+        val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
+        urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), urlString = any())
+    }
+
+    @Test
+    fun whenFeatureFlagDisabledAndCookieNotNullThenCookieHeaderIncluded() = runTest {
+        fileDownloadFeature.omitEmptyCookieHeader().setRawStoredState(Toggle.State(enable = false))
+
+        val urlFileDownloader = UrlFileDownloader(
+            downloadFileService,
+            realFileDownloadManager,
+            FakeCookieManagerWrapper("session=abc123; token=xyz"),
+            fileDownloadFeature = fileDownloadFeature,
+        )
+
+        val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
+        urlFileDownloader.downloadFile(pendingFileDownload, "file.txt", mock<DownloadCallback>())
+
+        verify(downloadFileService).downloadFile(cookie = eq("session=abc123; token=xyz"), urlString = any())
+    }
+
     private fun buildPendingDownload(
         url: String,
         contentDisposition: String? = null,
@@ -185,9 +247,9 @@ class UrlFileDownloaderTest {
         )
     }
 
-    private class FakeCookieManagerWrapper : CookieManagerWrapper {
+    private class FakeCookieManagerWrapper(private val cookie: String? = null) : CookieManagerWrapper {
         override fun getCookie(url: String): String? {
-            return null
+            return cookie
         }
     }
 }

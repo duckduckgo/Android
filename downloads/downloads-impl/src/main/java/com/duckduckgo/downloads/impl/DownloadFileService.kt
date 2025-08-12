@@ -35,7 +35,7 @@ interface DownloadFileService {
     @Streaming
     @GET
     fun downloadFile(
-        @Header("Cookie") cookie: String,
+        @Header("Cookie") cookie: String?,
         @Url urlString: String,
     ): Call<ResponseBody>
 }
