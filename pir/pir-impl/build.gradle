@@ -29,10 +29,14 @@ dependencies {
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':di')
+    implementation project(':browser-api')
     implementation project(':common-ui')
     implementation project(':common-utils')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':js-messaging-api')
     implementation project(':navigation-api')
     implementation project(':subscriptions-api')
+
     ksp AndroidX.room.compiler
 
     implementation AndroidX.appCompat
