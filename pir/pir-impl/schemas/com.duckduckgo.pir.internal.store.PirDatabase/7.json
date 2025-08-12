@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "1658528c49d7672a38c6ed4b416b2b30",
+    "identityHash": "a43290a07862abf1864d793568f51bc2",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fileName` TEXT NOT NULL, `etag` TEXT NOT NULL, `isActive` INTEGER NOT NULL, PRIMARY KEY(`fileName`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fileName` TEXT NOT NULL, `etag` TEXT NOT NULL, PRIMARY KEY(`fileName`))",
         "fields": [
           {
             "fieldPath": "fileName",
@@ -18,12 +18,6 @@
             "fieldPath": "etag",
             "columnName": "etag",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isActive",
-            "columnName": "isActive",
-            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -748,7 +742,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1658528c49d7672a38c6ed4b416b2b30')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a43290a07862abf1864d793568f51bc2')"
     ]
   }
 }

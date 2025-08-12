@@ -24,7 +24,6 @@ import androidx.room.PrimaryKey
 data class BrokerJsonEtag(
     @PrimaryKey val fileName: String,
     val etag: String,
-    val isActive: Boolean,
 )
 
 @Entity(tableName = "pir_broker_details")

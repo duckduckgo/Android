@@ -57,13 +57,11 @@ interface PirRepository {
 
     suspend fun updateMainEtag(etag: String?)
 
-    suspend fun updateBrokerJsons(brokers: Map<BrokerJson, Boolean>)
+    suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
-    suspend fun getAllLocalBrokerJsons(): Map<BrokerJson, Boolean>
+    suspend fun getAllLocalBrokerJsons(): List<BrokerJson>
 
     suspend fun getStoredBrokersCount(): Int
-
-    suspend fun getActiveBrokerJsons(): List<BrokerJson>
 
     suspend fun getAllBrokersForScan(): List<String>
 
@@ -208,35 +206,30 @@ internal class RealPirRepository(
         pirDataStore.mainConfigEtag = etag
     }
 
-    override suspend fun updateBrokerJsons(brokers: Map<BrokerJson, Boolean>) {
+    override suspend fun updateBrokerJsons(brokers: List<BrokerJson>) {
         withContext(dispatcherProvider.io()) {
             brokers.map {
                 BrokerJsonEtag(
-                    fileName = it.key.fileName,
-                    etag = it.key.etag,
-                    isActive = it.value,
+                    fileName = it.fileName,
+                    etag = it.etag,
                 )
             }.also {
-                brokerJsonDao.upsertAll(it)
+                brokerJsonDao.insertBrokerJsonEtags(it)
             }
         }
     }
 
-    override suspend fun getAllLocalBrokerJsons(): Map<BrokerJson, Boolean> = withContext(dispatcherProvider.io()) {
-        return@withContext brokerJsonDao.getAllBrokers().associate {
+    override suspend fun getAllLocalBrokerJsons(): List<BrokerJson> = withContext(dispatcherProvider.io()) {
+        return@withContext brokerJsonDao.getAllBrokers().map {
             BrokerJson(
                 fileName = it.fileName,
                 etag = it.etag,
-            ) to it.isActive
+            )
         }
     }
 
     override suspend fun getStoredBrokersCount(): Int = withContext(dispatcherProvider.io()) {
         return@withContext brokerJsonDao.getAllBrokersCount()
-    }
-
-    override suspend fun getActiveBrokerJsons(): List<BrokerJson> = withContext(dispatcherProvider.io()) {
-        return@withContext brokerJsonDao.getAllActiveBrokers().map { BrokerJson(fileName = it.fileName, etag = it.etag) }
     }
 
     override suspend fun getAllBrokersForScan(): List<String> = withContext(dispatcherProvider.io()) {
