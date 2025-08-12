@@ -240,6 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Lösenord</string>
 
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importera lösenord</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lösenord har importerats från Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lösenord har importerats från CSV-fil</string>
 
@@ -249,6 +250,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronisera lösenord för dator</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronisera lösenord för dator</string>
 
+    <string name="importPasswordsChooseMethodDialogTitle">Importera lösenord från Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importera från Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Välj en CSV-fil</string>

@@ -240,6 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Paroolid</string>
 
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Impordi paroolid</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parooli imporditi Google\'ist</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d parooli imporditi CSV-st</string>
 
@@ -249,6 +250,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Töölaua paroolide sünkroonimine</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Töölaua paroolide sünkroonimine</string>
 
+    <string name="importPasswordsChooseMethodDialogTitle">Impordi paroolid Google\'ist</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Impordi Google\'ist</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Vali CSV-fail</string>

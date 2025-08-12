@@ -252,6 +252,7 @@
 
     <string name="newTabPageShortcutPasswords">Lozinke</string>
 
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Uvezi lozinke</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lozinki uvezeno s Googlea</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d lozinki uvezeno iz CSV-a</string>
 
@@ -261,6 +262,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinkroniziraj lozinke za radnu površinu</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sinkroniziraj lozinke za radnu površinu</string>
 
+    <string name="importPasswordsChooseMethodDialogTitle">Uvezi lozinke s Googlea</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Uvezi s Googlea</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Odaberi CSV datoteku</string>

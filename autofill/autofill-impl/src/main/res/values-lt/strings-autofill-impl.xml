@@ -252,6 +252,7 @@
 
     <string name="newTabPageShortcutPasswords">Slaptažodžiai</string>
 
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importuoti slaptažodžius</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d slaptažodžiai importuoti iš „Google“</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d slaptažodžiai importuoti iš CSV</string>
 
@@ -261,6 +262,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinchronizuoti darbalaukio slaptažodžius</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sinchronizuoti darbalaukio slaptažodžius</string>
 
+    <string name="importPasswordsChooseMethodDialogTitle">Importuok slaptažodžius iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">„Google“ gali paprašyti tavęs prisijungti arba įvesti slaptažodį patvirtinimui.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importuok iš „Google“</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Pasirink CSV failą</string>

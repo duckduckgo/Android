@@ -240,6 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Wachtwoorden</string>
 
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Wachtwoorden importeren</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d wachtwoorden geïmporteerd van Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d wachtwoorden geïmporteerd uit CSV-bestand</string>
 
@@ -249,6 +250,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Wachtwoorden bureaublad synchroniseren</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Wachtwoorden bureaublad synchroniseren</string>
 
+    <string name="importPasswordsChooseMethodDialogTitle">Wachtwoorden importeren van Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importeren van Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Kies een CSV-bestand</string>

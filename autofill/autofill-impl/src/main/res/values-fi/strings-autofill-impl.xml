@@ -240,6 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Salasanat</string>
 
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Tuo salasanat</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d Googlesta tuotua salasanaa</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d salasanaa tuotu CSV-tiedostosta</string>
 
@@ -249,6 +250,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Synkronoi työpöytäsalasanat</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Synkronoi työpöytäsalasanat</string>
 
+    <string name="importPasswordsChooseMethodDialogTitle">Tuo salasanat Googlesta</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Tuo Googlesta</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Valitse CSV-tiedosto</string>
