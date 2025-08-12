@@ -882,7 +882,6 @@ class CtaViewModelTest {
         whenever(mockSubscriptions.isEligible()).thenReturn(true)
         whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
         whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockOnboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()).thenReturn(false)
         whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
@@ -891,24 +890,6 @@ class CtaViewModelTest {
 
         val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
         assertTrue(value is DaxBubbleCta.DaxPrivacyProCta)
-    }
-
-    @Test
-    fun givenPrivacyProCtaExperimentWhenRefreshCtaOnHomeTabAndExperimentEnabledThenDoNotReturnPrivacyProCta() = runTest {
-        givenDaxOnboardingActive()
-        whenever(mockOnboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()).thenReturn(true)
-        whenever(mockOnboardingHomeScreenWidgetExperiment.isOnboardingHomeScreenWidgetExperiment()).thenReturn(false)
-        whenever(mockExtendedOnboardingFeatureToggles.freeTrialCopy()).thenReturn(mockDisabledToggle)
-        whenever(mockSubscriptions.isEligible()).thenReturn(true)
-        whenever(mockExtendedOnboardingFeatureToggles.noBrowserCtas()).thenReturn(mockEnabledToggle)
-        whenever(mockExtendedOnboardingFeatureToggles.privacyProCta()).thenReturn(mockEnabledToggle)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO_VISIT_SITE)).thenReturn(true)
-        whenever(mockDismissedCtaDao.exists(CtaId.DAX_END)).thenReturn(true)
-        whenever(mockWidgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
-
-        val value = testee.refreshCta(coroutineRule.testDispatcher, isBrowserShowing = false, detectedRefreshPatterns = detectedRefreshPatterns)
-        assertFalse(value is DaxBubbleCta.DaxPrivacyProCta)
     }
 
     @Test
