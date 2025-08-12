@@ -21,26 +21,52 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.BufferedReader
 import javax.inject.Inject
+import javax.inject.Named
 
 interface ContentScopeJSReader {
+    /**
+     * Returns the content scope JavaScript as a String.
+     */
     fun getContentScopeJS(): String
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class RealContentScopeJSReader @Inject constructor() : ContentScopeJSReader {
+abstract class GenericContentScopeJSReader {
+    abstract val fileName: String
+
     private lateinit var contentScopeJS: String
 
-    override fun getContentScopeJS(): String {
+    protected fun getContentScopeJSFile(): String {
         if (!this::contentScopeJS.isInitialized) {
-            contentScopeJS = loadJs("contentScope.js")
+            contentScopeJS = readResource(fileName).use { it?.readText() }.orEmpty()
         }
         return contentScopeJS
     }
 
-    fun loadJs(resourceName: String): String = readResource(resourceName).use { it?.readText() }.orEmpty()
-
     private fun readResource(resourceName: String): BufferedReader? {
         return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
+    }
+}
+
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = ContentScopeJSReader::class)
+@Named("contentScope")
+class RealContentScopeJSReader @Inject constructor() : GenericContentScopeJSReader(), ContentScopeJSReader {
+    override val fileName: String
+        get() = "contentScope.js"
+
+    override fun getContentScopeJS(): String {
+        return getContentScopeJSFile()
+    }
+}
+
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, boundType = ContentScopeJSReader::class)
+@Named("adsJS")
+class AdsContentScopeJSReader @Inject constructor() : GenericContentScopeJSReader(), ContentScopeJSReader {
+    override val fileName: String
+        get() = "adsjsContentScope.js"
+
+    override fun getContentScopeJS(): String {
+        return getContentScopeJSFile()
     }
 }

@@ -298,6 +298,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.js.messaging.api.NewJsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.R as CommonR
@@ -510,6 +511,10 @@ class BrowserTabFragment :
     @Inject
     @Named("DuckPlayer")
     lateinit var duckPlayerScripts: JsMessaging
+
+    @Inject
+    @Named("AdsJsContentScopeScripts")
+    lateinit var adsJsContentScopeScripts: NewJsMessaging
 
     @Inject
     lateinit var webContentDebugging: WebContentDebugging
@@ -3006,7 +3011,24 @@ class BrowserTabFragment :
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
-            webViewClient.triggerJSInit(it)
+            lifecycleScope.launch(dispatchers.main()) {
+                webViewClient.triggerJSInit(it)
+                adsJsContentScopeScripts.register(
+                    it,
+                    object : JsMessageCallback() {
+                        override fun process(
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                        ) {
+                            viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                                it.url
+                            }
+                        }
+                    },
+                )
+            }
 
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()

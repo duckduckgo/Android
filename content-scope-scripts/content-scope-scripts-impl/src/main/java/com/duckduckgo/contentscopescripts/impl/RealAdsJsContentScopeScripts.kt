@@ -30,16 +30,14 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
 import dagger.SingleInstanceIn
-import java.io.BufferedReader
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
 
-interface CoreContentScopeScripts {
+interface AdsJsContentScopeScripts {
     fun getScript(
-        isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String
 
@@ -52,15 +50,15 @@ interface CoreContentScopeScripts {
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
-class RealContentScopeScripts @Inject constructor(
+class RealAdsJsContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val userAllowListRepository: UserAllowListRepository,
-    @Named("contentScope") private val contentScopeJSReader: ContentScopeJSReader,
+    @Named("adsJS") private val adsContentScopeJSReader: ContentScopeJSReader,
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
-) : CoreContentScopeScripts {
+) : AdsJsContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
 
@@ -72,14 +70,13 @@ class RealContentScopeScripts @Inject constructor(
     private var cachedUnprotectTemporaryExceptions = CopyOnWriteArrayList<FeatureException>()
     private var cachedUnprotectTemporaryExceptionsJson: String = emptyJsonList
 
-    private lateinit var cachedContentScopeJS: String
+    private lateinit var cachedAdsJS: String
 
     override val secret: String = getSecret()
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
 
     override fun getScript(
-        isDesktopMode: Boolean?,
         activeExperiments: List<Toggle>,
     ): String {
         var updateJS = false
@@ -102,16 +99,16 @@ class RealContentScopeScripts @Inject constructor(
             updateJS = true
         }
 
-        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, isDesktopMode, activeExperiments)
+        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, activeExperiments = activeExperiments)
         if (cachedUserPreferencesJson != userPreferencesJson) {
             cachedUserPreferencesJson = userPreferencesJson
             updateJS = true
         }
 
-        if (!this::cachedContentScopeJS.isInitialized || updateJS) {
-            cacheContentScopeJS()
+        if (!this::cachedAdsJS.isInitialized || updateJS) {
+            cacheJs()
         }
-        return cachedContentScopeJS
+        return cachedAdsJS
     }
 
     override fun isEnabled(): Boolean {
@@ -162,18 +159,14 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 
-    private fun cacheContentScopeJS() {
-        val contentScopeJS = contentScopeJSReader.getContentScopeJS()
+    private fun cacheJs() {
+        val adsContentScopeJs = adsContentScopeJSReader.getContentScopeJS()
 
-        cachedContentScopeJS = contentScopeJS
+        cachedAdsJS = adsContentScopeJs
             .replace(contentScope, cachedContentScopeJson)
             .replace(userUnprotectedDomains, cachedUserUnprotectedDomainsJson)
             .replace(userPreferences, cachedUserPreferencesJson)
             .replace(messagingParameters, "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}")
-    }
-
-    private fun readResource(resourceName: String): BufferedReader? {
-        return javaClass.classLoader?.getResource(resourceName)?.openStream()?.bufferedReader()
     }
 
     private fun getUserUnprotectedDomainsJson(userUnprotectedDomains: List<String>): String {
@@ -192,7 +185,7 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getUserPreferencesJson(
         userPreferences: String,
-        isDesktopMode: Boolean?,
+        isDesktopMode: Boolean? = null,
         activeExperiments: List<Toggle>,
     ): String {
         val experiments = getExperimentsKeyValuePair(activeExperiments)
@@ -245,14 +238,3 @@ class RealContentScopeScripts @Inject constructor(
         }
     }
 }
-
-data class PluginParameters(
-    val config: String,
-    val preferences: String,
-)
-
-data class Experiment(
-    val feature: String,
-    val subfeature: String,
-    val cohort: String?,
-)
