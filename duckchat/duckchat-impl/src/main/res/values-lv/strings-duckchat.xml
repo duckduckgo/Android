@@ -61,7 +61,6 @@
     <string name="duck_chat_title_rebranding">Mākslīgā intelekta funkcijas</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Tērzē anonīmi ar populāriem trešo personu MI tērzēšanas modeļiem</string>
     <string name="duck_chat_assist_settings_title_rebranding">Meklēšanas Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description_rebranding">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
 </resources>

@@ -61,7 +61,6 @@
     <string name="duck_chat_title_rebranding">Функции с изкуствен интелект</string>
     <string name="duck_chat_settings_activity_description_rebranding">Функциите на DuckDuckGo AI са поверителни и незадължителни.Вашите данни не се използват за обучение на AI.\n<annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Анонимен чат с популярни AI модели на трети страни</string>
     <string name="duck_chat_assist_settings_title_rebranding">Настройки за Assist при търсене</string>
     <string name="duck_chat_assist_settings_description_rebranding">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
 </resources>

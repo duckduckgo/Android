@@ -71,12 +71,6 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/divider"/>
 
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/duckAiUserPrefsHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_title" />
-
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/userEnabledDuckChatToggle"
                 android:layout_width="match_parent"
@@ -103,10 +97,16 @@
                 app:primaryText="@string/duck_ai_shortcut_settings_title"
                 app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/dividerInputScreenToggles"/>
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/duckAiInputScreenToggleContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
                 android:layout_marginHorizontal="@dimen/keyline_4">
 
                 <LinearLayout

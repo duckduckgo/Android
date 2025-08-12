@@ -61,7 +61,6 @@
     <string name="duck_chat_title_rebranding">Функции ИИ</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI — дополнительный конфиденциальный сервис.\nВаши данные не применяются для обучения ИИ.\n<annotation type="learn_more_link">Подробнее...</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Анонимные чаты с популярными сторонними ИИ-моделями</string>
     <string name="duck_chat_assist_settings_title_rebranding">Настройки Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Выберите, как часто вы хотите видеть ответы от ИИ в результатах поиска.</string>
 </resources>
