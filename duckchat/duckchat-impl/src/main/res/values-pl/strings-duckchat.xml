@@ -49,7 +49,6 @@
     <string name="input_screen_search_hint">Wyszukaj lub wprowadź adres</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Zapytaj Duck.ai</string>
-    <string name="input_screen_user_pref_title">Eksperymentalny Pasek Adresu</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

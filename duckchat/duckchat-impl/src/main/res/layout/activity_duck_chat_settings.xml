@@ -71,6 +71,12 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/divider"/>
 
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/duckAiUserPrefsHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duck_chat_title" />
+
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/userEnabledDuckChatToggle"
                 android:layout_width="match_parent"
@@ -96,13 +102,6 @@
                 android:visibility="gone"
                 app:primaryText="@string/duck_ai_shortcut_settings_title"
                 app:secondaryText="@string/duck_ai_shortcut_settings_description" />
-
-            <!--TODO add beta pill-->
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/duckAiInputScreenHeader"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/input_screen_user_pref_title" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/duckAiInputScreenToggleContainer"

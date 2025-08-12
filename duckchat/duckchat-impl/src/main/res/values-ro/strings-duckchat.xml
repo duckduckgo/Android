@@ -49,7 +49,6 @@
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Întreabă Duck.ai</string>
-    <string name="input_screen_user_pref_title">Bară de adrese experimentală</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

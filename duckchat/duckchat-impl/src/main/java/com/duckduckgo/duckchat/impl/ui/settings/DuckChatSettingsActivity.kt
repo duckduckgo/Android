@@ -96,6 +96,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         if (viewState.isRebrandingAiFeaturesEnabled) {
+            binding.duckAiUserPrefsHeader.show()
             binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_ai_128))
             binding.userEnabledDuckChatToggleRebranding.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title_rebranding)
@@ -104,6 +105,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
         } else {
+            binding.duckAiUserPrefsHeader.gone()
             binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.chat_private_128))
             binding.userEnabledDuckChatToggle.quietlySetIsChecked(viewState.isDuckChatUserEnabled, userEnabledDuckChatToggleListener)
             binding.duckChatSettingsTitle.setText(R.string.duck_chat_title)
@@ -128,7 +130,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.duckAiInputScreenHeader.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {
