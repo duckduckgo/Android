@@ -88,7 +88,7 @@ interface Site {
 
     var activeContentScopeExperiments: List<Toggle>?
 
-    var debugFlags: List<String>?
+    var debugFlags: Set<String>?
 }
 
 enum class MaliciousSiteStatus {

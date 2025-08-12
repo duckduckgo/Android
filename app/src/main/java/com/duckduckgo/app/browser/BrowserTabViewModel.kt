@@ -3663,7 +3663,7 @@ class BrowserTabViewModel @Inject constructor(
             }
 
             "addDebugFlag" -> {
-                site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
+                site?.debugFlags = (site?.debugFlags ?: setOf()).plus(featureName)
             }
 
             else -> {

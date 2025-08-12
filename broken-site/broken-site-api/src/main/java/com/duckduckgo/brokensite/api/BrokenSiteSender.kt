@@ -42,7 +42,7 @@ data class BrokenSite(
     val openerContext: String?,
     val jsPerformance: List<Double>?,
     val contentScopeExperiments: List<Toggle>?,
-    val debugFlags: List<String>?,
+    val debugFlags: Set<String>?,
 ) {
     companion object {
         const val SITE_TYPE_DESKTOP = "desktop"
