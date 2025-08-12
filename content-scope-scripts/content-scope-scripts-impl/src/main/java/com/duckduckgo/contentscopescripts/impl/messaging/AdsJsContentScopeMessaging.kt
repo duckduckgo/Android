@@ -21,7 +21,6 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.NewContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.contentscopescripts.impl.CoreContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -37,7 +36,6 @@ import logcat.logcat
 @ContributesBinding(ActivityScope::class)
 @Named("AdsJsContentScopeScripts")
 class AdsJsContentScopeMessaging @Inject constructor(
-    coreContentScopeScripts: CoreContentScopeScripts,
     private val handlers: PluginPoint<NewContentScopeJsMessageHandlersPlugin>,
 ) : NewJsMessaging {
 
@@ -46,8 +44,6 @@ class AdsJsContentScopeMessaging @Inject constructor(
     private lateinit var webView: WebView
 
     override val context: String = "contentScopeScripts"
-    override val callbackName: String = coreContentScopeScripts.callbackName
-    override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: Set<String> = setOf("*")
 
     private fun process(message: String, jsMessageCallback: JsMessageCallback) {
@@ -69,7 +65,7 @@ class AdsJsContentScopeMessaging @Inject constructor(
 
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, secret, jsMessageCallback)
+                    }?.process(jsMessage, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {

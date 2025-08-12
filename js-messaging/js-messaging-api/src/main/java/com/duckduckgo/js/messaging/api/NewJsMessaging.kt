@@ -31,16 +31,6 @@ interface NewJsMessaging {
     val context: String
 
     /**
-     * Name of the JS callback
-     */
-    val callbackName: String
-
-    /**
-     * Secret to use in the JS code
-     */
-    val secret: String
-
-    /**
      * List of domains where the interface can be added
      */
     val allowedDomains: Set<String>
@@ -51,7 +41,7 @@ interface NewJsMessageHandler {
      * This method processes a [JsMessage] and can return a JsRequestResponse to reply to the message if needed
      * @return `JsRequestResponse` or `null`
      */
-    fun process(jsMessage: JsMessage, secret: String, jsMessageCallback: JsMessageCallback?)
+    fun process(jsMessage: JsMessage, jsMessageCallback: JsMessageCallback?)
 
     /**
      * Name of the feature
