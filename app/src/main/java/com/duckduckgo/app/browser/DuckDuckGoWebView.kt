@@ -430,25 +430,42 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
     suspend fun safeAddWebMessageListener(
-        webViewCapabilityChecker: WebViewCapabilityChecker,
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
-    ): Boolean = runCatching {
-        if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
-            WebViewCompat.addWebMessageListener(
-                this,
-                jsObjectName,
-                allowedOriginRules,
-                listener,
-            )
-            true
-        } else {
-            false
+    ) = runCatching {
+        if (!isDestroyed) {
+            if (::dispatcherProvider.isInitialized) {
+                withContext(dispatcherProvider.main()) {
+                    WebViewCompat.addWebMessageListener(
+                        this@DuckDuckGoWebView,
+                        jsObjectName,
+                        allowedOriginRules,
+                        listener,
+                    )
+                }
+            }
         }
     }.getOrElse { exception ->
         logcat(ERROR) { "Error adding WebMessageListener: $jsObjectName: ${exception.asLog()}" }
-        false
+    }
+
+    @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
+    suspend fun safeRemoveWebMessageListener(
+        jsObjectName: String,
+    ) = runCatching {
+        if (!isDestroyed) {
+            if (::dispatcherProvider.isInitialized) {
+                withContext(dispatcherProvider.main()) {
+                    WebViewCompat.removeWebMessageListener(
+                        this@DuckDuckGoWebView,
+                        jsObjectName,
+                    )
+                }
+            }
+        }
+    }.getOrElse { exception ->
+        logcat(ERROR) { "Error removing WebMessageListener: $jsObjectName: ${exception.asLog()}" }
     }
 
     @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")

@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
@@ -62,5 +63,21 @@ class RealWebViewCompatWrapper @Inject constructor(
             logcat(ERROR) { "Error calling addDocumentStartJavaScript: ${e.asLog()}" }
             null
         }
+    }
+
+    override fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
+        WebViewCompat.removeWebMessageListener(
+            webView,
+            jsObjectName,
+        )
+    }
+
+    override fun addWebMessageListener(
+        webView: WebView,
+        jsObjectName: String,
+        allowedOriginRules: Set<String>,
+        listener: WebViewCompat.WebMessageListener,
+    ) {
+        return WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
     }
 }

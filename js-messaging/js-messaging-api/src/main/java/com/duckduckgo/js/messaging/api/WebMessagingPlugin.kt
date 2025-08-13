@@ -14,29 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.browser.api.webviewcompat
+package com.duckduckgo.js.messaging.api
 
-import android.webkit.WebView
-import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat.WebMessageListener
 
-interface WebViewCompatWrapper {
-
-    suspend fun addDocumentStartJavaScript(
-        webView: WebView,
-        script: String,
-        allowedOriginRules: Set<String>,
-    ): ScriptHandler?
-
-    fun removeWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
+interface WebMessagingPlugin {
+    suspend fun register(
+        jsMessageCallback: JsMessageCallback?,
+        registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
     )
 
-    fun addWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
-        allowedOriginRules: Set<String>,
-        listener: WebMessageListener,
+    suspend fun unregister(
+        unregisterer: suspend (objectName: String) -> Boolean,
     )
 }

@@ -80,6 +80,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -128,6 +130,7 @@ class BrowserWebViewClient @Inject constructor(
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
+    private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -465,9 +468,18 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
-    fun configureWebView(webView: DuckDuckGoWebView) {
+    fun configureWebView(webView: DuckDuckGoWebView, callback: JsMessageCallback) {
         addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
             plugin.addDocumentStartJavaScript(webView)
+        }
+        webMessagingPlugins.getPlugins().forEach { plugin ->
+            plugin.register(callback) { objectName, allowedOriginRules, webMessageListener ->
+                webView.safeAddWebMessageListener(
+                    objectName,
+                    allowedOriginRules,
+                    webMessageListener,
+                )
+            }
         }
     }
 
@@ -747,6 +759,14 @@ class BrowserWebViewClient @Inject constructor(
 
     fun addExemptedMaliciousSite(url: Uri, feed: Feed) {
         requestInterceptor.addExemptedMaliciousSite(url, feed)
+    }
+
+    suspend fun destroy(webView: DuckDuckGoWebView) {
+        webMessagingPlugins.getPlugins().forEach { plugin ->
+            plugin.unregister { objectName ->
+                webView.safeRemoveWebMessageListener(objectName)
+            }
+        }
     }
 }
 

@@ -3012,7 +3012,24 @@ class BrowserTabFragment :
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
-            webViewClient.configureWebView(it)
+            lifecycleScope.launch(dispatchers.main()) {
+                webViewClient.configureWebView(
+                    it,
+                    object : JsMessageCallback() {
+                        override fun process(
+                            featureName: String,
+                            method: String,
+                            id: String?,
+                            data: JSONObject?,
+                        ) {
+                            viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
+                                it.url
+                            }
+                        }
+                    },
+                )
+            }
+
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
 
@@ -3845,8 +3862,13 @@ class BrowserTabFragment :
 
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
-        webView?.destroy()
-        webView = null
+        appCoroutineScope.launch(dispatchers.main()) {
+            webView?.let {
+                webViewClient.destroy(it)
+                it.destroy()
+            }
+            webView = null
+        }
     }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {
