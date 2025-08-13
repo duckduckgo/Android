@@ -261,41 +261,21 @@ class RealDuckChat @Inject constructor(
     }
 
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {
-        if (enabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
-        }
         duckChatFeatureRepository.setDuckChatUserEnabled(enabled)
         cacheUserSettings()
     }
 
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
-        if (enabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
-        }
         duckChatFeatureRepository.setInputScreenUserSetting(enabled)
         cacheUserSettings()
     }
 
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        if (showDuckChat) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
-        }
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
         cacheUserSettings()
     }
 
     override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        if (showDuckChat) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
-        }
         duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
         cacheUserSettings()
     }

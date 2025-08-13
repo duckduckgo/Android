@@ -83,24 +83,44 @@ class DuckChatSettingsViewModel @Inject constructor(
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
         viewModelScope.launch {
+            if (checked) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+            }
             duckChat.setEnableDuckChatUserSetting(checked)
         }
     }
 
     fun onDuckAiInputScreenToggled(checked: Boolean) {
         viewModelScope.launch {
+            if (checked) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
+            }
             duckChat.setInputScreenUserSetting(checked)
         }
     }
 
     fun onShowDuckChatInMenuToggled(checked: Boolean) {
         viewModelScope.launch {
+            if (checked) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
+            }
             duckChat.setShowInBrowserMenuUserSetting(checked)
         }
     }
 
     fun onShowDuckChatInAddressBarToggled(checked: Boolean) {
         viewModelScope.launch {
+            if (checked) {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
+            } else {
+                pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
+            }
             duckChat.setShowInAddressBarUserSetting(checked)
         }
     }
