@@ -412,6 +412,10 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
     }
 
+    fun isDestroyed(): Boolean {
+        return isDestroyed
+    }
+
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
     suspend fun safeAddWebMessageListener(
         webViewCapabilityChecker: WebViewCapabilityChecker,
