@@ -265,6 +265,7 @@ internal class RealPirRepository(
                     version = broker.version,
                     parent = broker.parent,
                     addedDatetime = broker.addedDatetime,
+                    removedAt = broker.removedAt ?: 0L,
                 ),
                 brokerScan = BrokerScan(
                     brokerName = broker.name,

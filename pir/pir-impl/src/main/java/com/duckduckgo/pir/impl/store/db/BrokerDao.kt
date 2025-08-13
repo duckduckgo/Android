@@ -27,7 +27,7 @@ interface BrokerDao {
     @Query("SELECT * from pir_broker_details where name = :brokerName")
     fun getBrokerDetails(brokerName: String): Broker?
 
-    @Query("SELECT * FROM pir_broker_details WHERE removedAt IS NULL")
+    @Query("SELECT * FROM pir_broker_details WHERE removedAt = 0")
     fun getAllActiveBrokers(): List<Broker>
 
     @Query("SELECT stepsJson from pir_broker_scan where brokerName = :brokerName")

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "a43290a07862abf1864d793568f51bc2",
+    "identityHash": "88e84039df8a6d1531d4df265f380691",
     "entities": [
       {
         "tableName": "pir_broker_json_etag",
@@ -32,7 +32,7 @@
       },
       {
         "tableName": "pir_broker_details",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `url` TEXT NOT NULL, `version` TEXT NOT NULL, `parent` TEXT, `addedDatetime` INTEGER NOT NULL, `removedAt` INTEGER, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `url` TEXT NOT NULL, `version` TEXT NOT NULL, `parent` TEXT, `addedDatetime` INTEGER NOT NULL, `removedAt` INTEGER NOT NULL, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -74,7 +74,7 @@
             "fieldPath": "removedAt",
             "columnName": "removedAt",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -742,7 +742,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a43290a07862abf1864d793568f51bc2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '88e84039df8a6d1531d4df265f380691')"
     ]
   }
 }

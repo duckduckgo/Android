@@ -34,7 +34,7 @@ data class Broker(
     val version: String,
     val parent: String?,
     val addedDatetime: Long,
-    val removedAt: Long? = null,
+    val removedAt: Long,
 )
 
 @Entity(
