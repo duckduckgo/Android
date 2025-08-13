@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.internal.brokers
+package com.duckduckgo.pir.impl.brokers
 
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.pir.internal.service.DbpService
-import com.duckduckgo.pir.internal.service.DbpService.PirBrokerEtags
-import com.duckduckgo.pir.internal.service.DbpService.PirMainConfig
-import com.duckduckgo.pir.internal.store.PirRepository
-import com.duckduckgo.pir.internal.store.PirRepository.BrokerJson
+import com.duckduckgo.pir.impl.service.DbpService
+import com.duckduckgo.pir.impl.service.DbpService.PirBrokerEtags
+import com.duckduckgo.pir.impl.service.DbpService.PirMainConfig
+import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertFalse
