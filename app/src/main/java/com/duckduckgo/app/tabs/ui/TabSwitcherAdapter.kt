@@ -19,8 +19,10 @@ package com.duckduckgo.app.tabs.ui
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.TouchDelegate
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -67,17 +69,18 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Comp
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.ANIMATED_TILE_NO_REPLACE_ALPHA
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.swap
-import com.duckduckgo.mobile.android.R as AndroidR
-import com.duckduckgo.mobile.android.R as CommonR
-import java.io.File
-import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.io.File
+import java.security.MessageDigest
+import com.duckduckgo.mobile.android.R as AndroidR
+import com.duckduckgo.mobile.android.R as CommonR
 
 class TabSwitcherAdapter(
     private val isVisualExperimentEnabled: Boolean,
@@ -108,9 +111,11 @@ class TabSwitcherAdapter(
             GRID_TAB -> {
                 if (isVisualExperimentEnabled) {
                     val binding = ItemTabGridNewBinding.inflate(inflater, parent, false)
+                    addExtraCloseButtonTouchArea(binding.close)
                     TabSwitcherViewHolder.GridTabViewHolder(binding)
                 } else {
                     val binding = ItemTabGridBinding.inflate(inflater, parent, false)
+                    addExtraCloseButtonTouchArea(binding.close)
                     TabSwitcherViewHolder.GridTabViewHolder(binding)
                 }
             }
@@ -486,6 +491,8 @@ class TabSwitcherAdapter(
             const val GRID_TAB = 0
             const val LIST_TAB = 1
             const val TRACKER_ANIMATION_TILE_INFO_PANEL = 2
+
+            const val EXTRA_CLOSE_BUTTON_TOUCH_AREA = 6 // dp
         }
 
         interface TabViewHolder {
@@ -562,5 +569,19 @@ class TabSwitcherAdapter(
         data class TrackerAnimationInfoPanelViewHolder(
             val binding: ItemTabSwitcherAnimationInfoPanelBinding,
         ) : TabSwitcherViewHolder(binding.root)
+    }
+}
+
+private fun addExtraCloseButtonTouchArea(closeButton: ImageView) {
+    val parent = closeButton.parent as View
+    parent.post {
+        val extraSpace = TabSwitcherAdapter.TabSwitcherViewHolder.Companion.EXTRA_CLOSE_BUTTON_TOUCH_AREA.toPx()
+        val touchableArea = Rect()
+        closeButton.getHitRect(touchableArea)
+        touchableArea.top -= extraSpace
+        touchableArea.bottom += extraSpace
+        touchableArea.left -= extraSpace
+        touchableArea.right += extraSpace
+        parent.touchDelegate = TouchDelegate(touchableArea, closeButton)
     }
 }

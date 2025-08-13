@@ -59,7 +59,7 @@
             android:contentDescription="@string/closeContentDescription"
             android:layout_marginTop="2dp"
             android:padding="8dp"
-            android:src="@drawable/ic_close_solid_16"
+            android:src="@drawable/ic_close_16"
             android:background="@drawable/selectable_circular_ripple"
             app:tint="?attr/daxColorTabHighlight"
             app:layout_constraintEnd_toEndOf="parent"
