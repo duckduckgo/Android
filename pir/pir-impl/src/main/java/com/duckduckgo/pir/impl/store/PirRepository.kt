@@ -57,13 +57,13 @@ interface PirRepository {
 
     suspend fun updateMainEtag(etag: String?)
 
-    suspend fun updateBrokerJsons(brokers: Map<BrokerJson, Boolean>)
+    suspend fun updateBrokerJsons(brokers: List<BrokerJson>)
 
-    suspend fun getAllLocalBrokerJsons(): Map<BrokerJson, Boolean>
+    suspend fun getAllLocalBrokerJsons(): List<BrokerJson>
 
     suspend fun getStoredBrokersCount(): Int
 
-    suspend fun getActiveBrokerJsons(): List<BrokerJson>
+    suspend fun getAllActiveBrokers(): List<String>
 
     suspend fun getAllBrokersForScan(): List<String>
 
@@ -208,44 +208,49 @@ internal class RealPirRepository(
         pirDataStore.mainConfigEtag = etag
     }
 
-    override suspend fun updateBrokerJsons(brokers: Map<BrokerJson, Boolean>) {
+    override suspend fun updateBrokerJsons(brokers: List<BrokerJson>) {
         withContext(dispatcherProvider.io()) {
             brokers.map {
                 BrokerJsonEtag(
-                    fileName = it.key.fileName,
-                    etag = it.key.etag,
-                    isActive = it.value,
+                    fileName = it.fileName,
+                    etag = it.etag,
                 )
             }.also {
-                brokerJsonDao.upsertAll(it)
+                brokerJsonDao.insertBrokerJsonEtags(it)
             }
         }
     }
 
-    override suspend fun getAllLocalBrokerJsons(): Map<BrokerJson, Boolean> = withContext(dispatcherProvider.io()) {
-        return@withContext brokerJsonDao.getAllBrokers().associate {
-            BrokerJson(
-                fileName = it.fileName,
-                etag = it.etag,
-            ) to it.isActive
+    override suspend fun getAllLocalBrokerJsons(): List<BrokerJson> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerJsonDao.getAllBrokers().map {
+                BrokerJson(
+                    fileName = it.fileName,
+                    etag = it.etag,
+                )
+            }
         }
-    }
 
     override suspend fun getStoredBrokersCount(): Int = withContext(dispatcherProvider.io()) {
         return@withContext brokerJsonDao.getAllBrokersCount()
     }
 
-    override suspend fun getActiveBrokerJsons(): List<BrokerJson> = withContext(dispatcherProvider.io()) {
-        return@withContext brokerJsonDao.getAllActiveBrokers().map { BrokerJson(fileName = it.fileName, etag = it.etag) }
-    }
+    override suspend fun getAllActiveBrokers(): List<String> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getAllActiveBrokers().map {
+                it.name
+            }
+        }
 
-    override suspend fun getAllBrokersForScan(): List<String> = withContext(dispatcherProvider.io()) {
-        return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
-    }
+    override suspend fun getAllBrokersForScan(): List<String> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
+        }
 
-    override suspend fun getEtagForFilename(fileName: String): String = withContext(dispatcherProvider.io()) {
-        return@withContext brokerJsonDao.getEtag(fileName)
-    }
+    override suspend fun getEtagForFilename(fileName: String): String =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerJsonDao.getEtag(fileName)
+        }
 
     override suspend fun updateBrokerData(
         fileName: String,
@@ -260,6 +265,7 @@ internal class RealPirRepository(
                     version = broker.version,
                     parent = broker.parent,
                     addedDatetime = broker.addedDatetime,
+                    removedAt = broker.removedAt ?: 0L,
                 ),
                 brokerScan = BrokerScan(
                     brokerName = broker.name,
@@ -281,51 +287,57 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun getBrokerSchedulingConfig(brokerName: String): BrokerSchedulingConfig? = withContext(dispatcherProvider.io()) {
-        return@withContext brokerDao.getSchedulingConfig(brokerName)?.run {
-            BrokerSchedulingConfig(
-                brokerName = this.brokerName,
-                retryErrorInMillis = TimeUnit.HOURS.toMillis(this.retryError.toLong()),
-                confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(this.confirmOptOutScan.toLong()),
-                maintenanceScanInMillis = TimeUnit.HOURS.toMillis(this.maintenanceScan.toLong()),
-                maxAttempts = this.maxAttempts ?: -1,
-            )
-        }
-    }
-
-    override suspend fun getAllBrokerSchedulingConfigs(): List<BrokerSchedulingConfig> = withContext(dispatcherProvider.io()) {
-        return@withContext brokerDao.getAllSchedulingConfigs().map {
-            BrokerSchedulingConfig(
-                brokerName = it.brokerName,
-                retryErrorInMillis = TimeUnit.HOURS.toMillis(it.retryError.toLong()),
-                confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(it.confirmOptOutScan.toLong()),
-                maintenanceScanInMillis = TimeUnit.HOURS.toMillis(it.maintenanceScan.toLong()),
-                maxAttempts = it.maxAttempts ?: -1,
-            )
-        }
-    }
-
-    override suspend fun getBrokerScanSteps(name: String): String? = withContext(dispatcherProvider.io()) {
-        brokerDao.getScanJson(name)
-    }
-
-    override suspend fun getBrokerOptOutSteps(name: String): String? = withContext(dispatcherProvider.io()) {
-        brokerDao.getOptOutJson(name)
-    }
-
-    override suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String> = withContext(dispatcherProvider.io()) {
-        scanResultsDao.getAllExtractedProfiles().map {
-            it.brokerName
-        }.distinct().run {
-            if (formOptOutOnly) {
-                this.filter {
-                    brokerDao.getOptOutJson(it)?.contains("\"optOutType\":\"formOptOut\"") == true
-                }
-            } else {
-                this
+    override suspend fun getBrokerSchedulingConfig(brokerName: String): BrokerSchedulingConfig? =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getSchedulingConfig(brokerName)?.run {
+                BrokerSchedulingConfig(
+                    brokerName = this.brokerName,
+                    retryErrorInMillis = TimeUnit.HOURS.toMillis(this.retryError.toLong()),
+                    confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(this.confirmOptOutScan.toLong()),
+                    maintenanceScanInMillis = TimeUnit.HOURS.toMillis(this.maintenanceScan.toLong()),
+                    maxAttempts = this.maxAttempts ?: -1,
+                )
             }
         }
-    }
+
+    override suspend fun getAllBrokerSchedulingConfigs(): List<BrokerSchedulingConfig> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getAllSchedulingConfigs().map {
+                BrokerSchedulingConfig(
+                    brokerName = it.brokerName,
+                    retryErrorInMillis = TimeUnit.HOURS.toMillis(it.retryError.toLong()),
+                    confirmOptOutScanInMillis = TimeUnit.HOURS.toMillis(it.confirmOptOutScan.toLong()),
+                    maintenanceScanInMillis = TimeUnit.HOURS.toMillis(it.maintenanceScan.toLong()),
+                    maxAttempts = it.maxAttempts ?: -1,
+                )
+            }
+        }
+
+    override suspend fun getBrokerScanSteps(name: String): String? =
+        withContext(dispatcherProvider.io()) {
+            brokerDao.getScanJson(name)
+        }
+
+    override suspend fun getBrokerOptOutSteps(name: String): String? =
+        withContext(dispatcherProvider.io()) {
+            brokerDao.getOptOutJson(name)
+        }
+
+    override suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String> =
+        withContext(dispatcherProvider.io()) {
+            scanResultsDao.getAllExtractedProfiles().map {
+                it.brokerName
+            }.distinct().run {
+                if (formOptOutOnly) {
+                    this.filter {
+                        brokerDao.getOptOutJson(it)
+                            ?.contains("\"optOutType\":\"formOptOut\"") == true
+                    }
+                } else {
+                    this
+                }
+            }
+        }
 
     override suspend fun saveNewExtractedProfiles(
         extractedProfiles: List<ExtractedProfile>,
@@ -343,7 +355,10 @@ internal class RealPirRepository(
         brokerName: String,
         profileQueryId: Long,
     ): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
-        return@withContext scanResultsDao.getExtractedProfilesForBrokerAndProfile(brokerName, profileQueryId).map {
+        return@withContext scanResultsDao.getExtractedProfilesForBrokerAndProfile(
+            brokerName,
+            profileQueryId,
+        ).map {
             it.toExtractedProfile()
         }
     }
@@ -356,11 +371,12 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun getAllExtractedProfiles(): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
-        return@withContext scanResultsDao.getAllExtractedProfiles().map {
-            it.toExtractedProfile()
+    override suspend fun getAllExtractedProfiles(): List<ExtractedProfile> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext scanResultsDao.getAllExtractedProfiles().map {
+                it.toExtractedProfile()
+            }
         }
-    }
 
     override suspend fun deleteAllScanResults() {
         withContext(dispatcherProvider.io()) {
@@ -369,17 +385,19 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun getUserProfileQueries(): List<ProfileQuery> = withContext(dispatcherProvider.io()) {
-        userProfileDao.getUserProfiles().map {
-            it.toProfileQuery()
+    override suspend fun getUserProfileQueries(): List<ProfileQuery> =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.getUserProfiles().map {
+                it.toProfileQuery()
+            }
         }
-    }
 
-    override suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery> = withContext(dispatcherProvider.io()) {
-        userProfileDao.getUserProfilesWithIds(ids).map {
-            it.toProfileQuery()
+    override suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery> =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.getUserProfilesWithIds(ids).map {
+                it.toProfileQuery()
+            }
         }
-    }
 
     override suspend fun deleteAllUserProfilesQueries() {
         withContext(dispatcherProvider.io()) {
@@ -447,15 +465,17 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun getEmailForBroker(dataBroker: String): String = withContext(dispatcherProvider.io()) {
-        return@withContext dbpService.getEmail(brokerDao.getBrokerDetails(dataBroker)!!.url).emailAddress
-    }
-
-    override suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?> = withContext(dispatcherProvider.io()) {
-        return@withContext dbpService.getEmailStatus(email).run {
-            this.status.toConfirmationStatus() to this.link
+    override suspend fun getEmailForBroker(dataBroker: String): String =
+        withContext(dispatcherProvider.io()) {
+            return@withContext dbpService.getEmail(brokerDao.getBrokerDetails(dataBroker)!!.url).emailAddress
         }
-    }
+
+    override suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext dbpService.getEmailStatus(email).run {
+                this.status.toConfirmationStatus() to this.link
+            }
+        }
 
     private fun String.toConfirmationStatus(): ConfirmationStatus {
         return when (this) {
