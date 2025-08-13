@@ -95,6 +95,7 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
         appWidgetId: Int,
         newOptions: Bundle?,
     ) {
+        // TODO ANA: Add Duck.ai entry point.
         val appWidgetOptions = appWidgetManager.getAppWidgetOptions(appWidgetId)
         var portraitWidth = appWidgetOptions.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH)
 
