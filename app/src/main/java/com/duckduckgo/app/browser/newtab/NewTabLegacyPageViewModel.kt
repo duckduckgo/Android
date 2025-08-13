@@ -127,7 +127,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
                                 newMessage = newMessage,
                                 favourites = snapshot.favourites,
                                 onboardingComplete = isHomeOnboardingComplete(),
-                                lowPriorityMessage = lowPriorityMessagingModel.getMessage(),
+                                lowPriorityMessage = if (!newMessage) lowPriorityMessagingModel.getMessage() else null,
                             ),
                         )
                     }
