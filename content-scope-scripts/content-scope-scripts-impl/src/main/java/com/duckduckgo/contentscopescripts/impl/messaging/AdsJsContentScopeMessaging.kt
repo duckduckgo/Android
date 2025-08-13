@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebViewCompat
@@ -80,6 +81,7 @@ class AdsJsContentScopeMessaging @Inject constructor(
     }
 
     // TODO: A/B this, don't register if the feature is not enabled
+    @SuppressLint("AddWebMessageListenerUsage") // safeAddWebMessageListener belongs to app module
     override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView

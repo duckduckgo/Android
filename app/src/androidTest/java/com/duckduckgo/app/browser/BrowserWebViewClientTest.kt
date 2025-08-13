@@ -1192,7 +1192,11 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
-        override fun onInit(webView: WebView) {
+
+        override fun onInit(
+            webView: WebView,
+            activeExperiments: List<Toggle>,
+        ) {
         }
 
         override fun onPageStarted(
@@ -1207,7 +1211,6 @@ class BrowserWebViewClientTest {
         override fun onPageFinished(
             webView: WebView,
             url: String?,
-            isDesktopMode: Boolean?,
             activeExperiments: List<Toggle>,
         ) {
             countFinished++
