@@ -18,7 +18,10 @@ package com.duckduckgo.duckchat.impl.ui
 
 import android.webkit.WebView
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -26,18 +29,21 @@ import org.mockito.kotlin.whenever
 
 class DuckChatWebViewClientTest {
 
+    @get:Rule
+    var coroutineRule = CoroutineTestRule()
+
     @Test
-    fun whenOnPageStartedCalledThenJsPluginOnPageStartedInvoked() {
+    fun whenOnPageStartedCalledThenJsPluginOnPageStartedInvoked() = runTest {
         val mockPlugin: JsInjectorPlugin = mock()
         val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
         whenever(pluginPoint.getPlugins()).thenReturn(listOf(mockPlugin))
 
-        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint, coroutineRule.testScope)
         val webView: WebView = mock()
         val url = "https://example.com"
 
         duckChatWebViewClient.onPageStarted(webView, url, null)
 
-        verify(mockPlugin).onPageStarted(webView, url, null, listOf())
+        verify(mockPlugin).onPageStarted(webView, url, null)
     }
 }
