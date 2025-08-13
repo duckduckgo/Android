@@ -39,6 +39,7 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.webkit.ScriptHandler
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -73,6 +74,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -111,6 +113,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+
+private val mockToggle: Toggle = mock()
 
 class BrowserWebViewClientTest {
 
@@ -158,6 +162,8 @@ class BrowserWebViewClientTest {
     private val openInNewTabFlow: MutableSharedFlow<OpenDuckPlayerInNewTab> = MutableSharedFlow()
     private val mockUriLoadedManager: UriLoadedManager = mock()
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
+    private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
     private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(
         mockDuckDuckGoUrlDetector,
         mockCustomHeaderGracePeriodChecker,
@@ -166,15 +172,13 @@ class BrowserWebViewClientTest {
         mock(),
     )
     private val mockDuckChat: DuckChat = mock()
-    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
 
     @UiThreadTest
     @Before
     fun setup() = runTest {
         webView = TestWebView(context)
         whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
-        val toggle: Toggle = mock()
-        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
+        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
         testee = BrowserWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
@@ -208,6 +212,7 @@ class BrowserWebViewClientTest {
             mockAndroidFeaturesHeaderPlugin,
             mockDuckChat,
             mockContentScopeExperiments,
+            fakeAddDocumentStartJavaScriptPlugins,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -227,11 +232,8 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() = runTest {
-        val toggle: Toggle = mock()
-        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
-
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).pageStarted(any(), eq(listOf(toggle)))
+        verify(listener).pageStarted(any(), eq(listOf(mockToggle)))
     }
 
     @UiThreadTest
@@ -331,6 +333,23 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(webView, EXAMPLE_URL)
         assertEquals(1, jsPlugins.plugin.countFinished)
         assertEquals(0, jsPlugins.plugin.countStarted)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedThenReturnActiveExperiments() {
+        val captor = argumentCaptor<List<Toggle>>()
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageStarted(any(), captor.capture())
+        assertTrue(captor.firstValue.contains(mockToggle))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenTriggerJsInitThenInjectJsCode() {
+        assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+        testee.configureWebView(DuckDuckGoWebView(context))
+        assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
     }
 
     @UiThreadTest
@@ -1203,7 +1222,11 @@ class BrowserWebViewClientTest {
             countStarted++
         }
 
-        override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        override fun onPageFinished(
+            webView: WebView,
+            url: String?,
+            site: Site?,
+        ) {
             countFinished++
         }
     }
@@ -1265,5 +1288,25 @@ class BrowserWebViewClientTest {
 
     companion object {
         const val EXAMPLE_URL = "https://example.com"
+    }
+
+    class FakeAddDocumentStartJavaScriptPlugin : AddDocumentStartJavaScriptPlugin {
+
+        var countInitted = 0
+            private set
+
+        override suspend fun configureAddDocumentStartJavaScript(
+            activeExperiments: List<Toggle>,
+            scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler?,
+        ) {
+            countInitted++
+        }
+    }
+
+    class FakeAddDocumentStartJavaScriptPluginPoint : PluginPoint<AddDocumentStartJavaScriptPlugin> {
+
+        val plugin = FakeAddDocumentStartJavaScriptPlugin()
+
+        override fun getPlugins() = listOf(plugin)
     }
 }
