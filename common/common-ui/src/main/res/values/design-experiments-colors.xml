@@ -22,9 +22,10 @@
 
     <!-- Dark Palette -->
     <!-- Backgrounds -->
-    <color name="background_background_dark">#27282A</color>
-    <color name="background_surface_dark">#333538</color>
-    <color name="background_window_dark">#404145</color>
+    <color name="background_background_dark">#282828</color>
+    <color name="background_surface_dark">#373737</color>
+    <color name="background_window_dark">#474747</color>
+    <color name="background_canvas_dark">#1F1F1F</color>
     <color name="background_container_dark">#404145</color>
 
     <!-- Text -->
@@ -51,6 +52,7 @@
     <color name="background_background_light">#F2F2F2</color>
     <color name="background_surface_light">#F9F9F9</color>
     <color name="background_window_light">#FFFFFF</color>
+    <color name="background_canvas_light">#FFFFFF</color>
     <color name="background_container_light">#FFFFFF</color>
 
     <!-- Text -->
