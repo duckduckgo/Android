@@ -34,8 +34,11 @@
         <item name="daxColorSecondaryIcon">@color/icon_secondary_dark</item>
         <item name="daxColorIconDisabled">@color/icon_tertiary_dark</item>
 
-        <!-- Lines-->
+        <!-- Lines -->
         <item name="daxColorLines">@color/lines_dark</item>
+
+        <!-- Tone -->
+        <item name="daxColorShade">@color/shade_dark</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
@@ -80,6 +83,9 @@
 
         <!-- Lines-->
         <item name="daxColorLines">@color/lines_light</item>
+
+        <!-- Tone -->
+        <item name="daxColorShade">@color/shade_light</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>

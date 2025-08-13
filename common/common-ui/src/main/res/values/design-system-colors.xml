@@ -59,6 +59,7 @@
     <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
+    <attr name="daxColorShade" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>

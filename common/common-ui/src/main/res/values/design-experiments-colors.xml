@@ -38,8 +38,11 @@
     <color name="icon_secondary_dark">#7AFFFFFF</color>
     <color name="icon_tertiary_dark">#3DFFFFFF</color>
 
-    <!-- Lines-->
+    <!-- Lines -->
     <color name="lines_dark">#1FF9F9F9</color>
+
+    <!-- Tone -->
+    <color name="shade_dark">#52171718</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -65,8 +68,11 @@
     <color name="icon_secondary_light">#991F1F1F</color>
     <color name="icon_tertiary_light">#661F1F1F</color>
 
-    <!-- Lines-->
+    <!-- Lines -->
     <color name="lines_light">#171F1F1F</color>
+
+    <!-- Tone -->
+    <color name="shade_light">#2E1F1F1F</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
