@@ -98,11 +98,12 @@
 
                 <LinearLayout
                     android:id="@+id/duckAiInputScreenWithoutAiContainer"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/selectable_item_experimental_background"
                     android:gravity="center"
                     android:orientation="vertical"
+                    app:layout_constraintWidth_max="160dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/duckAiInputScreenWithAiContainer"
                     app:layout_constraintHorizontal_chainStyle="packed"
@@ -111,8 +112,9 @@
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:scaleType="fitCenter"
                         android:background="@drawable/searchbox_background_active"
                         android:paddingStart="16dp"
                         android:paddingTop="16dp"
@@ -140,12 +142,13 @@
 
                 <LinearLayout
                     android:id="@+id/duckAiInputScreenWithAiContainer"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
                     android:background="@drawable/selectable_item_experimental_background"
                     android:gravity="center"
                     android:orientation="vertical"
+                    app:layout_constraintWidth_max="160dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/duckAiInputScreenWithoutAiContainer"
@@ -153,8 +156,9 @@
 
                     <ImageView
                         android:id="@+id/duckAiInputScreenToggleWithAiImage"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:scaleType="fitCenter"
                         android:background="@drawable/searchbox_background"
                         android:paddingStart="16dp"
                         android:paddingTop="16dp"
