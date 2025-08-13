@@ -131,11 +131,6 @@ interface DuckChatInternal : DuckChat {
     fun isAddressBarEntryPointEnabled(): Boolean
 
     /**
-     * Returns whether DuckChat is user enabled or not.
-     */
-    fun isDuckChatUserEnabled(): Boolean
-
-    /**
      * Updates the current chat state.
      */
     fun updateChatState(state: ChatState)
@@ -371,6 +366,16 @@ class RealDuckChat @Inject constructor(
         openDuckChat(emptyMap())
     }
 
+    override fun createDuckChatIntent(): Intent? {
+        logcat { "Duck.ai: createDuckChatIntent" }
+        val parameters = addChatParameters("", autoPrompt = false)
+        val url = appendParameters(parameters, duckChatLink)
+
+        return browserNav.openDuckChat(context, duckChatUrl = url, hasSessionActive = true)
+            .apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+    }
     override fun openDuckChatWithAutoPrompt(query: String) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
         val parameters = addChatParameters(query, autoPrompt = true)

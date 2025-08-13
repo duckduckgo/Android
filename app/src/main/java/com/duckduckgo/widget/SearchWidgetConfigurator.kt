@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2025 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.duckduckgo.widget
+
+import android.app.PendingIntent
+import android.content.Context
+import android.view.View
+import android.widget.RemoteViews
+import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.voice.api.VoiceSearchAvailability
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.runBlocking
+import logcat.logcat
+
+class SearchWidgetConfigurator @Inject constructor(
+    private val voiceSearchAvailability: VoiceSearchAvailability,
+    private val duckChat: DuckChat,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) {
+
+    fun configureWidget(
+        context: Context,
+        remoteViews: RemoteViews,
+        fromFavWidget: Boolean,
+    ) {
+        // TODO ANA: Improve this method to avoid blocking the main thread.
+        runBlocking {
+            val voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable
+            val duckAiEnabled = duckChat.isEnabled() && duckChat.isDuckChatUserEnabled() && duckChat.wasOpenedBefore()
+
+            logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
+            remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.duckAi, if (duckAiEnabled) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && duckAiEnabled) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !duckAiEnabled) View.VISIBLE else View.GONE)
+
+            if (voiceSearchEnabled) {
+                val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
+                remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
+            }
+
+            if (duckAiEnabled) {
+                val pendingIntent = buildDuckAiPendingIntent(context)
+                pendingIntent?.let { remoteViews.setOnClickPendingIntent(R.id.duckAi, it) }
+            }
+        }
+    }
+
+    private fun buildVoiceSearchPendingIntent(
+        context: Context,
+        fromFavWidget: Boolean,
+    ): PendingIntent {
+        val intent = if (fromFavWidget) SystemSearchActivity.fromFavWidget(context, true) else SystemSearchActivity.fromWidget(context, true)
+        return PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+
+    private fun buildDuckAiPendingIntent(
+        context: Context,
+    ): PendingIntent? {
+        val intent = duckChat.createDuckChatIntent()
+        if (intent == null) {
+            return null
+        }
+        return PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
+}

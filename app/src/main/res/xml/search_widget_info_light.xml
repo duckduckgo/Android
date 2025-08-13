@@ -20,7 +20,7 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialKeyguardLayout="@layout/search_widget_light"
     android:initialLayout="@layout/search_widget_light"
-    android:minWidth="314dp"
+    android:minWidth="250dp"
     android:minHeight="40dp"
     android:minResizeWidth="110dp"
     android:previewImage="@drawable/search_widget_light_preview"

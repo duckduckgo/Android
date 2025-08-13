@@ -539,6 +539,14 @@
         </receiver>
 
         <receiver
+            android:name="com.duckduckgo.widget.DuckAiSearchWidgetUpdaterReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".remotemessage.SharePromoLinkRMFBroadCastReceiver"
             android:exported="false" />
 
