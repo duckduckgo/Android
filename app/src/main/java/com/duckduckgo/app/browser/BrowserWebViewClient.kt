@@ -463,6 +463,16 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
+    fun triggerJSInit(webView: WebView) {
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            jsPlugins.getPlugins().forEach {
+                it.onInit(webView, activeExperiments)
+            }
+        }
+    }
+
+    // TODO check new API
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
@@ -470,7 +480,12 @@ class BrowserWebViewClient @Inject constructor(
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
-                it.onPageFinished(webView, url, webViewClientListener?.getSite())
+                val activeExperiments = webViewClientListener?.getSite()?.activeContentScopeExperiments ?: listOf()
+                it.onPageFinished(
+                    webView,
+                    url,
+                    activeExperiments,
+                )
             }
 
             url?.let {

@@ -15,13 +15,17 @@ import org.mockito.kotlin.whenever
 class ContentScopeScriptsJsInjectorPluginTest {
 
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
+    private val adsJsContentScopeScripts: AdsJsContentScopeScripts = mock()
     private val mockWebView: WebView = mock()
 
     private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() {
-        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(mockCoreContentScopeScripts)
+        contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(
+            mockCoreContentScopeScripts,
+            adsJsContentScopeScripts,
+        )
     }
 
     @Test
