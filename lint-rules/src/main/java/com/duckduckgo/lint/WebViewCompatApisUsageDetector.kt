@@ -5,7 +5,7 @@ import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
 
 @Suppress("UnstableApiUsage")
-class WebMessageListenerUsageDetector : Detector(), SourceCodeScanner {
+class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
 
     override fun getApplicableMethodNames(): List<String> {
         return listOf("addWebMessageListener", "removeWebMessageListener")
@@ -33,6 +33,16 @@ class WebMessageListenerUsageDetector : Detector(), SourceCodeScanner {
                     )
                 }
             }
+            "addDocumentStartJavaScript" -> {
+                if (context.evaluator.isMemberInClass(method, "androidx.webkit.WebViewCompat")) {
+                    context.report(
+                        ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE,
+                        node,
+                        context.getLocation(node),
+                        ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE.getExplanation(TextFormat.RAW)
+                    )
+                }
+            }
         }
     }
 
@@ -44,7 +54,7 @@ class WebMessageListenerUsageDetector : Detector(), SourceCodeScanner {
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
-                WebMessageListenerUsageDetector::class.java,
+                WebViewCompatApisUsageDetector::class.java,
                 Scope.JAVA_FILE_SCOPE
             )
         )
@@ -56,7 +66,19 @@ class WebMessageListenerUsageDetector : Detector(), SourceCodeScanner {
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
-                WebMessageListenerUsageDetector::class.java,
+                WebViewCompatApisUsageDetector::class.java,
+                Scope.JAVA_FILE_SCOPE
+            )
+        )
+
+        val ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE: Issue = Issue.create(
+            id = "AddDocumentStartJavaScriptUsage",
+            briefDescription = "Use safe WebViewCompat methods",
+            explanation = "Use `safeAddDocumentStartJavaScript` instead of `WebViewCompat.addDocumentStartJavaScript`",
+            category = Category.CORRECTNESS,
+            severity = Severity.ERROR,
+            implementation = Implementation(
+                WebViewCompatApisUsageDetector::class.java,
                 Scope.JAVA_FILE_SCOPE
             )
         )

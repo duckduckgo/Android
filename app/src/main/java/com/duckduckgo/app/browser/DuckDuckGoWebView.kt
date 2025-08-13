@@ -33,11 +33,17 @@ import android.webkit.WebViewClient
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
+import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.contentscopescripts.impl.WebViewCompatWrapper
+import com.duckduckgo.di.scopes.ViewScope
+import dagger.android.support.AndroidSupportInjection
+import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -49,6 +55,7 @@ import logcat.logcat
  *
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
+@InjectWith(ViewScope::class)
 class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var lastClampedTopY: Boolean = true // when created we are always at the top
     private var contentAllowsSwipeToRefresh: Boolean = true
@@ -67,6 +74,12 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var isDestroyed: Boolean = false
     var isSafeWebViewEnabled: Boolean = false
 
+    @Inject
+    lateinit var webViewCompatWrapper: WebViewCompatWrapper
+
+    @Inject
+    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+
     constructor(context: Context) : this(context, null)
     constructor(
         context: Context,
@@ -76,6 +89,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     }
 
     override fun onAttachedToWindow() {
+        AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
         helper.onViewAttached(this)
     }
@@ -418,7 +432,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
     suspend fun safeAddWebMessageListener(
-        webViewCapabilityChecker: WebViewCapabilityChecker,
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
@@ -441,7 +454,6 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
     suspend fun safeRemoveWebMessageListener(
-        webViewCapabilityChecker: WebViewCapabilityChecker,
         jsObjectName: String,
     ): Boolean = runCatching {
         if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
@@ -456,6 +468,23 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     }.getOrElse { exception ->
         logcat(ERROR) { "Error removing WebMessageListener: $jsObjectName: ${exception.asLog()}" }
         false
+    }
+
+    @SuppressLint("RequiresFeature")
+    suspend fun safeAddDocumentStartJavaScript(
+        script: String,
+        allowedOriginRules: Set<String>,
+    ): ScriptHandler? {
+        return runCatching {
+            if (webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript) && !isDestroyed) {
+                webViewCompatWrapper.addDocumentStartJavaScript(this, script, allowedOriginRules)
+            } else {
+                null
+            }
+        }.getOrElse { e ->
+            logcat(ERROR) { "Error calling addDocumentStartJavaScript: ${e.asLog()}" }
+            null
+        }
     }
 
     companion object {
