@@ -40,6 +40,7 @@ import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.webkit.ScriptHandler
+import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -75,6 +76,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.contentscopescripts.api.WebMessagingPlugin
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -86,6 +88,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -164,6 +167,7 @@ class BrowserWebViewClientTest {
     private val mockAndroidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
     private val mockContentScopeExperiments: ContentScopeExperiments = mock()
     private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
+    private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
     private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(
         mockDuckDuckGoUrlDetector,
         mockCustomHeaderGracePeriodChecker,
@@ -213,6 +217,7 @@ class BrowserWebViewClientTest {
             mockDuckChat,
             mockContentScopeExperiments,
             fakeAddDocumentStartJavaScriptPlugins,
+            fakeMessagingPlugins,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -346,10 +351,31 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
-    fun whenTriggerJsInitThenInjectJsCode() {
+    fun whenConfigureWebViewThenInjectJsCode() {
         assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
-        testee.configureWebView(DuckDuckGoWebView(context))
+        val mockCallback = mock<JsMessageCallback>()
+        testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
         assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenConfigureWebViewThenAddWebMessageListener() {
+        assertFalse(fakeMessagingPlugins.plugin.registered)
+        val mockCallback = mock<JsMessageCallback>()
+        testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
+        assertTrue(fakeMessagingPlugins.plugin.registered)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenDestroyThenRemoveWebMessageListener() = runTest {
+        val mockCallback = mock<JsMessageCallback>()
+        val webView = DuckDuckGoWebView(context)
+        testee.configureWebView(webView, mockCallback)
+        assertTrue(fakeMessagingPlugins.plugin.registered)
+        testee.destroy(webView)
+        assertFalse(fakeMessagingPlugins.plugin.registered)
     }
 
     @UiThreadTest
@@ -1308,5 +1334,29 @@ class BrowserWebViewClientTest {
         val plugin = FakeAddDocumentStartJavaScriptPlugin()
 
         override fun getPlugins() = listOf(plugin)
+    }
+
+    class FakeWebMessagingPlugin : WebMessagingPlugin {
+        var registered = false
+            private set
+
+        override suspend fun unregister(unregisterer: suspend (objectName: String) -> Boolean) {
+            registered = false
+        }
+
+        override suspend fun register(
+            jsMessageCallback: JsMessageCallback?,
+            registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
+        ) {
+            registered = true
+        }
+    }
+
+    class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
+        val plugin = FakeWebMessagingPlugin()
+
+        override fun getPlugins(): Collection<WebMessagingPlugin> {
+            return listOf(plugin)
+        }
     }
 }

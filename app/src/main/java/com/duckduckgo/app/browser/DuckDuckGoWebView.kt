@@ -34,7 +34,6 @@ import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
 import androidx.webkit.ScriptHandler
-import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
@@ -437,7 +436,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         listener: WebMessageListener,
     ): Boolean = runCatching {
         if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
-            WebViewCompat.addWebMessageListener(
+            webViewCompatWrapper.addWebMessageListener(
                 this,
                 jsObjectName,
                 allowedOriginRules,
@@ -457,7 +456,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         jsObjectName: String,
     ): Boolean = runCatching {
         if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
-            WebViewCompat.removeWebMessageListener(
+            webViewCompatWrapper.removeWebMessageListener(
                 this,
                 jsObjectName,
             )

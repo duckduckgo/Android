@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -35,6 +36,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 interface WebViewCompatContentScopeScripts {
     fun getScript(
@@ -58,6 +60,7 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : WebViewCompatContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -112,7 +115,9 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     }
 
     override suspend fun isEnabled(): Boolean {
-        return contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+        return withContext(dispatcherProvider.io()) {
+            contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+        }
     }
 
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
