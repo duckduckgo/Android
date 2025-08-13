@@ -3012,6 +3012,7 @@ class BrowserTabFragment :
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
+            webViewClient.configureWebView(it)
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
 
@@ -3196,7 +3197,6 @@ class BrowserTabFragment :
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webView.safeAddWebMessageListener(
-                    webViewCapabilityChecker,
                     "ddgBlobDownloadObj",
                     setOf("*"),
                     object : WebViewCompat.WebMessageListener {

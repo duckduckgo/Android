@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,16 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.contentscopescripts.impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.webkit.WebView
+import androidx.webkit.ScriptHandler
 
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation AndroidX.webkit
-    implementation project(':feature-toggles-api')
-    implementation project(':js-messaging-api')
-}
+interface WebViewCompatWrapper {
 
-android {
-    namespace 'com.duckduckgo.contentscopescripts.api'
+    fun addDocumentStartJavaScript(
+        webView: WebView,
+        script: String,
+        allowedOriginRules: Set<String>,
+    ): ScriptHandler
 }
