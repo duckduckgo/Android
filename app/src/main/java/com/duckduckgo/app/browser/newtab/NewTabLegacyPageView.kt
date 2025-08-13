@@ -134,21 +134,21 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         logcat { "New Tab: render $viewState" }
+        val hasContentThatDisplacesHomoLogo = viewState.onboardingComplete &&
+            viewState.message != null ||
+            viewState.favourites.isNotEmpty()
+        val shouldShowLogo = !hasContentThatDisplacesHomoLogo && showLogo
+        val isAppTpEnabled = viewState.appTpEnabled
+        val hasLowPriorityMessage = viewState.lowPriorityMessage != null
 
-        val isHomeBackgroundLogoVisible = (!viewState.onboardingComplete || viewState.message == null) &&
-            viewState.favourites.isEmpty()
+        val hasContent = shouldShowLogo || hasContentThatDisplacesHomoLogo || isAppTpEnabled || hasLowPriorityMessage
+        isVisible = hasContent
+        onHasContent?.invoke(hasContent)
 
-        if (!showLogo && isHomeBackgroundLogoVisible) {
-            this.gone()
-            onHasContent?.invoke(false)
+        if (shouldShowLogo) {
+            homeBackgroundLogo.showLogo()
         } else {
-            this.show()
-            onHasContent?.invoke(true)
-            if (isHomeBackgroundLogoVisible) {
-                homeBackgroundLogo.showLogo()
-            } else {
-                homeBackgroundLogo.hideLogo()
-            }
+            homeBackgroundLogo.hideLogo()
         }
         if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)

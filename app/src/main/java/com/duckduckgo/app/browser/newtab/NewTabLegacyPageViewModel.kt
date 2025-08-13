@@ -30,6 +30,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -63,6 +65,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val settingsDataStore: SettingsDataStore,
     private val lowPriorityMessagingModel: LowPriorityMessagingModel,
+    private val appTrackingProtection: AppTrackingProtection,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
@@ -71,6 +74,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
         val onboardingComplete: Boolean = false,
         val favourites: List<Favorite> = emptyList(),
         val lowPriorityMessage: LowPriorityMessage? = null,
+        val appTpEnabled: Boolean = false,
     )
 
     private data class ViewStateSnapshot(
@@ -134,6 +138,12 @@ class NewTabLegacyPageViewModel @Inject constructor(
                 }
                 .flowOn(dispatchers.main())
                 .launchIn(viewModelScope)
+        }
+
+        viewModelScope.launch {
+            _viewState.update {
+                it.copy(appTpEnabled = appTrackingProtection.isEnabled())
+            }
         }
     }
 
