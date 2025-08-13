@@ -28,6 +28,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup.MarginLayoutParams
+import android.view.ViewPropertyAnimator
 import android.view.WindowManager
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.PathInterpolator
@@ -90,6 +91,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
+    private var welcomeTitleAnimator: ViewPropertyAnimator? = null
+    private var daxDialogAnimator: ValueAnimator? = null
     private var daxDialogAnimationStarted = false
     private var backgroundSceneManager: BbOnboardingBackgroundSceneManager? = null
 
@@ -173,6 +176,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     override fun onDestroyView() {
         super.onDestroyView()
         welcomeAnimation?.cancel()
+        welcomeTitleAnimator?.cancel()
+        daxDialogAnimator?.cancel()
     }
 
     override fun onActivityResult(
@@ -496,7 +501,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
             applyTo(binding.longDescriptionContainer)
         }
 
-        ValueAnimator.ofFloat(0f, 1f)
+        daxDialogAnimator = ValueAnimator.ofFloat(0f, 1f)
             .apply {
                 duration = transitionDuration.inWholeMilliseconds
                 startDelay = transitionDelay.inWholeMilliseconds
@@ -528,10 +533,11 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                         height = calculateCurrentValue(initialHeight, targetHeight, progress)
                     }
                 }
+            }.also {
+                it.start()
             }
-            .start()
 
-        binding.welcomeTitle.animate()
+        welcomeTitleAnimator = binding.welcomeTitle.animate()
             .translationX(-resources.displayMetrics.widthPixels.toFloat())
             .setDuration(transitionDuration.inWholeMilliseconds)
             .setStartDelay(transitionDelay.inWholeMilliseconds)
