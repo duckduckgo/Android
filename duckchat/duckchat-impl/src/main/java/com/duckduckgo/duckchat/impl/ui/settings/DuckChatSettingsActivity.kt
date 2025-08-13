@@ -130,7 +130,6 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             ),
         )
 
-        binding.dividerInputScreenToggles.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
         if (viewState.isInputScreenEnabled) {

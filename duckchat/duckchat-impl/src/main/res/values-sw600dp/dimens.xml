@@ -15,5 +15,5 @@
   -->
 
 <resources>
-    <dimen name="inputScreenUserPrefToggleSpacing">40dp</dimen>
+    <dimen name="inputScreenUserPrefToggleSpacing">160dp</dimen>
 </resources>

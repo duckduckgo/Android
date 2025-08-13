@@ -89,19 +89,6 @@
                 app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description_rebranding"
                 app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/duckAiShortcuts"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone"
-                app:primaryText="@string/duck_ai_shortcut_settings_title"
-                app:secondaryText="@string/duck_ai_shortcut_settings_description" />
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/dividerInputScreenToggles"/>
-
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/duckAiInputScreenToggleContainer"
                 android:layout_width="match_parent"
@@ -204,6 +191,14 @@
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:text="@string/input_screen_user_pref_description"
                 app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiShortcuts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duck_ai_shortcut_settings_title"
+                app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
