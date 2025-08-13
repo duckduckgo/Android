@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl
+package com.duckduckgo.contentscopescripts.api
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.contentscopescripts.api.NewContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.js.messaging.api.AdsjsMessageHandler
 
-@ContributesPluginPoint(
-    scope = AppScope::class,
-    boundType = NewContentScopeJsMessageHandlersPlugin::class,
-)
-@Suppress("unused")
-interface NewContentScopeJsMessageHandlersPluginPoint
+/**
+ * Implement this interface and contribute it as a multibinding to manage JS Messages that are sent to C-S-S
+ */
+interface AdsjsContentScopeJsMessageHandlersPlugin {
+    /**
+     * @return a [AdsjsMessageHandler] that will be used to handle the JS messages
+     */
+    fun getJsMessageHandler(): AdsjsMessageHandler
+}

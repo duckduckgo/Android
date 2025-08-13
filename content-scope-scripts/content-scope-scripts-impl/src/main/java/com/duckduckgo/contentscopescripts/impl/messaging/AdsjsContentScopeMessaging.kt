@@ -22,8 +22,8 @@ import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.AdsjsContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.GlobalContentScopeJsMessageHandlersPlugin
-import com.duckduckgo.contentscopescripts.api.NewContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -37,9 +37,9 @@ import logcat.asLog
 import logcat.logcat
 
 @ContributesBinding(ActivityScope::class)
-@Named("AdsJsContentScopeScripts")
-class AdsJsContentScopeMessaging @Inject constructor(
-    private val handlers: PluginPoint<NewContentScopeJsMessageHandlersPlugin>,
+@Named("AdsjsContentScopeScripts")
+class AdsjsContentScopeMessaging @Inject constructor(
+    private val handlers: PluginPoint<AdsjsContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
 ) : NewJsMessaging {
 

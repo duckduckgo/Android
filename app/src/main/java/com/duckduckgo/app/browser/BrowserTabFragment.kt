@@ -513,7 +513,7 @@ class BrowserTabFragment :
     lateinit var duckPlayerScripts: JsMessaging
 
     @Inject
-    @Named("AdsJsContentScopeScripts")
+    @Named("AdsjsContentScopeScripts")
     lateinit var adsJsContentScopeScripts: NewJsMessaging
 
     @Inject

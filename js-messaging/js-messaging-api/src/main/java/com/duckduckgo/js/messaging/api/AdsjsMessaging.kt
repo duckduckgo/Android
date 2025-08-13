@@ -37,7 +37,7 @@ interface NewJsMessaging {
     val allowedDomains: Set<String>
 }
 
-interface NewJsMessageHandler {
+interface AdsjsMessageHandler {
     /**
      * This method processes a [JsMessage]
      */
