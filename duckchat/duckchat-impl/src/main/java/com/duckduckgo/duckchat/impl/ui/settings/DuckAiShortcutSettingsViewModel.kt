@@ -44,7 +44,6 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
     data class ViewState(
         val showInBrowserMenu: Boolean = false,
         val showInAddressBar: Boolean = false,
-        val shouldShowBrowserMenuToggle: Boolean = false,
         val shouldShowAddressBarToggle: Boolean = false,
     )
 
@@ -55,7 +54,6 @@ class DuckAiShortcutSettingsViewModel @Inject constructor(
         ViewState(
             showInBrowserMenu = showInBrowserMenu,
             showInAddressBar = showInAddressBar,
-            shouldShowBrowserMenuToggle = true,
             shouldShowAddressBarToggle = duckChat.isAddressBarEntryPointEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())

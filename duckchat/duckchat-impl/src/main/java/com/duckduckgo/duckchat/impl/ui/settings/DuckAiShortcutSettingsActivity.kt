@@ -66,7 +66,6 @@ class DuckAiShortcutSettingsActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.showDuckAiInMenuToggle.apply {
-            isVisible = viewState.shouldShowBrowserMenuToggle
             quietlySetIsChecked(viewState.showInBrowserMenu, menuToggleListener)
         }
         binding.showDuckAiInAddressBarToggle.apply {

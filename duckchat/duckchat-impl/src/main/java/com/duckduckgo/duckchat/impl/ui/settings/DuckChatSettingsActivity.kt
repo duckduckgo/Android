@@ -131,42 +131,12 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         )
 
         binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
+        configureInputScreenToggle(
+            withoutAi = InputScreenToggleButton.WithoutAi(isActive = !viewState.isInputScreenEnabled),
+            withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled),
+        )
+
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
-        if (viewState.isInputScreenEnabled) {
-            // disable without ai container
-            binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
-                ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai)
-            )
-            binding.duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(R.drawable.searchbox_background)
-            binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
-                ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
-            )
-            // enable with ai container
-            binding.duckAiInputScreenToggleWithAiImage.setImageDrawable(
-                ContextCompat.getDrawable(this, R.drawable.searchbox_withai_active)
-            )
-            binding.duckAiInputScreenToggleWithAiImage.setBackgroundResource(R.drawable.searchbox_background_active)
-            binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
-                ContextCompat.getDrawable(this, CommonR.drawable.ic_check_blue_round_24)
-            )
-        } else {
-            // enable without ai container
-            binding.duckAiInputScreenToggleWithoutAiImage.setImageDrawable(
-                ContextCompat.getDrawable(this, R.drawable.searchbox_withoutai_active)
-            )
-            binding.duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(R.drawable.searchbox_background_active)
-            binding.duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(
-                ContextCompat.getDrawable(this, CommonR.drawable.ic_check_blue_round_24)
-            )
-            // enable with ai container
-            binding.duckAiInputScreenToggleWithAiImage.setImageDrawable(
-                ContextCompat.getDrawable(this, R.drawable.searchbox_withai)
-            )
-            binding.duckAiInputScreenToggleWithAiImage.setBackgroundResource(R.drawable.searchbox_background)
-            binding.duckAiInputScreenToggleWithAiCheck.setImageDrawable(
-                ContextCompat.getDrawable(this, CommonR.drawable.ic_shape_circle_24)
-            )
-        }
         binding.duckAiInputScreenDescription.addClickableSpan(
             textSequence = getText(R.string.input_screen_user_pref_description),
             spans = listOf(
@@ -216,6 +186,50 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
             is DuckChatSettingsViewModel.Command.LaunchFeedback -> {
                 globalActivityStarter.start(this, FeedbackActivityWithEmptyParams)
+            }
+        }
+    }
+
+    private fun configureInputScreenToggle(
+        withoutAi: InputScreenToggleButton,
+        withAi: InputScreenToggleButton,
+    ) = with(binding) {
+        val context = this@DuckChatSettingsActivity
+        duckAiInputScreenToggleWithoutAiImage.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.imageRes))
+        duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(withoutAi.backgroundRes)
+        duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.checkRes))
+
+        duckAiInputScreenToggleWithAiImage.setImageDrawable(ContextCompat.getDrawable(context, withAi.imageRes))
+        duckAiInputScreenToggleWithAiImage.setBackgroundResource(withAi.backgroundRes)
+        duckAiInputScreenToggleWithAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withAi.checkRes))
+    }
+
+    private sealed class InputScreenToggleButton(isActive: Boolean) {
+        abstract val imageRes: Int
+        val backgroundRes: Int = if (isActive) {
+            R.drawable.searchbox_background_active
+        } else {
+            R.drawable.searchbox_background
+        }
+        val checkRes: Int = if (isActive) {
+            CommonR.drawable.ic_check_blue_round_24
+        } else {
+            CommonR.drawable.ic_shape_circle_24
+        }
+
+        class WithoutAi(isActive: Boolean): InputScreenToggleButton(isActive) {
+            override val imageRes: Int = if (isActive) {
+                R.drawable.searchbox_withoutai_active
+            } else {
+                R.drawable.searchbox_withoutai
+            }
+        }
+
+        class WithAi(isActive: Boolean): InputScreenToggleButton(isActive) {
+            override val imageRes: Int = if (isActive) {
+                R.drawable.searchbox_withai_active
+            } else {
+                R.drawable.searchbox_withai
             }
         }
     }
