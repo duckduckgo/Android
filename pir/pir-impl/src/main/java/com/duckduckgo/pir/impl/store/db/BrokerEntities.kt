@@ -88,3 +88,13 @@ data class BrokerSchedulingConfigEntity(
     val maintenanceScan: Int,
     val maxAttempts: Int?,
 )
+
+@Entity(tableName = "pir_broker_mirror_sites")
+data class MirrorSiteEntity(
+    @PrimaryKey val name: String,
+    val url: String,
+    val addedAt: Long,
+    val removedAt: Long,
+    val optOutUrl: String,
+    val parentSite: String,
+)

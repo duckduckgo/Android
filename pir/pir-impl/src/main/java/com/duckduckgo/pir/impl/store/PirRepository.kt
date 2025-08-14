@@ -35,6 +35,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
 import com.duckduckgo.pir.impl.store.db.OptOutActionLog
 import com.duckduckgo.pir.impl.store.db.OptOutCompletedBroker
 import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
@@ -283,6 +284,16 @@ internal class RealPirRepository(
                     maintenanceScan = broker.schedulingConfig.maintenanceScan,
                     maxAttempts = broker.schedulingConfig.maxAttempts,
                 ),
+                mirrorSiteEntity = broker.mirrorSites.map {
+                    MirrorSiteEntity(
+                        name = it.name,
+                        url = it.url,
+                        addedAt = it.addedAt,
+                        removedAt = it.removedAt ?: 0L,
+                        optOutUrl = it.optOutUrl.orEmpty(),
+                        parentSite = broker.name,
+                    )
+                },
             )
         }
     }
