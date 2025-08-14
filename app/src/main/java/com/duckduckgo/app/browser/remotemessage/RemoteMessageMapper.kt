@@ -27,8 +27,8 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
-import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.VISUAL_DESIGN_UPDATE
