@@ -142,7 +142,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             spans = listOf(
                 "share_feedback" to object : DuckDuckGoClickableSpan() {
                     override fun onClick(widget: View) {
-                        viewModel.duckAiShareFeedbackCLicked()
+                        viewModel.duckAiInputScreenShareFeedbackClicked()
                     }
                 },
             ),

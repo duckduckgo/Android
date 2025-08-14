@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -41,7 +40,6 @@ import kotlinx.coroutines.launch
 class DuckChatSettingsViewModel @Inject constructor(
     private val duckChat: DuckChatInternal,
     private val pixel: Pixel,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val rebrandingAiFeaturesEnabled: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel() {
 
@@ -53,24 +51,18 @@ class DuckChatSettingsViewModel @Inject constructor(
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
-        val shouldShowBrowserMenuToggle: Boolean = false,
-        val shouldShowAddressBarToggle: Boolean = false,
         val isRebrandingAiFeaturesEnabled: Boolean = false,
     )
 
     val viewState = combine(
         duckChat.observeEnableDuckChatUserSetting(),
         duckChat.observeInputScreenUserSettingEnabled(),
-        duckChat.observeShowInBrowserMenuUserSetting(),
-        duckChat.observeShowInAddressBarUserSetting(),
-    ) { isDuckChatUserEnabled, isInputScreenEnabled, showInBrowserMenu, showInAddressBar ->
+    ) { isDuckChatUserEnabled, isInputScreenEnabled ->
         ViewState(
             isDuckChatUserEnabled = isDuckChatUserEnabled,
             isInputScreenEnabled = isInputScreenEnabled,
             shouldShowShortcuts = isDuckChatUserEnabled,
             shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
-            shouldShowBrowserMenuToggle = isDuckChatUserEnabled,
-            shouldShowAddressBarToggle = isDuckChatUserEnabled && duckChat.isAddressBarEntryPointEnabled(),
             isRebrandingAiFeaturesEnabled = rebrandingAiFeaturesEnabled.isAIFeaturesRebrandingEnabled(),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), ViewState())
@@ -131,7 +123,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         }
     }
 
-    fun duckAiShareFeedbackCLicked() {
+    fun duckAiInputScreenShareFeedbackClicked() {
         viewModelScope.launch {
             commandChannel.send(Command.LaunchFeedback)
         }
