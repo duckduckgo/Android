@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">AI-functies</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI-functies zijn privé en optioneel.\nJe gegevens worden niet gebruikt om AI te trainen.\n<annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat anoniem met populaire AI-chatmodellen van derden</string>
     <string name="duck_chat_show_in_heading_rebranding">Duck.ai-snelkoppelingen</string>
     <string name="duck_chat_assist_settings_title_rebranding">Instellingen voor zoek Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Kies hoe vaak antwoorden op basis van AI in je zoekresultaten moeten worden weergegeven</string>

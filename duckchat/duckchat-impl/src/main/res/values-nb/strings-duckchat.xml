@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">AI-funksjoner</string>
     <string name="duck_chat_settings_activity_description_rebranding">AI-funksjonene i DuckDuckGo er private og valgfrie.\nDataene dine brukes ikke til å trene AI.\n<annotation type="learn_more_link">Les mer</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat anonymt med populære tredjeparts AI-chat-modeller</string>
     <string name="duck_chat_show_in_heading_rebranding">Duck.ai-snarveier</string>
     <string name="duck_chat_assist_settings_title_rebranding">Innstillinger for Search Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Velg hvor ofte du vil at AI-assisterte svar skal vises i søkene dine</string>

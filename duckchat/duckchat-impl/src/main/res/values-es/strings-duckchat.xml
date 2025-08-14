@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">Características de la IA</string>
     <string name="duck_chat_settings_activity_description_rebranding">Las funciones de IA de DuckDuckGo son privadas y opcionales.Tus datos no se utilizan para entrenar la IA.\n<annotation type="learn_more_link">Más información</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatea de forma anónima con modelos de chat de IA populares de terceros</string>
     <string name="duck_chat_show_in_heading_rebranding">Atajos de Duck.ai</string>
     <string name="duck_chat_assist_settings_title_rebranding">Configuración de Asistente de búsqueda</string>
     <string name="duck_chat_assist_settings_description_rebranding">Elige con qué frecuencia deseas que las respuestas asistidas por IA aparezcan en tus búsquedas</string>
