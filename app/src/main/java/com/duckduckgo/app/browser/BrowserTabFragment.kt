@@ -178,6 +178,7 @@ import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
+import com.duckduckgo.app.browser.webshare.AdsjsWebShareChooser
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
@@ -297,6 +298,7 @@ import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultCodes
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityResultParams
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.js.messaging.api.AdsjsJsMessageCallback
 import com.duckduckgo.js.messaging.api.AdsjsMessaging
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -887,6 +889,13 @@ class BrowserTabFragment :
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)
         }
+
+    private var currentWebShareReplyCallback: ((JSONObject) -> Unit)? = null
+
+    private val adsJsWebShareLauncher = registerForActivityResult(AdsjsWebShareChooser()) { result ->
+        currentWebShareReplyCallback?.invoke(result)
+        currentWebShareReplyCallback = null
+    }
 
     // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
@@ -2150,6 +2159,10 @@ class BrowserTabFragment :
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
+            is Command.AdsjsWebShareRequest -> {
+                currentWebShareReplyCallback = it.onResponse
+                adsJsWebShareLauncher.launch(it.data)
+            }
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
@@ -3031,16 +3044,15 @@ class BrowserTabFragment :
                 webViewClient.triggerJSInit(it)
                 adsJsContentScopeScripts.register(
                     it,
-                    object : JsMessageCallback() {
+                    object : AdsjsJsMessageCallback() {
                         override fun process(
                             featureName: String,
                             method: String,
                             id: String?,
                             data: JSONObject?,
+                            onResponse: (JSONObject) -> Unit,
                         ) {
-                            viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                                it.url
-                            }
+                            viewModel.adsjsProcessJsCallbackMessage(featureName, method, id, data, onResponse)
                         }
                     },
                 )

@@ -67,6 +67,7 @@ import com.duckduckgo.app.browser.certificates.BypassedSSLCertificatesRepository
 import com.duckduckgo.app.browser.certificates.remoteconfig.SSLCertificatesFeature
 import com.duckduckgo.app.browser.commands.Command
 import com.duckduckgo.app.browser.commands.Command.AddHomeShortcut
+import com.duckduckgo.app.browser.commands.Command.AdsjsWebShareRequest
 import com.duckduckgo.app.browser.commands.Command.AskToAutomateFireproofWebsite
 import com.duckduckgo.app.browser.commands.Command.AskToDisableLoginDetection
 import com.duckduckgo.app.browser.commands.Command.AskToFireproofWebsite
@@ -3654,6 +3655,20 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
+    fun adsjsProcessJsCallbackMessage(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        when (method) {
+            "webShare" -> if (id != null && data != null) {
+                adsjsWebShare(featureName, method, id, data, onResponse)
+            }
+        }
+    }
+
     fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -3737,6 +3752,18 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.main()) {
             command.value = WebShareRequest(JsCallbackData(data, featureName, method, id))
+        }
+    }
+
+    private fun adsjsWebShare(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = AdsjsWebShareRequest(JsCallbackData(data, featureName, method, id), onResponse)
         }
     }
 

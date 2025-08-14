@@ -33,6 +33,7 @@ import android.webkit.WebViewClient
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -46,6 +47,7 @@ import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 
 /**
  * WebView subclass which allows the WebView to
@@ -475,6 +477,21 @@ class RealDuckDuckGoWebView : DuckDuckGoWebView, NestedScrollingChild3 {
                 null
             }
         }.getOrElse { null }
+    }
+
+    @SuppressLint("RequiresFeature")
+    override suspend fun safePostMessage(
+        replyProxy: JavaScriptReplyProxy,
+        response: JSONObject
+    ) {
+        runCatching {
+            if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+                replyProxy.postMessage(response.toString())
+            }
+        }.getOrElse { exception ->
+            logcat(ERROR) { "Error posting message: ${exception.asLog()}" }
+            false
+        }
     }
 
     companion object {

@@ -23,8 +23,10 @@ import android.util.AttributeSet
 import android.webkit.WebBackForwardList
 import android.webkit.WebSettings
 import android.webkit.WebView
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat.WebMessageListener
+import org.json.JSONObject
 
 abstract class DuckDuckGoWebView(
     context: Context,
@@ -56,4 +58,9 @@ abstract class DuckDuckGoWebView(
     ): ScriptHandler?
 
     abstract fun isDestroyed(): Boolean
+
+    abstract suspend fun safePostMessage(
+        replyProxy: JavaScriptReplyProxy,
+        response: JSONObject
+    )
 }

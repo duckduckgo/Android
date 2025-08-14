@@ -17,13 +17,17 @@
 package com.duckduckgo.js.messaging.api
 
 import android.webkit.WebView
+import org.json.JSONObject
 
 interface AdsjsMessaging {
 
     /**
      * Method to register the JS interface to the webView instance
      */
-    suspend fun register(webView: WebView, jsMessageCallback: JsMessageCallback?)
+    suspend fun register(
+        webView: WebView,
+        jsMessageCallback: AdsjsJsMessageCallback?
+    )
     suspend fun unregister(webView: WebView)
 
     /**
@@ -37,13 +41,24 @@ interface AdsjsMessaging {
     val allowedDomains: Set<String>
 }
 
+abstract class AdsjsJsMessageCallback {
+    abstract fun process(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (params: JSONObject) -> Unit,
+    )
+}
+
 interface AdsjsMessageHandler {
     /**
      * This method processes a [JsMessage]
      */
     fun process(
         jsMessage: JsMessage,
-        jsMessageCallback: JsMessageCallback?,
+        jsMessageCallback: AdsjsJsMessageCallback?,
+        onResponse: suspend (JSONObject) -> Unit,
     )
 
     /**
