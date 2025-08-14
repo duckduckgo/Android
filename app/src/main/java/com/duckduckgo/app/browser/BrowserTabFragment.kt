@@ -176,6 +176,7 @@ import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
+import com.duckduckgo.app.browser.webshare.WebViewCompatWebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
 import com.duckduckgo.app.browser.webview.safewebview.SafeWebViewFeature
@@ -301,6 +302,7 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -883,6 +885,13 @@ class BrowserTabFragment :
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)
         }
+
+    private var currentWebShareReplyCallback: ((JSONObject) -> Unit)? = null
+
+    private val webViewCompatWebShareLauncher = registerForActivityResult(WebViewCompatWebShareChooser()) { result ->
+        currentWebShareReplyCallback?.invoke(result)
+        currentWebShareReplyCallback = null
+    }
 
     // Instantiating a private class that contains an implementation detail of BrowserTabFragment but is separated for tidiness
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
@@ -2133,6 +2142,10 @@ class BrowserTabFragment :
             is Command.SendResponseToJs -> contentScopeScripts.onResponse(it.data)
             is Command.SendResponseToDuckPlayer -> duckPlayerScripts.onResponse(it.data)
             is Command.WebShareRequest -> webShareRequest.launch(it.data)
+            is Command.WebViewCompatWebShareRequest -> {
+                currentWebShareReplyCallback = it.onResponse
+                webViewCompatWebShareLauncher.launch(it.data)
+            }
             is Command.ScreenLock -> screenLock(it.data)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
@@ -3021,16 +3034,15 @@ class BrowserTabFragment :
             lifecycleScope.launch(dispatchers.main()) {
                 webViewClient.configureWebView(
                     it,
-                    object : JsMessageCallback() {
+                    object : WebViewCompatMessageCallback {
                         override fun process(
                             featureName: String,
                             method: String,
                             id: String?,
                             data: JSONObject?,
+                            onResponse: (JSONObject) -> Unit,
                         ) {
-                            viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
-                                it.url
-                            }
+                            viewModel.webViewCompatProcessJsCallbackMessage(featureName, method, id, data, onResponse)
                         }
                     },
                 )

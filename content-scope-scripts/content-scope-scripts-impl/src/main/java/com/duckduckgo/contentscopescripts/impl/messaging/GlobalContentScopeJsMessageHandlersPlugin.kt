@@ -17,7 +17,8 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
+import org.json.JSONObject
 
 /**
  * Plugin interface for global message handlers that should always be processed
@@ -48,7 +49,8 @@ interface GlobalJsMessageHandler {
      */
     fun process(
         jsMessage: JsMessage,
-        jsMessageCallback: JsMessageCallback,
+        jsMessageCallback: WebViewCompatMessageCallback,
+        onResponse: (JSONObject) -> Unit,
     )
 
     /**
