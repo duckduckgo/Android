@@ -112,6 +112,9 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     @Inject
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
+    @Inject
+    lateinit var favoritesSwipeHandling: FavoritesSwipeHandling
+
     private var isExpandable = true
     private var showPlaceholders = false
     private var placement: FavoritesPlacement = FavoritesPlacement.NEW_TAB_PAGE
@@ -196,35 +199,37 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (!swipingTabsFeature.isEnabled) return super.dispatchTouchEvent(ev)
+        if (favoritesSwipeHandling.self().isEnabled()) {
+            when (ev?.actionMasked) {
+                MotionEvent.ACTION_DOWN -> {
+                    viewModel.onTouchDown(ev.x, ev.y)
+                    removeCallbacks(longPressRunnable)
+                    postDelayed(longPressRunnable, longPressTimeoutMs)
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
 
-        when (ev?.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                viewModel.onTouchDown(ev.x, ev.y)
-                removeCallbacks(longPressRunnable)
-                postDelayed(longPressRunnable, longPressTimeoutMs)
-                parent?.requestDisallowInterceptTouchEvent(false)
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                if (viewModel.isLongPressActive()) {
-                    parent?.requestDisallowInterceptTouchEvent(true)
-                } else {
-                    viewModel.onTouchMove(ev.x, ev.y, touchSlop)?.let { decision ->
-                        when (decision) {
-                            SwipeDecision.CANCEL_LONG_PRESS -> removeCallbacks(longPressRunnable)
-                            SwipeDecision.HORIZONTAL -> parent?.requestDisallowInterceptTouchEvent(false)
-                            SwipeDecision.VERTICAL -> parent?.requestDisallowInterceptTouchEvent(true)
+                MotionEvent.ACTION_MOVE -> {
+                    if (viewModel.isLongPressActive()) {
+                        parent?.requestDisallowInterceptTouchEvent(true)
+                    } else {
+                        viewModel.onTouchMove(ev.x, ev.y, touchSlop)?.let { decision ->
+                            when (decision) {
+                                SwipeDecision.CANCEL_LONG_PRESS -> removeCallbacks(longPressRunnable)
+                                SwipeDecision.HORIZONTAL -> parent?.requestDisallowInterceptTouchEvent(false)
+                                SwipeDecision.VERTICAL -> parent?.requestDisallowInterceptTouchEvent(true)
+                            }
                         }
                     }
                 }
-            }
 
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                removeCallbacks(longPressRunnable)
-                viewModel.onTouchUp()
-                parent?.requestDisallowInterceptTouchEvent(false)
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    removeCallbacks(longPressRunnable)
+                    viewModel.onTouchUp()
+                    parent?.requestDisallowInterceptTouchEvent(false)
+                }
             }
+        } else if (swipingTabsFeature.isEnabled) {
+            parent?.requestDisallowInterceptTouchEvent(true)
         }
         return super.dispatchTouchEvent(ev)
     }
