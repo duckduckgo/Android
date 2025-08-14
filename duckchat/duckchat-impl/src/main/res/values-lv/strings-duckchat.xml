@@ -39,7 +39,6 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai ir papildu līdzeklis, kas ļauj anonīmi tērzēt ar populāriem trešo pušu Ml tērzēšanas modeļiem. Tavas tērzēšanas sarunas netiek izmantotas AMI apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Iespējot Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Saīsnes</string>
     <string name="duck_chat_visibility_setting">Pārlūka izvēlne</string>
     <string name="duck_chat_address_bar_visibility_setting">Adreses josla</string>
     <string name="duck_chat_assist_settings_title">Assist iestatījumi</string>
@@ -64,7 +63,6 @@
     <string name="duck_chat_title_rebranding">Mākslīgā intelekta funkcijas</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo MI funkcijas ir privātas un nav obligātas.Tavi dati netiek izmantoti mākslīgā intelekta apmācībai.\n<annotation type="learn_more_link">Uzzini vairāk</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai īsceļi</string>
     <string name="duck_chat_assist_settings_title_rebranding">Meklēšanas Assist iestatījumi</string>
     <string name="duck_chat_assist_settings_description_rebranding">Izvēlies, cik bieži tu vēlies, lai MI atbalstītās atbildes parādītos tavos meklējumos.</string>
 </resources>

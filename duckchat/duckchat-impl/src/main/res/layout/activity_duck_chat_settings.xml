@@ -98,25 +98,13 @@
                 app:showBetaPill="true"
                 app:showSwitch="true"/>
 
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/duckChatToggleSettingsTitle"
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiShortcuts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_show_in_heading" />
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showDuckChatInMenuToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_visibility_setting"
-                app:showSwitch="true"/>
-
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showDuckChatInAddressBarToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_address_bar_visibility_setting"
-                app:showSwitch="true"/>
+                android:visibility="gone"
+                app:primaryText="@string/duck_ai_shortcut_settings_title"
+                app:secondaryText="@string/duck_ai_shortcut_settings_description" />
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:layout_width="match_parent"
