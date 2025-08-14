@@ -1,7 +1,5 @@
 {
   "mcpServers": {
-
-
     "doc-bot": {
       "type": "stdio",
       "command": "npx",
@@ -12,7 +10,5 @@
         "--watch"
       ]
     }
-
-
   }
 }
