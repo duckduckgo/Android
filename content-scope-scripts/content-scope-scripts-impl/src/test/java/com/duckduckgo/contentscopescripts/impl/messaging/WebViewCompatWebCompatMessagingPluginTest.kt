@@ -17,13 +17,14 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
@@ -42,6 +43,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
 
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
+    private val mockReplyProxy: JavaScriptReplyProxy = mock()
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> = FakeGlobalHandlersPluginPoint()
     private lateinit var testee: WebViewCompatWebCompatMessagingPlugin
 
@@ -55,9 +57,16 @@ class WebViewCompatWebCompatMessagingPluginTest {
                 return object : WebViewCompatMessageHandler {
                     override fun process(
                         jsMessage: JsMessage,
-                        jsMessageCallback: JsMessageCallback?,
+                        jsMessageCallback: WebViewCompatMessageCallback?,
+                        onResponse: (JSONObject) -> Unit,
                     ) {
-                        jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                        jsMessageCallback?.process(
+                            jsMessage.featureName,
+                            jsMessage.method,
+                            jsMessage.id,
+                            jsMessage.params,
+                            onResponse,
+                        )
                     }
 
                     override val featureName: String = "webCompat"
@@ -79,9 +88,16 @@ class WebViewCompatWebCompatMessagingPluginTest {
 
                     override fun process(
                         jsMessage: JsMessage,
-                        jsMessageCallback: JsMessageCallback,
+                        jsMessageCallback: WebViewCompatMessageCallback,
+                        onResponse: (JSONObject) -> Unit,
                     ) {
-                        jsMessageCallback.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
+                        jsMessageCallback.process(
+                            jsMessage.featureName,
+                            jsMessage.method,
+                            jsMessage.id,
+                            jsMessage.params,
+                            onResponse,
+                        )
                     }
 
                     override val method: String = "addDebugFlag"
@@ -109,7 +125,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
             {"context":"contentScopeScripts","featureName":"webCompat","id":"myId","method":"webShare","params":{}}
         """.trimIndent()
 
-        testee.process(message, callback)
+        testee.process(message, callback, mockReplyProxy)
 
         assertEquals(1, callback.counter)
     }
@@ -118,7 +134,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
     fun `when processing unknown message do nothing`() = runTest {
         givenInterfaceIsRegistered()
 
-        testee.process("", callback)
+        testee.process("", callback, mockReplyProxy)
 
         assertEquals(0, callback.counter)
     }
@@ -131,7 +147,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
             {"context":"contentScopeScripts","featureName":"test","id":"myId","method":"webShare","params":{}}
         """.trimIndent()
 
-        testee.process(message, callback)
+        testee.process(message, callback, mockReplyProxy)
 
         assertEquals(0, callback.counter)
     }
@@ -144,7 +160,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
             {"context":"contentScopeScripts","webCompat":"test","method":"webShare","params":{}}
         """.trimIndent()
 
-        testee.process(message, callback)
+        testee.process(message, callback, mockReplyProxy)
 
         assertEquals(0, callback.counter)
     }
@@ -157,7 +173,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
             {"context":"contentScopeScripts","featureName":"debugFeature","id":"debugId","method":"addDebugFlag","params":{}}
         """.trimIndent()
 
-        testee.process(message, callback)
+        testee.process(message, callback, mockReplyProxy)
 
         assertEquals(1, callback.counter)
     }
@@ -229,9 +245,15 @@ class WebViewCompatWebCompatMessagingPluginTest {
         assertEquals("contentScopeAdsjs", capturedObjectName)
     }
 
-    private val callback = object : JsMessageCallback() {
+    private val callback = object : WebViewCompatMessageCallback {
         var counter = 0
-        override fun process(featureName: String, method: String, id: String?, data: JSONObject?) {
+        override fun process(
+            featureName: String,
+            method: String,
+            id: String?,
+            data: JSONObject?,
+            onResponse: (params: JSONObject) -> Unit,
+        ) {
             counter++
         }
     }

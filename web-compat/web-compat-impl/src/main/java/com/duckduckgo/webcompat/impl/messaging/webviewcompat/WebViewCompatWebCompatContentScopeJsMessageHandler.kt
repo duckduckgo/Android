@@ -14,39 +14,32 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.messaging
+package com.duckduckgo.webcompat.impl.messaging.webviewcompat
 
+import com.duckduckgo.contentscopescripts.api.WebCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.WebCompatMessageHandler
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import logcat.logcat
 import org.json.JSONObject
 
 @ContributesMultibinding(AppScope::class)
-class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessageHandlersPlugin {
+class WebViewCompatWebCompatContentScopeJsMessageHandler @Inject constructor() : WebCompatContentScopeJsMessageHandlersPlugin {
 
-    override fun getGlobalJsMessageHandler(): GlobalJsMessageHandler = object :
-        GlobalJsMessageHandler {
+    override fun getJsMessageHandler(): WebCompatMessageHandler = object : WebCompatMessageHandler {
 
         override fun process(
             jsMessage: JsMessage,
-            jsMessageCallback: WebViewCompatMessageCallback,
+            jsMessageCallback: WebViewCompatMessageCallback?,
             onResponse: (JSONObject) -> Unit,
         ) {
-            if (jsMessage.method == method) {
-                logcat { "DebugFlagGlobalHandler addDebugFlag: ${jsMessage.featureName}" }
-                jsMessageCallback.process(
-                    featureName = jsMessage.featureName,
-                    method = jsMessage.method,
-                    id = jsMessage.id,
-                    data = jsMessage.params,
-                    onResponse = onResponse,
-                )
-            }
+            if (jsMessage.id == null) return
+            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params, onResponse)
         }
 
-        override val method: String = "addDebugFlag"
+        override val featureName: String = "webCompat"
+        override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock")
     }
 }

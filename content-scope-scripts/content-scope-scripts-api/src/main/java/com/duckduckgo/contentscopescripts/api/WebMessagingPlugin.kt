@@ -17,11 +17,11 @@
 package com.duckduckgo.contentscopescripts.api
 
 import androidx.webkit.WebViewCompat.WebMessageListener
-import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 
 interface WebMessagingPlugin {
     suspend fun register(
-        jsMessageCallback: JsMessageCallback?,
+        jsMessageCallback: WebViewCompatMessageCallback?,
         registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
     )
 
