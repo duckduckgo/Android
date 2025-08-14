@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">Λειτουργίες τεχνητής νοημοσύνης</string>
     <string name="duck_chat_settings_activity_description_rebranding">Οι λειτουργίες τεχνητής νοημοσύνης του DuckDuckGo είναι ιδιωτικές και προαιρετικές.Τα δεδομένα σας δεν χρησιμοποιούνται για εκπαίδευση της τεχνητής νοημοσύνης.\n<annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Συνομίλησε ανώνυμα με δημοφιλή μοντέλα συνομιλίας μέσω τεχνητής νοημοσύνης, τρίτων μερών</string>
     <string name="duck_chat_show_in_heading_rebranding">Συντομεύσεις Duck.ai</string>
     <string name="duck_chat_assist_settings_title_rebranding">Ρυθμίσεις αναζήτησης Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Επιλέξτε πόσο συχνά θέλετε να εμφανίζονται οι απαντήσεις που υποστηρίζονται από τεχνητή νοημοσύνη στις αναζητήσεις σας</string>

@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">AI funkciók</string>
     <string name="duck_chat_settings_activity_description_rebranding">A DuckDuckGo AI-funkciói privátak és opcionálisak.\nAz adataidat nem használjuk fel az AI tanítására.\n<annotation type="learn_more_link">További részletek</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Névtelen csevegés harmadik féltől származó népszerű AI-modellekkel</string>
     <string name="duck_chat_show_in_heading_rebranding">Duck.ai-gyorsparancsok</string>
     <string name="duck_chat_assist_settings_title_rebranding">Keresési asszisztens beállításai</string>
     <string name="duck_chat_assist_settings_description_rebranding">Válaszd ki, milyen gyakran szeretnél mesterséges intelligenciával generált válaszokat látni a kereséseid során</string>

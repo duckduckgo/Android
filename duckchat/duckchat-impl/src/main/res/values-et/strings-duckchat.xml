@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">AI funktsioonid</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo tehisintellekti funktsioonid on privaatsed ja valikulised.Sinu andmeid ei kasutata tehisintellekti treenimiseks.\n<annotation type="learn_more_link">Lisateave</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Vestle anonüümselt populaarsete kolmanda osapoole tehisintellekti vestlusmudelitega</string>
     <string name="duck_chat_show_in_heading_rebranding">Duck.ai otseteed</string>
     <string name="duck_chat_assist_settings_title_rebranding">Otsingu Assist seaded</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vali, kui tihti soovid, et AI-toega vastused ilmuksid sinu otsingutesse</string>

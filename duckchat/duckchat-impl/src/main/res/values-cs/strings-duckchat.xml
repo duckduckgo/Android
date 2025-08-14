@@ -64,7 +64,6 @@
     <string name="duck_chat_title_rebranding">Funkce AI</string>
     <string name="duck_chat_settings_activity_description_rebranding">Funkce AI na DuckDuckGo jsou soukromé a volitelné.Tvoje data se nepoužívají k trénování umělé inteligence.\n<annotation type="learn_more_link">Další informace</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">S populárními AI modely třetích stran můžeš chatovat anonymně</string>
     <string name="duck_chat_show_in_heading_rebranding">Zkratky Duck.ai</string>
     <string name="duck_chat_assist_settings_title_rebranding">Nastavení vyhledávání s funkcí Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních</string>
