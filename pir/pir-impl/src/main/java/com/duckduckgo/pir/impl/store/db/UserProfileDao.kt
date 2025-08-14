@@ -32,6 +32,9 @@ interface UserProfileDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertUserProfile(userProfile: UserProfile)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertUserProfiles(userProfiles: List<UserProfile>)
+
     @Query("DELETE from pir_user_profile")
     fun deleteAllProfiles()
 }

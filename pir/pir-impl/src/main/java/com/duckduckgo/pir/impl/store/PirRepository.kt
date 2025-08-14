@@ -66,6 +66,8 @@ interface PirRepository {
 
     suspend fun getAllActiveBrokers(): List<String>
 
+    suspend fun getAllActiveBrokerObjects(): List<Broker>
+
     suspend fun getAllBrokersForScan(): List<String>
 
     suspend fun getEtagForFilename(fileName: String): String?
@@ -126,6 +128,8 @@ interface PirRepository {
     suspend fun deleteAllUserProfilesQueries()
 
     suspend fun replaceUserProfile(userProfile: UserProfile)
+
+    suspend fun saveUserProfiles(userProfiles: List<UserProfile>)
 
     fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
 
@@ -241,6 +245,11 @@ internal class RealPirRepository(
             return@withContext brokerDao.getAllActiveBrokers().map {
                 it.name
             }
+        }
+
+    override suspend fun getAllActiveBrokerObjects(): List<Broker> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getAllActiveBrokers()
         }
 
     override suspend fun getAllBrokersForScan(): List<String> =
@@ -454,6 +463,11 @@ internal class RealPirRepository(
         }
     }
 
+    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>) =
+        withContext(dispatcherProvider.io()) {
+            userProfileDao.insertUserProfiles(userProfiles)
+        }
+
     override fun getAllEventLogsFlow(): Flow<List<PirEventLog>> {
         return scanLogDao.getAllEventLogsFlow()
     }
@@ -513,7 +527,10 @@ internal class RealPirRepository(
             it.filter {
                 it.isSubmitSuccess
             }.map {
-                (extractedProfileAdapter.fromJson(it.extractedProfile)?.identifier ?: "Unknown") to it.brokerName
+                (
+                    extractedProfileAdapter.fromJson(it.extractedProfile)?.identifier
+                        ?: "Unknown"
+                    ) to it.brokerName
             }.distinct().toMap()
         }
     }

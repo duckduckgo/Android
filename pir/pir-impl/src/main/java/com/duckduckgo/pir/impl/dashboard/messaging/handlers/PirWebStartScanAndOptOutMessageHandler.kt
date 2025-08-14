@@ -24,40 +24,31 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
-import org.json.JSONObject
 
 /**
- * Handles the initial handshake message from Web which is used to establish communication.
+ * Handles the message from Web to start the initial scan.
  */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebHandshakeMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
+class PirWebStartScanAndOptOutMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.HANDSHAKE)
+    override val messageNames: List<PirDashboardWebMessages> =
+        listOf(PirDashboardWebMessages.START_SCAN_AND_OPT_OUT)
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebHandshakeMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebStartScanAndOptOutMessageHandler: process $jsMessage" }
 
+        // no-op, we rely on saveProfile to start the initial scans
+        // we still need to respond to the message otherwise the web will not continue with the flow
         jsMessaging.sendPirResponse(
             jsMessage = jsMessage,
             success = true,
-            customParams = mapOf(
-                PARAM_USER_DATA to JSONObject().apply {
-                    // TODO Check access token and subscription
-                    put(PARAM_IS_AUTHENTICATED_USER, true)
-                },
-            ),
         )
-    }
-
-    companion object {
-        private const val PARAM_USER_DATA = "userData"
-        private const val PARAM_IS_AUTHENTICATED_USER = "isAuthenticatedUser"
     }
 }

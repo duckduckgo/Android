@@ -24,64 +24,67 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_STARTED
+import com.duckduckgo.pir.impl.store.db.Broker
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Handles the initial scan status message from Web which is used to retrieve the status of the initial scan.
+ * Handles the getDataBrokers message from Web which is used
+ * to retrieve the list of all data brokers the client has / supports.
  */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebInitialScanStatusMessageHandler @Inject constructor(
+class PirWebGetDataBrokersMessageHandler @Inject constructor(
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) :
-    PirWebJsMessageHandler() {
-
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+) : PirWebJsMessageHandler() {
+    override val messageNames: List<PirDashboardWebMessages> =
+        listOf(PirDashboardWebMessages.GET_DATA_BROKERS)
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebGetDataBrokersMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val eventLogs = repository.getAllEventLogsFlow().firstOrNull().orEmpty()
+            val brokers = repository.getAllActiveBrokerObjects()
 
-            // TODO get actual scan progress results from the repository
             jsMessaging.sendPirResponse(
-                jsMessage = jsMessage,
+                jsMessage,
                 success = true,
                 customParams = mapOf(
-                    PARAM_RESULTS_FOUND to JSONArray(),
-                    PARAM_SCAN_PROGRESS to JSONObject().apply {
-                        put(PARAM_CURRENT_SCAN, eventLogs.count { it.eventType == MANUAL_SCAN_COMPLETED })
-                        put(PARAM_TOTAL_SCANS, eventLogs.count { it.eventType == MANUAL_SCAN_STARTED })
-                        put(PARAM_SCANNED_BROKERS, JSONArray())
-                    },
+                    PARAM_DATA_BROKERS to brokers.toResponseBrokers(),
                 ),
             )
         }
     }
 
+    private fun List<Broker>.toResponseBrokers(): JSONArray {
+        // TODO verify parentURL and add optOutURL as per documentation
+        return JSONArray().apply {
+            forEach { broker ->
+                put(
+                    JSONObject().apply {
+                        put("url", broker.url)
+                        put("name", broker.name)
+                        put("parentURL", broker.parent ?: JSONObject.NULL)
+                    },
+                )
+            }
+        }
+    }
+
     companion object {
-        private const val PARAM_RESULTS_FOUND = "resultsFound"
-        private const val PARAM_SCAN_PROGRESS = "scanProgress"
-        private const val PARAM_CURRENT_SCAN = "currentScan"
-        private const val PARAM_TOTAL_SCANS = "totalScans"
-        private const val PARAM_SCANNED_BROKERS = "scannedBrokers"
+        private const val PARAM_DATA_BROKERS = "dataBrokers"
     }
 }
