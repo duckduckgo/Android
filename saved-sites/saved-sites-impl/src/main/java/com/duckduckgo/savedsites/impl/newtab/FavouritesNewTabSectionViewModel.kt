@@ -41,6 +41,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -88,6 +89,12 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    enum class SwipeDecision { HORIZONTAL, VERTICAL, CANCEL_LONG_PRESS }
+
+    private var initialTouchX = 0f
+    private var initialTouchY = 0f
+    private var longPressActivated = false
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
@@ -287,4 +294,32 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     ): String {
         return pixelName.pixelName + "_" + placement.name.lowercase()
     }
+
+    fun onTouchDown(x: Float, y: Float) {
+        initialTouchX = x
+        initialTouchY = y
+        longPressActivated = false
+    }
+
+    fun onTouchUp() {
+        longPressActivated = false
+    }
+
+    fun onTouchMove(x: Float, y: Float, touchSlop: Int): SwipeDecision? {
+        val dx = abs(x - initialTouchX)
+        val dy = abs(y - initialTouchY)
+
+        return when {
+            dx > dy && dx > touchSlop -> SwipeDecision.HORIZONTAL
+            dy > dx && dy > touchSlop -> SwipeDecision.VERTICAL
+            dx > touchSlop || dy > touchSlop -> SwipeDecision.CANCEL_LONG_PRESS
+            else -> null
+        }
+    }
+
+    fun onLongPressTriggered() {
+        longPressActivated = true
+    }
+
+    fun isLongPressActive(): Boolean = longPressActivated
 }

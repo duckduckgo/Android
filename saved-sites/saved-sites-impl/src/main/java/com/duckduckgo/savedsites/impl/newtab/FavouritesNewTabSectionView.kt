@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.core.text.HtmlCompat
@@ -77,6 +78,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteSavedSiteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SavedSiteChangedViewState
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SwipeDecision
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.ViewState
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_GRID_MAX_COLUMNS
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionsAdapter.Companion.QUICK_ACCESS_ITEM_MAX_SIZE_DP
@@ -134,6 +136,14 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
+    private val touchSlop: Int by lazy { ViewConfiguration.get(context).scaledTouchSlop }
+    private val longPressTimeoutMs: Long by lazy { ViewConfiguration.getLongPressTimeout().toLong() }
+
+    private val longPressRunnable = Runnable {
+        viewModel.onLongPressTriggered()
+        parent?.requestDisallowInterceptTouchEvent(true)
+    }
+
     init {
         context.obtainStyledAttributes(
             attrs,
@@ -186,8 +196,35 @@ class FavouritesNewTabSectionView @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-        if (swipingTabsFeature.isEnabled) {
-            parent.requestDisallowInterceptTouchEvent(true)
+        if (!swipingTabsFeature.isEnabled) return super.dispatchTouchEvent(ev)
+
+        when (ev?.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                viewModel.onTouchDown(ev.x, ev.y)
+                removeCallbacks(longPressRunnable)
+                postDelayed(longPressRunnable, longPressTimeoutMs)
+                parent?.requestDisallowInterceptTouchEvent(false)
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                if (viewModel.isLongPressActive()) {
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                } else {
+                    viewModel.onTouchMove(ev.x, ev.y, touchSlop)?.let { decision ->
+                        when (decision) {
+                            SwipeDecision.CANCEL_LONG_PRESS -> removeCallbacks(longPressRunnable)
+                            SwipeDecision.HORIZONTAL -> parent?.requestDisallowInterceptTouchEvent(false)
+                            SwipeDecision.VERTICAL -> parent?.requestDisallowInterceptTouchEvent(true)
+                        }
+                    }
+                }
+            }
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                removeCallbacks(longPressRunnable)
+                viewModel.onTouchUp()
+                parent?.requestDisallowInterceptTouchEvent(false)
+            }
         }
         return super.dispatchTouchEvent(ev)
     }
