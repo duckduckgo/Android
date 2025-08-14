@@ -16,16 +16,22 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder.Name
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.logcat
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -36,33 +42,72 @@ import org.json.JSONObject
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebGetCurrentUserProfileMessageHandler @Inject constructor() :
+class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
+    private val repository: PirRepository,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) :
     PirWebJsMessageHandler() {
 
-    override val methods: List<String> =
-        listOf(PirDashboardWebMessages.GET_CURRENT_USER_PROFILE.messageName)
+    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: GetCurrentUserProfileMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebGetCurrentUserProfileMessageHandler: process $jsMessage" }
 
-        jsMessaging.onResponse(
-            JsCallbackData(
-                params = JSONObject().apply {
-                    put(PirDashboardWebConstants.PARAM_SUCCESS, false)
-                    put(
-                        PirDashboardWebConstants.PARAM_VERSION,
-                        PirDashboardWebConstants.SCRIPT_API_VERSION,
-                    )
-                    // TODO: Replace with actual user profile data
-                },
-                featureName = jsMessage.featureName,
-                method = jsMessage.method,
-                id = jsMessage.id ?: "",
-            ),
-        )
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val profiles = repository.getUserProfileQueries()
+
+            if (profiles.isEmpty()) {
+                logcat { "PIR-WEB: GetCurrentUserProfileMessageHandler: no user profiles found" }
+                jsMessaging.sendPirResponse(
+                    jsMessage = jsMessage,
+                    success = true,
+                )
+                return@launch
+            }
+
+            val names = profiles.map { Name(it.firstName, it.middleName, it.lastName) }
+            val addresses = profiles.map { it.addresses }.flatten()
+            val birthYear = profiles.firstOrNull()?.birthYear ?: 0
+
+            jsMessaging.sendPirResponse(
+                jsMessage = jsMessage,
+                success = true,
+                customParams = mapOf(
+                    PARAM_ADDRESSES to JSONArray().apply {
+                        addresses.forEach { address ->
+                            put(
+                                JSONObject().apply {
+                                    put(PirDashboardWebConstants.PARAM_CITY, address.city)
+                                    put(PirDashboardWebConstants.PARAM_STATE, address.state)
+                                },
+                            )
+                        }
+                    },
+                    PARAM_BIRTH_YEAR to birthYear,
+                    PARAM_NAMES to JSONArray().apply {
+                        names.forEach { name ->
+                            put(
+                                JSONObject().apply {
+                                    put(PirDashboardWebConstants.PARAM_FIRST_NAME, name.firstName)
+                                    put(PirDashboardWebConstants.PARAM_MIDDLE_NAME, name.middleName ?: "")
+                                    put(PirDashboardWebConstants.PARAM_LAST_NAME, name.lastName)
+                                },
+                            )
+                        }
+                    },
+                ),
+            )
+        }
+    }
+
+    companion object {
+        private const val PARAM_ADDRESSES = "addresses"
+        private const val PARAM_BIRTH_YEAR = "birthYear"
+        private const val PARAM_NAMES = "names"
     }
 }

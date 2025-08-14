@@ -21,7 +21,7 @@ object PirDashboardWebConstants {
     const val CUSTOM_UA = "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko)" +
         " Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
 
-    internal const val SCRIPT_API_VERSION = 10
+    internal const val SCRIPT_API_VERSION = 11
     internal const val SCRIPT_CONTEXT_NAME = "dbpui"
     internal const val SCRIPT_FEATURE_NAME = "dbpuiCommunication"
     internal const val MESSAGE_CALLBACK = "messageCallback"
@@ -30,4 +30,9 @@ object PirDashboardWebConstants {
 
     internal const val PARAM_SUCCESS = "success"
     internal const val PARAM_VERSION = "version"
+    internal const val PARAM_FIRST_NAME = "first"
+    internal const val PARAM_MIDDLE_NAME = "middle"
+    internal const val PARAM_LAST_NAME = "last"
+    internal const val PARAM_CITY = "city"
+    internal const val PARAM_STATE = "state"
 }

@@ -16,48 +16,47 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
+import android.content.Context
+import android.content.Intent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.scan.PirForegroundScanService
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
-import org.json.JSONObject
 
 /**
- * Handles the initial handshake message from Web which is used to establish communication.
+ * Handles the message from Web to start the initial scan.
  */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebHandshakeMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
+class PirWebStartScanAndOptOutMessageHandler @Inject constructor(
+    private val context: Context,
+    private val scanScheduler: PirScanScheduler,
+) : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.HANDSHAKE)
+    override val messageNames: List<PirDashboardWebMessages> =
+        listOf(PirDashboardWebMessages.START_SCAN_AND_OPT_OUT)
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebHandshakeMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebStartScanAndOptOutMessageHandler: process $jsMessage" }
+
+        context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
+        scanScheduler.scheduleScans()
 
         jsMessaging.sendPirResponse(
             jsMessage = jsMessage,
             success = true,
-            customParams = mapOf(
-                PARAM_USER_DATA to JSONObject().apply {
-                    // TODO Check access token and subscription
-                    put(PARAM_IS_AUTHENTICATED_USER, true)
-                },
-            ),
         )
-    }
-
-    companion object {
-        private const val PARAM_USER_DATA = "userData"
-        private const val PARAM_IS_AUTHENTICATED_USER = "isAuthenticatedUser"
     }
 }
