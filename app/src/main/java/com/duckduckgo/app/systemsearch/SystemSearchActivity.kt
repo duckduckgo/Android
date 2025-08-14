@@ -19,6 +19,7 @@ package com.duckduckgo.app.systemsearch
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.Spanned
@@ -58,6 +59,7 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.showKeyboard
@@ -160,6 +162,15 @@ class SystemSearchActivity : DuckDuckGoActivity() {
                 sendLaunchPixels(it)
                 handleVoiceSearchLaunch(it)
             }
+        }
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            binding.omniBarContainerShadow.addBottomShadow(
+                shadowSizeDp = 12f,
+                offsetYDp = 3f,
+                insetDp = 3f,
+                shadowColor = ContextCompat.getColor(this, CommonR.color.background_omnibar_shadow),
+            )
         }
     }
 
@@ -323,7 +334,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         } else {
             voiceSearch.visibility = View.GONE
         }
-        binding.spacer.isVisible = voiceSearch.isVisible && binding.clearTextButton.isVisible
     }
 
     private fun updateVoiceSearchVisibility() {
@@ -331,7 +341,6 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         voiceSearch.isVisible =
             voiceSearchAvailability.shouldShowVoiceSearch(true, omnibarTextInput.text.toString(), omnibarTextInput.text.toString().isNotEmpty(), "")
         binding.clearTextButton.isVisible = searchQuery.isNotEmpty()
-        binding.spacer.isVisible = voiceSearch.isVisible && binding.clearTextButton.isVisible
     }
 
     private fun showEditSavedSiteDialog(savedSite: SavedSite) {
@@ -344,10 +353,10 @@ class SystemSearchActivity : DuckDuckGoActivity() {
         val results = binding.results
         val scrollable = binding.resultsContent.height > (results.height - results.paddingTop - results.paddingBottom)
         if (scrollable) {
-            omnibarScrolling.enableOmnibarScrolling(binding.toolbarContainer)
+            omnibarScrolling.enableOmnibarScrolling(binding.rootContainer)
         } else {
             showOmnibar()
-            omnibarScrolling.disableOmnibarScrolling(binding.toolbarContainer)
+            omnibarScrolling.disableOmnibarScrolling(binding.rootContainer)
         }
     }
 
