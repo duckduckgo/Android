@@ -151,7 +151,7 @@
 
     <string name="feedbackSubmitVpnHeader">Wystąpił problem, który nie został omówiony w naszym <annotation type="faqs_link">centrum pomocy</annotation>? Zdecydowanie chcemy o tym wiedzieć.\n\n</string>
     <string name="feedbackSubmitVpnDescriptionHint">Powiedz nam, co się dzieje…</string>
-    <string name="feedbackSubmitVpnDisclaimer">"Oprócz szczegółów podanych powyżej wysyłamy wraz z opinią następujące zanonimizowane informacje:\n\n • Czy niektóre funkcje przeglądarki są aktywne\n• Zbiorcza diagnostyka aplikacji (np. kody błędów)\n\n Klikając przycisk przesyłania, wyrażasz zgodę na możliwość wykorzystania przez DuckDuckGo przesłanych informacji w celu ulepszenia aplikacji."</string>
+    <string name="feedbackSubmitVpnDisclaimer">"Oprócz szczegółów podanych powyżej wysyłamy wraz z opinią następujące zanonimizowane informacje:\n\n• Czy niektóre funkcje przeglądarki są aktywne\n• Zbiorcza diagnostyka aplikacji (np. kody błędów)\n\n Klikając przycisk przesyłania, wyrażasz zgodę na możliwość wykorzystania przez DuckDuckGo przesłanych informacji w celu ulepszenia aplikacji."</string>
     <string name="feedbackSubmitVpnSubmit">Wyślij</string>
     <string name="feedbackSubmitCompletedMessage">Dziękujemy! Informacje zostały przekazane.</string>
     <string name="feedbackSubmitFailedMessage">Wystąpił błąd</string>
@@ -192,7 +192,7 @@
     <string name="feedbackSubCategoryDuckAiOther">Inne opinie o Duck.ai</string>
 
     <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
-    <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi i czatuj prywatnie z zaawansowanymi modelami AI</string>
+    <string name="subscriptionSettingSubscribeSecure">Zabezpiecz Wi-Fi oraz używaj zaawansowanych modeli AI</string>
 
     <string name="subscriptionSettingGetRebranding">Subskrybuj DuckDuckGo</string>
     <string name="subscriptionSettingTryFreeTrialRebranding">Wypróbuj za darmo</string>
