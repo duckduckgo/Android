@@ -16,6 +16,8 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
+import android.content.Context
+import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
@@ -24,6 +26,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
+import com.duckduckgo.pir.impl.scan.PirForegroundScanService
+import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.Address
 import com.duckduckgo.pir.impl.store.db.UserName
@@ -45,6 +49,8 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
+    private val context: Context,
+    private val scanScheduler: PirScanScheduler,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
     override val messageNames: List<PirDashboardWebMessages> =
@@ -79,6 +85,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
                 jsMessage,
                 success = true,
             )
+
+            context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
+            scanScheduler.scheduleScans()
         }
     }
 

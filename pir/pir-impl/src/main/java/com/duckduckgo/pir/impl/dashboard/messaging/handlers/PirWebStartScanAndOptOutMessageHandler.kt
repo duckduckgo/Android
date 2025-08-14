@@ -16,15 +16,11 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
-import android.content.Context
-import android.content.Intent
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
-import com.duckduckgo.pir.impl.scan.PirForegroundScanService
-import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
@@ -36,10 +32,7 @@ import logcat.logcat
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebStartScanAndOptOutMessageHandler @Inject constructor(
-    private val context: Context,
-    private val scanScheduler: PirScanScheduler,
-) : PirWebJsMessageHandler() {
+class PirWebStartScanAndOptOutMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
 
     override val messageNames: List<PirDashboardWebMessages> =
         listOf(PirDashboardWebMessages.START_SCAN_AND_OPT_OUT)
@@ -51,9 +44,8 @@ class PirWebStartScanAndOptOutMessageHandler @Inject constructor(
     ) {
         logcat { "PIR-WEB: PirWebStartScanAndOptOutMessageHandler: process $jsMessage" }
 
-        context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
-        scanScheduler.scheduleScans()
-
+        // no-op, we rely on saveProfile to start the initial scans
+        // we still need to respond to the message otherwise the web will not continue with the flow
         jsMessaging.sendPirResponse(
             jsMessage = jsMessage,
             success = true,
