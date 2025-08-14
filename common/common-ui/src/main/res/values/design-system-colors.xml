@@ -74,6 +74,7 @@
     <attr name="daxColorControlFillPrimary" format="color"/>
     <attr name="daxColorControlFillSecondary" format="color"/>
     <attr name="daxColorControlFillTertiary" format="color"/>
+    <attr name="daxColorControlDecorationTertiary" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>

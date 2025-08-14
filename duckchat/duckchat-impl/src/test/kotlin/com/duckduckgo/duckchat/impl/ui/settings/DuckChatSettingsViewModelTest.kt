@@ -19,8 +19,10 @@ package com.duckduckgo.duckchat.impl.ui.settings
 import app.cash.turbine.test
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.LaunchFeedback
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLink
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenLinkInNewTab
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.Command.OpenShortcutSettings
@@ -95,14 +97,14 @@ class DuckChatSettingsViewModelTest {
     }
 
     @Test
-    fun `when onDuckAiInputScreen enabled then set user setting`() = runTest {
-        testee.onDuckAiInputScreenToggled(true)
+    fun `when onDuckAiInputScreenWithAiSelected selected then set user setting`() = runTest {
+        testee.onDuckAiInputScreenWithAiSelected()
         verify(duckChat).setInputScreenUserSetting(true)
     }
 
     @Test
-    fun `when onDuckAiInputScreen disabled then set user setting`() = runTest {
-        testee.onDuckAiInputScreenToggled(false)
+    fun `when onDuckAiInputScreenWithoutAiSelected selected then set user setting`() = runTest {
+        testee.onDuckAiInputScreenWithoutAiSelected()
         verify(duckChat).setInputScreenUserSetting(false)
     }
 
@@ -214,14 +216,14 @@ class DuckChatSettingsViewModelTest {
     }
 
     @Test
-    fun `when onDuckAiInputScreenToggled true then on pixel fired`() = runTest {
-        testee.onDuckAiInputScreenToggled(true)
+    fun `when onDuckAiInputScreenWithAiSelected true then on pixel fired`() = runTest {
+        testee.onDuckAiInputScreenWithAiSelected()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
     }
 
     @Test
-    fun `when onDuckAiInputScreenToggled false then off pixel fired`() = runTest {
-        testee.onDuckAiInputScreenToggled(false)
+    fun `when onDuckAiInputScreenWithoutAiSelected false then off pixel fired`() = runTest {
+        testee.onDuckAiInputScreenWithoutAiSelected()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
     }
 
@@ -256,6 +258,17 @@ class DuckChatSettingsViewModelTest {
         testee.commands.test {
             val command = awaitItem()
             assertTrue(command is OpenShortcutSettings)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when input toggle share feedback clicked, then dispatch launch command`() = runTest {
+        testee.duckAiInputScreenShareFeedbackClicked()
+
+        testee.commands.test {
+            val command = awaitItem()
+            assertTrue(command is LaunchFeedback)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -40,6 +40,7 @@
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
         <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_dark</item>
         <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_dark</item>
+        <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_dark</item>
 
         <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>
@@ -83,6 +84,7 @@
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>
         <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_light</item>
         <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_light</item>
+        <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_light</item>
 
         <!-- Widgets -->
         <item name="daxColorToolbar">?attr/daxColorBackground</item>

@@ -49,8 +49,6 @@
     <string name="input_screen_search_hint">Keresés vagy cím megadása</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Duck.ai kérdezése</string>
-    <string name="input_screen_user_pref_title">Kísérleti címsor</string>
-    <string name="input_screen_user_pref_description">Keresés a weben vagy a Duck.ai megkérdezése közvetlenül a címsorból</string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>

@@ -71,6 +71,7 @@ class DuckChatSettingsViewModel @Inject constructor(
         data class OpenLink(val link: String) : Command()
         data class OpenLinkInNewTab(val link: String) : Command()
         data object OpenShortcutSettings : Command()
+        data object LaunchFeedback : Command()
     }
 
     fun onDuckChatUserEnabledToggled(checked: Boolean) {
@@ -81,17 +82,6 @@ class DuckChatSettingsViewModel @Inject constructor(
                 pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
             }
             duckChat.setEnableDuckChatUserSetting(checked)
-        }
-    }
-
-    fun onDuckAiInputScreenToggled(checked: Boolean) {
-        viewModelScope.launch {
-            if (checked) {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
-            } else {
-                pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
-            }
-            duckChat.setInputScreenUserSetting(checked)
         }
     }
 
@@ -133,6 +123,26 @@ class DuckChatSettingsViewModel @Inject constructor(
     fun onDuckAiShortcutsClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenShortcutSettings)
+        }
+    }
+
+    fun onDuckAiInputScreenWithoutAiSelected() {
+        viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
+            duckChat.setInputScreenUserSetting(enabled = false)
+        }
+    }
+
+    fun onDuckAiInputScreenWithAiSelected() {
+        viewModelScope.launch {
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
+            duckChat.setInputScreenUserSetting(enabled = true)
+        }
+    }
+
+    fun duckAiInputScreenShareFeedbackClicked() {
+        viewModelScope.launch {
+            commandChannel.send(Command.LaunchFeedback)
         }
     }
 
