@@ -33,7 +33,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-class ExperimentAppUsageRepositoryImplTest {
+class DefaultBrowserPromptsAppUsageRepositoryImplTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -52,7 +52,7 @@ class ExperimentAppUsageRepositoryImplTest {
                 .truncatedTo(ChronoUnit.DAYS)
                 .format(DateTimeFormatter.ISO_LOCAL_DATE),
         )
-        val testee = ExperimentAppUsageRepositoryImpl(
+        val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
@@ -65,7 +65,7 @@ class ExperimentAppUsageRepositoryImplTest {
     @Test
     fun `when active days since enrollment queried and first day is null, return failure`() = runTest {
         whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(null)
-        val testee = ExperimentAppUsageRepositoryImpl(
+        val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
@@ -80,7 +80,7 @@ class ExperimentAppUsageRepositoryImplTest {
     fun `when active days since enrollment queried and first day is malformed date, return failure`() = runTest {
         val invalidDate = "not-a-valid-date"
         whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(invalidDate)
-        val testee = ExperimentAppUsageRepositoryImpl(
+        val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
@@ -98,7 +98,7 @@ class ExperimentAppUsageRepositoryImplTest {
         whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(validDate)
         whenever(experimentAppUsageDaoMock.getNumberOfDaysAppUsedSinceDateET(validDate)).thenReturn(expectedDaysUsed)
 
-        val testee = ExperimentAppUsageRepositoryImpl(
+        val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )

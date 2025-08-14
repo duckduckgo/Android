@@ -712,6 +712,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.OpenSavedSite -> currentTab?.openSavedSite(command.url)
             is Command.ShowSetAsDefaultBrowserDialog -> showSetAsDefaultBrowserDialog()
             is Command.DismissSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
+            is Command.DoNotAskAgainSetAsDefaultBrowserDialog -> dismissSetAsDefaultBrowserDialog()
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
@@ -1262,8 +1263,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 viewModel.onSetDefaultBrowserConfirmationButtonClicked()
             }
 
-            override fun onNotNowButtonClicked() {
-                viewModel.onSetDefaultBrowserNotNowButtonClicked()
+            override fun onDoNotAskAgainButtonClicked() {
+                viewModel.onSetDefaultBrowserDoNotAskAgainButtonClicked()
             }
         }
         dialog.show()

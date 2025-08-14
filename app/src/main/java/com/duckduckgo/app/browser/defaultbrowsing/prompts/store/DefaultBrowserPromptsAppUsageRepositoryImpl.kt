@@ -37,10 +37,10 @@ import kotlinx.coroutines.withContext
 
 @ContributesBinding(scope = AppScope::class)
 @SingleInstanceIn(scope = AppScope::class)
-class ExperimentAppUsageRepositoryImpl @Inject constructor(
+class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val experimentAppUsageDao: ExperimentAppUsageDao,
-) : ExperimentAppUsageRepository {
+) : DefaultBrowserPromptsAppUsageRepository {
 
     override suspend fun recordAppUsedNow() = withContext(dispatchers.io()) {
         val isoDateET = ZonedDateTime.now(ZoneId.of("America/New_York"))
