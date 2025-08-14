@@ -49,7 +49,7 @@ fun ImageView.loadFavicon(
             .load(file)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .skipMemoryCache(true)
-            .transform(RoundedCorners(10))
+            .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
             .placeholder(defaultDrawable)
             .error(defaultDrawable)
             .into(this)
@@ -70,7 +70,7 @@ fun ImageView.loadFavicon(
             .load(bitmap)
             .diskCacheStrategy(DiskCacheStrategy.NONE)
             .skipMemoryCache(true)
-            .transform(RoundedCorners(10))
+            .transform(RoundedCorners(context.resources.getDimensionPixelSize(CommonR.dimen.verySmallShapeCornerRadius)))
             .placeholder(defaultDrawable)
             .error(defaultDrawable)
             .into(this)
@@ -97,7 +97,7 @@ fun generateDefaultDrawable(
     context: Context,
     domain: String,
     overridePlaceholderCharacter: String? = null,
-    @DimenRes cornerRadius: Int = CommonR.dimen.keyline_0,
+    @DimenRes cornerRadius: Int = CommonR.dimen.verySmallShapeCornerRadius,
 ): Drawable {
     return object : Drawable() {
         private val baseHost: String = domain.toUri().baseHost ?: ""
