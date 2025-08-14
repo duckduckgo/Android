@@ -48,6 +48,27 @@ interface BrokerDao {
     @Query("DELETE from pir_broker_details where name = :brokerName")
     fun deleteBroker(brokerName: String)
 
+    @Query("SELECT * from pir_broker_mirror_sites")
+    fun getAllMirrorSites(): List<MirrorSiteEntity>
+
+    @Query("SELECT * from pir_broker_mirror_sites where removedAt = 0")
+    fun getAllActiveMirrorSites(): List<MirrorSiteEntity>
+
+    @Query("SELECT * from pir_broker_mirror_sites where removedAt = 0 AND parentSite = :brokerName")
+    fun getAllActiveMirrorSitesForBroker(brokerName: String): List<MirrorSiteEntity>
+
+    @Query("SELECT * from pir_broker_mirror_sites where parentSite = :brokerName")
+    fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSiteEntity>
+
+    @Query("DELETE from pir_broker_mirror_sites")
+    fun deleteAllMirrorSites()
+
+    @Query("DELETE from pir_broker_mirror_sites where parentSite = :brokerName")
+    fun deleteMirrorSitesForBroker(brokerName: String)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertMirrorSites(mirrorSiteEntity: List<MirrorSiteEntity>)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertBroker(broker: Broker)
 
@@ -66,12 +87,15 @@ interface BrokerDao {
         brokerScan: BrokerScan,
         brokerOptOut: BrokerOptOut,
         schedulingConfig: BrokerSchedulingConfigEntity,
+        mirrorSiteEntity: List<MirrorSiteEntity>,
     ) {
         deleteBroker(broker.name)
+        deleteMirrorSitesForBroker(broker.name)
         insertBroker(broker)
         insertScanSteps(brokerScan)
         insertOptOutSteps(brokerOptOut)
         insertBrokerSchedulingConfig(schedulingConfig)
+        insertMirrorSites(mirrorSiteEntity)
     }
 
     @Query("SELECT brokerName from pir_broker_scan")
