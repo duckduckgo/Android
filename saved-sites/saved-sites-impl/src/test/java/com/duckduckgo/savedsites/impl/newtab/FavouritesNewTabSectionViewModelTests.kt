@@ -26,11 +26,14 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.ShowEditSavedSiteDialog
+import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.SwipeDecision
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -200,5 +203,79 @@ class FavouritesNewTabSectionViewModelTests {
         testee.onListCollapsed()
 
         verify(pixel).fire(SavedSitesPixelName.FAVOURITES_LIST_COLLAPSED)
+    }
+
+    @Test
+    fun `when onLongPressTriggered then isLongPressActive returns true`() {
+        assertFalse(testee.isLongPressActive())
+
+        testee.onLongPressTriggered()
+
+        assertTrue(testee.isLongPressActive())
+    }
+
+    @Test
+    fun `when onTouchDown then isLongPressActive returns false`() {
+        testee.onLongPressTriggered()
+        assertTrue(testee.isLongPressActive())
+
+        testee.onTouchDown(0f, 0f)
+
+        assertFalse(testee.isLongPressActive())
+    }
+
+    @Test
+    fun `when onTouchUp then isLongPressActive returns false`() {
+        testee.onLongPressTriggered()
+        assertTrue(testee.isLongPressActive())
+
+        testee.onTouchUp()
+
+        assertFalse(testee.isLongPressActive())
+    }
+
+    @Test
+    fun `when onTouchMove and dx greater than dy and touchSlop then return HORIZONTAL swipe`() {
+        testee.onTouchDown(0f, 0f)
+
+        val decision = testee.onTouchMove(x = 3f, y = 1f, touchSlop = 2)
+
+        assertEquals(SwipeDecision.HORIZONTAL, decision)
+    }
+
+    @Test
+    fun `when onTouchMove and dy greater than dx and touchSlop then return VERTICAL swipe`() {
+        testee.onTouchDown(0f, 0f)
+
+        val decision = testee.onTouchMove(x = 1f, y = 3f, touchSlop = 2)
+
+        assertEquals(SwipeDecision.VERTICAL, decision)
+    }
+
+    @Test
+    fun `when onTouchMove and dx and dy are equal and greater than touchSlop then return CANCEL_LONG_PRESS`() {
+        testee.onTouchDown(0f, 0f)
+
+        val decision = testee.onTouchMove(x = 2f, y = 2f, touchSlop = 1)
+
+        assertEquals(SwipeDecision.CANCEL_LONG_PRESS, decision)
+    }
+
+    @Test
+    fun `when onTouchMove and dx and dy are less than touchSlop then return null`() {
+        testee.onTouchDown(0f, 0f)
+
+        val decision = testee.onTouchMove(x = 1f, y = 1f, touchSlop = 2)
+
+        assertNull(decision)
+    }
+
+    @Test
+    fun `when onTouchMove and dx and dy and touchSlop are equal then return null`() {
+        testee.onTouchDown(0f, 0f)
+
+        val decision = testee.onTouchMove(x = 1f, y = 1f, touchSlop = 1)
+
+        assertNull(decision)
     }
 }
