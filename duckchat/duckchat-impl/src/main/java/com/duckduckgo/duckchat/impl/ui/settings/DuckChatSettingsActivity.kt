@@ -43,11 +43,11 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ActivityDuckChatSettingsBinding
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_SETTINGS_DISPLAYED
 import com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsViewModel.ViewState
+import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(DuckChatSettingsNoParams::class, screenName = "duckai.settings")
@@ -217,7 +217,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             CommonR.drawable.ic_shape_circle_24
         }
 
-        class WithoutAi(isActive: Boolean): InputScreenToggleButton(isActive) {
+        class WithoutAi(isActive: Boolean) : InputScreenToggleButton(isActive) {
             override val imageRes: Int = if (isActive) {
                 R.drawable.searchbox_withoutai_active
             } else {
@@ -225,7 +225,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             }
         }
 
-        class WithAi(isActive: Boolean): InputScreenToggleButton(isActive) {
+        class WithAi(isActive: Boolean) : InputScreenToggleButton(isActive) {
             override val imageRes: Int = if (isActive) {
                 R.drawable.searchbox_withai_active
             } else {
