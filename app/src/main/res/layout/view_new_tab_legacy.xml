@@ -34,13 +34,12 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/ddgLogo"
             android:layout_height="wrap_content"
             android:layout_width="@dimen/ntpDaxLogoIconWidth"
-            android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
             android:adjustViewBounds="true"
             android:alpha="0"
             android:contentDescription="@string/duckDuckGoLogoDescription"
@@ -48,6 +47,7 @@
             android:maxHeight="180dp"
             app:srcCompat="@drawable/logo_full"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
