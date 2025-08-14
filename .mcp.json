@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "doc-bot": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@afterxleep/doc-bot@latest",
+        "--docs",
+        "./.rules",
+        "--watch"
+      ]
+    }
+  }
+}
