@@ -162,6 +162,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
+import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
@@ -3674,6 +3675,23 @@ class BrowserTabViewModel @Inject constructor(
         )
     }
 
+    fun webViewCompatProcessJsCallbackMessage(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        when (method) {
+            "webShare" -> if (id != null && data != null) {
+                webViewCompatWebShare(featureName, method, id, data, onResponse)
+            }
+            "addDebugFlag" -> {
+                site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
+            }
+        }
+    }
+
     fun processJsCallbackMessage(
         featureName: String,
         method: String,
@@ -3757,6 +3775,18 @@ class BrowserTabViewModel @Inject constructor(
     ) {
         viewModelScope.launch(dispatchers.main()) {
             command.value = WebShareRequest(JsCallbackData(data, featureName, method, id))
+        }
+    }
+
+    private fun webViewCompatWebShare(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = WebViewCompatWebShareRequest(JsCallbackData(data, featureName, method, id), onResponse)
         }
     }
 

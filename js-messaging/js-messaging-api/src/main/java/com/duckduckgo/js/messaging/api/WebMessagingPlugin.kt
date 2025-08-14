@@ -20,7 +20,7 @@ import android.webkit.WebView
 
 interface WebMessagingPlugin {
     fun register(
-        jsMessageCallback: JsMessageCallback,
+        jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
     )
 
