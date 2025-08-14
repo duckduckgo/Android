@@ -27,6 +27,7 @@ import com.duckduckgo.remote.messaging.api.Content.Placeholder.ANNOUNCE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.APP_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.CRITICAL_UPDATE
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DDG_ANNOUNCE
+import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI_OLD
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.DUCK_AI
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.MAC_AND_WINDOWS
 import com.duckduckgo.remote.messaging.api.Content.Placeholder.PRIVACY_SHIELD
@@ -81,7 +82,8 @@ private fun Placeholder.drawable(isLightModeEnabled: Boolean): Int {
         APP_UPDATE -> R.drawable.ic_app_update
         MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
         PRIVACY_SHIELD -> R.drawable.ic_privacy_pro
-        DUCK_AI -> R.drawable.ic_duck_ai
+        DUCK_AI_OLD -> R.drawable.ic_duck_ai
+        DUCK_AI -> R.drawable.ic_duckai
         VISUAL_DESIGN_UPDATE -> if (isLightModeEnabled) {
             R.drawable.ic_visual_design_update_artwork_light
         } else {
