@@ -29,15 +29,17 @@
         android:layout_height="@dimen/gridItemImageSize"
         android:layout_gravity="center_horizontal"
         app:cardBackgroundColor="?attr/daxColorSurface"
-        app:cardCornerRadius="@dimen/smallShapeCornerRadius"
+        app:cardCornerRadius="@dimen/mediumShapeCornerRadius"
         tools:visibility="gone"
-        app:cardElevation="2dp">
+        app:cardElevation="0dp">
 
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/quickAccessFavicon"
-            android:layout_width="@dimen/gridItemImageSize"
-            android:layout_height="@dimen/gridItemImageSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/keyline_2"
             android:layout_gravity="center"
+            app:shapeAppearanceOverlay="@style/Widget.DuckDuckGo.FavouritesItemFavicon"
             android:importantForAccessibility="no" />
 
     </com.google.android.material.card.MaterialCardView>
