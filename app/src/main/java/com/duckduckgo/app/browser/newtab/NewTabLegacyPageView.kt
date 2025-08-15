@@ -45,6 +45,7 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.ui.store.AppTheme
@@ -98,6 +99,9 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var settingsDataStore: SettingsDataStore
+
     private val binding: ViewNewTabLegacyBinding by viewBinding()
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
@@ -145,7 +149,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             this.show()
             onHasContent?.invoke(true)
             if (isHomeBackgroundLogoVisible) {
-                homeBackgroundLogo.showLogo()
+                homeBackgroundLogo.showLogo(settingsDataStore.omnibarPosition)
             } else {
                 homeBackgroundLogo.hideLogo()
             }
