@@ -73,7 +73,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 58,
+    version = 59,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
