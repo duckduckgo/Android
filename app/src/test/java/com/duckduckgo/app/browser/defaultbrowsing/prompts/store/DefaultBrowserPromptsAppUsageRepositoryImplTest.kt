@@ -70,7 +70,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
 
-        val result = testee.getActiveDaysUsedSinceEnrollment()
+        val result = testee.getActiveDaysUsedSinceStart()
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalStateException)
@@ -85,7 +85,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
 
-        val result = testee.getActiveDaysUsedSinceEnrollment()
+        val result = testee.getActiveDaysUsedSinceStart()
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is DateTimeParseException)
@@ -103,7 +103,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
             experimentAppUsageDao = experimentAppUsageDaoMock,
         )
 
-        val result = testee.getActiveDaysUsedSinceEnrollment()
+        val result = testee.getActiveDaysUsedSinceStart()
 
         assertTrue(result.isSuccess)
         Assert.assertEquals(expectedDaysUsed, result.getOrThrow())

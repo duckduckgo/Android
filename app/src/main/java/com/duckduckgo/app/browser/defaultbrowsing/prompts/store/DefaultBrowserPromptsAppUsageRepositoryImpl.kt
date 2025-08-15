@@ -50,14 +50,14 @@ class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
         experimentAppUsageDao.insert(ExperimentAppUsageEntity(isoDateET))
     }
 
-    override suspend fun getActiveDaysUsedSinceEnrollment(): Result<Long> = withContext(dispatchers.io()) {
+    override suspend fun getActiveDaysUsedSinceStart(): Result<Long> = withContext(dispatchers.io()) {
         try {
-            // enrollmentDateET is already a String like "2025-07-23"
-            val enrollmentDateETString = experimentAppUsageDao.getFirstDay()
-            if (enrollmentDateETString == null) {
+            // dateETString is already a String like "2025-07-23"
+            val dateETString = experimentAppUsageDao.getFirstDay()
+            if (dateETString == null) {
                 return@withContext Result.failure(IllegalStateException("Date is missing"))
             }
-            val parsedDate = LocalDate.parse(enrollmentDateETString, DateTimeFormatter.ISO_LOCAL_DATE)
+            val parsedDate = LocalDate.parse(dateETString, DateTimeFormatter.ISO_LOCAL_DATE)
             val isoDateET = parsedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
             val daysUsed = experimentAppUsageDao.getNumberOfDaysAppUsedSinceDateET(isoDateET)

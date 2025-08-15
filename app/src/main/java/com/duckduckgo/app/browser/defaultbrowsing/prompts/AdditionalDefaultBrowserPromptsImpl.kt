@@ -249,7 +249,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             STARTED
         } else {
             logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
-            val appActiveDaysUsedSinceEnrollment = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
+            val appActiveDaysUsedSinceEnrollment = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
