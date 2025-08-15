@@ -8,11 +8,11 @@ spotless {
         targetExclude("**/FragmentStateAdapter.java") // temporary
         removeUnusedImports()
         trimTrailingWhitespace()
-        indentWithSpaces()
+        leadingTabsToSpaces()
     }
     format 'xml', {
         target '**/*.xml'
-        indentWithSpaces()
+        leadingTabsToSpaces()
         trimTrailingWhitespace()
     }
 }
