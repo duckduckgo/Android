@@ -79,12 +79,12 @@ abstract class DefaultBrowserPromptsAppUsageDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insert(defaultBrowserPromptsAppUsageEntity: DefaultBrowserPromptsAppUsageEntity)
 
-    @Query("SELECT COUNT(*) from experiment_app_usage_entity WHERE isoDateET > :isoDateET")
+    @Query("SELECT COUNT(*) from default_browser_prompts_app_usage WHERE isoDateET > :isoDateET")
     abstract fun getNumberOfDaysAppUsedSinceDateET(isoDateET: String): Long
 
-    @Query("SELECT isoDateET FROM experiment_app_usage_entity ORDER BY isoDateET ASC LIMIT 1")
+    @Query("SELECT isoDateET FROM default_browser_prompts_app_usage ORDER BY isoDateET ASC LIMIT 1")
     abstract fun getFirstDay(): String?
 }
 
-@Entity(tableName = "experiment_app_usage_entity")
+@Entity(tableName = "default_browser_prompts_app_usage")
 data class DefaultBrowserPromptsAppUsageEntity(@PrimaryKey val isoDateET: String)
