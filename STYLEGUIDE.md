@@ -5,8 +5,8 @@
 
 ###  Code formatting
 
-You can check the code formatting correctness by running `./gradleW code_format_checks`.
-To adhere to codestyle, please run `./gradleW formatKotlin` and `./gradleW spotlessApply` to autoformat in order to fix any CI issues.
+You can check the code formatting correctness by running `./gradleW spotlessCheck`.
+To adhere to codestyle, please run `./gradleW spotlessApply` to autoformat and fix any CI issues.
 
 If you want to do this automatically upon commit we recommend the existing [pre-commit hook](.githooks/pre-commit):
 - Pull develop branch
