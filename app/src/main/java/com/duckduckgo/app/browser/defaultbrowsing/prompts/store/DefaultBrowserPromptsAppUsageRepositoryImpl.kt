@@ -47,7 +47,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
             .truncatedTo(ChronoUnit.DAYS)
             .format(DateTimeFormatter.ISO_LOCAL_DATE)
 
-        defaultBrowserPromptsAppUsageDao.insert(ExperimentAppUsageEntity(isoDateET))
+        defaultBrowserPromptsAppUsageDao.insert(DefaultBrowserPromptsAppUsageEntity(isoDateET))
     }
 
     override suspend fun getActiveDaysUsedSinceStart(): Result<Long> = withContext(dispatchers.io()) {
@@ -77,7 +77,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
 abstract class DefaultBrowserPromptsAppUsageDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun insert(experimentAppUsageEntity: ExperimentAppUsageEntity)
+    abstract fun insert(defaultBrowserPromptsAppUsageEntity: DefaultBrowserPromptsAppUsageEntity)
 
     @Query("SELECT COUNT(*) from experiment_app_usage_entity WHERE isoDateET > :isoDateET")
     abstract fun getNumberOfDaysAppUsedSinceDateET(isoDateET: String): Long
@@ -87,4 +87,4 @@ abstract class DefaultBrowserPromptsAppUsageDao {
 }
 
 @Entity(tableName = "experiment_app_usage_entity")
-data class ExperimentAppUsageEntity(@PrimaryKey val isoDateET: String)
+data class DefaultBrowserPromptsAppUsageEntity(@PrimaryKey val isoDateET: String)

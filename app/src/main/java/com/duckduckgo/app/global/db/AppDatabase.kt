@@ -27,7 +27,7 @@ import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageEntity
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageEntity
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
@@ -106,7 +106,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
-        ExperimentAppUsageEntity::class,
+        DefaultBrowserPromptsAppUsageEntity::class,
     ],
 )
 

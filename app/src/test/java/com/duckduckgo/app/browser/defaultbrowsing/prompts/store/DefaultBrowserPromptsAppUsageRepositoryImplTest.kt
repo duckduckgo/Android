@@ -47,7 +47,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
 
     @Test
     fun `when record usage, then insert ET time`() = runTest {
-        val expected = ExperimentAppUsageEntity(
+        val expected = DefaultBrowserPromptsAppUsageEntity(
             isoDateET = ZonedDateTime.now(ZoneId.of("America/New_York"))
                 .truncatedTo(ChronoUnit.DAYS)
                 .format(DateTimeFormatter.ISO_LOCAL_DATE),
