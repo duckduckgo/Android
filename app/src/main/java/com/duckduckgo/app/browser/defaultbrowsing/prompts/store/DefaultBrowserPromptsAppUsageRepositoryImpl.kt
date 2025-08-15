@@ -39,7 +39,7 @@ import kotlinx.coroutines.withContext
 @SingleInstanceIn(scope = AppScope::class)
 class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val experimentAppUsageDao: ExperimentAppUsageDao,
+    private val defaultBrowserPromptsAppUsageDao: DefaultBrowserPromptsAppUsageDao,
 ) : DefaultBrowserPromptsAppUsageRepository {
 
     override suspend fun recordAppUsedNow() = withContext(dispatchers.io()) {
@@ -47,20 +47,20 @@ class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
             .truncatedTo(ChronoUnit.DAYS)
             .format(DateTimeFormatter.ISO_LOCAL_DATE)
 
-        experimentAppUsageDao.insert(ExperimentAppUsageEntity(isoDateET))
+        defaultBrowserPromptsAppUsageDao.insert(ExperimentAppUsageEntity(isoDateET))
     }
 
     override suspend fun getActiveDaysUsedSinceStart(): Result<Long> = withContext(dispatchers.io()) {
         try {
             // dateETString is already a String like "2025-07-23"
-            val dateETString = experimentAppUsageDao.getFirstDay()
+            val dateETString = defaultBrowserPromptsAppUsageDao.getFirstDay()
             if (dateETString == null) {
                 return@withContext Result.failure(IllegalStateException("Date is missing"))
             }
             val parsedDate = LocalDate.parse(dateETString, DateTimeFormatter.ISO_LOCAL_DATE)
             val isoDateET = parsedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
 
-            val daysUsed = experimentAppUsageDao.getNumberOfDaysAppUsedSinceDateET(isoDateET)
+            val daysUsed = defaultBrowserPromptsAppUsageDao.getNumberOfDaysAppUsedSinceDateET(isoDateET)
             Result.success(daysUsed)
         } catch (ex: DateTimeParseException) {
             // This catch block will now correctly handle if getFirstDay() returns
@@ -74,7 +74,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImpl @Inject constructor(
 }
 
 @Dao
-abstract class ExperimentAppUsageDao {
+abstract class DefaultBrowserPromptsAppUsageDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun insert(experimentAppUsageEntity: ExperimentAppUsageEntity)

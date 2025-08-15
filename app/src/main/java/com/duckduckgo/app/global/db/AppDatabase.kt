@@ -26,7 +26,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.duckduckgo.app.bookmarks.db.*
 import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageDao
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageDao
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.ExperimentAppUsageEntity
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
@@ -160,7 +160,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun syncRelationsDao(): SavedSitesRelationsDao
 
-    abstract fun experimentAppUsageDao(): ExperimentAppUsageDao
+    abstract fun defaultBrowserPromptsAppUsageDao(): DefaultBrowserPromptsAppUsageDao
 }
 
 @Suppress("PropertyName")
