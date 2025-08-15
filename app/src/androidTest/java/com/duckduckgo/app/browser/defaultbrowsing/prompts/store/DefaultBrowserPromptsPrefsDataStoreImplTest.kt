@@ -79,7 +79,7 @@ class DefaultBrowserPromptsPrefsDataStoreImplTest {
             testee.stage.toList(actualUpdates)
         }
 
-        testee.storeExperimentStage(Stage.STAGE_1)
+        testee.storeStage(Stage.STAGE_1)
 
         assertEquals(expectedUpdates, actualUpdates)
     }

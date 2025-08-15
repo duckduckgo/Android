@@ -205,7 +205,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         appCoroutineScope.launch {
             defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
             if (doNotShowAgain) {
-                defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
+                defaultBrowserPromptsDataStore.storeStage(STOPPED)
             }
         }
     }
@@ -283,7 +283,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         }
 
         if (newStage != null) {
-            defaultBrowserPromptsDataStore.storeExperimentStage(newStage)
+            defaultBrowserPromptsDataStore.storeStage(newStage)
 
             val action = stageEvaluator.evaluate(newStage)
             logcat { "evaluate: action = $action show message dialog = ${action.showMessageDialog}" }
@@ -325,7 +325,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK)
         appCoroutineScope.launch {
             // The user does not want to see the prompt again, so we jump to stage 2.
-            defaultBrowserPromptsDataStore.storeExperimentStage(STAGE_2)
+            defaultBrowserPromptsDataStore.storeStage(STAGE_2)
         }
     }
 

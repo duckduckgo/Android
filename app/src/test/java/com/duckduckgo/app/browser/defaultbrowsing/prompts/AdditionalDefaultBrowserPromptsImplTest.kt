@@ -294,7 +294,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock, never()).storeStage(any())
         assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
     }
 
@@ -306,7 +306,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock, never()).storeStage(any())
         assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
     }
 
@@ -318,7 +318,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock, never()).storeStage(any())
         assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
     }
 
@@ -330,7 +330,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, atMostOnce()).storeExperimentStage(Stage.STOPPED)
+        verify(dataStoreMock, atMostOnce()).storeStage(Stage.STOPPED)
         assertEquals(Stage.STOPPED, dataStoreMock.stage.first())
     }
 
@@ -353,7 +353,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock).storeUserType(UserType.EXISTING)
-        verify(dataStoreMock).storeExperimentStage(Stage.STARTED)
+        verify(dataStoreMock).storeStage(Stage.STARTED)
         verify(stageEvaluatorMock).evaluate(Stage.STARTED)
     }
 
@@ -372,7 +372,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock, never()).storeStage(any())
         verify(stageEvaluatorMock, never()).evaluate(any())
         verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
         verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
@@ -400,7 +400,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(Stage.STAGE_1)
+        verify(dataStoreMock).storeStage(Stage.STAGE_1)
         verify(stageEvaluatorMock).evaluate(Stage.STAGE_1)
     }
 
@@ -424,7 +424,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock, never()).storeStage(any())
         verify(stageEvaluatorMock, never()).evaluate(any())
         verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
         verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
@@ -450,7 +450,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
             testee.onResume(lifecycleOwnerMock)
 
-            verify(dataStoreMock, never()).storeExperimentStage(any())
+            verify(dataStoreMock, never()).storeStage(any())
             verify(stageEvaluatorMock, never()).evaluate(any())
             verify(pixelMock, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
             verify(pixelMock, never()).fire(any<String>(), any(), any(), any())
@@ -479,7 +479,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(Stage.STAGE_2)
+        verify(dataStoreMock).storeStage(Stage.STAGE_2)
         verify(stageEvaluatorMock).evaluate(Stage.STAGE_2)
     }
 
@@ -507,7 +507,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
             testee.onResume(lifecycleOwnerMock)
 
-            verify(dataStoreMock).storeExperimentStage(Stage.STAGE_3)
+            verify(dataStoreMock).storeStage(Stage.STAGE_3)
             verify(stageEvaluatorMock).evaluate(Stage.STAGE_3)
         }
 
@@ -524,7 +524,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
+        verify(dataStoreMock).storeStage(Stage.STOPPED)
         verify(stageEvaluatorMock).evaluate(Stage.STOPPED)
     }
 
@@ -541,7 +541,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock).storeExperimentStage(Stage.STOPPED)
+        verify(dataStoreMock).storeStage(Stage.STOPPED)
         verify(stageEvaluatorMock).evaluate(Stage.STOPPED)
     }
 
@@ -558,7 +558,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
 
         testee.onResume(lifecycleOwnerMock)
 
-        verify(dataStoreMock, never()).storeExperimentStage(any())
+        verify(dataStoreMock, never()).storeStage(any())
         verify(stageEvaluatorMock, never()).evaluate(any())
     }
 
@@ -847,7 +847,7 @@ class DefaultBrowserPromptsDataStoreMock(
     private val _showSetAsDefaultMessage = MutableStateFlow(initialShowSetAsDefaultMessage)
     override val showSetAsDefaultMessage: Flow<Boolean> = _showSetAsDefaultMessage.asStateFlow()
 
-    override suspend fun storeExperimentStage(stage: Stage) {
+    override suspend fun storeStage(stage: Stage) {
         _experimentStage.value = stage
     }
 
