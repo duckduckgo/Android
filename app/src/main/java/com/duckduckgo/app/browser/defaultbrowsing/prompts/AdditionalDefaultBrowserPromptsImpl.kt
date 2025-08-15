@@ -249,12 +249,12 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             STARTED
         } else {
             logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
-            val appActiveDaysUsedSinceEnrollment = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
+            val appActiveDaysUsedSinceStart = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
 
-            logcat { "evaluate: active days used since flow started = $appActiveDaysUsedSinceEnrollment" }
+            logcat { "evaluate: active days used since flow started = $appActiveDaysUsedSinceStart" }
 
             val configSettings = featureSettings ?: run {
                 // If feature settings weren't cached before, deserialize and cache them now.
@@ -269,11 +269,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             when (userType) {
                 DefaultBrowserPromptsDataStore.UserType.NEW -> {
                     logcat { "evaluate: user is new" }
-                    getNewStageForNewUser(currentStage, appActiveDaysUsedSinceEnrollment, configSettings)
+                    getNewStageForNewUser(currentStage, appActiveDaysUsedSinceStart, configSettings)
                 }
                 DefaultBrowserPromptsDataStore.UserType.EXISTING -> {
                     logcat { "evaluate: user is existing" }
-                    getNewStageForExistingUser(currentStage, appActiveDaysUsedSinceEnrollment, configSettings)
+                    getNewStageForExistingUser(currentStage, appActiveDaysUsedSinceStart, configSettings)
                 }
                 else -> {
                     logcat { "evaluate: user type is not known, skipping evaluation" }
@@ -406,12 +406,12 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     private fun getNewStageForNewUser(
         currentStage: Stage?,
-        appActiveDaysUsedSinceEnrollment: Long,
+        appActiveDaysUsedSinceStart: Long,
         configSettings: FeatureSettings,
     ): Stage? {
         return when (currentStage) {
             STARTED -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage1) {
+                if (appActiveDaysUsedSinceStart >= configSettings.newUserActiveDaysUntilStage1) {
                     logcat { "evaluate: user is new, go from STARTED to STAGE_1." }
                     STAGE_1
                 } else {
@@ -420,7 +420,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_1 -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage2) {
+                if (appActiveDaysUsedSinceStart >= configSettings.newUserActiveDaysUntilStage2) {
                     logcat { "evaluate: user is new, go from STAGE_1 to STAGE_2." }
                     STAGE_2
                 } else {
@@ -429,7 +429,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_2 -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage3) {
+                if (appActiveDaysUsedSinceStart >= configSettings.newUserActiveDaysUntilStage3) {
                     logcat { "evaluate: user is new, go from STAGE_2 to STAGE_3." }
                     STAGE_3
                 } else {
@@ -451,12 +451,12 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     private fun getNewStageForExistingUser(
         currentStage: Stage?,
-        appActiveDaysUsedSinceEnrollment: Long,
+        appActiveDaysUsedSinceStart: Long,
         configSettings: FeatureSettings,
     ): Stage? {
         return when (currentStage) {
             STARTED -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage1) {
+                if (appActiveDaysUsedSinceStart >= configSettings.existingUserActiveDaysUntilStage1) {
                     logcat { "evaluate: user is existing, go from STARTED to STAGE_1." }
                     STAGE_1
                 } else {
@@ -465,7 +465,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_1 -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage3) {
+                if (appActiveDaysUsedSinceStart >= configSettings.existingUserActiveDaysUntilStage3) {
                     logcat { "evaluate: user is existing, skip STAGE_2 and go from STAGE_1 to STAGE_3." }
                     STAGE_3
                 } else {
