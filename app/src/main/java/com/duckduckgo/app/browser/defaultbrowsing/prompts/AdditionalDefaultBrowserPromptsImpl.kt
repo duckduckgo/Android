@@ -31,11 +31,11 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageRepository
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
@@ -244,17 +244,17 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
             logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED." }
             STOPPED
-        } else if (currentStage == NOT_ENROLLED) {
-            logcat { "evaluate: new stage is ENROLLED" }
-            ENROLLED
+        } else if (currentStage == NOT_STARTED) {
+            logcat { "evaluate: new stage is STARTED" }
+            STARTED
         } else {
-            logcat { "evaluate: current stage is other than NOT_ENROLLED and DuckDuckGo is NOT default browser." }
+            logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
             val appActiveDaysUsedSinceEnrollment = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
 
-            logcat { "evaluate: active days used since enrollment = $appActiveDaysUsedSinceEnrollment" }
+            logcat { "evaluate: active days used since flow started = $appActiveDaysUsedSinceEnrollment" }
 
             val configSettings = featureSettings ?: run {
                 // If feature settings weren't cached before, deserialize and cache them now.
@@ -410,9 +410,9 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         configSettings: FeatureSettings,
     ): Stage? {
         return when (currentStage) {
-            ENROLLED -> {
+            STARTED -> {
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage1) {
-                    logcat { "evaluate: user is new, go from ENROLLED to STAGE_1." }
+                    logcat { "evaluate: user is new, go from STARTED to STAGE_1." }
                     STAGE_1
                 } else {
                     null
@@ -455,9 +455,9 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         configSettings: FeatureSettings,
     ): Stage? {
         return when (currentStage) {
-            ENROLLED -> {
+            STARTED -> {
                 if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage1) {
-                    logcat { "evaluate: user is existing, go from ENROLLED to STAGE_1." }
+                    logcat { "evaluate: user is existing, go from STARTED to STAGE_1." }
                     STAGE_1
                 } else {
                     null

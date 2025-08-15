@@ -17,11 +17,11 @@
 package com.duckduckgo.app.browser.defaultbrowsing.prompts
 
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -52,9 +52,9 @@ class DefaultBrowserPromptsFlowStageEvaluatorImpl @Inject constructor() : Defaul
 
     override suspend fun evaluate(newStage: Stage): DefaultBrowserPromptsFlowStageAction =
         when (newStage) {
-            NOT_ENROLLED -> DefaultBrowserPromptsFlowStageAction.disableAll
+            NOT_STARTED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
-            ENROLLED -> DefaultBrowserPromptsFlowStageAction.disableAll
+            STARTED -> DefaultBrowserPromptsFlowStageAction.disableAll
 
             STAGE_1 -> DefaultBrowserPromptsFlowStageAction(
                 showMessageDialog = true,

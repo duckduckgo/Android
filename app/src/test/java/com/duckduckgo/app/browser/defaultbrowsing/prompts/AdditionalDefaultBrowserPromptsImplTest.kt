@@ -295,7 +295,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
+        assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -307,7 +307,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
+        assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -319,7 +319,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock, never()).storeExperimentStage(any())
-        assertEquals(Stage.NOT_ENROLLED, dataStoreMock.stage.first())
+        assertEquals(Stage.NOT_STARTED, dataStoreMock.stage.first())
     }
 
     @Test
@@ -348,19 +348,19 @@ class AdditionalDefaultBrowserPromptsImplTest {
             highlightPopupMenu = false,
             showMessage = false,
         )
-        whenever(stageEvaluatorMock.evaluate(Stage.ENROLLED)).thenReturn(action)
+        whenever(stageEvaluatorMock.evaluate(Stage.STARTED)).thenReturn(action)
 
         testee.onResume(lifecycleOwnerMock)
 
         verify(dataStoreMock).storeUserType(UserType.EXISTING)
-        verify(dataStoreMock).storeExperimentStage(Stage.ENROLLED)
-        verify(stageEvaluatorMock).evaluate(Stage.ENROLLED)
+        verify(dataStoreMock).storeExperimentStage(Stage.STARTED)
+        verify(stageEvaluatorMock).evaluate(Stage.STARTED)
     }
 
     @Test
     fun `evaluate - if enrolled, browser not set as default, and not enough active days until stage 1, then do nothing`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.ENROLLED,
+            initialStage = Stage.STARTED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -381,7 +381,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if enrolled, browser not set as default, and enough active days until stage 1, then move to stage 1`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.ENROLLED,
+            initialStage = Stage.STARTED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -565,7 +565,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     @Test
     fun `evaluate - if stage changes and show dialog action produced, then propagate it`() = runTest {
         val dataStoreMock = createDataStoreFake(
-            initialStage = Stage.ENROLLED,
+            initialStage = Stage.STARTED,
         )
         val testee = createTestee(
             defaultBrowserPromptsDataStore = dataStoreMock,
@@ -790,7 +790,7 @@ class AdditionalDefaultBrowserPromptsImplTest {
     )
 
     private fun createDataStoreFake(
-        initialStage: Stage = Stage.NOT_ENROLLED,
+        initialStage: Stage = Stage.NOT_STARTED,
         userType: UserType = UserType.UNKNOWN,
         initialShowPopupMenuItem: Boolean = false,
         initialHighlightPopupMenuIcon: Boolean = false,

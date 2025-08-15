@@ -23,7 +23,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType.UNKNOWN
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -48,8 +48,8 @@ interface DefaultBrowserPromptsDataStore {
     suspend fun storeShowSetAsDefaultMessageState(show: Boolean)
 
     enum class Stage {
-        NOT_ENROLLED,
-        ENROLLED,
+        NOT_STARTED,
+        STARTED,
         STAGE_1,
         STAGE_2,
         STAGE_3,
@@ -77,7 +77,7 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
     }
 
     override val stage: Flow<Stage> = store.data.map { preferences ->
-        preferences[stringPreferencesKey(PREF_KEY_EXPERIMENT_STAGE_ID)]?.let { Stage.valueOf(it) } ?: NOT_ENROLLED
+        preferences[stringPreferencesKey(PREF_KEY_EXPERIMENT_STAGE_ID)]?.let { Stage.valueOf(it) } ?: NOT_STARTED
     }
 
     override val userType: Flow<UserType> = store.data.map { preferences ->

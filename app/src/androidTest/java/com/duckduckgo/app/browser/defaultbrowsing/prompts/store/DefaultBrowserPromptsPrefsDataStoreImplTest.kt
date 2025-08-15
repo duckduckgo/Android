@@ -64,14 +64,14 @@ class DefaultBrowserPromptsPrefsDataStoreImplTest {
     fun whenExperimentInitializedThenDefaultValueIsNotEnrolled() = runTest {
         val testee = DefaultBrowserPromptsPrefsDataStoreImpl(testDataStore, coroutinesTestRule.testDispatcherProvider)
 
-        assertEquals(testee.stage.first(), Stage.NOT_ENROLLED)
+        assertEquals(testee.stage.first(), Stage.NOT_STARTED)
     }
 
     @Test
     fun whenExperimentStageIsUpdatedThenValueIsPropagated() = runTest {
         val testee = DefaultBrowserPromptsPrefsDataStoreImpl(testDataStore, coroutinesTestRule.testDispatcherProvider)
         val expectedUpdates = listOf(
-            Stage.NOT_ENROLLED,
+            Stage.NOT_STARTED,
             Stage.STAGE_1,
         )
         val actualUpdates = mutableListOf<Stage>()
