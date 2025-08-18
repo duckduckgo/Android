@@ -21,10 +21,10 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
-import org.json.JSONObject
 
 /**
  * Handles the initial handshake message from Web which is used to establish communication.
@@ -35,7 +35,7 @@ import org.json.JSONObject
 )
 class PirWebHandshakeMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.HANDSHAKE)
+    override val message = PirDashboardWebMessages.HANDSHAKE
 
     override fun process(
         jsMessage: JsMessage,
@@ -44,20 +44,14 @@ class PirWebHandshakeMessageHandler @Inject constructor() : PirWebJsMessageHandl
     ) {
         logcat { "PIR-WEB: PirWebHandshakeMessageHandler: process $jsMessage" }
 
-        jsMessaging.sendPirResponse(
+        jsMessaging.sendResponse(
             jsMessage = jsMessage,
-            success = true,
-            customParams = mapOf(
-                PARAM_USER_DATA to JSONObject().apply {
-                    // TODO Check access token and subscription
-                    put(PARAM_IS_AUTHENTICATED_USER, true)
-                },
+            response = PirWebMessageResponse.HandshakeResponse(
+                success = true,
+                userData = PirWebMessageResponse.HandshakeResponse.UserData(
+                    isAuthenticatedUser = true,
+                ),
             ),
         )
-    }
-
-    companion object {
-        private const val PARAM_USER_DATA = "userData"
-        private const val PARAM_IS_AUTHENTICATED_USER = "isAuthenticatedUser"
     }
 }

@@ -25,6 +25,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -53,8 +54,8 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val scanScheduler: PirScanScheduler,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.SAVE_PROFILE)
+
+    override val message = PirDashboardWebMessages.SAVE_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -69,9 +70,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             (pirWebOnboardingStateHolder.birthYear ?: 0) == 0
         ) {
             logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: incomplete profile information" }
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = false,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
             )
             return
         }
@@ -81,9 +82,9 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
             repository.saveUserProfiles(profiles)
 
             // TODO check if all profiles were saved successfully
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage,
-                success = true,
+                response = PirWebMessageResponse.DefaultResponse.SUCCESS,
             )
 
             context.startForegroundService(Intent(context, PirForegroundScanService::class.java))

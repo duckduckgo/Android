@@ -21,6 +21,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
@@ -34,8 +35,7 @@ import logcat.logcat
 )
 class PirWebStartScanAndOptOutMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.START_SCAN_AND_OPT_OUT)
+    override val message = PirDashboardWebMessages.START_SCAN_AND_OPT_OUT
 
     override fun process(
         jsMessage: JsMessage,
@@ -46,9 +46,9 @@ class PirWebStartScanAndOptOutMessageHandler @Inject constructor() : PirWebJsMes
 
         // no-op, we rely on saveProfile to start the initial scans
         // we still need to respond to the message otherwise the web will not continue with the flow
-        jsMessaging.sendPirResponse(
+        jsMessaging.sendResponse(
             jsMessage = jsMessage,
-            success = true,
+            response = PirWebMessageResponse.DefaultResponse.SUCCESS,
         )
     }
 }

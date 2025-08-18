@@ -21,6 +21,8 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -37,8 +39,7 @@ class PirWebSetBirthYearForCurrentUserProfile @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.SET_BIRTH_YEAR_FOR_CURRENT_USER_PROFILE)
+    override val message = PirDashboardWebMessages.SET_BIRTH_YEAR_FOR_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -47,16 +48,16 @@ class PirWebSetBirthYearForCurrentUserProfile @Inject constructor(
     ) {
         logcat { "PIR-WEB: PirWebSetBirthYearForCurrentUserProfile: process $jsMessage" }
 
+        val birthYear = jsMessage.toRequestMessage(
+            PirWebMessageRequest.SetBirthYearForCurrentUserProfileRequest::class,
+        )?.year ?: 0
+
         // store the new birth year in the current user profile
-        pirWebOnboardingStateHolder.birthYear = jsMessage.params.getInt(PARAM_YEAR)
+        pirWebOnboardingStateHolder.birthYear = birthYear
 
-        jsMessaging.sendPirResponse(
+        jsMessaging.sendResponse(
             jsMessage = jsMessage,
-            success = true,
+            response = PirWebMessageResponse.DefaultResponse.SUCCESS,
         )
-    }
-
-    companion object {
-        private const val PARAM_YEAR = "year"
     }
 }

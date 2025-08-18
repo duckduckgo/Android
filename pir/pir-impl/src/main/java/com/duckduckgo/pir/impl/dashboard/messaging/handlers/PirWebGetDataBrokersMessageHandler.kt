@@ -23,15 +23,13 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.db.Broker
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Handles the getDataBrokers message from Web which is used
@@ -46,8 +44,8 @@ class PirWebGetDataBrokersMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.GET_DATA_BROKERS)
+
+    override val message = PirDashboardWebMessages.GET_DATA_BROKERS
 
     override fun process(
         jsMessage: JsMessage,
@@ -59,32 +57,18 @@ class PirWebGetDataBrokersMessageHandler @Inject constructor(
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val brokers = repository.getAllActiveBrokerObjects()
 
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage,
-                success = true,
-                customParams = mapOf(
-                    PARAM_DATA_BROKERS to brokers.toResponseBrokers(),
+                response = PirWebMessageResponse.GetDataBrokersResponse(
+                    dataBrokers = brokers.map {
+                        PirWebMessageResponse.GetDataBrokersResponse.DataBroker(
+                            url = it.url,
+                            name = it.name,
+                            parentURL = it.parent,
+                        )
+                    },
                 ),
             )
         }
-    }
-
-    private fun List<Broker>.toResponseBrokers(): JSONArray {
-        // TODO verify parentURL and add optOutURL as per documentation
-        return JSONArray().apply {
-            forEach { broker ->
-                put(
-                    JSONObject().apply {
-                        put("url", broker.url)
-                        put("name", broker.name)
-                        put("parentURL", broker.parent ?: JSONObject.NULL)
-                    },
-                )
-            }
-        }
-    }
-
-    companion object {
-        private const val PARAM_DATA_BROKERS = "dataBrokers"
     }
 }
