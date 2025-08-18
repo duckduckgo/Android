@@ -26,7 +26,6 @@ interface JsInjectorPlugin {
      */
     fun onInit(
         webView: WebView,
-        activeExperiments: List<Toggle>,
     )
 
     /**
@@ -36,8 +35,7 @@ interface JsInjectorPlugin {
         webView: WebView,
         url: String?,
         isDesktopMode: Boolean?,
-        activeExperiments: List<Toggle> = listOf(),
-    )
+    ): List<Toggle>
 
     /**
      * This method is called during onPageFinished and receives a [webView] instance, the [url] of the website and the [site]
@@ -45,6 +43,5 @@ interface JsInjectorPlugin {
     fun onPageFinished(
         webView: WebView,
         url: String?,
-        activeExperiments: List<Toggle>,
     )
 }

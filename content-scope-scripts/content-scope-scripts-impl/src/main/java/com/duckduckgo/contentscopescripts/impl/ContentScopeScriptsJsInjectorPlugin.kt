@@ -20,64 +20,79 @@ import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
     private val adsJsContentScopeScripts: AdsJsContentScopeScripts,
+    private val contentScopeExperiments: ContentScopeExperiments,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : JsInjectorPlugin {
     private var script: ScriptHandler? = null
     private var currentScriptString: String? = null
 
+    private var activeExperiments: List<Toggle> = emptyList()
+
     private fun reloadJSIfNeeded(
         webView: WebView,
-        activeExperiments: List<Toggle>,
     ) {
-        if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
-            return
-        }
-        val scriptString = adsJsContentScopeScripts.getScript(activeExperiments)
-        if (scriptString == currentScriptString) {
-            return
-        }
-        script?.let {
-            it.remove()
-            script = null
-        }
-        if (coreContentScopeScripts.isEnabled()) {
-            currentScriptString = scriptString
-            script = WebViewCompat.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            activeExperiments = contentScopeExperiments.getActiveExperiments()
+
+            withContext(dispatcherProvider.main()) {
+                if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+                    return@withContext
+                }
+                val scriptString = adsJsContentScopeScripts.getScript(activeExperiments)
+                if (scriptString == currentScriptString) {
+                    return@withContext
+                }
+                script?.let {
+                    it.remove()
+                    script = null
+                }
+                if (coreContentScopeScripts.isEnabled()) {
+                    currentScriptString = scriptString
+                    script = WebViewCompat.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
+                }
+            }
         }
     }
 
     override fun onInit(
         webView: WebView,
-        activeExperiments: List<Toggle>,
     ) {
-        reloadJSIfNeeded(webView, activeExperiments)
+        reloadJSIfNeeded(webView)
     }
 
     override fun onPageStarted(
         webView: WebView,
         url: String?,
         isDesktopMode: Boolean?,
-        activeExperiments: List<Toggle>,
-    ) {
+    ): List<Toggle> {
         if (coreContentScopeScripts.isEnabled()) {
             webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+            return activeExperiments
         }
+        return listOf()
     }
 
     override fun onPageFinished(
         webView: WebView,
         url: String?,
-        activeExperiments: List<Toggle>,
     ) {
-        reloadJSIfNeeded(webView, activeExperiments)
+        reloadJSIfNeeded(webView)
     }
 }
