@@ -72,7 +72,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -110,6 +109,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+
+private val mockToggle: Toggle = mock()
 
 class BrowserWebViewClientTest {
 
@@ -165,15 +166,12 @@ class BrowserWebViewClientTest {
         mock(),
     )
     private val mockDuckChat: DuckChat = mock()
-    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
 
     @UiThreadTest
     @Before
     fun setup() = runTest {
         webView = TestWebView(context)
         whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
-        val toggle: Toggle = mock()
-        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
         testee = BrowserWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
@@ -206,7 +204,6 @@ class BrowserWebViewClientTest {
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
             mockDuckChat,
-            mockContentScopeExperiments,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -226,11 +223,8 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() = runTest {
-        val toggle: Toggle = mock()
-        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
-
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).pageStarted(any(), eq(listOf(toggle)))
+        verify(listener).pageStarted(any(), eq(listOf(mockToggle)))
     }
 
     @UiThreadTest
@@ -1195,7 +1189,6 @@ class BrowserWebViewClientTest {
 
         override fun onInit(
             webView: WebView,
-            activeExperiments: List<Toggle>,
         ) {
         }
 
@@ -1203,15 +1196,14 @@ class BrowserWebViewClientTest {
             webView: WebView,
             url: String?,
             isDesktopMode: Boolean?,
-            activeExperiments: List<Toggle>,
-        ) {
+        ): List<Toggle> {
             countStarted++
+            return listOf(mockToggle)
         }
 
         override fun onPageFinished(
             webView: WebView,
             url: String?,
-            activeExperiments: List<Toggle>,
         ) {
             countFinished++
         }
