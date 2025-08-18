@@ -1100,19 +1100,23 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
-            val intent = globalActivityStarter.startIntent(
-                requireContext(),
-                InputScreenActivityParams(query = query),
-            )
-            val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
-            val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
-            val options = ActivityOptionsCompat.makeCustomAnimation(
-                requireActivity(),
-                enterTransition,
-                exitTransition,
-            )
-            inputScreenLauncher.launch(intent, options)
+            launchInputScreen(query)
         }
+    }
+
+    private fun launchInputScreen(query: String) {
+        val intent = globalActivityStarter.startIntent(
+            requireContext(),
+            InputScreenActivityParams(query = query),
+        )
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
+        val options = ActivityOptionsCompat.makeCustomAnimation(
+            requireActivity(),
+            enterTransition,
+            exitTransition,
+        )
+        inputScreenLauncher.launch(intent, options)
     }
 
     private fun configureNavigationBar() {
@@ -2202,6 +2206,12 @@ class BrowserTabFragment :
 
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
+            is Command.LaunchInputScreen -> {
+                // if the fire button is used, prevent automatically launching the input screen until the process reloads
+                if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
+                    launchInputScreen(query = "")
+                }
+            }
             else -> {
                 // NO OP
             }

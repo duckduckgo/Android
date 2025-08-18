@@ -446,6 +446,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
+    private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
+
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
@@ -584,6 +586,7 @@ class BrowserTabViewModelTest {
     private val SHORT_EXAMPLE_URL = "example.com"
 
     private val selectedTab = TabEntity("TAB_ID", EXAMPLE_URL, position = 0, sourceTabId = "TAB_ID_SOURCE")
+    private val flowSelectedTab = MutableStateFlow(selectedTab)
 
     private var isFullSiteAddressEnabled = true
 
@@ -620,7 +623,7 @@ class BrowserTabViewModelTest {
         whenever(mockDismissedCtaDao.dismissedCtas()).thenReturn(dismissedCtaDaoChannel.consumeAsFlow())
         whenever(mockTabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(mockTabRepository.getTabs()).thenReturn(emptyList())
-        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowOf(selectedTab))
+        whenever(mockTabRepository.flowSelectedTab).thenReturn(flowSelectedTab)
         whenever(mockTabRepository.liveTabs).thenReturn(tabsLiveData)
         whenever(mockEmailManager.signedInFlow()).thenReturn(emailStateFlow.asStateFlow())
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favoriteListFlow.consumeAsFlow())
@@ -641,7 +644,7 @@ class BrowserTabViewModelTest {
         whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
-        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(MutableStateFlow(false))
+        whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
@@ -6976,6 +6979,98 @@ class BrowserTabViewModelTest {
         testee.onFireMenuSelected()
 
         verify(mockOnboardingDesignExperimentManager).fireFireButtonClickedFromOnboardingPixel()
+    }
+
+    @Test
+    fun whenInputScreenEnabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val ntpTabId = "ntp-tab"
+        val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(ntpTabId, null, false, false)
+        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+
+        flowSelectedTab.emit(ntpTab)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "LaunchInputScreen command should be triggered for null URL tab",
+            commands.any { it is Command.LaunchInputScreen },
+        )
+    }
+
+    @Test
+    fun whenInputScreenDisabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val ntpTabId = "ntp-tab"
+        val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(ntpTabId, null, false, false)
+        mockDuckAiFeatureStateInputScreenFlow.emit(false)
+
+        flowSelectedTab.emit(ntpTab)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "LaunchInputScreen command should NOT be triggered when input screen is disabled",
+            commands.any { it is Command.LaunchInputScreen },
+        )
+    }
+
+    @Test
+    fun whenInputScreenEnabledAndSwitchToTabWithUrlThenLaunchInputScreenCommandNotTriggered() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val targetTabId = "target-tab"
+        val targetTab = TabEntity(tabId = targetTabId, url = "https://duckduckgo.com", title = "DDG", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(targetTabId)).thenReturn(targetTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(targetTabId, null, false, false)
+        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+
+        flowSelectedTab.emit(targetTab)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "LaunchInputScreen command should NOT be triggered when switching to tab with existing URL",
+            commands.any { it is Command.LaunchInputScreen },
+        )
+    }
+
+    @Test
+    fun whenInputScreenEnabledAndSwitchToNewTabThatManagedByAnotherViewModelThenLaunchInputScreenCommandNotTriggered() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val ntpTabId = "ntp-tab"
+        val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(initialTabId, null, false, false)
+        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+
+        flowSelectedTab.emit(ntpTab)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "LaunchInputScreen command should NOT be triggered when switching to new tab that's managed by another view model",
+            commands.any { it is Command.LaunchInputScreen },
+        )
     }
 
     private fun aCredential(): LoginCredentials {

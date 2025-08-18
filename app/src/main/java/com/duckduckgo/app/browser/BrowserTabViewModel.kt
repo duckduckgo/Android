@@ -105,6 +105,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchAddWidget
 import com.duckduckgo.app.browser.commands.Command.LaunchAutofillSettings
 import com.duckduckgo.app.browser.commands.Command.LaunchBookmarksActivity
 import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardingDialog
+import com.duckduckgo.app.browser.commands.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchPrivacyPro
@@ -375,7 +376,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -394,6 +397,7 @@ import org.json.JSONObject
 
 private const val SCAM_PROTECTION_REPORT_ERROR_URL = "https://duckduckgo.com/malicious-site-protection/report-error?url="
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
     private val statisticsUpdater: StatisticsUpdater,
@@ -725,6 +729,34 @@ class BrowserTabViewModel @Inject constructor(
         additionalDefaultBrowserPrompts.showSetAsDefaultPopupMenuItem
             .onEach {
                 browserViewState.value = currentBrowserViewState().copy(showSelectDefaultBrowserMenuItem = it)
+            }
+            .launchIn(viewModelScope)
+
+        // observe when user open a new tab page and launch the input screen
+        duckAiFeatureState.showInputScreen
+            .flatMapLatest { inputScreenEnabled ->
+                if (inputScreenEnabled) {
+                    tabRepository.flowSelectedTab
+                        .map { selectedTab -> selectedTab?.tabId }
+                        .distinctUntilChanged() // only observe when the tab changes and ignore further updates
+                        .filter { selectedTabId ->
+                            // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
+                            val isActiveTab = selectedTabId == tabId
+                            if (isActiveTab) {
+                                val thisTab = tabRepository.getTab(tabId)
+                                thisTab != null && thisTab.url.isNullOrBlank()
+                            } else {
+                                false
+                            }
+                        }
+                } else {
+                    flowOf()
+                }
+            }
+            .flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
+            .onEach {
+                // whenever an event fires, so the user switched to a new tab page, launch the input screen
+                command.value = LaunchInputScreen
             }
             .launchIn(viewModelScope)
     }
