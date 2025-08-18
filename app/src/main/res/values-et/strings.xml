@@ -846,8 +846,8 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laske DuckDuckGo\'l kaitsta rohkem seda, mida te veebis teete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Muutke meid oma vaikebrauseriks, et kõik saidilingid avaneksid DuckDuckGos.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ära enam küsi</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Vaheta oma vaikebrauserit, et lingid avaneksid DuckDuckGos.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Mitte praegu</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ei ole sinu vaikebrauser. Saa rohkem kaitset.</string>
