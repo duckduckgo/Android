@@ -48,7 +48,8 @@ class PirWebAddNameToCurrentUserProfileMessageHandler @Inject constructor(
     ) {
         logcat { "PIR-WEB: PirWebAddNameToCurrentUserProfileMessageHandler: process $jsMessage" }
 
-        val request = jsMessage.toRequestMessage(PirWebMessageRequest.AddNameToCurrentUserProfileRequest::class)
+        val request =
+            jsMessage.toRequestMessage(PirWebMessageRequest.AddNameToCurrentUserProfileRequest::class)
 
         // attempting to add an empty name should return success=false
         if (request == null || request.first.isEmpty() || request.last.isEmpty()) {
@@ -61,7 +62,12 @@ class PirWebAddNameToCurrentUserProfileMessageHandler @Inject constructor(
         }
 
         // attempting to add a duplicate name should return success=false
-        if (pirWebOnboardingStateHolder.names.any { it.firstName == request.first && it.middleName == request.middle && it.lastName == request.last }) {
+        if (pirWebOnboardingStateHolder.names.any {
+            it.firstName == request.first &&
+                it.middleName == request.middle &&
+                it.lastName == request.last
+        }
+        ) {
             logcat { "PIR-WEB: PirWebAddNameToCurrentUserProfileMessageHandler: duplicate name detected" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
