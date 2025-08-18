@@ -18,22 +18,22 @@ package com.duckduckgo.widget
 
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 class SearchWidgetConfigurator @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val duckChat: DuckChat,
-    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) {
 
     fun configureWidget(
@@ -41,26 +41,28 @@ class SearchWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         fromFavWidget: Boolean,
     ) {
-        // TODO ANA: Improve this method to avoid blocking the main thread.
-        runBlocking {
-            val voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable
-            val duckAiEnabled = duckChat.isEnabled() && duckChat.isDuckChatUserEnabled() && duckChat.wasOpenedBefore()
+        val voiceSearchEnabled = runBlocking(dispatcherProvider.io()) {
+            voiceSearchAvailability.isVoiceSearchAvailable
+        }
+        val duckAiIntent = runBlocking(dispatcherProvider.io()) {
+            duckChat.createDuckChatIntent()
+        }
+        val duckAiEnabled = duckAiIntent != null
 
-            logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
-            remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.duckAi, if (duckAiEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && duckAiEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !duckAiEnabled) View.VISIBLE else View.GONE)
+        logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
+        remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
+        remoteViews.setViewVisibility(R.id.duckAi, if (duckAiEnabled) View.VISIBLE else View.GONE)
+        remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && duckAiEnabled) View.VISIBLE else View.GONE)
+        remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !duckAiEnabled) View.VISIBLE else View.GONE)
 
-            if (voiceSearchEnabled) {
-                val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
-                remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
-            }
+        if (voiceSearchEnabled) {
+            val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
+            remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
+        }
 
-            if (duckAiEnabled) {
-                val pendingIntent = buildDuckAiPendingIntent(context)
-                pendingIntent?.let { remoteViews.setOnClickPendingIntent(R.id.duckAi, it) }
-            }
+        if (duckAiEnabled) {
+            val pendingIntent = buildDuckAiPendingIntent(context, duckAiIntent!!)
+            remoteViews.setOnClickPendingIntent(R.id.duckAi, pendingIntent)
         }
     }
 
@@ -74,11 +76,8 @@ class SearchWidgetConfigurator @Inject constructor(
 
     private fun buildDuckAiPendingIntent(
         context: Context,
-    ): PendingIntent? {
-        val intent = duckChat.createDuckChatIntent()
-        if (intent == null) {
-            return null
-        }
+        intent: Intent,
+    ): PendingIntent {
         return PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 }

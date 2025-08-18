@@ -42,7 +42,7 @@ interface DuckChat {
      *
      * @return Intent that can be used to open DuckChat, or null if DuckChat cannot be opened.
      */
-    fun createDuckChatIntent(): Intent?
+    suspend fun createDuckChatIntent(): Intent?
 
     /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
@@ -65,9 +65,4 @@ interface DuckChat {
      * Returns `true` if Duck Chat was ever opened before.
      */
     suspend fun wasOpenedBefore(): Boolean
-
-    /**
-     * Returns whether DuckChat is user enabled or not.
-     */
-    fun isDuckChatUserEnabled(): Boolean
 }
