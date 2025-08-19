@@ -41,6 +41,7 @@ sealed interface PirWebMessageResponse {
 
         data class UserData(
             val isAuthenticatedUser: Boolean,
+            val isUserEligibleForFreeTrial: Boolean,
         )
     }
 

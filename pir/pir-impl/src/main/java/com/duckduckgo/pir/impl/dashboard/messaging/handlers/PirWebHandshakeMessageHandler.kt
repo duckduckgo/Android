@@ -16,14 +16,19 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.logcat
 
 /**
@@ -33,7 +38,11 @@ import logcat.logcat
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebHandshakeMessageHandler @Inject constructor() : PirWebJsMessageHandler() {
+class PirWebHandshakeMessageHandler @Inject constructor(
+    private val subscriptions: Subscriptions,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.HANDSHAKE
 
@@ -44,14 +53,25 @@ class PirWebHandshakeMessageHandler @Inject constructor() : PirWebJsMessageHandl
     ) {
         logcat { "PIR-WEB: PirWebHandshakeMessageHandler: process $jsMessage" }
 
-        jsMessaging.sendResponse(
-            jsMessage = jsMessage,
-            response = PirWebMessageResponse.HandshakeResponse(
-                success = true,
-                userData = PirWebMessageResponse.HandshakeResponse.UserData(
-                    isAuthenticatedUser = true,
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            // Web request contains the version of the API the web uses, but no version check comparison is needed
+            // per https://app.asana.com/1/137249556945/task/1205606257846476/comment/1211089906912712?focus=true
+            // (PIR is backwards and forwards compatible)
+
+            jsMessaging.sendResponse(
+                jsMessage = jsMessage,
+                response = PirWebMessageResponse.HandshakeResponse(
+                    success = true,
+                    userData = getHandshakeUserData(),
                 ),
-            ),
+            )
+        }
+    }
+
+    private suspend fun getHandshakeUserData(): PirWebMessageResponse.HandshakeResponse.UserData {
+        return PirWebMessageResponse.HandshakeResponse.UserData(
+            isAuthenticatedUser = subscriptions.getAccessToken() != null,
+            isUserEligibleForFreeTrial = subscriptions.isFreeTrialEligible(),
         )
     }
 }
