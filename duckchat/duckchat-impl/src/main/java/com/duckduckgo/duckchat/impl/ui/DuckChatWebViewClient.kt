@@ -20,12 +20,16 @@ import android.graphics.Bitmap
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.annotation.UiThread
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class DuckChatWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : WebViewClient() {
 
     @UiThread
@@ -34,8 +38,10 @@ class DuckChatWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, null)
+        appCoroutineScope.launch {
+            jsPlugins.getPlugins().forEach {
+                it.onPageStarted(webView, url, null)
+            }
         }
     }
 }

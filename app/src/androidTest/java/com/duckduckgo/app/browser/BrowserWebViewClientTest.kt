@@ -1187,12 +1187,12 @@ class BrowserWebViewClientTest {
         var countFinished = 0
         var countStarted = 0
 
-        override fun onInit(
+        override suspend fun onInit(
             webView: WebView,
         ) {
         }
 
-        override fun onPageStarted(
+        override suspend fun onPageStarted(
             webView: WebView,
             url: String?,
             isDesktopMode: Boolean?,
@@ -1201,7 +1201,7 @@ class BrowserWebViewClientTest {
             return listOf(mockToggle)
         }
 
-        override fun onPageFinished(
+        override suspend fun onPageFinished(
             webView: WebView,
             url: String?,
         ) {

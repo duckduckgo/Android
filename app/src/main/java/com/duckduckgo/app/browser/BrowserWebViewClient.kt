@@ -462,8 +462,10 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     fun triggerJSInit(webView: WebView) {
-        jsPlugins.getPlugins().forEach {
-            it.onInit(webView)
+        appCoroutineScope.launch {
+            jsPlugins.getPlugins().forEach {
+                it.onInit(webView)
+            }
         }
     }
 
@@ -474,11 +476,13 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            jsPlugins.getPlugins().forEach {
-                it.onPageFinished(
-                    webView,
-                    url,
-                )
+            appCoroutineScope.launch {
+                jsPlugins.getPlugins().forEach {
+                    it.onPageFinished(
+                        webView,
+                        url,
+                    )
+                }
             }
 
             url?.let {

@@ -24,14 +24,14 @@ interface JsInjectorPlugin {
     /**
      * On init of webview this is called and receives a [webView] instance.
      */
-    fun onInit(
+    suspend fun onInit(
         webView: WebView,
     )
 
     /**
      * This method is called during onPageStarted and receives a [webView] instance, the [url] of the website and the [site]
      */
-    fun onPageStarted(
+    suspend fun onPageStarted(
         webView: WebView,
         url: String?,
         isDesktopMode: Boolean?,
@@ -40,7 +40,7 @@ interface JsInjectorPlugin {
     /**
      * This method is called during onPageFinished and receives a [webView] instance, the [url] of the website and the [site]
      */
-    fun onPageFinished(
+    suspend fun onPageFinished(
         webView: WebView,
         url: String?,
     )
