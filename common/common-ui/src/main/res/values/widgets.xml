@@ -558,6 +558,8 @@
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_margin">5dp</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
         <item name="android:elevation">2dp</item>
     </style>
 
@@ -571,30 +573,26 @@
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetDDGLogo">
-        <item name="android:layout_width">26dp</item>
-        <item name="android:layout_height">26dp</item>
-        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
         <item name="android:layout_centerVertical">true</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetInputBox">
-        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:ellipsize">end</item>
         <item name="android:maxLines">1</item>
         <item name="android:textSize">16sp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetSearchIcon">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_width">24dp</item>
+        <item name="android:layout_height">24dp</item>
         <item name="android:layout_centerVertical">true</item>
-        <item name="android:layout_marginStart">12dp</item>
-        <item name="android:layout_marginEnd">12dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetFavoritesGrid">

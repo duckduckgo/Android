@@ -16,6 +16,9 @@
 
 package com.duckduckgo.duckchat.impl.repository
 
+import android.appwidget.AppWidgetManager
+import android.content.Context
+import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.squareup.anvil.annotations.ContributesBinding
@@ -49,6 +52,7 @@ interface DuckChatFeatureRepository {
 @ContributesBinding(AppScope::class)
 class RealDuckChatFeatureRepository @Inject constructor(
     private val duckChatDataStore: DuckChatDataStore,
+    private val context: Context,
 ) : DuckChatFeatureRepository {
     override suspend fun setDuckChatUserEnabled(enabled: Boolean) {
         duckChatDataStore.setDuckChatUserEnabled(enabled)
@@ -99,6 +103,9 @@ class RealDuckChatFeatureRepository @Inject constructor(
     }
 
     override suspend fun registerOpened() {
+        if (!duckChatDataStore.wasOpenedBefore()) {
+            updateWidgets()
+        }
         duckChatDataStore.registerOpened()
     }
 
@@ -112,6 +119,11 @@ class RealDuckChatFeatureRepository @Inject constructor(
 
     override suspend fun sessionDeltaInMinutes(): Long {
         return duckChatDataStore.sessionDeltaTimestamp() / MS_TO_MINUTES
+    }
+
+    private fun updateWidgets() {
+        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        context.sendBroadcast(intent)
     }
 
     companion object {
