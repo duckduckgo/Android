@@ -23,6 +23,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessageHandlersPlugin {
@@ -34,6 +35,7 @@ class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessage
             jsMessageCallback: JsMessageCallback,
         ) {
             if (jsMessage.method == method) {
+                logcat { "DebugFlagGlobalHandler addDebugFlag: ${jsMessage.featureName}" }
                 jsMessageCallback.process(
                     featureName = jsMessage.featureName,
                     method = jsMessage.method,
