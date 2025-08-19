@@ -33,6 +33,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.FeedbackActivityWithEmptyPar
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
+import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -69,6 +70,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var appTheme: AppTheme
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -132,8 +136,8 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
 
         binding.duckAiInputScreenToggleContainer.isVisible = viewState.shouldShowInputScreenToggle
         configureInputScreenToggle(
-            withoutAi = InputScreenToggleButton.WithoutAi(isActive = !viewState.isInputScreenEnabled),
-            withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled),
+            withoutAi = InputScreenToggleButton.WithoutAi(isActive = !viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
+            withAi = InputScreenToggleButton.WithAi(isActive = viewState.isInputScreenEnabled, appTheme.isLightModeEnabled()),
         )
 
         binding.duckAiInputScreenDescription.isVisible = viewState.shouldShowInputScreenToggle
@@ -196,40 +200,36 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     ) = with(binding) {
         val context = this@DuckChatSettingsActivity
         duckAiInputScreenToggleWithoutAiImage.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.imageRes))
-        duckAiInputScreenToggleWithoutAiImage.setBackgroundResource(withoutAi.backgroundRes)
         duckAiInputScreenToggleWithoutAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withoutAi.checkRes))
 
         duckAiInputScreenToggleWithAiImage.setImageDrawable(ContextCompat.getDrawable(context, withAi.imageRes))
-        duckAiInputScreenToggleWithAiImage.setBackgroundResource(withAi.backgroundRes)
         duckAiInputScreenToggleWithAiCheck.setImageDrawable(ContextCompat.getDrawable(context, withAi.checkRes))
     }
 
     private sealed class InputScreenToggleButton(isActive: Boolean) {
         abstract val imageRes: Int
-        val backgroundRes: Int = if (isActive) {
-            R.drawable.searchbox_background_active
-        } else {
-            R.drawable.searchbox_background
-        }
+
         val checkRes: Int = if (isActive) {
             CommonR.drawable.ic_check_blue_round_24
         } else {
             CommonR.drawable.ic_shape_circle_24
         }
 
-        class WithoutAi(isActive: Boolean) : InputScreenToggleButton(isActive) {
-            override val imageRes: Int = if (isActive) {
-                R.drawable.searchbox_withoutai_active
-            } else {
-                R.drawable.searchbox_withoutai
+        class WithoutAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int = when {
+                isActive && isLightMode -> R.drawable.searchbox_withoutai_active
+                isActive && !isLightMode -> R.drawable.searchbox_withoutai_active_dark
+                !isActive && isLightMode -> R.drawable.searchbox_withoutai_inactive
+                else -> R.drawable.searchbox_withoutai_inactive_dark
             }
         }
 
-        class WithAi(isActive: Boolean) : InputScreenToggleButton(isActive) {
-            override val imageRes: Int = if (isActive) {
-                R.drawable.searchbox_withai_active
-            } else {
-                R.drawable.searchbox_withai
+        class WithAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {
+            override val imageRes: Int = when {
+                isActive && isLightMode -> R.drawable.searchbox_withai_active
+                isActive && !isLightMode -> R.drawable.searchbox_withai_active_dark
+                !isActive && isLightMode -> R.drawable.searchbox_withai_inactive
+                else -> R.drawable.searchbox_withai_inactive_dark
             }
         }
     }

@@ -115,11 +115,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scaleType="fitCenter"
-                        android:background="@drawable/searchbox_background_active"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="1dp"
                         android:src="@drawable/searchbox_withoutai_active" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -159,12 +154,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scaleType="fitCenter"
-                        android:background="@drawable/searchbox_background"
-                        android:paddingStart="16dp"
-                        android:paddingTop="16dp"
-                        android:paddingEnd="16dp"
-                        android:paddingBottom="1dp"
-                        android:src="@drawable/searchbox_withai" />
+                        android:src="@drawable/searchbox_withai_inactive" />
 
                     <com.duckduckgo.common.ui.view.text.DaxTextView
                         android:layout_width="wrap_content"
