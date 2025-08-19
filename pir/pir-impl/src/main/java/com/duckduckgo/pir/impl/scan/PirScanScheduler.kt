@@ -33,7 +33,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.PirJobConstants.SCHEDULED_SCAN_INTERVAL_HOURS
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scan.PirScheduledScanRemoteWorker.Companion.TAG_SCHEDULED_SCAN
-import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
 import com.squareup.anvil.annotations.ContributesBinding
@@ -55,7 +55,7 @@ class RealPirScanScheduler @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirPixelSender: PirPixelSender,
-    private val repository: PirRepository,
+    private val eventsRepository: PirEventsRepository,
 ) : PirScanScheduler {
     override fun scheduleScans() {
         logcat { "PIR-SCHEDULED: Scheduling periodic scan appId: ${appBuildConfig.applicationId}" }
@@ -77,7 +77,7 @@ class RealPirScanScheduler @Inject constructor(
 
         pirPixelSender.reportScheduledScanScheduled()
         coroutineScope.launch {
-            repository.saveScanLog(
+            eventsRepository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.SCHEDULED_SCAN_SCHEDULED,

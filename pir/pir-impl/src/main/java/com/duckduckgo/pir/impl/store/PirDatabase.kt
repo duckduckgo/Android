@@ -28,6 +28,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
 import com.duckduckgo.pir.impl.store.db.OptOutActionLog
@@ -77,6 +78,7 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun scanLogDao(): ScanLogDao
     abstract fun optOutResultsDao(): OptOutResultsDao
     abstract fun jobSchedulingDao(): JobSchedulingDao
+    abstract fun extractedProfileDao(): ExtractedProfileDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration> = emptyList()

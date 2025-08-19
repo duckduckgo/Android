@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
@@ -103,6 +104,7 @@ interface PirOptOut {
 @SingleInstanceIn(AppScope::class)
 class RealPirOptOut @Inject constructor(
     private val repository: PirRepository,
+    private val eventsRepository: PirEventsRepository,
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
@@ -380,7 +382,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitStartPixel() {
-        repository.saveScanLog(
+        eventsRepository.saveScanLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_STARTED,
@@ -389,7 +391,7 @@ class RealPirOptOut @Inject constructor(
     }
 
     private suspend fun emitCompletedPixel() {
-        repository.saveScanLog(
+        eventsRepository.saveScanLog(
             PirEventLog(
                 eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                 eventType = EventType.MANUAL_OPTOUT_COMPLETED,
