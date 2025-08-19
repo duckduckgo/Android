@@ -64,6 +64,7 @@
                 android:layout_marginBottom="@dimen/keyline_6"
                 android:text="@string/duck_chat_settings_activity_description"
                 android:gravity="center"
+                app:textType="secondary"
                 app:typography="body2"/>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -184,6 +185,7 @@
                 android:layout_marginTop="@dimen/keyline_2"
                 android:layout_marginBottom="@dimen/keyline_4"
                 android:text="@string/input_screen_user_pref_description"
+                app:textType="secondary"
                 app:typography="body2" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
