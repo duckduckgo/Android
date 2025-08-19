@@ -210,9 +210,9 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
         abstract val imageRes: Int
 
         val checkRes: Int = if (isActive) {
-            CommonR.drawable.ic_check_blue_round_24
+            CommonR.drawable.ic_check_accent_24
         } else {
-            CommonR.drawable.ic_shape_circle_24
+            CommonR.drawable.ic_shape_circle_disabled_24
         }
 
         class WithoutAi(isActive: Boolean, isLightMode: Boolean) : InputScreenToggleButton(isActive) {

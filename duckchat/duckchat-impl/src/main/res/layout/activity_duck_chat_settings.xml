@@ -131,7 +131,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:src="@drawable/ic_check_blue_round_24" />
+                        android:src="@drawable/ic_check_accent_24" />
 
                 </LinearLayout>
 
