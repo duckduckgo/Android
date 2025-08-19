@@ -109,7 +109,7 @@ class PirModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun provideJExtractedProfileDao(database: PirDatabase): ExtractedProfileDao {
+    fun provideExtractedProfileDao(database: PirDatabase): ExtractedProfileDao {
         return database.extractedProfileDao()
     }
 
