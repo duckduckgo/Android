@@ -19,15 +19,17 @@ package com.duckduckgo.pir.impl.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.MirrorSite
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.BrokerSchedulingConfig
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
-import com.duckduckgo.pir.impl.store.db.Broker
 import com.duckduckgo.pir.impl.store.db.BrokerDao
+import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
@@ -67,6 +69,10 @@ interface PirRepository {
     suspend fun getAllActiveBrokers(): List<String>
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
+
+    suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite>
+
+    suspend fun getAllMirrorSites(): List<MirrorSite>
 
     suspend fun getAllBrokersForScan(): List<String>
 
@@ -249,8 +255,44 @@ internal class RealPirRepository(
 
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao.getAllActiveBrokers()
+            return@withContext brokerDao.getAllActiveBrokers().map {
+                Broker(
+                    name = it.name,
+                    fileName = it.fileName,
+                    url = it.url,
+                    version = it.version,
+                    parent = it.parent,
+                    addedDatetime = it.addedDatetime,
+                    removedAt = it.removedAt,
+                )
+            }
         }
+
+    override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> {
+        return brokerDao.getAllMirrorSitesForBroker(brokerName).map {
+            MirrorSite(
+                name = it.name,
+                url = it.url,
+                addedAt = it.addedAt,
+                removedAt = it.removedAt,
+                optOutUrl = it.optOutUrl,
+                parentSite = it.parentSite,
+            )
+        }
+    }
+
+    override suspend fun getAllMirrorSites(): List<MirrorSite> {
+        return brokerDao.getAllMirrorSites().map {
+            MirrorSite(
+                name = it.name,
+                url = it.url,
+                addedAt = it.addedAt,
+                removedAt = it.removedAt,
+                optOutUrl = it.optOutUrl,
+                parentSite = it.parentSite,
+            )
+        }
+    }
 
     override suspend fun getAllBrokersForScan(): List<String> =
         withContext(dispatcherProvider.io()) {
@@ -268,7 +310,7 @@ internal class RealPirRepository(
     ) {
         withContext(dispatcherProvider.io()) {
             brokerDao.upsert(
-                broker = Broker(
+                broker = BrokerEntity(
                     name = broker.name,
                     fileName = fileName,
                     url = broker.url,

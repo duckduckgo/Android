@@ -21,8 +21,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import com.duckduckgo.pir.impl.store.db.Broker
 import com.duckduckgo.pir.impl.store.db.BrokerDao
+import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
@@ -52,7 +52,7 @@ import com.squareup.moshi.Types
     version = 8,
     entities = [
         BrokerJsonEtag::class,
-        Broker::class,
+        BrokerEntity::class,
         BrokerOptOut::class,
         BrokerScan::class,
         BrokerSchedulingConfigEntity::class,
