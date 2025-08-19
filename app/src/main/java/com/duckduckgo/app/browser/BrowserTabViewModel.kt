@@ -375,6 +375,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -737,12 +738,11 @@ class BrowserTabViewModel @Inject constructor(
             .flatMapLatest { inputScreenEnabled ->
                 if (inputScreenEnabled) {
                     tabRepository.flowSelectedTab
-                        .map { selectedTab -> selectedTab?.tabId }
-                        .distinctUntilChanged() // only observe when the tab changes and ignore further updates
-                        .filter { selectedTabId ->
+                        .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
+                        .filter { selectedTab ->
                             // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
-                            val isActiveTab = selectedTabId == tabId
-                            isActiveTab && tabRepository.getTab(tabId)?.url.isNullOrBlank()
+                            val isActiveTab = selectedTab?.tabId == tabId
+                            isActiveTab && selectedTab?.url.isNullOrBlank()
                         }
                 } else {
                     flowOf()
