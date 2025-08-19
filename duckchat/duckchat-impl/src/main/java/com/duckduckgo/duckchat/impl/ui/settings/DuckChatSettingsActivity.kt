@@ -17,11 +17,13 @@
 package com.duckduckgo.duckchat.impl.ui.settings
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -108,6 +110,20 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             binding.userEnabledDuckChatToggleRebranding.show()
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title_rebranding))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description_rebranding))
+
+            // align content with the main Duck.ai toggle's text
+            val offset = resources.getDimensionPixelSize(CommonR.dimen.listItemImageContainerSize) +
+                resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
+            val orientation = resources.configuration.orientation
+            binding.duckAiInputScreenToggleContainer.updatePadding(
+                left = if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    0
+                } else {
+                    offset
+                },
+            )
+            binding.duckAiInputScreenDescription.updatePadding(left = offset)
+            binding.duckAiShortcuts.updatePadding(left = offset)
         } else {
             binding.includeToolbar.toolbar.title = getString(R.string.duck_ai_paid_settings_title)
             binding.duckChatSettingsIcon.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.chat_private_128))
@@ -117,6 +133,11 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
             binding.userEnabledDuckChatToggleRebranding.gone()
             binding.showDuckChatSearchSettingsLink.setPrimaryText(getString(R.string.duck_chat_assist_settings_title))
             binding.showDuckChatSearchSettingsLink.setSecondaryText(getString(R.string.duck_chat_assist_settings_description))
+
+            val offset = 0
+            binding.duckAiInputScreenToggleContainer.updatePadding(left = offset)
+            binding.duckAiInputScreenDescription.updatePadding(left = offset)
+            binding.duckAiShortcuts.updatePadding(left = offset)
         }
 
         binding.duckChatSettingsText.addClickableSpan(
