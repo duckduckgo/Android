@@ -20,8 +20,18 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
+import com.duckduckgo.pir.impl.brokers.JSONObjectAdapter
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import kotlin.reflect.KClass
+import logcat.LogPriority.ERROR
+import logcat.logcat
 import org.json.JSONObject
 
 /**
@@ -41,33 +51,44 @@ abstract class PirWebJsMessageHandler : JsMessageHandler {
     override val allowedDomains: List<String> = emptyList()
     override val featureName: String = PirDashboardWebConstants.SCRIPT_FEATURE_NAME
     override val methods: List<String>
-        get() = messageNames.map { it.messageName }
-    abstract val messageNames: List<PirDashboardWebMessages>
+        get() = listOf(message.messageName)
+    abstract val message: PirDashboardWebMessages
+
+    private val responseAdapter by lazy {
+        Moshi.Builder().add(
+            PolymorphicJsonAdapterFactory.of(PirWebMessageResponse::class.java, JSON_TYPE_PARAM)
+                .withSubtype(PirWebMessageResponse.DefaultResponse::class.java, "default")
+                .withSubtype(PirWebMessageResponse.HandshakeResponse::class.java, "handshake")
+                .withSubtype(PirWebMessageResponse.InitialScanResponse::class.java, "initialScan")
+                .withSubtype(PirWebMessageResponse.GetDataBrokersResponse::class.java, "getDataBrokers")
+                .withSubtype(PirWebMessageResponse.GetCurrentUserProfileResponse::class.java, "getCurrentUserProfile"),
+        ).add(KotlinJsonAdapterFactory())
+            .build().adapter(PirWebMessageResponse::class.java)
+    }
+
+    private val requestAdapter by lazy {
+        Moshi.Builder().add(KotlinJsonAdapterFactory()).add(JSONObjectAdapter()).build()
+    }
 
     /**
-     * Constructs and sends a response to the [jsMessage] with PIR specific parameters already included.
+     * Uses the [PirWebMessageResponse] to construct and send a response to the [jsMessage].
      *
-     * @param success Used to set the value of the `success` parameter in the response.
-     * @param customParams Additional parameters to include in the response on top of the standard PIR parameters like API version.
+     * @param response The body of the response to send back, must be a subclass of [PirWebMessageResponse].
      */
-    protected fun JsMessaging.sendPirResponse(
+    protected fun JsMessaging.sendResponse(
         jsMessage: JsMessage,
-        success: Boolean,
-        customParams: Map<String, Any> = emptyMap(),
+        response: PirWebMessageResponse,
     ) {
+        val responseParams = kotlin.runCatching {
+            response.toMessageParams()
+        }.getOrElse {
+            logcat(ERROR) { "PIR-WEB: Failed to serialize response: ${it.message}" }
+            JSONObject() // Fallback to empty JSON object if serialization fails
+        }
+
         onResponse(
             JsCallbackData(
-                // TODO This could be improved by serializing objects with Moshi
-                params = JSONObject().apply {
-                    put(PirDashboardWebConstants.PARAM_SUCCESS, success)
-                    put(
-                        PirDashboardWebConstants.PARAM_VERSION,
-                        PirDashboardWebConstants.SCRIPT_API_VERSION,
-                    )
-                    customParams.forEach { (name, value) ->
-                        put(name, value)
-                    }
-                },
+                params = responseParams,
                 featureName = jsMessage.featureName,
                 method = jsMessage.method,
                 id = jsMessage.id ?: "",
@@ -75,11 +96,25 @@ abstract class PirWebJsMessageHandler : JsMessageHandler {
         )
     }
 
-    protected fun JSONObject.getStringParam(param: String): String? {
-        return if (has(param)) {
-            getString(param).trim().takeIf { it.isNotEmpty() }
-        } else {
-            null
+    private fun PirWebMessageResponse.toMessageParams(): JSONObject {
+        return JSONObject(responseAdapter.toJson(this)).apply {
+            // remove the param that Moshi adds as it's not needed in the response
+            remove(JSON_TYPE_PARAM)
         }
+    }
+
+    /**
+     * Convenience function to convert the JSON params of [JsMessage] to a specific [PirWebMessageRequest] model to avoid manually parsing the JSON.
+     */
+    protected fun <R : PirWebMessageRequest> JsMessage.toRequestMessage(requestClass: KClass<R>): R? = kotlin.runCatching {
+        val jsonAdapter: JsonAdapter<R> = requestAdapter.adapter(requestClass.java)
+        return jsonAdapter.fromJson(this.params.toString())
+    }.getOrElse {
+        logcat(ERROR) { "PIR-WEB: Failed to deserialize request message: ${it.message}" }
+        null
+    }
+
+    companion object {
+        private const val JSON_TYPE_PARAM = "type"
     }
 }
