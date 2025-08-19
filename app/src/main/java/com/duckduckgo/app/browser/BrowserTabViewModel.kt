@@ -742,12 +742,7 @@ class BrowserTabViewModel @Inject constructor(
                         .filter { selectedTabId ->
                             // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
                             val isActiveTab = selectedTabId == tabId
-                            if (isActiveTab) {
-                                val thisTab = tabRepository.getTab(tabId)
-                                thisTab != null && thisTab.url.isNullOrBlank()
-                            } else {
-                                false
-                            }
+                            isActiveTab && tabRepository.getTab(tabId)?.url.isNullOrBlank()
                         }
                 } else {
                     flowOf()
