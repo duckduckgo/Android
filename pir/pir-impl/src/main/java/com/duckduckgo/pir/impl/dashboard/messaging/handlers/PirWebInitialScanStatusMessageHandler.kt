@@ -24,7 +24,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -42,7 +42,7 @@ import logcat.logcat
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebInitialScanStatusMessageHandler @Inject constructor(
-    private val repository: PirRepository,
+    private val eventsRepository: PirEventsRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
@@ -57,7 +57,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
         logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val eventLogs = repository.getAllEventLogsFlow().firstOrNull().orEmpty()
+            val eventLogs = eventsRepository.getAllEventLogsFlow().firstOrNull().orEmpty()
 
             // TODO get actual scan progress results from the repository
             jsMessaging.sendResponse(

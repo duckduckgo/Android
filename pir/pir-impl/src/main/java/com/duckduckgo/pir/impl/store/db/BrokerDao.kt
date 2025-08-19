@@ -25,10 +25,10 @@ import androidx.room.Transaction
 @Dao
 interface BrokerDao {
     @Query("SELECT * from pir_broker_details where name = :brokerName")
-    fun getBrokerDetails(brokerName: String): Broker?
+    fun getBrokerDetails(brokerName: String): BrokerEntity?
 
     @Query("SELECT * FROM pir_broker_details WHERE removedAt = 0")
-    fun getAllActiveBrokers(): List<Broker>
+    fun getAllActiveBrokers(): List<BrokerEntity>
 
     @Query("SELECT stepsJson from pir_broker_scan where brokerName = :brokerName")
     fun getScanJson(brokerName: String): String?
@@ -70,7 +70,7 @@ interface BrokerDao {
     fun insertMirrorSites(mirrorSiteEntity: List<MirrorSiteEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBroker(broker: Broker)
+    fun insertBroker(broker: BrokerEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertScanSteps(brokerScan: BrokerScan)
@@ -83,7 +83,7 @@ interface BrokerDao {
 
     @Transaction
     fun upsert(
-        broker: Broker,
+        broker: BrokerEntity,
         brokerScan: BrokerScan,
         brokerOptOut: BrokerOptOut,
         schedulingConfig: BrokerSchedulingConfigEntity,

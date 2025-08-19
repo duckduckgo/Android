@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.store.db
+package com.duckduckgo.pir.impl.models
 
-import androidx.room.Entity
+data class MirrorSite(
+    val name: String,
+    val url: String,
+    val addedAt: Long,
+    val removedAt: Long,
+    val optOutUrl: String,
+    val parentSite: String,
+)
 
-/**
- * Contains the sites that have been scanned.
- * Scanned means that the scan flow has been started and completed for the broker.
- */
-@Entity(
-    tableName = "pir_scan_complete_brokers",
-    primaryKeys = ["brokerName", "profileQueryId"],
-)
-data class ScanCompletedBroker(
-    val brokerName: String,
-    val profileQueryId: Long,
-    val startTimeInMillis: Long,
-    val endTimeInMillis: Long,
-    val isSuccess: Boolean,
-)
+fun MirrorSite.isExtant(timeInMillis: Long): Boolean {
+    return if (removedAt != 0L) {
+        timeInMillis in (addedAt + 1)..<removedAt
+    } else {
+        addedAt < timeInMillis
+    }
+}

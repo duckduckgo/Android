@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pir.impl.store.db
+package com.duckduckgo.pir.impl.models
 
-import androidx.room.Entity
-
-/**
- * Contains the sites that have been scanned.
- * Scanned means that the scan flow has been started and completed for the broker.
- */
-@Entity(
-    tableName = "pir_scan_complete_brokers",
-    primaryKeys = ["brokerName", "profileQueryId"],
-)
-data class ScanCompletedBroker(
-    val brokerName: String,
-    val profileQueryId: Long,
-    val startTimeInMillis: Long,
-    val endTimeInMillis: Long,
-    val isSuccess: Boolean,
+data class Broker(
+    val name: String,
+    val fileName: String,
+    val url: String,
+    val version: String,
+    val parent: String?,
+    val addedDatetime: Long,
+    val removedAt: Long,
 )
