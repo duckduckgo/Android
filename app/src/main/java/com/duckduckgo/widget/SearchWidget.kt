@@ -102,8 +102,13 @@ open class SearchWidget(val layoutId: Int = R.layout.search_widget_dark) : AppWi
         val views = RemoteViews(context.packageName, layoutId)
         views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
 
-        searchWidgetConfigurator.configureWidget(context, views, false)
-        appWidgetManager.updateAppWidget(appWidgetId, views)
+        searchWidgetConfigurator.configureWidget(
+            context = context,
+            remoteViews = views,
+            appWidgetManager = appWidgetManager,
+            appWidgetId = appWidgetId,
+            fromFavWidget = false,
+        )
     }
 
     private fun buildPendingIntent(context: Context): PendingIntent {

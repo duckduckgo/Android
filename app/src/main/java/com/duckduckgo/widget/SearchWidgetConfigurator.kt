@@ -17,52 +17,62 @@
 package com.duckduckgo.widget
 
 import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import javax.inject.Inject
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.logcat
 
 class SearchWidgetConfigurator @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val duckChat: DuckChat,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
 ) {
 
     fun configureWidget(
         context: Context,
         remoteViews: RemoteViews,
+        appWidgetManager: AppWidgetManager,
+        appWidgetId: Int,
         fromFavWidget: Boolean,
     ) {
-        val voiceSearchEnabled = runBlocking(dispatcherProvider.io()) {
-            voiceSearchAvailability.isVoiceSearchAvailable
-        }
-        val duckAiIntent = runBlocking(dispatcherProvider.io()) {
-            duckChat.createDuckChatIntent()
-        }
-        val duckAiEnabled = duckAiIntent != null
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val voiceSearchEnabled = voiceSearchAvailability.isVoiceSearchAvailable
+            val duckAiIntent = duckChat.createDuckChatIntent()
+            val duckAiEnabled = duckAiIntent != null
 
-        logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
-        remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
-        remoteViews.setViewVisibility(R.id.duckAi, if (duckAiEnabled) View.VISIBLE else View.GONE)
-        remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && duckAiEnabled) View.VISIBLE else View.GONE)
-        remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !duckAiEnabled) View.VISIBLE else View.GONE)
+            logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
 
-        if (voiceSearchEnabled) {
-            val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
-            remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
-        }
+            withContext(dispatcherProvider.main()) {
+                remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
+                remoteViews.setViewVisibility(R.id.duckAi, if (duckAiEnabled) View.VISIBLE else View.GONE)
+                remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && duckAiEnabled) View.VISIBLE else View.GONE)
+                remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !duckAiEnabled) View.VISIBLE else View.GONE)
 
-        if (duckAiEnabled) {
-            val pendingIntent = buildDuckAiPendingIntent(context, duckAiIntent!!)
-            remoteViews.setOnClickPendingIntent(R.id.duckAi, pendingIntent)
+                if (voiceSearchEnabled) {
+                    val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
+                    remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
+                }
+
+                if (duckAiEnabled) {
+                    val pendingIntent = buildDuckAiPendingIntent(context, duckAiIntent!!)
+                    remoteViews.setOnClickPendingIntent(R.id.duckAi, pendingIntent)
+                }
+
+                appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+            }
         }
     }
 
