@@ -24,7 +24,6 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
-import com.duckduckgo.pir.impl.models.Address
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
@@ -63,7 +62,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
         }
 
         // attempting to add a duplicate address should return success=false
-        if (pirWebOnboardingStateHolder.addresses.any { it.city == request.city && it.state == request.state }) {
+        if (!pirWebOnboardingStateHolder.addAddress(request.city, request.state)) {
             logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
@@ -71,13 +70,6 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
             )
             return
         }
-
-        pirWebOnboardingStateHolder.addresses.add(
-            Address(
-                city = request.city,
-                state = request.state,
-            ),
-        )
 
         jsMessaging.sendResponse(
             jsMessage = jsMessage,
