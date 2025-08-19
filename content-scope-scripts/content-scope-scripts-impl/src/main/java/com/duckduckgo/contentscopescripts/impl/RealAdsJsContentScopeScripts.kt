@@ -41,7 +41,7 @@ interface AdsJsContentScopeScripts {
         activeExperiments: List<Toggle>,
     ): String
 
-    fun isEnabled(): Boolean
+    suspend fun isEnabled(): Boolean
 
     val secret: String
     val javascriptInterface: String
@@ -111,8 +111,8 @@ class RealAdsJsContentScopeScripts @Inject constructor(
         return cachedAdsJS
     }
 
-    override fun isEnabled(): Boolean {
-        return contentScopeScriptsFeature.self().isEnabled()
+    override suspend fun isEnabled(): Boolean {
+        return contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
     }
 
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""

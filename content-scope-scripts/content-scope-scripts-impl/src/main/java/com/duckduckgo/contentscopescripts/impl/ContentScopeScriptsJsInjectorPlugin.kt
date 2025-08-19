@@ -59,7 +59,7 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
                 it.remove()
                 script = null
             }
-            if (coreContentScopeScripts.isEnabled()) {
+            if (adsJsContentScopeScripts.isEnabled()) {
                 currentScriptString = scriptString
                 script = webViewCompatWrapper.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
             }
