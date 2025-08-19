@@ -133,13 +133,39 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenDuckChatIsEnabledThenReturnTrue() = runTest {
+    fun whenDuckChatFeatureEnabledAndUserEnabledThenIsEnabledReturnsTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
         assertTrue(testee.isEnabled())
     }
 
     @Test
-    fun whenDuckChatIsDisabledThenReturnFalse() = runTest {
+    fun whenDuckChatFeatureDisabledAndUserEnabledThenIsEnabledReturnsFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isEnabled())
+    }
+
+    @Test
+    fun whenDuckChatFeatureEnabledAndUserDisabledThenIsEnabledReturnsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isEnabled())
+    }
+
+    @Test
+    fun whenDuckChatFeatureDisabledAndUserDisabledThenIsEnabledReturnsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
 
         testee.onPrivacyConfigDownloaded()
 
@@ -375,6 +401,14 @@ class RealDuckChatTest {
     @Test
     fun whenIsNotDuckDuckGoHostAndDuckChatEnabledThenIsNotDuckChatUrl() {
         assertFalse(testee.isDuckChatUrl("https://example.com/?ia=chat".toUri()))
+    }
+
+    @Test
+    fun whenDuckChatFeatureDisabledThenIsDuckChatUrlReturnsFalse() {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl("https://duckduckgo.com/?ia=chat".toUri()))
     }
 
     @Test
