@@ -519,6 +519,7 @@
         <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
         <item name="android:clipToPadding">false</item>
+        <item name="android:colorBackground">@color/white</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetFavoriteFavicon">
