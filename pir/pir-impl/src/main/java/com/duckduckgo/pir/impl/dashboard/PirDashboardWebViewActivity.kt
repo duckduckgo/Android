@@ -69,6 +69,11 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         observeCommands()
     }
 
+    override fun onDestroy() {
+        cleanupWebView()
+        super.onDestroy()
+    }
+
     @SuppressLint("SetJavaScriptEnabled")
     private fun setupWebView() {
         pirWebJsMessaging.register(
@@ -121,6 +126,13 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         }
 
         binding.pirWebView.loadUrl(PirDashboardWebConstants.WEB_UI_URL)
+    }
+
+    private fun cleanupWebView() {
+        binding.pirWebView.stopLoading()
+        binding.pirWebView.removeJavascriptInterface(pirWebJsMessaging.context)
+        binding.root.removeView(binding.pirWebView)
+        binding.pirWebView.destroy()
     }
 
     private fun observeCommands() {
