@@ -1,5 +1,5 @@
-<!--
-  ~ Copyright (c) 2018 DuckDuckGo
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
     <ImageView
         android:id="@+id/logo"
         style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
-        android:src="@drawable/logo_mini" />
+        android:src="@drawable/ic_ddg_logo" />
 
     <TextView
         android:id="@+id/searchInputBox"
@@ -43,5 +43,5 @@
     <ImageView
         android:id="@+id/search"
         style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_find_search_20_daynight" />
+        android:src="@drawable/ic_find_search_24_daynight" />
 </RelativeLayout>
