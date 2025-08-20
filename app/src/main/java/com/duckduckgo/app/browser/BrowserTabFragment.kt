@@ -3876,8 +3876,13 @@ class BrowserTabFragment :
 
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
-        webView?.destroy()
-        webView = null
+        appCoroutineScope.launch(dispatchers.main()) {
+            webView?.let {
+                adsJsContentScopeScripts.unregister(it)
+                it.destroy()
+            }
+            webView = null
+        }
     }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {

@@ -38,6 +38,8 @@ import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
+private const val JS_OBJECT_NAME = "contentScopeAdsjs"
+
 @ContributesBinding(ActivityScope::class)
 @Named("AdsjsContentScopeScripts")
 class AdsjsContentScopeMessaging @Inject constructor(
@@ -93,7 +95,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
             if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
                 WebViewCompat.addWebMessageListener(
                     webView,
-                    "contentScopeAdsjs",
+                    JS_OBJECT_NAME,
                     allowedDomains,
                 ) { _, message, _, _, replyProxy ->
                     process(
@@ -108,6 +110,19 @@ class AdsjsContentScopeMessaging @Inject constructor(
         }.getOrElse { exception ->
             logcat(ERROR) { "Error adding WebMessageListener for contentScopeAdsjs: ${exception.asLog()}" }
             false
+        }
+    }
+
+    override suspend fun unregister(webView: WebView) {
+        if (!adsJsContentScopeScripts.isEnabled()) return
+        withContext(dispatcherProvider.main()) {
+            runCatching {
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+                    WebViewCompat.removeWebMessageListener(webView, JS_OBJECT_NAME)
+                } else {
+                    logcat(ERROR) { "WebMessageListener is not supported on this WebView" }
+                }
+            }
         }
     }
 }
