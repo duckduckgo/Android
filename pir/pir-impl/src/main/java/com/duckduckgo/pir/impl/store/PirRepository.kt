@@ -124,7 +124,7 @@ interface PirRepository {
 
     suspend fun replaceUserProfile(userProfile: UserProfile)
 
-    suspend fun saveUserProfiles(userProfiles: List<UserProfile>)
+    suspend fun saveUserProfiles(userProfiles: List<UserProfile>): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -436,9 +436,10 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>) =
+    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>): Boolean =
         withContext(dispatcherProvider.io()) {
-            userProfileDao.insertUserProfiles(userProfiles)
+            val insertResult = userProfileDao.insertUserProfiles(userProfiles)
+            insertResult.size == userProfiles.size
         }
 
     override suspend fun getEmailForBroker(dataBroker: String): String =
