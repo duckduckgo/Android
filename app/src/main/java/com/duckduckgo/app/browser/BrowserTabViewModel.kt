@@ -3666,6 +3666,9 @@ class BrowserTabViewModel @Inject constructor(
             "webShare" -> if (id != null && data != null) {
                 adsjsWebShare(featureName, method, id, data, onResponse)
             }
+            "breakageReportResult" -> if (data != null) {
+                breakageReportResult(data)
+            }
         }
     }
 

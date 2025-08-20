@@ -30,6 +30,8 @@ interface AdsjsMessaging {
     )
     suspend fun unregister(webView: WebView)
 
+    fun postMessage(subscriptionEventData: SubscriptionEventData)
+
     /**
      * Context name
      */
