@@ -61,7 +61,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: JVM tests
-        run: ./gradlew jvm_tests
+        run: ./gradlew jvm_tests --parallel --max-workers=4
 
       - name: Bundle the JVM checks report
         if: always()
