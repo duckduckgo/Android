@@ -23,7 +23,7 @@ interface AdsjsMessaging {
     /**
      * Method to register the JS interface to the webView instance
      */
-    fun register(webView: WebView, jsMessageCallback: JsMessageCallback?)
+    suspend fun register(webView: WebView, jsMessageCallback: JsMessageCallback?)
 
     /**
      * Context name

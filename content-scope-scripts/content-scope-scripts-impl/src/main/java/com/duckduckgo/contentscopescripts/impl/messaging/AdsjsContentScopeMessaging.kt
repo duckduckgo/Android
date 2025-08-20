@@ -20,9 +20,11 @@ import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.AdsjsContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.GlobalContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.contentscopescripts.impl.AdsJsContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.AdsjsMessaging
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -31,6 +33,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -40,6 +43,8 @@ import logcat.logcat
 class AdsjsContentScopeMessaging @Inject constructor(
     private val handlers: PluginPoint<AdsjsContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
+    private val adsJsContentScopeScripts: AdsJsContentScopeScripts,
+    private val dispatcherProvider: DispatcherProvider,
 ) : AdsjsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -78,9 +83,9 @@ class AdsjsContentScopeMessaging @Inject constructor(
         }
     }
 
-    // TODO: A/B this, don't register if the feature is not enabled
-    @SuppressLint("AddWebMessageListenerUsage") // safeAddWebMessageListener belongs to app module
-    override fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
+    @SuppressLint("AddWebMessageListenerUsage")
+    override suspend fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
+        if (withContext(dispatcherProvider.io()) { !adsJsContentScopeScripts.isEnabled() }) return
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
 
