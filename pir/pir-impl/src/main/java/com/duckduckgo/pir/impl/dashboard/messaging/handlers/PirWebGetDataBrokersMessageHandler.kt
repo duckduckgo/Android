@@ -67,14 +67,14 @@ class PirWebGetDataBrokersMessageHandler @Inject constructor(
     private suspend fun getDataBrokers(): List<PirWebMessageResponse.GetDataBrokersResponse.DataBroker> {
         val activeBrokers = repository.getAllActiveBrokerObjects().associateBy { it.name }
         val mirrorSites = repository.getAllMirrorSites().filter { it.removedAt == 0L }
-        val brokerOptOuts = repository.getAllBrokerOptOuts().associate { it.brokerName to it.optOutUrl }
+        val brokerOptOutUrls = repository.getAllBrokerOptOutUrls()
 
         val mappedBrokers = activeBrokers.values.map {
             PirWebMessageResponse.GetDataBrokersResponse.DataBroker(
                 url = it.url,
                 name = it.name,
                 parentURL = it.parent,
-                optOutUrl = brokerOptOuts[it.name],
+                optOutUrl = brokerOptOutUrls[it.name],
             )
         }
         val mappedMirrorSites = mirrorSites.map {
@@ -82,7 +82,7 @@ class PirWebGetDataBrokersMessageHandler @Inject constructor(
                 url = it.url,
                 name = it.name,
                 parentURL = activeBrokers[it.parentSite]?.url,
-                optOutUrl = brokerOptOuts[it.parentSite],
+                optOutUrl = brokerOptOutUrls[it.parentSite],
             )
         }
 

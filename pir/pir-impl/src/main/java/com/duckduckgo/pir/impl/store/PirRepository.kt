@@ -66,7 +66,10 @@ interface PirRepository {
 
     suspend fun getAllBrokersForScan(): List<String>
 
-    suspend fun getAllBrokerOptOuts(): List<BrokerOptOut>
+    /**
+     * Returns a map of broker names to their opt-out URLs.
+     */
+    suspend fun getAllBrokerOptOutUrls(): Map<String, String?>
 
     suspend fun getEtagForFilename(fileName: String): String?
 
@@ -236,9 +239,10 @@ internal class RealPirRepository(
             return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
         }
 
-    override suspend fun getAllBrokerOptOuts(): List<BrokerOptOut> =
+    override suspend fun getAllBrokerOptOutUrls(): Map<String, String?> =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao.getAllBrokerOptOuts()
+            val brokerOptOuts = brokerDao.getAllBrokerOptOuts()
+            return@withContext brokerOptOuts.associate { it.brokerName to it.optOutUrl }
         }
 
     override suspend fun getEtagForFilename(fileName: String): String =
