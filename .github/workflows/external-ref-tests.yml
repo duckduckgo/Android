@@ -98,7 +98,7 @@ jobs:
         run: ./gradlew androidTestsBuild
 
       - name: Run Android Tests
-        run: ./gradlew runFlankAndroidTests
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache
 
       - name: Bundle the Android CI tests report
         if: always()
