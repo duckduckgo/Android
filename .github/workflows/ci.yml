@@ -147,7 +147,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build
-        run: ./gradlew androidTestsBuild
+        run: ./gradlew androidTestsBuild --no-configuration-cache
 
       - name: Find test APK path
         id: find-apk
