@@ -625,7 +625,6 @@ class BrowserTabFragment :
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory)[BrowserTabViewModel::class.java]
         viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp)
-        launchDownloadMessagesJob()
         viewModel
     }
 
@@ -1061,6 +1060,8 @@ class BrowserTabFragment :
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
         }
+
+        launchDownloadMessagesJob()
     }
 
     private fun updateOrDeleteWebViewPreview() {
