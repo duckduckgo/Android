@@ -79,12 +79,12 @@ class AdsjsContentScopeMessaging @Inject constructor(
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
-                    // Process global handlers first (always processed regardless of feature handlers)
-
+                    // Setup reply proxy so we can send subscription events
                     if (jsMessage.featureName == "messaging" || jsMessage.method == "initialPing") {
                         globalReplyProxy = replyProxy
                     }
 
+                    // Process global handlers first (always processed regardless of feature handlers)
                     globalHandlers.getPlugins()
                         .map { it.getGlobalJsMessageHandler() }
                         .filter { it.method == jsMessage.method }
