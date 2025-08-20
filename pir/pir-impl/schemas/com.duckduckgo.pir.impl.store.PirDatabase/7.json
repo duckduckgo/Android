@@ -1,0 +1,748 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 7,
+    "identityHash": "88e84039df8a6d1531d4df265f380691",
+    "entities": [
+      {
+        "tableName": "pir_broker_json_etag",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`fileName` TEXT NOT NULL, `etag` TEXT NOT NULL, PRIMARY KEY(`fileName`))",
+        "fields": [
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "etag",
+            "columnName": "etag",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "fileName"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_broker_details",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `fileName` TEXT NOT NULL, `url` TEXT NOT NULL, `version` TEXT NOT NULL, `parent` TEXT, `addedDatetime` INTEGER NOT NULL, `removedAt` INTEGER NOT NULL, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "parent",
+            "columnName": "parent",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addedDatetime",
+            "columnName": "addedDatetime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "removedAt",
+            "columnName": "removedAt",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_broker_opt_out",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `stepsJson` TEXT NOT NULL, `optOutUrl` TEXT, PRIMARY KEY(`brokerName`), FOREIGN KEY(`brokerName`) REFERENCES `pir_broker_details`(`name`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stepsJson",
+            "columnName": "stepsJson",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "optOutUrl",
+            "columnName": "optOutUrl",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brokerName"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "pir_broker_details",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "brokerName"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pir_broker_scan",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `stepsJson` TEXT, PRIMARY KEY(`brokerName`), FOREIGN KEY(`brokerName`) REFERENCES `pir_broker_details`(`name`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stepsJson",
+            "columnName": "stepsJson",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brokerName"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "pir_broker_details",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "brokerName"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pir_broker_scheduling_config",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `retryError` INTEGER NOT NULL, `confirmOptOutScan` INTEGER NOT NULL, `maintenanceScan` INTEGER NOT NULL, `maxAttempts` INTEGER, PRIMARY KEY(`brokerName`), FOREIGN KEY(`brokerName`) REFERENCES `pir_broker_details`(`name`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "retryError",
+            "columnName": "retryError",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "confirmOptOutScan",
+            "columnName": "confirmOptOutScan",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maintenanceScan",
+            "columnName": "maintenanceScan",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "maxAttempts",
+            "columnName": "maxAttempts",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brokerName"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": [
+          {
+            "table": "pir_broker_details",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "brokerName"
+            ],
+            "referencedColumns": [
+              "name"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pir_user_profile",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `birthYear` INTEGER NOT NULL, `phone` TEXT, `user_firstName` TEXT NOT NULL, `user_lastName` TEXT NOT NULL, `user_middleName` TEXT, `user_suffix` TEXT, `address_city` TEXT NOT NULL, `address_state` TEXT NOT NULL, `address_street` TEXT, `address_zip` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "birthYear",
+            "columnName": "birthYear",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phone",
+            "columnName": "phone",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userName.firstName",
+            "columnName": "user_firstName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userName.lastName",
+            "columnName": "user_lastName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userName.middleName",
+            "columnName": "user_middleName",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "userName.suffix",
+            "columnName": "user_suffix",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addresses.city",
+            "columnName": "address_city",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addresses.state",
+            "columnName": "address_state",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addresses.street",
+            "columnName": "address_street",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "addresses.zip",
+            "columnName": "address_zip",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_events_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventTimeInMillis` INTEGER NOT NULL, `eventType` TEXT NOT NULL, PRIMARY KEY(`eventTimeInMillis`))",
+        "fields": [
+          {
+            "fieldPath": "eventTimeInMillis",
+            "columnName": "eventTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventType",
+            "columnName": "eventType",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "eventTimeInMillis"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_broker_scan_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`eventTimeInMillis` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `eventType` TEXT NOT NULL, PRIMARY KEY(`eventTimeInMillis`))",
+        "fields": [
+          {
+            "fieldPath": "eventTimeInMillis",
+            "columnName": "eventTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "eventType",
+            "columnName": "eventType",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "eventTimeInMillis"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_scan_complete_brokers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `profileQueryId` INTEGER NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, `isSuccess` INTEGER NOT NULL, PRIMARY KEY(`brokerName`, `profileQueryId`))",
+        "fields": [
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileQueryId",
+            "columnName": "profileQueryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startTimeInMillis",
+            "columnName": "startTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endTimeInMillis",
+            "columnName": "endTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSuccess",
+            "columnName": "isSuccess",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brokerName",
+            "profileQueryId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_opt_out_complete_brokers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `extractedProfile` TEXT NOT NULL, `startTimeInMillis` INTEGER NOT NULL, `endTimeInMillis` INTEGER NOT NULL, `isSubmitSuccess` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "extractedProfile",
+            "columnName": "extractedProfile",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "startTimeInMillis",
+            "columnName": "startTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "endTimeInMillis",
+            "columnName": "endTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isSubmitSuccess",
+            "columnName": "isSubmitSuccess",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_opt_out_action_log",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `brokerName` TEXT NOT NULL, `extractedProfile` TEXT NOT NULL, `completionTimeInMillis` INTEGER NOT NULL, `actionType` TEXT NOT NULL, `isError` INTEGER NOT NULL, `result` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "extractedProfile",
+            "columnName": "extractedProfile",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "completionTimeInMillis",
+            "columnName": "completionTimeInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "actionType",
+            "columnName": "actionType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isError",
+            "columnName": "isError",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "result",
+            "columnName": "result",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_extracted_profiles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `profileQueryId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `name` TEXT NOT NULL, `alternativeNames` TEXT NOT NULL, `age` TEXT NOT NULL, `addresses` TEXT NOT NULL, `phoneNumbers` TEXT NOT NULL, `relatives` TEXT NOT NULL, `profileUrl` TEXT NOT NULL, `identifier` TEXT NOT NULL, `reportId` TEXT NOT NULL, `email` TEXT NOT NULL, `fullName` TEXT NOT NULL, `dateAddedInMillis` INTEGER NOT NULL, `deprecated` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileQueryId",
+            "columnName": "profileQueryId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alternativeNames",
+            "columnName": "alternativeNames",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "age",
+            "columnName": "age",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "addresses",
+            "columnName": "addresses",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "phoneNumbers",
+            "columnName": "phoneNumbers",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "relatives",
+            "columnName": "relatives",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "profileUrl",
+            "columnName": "profileUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "identifier",
+            "columnName": "identifier",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reportId",
+            "columnName": "reportId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "email",
+            "columnName": "email",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullName",
+            "columnName": "fullName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateAddedInMillis",
+            "columnName": "dateAddedInMillis",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deprecated",
+            "columnName": "deprecated",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_pir_extracted_profiles_profileQueryId_brokerName_name_profileUrl_identifier",
+            "unique": true,
+            "columnNames": [
+              "profileQueryId",
+              "brokerName",
+              "name",
+              "profileUrl",
+              "identifier"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_pir_extracted_profiles_profileQueryId_brokerName_name_profileUrl_identifier` ON `${TABLE_NAME}` (`profileQueryId`, `brokerName`, `name`, `profileUrl`, `identifier`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_scan_job_record",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`brokerName` TEXT NOT NULL, `userProfileId` INTEGER NOT NULL, `status` TEXT NOT NULL, `lastScanDateInMillis` INTEGER, PRIMARY KEY(`brokerName`, `userProfileId`))",
+        "fields": [
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userProfileId",
+            "columnName": "userProfileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastScanDateInMillis",
+            "columnName": "lastScanDateInMillis",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "brokerName",
+            "userProfileId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "pir_optout_job_record",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`extractedProfileId` INTEGER NOT NULL, `brokerName` TEXT NOT NULL, `userProfileId` INTEGER NOT NULL, `status` TEXT NOT NULL, `attemptCount` INTEGER NOT NULL, `lastOptOutAttemptDate` INTEGER, `optOutRequestedDate` INTEGER NOT NULL, `optOutRemovedDate` INTEGER NOT NULL, PRIMARY KEY(`extractedProfileId`))",
+        "fields": [
+          {
+            "fieldPath": "extractedProfileId",
+            "columnName": "extractedProfileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "brokerName",
+            "columnName": "brokerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userProfileId",
+            "columnName": "userProfileId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "attemptCount",
+            "columnName": "attemptCount",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastOptOutAttemptDate",
+            "columnName": "lastOptOutAttemptDate",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "optOutRequestedDate",
+            "columnName": "optOutRequestedDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "optOutRemovedDate",
+            "columnName": "optOutRemovedDate",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "extractedProfileId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '88e84039df8a6d1531d4df265f380691')"
+    ]
+  }
+}

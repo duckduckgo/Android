@@ -846,8 +846,8 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">DuckDuckGo\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Tüm site bağlantılarının DuckDuckGo\'da açılması için bizi varsayılan tarayıcınız yapın.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Bir Daha Sorma</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Bağlantıların DuckDuckGo\'da açılması için varsayılan tarayıcınızı değiştirin.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Şimdi Değil</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo varsayılan tarayıcınız değil. Daha fazla koruma elde edin.</string>

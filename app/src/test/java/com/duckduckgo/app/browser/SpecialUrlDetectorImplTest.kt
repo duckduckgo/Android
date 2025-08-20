@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser
 
 import android.content.Intent
+import android.content.Intent.URI_ANDROID_APP_SCHEME
+import android.content.Intent.URI_INTENT_SCHEME
 import android.content.IntentFilter
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
@@ -29,9 +31,12 @@ import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LEN
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.duckchat.AIChatQueryDetectionFeature
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
@@ -51,7 +56,7 @@ import org.mockito.kotlin.*
 @RunWith(AndroidJUnit4::class)
 class SpecialUrlDetectorImplTest {
 
-    lateinit var testee: SpecialUrlDetector
+    lateinit var testee: SpecialUrlDetectorImpl
 
     val mockPackageManager: PackageManager = mock()
 
@@ -61,9 +66,8 @@ class SpecialUrlDetectorImplTest {
 
     val subscriptions: Subscriptions = mock()
 
-    val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature = mock()
-
-    val mockToggle: Toggle = mock()
+    val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature =
+        FakeFeatureToggleFactory.create(ExternalAppIntentFlagsFeature::class.java)
 
     val mockDuckPlayer: DuckPlayer = mock()
 
@@ -73,22 +77,28 @@ class SpecialUrlDetectorImplTest {
 
     val mockAIChatQueryDetectionFeatureToggle: Toggle = mock()
 
+    val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+
     @Before
     fun setup() = runTest {
-        testee = SpecialUrlDetectorImpl(
-            packageManager = mockPackageManager,
-            ampLinks = mockAmpLinks,
-            trackingParameters = mockTrackingParameters,
-            subscriptions = subscriptions,
-            externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
-            duckPlayer = mockDuckPlayer,
-            duckChat = mockDuckChat,
-            aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
+        testee = spy(
+            SpecialUrlDetectorImpl(
+                packageManager = mockPackageManager,
+                ampLinks = mockAmpLinks,
+                trackingParameters = mockTrackingParameters,
+                subscriptions = subscriptions,
+                externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
+                duckPlayer = mockDuckPlayer,
+                duckChat = mockDuckChat,
+                aiChatQueryDetectionFeature = mockAIChatQueryDetectionFeature,
+                androidBrowserConfigFeature = androidBrowserConfigFeature,
+            ),
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
         whenever(mockDuckPlayer.willNavigateToDuckPlayer(any())).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeatureToggle.isEnabled()).thenReturn(false)
         whenever(mockAIChatQueryDetectionFeature.self()).thenReturn(mockAIChatQueryDetectionFeatureToggle)
+        androidBrowserConfigFeature.handleIntentScheme().setRawStoredState(State(true))
     }
 
     @Test
@@ -282,8 +292,7 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithAdditionalIntentFlags() {
-        whenever(mockToggle.isEnabled()).thenReturn(true)
-        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
+        externalAppIntentFlagsFeature.self().setRawStoredState(State(true))
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, type.intent.flags)
@@ -292,8 +301,7 @@ class SpecialUrlDetectorImplTest {
 
     @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithoutAdditionalIntentFlags() {
-        whenever(mockToggle.isEnabled()).thenReturn(false)
-        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
+        externalAppIntentFlagsFeature.self().setRawStoredState(State(false))
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(0, type.intent.flags)
@@ -477,10 +485,9 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenDuckChatIsEnabledAndIsDuckChatUrlThenReturnShouldLaunchDuckChatLink() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+    fun whenIsDuckChatUrlThenReturnShouldLaunchDuckChatLink() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        val type = testee.determineType("https://example.com")
+        val type = testee.determineType("https://duck.ai")
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
             listOf(
@@ -493,9 +500,8 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenDuckChatIsDisabledAndIsDuckChatUrlThenDoNotReturnShouldLaunchDuckChatLink() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+    fun whenIsNotDuckChatUrlThenDoNotReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         val type = testee.determineType("https://example.com")
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
@@ -506,6 +512,24 @@ class SpecialUrlDetectorImplTest {
             ),
         )
         assertTrue(type !is ShouldLaunchDuckChatLink)
+    }
+
+    @Test
+    fun whenIntentSchemeToggleEnabledThenCheckForIntentCalledWithUriIntentScheme() {
+        androidBrowserConfigFeature.handleIntentScheme().setRawStoredState(State(true))
+
+        testee.determineType("intent://path#Intent;scheme=testscheme;package=com.example.app;end")
+
+        verify(testee).checkForIntent(eq("intent"), any(), eq(URI_INTENT_SCHEME))
+    }
+
+    @Test
+    fun whenIntentSchemeToggleDisabledThenCheckForIntentCalledWithUriAndroidAppScheme() {
+        androidBrowserConfigFeature.handleIntentScheme().setRawStoredState(State(false))
+
+        testee.determineType("intent://path#Intent;scheme=testscheme;package=com.example.app;end")
+
+        verify(testee).checkForIntent(eq("intent"), any(), eq(URI_ANDROID_APP_SCHEME))
     }
 
     private fun randomString(length: Int): String {

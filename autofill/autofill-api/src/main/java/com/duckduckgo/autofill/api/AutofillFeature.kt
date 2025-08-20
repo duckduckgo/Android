@@ -132,12 +132,6 @@ interface AutofillFeature {
     fun deepDomainComparisonsOnExistingCredentialsChecks(): Toggle
 
     /**
-     * Kill switch for the new layout of list mode where everything is inside the recycler view
-     */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
-    fun newScrollBehaviourInPasswordManagementScreen(): Toggle
-
-    /**
      * Kill switch for making case insensitive checks on existing username matches
      */
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
@@ -160,4 +154,7 @@ interface AutofillFeature {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun canShowImportOptionInAppSettings(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.INTERNAL)
+    fun passkeySupport(): Toggle
 }

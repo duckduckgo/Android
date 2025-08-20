@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application>
         <activity
             android:name=".settings.PirDevSettingsActivity"
@@ -20,27 +19,8 @@
             android:label="@string/pirDevOptOutTitle" />
 
         <activity
-            android:name=".settings.PirWebViewActivity"
+            android:name=".settings.PirDevWebViewActivity"
             android:label="@string/pirDevDebugOptOutTitle" />
 
-        <service
-            android:name=".scan.PirForegroundScanService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="specialUse"
-            android:process=":pir" />
-
-        <service
-            android:name=".optout.PirForegroundOptOutService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="specialUse"
-            android:process=":pir" />
-
-        <service
-            android:name=".scan.PirRemoteWorkerService"
-            android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:process=":pir" />
     </application>
 </manifest>

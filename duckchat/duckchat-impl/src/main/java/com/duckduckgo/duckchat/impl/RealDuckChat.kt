@@ -159,6 +159,11 @@ interface DuckChatInternal : DuckChat {
      * Returns whether dedicated Duck.ai input screen feature is available (its feature flag is enabled).
      */
     fun isInputScreenFeatureAvailable(): Boolean
+
+    /**
+     * Checks whether DuckChat is enabled based on remote config flag.
+     */
+    fun isDuckChatFeatureEnabled(): Boolean
 }
 
 enum class ChatState(val value: String) {
@@ -234,7 +239,7 @@ class RealDuckChat @Inject constructor(
         moshi.adapter(DuckChatSettingJson::class.java)
     }
 
-    private var isDuckChatEnabled = false
+    private var isDuckChatFeatureEnabled = false
     private var isDuckAiInBrowserEnabled = false
     private var duckAiInputScreen = false
     private var isDuckChatUserEnabled = false
@@ -261,51 +266,35 @@ class RealDuckChat @Inject constructor(
     }
 
     override suspend fun setEnableDuckChatUserSetting(enabled: Boolean) {
-        if (enabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
-        }
         duckChatFeatureRepository.setDuckChatUserEnabled(enabled)
         cacheUserSettings()
     }
 
     override suspend fun setInputScreenUserSetting(enabled: Boolean) {
-        if (enabled) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
-        }
         duckChatFeatureRepository.setInputScreenUserSetting(enabled)
         cacheUserSettings()
     }
 
     override suspend fun setShowInBrowserMenuUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        if (showDuckChat) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
-        }
         duckChatFeatureRepository.setShowInBrowserMenu(showDuckChat)
         cacheUserSettings()
     }
 
     override suspend fun setShowInAddressBarUserSetting(showDuckChat: Boolean) = withContext(dispatchers.io()) {
-        if (showDuckChat) {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-        } else {
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
-        }
         duckChatFeatureRepository.setShowInAddressBar(showDuckChat)
         cacheUserSettings()
     }
 
     override fun isEnabled(): Boolean {
-        return isDuckChatEnabled
+        return isDuckChatFeatureEnabled && isDuckChatUserEnabled
     }
 
     override fun isInputScreenFeatureAvailable(): Boolean {
         return duckAiInputScreen
+    }
+
+    override fun isDuckChatFeatureEnabled(): Boolean {
+        return isDuckChatFeatureEnabled
     }
 
     override fun observeEnableDuckChatUserSetting(): Flow<Boolean> {
@@ -511,6 +500,8 @@ class RealDuckChat @Inject constructor(
     }
 
     override fun isDuckChatUrl(uri: Uri): Boolean {
+        if (!isDuckChatFeatureEnabled) return false
+
         if (isDuckChatBang(uri)) return true
 
         if (uri.host != DUCKDUCKGO_HOST) {
@@ -544,7 +535,7 @@ class RealDuckChat @Inject constructor(
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             val featureEnabled = duckChatFeature.self().isEnabled()
-            isDuckChatEnabled = featureEnabled
+            isDuckChatFeatureEnabled = featureEnabled
             _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
             duckAiInputScreen = duckChatFeature.duckAiInputScreen().isEnabled()
@@ -573,16 +564,16 @@ class RealDuckChat @Inject constructor(
     private suspend fun cacheUserSettings() = withContext(dispatchers.io()) {
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
-        val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatEnabled && isDuckChatUserEnabled &&
+        val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
             experimentalThemingDataStore.isSingleOmnibarEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
         _showInputScreen.emit(showInputScreen)
 
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
-            isDuckChatEnabled && isDuckChatUserEnabled
+            isDuckChatFeatureEnabled && isDuckChatUserEnabled
         _showInBrowserMenu.emit(showInBrowserMenu)
 
         val showInAddressBar = duckChatFeatureRepository.shouldShowInAddressBar() &&
-            isDuckChatEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
+            isDuckChatFeatureEnabled && isDuckChatUserEnabled && isAddressBarEntryPointEnabled
         _showInAddressBar.emit(showInAddressBar)
 
         val showOmnibarShortcutInAllStates = showInAddressBar && isDuckAiInBrowserEnabled

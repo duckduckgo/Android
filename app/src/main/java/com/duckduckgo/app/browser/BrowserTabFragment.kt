@@ -176,6 +176,7 @@ import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
 import com.duckduckgo.app.browser.viewstate.PrivacyShieldViewState
 import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
+import com.duckduckgo.app.browser.webauthn.WebViewPasskeyInitializer
 import com.duckduckgo.app.browser.webshare.WebShareChooser
 import com.duckduckgo.app.browser.webview.WebContentDebugging
 import com.duckduckgo.app.browser.webview.WebViewBlobDownloadFeature
@@ -197,8 +198,9 @@ import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -571,13 +573,19 @@ class BrowserTabFragment :
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
-    lateinit var onboardingDesignExperimentToggles: OnboardingDesignExperimentToggles
+    lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
     lateinit var omnibarTypeResolver: OmnibarTypeResolver
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
+
+    @Inject
+    lateinit var androidBrowserConfigFeature: AndroidBrowserConfigFeature
+
+    @Inject
+    lateinit var passkeyInitializer: WebViewPasskeyInitializer
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -617,7 +625,6 @@ class BrowserTabFragment :
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory)[BrowserTabViewModel::class.java]
         viewModel.loadData(tabId, initialUrl, skipHome, isLaunchedFromExternalApp)
-        launchDownloadMessagesJob()
         viewModel
     }
 
@@ -1053,6 +1060,8 @@ class BrowserTabFragment :
         if (swipingTabsFeature.isEnabled) {
             disableSwipingOutsideTheOmnibar()
         }
+
+        launchDownloadMessagesJob()
     }
 
     private fun updateOrDeleteWebViewPreview() {
@@ -1092,19 +1101,23 @@ class BrowserTabFragment :
 
     private fun configureInputScreenLauncher() {
         omnibar.configureInputScreenLaunchListener { query ->
-            val intent = globalActivityStarter.startIntent(
-                requireContext(),
-                InputScreenActivityParams(query = query),
-            )
-            val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
-            val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
-            val options = ActivityOptionsCompat.makeCustomAnimation(
-                requireActivity(),
-                enterTransition,
-                exitTransition,
-            )
-            inputScreenLauncher.launch(intent, options)
+            launchInputScreen(query)
         }
+    }
+
+    private fun launchInputScreen(query: String) {
+        val intent = globalActivityStarter.startIntent(
+            requireContext(),
+            InputScreenActivityParams(query = query),
+        )
+        val enterTransition = browserAndInputScreenTransitionProvider.getInputScreenEnterAnimation()
+        val exitTransition = browserAndInputScreenTransitionProvider.getBrowserExitAnimation()
+        val options = ActivityOptionsCompat.makeCustomAnimation(
+            requireActivity(),
+            enterTransition,
+            exitTransition,
+        )
+        inputScreenLauncher.launch(intent, options)
     }
 
     private fun configureNavigationBar() {
@@ -1575,9 +1588,11 @@ class BrowserTabFragment :
         )
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
-                    if (!result) {
-                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                    activity?.let {
+                        val result = downloadsFileActions.openFile(it, File(command.filePath))
+                        if (!result) {
+                            view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
@@ -2192,6 +2207,12 @@ class BrowserTabFragment :
 
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
+            is Command.LaunchInputScreen -> {
+                // if the fire button is used, prevent automatically launching the input screen until the process reloads
+                if ((requireActivity() as? BrowserActivity)?.isDataClearingInProgress == false) {
+                    launchInputScreen(query = "")
+                }
+            }
             else -> {
                 // NO OP
             }
@@ -2222,7 +2243,7 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundRes(backgroundRes: Int) {
-        if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled()) {
             bbDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
         } else {
             daxDialogInContext.onboardingDaxDialogBackground.setImageResource(backgroundRes)
@@ -2230,7 +2251,7 @@ class BrowserTabFragment :
     }
 
     private fun setOnboardingDialogBackgroundColor(@ColorRes colorRes: Int) {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             buckDialogInContext.root.setBackgroundColor(getColor(requireContext(), colorRes))
         } else {
             daxDialogInContext.onboardingDaxDialogContainer.setBackgroundColor(getColor(requireContext(), colorRes))
@@ -2480,6 +2501,20 @@ class BrowserTabFragment :
 
             if (activities.isEmpty()) {
                 when {
+                    fallbackIntent == null && fallbackUrl == null && androidBrowserConfigFeature.handleIntentScheme().isEnabled() -> {
+                        intent.`package`?.let { pkg ->
+                            val playIntent = Intent(
+                                Intent.ACTION_VIEW,
+                                "$STORE_PREFIX$pkg".toUri(),
+                            ).apply { addCategory(Intent.CATEGORY_BROWSABLE) }
+
+                            if (pm.resolveActivity(playIntent, 0) != null) {
+                                launchDialogForIntent(it, pm, playIntent, activities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
+                                return
+                            }
+                        }
+                    }
+
                     fallbackIntent != null -> {
                         val fallbackActivities = pm.queryIntentActivities(fallbackIntent, 0)
                         launchDialogForIntent(it, pm, fallbackIntent, fallbackActivities, useFirstActivityFound, viewModel.linkOpenedInNewTab())
@@ -2967,7 +3002,7 @@ class BrowserTabFragment :
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun configureWebView() {
-        if (!onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (!onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             binding.daxDialogOnboardingCtaContent.layoutTransition = LayoutTransition()
             binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
@@ -3091,6 +3126,10 @@ class BrowserTabFragment :
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+
+        lifecycleScope.launch {
+            webView?.let { passkeyInitializer.configurePasskeySupport(it) }
+        }
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3116,10 +3155,10 @@ class BrowserTabFragment :
 
     private fun hideOnboardingDaxDialog(onboardingCta: OnboardingDaxDialogCta) {
         when {
-            onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                 onboardingCta.hideBuckOnboardingCta(binding)
             }
-            onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+            onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                 onboardingCta.hideBBOnboardingCta(binding)
             }
             else -> {
@@ -3135,9 +3174,11 @@ class BrowserTabFragment :
     private fun hideOnboardingDaxBubbleCta(daxBubbleCta: DaxBubbleCta) {
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-            if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
-                hideBuckEndAnimation()
+        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+            when (daxBubbleCta) {
+                is DaxBubbleCta.DaxIntroSearchOptionsCta -> hideBuckMagnifyingGlassAnimation()
+                is DaxBubbleCta.DaxEndCta -> hideBuckEndAnimation()
+                else -> Unit
             }
         }
         renderer.showNewTab()
@@ -3145,7 +3186,7 @@ class BrowserTabFragment :
     }
 
     private fun hideDaxBubbleCta() {
-        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
             newBrowserTab.newTabLayout.setBackgroundColor(
                 requireContext().getColorFromAttr(CommonR.attr.daxColorSurface),
             )
@@ -4093,6 +4134,8 @@ class BrowserTabFragment :
 
         private const val SITE_SECURITY_WARNING = "Warning: Security Risk"
 
+        private const val STORE_PREFIX = "market://details?id="
+
         fun newInstance(
             tabId: String,
             query: String? = null,
@@ -4399,7 +4442,7 @@ class BrowserTabFragment :
 
                     viewState.isOnboardingCompleteInNewTabPage && !viewState.isErrorShowing -> {
                         hideDaxBubbleCta()
-                        if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+                        if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                             hideBuckEndAnimation()
                         }
                         showNewTab()
@@ -4421,34 +4464,46 @@ class BrowserTabFragment :
             hideNewTab()
             configuration.apply {
                 when {
-                    onboardingDesignExperimentToggles.buckOnboarding().isEnabled() -> {
+                    onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() -> {
                         showBuckCta(binding = buckDialogIntroBubble, configuration = configuration) {
                             setOnOptionClicked(
                                 onboardingExperimentEnabled = true,
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
-                    onboardingDesignExperimentToggles.bbOnboarding().isEnabled() -> {
+                    onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                         showBBCta(binding = bbDialogIntroBubble, configuration = configuration) {
                             setOnOptionClicked(
                                 onboardingExperimentEnabled = true,
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
                     else -> {
                         showCta(daxDialogIntroBubble.daxCtaContainer) {
                             setOnOptionClicked(
-                                onboardingExperimentEnabled = onboardingDesignExperimentToggles.modifiedControl().isEnabled(),
+                                onboardingExperimentEnabled = onboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled(),
                                 configuration = configuration,
-                            ) { userEnteredQuery(it.link) }
+                            ) { option, index ->
+                                userEnteredQuery(option.link)
+                                viewModel.onUserSelectedOnboardingDialogOption(configuration, index)
+                            }
                         }
                     }
                 }
 
                 setOnPrimaryCtaClicked {
-                    if (onboardingDesignExperimentToggles.bbOnboarding().isEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                    if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
+                        newBrowserTab.buckEndAnimation.isGone = true
+                        viewModel.onUserClickCtaOkButton(configuration)
+                    } else if (onboardingDesignExperimentManager.isBbEnrolledAndEnabled() && configuration is DaxBubbleCta.DaxEndCta) {
                         configuration.hideBBEndCta(
                             onAnimationEnd = {
                                 viewModel.onUserClickCtaOkButton(configuration)
@@ -4467,13 +4522,16 @@ class BrowserTabFragment :
                 }
             }
 
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
-                if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
-                    lifecycleScope.launch {
-                        with(newBrowserTab.wingAnimation) {
-                            delay(2.5.seconds)
-                            show()
-                            playAnimation()
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
+                if (configuration is DaxIntroVisitSiteOptionsCta) {
+                    hideBuckMagnifyingGlassAnimation()
+                    if (context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
+                        lifecycleScope.launch {
+                            with(newBrowserTab.wingAnimation) {
+                                delay(2.5.seconds)
+                                show()
+                                playAnimation()
+                            }
                         }
                     }
                 }
@@ -4642,7 +4700,7 @@ class BrowserTabFragment :
         }
 
         private fun hideDaxCta() {
-            if (onboardingDesignExperimentToggles.buckOnboarding().isEnabled()) {
+            if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
                 buckDialogInContext.root.gone()
             } else {
                 daxDialogInContext.dialogTextCta.cancelAnimation()
@@ -4682,6 +4740,10 @@ class BrowserTabFragment :
             newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
             newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
         }
+    }
+
+    private fun hideBuckMagnifyingGlassAnimation() {
+        newBrowserTab.buckMagnifyingGlassAnimation.isGone = true
     }
 
     private fun hideBuckEndAnimation() {

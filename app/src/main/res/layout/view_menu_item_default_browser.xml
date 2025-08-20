@@ -22,7 +22,7 @@
             android:layout_width="@dimen/keyline_4"
             android:layout_height="@dimen/keyline_4"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_default_browser_mobile_color_16"
+            android:src="@drawable/ic_default_browser_mobile_grey_16"
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
@@ -32,9 +32,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="@dimen/keyline_2"
             android:text="@string/setAsDefaultBrowser"
-            android:textColor="@color/blue50"
-            app:typography="body1"
-            tools:ignore="InvalidColorAttribute" />
+            app:typography="body1" />
 
     </LinearLayout>
 

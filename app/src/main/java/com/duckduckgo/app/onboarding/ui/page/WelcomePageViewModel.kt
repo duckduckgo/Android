@@ -39,6 +39,7 @@ import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowDe
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowInitialReinstallUserDialog
 import com.duckduckgo.app.onboarding.ui.page.WelcomePageViewModel.Command.ShowSkipOnboardingOption
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.NOTIFICATION_RUNTIME_PERMISSION_SHOWN
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE
@@ -76,6 +77,7 @@ class WelcomePageViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val dispatchers: DispatcherProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : ViewModel() {
 
     private val _commands = Channel<Command>(1, DROP_OLDEST)
@@ -129,6 +131,7 @@ class WelcomePageViewModel @Inject constructor(
                         PREONBOARDING_CHOOSE_BROWSER_PRESSED,
                         mapOf(PixelParameter.DEFAULT_BROWSER to isDDGDefaultBrowser.toString()),
                     )
+                    onboardingDesignExperimentManager.fireChooseBrowserPixel()
                 }
             }
 
@@ -145,6 +148,11 @@ class WelcomePageViewModel @Inject constructor(
                     pixel.fire(PREONBOARDING_BOTTOM_ADDRESS_BAR_SELECTED_UNIQUE)
                 }
                 viewModelScope.launch {
+                    if (!defaultAddressBarPosition) {
+                        onboardingDesignExperimentManager.fireAddressBarSetBottomPixel()
+                    } else {
+                        onboardingDesignExperimentManager.fireAddressBarSetTopPixel()
+                    }
                     _commands.send(Finish)
                 }
             }
@@ -187,6 +195,7 @@ class WelcomePageViewModel @Inject constructor(
         pixel.fire(AppPixelName.DEFAULT_BROWSER_SET, mapOf(PixelParameter.DEFAULT_BROWSER_SET_FROM_ONBOARDING to true.toString()))
 
         viewModelScope.launch {
+            onboardingDesignExperimentManager.fireSetDefaultRatePixel()
             _commands.send(ShowAddressBarPositionDialog)
         }
     }
@@ -214,11 +223,28 @@ class WelcomePageViewModel @Inject constructor(
 
     fun onDialogShown(onboardingDialogType: PreOnboardingDialogType) {
         when (onboardingDialogType) {
-            INITIAL_REINSTALL_USER -> pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
-            INITIAL -> pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
-            COMPARISON_CHART -> pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+            INITIAL_REINSTALL_USER -> {
+                pixel.fire(PREONBOARDING_INTRO_REINSTALL_USER_SHOWN_UNIQUE, type = Unique())
+            }
+            INITIAL -> {
+                pixel.fire(PREONBOARDING_INTRO_SHOWN_UNIQUE, type = Unique())
+                viewModelScope.launch {
+                    onboardingDesignExperimentManager.fireIntroScreenDisplayedPixel()
+                }
+            }
+            COMPARISON_CHART -> {
+                pixel.fire(PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE, type = Unique())
+                viewModelScope.launch {
+                    onboardingDesignExperimentManager.fireComparisonScreenDisplayedPixel()
+                }
+            }
             SKIP_ONBOARDING_OPTION -> pixel.fire(PREONBOARDING_SKIP_ONBOARDING_SHOWN_UNIQUE, type = Unique())
-            ADDRESS_BAR_POSITION -> pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+            ADDRESS_BAR_POSITION -> {
+                pixel.fire(PREONBOARDING_ADDRESS_BAR_POSITION_SHOWN_UNIQUE, type = Unique())
+                viewModelScope.launch {
+                    onboardingDesignExperimentManager.fireSetAddressBarDisplayedPixel()
+                }
+            }
         }
     }
 

@@ -28,10 +28,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.pir.internal.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.PirConstants.NOTIF_CHANNEL_ID
+import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
-import com.duckduckgo.pir.internal.store.PirRepository
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -99,11 +100,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
             NotificationManager::class.java,
         )
         notificationManager?.createNotificationChannel(channel)
-    }
-
-    companion object {
-        const val NOTIF_CHANNEL_ID = "PirDevNotificationChannel"
-        const val NOTIF_ID_STATUS_COMPLETE = 987
     }
 }
 

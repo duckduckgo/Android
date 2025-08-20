@@ -246,7 +246,7 @@
 
     <string name="newTabPageShortcutPasswords">Paroles</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importēt Google paroles</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importēt paroles</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d paroles importētas no Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d paroles importētas no CSV</string>
 
@@ -256,7 +256,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sinhronizēt darbvirsmas paroles</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sinhronizēt darbvirsmas paroles</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importē savas Google paroles</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Importēt paroles no Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google var lūgt tevi pierakstīties vai ievadīt paroli, lai apstiprinātu.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importēt no Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Izvēlies CSV failu</string>

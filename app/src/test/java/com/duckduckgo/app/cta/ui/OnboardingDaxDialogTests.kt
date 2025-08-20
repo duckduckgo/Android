@@ -35,7 +35,7 @@ import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
-import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -86,7 +86,7 @@ class OnboardingDaxDialogTests {
     private val mockSubscriptions: Subscriptions = mock()
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val mockOnboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment = mock()
-    private val mockOnboardingDesignExperimentToggles: OnboardingDesignExperimentToggles = mock()
+    private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
     private val mockRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
 
     val mockEnabledToggle: Toggle = org.mockito.kotlin.mock { on { it.isEnabled() } doReturn true }
@@ -116,7 +116,7 @@ class OnboardingDaxDialogTests {
             mockBrokenSitePrompt,
             mockSenseOfProtectionExperiment,
             mockOnboardingHomeScreenWidgetExperiment,
-            mockOnboardingDesignExperimentToggles,
+            mockOnboardingDesignExperimentManager,
             mockRebrandingFeatureToggle,
         )
     }

@@ -878,8 +878,8 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Neklausk dar kartą</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Pakeiskite numatytąją naršyklę, kad nuorodos atsidarytų su „DuckDuckGo“.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne dabar</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">„DuckDuckGo“ nėra numatytoji naršyklė. Gauk daugiau apsaugos.</string>

@@ -99,6 +99,17 @@
                         tools:ignore="InvalidColorAttribute" />
                 </FrameLayout>
 
+                <ImageView
+                    android:id="@+id/placeholderImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="44dp"
+                    android:layout_gravity="center"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    android:layout_marginTop="@dimen/keyline_4"
+                    app:srcCompat="@drawable/buck_shield"
+                    tools:visibility="gone" />
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/daxDialogOption1"
                     style="@style/Widget.DuckDuckGo.BuckButton.Secondary"

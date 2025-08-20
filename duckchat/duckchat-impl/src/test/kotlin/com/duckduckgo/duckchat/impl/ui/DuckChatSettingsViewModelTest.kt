@@ -271,4 +271,52 @@ class DuckChatSettingsViewModelTest {
         testee.duckChatSearchAISettingsClicked()
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCH_ASSIST_SETTINGS_BUTTON_CLICKED)
     }
+
+    @Test
+    fun `when onDuckChatUserEnabledToggled true then enabled pixel fired`() = runTest {
+        testee.onDuckChatUserEnabledToggled(true)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
+    }
+
+    @Test
+    fun `when onDuckChatUserEnabledToggled false then disabled pixel fired`() = runTest {
+        testee.onDuckChatUserEnabledToggled(false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
+    }
+
+    @Test
+    fun `when onDuckAiInputScreenToggled true then on pixel fired`() = runTest {
+        testee.onDuckAiInputScreenToggled(true)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
+    }
+
+    @Test
+    fun `when onDuckAiInputScreenToggled false then off pixel fired`() = runTest {
+        testee.onDuckAiInputScreenToggled(false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
+    }
+
+    @Test
+    fun `when onShowDuckChatInMenuToggled true then on pixel fired`() = runTest {
+        testee.onShowDuckChatInMenuToggled(true)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
+    }
+
+    @Test
+    fun `when onShowDuckChatInMenuToggled false then off pixel fired`() = runTest {
+        testee.onShowDuckChatInMenuToggled(false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
+    }
+
+    @Test
+    fun `when onShowDuckChatInAddressBarToggled true then on pixel fired`() = runTest {
+        testee.onShowDuckChatInAddressBarToggled(true)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
+    }
+
+    @Test
+    fun `when onShowDuckChatInAddressBarToggled false then off pixel fired`() = runTest {
+        testee.onShowDuckChatInAddressBarToggled(false)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
+    }
 }

@@ -5,6 +5,7 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import org.json.JSONObject
 import org.junit.Assert.*
 import org.junit.Test
+import org.mockito.kotlin.mock
 
 class DuckPlayerContentScopeJsMessageHandlerTest {
     private val handler = DuckPlayerContentScopeJsMessageHandler().getJsMessageHandler()
@@ -19,7 +20,7 @@ class DuckPlayerContentScopeJsMessageHandlerTest {
             params = JSONObject(),
         )
 
-        handler.process(message, "secret", callback)
+        handler.process(message, mock(), callback)
 
         assertEquals(1, callback.counter)
     }

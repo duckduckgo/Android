@@ -39,14 +39,8 @@
     <string name="pirStatsStatusRecords" instruction="Placeholder is an integer">Total extracted profiles: %1$d</string>
     <string name="pirStatsStatusBrokerFound" instruction="Placeholder is an integer">Brokers with records: %1$d</string>
     <string name="pirStatsStatusError" instruction="Placeholder is an integer">Errors: %1$d</string>
-    <string name="pirNotificationTitle">Pir Manual Scan</string>
-    <string name="pirNotificationMessageInProgress">Manual scan is currently in progress…</string>
-    <string name="pirNotificationMessageComplete">Manual scan is complete! View your results.</string>
     <string name="pirMessageSchedule">Successfully schedule background scan!</string>
     <string name="pirDevScanLogHeader">Scan events log</string>
-    <string name="pirOptOutNotificationTitle">Pir Opt Out</string>
-    <string name="pirOptOutNotificationMessageInProgress">Opt out is currently in progress…</string>
-    <string name="pirOptOutNotificationMessageComplete">Opt out is complete! View your results.</string>
     <string name="pirDevDebugOptOut">Debug opt out</string>
     <string name="pirDevOptOut">Run opt out</string>
     <string name="pirDevOptOutDisclaimer">Note: Only brokers with formOptOut are supported and will appear as an option for optout.</string>

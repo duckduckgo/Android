@@ -589,7 +589,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onDuckAIButtonClicked() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
             duckChat.openDuckChat()
         }

@@ -86,6 +86,7 @@ dependencies {
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
 }

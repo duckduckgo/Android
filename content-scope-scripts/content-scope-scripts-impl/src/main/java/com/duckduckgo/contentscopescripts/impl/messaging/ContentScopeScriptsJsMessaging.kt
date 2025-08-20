@@ -82,7 +82,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName &&
                             (it.allowedDomains.isEmpty() || it.allowedDomains.contains(domain))
-                    }?.process(jsMessage, secret, jsMessageCallback)
+                    }?.process(jsMessage, this, jsMessageCallback)
                 }
             }
         } catch (e: Exception) {

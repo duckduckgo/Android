@@ -846,8 +846,8 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laat DuckDuckGo meer beschermen van wat je online doet</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Maak ons je standaardbrowser zodat alle sitelinks in DuckDuckGo worden geopend.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Niet opnieuw vragen</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Stel je standaardbrowser in, zodat links in DuckDuckGo worden geopend.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Niet nu</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo is niet je standaardbrowser. Krijg meer bescherming.</string>

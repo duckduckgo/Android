@@ -21,8 +21,6 @@ import com.duckduckgo.app.cta.ui.DaxBubbleCta.DaxDialogIntroOption
 interface OnboardingStore {
     var onboardingDialogJourney: String?
 
-    @Deprecated(message = "Parameter used for a temporary pixel")
     fun getSearchOptions(): List<DaxDialogIntroOption>
     fun getSitesOptions(): List<DaxDialogIntroOption>
-    fun getExperimentSearchOptions(): List<DaxDialogIntroOption>
 }
