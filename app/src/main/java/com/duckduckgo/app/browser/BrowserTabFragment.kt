@@ -1190,9 +1190,18 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+    }
+
+    private fun postBreakageReportingEvent() {
+        appCoroutineScope.launch {
+            val eventData = createBreakageReportingEventData()
+            webViewClient.postMessage(eventData) {
+                contentScopeScripts.sendSubscriptionEvent(eventData)
+            }
+        }
     }
 
     private fun onFireButtonPressed() {
@@ -1202,12 +1211,12 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         launchPrivacyDashboard(toggle = false)
     }
 

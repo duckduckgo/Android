@@ -217,6 +217,63 @@ class ContentScopeScriptsWebMessagingPluginTest {
         verify(mockWebViewCompatWrapper).removeWebMessageListener(mockWebView, "contentScopeAdsjs")
     }
 
+    // @Test
+    // fun `when posting message and adsjs is disabled then do not post message`() = runTest {
+    //     whenever(adsJsContentScopeScripts.isEnabled()).thenReturn(false)
+    //     val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+    //     givenInterfaceIsRegistered()
+    //     processInitialPing()
+    //
+    //     val result = testee.postMessage(eventData)
+    //
+    //     verify(mockWebView, never()).safePostMessage(any(), any())
+    //     assertFalse(result)
+    // }
+    //
+    // @Test
+    // fun `when posting message and adsjs is enabled but webView not registered then do not post message`() = runTest {
+    //     whenever(adsJsContentScopeScripts.isEnabled()).thenReturn(true)
+    //     val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+    //     processInitialPing()
+    //
+    //     val result = testee.postMessage(eventData)
+    //
+    //     verify(mockWebView, never()).safePostMessage(any(), any())
+    //     assertFalse(result)
+    // }
+    //
+    // @Test
+    // fun `when posting message and adsjs is enabled but initialPing not processes then do not post message`() = runTest {
+    //     whenever(adsJsContentScopeScripts.isEnabled()).thenReturn(true)
+    //     val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+    //
+    //     val result = testee.postMessage(eventData)
+    //
+    //     verify(mockWebView, never()).safePostMessage(any(), any())
+    //     assertFalse(result)
+    // }
+    //
+    // @Test
+    // fun `when posting message after getting initialPing and adsjs is enabled then post message`() = runTest {
+    //     whenever(adsJsContentScopeScripts.isEnabled()).thenReturn(true)
+    //     val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+    //     givenInterfaceIsRegistered()
+    //     processInitialPing()
+    //     verify(mockWebView, never()).postWebMessage(any(), any())
+    //
+    //     val result = testee.postMessage(eventData)
+    //
+    //     verify(mockWebView).safePostMessage(any(), any())
+    //     assertTrue(result)
+    // }
+
+    private fun processInitialPing() = runTest {
+        val message = """
+            {"context":"contentScopeScripts","featureName":"messaging","id":"debugId","method":"initialPing","params":{}}
+        """.trimIndent()
+        testee.process(message, callback, mockReplyProxy)
+    }
+
     private val callback = object : WebViewCompatMessageCallback {
         var counter = 0
         override fun process(

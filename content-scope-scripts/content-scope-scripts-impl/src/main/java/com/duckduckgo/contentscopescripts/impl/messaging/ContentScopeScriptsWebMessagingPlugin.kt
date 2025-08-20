@@ -31,6 +31,8 @@ import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -38,6 +40,8 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -60,6 +64,8 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val context: String = "contentScopeScripts"
     private val allowedDomains: Set<String> = setOf("*")
 
+    private var globalReplyProxy: JavaScriptReplyProxy? = null
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun process(
         message: String,
@@ -72,6 +78,12 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
+                    // Setup reply proxy so we can send subscription events
+                    if (jsMessage.featureName == "messaging" || jsMessage.method == "initialPing") {
+                        logcat("Cris") { "initialPing" }
+                        globalReplyProxy = replyProxy
+                    }
+
                     // Process global handlers first (always processed regardless of feature handlers)
                     globalHandlers.getPlugins()
                         .map { it.getGlobalJsMessageHandler() }
@@ -197,5 +209,31 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                 replyProxy.postMessage(responseWithId.toString())
             }
         }
+    }
+
+    @SuppressLint("RequiresFeature")
+    override fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
+        return runCatching {
+            // TODO (cbarreiro) temporary, remove
+            val newWebCompatApisEnabled = runBlocking {
+                webViewCompatContentScopeScripts.isEnabled()
+            }
+
+            if (!newWebCompatApisEnabled) {
+                return false
+            }
+
+            val subscriptionEvent = SubscriptionEvent(
+                context = context,
+                featureName = subscriptionEventData.featureName,
+                subscriptionName = subscriptionEventData.subscriptionName,
+                params = subscriptionEventData.params,
+            ).let {
+                moshi.adapter(SubscriptionEvent::class.java).toJson(it)
+            }
+
+            globalReplyProxy?.postMessage(subscriptionEvent)
+            true
+        }.getOrElse { false }
     }
 }

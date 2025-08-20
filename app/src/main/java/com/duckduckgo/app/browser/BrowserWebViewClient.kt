@@ -80,6 +80,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -759,6 +760,17 @@ class BrowserWebViewClient @Inject constructor(
     fun destroy(webView: DuckDuckGoWebView) {
         webMessagingPlugins.getPlugins().forEach { plugin ->
             plugin.unregister(webView)
+        }
+    }
+
+    fun postMessage(
+        eventData: SubscriptionEventData,
+        fallback: () -> Unit,
+    ) {
+        webMessagingPlugins.getPlugins().forEach {
+            if (!it.postMessage(eventData)) {
+                fallback()
+            }
         }
     }
 }

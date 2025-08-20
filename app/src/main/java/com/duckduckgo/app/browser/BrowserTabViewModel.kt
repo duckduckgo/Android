@@ -3689,6 +3689,19 @@ class BrowserTabViewModel @Inject constructor(
             "addDebugFlag" -> {
                 site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
             }
+            "breakageReportResult" -> if (data != null) {
+                breakageReportResult(data)
+            }
+            "initialPing" -> {
+                // TODO: Eventually, we might want plugins here
+                val response = JSONObject(
+                    mapOf(
+                        "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                        "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                    ),
+                )
+                onResponse(response)
+            }
         }
     }
 

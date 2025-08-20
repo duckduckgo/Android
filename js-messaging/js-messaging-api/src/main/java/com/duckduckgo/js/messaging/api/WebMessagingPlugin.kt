@@ -27,4 +27,6 @@ interface WebMessagingPlugin {
     fun unregister(
         webView: WebView,
     )
+
+    fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean
 }
