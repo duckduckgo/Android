@@ -163,13 +163,12 @@ class AdsjsContentScopeMessaging @Inject constructor(
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 (webView as? DuckDuckGoWebView)?.safePostMessage(
                     replyProxy,
-                    responseWithId,
+                    responseWithId.toString(),
                 )
             }
         }
     }
 
-    @SuppressLint("RequiresFeature")
     override fun postMessage(subscriptionEventData: SubscriptionEventData) {
         runCatching {
             val subscriptionEvent = SubscriptionEvent(
@@ -181,7 +180,14 @@ class AdsjsContentScopeMessaging @Inject constructor(
                 moshi.adapter(SubscriptionEvent::class.java).toJson(it)
             }
 
-            globalReplyProxy?.postMessage(subscriptionEvent)
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                globalReplyProxy?.let {
+                    (webView as? DuckDuckGoWebView)?.safePostMessage(
+                        it,
+                        subscriptionEvent,
+                    )
+                }
+            }
         }
     }
 }
