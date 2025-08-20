@@ -273,6 +273,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                             }
 
                             val titleText = getString(R.string.highlightsPreOnboardingDaxDialog1TitleBb)
+                            binding.daxDialogCta.initial.dialogTitleInvisible.text = titleText
 
                             afterTypingAnimation = {
                                 binding.daxDialogCta.initial.dialogTitle.finishAnimation()

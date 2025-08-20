@@ -3175,8 +3175,10 @@ class BrowserTabFragment :
         daxBubbleCta.hideDaxBubbleCta(binding)
         hideDaxBubbleCta()
         if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-            if (daxBubbleCta is DaxBubbleCta.DaxEndCta) {
-                hideBuckEndAnimation()
+            when (daxBubbleCta) {
+                is DaxBubbleCta.DaxIntroSearchOptionsCta -> hideBuckMagnifyingGlassAnimation()
+                is DaxBubbleCta.DaxEndCta -> hideBuckEndAnimation()
+                else -> Unit
             }
         }
         renderer.showNewTab()
@@ -4521,12 +4523,15 @@ class BrowserTabFragment :
             }
 
             if (onboardingDesignExperimentManager.isBuckEnrolledAndEnabled()) {
-                if (configuration is DaxIntroVisitSiteOptionsCta && context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
-                    lifecycleScope.launch {
-                        with(newBrowserTab.wingAnimation) {
-                            delay(2.5.seconds)
-                            show()
-                            playAnimation()
+                if (configuration is DaxIntroVisitSiteOptionsCta) {
+                    hideBuckMagnifyingGlassAnimation()
+                    if (context?.resources?.getBoolean(R.bool.show_wing_animation) == true) {
+                        lifecycleScope.launch {
+                            with(newBrowserTab.wingAnimation) {
+                                delay(2.5.seconds)
+                                show()
+                                playAnimation()
+                            }
                         }
                     }
                 }
@@ -4735,6 +4740,10 @@ class BrowserTabFragment :
             newBrowserTab.buckMagnifyingGlassAnimation.isVisible = true
             newBrowserTab.buckMagnifyingGlassAnimation.playAnimation()
         }
+    }
+
+    private fun hideBuckMagnifyingGlassAnimation() {
+        newBrowserTab.buckMagnifyingGlassAnimation.isGone = true
     }
 
     private fun hideBuckEndAnimation() {

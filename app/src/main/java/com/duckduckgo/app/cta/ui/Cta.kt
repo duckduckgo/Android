@@ -485,7 +485,8 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         title = getTrackersDescription(context, trackers),
-                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
+                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
@@ -912,11 +913,14 @@ sealed class OnboardingDaxDialogCta(
 
                     optionsViews.forEachIndexed { index, buttonView ->
                         options[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                        buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index], index)
-                            wingAnimation.gone()
-                        }
+                        buttonView.animate().alpha(MAX_ALPHA)
+                            .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
+                            .withEndAction {
+                                buttonView.setOnClickListener {
+                                    onSuggestedOptionClicked?.invoke(options[index], index)
+                                    wingAnimation.gone()
+                                }
+                            }
                     }
 
                     showAndPlayWingAnimation()
@@ -1004,10 +1008,13 @@ sealed class OnboardingDaxDialogCta(
 
                     optionsViews.forEachIndexed { index, buttonView ->
                         options[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                        buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index], index)
-                        }
+                        buttonView.animate().alpha(MAX_ALPHA)
+                            .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
+                            .withEndAction {
+                                buttonView.setOnClickListener {
+                                    onSuggestedOptionClicked?.invoke(options[index], index)
+                                }
+                            }
                     }
                 }
 
