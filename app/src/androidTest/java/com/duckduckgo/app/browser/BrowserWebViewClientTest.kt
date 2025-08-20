@@ -88,6 +88,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailable
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -1349,6 +1350,11 @@ class BrowserWebViewClientTest {
             registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
         ) {
             registered = true
+        }
+
+        // TODO (cbarreiro) Test message posting
+        override fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
+            TODO("Not yet implemented")
         }
     }
 
