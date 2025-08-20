@@ -26,7 +26,7 @@ interface AdsjsMessaging {
      */
     suspend fun register(
         webView: WebView,
-        jsMessageCallback: AdsjsJsMessageCallback?
+        jsMessageCallback: AdsjsJsMessageCallback?,
     )
     suspend fun unregister(webView: WebView)
 

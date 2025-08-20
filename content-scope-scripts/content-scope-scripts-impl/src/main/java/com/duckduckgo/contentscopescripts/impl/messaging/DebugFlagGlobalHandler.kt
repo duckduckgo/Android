@@ -23,8 +23,8 @@ import com.duckduckgo.js.messaging.api.AdsjsJsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import org.json.JSONObject
 import logcat.logcat
+import org.json.JSONObject
 
 @ContributesMultibinding(AppScope::class)
 class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessageHandlersPlugin {
