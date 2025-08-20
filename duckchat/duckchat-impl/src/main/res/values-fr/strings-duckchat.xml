@@ -43,12 +43,17 @@
     <string name="duck_chat_address_bar_visibility_setting">Barre d\'adresse</string>
     <string name="duck_chat_assist_settings_title">Paramètres d\'Assist</string>
     <string name="duck_chat_assist_settings_description">Choisissez la fréquence à laquelle vous souhaitez que les réponses assistées par l\'IA apparaissent dans vos recherches</string>
+    <string name="duck_ai_shortcut_settings_title">Raccourcis Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Choisissez les raccourcis Duck.ai à afficher</string>
 
     <!-- Input Screen  -->
     <string name="input_screen_search_tab">Rechercher</string>
     <string name="input_screen_search_hint">Rechercher ou saisir une adresse</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Demandez à Duck.ai</string>
+    <string name="input_screen_user_pref_without_ai">Recherche uniquement\n(Par défaut)</string>
+    <string name="input_screen_user_pref_with_ai">Recherche et Duck.ai\n(Expérimental)</string>
+    <string name="input_screen_user_pref_description">Essayez notre option expérimentale pour interroger Duck.ai directement à partir de la barre d\'adresse <annotation type="share_feedback">Partagez vos commentaires</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -61,6 +66,7 @@
     <string name="duck_chat_title_rebranding">Fonctionnalités de l\'IA</string>
     <string name="duck_chat_settings_activity_description_rebranding">Les fonctionnalités de DuckDuckGo AI sont privées et facultatives.Vos données ne servent pas à entraîner l’IA.\n<annotation type="learn_more_link">En savoir plus</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Discutez en privé avec des modèles d\'IA tiers populaires</string>
     <string name="duck_chat_assist_settings_title_rebranding">Paramètres de recherche Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Choisissez la fréquence à laquelle vous souhaitez que les réponses assistées par l\'IA apparaissent dans vos recherches</string>
 </resources>
