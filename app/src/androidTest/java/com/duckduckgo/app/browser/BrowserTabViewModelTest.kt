@@ -7073,6 +7073,30 @@ class BrowserTabViewModelTest {
         )
     }
 
+    @Test
+    fun whenInputScreenPrefChangesToEnabledThenLaunchInputScreenCommandNotTriggered() = runTest {
+        val initialTabId = "initial-tab"
+        val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
+        val ntpTabId = "ntp-tab"
+        val ntpTab = TabEntity(tabId = ntpTabId, url = null, title = "", skipHome = false, viewed = true, position = 0)
+        whenever(mockTabRepository.getTab(initialTabId)).thenReturn(initialTab)
+        whenever(mockTabRepository.getTab(ntpTabId)).thenReturn(ntpTab)
+        flowSelectedTab.emit(initialTab)
+
+        testee.loadData(ntpTabId, null, false, false)
+        mockDuckAiFeatureStateInputScreenFlow.emit(false)
+
+        flowSelectedTab.emit(ntpTab)
+        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "LaunchInputScreen command should NOT be triggered when preference is toggled",
+            commands.any { it is Command.LaunchInputScreen },
+        )
+    }
+
     private fun aCredential(): LoginCredentials {
         return LoginCredentials(domain = null, username = null, password = null)
     }
