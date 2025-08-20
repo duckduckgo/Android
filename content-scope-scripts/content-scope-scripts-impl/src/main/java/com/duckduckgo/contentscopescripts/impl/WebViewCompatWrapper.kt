@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl
 
 import android.webkit.WebView
 import androidx.webkit.ScriptHandler
+import androidx.webkit.WebViewCompat.WebMessageListener
 
 interface WebViewCompatWrapper {
 
@@ -26,4 +27,16 @@ interface WebViewCompatWrapper {
         script: String,
         allowedOriginRules: Set<String>,
     ): ScriptHandler
+
+    fun removeWebMessageListener(
+        webView: WebView,
+        jsObjectName: String,
+    )
+
+    fun addWebMessageListener(
+        webView: WebView,
+        jsObjectName: String,
+        allowedOriginRules: Set<String>,
+        listener: WebMessageListener,
+    )
 }

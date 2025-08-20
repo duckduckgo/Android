@@ -46,6 +46,10 @@ abstract class DuckDuckGoWebView(
         listener: WebMessageListener,
     ): Boolean
 
+    abstract suspend fun safeRemoveWebMessageListener(
+        jsObjectName: String,
+    ): Boolean
+
     abstract suspend fun safeAddDocumentStartJavaScript(
         script: String,
         allowedOriginRules: Set<String>,

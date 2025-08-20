@@ -16,10 +16,8 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
-import android.annotation.SuppressLint
 import android.webkit.WebView
-import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewFeature
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.AdsjsContentScopeJsMessageHandlersPlugin
@@ -85,16 +83,14 @@ class AdsjsContentScopeMessaging @Inject constructor(
         }
     }
 
-    @SuppressLint("AddWebMessageListenerUsage")
     override suspend fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
         if (withContext(dispatcherProvider.io()) { !adsJsContentScopeScripts.isEnabled() }) return
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
 
         runCatching {
-            if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-                WebViewCompat.addWebMessageListener(
-                    webView,
+            (webView as? DuckDuckGoWebView)?.let {
+                return@runCatching it.safeAddWebMessageListener(
                     JS_OBJECT_NAME,
                     allowedDomains,
                 ) { _, message, _, _, replyProxy ->
@@ -103,10 +99,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
                         jsMessageCallback,
                     )
                 }
-                true
-            } else {
-                false
-            }
+            } ?: false
         }.getOrElse { exception ->
             logcat(ERROR) { "Error adding WebMessageListener for contentScopeAdsjs: ${exception.asLog()}" }
             false
@@ -117,10 +110,11 @@ class AdsjsContentScopeMessaging @Inject constructor(
         if (!adsJsContentScopeScripts.isEnabled()) return
         withContext(dispatcherProvider.main()) {
             runCatching {
-                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
-                    WebViewCompat.removeWebMessageListener(webView, JS_OBJECT_NAME)
-                } else {
-                    logcat(ERROR) { "WebMessageListener is not supported on this WebView" }
+                return@runCatching (webView as? DuckDuckGoWebView)
+                    ?.safeRemoveWebMessageListener(JS_OBJECT_NAME)
+            }.getOrElse { exception ->
+                logcat(ERROR) {
+                    "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
                 }
             }
         }

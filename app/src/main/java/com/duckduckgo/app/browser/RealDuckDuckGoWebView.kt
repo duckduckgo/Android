@@ -34,7 +34,6 @@ import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
 import androidx.webkit.ScriptHandler
-import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.api.DuckDuckGoWebView
@@ -437,7 +436,7 @@ class RealDuckDuckGoWebView : DuckDuckGoWebView, NestedScrollingChild3 {
         listener: WebMessageListener,
     ): Boolean = runCatching {
         if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
-            WebViewCompat.addWebMessageListener(
+            webViewCompatWrapper.addWebMessageListener(
                 this,
                 jsObjectName,
                 allowedOriginRules,
@@ -449,6 +448,18 @@ class RealDuckDuckGoWebView : DuckDuckGoWebView, NestedScrollingChild3 {
         }
     }.getOrElse { exception ->
         logcat(ERROR) { "Error adding WebMessageListener: $jsObjectName: ${exception.asLog()}" }
+        false
+    }
+
+    override suspend fun safeRemoveWebMessageListener(jsObjectName: String): Boolean = runCatching {
+        if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
+            webViewCompatWrapper.removeWebMessageListener(this, jsObjectName)
+            true
+        } else {
+            false
+        }
+    }.getOrElse { exception ->
+        logcat(ERROR) { "Error removing WebMessageListener: $jsObjectName: ${exception.asLog()}" }
         false
     }
 
