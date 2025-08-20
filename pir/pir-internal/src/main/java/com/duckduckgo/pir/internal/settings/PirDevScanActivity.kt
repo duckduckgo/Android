@@ -37,6 +37,7 @@ import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirRemoteWorkerService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.store.db.Address
@@ -55,6 +56,9 @@ import logcat.logcat
 class PirDevScanActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var repository: PirRepository
+
+    @Inject
+    lateinit var eventsRepository: PirEventsRepository
 
     @Inject
     lateinit var pirSchedulingRepository: PirSchedulingRepository
@@ -90,7 +94,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
             }
             .launchIn(lifecycleScope)
 
-        repository.getTotalScannedBrokersFlow()
+        eventsRepository.getTotalScannedBrokersFlow()
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach {
                 binding.statusSitesScanned.text = getString(R.string.pirStatsStatusScanned, it)
@@ -151,10 +155,10 @@ class PirDevScanActivity : DuckDuckGoActivity() {
         binding.debugResetAll.setOnClickListener {
             killRunningWork()
             lifecycleScope.launch(dispatcherProvider.io()) {
-                repository.deleteAllScanResults()
+                eventsRepository.deleteAllScanResults()
                 repository.deleteAllUserProfilesQueries()
-                repository.deleteEventLogs()
-                repository.deleteAllOptOutData()
+                eventsRepository.deleteEventLogs()
+                eventsRepository.deleteAllOptOutData()
                 pirSchedulingRepository.deleteAllJobRecords()
             }
         }

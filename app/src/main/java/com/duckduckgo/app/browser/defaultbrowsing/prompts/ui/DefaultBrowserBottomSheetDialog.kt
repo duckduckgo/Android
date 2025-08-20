@@ -21,7 +21,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat.getString
+import com.duckduckgo.app.browser.R as BrowserR
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -42,6 +45,11 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
         // especially in landscape aspect-ratios. If the dialog started as collapsed, the drag would interfere with internal scroll.
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
+
+        binding.defaultBrowserBottomSheetDialogTitle.text =
+            getString(context, BrowserR.string.defaultBrowserBottomSheetDialogTitle).preventWidows()
+        binding.defaultBrowserBottomSheetDialogSubTitle.text =
+            getString(context, BrowserR.string.defaultBrowserBottomSheetDialogSubTitle).preventWidows()
 
         setOnShowListener { dialogInterface ->
             setRoundCorners(dialogInterface)

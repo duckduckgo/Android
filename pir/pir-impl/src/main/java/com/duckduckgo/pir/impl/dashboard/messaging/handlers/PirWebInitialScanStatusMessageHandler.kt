@@ -23,7 +23,8 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
-import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_COMPLETED
 import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_STARTED
 import com.squareup.anvil.annotations.ContributesMultibinding
@@ -32,8 +33,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Handles the initial scan status message from Web which is used to retrieve the status of the initial scan.
@@ -43,13 +42,12 @@ import org.json.JSONObject
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebInitialScanStatusMessageHandler @Inject constructor(
-    private val repository: PirRepository,
+    private val eventsRepository: PirEventsRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) :
-    PirWebJsMessageHandler() {
+) : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+    override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
 
     override fun process(
         jsMessage: JsMessage,
@@ -59,29 +57,20 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
         logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val eventLogs = repository.getAllEventLogsFlow().firstOrNull().orEmpty()
+            val eventLogs = eventsRepository.getAllEventLogsFlow().firstOrNull().orEmpty()
 
             // TODO get actual scan progress results from the repository
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = true,
-                customParams = mapOf(
-                    PARAM_RESULTS_FOUND to JSONArray(),
-                    PARAM_SCAN_PROGRESS to JSONObject().apply {
-                        put(PARAM_CURRENT_SCAN, eventLogs.count { it.eventType == MANUAL_SCAN_COMPLETED })
-                        put(PARAM_TOTAL_SCANS, eventLogs.count { it.eventType == MANUAL_SCAN_STARTED })
-                        put(PARAM_SCANNED_BROKERS, JSONArray())
-                    },
+                response = PirWebMessageResponse.InitialScanResponse(
+                    resultsFound = listOf(),
+                    scanProgress = PirWebMessageResponse.InitialScanResponse.ScanProgress(
+                        currentScan = eventLogs.count { it.eventType == MANUAL_SCAN_COMPLETED },
+                        totalScans = eventLogs.count { it.eventType == MANUAL_SCAN_STARTED },
+                        scannedBrokers = listOf(),
+                    ),
                 ),
             )
         }
-    }
-
-    companion object {
-        private const val PARAM_RESULTS_FOUND = "resultsFound"
-        private const val PARAM_SCAN_PROGRESS = "scanProgress"
-        private const val PARAM_CURRENT_SCAN = "currentScan"
-        private const val PARAM_TOTAL_SCANS = "totalScans"
-        private const val PARAM_SCANNED_BROKERS = "scannedBrokers"
     }
 }

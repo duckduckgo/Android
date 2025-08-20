@@ -27,7 +27,7 @@ data class BrokerJsonEtag(
 )
 
 @Entity(tableName = "pir_broker_details")
-data class Broker(
+data class BrokerEntity(
     @PrimaryKey val name: String,
     val fileName: String,
     val url: String,
@@ -41,7 +41,7 @@ data class Broker(
     tableName = "pir_broker_scan",
     foreignKeys = [
         ForeignKey(
-            entity = Broker::class,
+            entity = BrokerEntity::class,
             parentColumns = ["name"],
             childColumns = ["brokerName"],
             onDelete = ForeignKey.CASCADE,
@@ -57,7 +57,7 @@ data class BrokerScan(
     tableName = "pir_broker_opt_out",
     foreignKeys = [
         ForeignKey(
-            entity = Broker::class,
+            entity = BrokerEntity::class,
             parentColumns = ["name"],
             childColumns = ["brokerName"],
             onDelete = ForeignKey.CASCADE,
@@ -74,7 +74,7 @@ data class BrokerOptOut(
     tableName = "pir_broker_scheduling_config",
     foreignKeys = [
         ForeignKey(
-            entity = Broker::class,
+            entity = BrokerEntity::class,
             parentColumns = ["name"],
             childColumns = ["brokerName"],
             onDelete = ForeignKey.CASCADE,

@@ -29,7 +29,7 @@ import javax.inject.Qualifier
 
 @ContributesTo(AppScope::class)
 @Module
-object DefaultBrowserPromptsExperimentModule {
+object DefaultBrowserPromptsModule {
 
     private val Context.defaultBrowserPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "default_browser_prompts",
@@ -40,7 +40,7 @@ object DefaultBrowserPromptsExperimentModule {
     fun providesDefaultBrowserPromptsDataStore(context: Context): DataStore<Preferences> = context.defaultBrowserPromptsDataStore
 
     @Provides
-    fun providesExperimentAppUsageDao(database: AppDatabase) = database.experimentAppUsageDao()
+    fun providesDefaultBrowserPromptsAppUsageDao(database: AppDatabase) = database.defaultBrowserPromptsAppUsageDao()
 }
 
 @Qualifier

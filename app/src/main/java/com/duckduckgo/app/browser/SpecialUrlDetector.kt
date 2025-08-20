@@ -105,7 +105,7 @@ class SpecialUrlDetectorImpl(
 
         val uri = uriString.toUri()
 
-        if (duckChat.isEnabled() && duckChat.isDuckChatUrl(uri)) {
+        if (duckChat.isDuckChatUrl(uri)) {
             return UrlType.ShouldLaunchDuckChatLink
         }
 

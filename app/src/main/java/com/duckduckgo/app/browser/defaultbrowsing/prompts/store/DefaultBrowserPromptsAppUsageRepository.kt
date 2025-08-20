@@ -26,13 +26,13 @@ interface DefaultBrowserPromptsAppUsageRepository {
     suspend fun recordAppUsedNow()
 
     /**
-     * Returns the number of active days the app has been used since the user entered the  Default Browser Prompts flow.
+     * Returns the number of active days the app has been used since the user entered the Default Browser Prompts flow.
      *
      * Crossing a dateline in local time will not increment the returned count.
      * Only if a given instant crossed dateline in ET timezone, the value will be incremented.
      *
      * @return Count if successful.
-     *  [DateTimeParseException] if the enrollment date is malformed.
+     *  [DateTimeParseException] if the date is malformed.
      */
-    suspend fun getActiveDaysUsedSinceEnrollment(): Result<Long>
+    suspend fun getActiveDaysUsedSinceStart(): Result<Long>
 }

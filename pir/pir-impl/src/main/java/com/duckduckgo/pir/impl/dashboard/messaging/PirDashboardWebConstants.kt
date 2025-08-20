@@ -27,12 +27,4 @@ object PirDashboardWebConstants {
     internal const val MESSAGE_CALLBACK = "messageCallback"
     internal const val SECRET = "duckduckgo-android-messaging-secret"
     internal const val ALLOWED_DOMAIN = "duckduckgo.com"
-
-    internal const val PARAM_SUCCESS = "success"
-    internal const val PARAM_VERSION = "version"
-    internal const val PARAM_FIRST_NAME = "first"
-    internal const val PARAM_MIDDLE_NAME = "middle"
-    internal const val PARAM_LAST_NAME = "last"
-    internal const val PARAM_CITY = "city"
-    internal const val PARAM_STATE = "state"
 }

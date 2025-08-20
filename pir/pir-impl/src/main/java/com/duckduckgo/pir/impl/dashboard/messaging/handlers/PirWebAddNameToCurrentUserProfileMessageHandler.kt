@@ -20,8 +20,9 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -38,8 +39,7 @@ class PirWebAddNameToCurrentUserProfileMessageHandler @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE)
+    override val message = PirDashboardWebMessages.ADD_NAME_TO_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -48,26 +48,30 @@ class PirWebAddNameToCurrentUserProfileMessageHandler @Inject constructor(
     ) {
         logcat { "PIR-WEB: PirWebAddNameToCurrentUserProfileMessageHandler: process $jsMessage" }
 
-        val firstName = jsMessage.params.getStringParam(PirDashboardWebConstants.PARAM_FIRST_NAME)
-        val middleName = jsMessage.params.getStringParam(PirDashboardWebConstants.PARAM_MIDDLE_NAME)
-        val lastName = jsMessage.params.getStringParam(PirDashboardWebConstants.PARAM_LAST_NAME)
+        val request =
+            jsMessage.toRequestMessage(PirWebMessageRequest.AddNameToCurrentUserProfileRequest::class)
 
         // attempting to add an empty name should return success=false
-        if (firstName == null || lastName == null) {
+        if (request == null || request.first.isEmpty() || request.last.isEmpty()) {
             logcat { "PIR-WEB: PirWebAddNameToCurrentUserProfileMessageHandler: missing first and/or last names" }
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = false,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
             )
             return
         }
 
         // attempting to add a duplicate name should return success=false
-        if (pirWebOnboardingStateHolder.names.any { it.firstName == firstName && it.middleName == middleName && it.lastName == lastName }) {
+        if (pirWebOnboardingStateHolder.names.any {
+            it.firstName == request.first &&
+                it.middleName == request.middle &&
+                it.lastName == request.last
+        }
+        ) {
             logcat { "PIR-WEB: PirWebAddNameToCurrentUserProfileMessageHandler: duplicate name detected" }
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = false,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
             )
             return
         }
@@ -75,15 +79,15 @@ class PirWebAddNameToCurrentUserProfileMessageHandler @Inject constructor(
         // Add the name to the current user profile
         pirWebOnboardingStateHolder.names.add(
             PirWebOnboardingStateHolder.Name(
-                firstName = firstName,
-                middleName = middleName,
-                lastName = lastName,
+                firstName = request.first,
+                middleName = request.middle,
+                lastName = request.last,
             ),
         )
 
-        jsMessaging.sendPirResponse(
+        jsMessaging.sendResponse(
             jsMessage = jsMessage,
-            success = true,
+            response = PirWebMessageResponse.DefaultResponse.SUCCESS,
         )
     }
 }

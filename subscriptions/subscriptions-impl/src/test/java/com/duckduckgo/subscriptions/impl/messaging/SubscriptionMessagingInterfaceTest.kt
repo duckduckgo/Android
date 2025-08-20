@@ -822,13 +822,14 @@ class SubscriptionMessagingInterfaceTest {
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = true)
+        givenStripeSupported(enabled = true)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":true}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true}"""),
         )
 
         val message = """
@@ -851,13 +852,14 @@ class SubscriptionMessagingInterfaceTest {
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = false)
         givenDuckAiPlus(enabled = true)
+        givenStripeSupported(enabled = true)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":false,"usePaidDuckAi":true}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":false,"usePaidDuckAi":true,"useAlternateStripePaymentFlow":true}"""),
         )
 
         val message = """
@@ -880,13 +882,14 @@ class SubscriptionMessagingInterfaceTest {
         givenSubscriptionMessaging(enabled = true)
         givenAuthV2(enabled = true)
         givenDuckAiPlus(enabled = false)
+        givenStripeSupported(enabled = true)
 
         val expected = JsRequestResponse.Success(
             context = "subscriptionPages",
             featureName = "useSubscription",
             method = "getFeatureConfig",
             id = "myId",
-            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":false}"""),
+            result = JSONObject("""{"useSubscriptionsAuthV2":true,"usePaidDuckAi":false,"useAlternateStripePaymentFlow":true}"""),
         )
 
         val message = """
@@ -986,6 +989,12 @@ class SubscriptionMessagingInterfaceTest {
         val duckAiPlusToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
         whenever(duckAiPlusToggle.isEnabled()).thenReturn(enabled)
         whenever(privacyProFeature.duckAiPlus()).thenReturn(duckAiPlusToggle)
+    }
+
+    private fun givenStripeSupported(enabled: Boolean) {
+        val stripeSupportedToggle = mock<com.duckduckgo.feature.toggles.api.Toggle>()
+        whenever(stripeSupportedToggle.isEnabled()).thenReturn(enabled)
+        whenever(privacyProFeature.supportsAlternateStripePaymentFlow()).thenReturn(stripeSupportedToggle)
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {
