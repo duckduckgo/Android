@@ -739,10 +739,9 @@ class BrowserTabViewModel @Inject constructor(
             .filter { selectedTab ->
                 // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
                 val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
-                isActiveTab && selectedTab?.url.isNullOrBlank()
+                duckAiFeatureState.showInputScreen.value && isActiveTab && selectedTab?.url.isNullOrBlank()
             }
             .flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
-            .takeWhile { duckAiFeatureState.showInputScreen.value }
             .onEach {
                 // whenever an event fires, so the user switched to a new tab page, launch the input screen
                 command.value = LaunchInputScreen
