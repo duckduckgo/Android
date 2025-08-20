@@ -33,11 +33,17 @@ import android.webkit.WebViewClient
 import androidx.core.view.NestedScrollingChild3
 import androidx.core.view.NestedScrollingChildHelper
 import androidx.core.view.ViewCompat
+import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.contentscopescripts.impl.WebViewCompatWrapper
+import com.duckduckgo.di.scopes.ViewScope
+import javax.inject.Inject
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -49,7 +55,9 @@ import logcat.logcat
  *
  * Originally based on https://github.com/takahirom/webview-in-coordinatorlayout for scrolling behaviour
  */
-class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
+
+@InjectWith(ViewScope::class)
+class RealDuckDuckGoWebView : DuckDuckGoWebView, NestedScrollingChild3 {
     private var lastClampedTopY: Boolean = true // when created we are always at the top
     private var contentAllowsSwipeToRefresh: Boolean = true
     private var enableSwipeRefreshCallback: ((Boolean) -> Unit)? = null
@@ -65,7 +73,13 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private val helper = CoordinatorLayoutHelper()
 
     private var isDestroyed: Boolean = false
-    var isSafeWebViewEnabled: Boolean = false
+    override var isSafeWebViewEnabled: Boolean = false
+
+    @Inject
+    lateinit var webViewCompatWrapper: WebViewCompatWrapper
+
+    @Inject
+    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -189,29 +203,29 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         return super.getUrl()
     }
 
-    fun safeCopyBackForwardList(): WebBackForwardList? {
+    override fun safeCopyBackForwardList(): WebBackForwardList? {
         if (isDestroyed) return null
         return (this as WebView).safeCopyBackForwardList()
     }
 
-    fun createSafePrintDocumentAdapter(documentName: String): PrintDocumentAdapter? {
+    override fun createSafePrintDocumentAdapter(documentName: String): PrintDocumentAdapter? {
         if (isDestroyed) return null
         return createPrintDocumentAdapter(documentName)
     }
 
-    val safeSettings: WebSettings?
+    override val safeSettings: WebSettings?
         get() {
             if (isDestroyed) return null
             return getSettings()
         }
 
-    val safeHitTestResult: HitTestResult?
+    override val safeHitTestResult: HitTestResult?
         get() {
             if (isDestroyed) return null
             return getHitTestResult()
         }
 
-    fun setBottomMatchingBehaviourEnabled(value: Boolean) {
+    override fun setBottomMatchingBehaviourEnabled(value: Boolean) {
         helper.setBottomMatchingBehaviourEnabled(value)
     }
 
@@ -393,11 +407,11 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         super.onOverScrolled(scrollX, scrollY, clampedX, clampedY)
     }
 
-    fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
+    override fun setEnableSwipeRefreshCallback(callback: (Boolean) -> Unit) {
         enableSwipeRefreshCallback = callback
     }
 
-    fun removeEnableSwipeRefreshCallback() {
+    override fun removeEnableSwipeRefreshCallback() {
         enableSwipeRefreshCallback = null
     }
 
@@ -417,8 +431,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     }
 
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
-    suspend fun safeAddWebMessageListener(
-        webViewCapabilityChecker: WebViewCapabilityChecker,
+    override suspend fun safeAddWebMessageListener(
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
@@ -439,23 +452,18 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         false
     }
 
-    @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
-    suspend fun safeRemoveWebMessageListener(
-        webViewCapabilityChecker: WebViewCapabilityChecker,
-        jsObjectName: String,
-    ): Boolean = runCatching {
-        if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
-            WebViewCompat.removeWebMessageListener(
-                this,
-                jsObjectName,
-            )
-            true
-        } else {
-            false
-        }
-    }.getOrElse { exception ->
-        logcat(ERROR) { "Error removing WebMessageListener: $jsObjectName: ${exception.asLog()}" }
-        false
+    @SuppressLint("RequiresFeature")
+    override suspend fun safeAddDocumentStartJavaScript(
+        script: String,
+        allowedOriginRules: Set<String>,
+    ): ScriptHandler? {
+        return runCatching {
+            if (webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript) && !isDestroyed) {
+                webViewCompatWrapper.addDocumentStartJavaScript(this, script, allowedOriginRules)
+            } else {
+                null
+            }
+        }.getOrElse { null }
     }
 
     companion object {

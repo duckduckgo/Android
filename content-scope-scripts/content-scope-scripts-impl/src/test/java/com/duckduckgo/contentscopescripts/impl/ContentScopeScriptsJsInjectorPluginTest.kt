@@ -1,21 +1,20 @@
 package com.duckduckgo.contentscopescripts.impl
 
-import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -28,23 +27,20 @@ class ContentScopeScriptsJsInjectorPluginTest {
 
     private val mockCoreContentScopeScripts: CoreContentScopeScripts = mock()
     private val mockAdsJsContentScopeScripts: AdsJsContentScopeScripts = mock()
-    private val mockWebView: WebView = mock()
+    private val mockWebView: DuckDuckGoWebView = mock()
     private val mockContentScopeExperiments: ContentScopeExperiments = mock()
-    private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
     private val mockToggle = mock<Toggle>()
 
     private lateinit var contentScopeScriptsJsInjectorPlugin: ContentScopeScriptsJsInjectorPlugin
 
     @Before
     fun setUp() = runTest {
-        whenever(mockWebViewCompatWrapper.isDocumentStartScriptSupported()).thenReturn(true)
         whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(mockToggle))
         contentScopeScriptsJsInjectorPlugin = ContentScopeScriptsJsInjectorPlugin(
             mockCoreContentScopeScripts,
             mockAdsJsContentScopeScripts,
             mockContentScopeExperiments,
             coroutineRule.testDispatcherProvider,
-            mockWebViewCompatWrapper,
         )
     }
 
@@ -147,64 +143,5 @@ class ContentScopeScriptsJsInjectorPluginTest {
         val result2 = contentScopeScriptsJsInjectorPlugin.onPageStarted(mockWebView, null, null)
 
         assertEquals(listOf(mockToggle2), result2)
-    }
-
-    @Test
-    fun whenDocumentStartScriptSupportedAndInitCalledWithScriptChangedThenScriptInjected() = runTest {
-        whenever(mockWebViewCompatWrapper.isDocumentStartScriptSupported()).thenReturn(true)
-        whenever(mockAdsJsContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockAdsJsContentScopeScripts.getScript(any())).thenReturn("mockScript")
-
-        contentScopeScriptsJsInjectorPlugin.onInit(mockWebView)
-
-        verify(mockAdsJsContentScopeScripts).getScript(listOf(mockToggle))
-        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(any(), eq("mockScript"), any())
-    }
-
-    @Test
-    fun whenDocumentStartScriptNotSupportedAndInitCalledThenNoScriptInjected() = runTest {
-        whenever(mockWebViewCompatWrapper.isDocumentStartScriptSupported()).thenReturn(false)
-        whenever(mockAdsJsContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockAdsJsContentScopeScripts.getScript(any())).thenReturn("mockScript")
-
-        contentScopeScriptsJsInjectorPlugin.onInit(mockWebView)
-
-        verifyNoInteractions(mockAdsJsContentScopeScripts)
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
-
-    @Test
-    fun whenAdsjsIsNotEnabledAndInitCalledThenNoScriptInjected() = runTest {
-        whenever(mockWebViewCompatWrapper.isDocumentStartScriptSupported()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockAdsJsContentScopeScripts.isEnabled()).thenReturn(false)
-        whenever(mockAdsJsContentScopeScripts.getScript(any())).thenReturn("mockScript")
-
-        contentScopeScriptsJsInjectorPlugin.onInit(mockWebView)
-
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
-
-    @Test
-    fun whenAdsjsIsNotEnabledAndPageFinishedCalledThenNoScriptInjected() = runTest {
-        whenever(mockWebViewCompatWrapper.isDocumentStartScriptSupported()).thenReturn(true)
-        whenever(mockCoreContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockAdsJsContentScopeScripts.isEnabled()).thenReturn(false)
-        whenever(mockAdsJsContentScopeScripts.getScript(any())).thenReturn("mockScript")
-
-        contentScopeScriptsJsInjectorPlugin.onPageFinished(mockWebView, null)
-
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
-    }
-
-    @Test
-    fun whenDocumentStartScriptNotSupportedAndPageFinishedCalledThenNoScriptInjected() = runTest {
-        whenever(mockWebViewCompatWrapper.isDocumentStartScriptSupported()).thenReturn(false)
-        whenever(mockAdsJsContentScopeScripts.isEnabled()).thenReturn(true)
-
-        contentScopeScriptsJsInjectorPlugin.onPageFinished(mockWebView, null)
-
-        verifyNoInteractions(mockAdsJsContentScopeScripts)
-        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.duckduckgo.contentscopescripts.impl
 import android.annotation.SuppressLint
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
-import androidx.webkit.WebViewFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -27,10 +26,6 @@ import javax.inject.Inject
 @SuppressLint("RequiresFeature")
 @ContributesBinding(AppScope::class)
 class RealWebViewCompatWrapper @Inject constructor() : WebViewCompatWrapper {
-    override fun isDocumentStartScriptSupported(): Boolean {
-        return WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
-    }
-
     override fun addDocumentStartJavaScript(
         webView: android.webkit.WebView,
         script: String,

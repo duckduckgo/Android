@@ -19,6 +19,7 @@ package com.duckduckgo.contentscopescripts.impl
 import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.webkit.ScriptHandler
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
@@ -34,7 +35,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val adsJsContentScopeScripts: AdsJsContentScopeScripts,
     private val contentScopeExperiments: ContentScopeExperiments,
     private val dispatcherProvider: DispatcherProvider,
-    private val webViewCompatWrapper: WebViewCompatWrapper,
 ) : JsInjectorPlugin {
     private var script: ScriptHandler? = null
     private var currentScriptString: String? = null
@@ -48,9 +48,6 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
         activeExperiments = withContext(dispatcherProvider.io()) { contentScopeExperiments.getActiveExperiments() }
 
         withContext(dispatcherProvider.main()) {
-            if (!webViewCompatWrapper.isDocumentStartScriptSupported()) {
-                return@withContext
-            }
             val scriptString = adsJsContentScopeScripts.getScript(activeExperiments)
             if (scriptString == currentScriptString) {
                 return@withContext
@@ -60,8 +57,13 @@ class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
                 script = null
             }
             if (adsJsContentScopeScripts.isEnabled()) {
-                currentScriptString = scriptString
-                script = webViewCompatWrapper.addDocumentStartJavaScript(webView, scriptString, setOf("*"))
+                (webView as? DuckDuckGoWebView)?.safeAddDocumentStartJavaScript(
+                    scriptString,
+                    setOf("*"),
+                )?.let {
+                    script = it
+                    currentScriptString = scriptString
+                }
             }
         }
     }

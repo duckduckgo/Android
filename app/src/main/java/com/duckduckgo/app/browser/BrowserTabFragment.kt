@@ -108,6 +108,7 @@ import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -3206,7 +3207,6 @@ class BrowserTabFragment :
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webView.safeAddWebMessageListener(
-                    webViewCapabilityChecker,
                     "ddgBlobDownloadObj",
                     setOf("*"),
                     object : WebViewCompat.WebMessageListener {
