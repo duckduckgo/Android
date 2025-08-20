@@ -485,7 +485,8 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         title = getTrackersDescription(context, trackers),
-                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
+                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
