@@ -514,7 +514,7 @@
         return global ? result || [] : result && result[0];
       };
       XRegExp.matchChain = function(str, chain) {
-        return function recurseChain(values, level) {
+        return (function recurseChain(values, level) {
           var item = chain[level].regex ? chain[level] : { regex: chain[level] };
           var matches = [];
           function addMatch(match) {
@@ -531,7 +531,7 @@
             XRegExp.forEach(values[i], item.regex, addMatch);
           }
           return level === chain.length - 1 || !matches.length ? matches : recurseChain(matches, level + 1);
-        }([str], 0);
+        })([str], 0);
       };
       XRegExp.replace = function(str, search, replacement, scope) {
         var isRegex = XRegExp.isRegExp(search);
