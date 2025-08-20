@@ -58,7 +58,7 @@ interface AdsjsMessageHandler {
     fun process(
         jsMessage: JsMessage,
         jsMessageCallback: AdsjsJsMessageCallback?,
-        onResponse: suspend (JSONObject) -> Unit,
+        onResponse: (JSONObject) -> Unit,
     )
 
     /**

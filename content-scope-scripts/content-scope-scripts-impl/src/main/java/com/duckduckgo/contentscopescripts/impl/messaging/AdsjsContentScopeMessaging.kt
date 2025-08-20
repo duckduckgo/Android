@@ -20,6 +20,7 @@ import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
 import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.app.browser.api.DuckDuckGoWebView
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.AdsjsContentScopeJsMessageHandlersPlugin
@@ -34,6 +35,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -49,6 +52,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val adsJsContentScopeScripts: AdsJsContentScopeScripts,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AdsjsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -115,7 +119,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
                     process(
                         message.data ?: "",
                         jsMessageCallback,
-                        replyProxy
+                        replyProxy,
                     )
                 }
             } ?: false
@@ -139,7 +143,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
         }
     }
 
-    private suspend fun onResponse(response: JsCallbackData, replyProxy: JavaScriptReplyProxy) {
+    private fun onResponse(response: JsCallbackData, replyProxy: JavaScriptReplyProxy) {
         runCatching {
             val responseWithId = JSONObject().apply {
                 put("id", response.id)
@@ -147,10 +151,12 @@ class AdsjsContentScopeMessaging @Inject constructor(
                 put("featureName", response.featureName)
                 put("context", context)
             }
-            (webView as? DuckDuckGoWebView)?.safePostMessage(
-                replyProxy,
-                responseWithId,
-            )
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                (webView as? DuckDuckGoWebView)?.safePostMessage(
+                    replyProxy,
+                    responseWithId,
+                )
+            }
         }
     }
 }

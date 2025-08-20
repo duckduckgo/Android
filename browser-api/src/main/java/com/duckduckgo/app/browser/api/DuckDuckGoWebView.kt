@@ -61,6 +61,6 @@ abstract class DuckDuckGoWebView(
 
     abstract suspend fun safePostMessage(
         replyProxy: JavaScriptReplyProxy,
-        response: JSONObject
+        response: JSONObject,
     )
 }

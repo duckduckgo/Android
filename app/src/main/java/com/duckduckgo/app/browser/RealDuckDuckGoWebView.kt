@@ -482,7 +482,7 @@ class RealDuckDuckGoWebView : DuckDuckGoWebView, NestedScrollingChild3 {
     @SuppressLint("RequiresFeature")
     override suspend fun safePostMessage(
         replyProxy: JavaScriptReplyProxy,
-        response: JSONObject
+        response: JSONObject,
     ) {
         runCatching {
             if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
