@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
+import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -41,13 +42,9 @@ class SearchWidgetConfigurator @Inject constructor(
         remoteViews: RemoteViews,
         fromFavWidget: Boolean,
     ) {
-        val voiceSearchEnabled = withContext(dispatcherProvider.io()) {
-            voiceSearchAvailability.isVoiceSearchAvailable
+        val (voiceSearchEnabled, duckAiEnabled) = withContext(dispatcherProvider.io()) {
+            voiceSearchAvailability.isVoiceSearchAvailable to (duckChat.isEnabled() && duckChat.wasOpenedBefore())
         }
-        val duckAiIntent = withContext(dispatcherProvider.io()) {
-            duckChat.createDuckChatIntent()
-        }
-        val duckAiEnabled = duckAiIntent != null
 
         logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
 
@@ -63,7 +60,7 @@ class SearchWidgetConfigurator @Inject constructor(
             }
 
             if (duckAiEnabled) {
-                val pendingIntent = buildDuckAiPendingIntent(context, duckAiIntent!!)
+                val pendingIntent = buildDuckAiPendingIntent(context)
                 remoteViews.setOnClickPendingIntent(R.id.duckAi, pendingIntent)
             }
         }
@@ -79,8 +76,8 @@ class SearchWidgetConfigurator @Inject constructor(
 
     private fun buildDuckAiPendingIntent(
         context: Context,
-        intent: Intent,
     ): PendingIntent {
+        val intent = BrowserActivity.intent(context, openDuckChat = true).also { it.action = Intent.ACTION_VIEW }
         return PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 }

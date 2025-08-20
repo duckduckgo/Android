@@ -380,21 +380,6 @@ class RealDuckChat @Inject constructor(
         openDuckChat(emptyMap())
     }
 
-    override suspend fun createDuckChatIntent(): Intent? {
-        logcat { "Duck.ai: createDuckChatIntent" }
-        if (!isDuckChatEnabled || !isDuckChatUserEnabled || !wasOpenedBefore()) {
-            logcat { "Duck.ai: createDuckChatIntent. DuckChat is not enabled or opened before, returning null" }
-            return null
-        }
-
-        val parameters = addChatParameters("", autoPrompt = false)
-        val url = appendParameters(parameters, duckChatLink)
-
-        return browserNav.openDuckChat(context, duckChatUrl = url, hasSessionActive = true)
-            .apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-    }
     override fun openDuckChatWithAutoPrompt(query: String) {
         logcat { "Duck.ai: openDuckChatWithAutoPrompt query $query" }
         val parameters = addChatParameters(query, autoPrompt = true)

@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.api
 
-import android.content.Intent
 import android.net.Uri
 
 /**
@@ -35,14 +34,6 @@ interface DuckChat {
      * Opens the DuckChat WebView with optional pre-filled [String] query.
      */
     fun openDuckChat()
-
-    /**
-     * Creates an Intent that can be used to launch the DuckChat WebView.
-     * Does not actually open DuckChat, just prepares the Intent.
-     *
-     * @return Intent that can be used to open DuckChat, or null if DuckChat cannot be opened.
-     */
-    suspend fun createDuckChatIntent(): Intent?
 
     /**
      * Auto-prompts the DuckChat WebView with the provided [String] query.
