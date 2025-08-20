@@ -49,22 +49,24 @@
             tools:ignore="ContentDescription" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/defaultBrowserBottomSheetDialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:paddingHorizontal="24dp"
             android:gravity="center"
-            android:text="@string/defaultBrowserBottomSheetDialogTitle"
+            tools:text="@string/defaultBrowserBottomSheetDialogTitle"
             app:textType="primary"
             app:typography="h1" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/defaultBrowserBottomSheetDialogSubTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:paddingHorizontal="24dp"
             android:gravity="center"
-            android:text="@string/defaultBrowserBottomSheetDialogSubTitle"
+            tools:text="@string/defaultBrowserBottomSheetDialogSubTitle"
             app:textType="primary"
             app:typography="body1" />
 
