@@ -48,6 +48,9 @@ interface BrokerDao {
     @Query("DELETE from pir_broker_details where name = :brokerName")
     fun deleteBroker(brokerName: String)
 
+    @Query("SELECT * FROM pir_broker_opt_out")
+    fun getAllBrokerOptOuts(): List<BrokerOptOut>
+
     @Query("SELECT * from pir_broker_mirror_sites")
     fun getAllMirrorSites(): List<MirrorSiteEntity>
 

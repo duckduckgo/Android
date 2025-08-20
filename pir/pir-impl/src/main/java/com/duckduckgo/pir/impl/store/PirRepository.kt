@@ -66,6 +66,8 @@ interface PirRepository {
 
     suspend fun getAllBrokersForScan(): List<String>
 
+    suspend fun getAllBrokerOptOuts(): List<BrokerOptOut>
+
     suspend fun getEtagForFilename(fileName: String): String?
 
     suspend fun updateBrokerData(
@@ -232,6 +234,11 @@ internal class RealPirRepository(
     override suspend fun getAllBrokersForScan(): List<String> =
         withContext(dispatcherProvider.io()) {
             return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
+        }
+
+    override suspend fun getAllBrokerOptOuts(): List<BrokerOptOut> =
+        withContext(dispatcherProvider.io()) {
+            return@withContext brokerDao.getAllBrokerOptOuts()
         }
 
     override suspend fun getEtagForFilename(fileName: String): String =
