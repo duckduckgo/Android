@@ -379,11 +379,11 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -733,22 +733,16 @@ class BrowserTabViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
-        // observe when user open a new tab page and launch the input screen
-        duckAiFeatureState.showInputScreen
-            .flatMapLatest { inputScreenEnabled ->
-                if (inputScreenEnabled) {
-                    tabRepository.flowSelectedTab
-                        .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
-                        .filter { selectedTab ->
-                            // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
-                            val isActiveTab = selectedTab?.tabId == tabId
-                            isActiveTab && selectedTab?.url.isNullOrBlank()
-                        }
-                } else {
-                    flowOf()
-                }
+        // observe when user opens a new tab and launch the input screen, if the feature is enabled
+        tabRepository.flowSelectedTab
+            .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
+            .filter { selectedTab ->
+                // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
+                val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
+                isActiveTab && selectedTab?.url.isNullOrBlank()
             }
             .flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
+            .takeWhile { duckAiFeatureState.showInputScreen.value }
             .onEach {
                 // whenever an event fires, so the user switched to a new tab page, launch the input screen
                 command.value = LaunchInputScreen
