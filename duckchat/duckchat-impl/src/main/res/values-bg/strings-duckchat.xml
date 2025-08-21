@@ -43,12 +43,17 @@
     <string name="duck_chat_address_bar_visibility_setting">Адресна лента</string>
     <string name="duck_chat_assist_settings_title">Настройки на Assist</string>
     <string name="duck_chat_assist_settings_description">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
+    <string name="duck_ai_shortcut_settings_title">Преки пътища за Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Изберете кои преки пътища на Duck.ai да се показват</string>
 
     <!-- Input Screen  -->
     <string name="input_screen_search_tab">Търсене</string>
     <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Попитай Duck.ai</string>
+    <string name="input_screen_user_pref_without_ai">Само търсене\n(По подразбиране)</string>
+    <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai\n(Експериментално)</string>
+    <string name="input_screen_user_pref_description">Изпробвайте нашата експериментална опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -61,6 +66,7 @@
     <string name="duck_chat_title_rebranding">Функции с изкуствен интелект</string>
     <string name="duck_chat_settings_activity_description_rebranding">Функциите на DuckDuckGo AI са поверителни и незадължителни.Вашите данни не се използват за обучение на AI.\n<annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Поверителен чат с популярни AI модели на трети страни</string>
     <string name="duck_chat_assist_settings_title_rebranding">Настройки за Assist при търсене</string>
     <string name="duck_chat_assist_settings_description_rebranding">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
 </resources>

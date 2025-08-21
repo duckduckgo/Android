@@ -43,12 +43,17 @@
     <string name="duck_chat_address_bar_visibility_setting">Adresszeile</string>
     <string name="duck_chat_assist_settings_title">Assist-Einstellungen</string>
     <string name="duck_chat_assist_settings_description">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
+    <string name="duck_ai_shortcut_settings_title">Duck.ai-Shortcuts</string>
+    <string name="duck_ai_shortcut_settings_description">Wähle aus, welche Duck.ai-Shortcuts angezeigt werden sollen</string>
 
     <!-- Input Screen  -->
     <string name="input_screen_search_tab">Suche</string>
     <string name="input_screen_search_hint">Adresse suchen oder eingeben</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Frag Duck.ai</string>
+    <string name="input_screen_user_pref_without_ai">Nur suchen\n(Standard)</string>
+    <string name="input_screen_user_pref_with_ai">Suchen &amp; Duck.ai\n(Experimentell)</string>
+    <string name="input_screen_user_pref_description">Probiere unsere experimentelle Option aus, um Duck.ai direkt aus der Adressleiste zu fragen. <annotation type="share_feedback">Feedback teilen</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -61,6 +66,7 @@
     <string name="duck_chat_title_rebranding">KI-Funktionen</string>
     <string name="duck_chat_settings_activity_description_rebranding">Die KI-Funktionen von DuckDuckGo sind privat und optional.\nIhre Daten werden nicht zum Trainieren von KI verwendet.\n<annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Privat mit beliebten KI-Modellen von Drittanbietern chatten</string>
     <string name="duck_chat_assist_settings_title_rebranding">Such-Assist-Einstellungen</string>
     <string name="duck_chat_assist_settings_description_rebranding">Du kannst auswählen, wie oft KI-gestützte Antworten in deinen Suchergebnissen angezeigt werden sollen.</string>
 </resources>
