@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.I
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanResult.ScanResultAddress
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -90,13 +91,17 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 },
                 alternativeNames = it.extractedProfile.alternativeNames,
                 relatives = it.extractedProfile.relatives,
-                foundDate = it.extractedProfile.dateAddedInMillis,
-                optOutSubmittedDate = it.optOutSubmittedDateInMillis,
-                estimatedRemovalDate = it.estimatedRemovalDateInMillis,
-                removedDate = it.optOutRemovedDateInMillis,
+                foundDate = it.extractedProfile.dateAddedInMillis.convertToSeconds(),
+                optOutSubmittedDate = it.optOutSubmittedDateInMillis?.convertToSeconds(),
+                estimatedRemovalDate = it.estimatedRemovalDateInMillis?.convertToSeconds(),
+                removedDate = it.optOutRemovedDateInMillis?.convertToSeconds(),
                 hasMatchingRecordOnParentBroker = it.hasMatchingRecordOnParentBroker,
             )
         }
+    }
+
+    private fun Long.convertToSeconds(): Long {
+        return TimeUnit.MILLISECONDS.toSeconds(this)
     }
 
     private suspend fun getScannedBrokers(): List<ScannedBroker> {
