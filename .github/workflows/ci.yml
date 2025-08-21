@@ -173,7 +173,7 @@ jobs:
 
       - name: Run Android Tests
         if: steps.check-alignment.outcome == 'success'
-        run: ./gradlew runFlankAndroidTests
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache
 
       - name: Bundle the Android CI tests report
         if: |
