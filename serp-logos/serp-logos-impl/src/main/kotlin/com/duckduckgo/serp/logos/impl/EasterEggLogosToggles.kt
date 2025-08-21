@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.serp.logos.impl
 
-import com.duckduckgo.app.browser.easteregglogos.SerpLogo
+import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.site.permissions.api.EasterEggLogosToggles
 
-data class OmnibarViewState(
-    val omnibarText: String = "",
-    val queryOrFullUrl: String = "",
-    val isEditing: Boolean = false,
-    val navigationChange: Boolean = false,
-    val forceExpand: Boolean = true,
-    val serpLogo: SerpLogo? = null,
+@ContributesRemoteFeature(
+    scope = AppScope::class,
+    featureName = "easterEggLogos",
 )
+interface EasterEggLogosTogglesImpl: EasterEggLogosToggles

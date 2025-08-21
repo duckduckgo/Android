@@ -48,12 +48,15 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.lottie.LottieAnimationView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withCrossFade
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.PulseAnimation
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SmoothProgressAnimator
 import com.duckduckgo.app.browser.databinding.IncludeCustomTabToolbarBinding
 import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
+import com.duckduckgo.app.browser.easteregglogos.EasterEggLogosToggles
 import com.duckduckgo.app.browser.omnibar.Omnibar.OmnibarTextState
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -74,6 +77,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartEx
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2OrVariant3Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartVisualDesignTrackersAnimation
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -105,6 +109,7 @@ import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.appbar.AppBarLayout
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
@@ -192,6 +197,9 @@ open class OmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
+    @Inject
+    lateinit var easterEggLogosToggles: EasterEggLogosToggles
+
     private var previousTransitionState: TransitionState? = null
 
     private val lifecycleOwner: LifecycleOwner by lazy {
@@ -205,6 +213,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private var omnibarTextListener: Omnibar.TextListener? = null
     private var omnibarItemPressedListener: Omnibar.ItemPressedListener? = null
     private var omnibarInputScreenLaunchListener: Omnibar.InputScreenLaunchListener? = null
+    private var omnibarLogoClickedListener: Omnibar.LogoClickListener? = null
 
     private var decoration: Decoration? = null
     private var lastViewMode: Mode? = null
@@ -503,6 +512,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
+    fun setLogoClickListener(logoClickListener: Omnibar.LogoClickListener) {
+        omnibarLogoClickedListener = logoClickListener
+    }
+
     open fun render(viewState: ViewState) {
         when (viewState.viewMode) {
             is CustomTab -> {
@@ -560,6 +573,10 @@ open class OmnibarLayout @JvmOverloads constructor(
             is LaunchInputScreen -> {
                 omnibarInputScreenLaunchListener?.launchInputScreen(query = command.query)
             }
+
+            is Command.LogoClicked -> {
+                onLogoClicked(command.url)
+            }
         }
     }
 
@@ -577,7 +594,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderLeadingIconState(viewState: ViewState) {
-        when (viewState.leadingIconState) {
+        when (val leadingIconState = viewState.leadingIconState) {
             OmnibarLayoutViewModel.LeadingIconState.Search -> {
                 searchIcon.show()
                 shieldIcon.gone()
@@ -602,7 +619,19 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
 
             OmnibarLayoutViewModel.LeadingIconState.Dax -> {
-                daxIcon.show()
+                if (easterEggLogosToggles.feature().isEnabled()) {
+                    with(daxIcon) {
+                        setOnClickListener(null)
+                        show()
+                        Glide.with(this)
+                            .load(CommonR.drawable.ic_ddg_logo)
+                            .transition(withCrossFade())
+                            .placeholder(daxIcon.drawable)
+                            .into(this)
+                    }
+                } else {
+                    daxIcon.show()
+                }
                 shieldIcon.gone()
                 shieldIconExperiment.gone()
                 searchIcon.gone()
@@ -626,6 +655,23 @@ open class OmnibarLayout @JvmOverloads constructor(
                 shieldIconExperiment.gone()
                 searchIcon.gone()
                 duckPlayerIcon.show()
+            }
+
+            is EasterEggLogo -> {
+                daxIcon.show()
+                Glide.with(daxIcon)
+                    .load(leadingIconState.logoUrl)
+                    .placeholder(daxIcon.drawable)
+                    .transition(withCrossFade())
+                    .into(daxIcon)
+                daxIcon.setOnClickListener {
+                    viewModel.onDynamicLogoClicked()
+                }
+                globeIcon.gone()
+                shieldIcon.gone()
+                shieldIconExperiment.gone()
+                searchIcon.gone()
+                duckPlayerIcon.gone()
             }
         }
     }
@@ -984,6 +1030,10 @@ open class OmnibarLayout @JvmOverloads constructor(
         } else {
             Color.BLACK
         }
+    }
+
+    private fun onLogoClicked(url: String) {
+        omnibarLogoClickedListener?.onClick(url)
     }
 
     override fun measuredHeight(): Int {

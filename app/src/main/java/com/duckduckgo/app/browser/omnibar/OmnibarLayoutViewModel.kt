@@ -24,6 +24,8 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.AddressDisplayFormatter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.easteregglogos.EasterEggLogosToggles
+import com.duckduckgo.app.browser.easteregglogos.SerpLogo
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Browser
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
@@ -39,6 +41,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Dax
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DuckPlayer
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Globe
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
@@ -81,6 +84,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.lang.Compiler.command
 
 @ContributesViewModel(FragmentScope::class)
 class OmnibarLayoutViewModel @Inject constructor(
@@ -99,7 +103,10 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
+    private val easterEggLogosToggles: EasterEggLogosToggles,
 ) : ViewModel() {
+
+    private var lastKnownEasterEggLogo: EasterEggLogo? = null
 
     private val _viewState = MutableStateFlow(
         ViewState(
@@ -190,6 +197,7 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
+        data class LogoClicked(val url: String) : Command()
     }
 
     sealed class LeadingIconState {
@@ -198,6 +206,10 @@ class OmnibarLayoutViewModel @Inject constructor(
         object Dax : LeadingIconState()
         object DuckPlayer : LeadingIconState()
         object Globe : LeadingIconState()
+        data class EasterEggLogo(
+            val logoUrl: String,
+            val serpUrl: String
+        ) : LeadingIconState()
     }
 
     init {
@@ -336,12 +348,14 @@ class OmnibarLayoutViewModel @Inject constructor(
         hasFocus: Boolean,
         url: String,
     ): LeadingIconState {
-        return when (_viewState.value.viewMode) {
+        val iconState = when (_viewState.value.viewMode) {
             Error, SSLWarning, MaliciousSiteWarning -> Globe
             NewTab -> Search
             else -> {
                 if (hasFocus) {
                     Search
+                } else if (shouldShowCachedEasterEggLogo(url)) {
+                    lastKnownEasterEggLogo!!
                 } else if (shouldShowDaxIcon(url)) {
                     Dax
                 } else if (shouldShowDuckPlayerIcon(url)) {
@@ -355,6 +369,13 @@ class OmnibarLayoutViewModel @Inject constructor(
                 }
             }
         }
+        return iconState
+    }
+
+    private fun shouldShowCachedEasterEggLogo(currentUrl: String?): Boolean {
+        val url = currentUrl ?: return false
+        val lastKnownEasterEggLogo = lastKnownEasterEggLogo
+        return lastKnownEasterEggLogo != null && lastKnownEasterEggLogo.serpUrl == url
     }
 
     private fun shouldShowDaxIcon(currentUrl: String?): Boolean {
@@ -582,34 +603,45 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState, forceRender: Boolean) {
+    private fun onExternalOmnibarStateChanged(
+        omnibarViewState: OmnibarViewState,
+        forceRender: Boolean
+    ) {
         logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState" }
-        if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-            val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                if (settingsDataStore.isFullUrlEnabled) {
-                    omnibarViewState.queryOrFullUrl
+        if (easterEggLogosToggles.feature().isEnabled()) {
+            val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+                if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                    val url = if (settingsDataStore.isFullUrlEnabled) {
+                        omnibarViewState.queryOrFullUrl
+                    } else {
+                        addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                    }
+                    _viewState.value.copy(
+                        omnibarText = url,
+                        updateOmnibarText = true,
+                    )
                 } else {
-                    addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                    _viewState.value.copy(
+                        omnibarText = omnibarViewState.omnibarText,
+                    )
                 }
             } else {
-                omnibarViewState.omnibarText
+                _viewState.value
             }
 
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
-                    it.copy(
+                    state.copy(
                         expanded = true,
                         expandedAnimated = true,
-                        omnibarText = omnibarText,
                         updateOmnibarText = true,
                     )
                 }
             } else {
                 _viewState.update {
-                    it.copy(
+                    state.copy(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
-                        omnibarText = omnibarText,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
                             hasFocus = omnibarViewState.isEditing,
@@ -617,7 +649,57 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasQueryChanged = true,
                             urlLoaded = _viewState.value.url,
                         ),
+                        leadingIconState = if (easterEggLogosToggles.feature().isEnabled()) {
+                            when (omnibarViewState.serpLogo) {
+                                is SerpLogo.EasterEgg -> {
+                                    EasterEggLogo(logoUrl = omnibarViewState.serpLogo.logoUrl, serpUrl = _viewState.value.url).also {
+                                        lastKnownEasterEggLogo = it
+                                    }
+                                }
+                                SerpLogo.Normal,
+                                null,
+                                    -> getLeadingIconState(hasFocus = omnibarViewState.isEditing, url = _viewState.value.url)
+                            }
+                        } else it.leadingIconState,
                     )
+                }
+            }
+        } else {
+            if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+                val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                    if (settingsDataStore.isFullUrlEnabled) {
+                        omnibarViewState.queryOrFullUrl
+                    } else {
+                        addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                    }
+                } else {
+                    omnibarViewState.omnibarText
+                }
+
+                if (omnibarViewState.navigationChange) {
+                    _viewState.update {
+                        it.copy(
+                            expanded = true,
+                            expandedAnimated = true,
+                            omnibarText = omnibarText,
+                            updateOmnibarText = true,
+                        )
+                    }
+                } else {
+                    _viewState.update {
+                        it.copy(
+                            expanded = omnibarViewState.forceExpand,
+                            expandedAnimated = omnibarViewState.forceExpand,
+                            omnibarText = omnibarText,
+                            updateOmnibarText = true,
+                            showVoiceSearch = shouldShowVoiceSearch(
+                                hasFocus = omnibarViewState.isEditing,
+                                query = omnibarViewState.omnibarText,
+                                hasQueryChanged = true,
+                                urlLoaded = _viewState.value.url,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -625,19 +707,38 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         logcat { "Omnibar: onExternalLoadingStateChanged $loadingState" }
-        _viewState.update {
-            it.copy(
-                url = loadingState.url,
-                isLoading = loadingState.isLoading,
-                loadingProgress = loadingState.progress,
-                leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url),
-                showVoiceSearch = shouldShowVoiceSearch(
-                    hasFocus = _viewState.value.hasFocus,
-                    query = _viewState.value.omnibarText,
-                    hasQueryChanged = false,
-                    urlLoaded = loadingState.url,
-                ),
-            )
+        if (easterEggLogosToggles.feature().isEnabled()) {
+            _viewState.update {
+                val currentLeadingIcon = it.leadingIconState
+
+                it.copy(
+                    url = loadingState.url,
+                    isLoading = loadingState.isLoading,
+                    loadingProgress = loadingState.progress,
+                    leadingIconState = currentLeadingIcon as? EasterEggLogo ?: getLeadingIconState(it.hasFocus, loadingState.url),
+                    showVoiceSearch = shouldShowVoiceSearch(
+                        hasFocus = _viewState.value.hasFocus,
+                        query = _viewState.value.omnibarText,
+                        hasQueryChanged = false,
+                        urlLoaded = loadingState.url,
+                    ),
+                )
+            }
+        } else {
+            _viewState.update {
+                it.copy(
+                    url = loadingState.url,
+                    isLoading = loadingState.isLoading,
+                    loadingProgress = loadingState.progress,
+                    leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url),
+                    showVoiceSearch = shouldShowVoiceSearch(
+                        hasFocus = _viewState.value.hasFocus,
+                        query = _viewState.value.omnibarText,
+                        hasQueryChanged = false,
+                        urlLoaded = loadingState.url,
+                    ),
+                )
+            }
         }
     }
 
@@ -864,6 +965,15 @@ class OmnibarLayoutViewModel @Inject constructor(
                 omnibarText
             }
             command.send(Command.LaunchInputScreen(query = textToPreFill))
+        }
+    }
+
+    fun onDynamicLogoClicked() {
+        viewModelScope.launch {
+            val state = _viewState.value.leadingIconState
+            if (state is EasterEggLogo) {
+                command.send(Command.LogoClicked(state.logoUrl))
+            }
         }
     }
 }

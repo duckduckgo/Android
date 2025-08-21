@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.site.permissions.api
 
-import com.duckduckgo.app.browser.easteregglogos.SerpLogo
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 
-data class OmnibarViewState(
-    val omnibarText: String = "",
-    val queryOrFullUrl: String = "",
-    val isEditing: Boolean = false,
-    val navigationChange: Boolean = false,
-    val forceExpand: Boolean = true,
-    val serpLogo: SerpLogo? = null,
-)
+sealed class SerpLogosScreens {
+
+    /**
+     * Use this model to launch the EasterEggLogo screen
+     *
+     * @param logoUrl The URL of the logo to be displayed
+     * @param transitionName The transition name for the logo image, used for shared element transitions
+     */
+    data class EasterEggLogoScreen(
+        val logoUrl: String,
+        val transitionName: String,
+    ) : ActivityParams
+}

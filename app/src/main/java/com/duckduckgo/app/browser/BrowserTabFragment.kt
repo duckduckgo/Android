@@ -78,6 +78,7 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
@@ -439,6 +440,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var browserAutofill: BrowserAutofill
+
+    @Inject
+    lateinit var serpLogoHandler:
 
     @Inject
     lateinit var faviconManager: FaviconManager
@@ -1097,6 +1101,17 @@ class BrowserTabFragment :
         configureCustomTab()
         configureEditModeChangeDetection()
         configureInputScreenLauncher()
+        configureLogoClickListener()
+    }
+
+    private fun configureLogoClickListener() {
+        omnibar.configureLogoClickListener(
+            object : Omnibar.LogoClickListener {
+                override fun onClick(url: String) {
+                    viewModel.onDynamicLogoClicked(url)
+                }
+            },
+        )
     }
 
     private fun configureInputScreenLauncher() {
@@ -2204,7 +2219,6 @@ class BrowserTabFragment :
             is Command.LaunchBookmarksActivity -> {
                 browserActivity?.launchBookmarks()
             }
-
             is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
             is Command.LaunchInputScreen -> {
@@ -2213,7 +2227,18 @@ class BrowserTabFragment :
                     launchInputScreen(query = "")
                 }
             }
-            else -> {
+            is Command.ExtractDDGLogo -> {
+                webView?.let {
+                    serpLogoHandler.evaluate(
+                        webView = it,
+                        onSerpLogoEvaluated = { serpLogo ->
+                            viewModel.onLogoReceived(serpLogo)
+                        },
+                    )
+                }
+            }
+            is Command.ShowEnlargedLogo -> launchEnlargedEasterEggLogoActivity(it.url)
+            null -> {
                 // NO OP
             }
         }
@@ -4827,6 +4852,18 @@ class BrowserTabFragment :
 
     fun launchTabSwitcherAfterTabsUndeleted() {
         viewModel.onLaunchTabSwitcherAfterTabsUndeletedRequest()
+    }
+
+    private fun launchEnlargedEasterEggLogoActivity(logoUrl: String) {
+        ViewCompat.setTransitionName(omnibar.daxIcon, logoUrl)
+
+        val intent = EnlargedEasterEggLogoActivity.intent(requireContext(), logoUrl, logoUrl)
+        val activityOptions = ActivityOptionsCompat.makeSceneTransitionAnimation(
+            requireActivity(),
+            omnibar.daxIcon,
+            logoUrl,
+        )
+        startActivity(intent, activityOptions.toBundle())
     }
 }
 
