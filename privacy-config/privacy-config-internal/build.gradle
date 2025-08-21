@@ -107,9 +107,10 @@ dependencies {
 }
 
 tasks.register('copyConfigPatches') {
+    def buildAssetsDir = layout.buildDirectory.dir("generated/assets/configPatches").get().asFile
+    def patchFiles = getConfigPatchFiles()
+    
     doLast {
-        def buildAssetsDir = layout.buildDirectory.dir("generated/assets/configPatches").get().asFile
-
         // always clean up any existing patch files first, also ensures that when patching is disabled, the directory is cleaned up
         if (buildAssetsDir.exists()) {
             buildAssetsDir.listFiles().each { file ->
@@ -122,8 +123,6 @@ tasks.register('copyConfigPatches') {
                 buildAssetsDir.delete()
             }
         }
-
-        def patchFiles = getConfigPatchFiles()
 
         if (patchFiles) {
             def fileNames = []
