@@ -90,10 +90,10 @@ class SearchAndFavoritesGridCalculatorKtTest {
                 return arrayOf(
                     TestCase(1, 100),
                     TestCase(1, 172),
-                    TestCase(2, 270),
-                    TestCase(3, 368),
+                    TestCase(1, 270),
+                    TestCase(2, 368),
                     TestCase(3, 465),
-                    TestCase(4, 466),
+                    TestCase(3, 466),
                     TestCase(4, 564),
                     TestCase(4, 662),
                     TestCase(4, 760),

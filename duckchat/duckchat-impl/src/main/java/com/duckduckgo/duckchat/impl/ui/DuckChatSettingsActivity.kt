@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.ui
 
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.CompoundButton
@@ -55,6 +57,7 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
     private val userEnabledDuckChatToggleListener =
         CompoundButton.OnCheckedChangeListener { _, isChecked ->
             viewModel.onDuckChatUserEnabledToggled(isChecked)
+            updateWidgets()
         }
 
     private val inputScreenToggleListener =
@@ -174,5 +177,10 @@ class DuckChatSettingsActivity : DuckDuckGoActivity() {
                 startActivity(browserNav.openInNewTab(this@DuckChatSettingsActivity, command.link))
             }
         }
+    }
+
+    private fun updateWidgets() {
+        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+        sendBroadcast(intent)
     }
 }

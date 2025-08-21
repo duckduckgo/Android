@@ -141,7 +141,7 @@
     <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>
     <dimen name="searchWidgetFavoriteItemContainerWidth">64dp</dimen>
     <dimen name="searchWidgetFavoriteItemContainerHeight">78dp</dimen>
-    <dimen name="searchWidgetSearchBarHeight">46dp</dimen>
+    <dimen name="searchWidgetSearchBarHeight">48dp</dimen>
     <dimen name="searchWidgetFavoritesTopMargin">16dp</dimen>
     <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
     <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
