@@ -61,7 +61,8 @@ abstract class PirWebJsMessageHandler : JsMessageHandler {
                 .withSubtype(PirWebMessageResponse.HandshakeResponse::class.java, "handshake")
                 .withSubtype(PirWebMessageResponse.InitialScanResponse::class.java, "initialScan")
                 .withSubtype(PirWebMessageResponse.GetDataBrokersResponse::class.java, "getDataBrokers")
-                .withSubtype(PirWebMessageResponse.GetCurrentUserProfileResponse::class.java, "getCurrentUserProfile"),
+                .withSubtype(PirWebMessageResponse.GetCurrentUserProfileResponse::class.java, "getCurrentUserProfile")
+                .withSubtype(PirWebMessageResponse.GetFeatureConfigResponse::class.java, "getFeatureConfig"),
         ).add(KotlinJsonAdapterFactory())
             .build().adapter(PirWebMessageResponse::class.java)
     }

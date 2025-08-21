@@ -92,4 +92,8 @@ sealed interface PirWebMessageResponse {
             class ScannedBroker
         }
     }
+
+    data class GetFeatureConfigResponse(
+        val useUnifiedFeedback: Boolean,
+    ) : PirWebMessageResponse
 }
