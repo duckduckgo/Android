@@ -85,7 +85,7 @@ sealed interface PirWebMessageResponse {
             val id: Long? = 0L,
             val dataBroker: DataBroker,
             val name: String,
-            val addresses: List<String>,
+            val addresses: List<ScanResultAddress>,
             val alternativeNames: List<String>,
             val relatives: List<String>,
             val foundDate: Long,
@@ -93,7 +93,13 @@ sealed interface PirWebMessageResponse {
             val estimatedRemovalDate: Long?,
             val removedDate: Long?,
             val hasMatchingRecordOnParentBroker: Boolean,
-        )
+        ) {
+            data class ScanResultAddress(
+                val street: String? = null,
+                val city: String?,
+                val state: String?,
+            )
+        }
 
         data class ScanProgress(
             val currentScan: Int,

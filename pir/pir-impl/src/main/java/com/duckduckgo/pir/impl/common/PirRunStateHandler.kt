@@ -29,6 +29,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanA
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanStarted
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
@@ -36,7 +37,6 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ClickResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExpectationResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse
-import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptAddressCityState
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
@@ -152,7 +152,6 @@ class RealPirRunStateHandler @Inject constructor(
         ).add(KotlinJsonAdapterFactory())
             .build()
     }
-    private val addressCityStateAdapter by lazy { moshi.adapter(ScriptAddressCityState::class.java) }
 
     private val pirSuccessAdapter by lazy { moshi.adapter(PirSuccessResponse::class.java) }
 
@@ -250,7 +249,13 @@ class RealPirRunStateHandler @Inject constructor(
                     name = it.name.orEmpty(),
                     alternativeNames = it.alternativeNames,
                     age = it.age.orEmpty(),
-                    addresses = it.addresses.map { item -> addressCityStateAdapter.toJson(item) },
+                    addresses = it.addresses.map { item ->
+                        AddressCityState(
+                            city = item.city,
+                            state = item.state,
+                            fullAddress = item.fullAddress,
+                        )
+                    },
                     phoneNumbers = it.phoneNumbers,
                     relatives = it.relatives,
                     identifier = it.identifier.orEmpty(),

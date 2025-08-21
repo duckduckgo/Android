@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanProgress.ScannedBroker
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanResult
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanResult.ScanResultAddress
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -81,7 +82,12 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                     parentURL = it.broker.parentUrl,
                 ),
                 name = it.extractedProfile.name,
-                addresses = it.extractedProfile.addresses,
+                addresses = it.extractedProfile.addresses.map { address ->
+                    ScanResultAddress(
+                        city = address.city,
+                        state = address.state,
+                    )
+                },
                 alternativeNames = it.extractedProfile.alternativeNames,
                 relatives = it.extractedProfile.relatives,
                 foundDate = it.extractedProfile.dateAddedInMillis,
