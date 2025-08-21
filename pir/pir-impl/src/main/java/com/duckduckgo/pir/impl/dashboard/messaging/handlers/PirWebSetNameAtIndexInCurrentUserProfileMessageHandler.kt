@@ -36,7 +36,8 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandler @Inject constructor
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
 
-    override val message: PirDashboardWebMessages = PirDashboardWebMessages.SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE
+    override val message: PirDashboardWebMessages =
+        PirDashboardWebMessages.SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -45,9 +46,15 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandler @Inject constructor
     ) {
         logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: process $jsMessage" }
 
-        val request = jsMessage.toRequestMessage(PirWebMessageRequest.SetNameAtIndexInCurrentUserProfileRequest::class)
+        val request =
+            jsMessage.toRequestMessage(PirWebMessageRequest.SetNameAtIndexInCurrentUserProfileRequest::class)
 
-        if (request == null || request.name.first.isEmpty() || request.name.last.isEmpty()) {
+        val index = request?.index ?: 0
+        val firstName = request?.name?.first?.trim().orEmpty()
+        val middleName = request?.name?.middle?.trim().orEmpty()
+        val lastName = request?.name?.last?.trim().orEmpty()
+
+        if (firstName.isBlank() || lastName.isBlank()) {
             logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: missing first and/or last name" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
@@ -58,13 +65,13 @@ class PirWebSetNameAtIndexInCurrentUserProfileMessageHandler @Inject constructor
 
         // attempting to add a duplicate address should return success=false
         if (!pirWebOnboardingStateHolder.setNameAtIndex(
-                index = request.index,
-                firstName = request.name.first,
-                middleName = request.name.middle,
-                lastName = request.name.last,
+                index = index,
+                firstName = firstName,
+                middleName = middleName,
+                lastName = lastName,
             )
         ) {
-            logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: failed to set name at index ${request.index}" }
+            logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: failed to set name at index $index" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.ERROR,

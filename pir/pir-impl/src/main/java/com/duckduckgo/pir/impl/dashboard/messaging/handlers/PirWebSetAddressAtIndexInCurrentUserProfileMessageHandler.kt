@@ -47,7 +47,11 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler @Inject construc
 
         val request = jsMessage.toRequestMessage(PirWebMessageRequest.SetAddressAtIndexForCurrentUserProfileRequest::class)
 
-        if (request == null || request.address.city.isEmpty() || request.address.state.isEmpty()) {
+        val index = request?.index ?: 0
+        val city = request?.address?.city?.trim().orEmpty()
+        val state = request?.address?.state?.trim().orEmpty()
+
+        if (city.isBlank() || state.isBlank()) {
             logcat { "PIR-WEB: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler: missing city and/or state" }
 
             jsMessaging.sendResponse(
@@ -59,12 +63,12 @@ class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler @Inject construc
 
         // attempting to add a duplicate address should return success=false
         if (!pirWebOnboardingStateHolder.setAddressAtIndex(
-                index = request.index,
-                city = request.address.city,
-                state = request.address.state,
+                index = index,
+                city = city,
+                state = state,
             )
         ) {
-            logcat { "PIR-WEB: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler: failed to set address at index ${request.index}" }
+            logcat { "PIR-WEB: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler: failed to set address at index $index" }
 
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,

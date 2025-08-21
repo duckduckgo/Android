@@ -51,8 +51,11 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
         val request =
             jsMessage.toRequestMessage(PirWebMessageRequest.AddAddressToCurrentUserProfileRequest::class)
 
+        val city = request?.city?.trim().orEmpty()
+        val state = request?.state?.trim().orEmpty()
+
         // attempting to add an empty address should return success=false
-        if (request == null || request.city.isEmpty() || request.state.isEmpty()) {
+        if (city.isBlank() || state.isBlank()) {
             logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: missing city and/or state" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
@@ -62,7 +65,7 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
         }
 
         // attempting to add a duplicate address should return success=false
-        if (!pirWebOnboardingStateHolder.addAddress(request.city, request.state)) {
+        if (!pirWebOnboardingStateHolder.addAddress(city, state)) {
             logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
