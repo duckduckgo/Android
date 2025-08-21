@@ -620,6 +620,8 @@
     <style name="Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHint">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">24dp</item>
+        <item name="android:layout_marginEnd">24dp</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">14sp</item>
         <item name="android:maxLines">1</item>

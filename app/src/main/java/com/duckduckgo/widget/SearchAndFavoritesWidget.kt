@@ -25,7 +25,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -164,7 +163,6 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         withContext(dispatchers.main()) {
             val remoteViews = RemoteViews(context.packageName, layoutId)
 
-            remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
             remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
 
             searchWidgetConfigurator.populateRemoteViews(
