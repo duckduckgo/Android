@@ -123,7 +123,7 @@ interface PirRepository {
 
     suspend fun deleteAllUserProfilesQueries()
 
-    suspend fun replaceUserProfile(userProfile: UserProfile)
+    suspend fun replaceUserProfile(profileQuery: ProfileQuery)
 
     suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
 
@@ -430,28 +430,17 @@ internal class RealPirRepository(
         )
     }
 
-    override suspend fun replaceUserProfile(userProfile: UserProfile) {
+    override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
-            userProfileDao.insertUserProfile(userProfile)
+            userProfileDao.insertUserProfile(profileQuery.toUserProfile())
         }
     }
 
     override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
         withContext(dispatcherProvider.io()) {
             val userProfiles = profileQueries.map { query ->
-                UserProfile(
-                    userName = UserName(
-                        firstName = query.firstName,
-                        lastName = query.lastName,
-                        middleName = query.middleName,
-                    ),
-                    addresses = com.duckduckgo.pir.impl.store.db.Address(
-                        city = query.city,
-                        state = query.state,
-                    ),
-                    birthYear = query.birthYear,
-                )
+                query.toUserProfile()
             }
             val insertResult = userProfileDao.insertUserProfiles(userProfiles)
             insertResult.size == userProfiles.size
@@ -520,6 +509,21 @@ internal class RealPirRepository(
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
+        )
+    }
+
+    private fun ProfileQuery.toUserProfile(): UserProfile {
+        return UserProfile(
+            userName = UserName(
+                firstName = this.firstName,
+                lastName = this.lastName,
+                middleName = this.middleName,
+            ),
+            addresses = com.duckduckgo.pir.impl.store.db.Address(
+                city = this.city,
+                state = this.state,
+            ),
+            birthYear = this.birthYear,
         )
     }
 }
