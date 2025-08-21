@@ -37,16 +37,16 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookies
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DAX
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DUCK_PLAYER
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.GLOBE
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Dax
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DuckPlayer
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Globe
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -61,7 +61,6 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
@@ -90,7 +89,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val duckPlayer: DuckPlayer,
+    private val duckPlayer: com.duckduckgo.duckplayer.api.DuckPlayer,
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
@@ -144,8 +143,8 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     data class ViewState(
         val viewMode: ViewMode = Browser(null),
-        val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
-        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
+        val leadingIconState: LeadingIconState = Search,
+        val privacyShield: PrivacyShieldState = PrivacyShieldState.UNKNOWN,
         val hasFocus: Boolean = false,
         val query: String = "",
         val omnibarText: String = "",
@@ -187,12 +186,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class LaunchInputScreen(val query: String) : Command()
     }
 
-    enum class LeadingIconState {
-        SEARCH,
-        PRIVACY_SHIELD,
-        DAX,
-        DUCK_PLAYER,
-        GLOBE,
+    sealed class LeadingIconState {
+        object Search : LeadingIconState()
+        object PrivacyShield : LeadingIconState()
+        object Dax : LeadingIconState()
+        object DuckPlayer : LeadingIconState()
+        object Globe : LeadingIconState()
     }
 
     init {
@@ -269,7 +268,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     hasFocus = true,
                     expanded = true,
-                    leadingIconState = SEARCH,
+                    leadingIconState = Search,
                     highlightPrivacyShield = HighlightableButton.Gone,
                     showClearButton = showClearButton,
                     showTabsMenu = showControls,
@@ -351,20 +350,20 @@ class OmnibarLayoutViewModel @Inject constructor(
         url: String,
     ): LeadingIconState {
         return when (_viewState.value.viewMode) {
-            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
-            NewTab -> SEARCH
+            Error, SSLWarning, MaliciousSiteWarning -> Globe
+            NewTab -> Search
             else -> {
                 if (hasFocus) {
-                    SEARCH
+                    Search
                 } else if (shouldShowDaxIcon(url)) {
-                    DAX
+                    Dax
                 } else if (shouldShowDuckPlayerIcon(url)) {
-                    DUCK_PLAYER
+                    DuckPlayer
                 } else {
                     if (url.isEmpty()) {
-                        SEARCH
+                        Search
                     } else {
-                        PRIVACY_SHIELD
+                        PrivacyShield
                     }
                 }
             }
@@ -420,12 +419,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
                     val leadingIcon = if (hasFocus) {
-                        LeadingIconState.SEARCH
+                        Search
                     } else {
                         when (viewMode) {
-                            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
-                            NewTab -> SEARCH
-                            else -> SEARCH
+                            Error, SSLWarning, MaliciousSiteWarning -> Globe
+                            NewTab -> Search
+                            else -> Search
                         }
                     }
 
@@ -448,11 +447,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
-        logcat { "Omnibar: onPrivacyShieldChanged $privacyShield" }
+    fun onPrivacyShieldChanged(privacyShieldState: PrivacyShieldState) {
+        logcat { "Omnibar: onPrivacyShieldChanged $privacyShieldState" }
         _viewState.update {
             it.copy(
-                privacyShield = privacyShield,
+                privacyShield = privacyShieldState,
             )
         }
     }
@@ -711,7 +710,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
-                                leadingIconState = PRIVACY_SHIELD,
+                                leadingIconState = PrivacyShield,
                             )
                         }
                         viewModelScope.launch {

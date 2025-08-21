@@ -70,7 +70,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchI
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -81,7 +81,7 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.tabswitcher.TabSwitcherButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -127,7 +127,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             val showDuckPlayerIcon: Boolean,
         ) : Decoration()
 
-        data class PrivacyShieldChanged(val privacyShield: PrivacyShield) : Decoration()
+        data class PrivacyShieldChanged(val privacyShield: com.duckduckgo.app.global.model.PrivacyShield) : Decoration()
         data class HighlightOmnibarItem(
             val fireButton: Boolean,
             val privacyShield: Boolean,
@@ -310,7 +310,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
 
-    private var lastSeenPrivacyShield: PrivacyShield? = null
+    private var lastSeenPrivacyShield: PrivacyShieldState? = null
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -494,7 +494,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
         }
 
-        if (viewState.leadingIconState == PRIVACY_SHIELD) {
+        if (viewState.leadingIconState == PrivacyShield) {
             renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
         } else {
             lastSeenPrivacyShield = null
@@ -546,7 +546,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     private fun renderLeadingIconState(viewState: ViewState) {
         when (viewState.leadingIconState) {
-            OmnibarLayoutViewModel.LeadingIconState.SEARCH -> {
+            OmnibarLayoutViewModel.LeadingIconState.Search -> {
                 searchIcon.show()
                 shieldIcon.gone()
                 daxIcon.gone()
@@ -554,7 +554,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
+            PrivacyShield -> {
                 shieldIcon.show()
                 searchIcon.gone()
                 daxIcon.gone()
@@ -562,7 +562,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            OmnibarLayoutViewModel.LeadingIconState.DAX -> {
+            OmnibarLayoutViewModel.LeadingIconState.Dax -> {
                 daxIcon.show()
                 shieldIcon.gone()
                 searchIcon.gone()
@@ -570,7 +570,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            OmnibarLayoutViewModel.LeadingIconState.GLOBE -> {
+            OmnibarLayoutViewModel.LeadingIconState.Globe -> {
                 globeIcon.show()
                 daxIcon.gone()
                 shieldIcon.gone()
@@ -578,7 +578,7 @@ open class OmnibarLayout @JvmOverloads constructor(
                 duckPlayerIcon.gone()
             }
 
-            OmnibarLayoutViewModel.LeadingIconState.DUCK_PLAYER -> {
+            OmnibarLayoutViewModel.LeadingIconState.DuckPlayer -> {
                 globeIcon.gone()
                 daxIcon.gone()
                 shieldIcon.gone()
@@ -738,7 +738,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private fun renderPulseAnimation(viewState: ViewState) {
         val targetView = if (viewState.highlightFireButton.isHighlighted() && viewState.showFireIcon) {
             fireIconImageView
-        } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PRIVACY_SHIELD) {
+        } else if (viewState.highlightPrivacyShield.isHighlighted() && viewState.leadingIconState == PrivacyShield) {
             placeholder
         } else {
             null
@@ -799,18 +799,18 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
 
     private fun renderPrivacyShield(
-        privacyShield: PrivacyShield,
+        privacyShieldState: PrivacyShieldState,
         viewMode: ViewMode,
     ) {
-        renderIfChanged(privacyShield, lastSeenPrivacyShield) {
-            lastSeenPrivacyShield = privacyShield
+        renderIfChanged(privacyShieldState, lastSeenPrivacyShield) {
+            lastSeenPrivacyShield = privacyShieldState
             val shieldIconView = if (viewMode is ViewMode.Browser) {
                 shieldIcon
             } else {
                 customTabToolbarContainer.customTabShieldIcon
             }
 
-            privacyShieldView.setAnimationView(shieldIconView, privacyShield, viewMode)
+            privacyShieldView.setAnimationView(shieldIconView, privacyShieldState, viewMode)
         }
     }
 
