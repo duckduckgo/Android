@@ -31,7 +31,6 @@ import java.util.concurrent.Executor
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
-import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -115,15 +114,8 @@ class RoomDatabaseProviderImpl @Inject constructor(
         poolSize: Int,
         queueSize: Int,
     ): Executor {
-        logcat("Cris") { "Creating executor with poolSize $poolSize and queueSize $queueSize" }
         val queue = object : ArrayBlockingQueue<Runnable>(queueSize) {
-
-            init {
-                logcat("Cris") { "Creating executor queue with size: $queueSize" }
-            }
-
             override fun add(element: Runnable): Boolean {
-                logcat("Cris") { "Adding task to executor queue, remaining capacity: ${this.remainingCapacity()}, queue size: ${this.size}" }
                 return super.add(element)
             }
         }
