@@ -17,16 +17,16 @@
 package com.duckduckgo.pir.impl.dashboard.state
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.impl.store.db.Address
-import com.duckduckgo.pir.impl.store.db.UserName
-import com.duckduckgo.pir.impl.store.db.UserProfile
+import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.Name
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @SingleInstanceIn(ActivityScope::class)
 class PirWebOnboardingStateHolder @Inject constructor() {
 
-    private val names: MutableList<UserName> = mutableListOf()
+    private val names: MutableList<Name> = mutableListOf()
     private val addresses: MutableList<Address> = mutableListOf()
     private var birthYear: Int? = null
 
@@ -53,7 +53,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
             return false
         }
         names.add(
-            UserName(
+            Name(
                 firstName = firstName,
                 lastName = lastName,
                 middleName = middleName,
@@ -82,7 +82,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
             return false
         }
 
-        names[index] = UserName(
+        names[index] = Name(
             firstName = firstName,
             lastName = lastName,
             middleName = middleName,
@@ -124,15 +124,25 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return false
     }
 
-    fun toUserProfiles(): List<UserProfile> {
-        val profiles = mutableListOf<UserProfile>()
+    fun toProfileQueries(currentYear: Int): List<ProfileQuery> {
+        val profiles = mutableListOf<ProfileQuery>()
         names.forEach { name ->
             addresses.forEach { address ->
                 profiles.add(
-                    UserProfile(
-                        userName = name,
+                    ProfileQuery(
+                        id = 0, // ID is auto-generated in the database
+                        firstName = name.firstName,
+                        lastName = name.lastName,
+                        middleName = name.middleName,
+                        city = address.city,
+                        state = address.state,
+                        addresses = listOf(address),
                         birthYear = birthYear ?: 0,
-                        addresses = address,
+                        fullName = name.middleName?.let { middleName ->
+                            "${name.firstName} $middleName ${name.lastName}"
+                        } ?: "${name.firstName} ${name.lastName}",
+                        age = currentYear - (birthYear ?: 0),
+                        deprecated = false,
                     ),
                 )
             }

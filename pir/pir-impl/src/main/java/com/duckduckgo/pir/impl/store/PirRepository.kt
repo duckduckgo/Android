@@ -38,6 +38,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
 import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
+import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import java.util.concurrent.TimeUnit
@@ -124,7 +125,7 @@ interface PirRepository {
 
     suspend fun replaceUserProfile(userProfile: UserProfile)
 
-    suspend fun saveUserProfiles(userProfiles: List<UserProfile>): Boolean
+    suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -436,8 +437,22 @@ internal class RealPirRepository(
         }
     }
 
-    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>): Boolean =
+    override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
         withContext(dispatcherProvider.io()) {
+            val userProfiles = profileQueries.map { query ->
+                UserProfile(
+                    userName = UserName(
+                        firstName = query.firstName,
+                        lastName = query.lastName,
+                        middleName = query.middleName,
+                    ),
+                    addresses = com.duckduckgo.pir.impl.store.db.Address(
+                        city = query.city,
+                        state = query.state,
+                    ),
+                    birthYear = query.birthYear,
+                )
+            }
             val insertResult = userProfileDao.insertUserProfiles(userProfiles)
             insertResult.size == userProfiles.size
         }
