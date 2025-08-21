@@ -28,35 +28,34 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
 
-/**
- * Handles the message from Web to add an address the user inputted to the current user profile.
- */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
+class PirWebSetNameAtIndexInCurrentUserProfileMessageHandler @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
 
-    override val message = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE
+    override val message: PirDashboardWebMessages =
+        PirDashboardWebMessages.SET_NAME_AT_INDEX_IN_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: process $jsMessage" }
 
         val request =
-            jsMessage.toRequestMessage(PirWebMessageRequest.AddAddressToCurrentUserProfileRequest::class)
+            jsMessage.toRequestMessage(PirWebMessageRequest.SetNameAtIndexInCurrentUserProfileRequest::class)
 
-        val city = request?.city?.trim().orEmpty()
-        val state = request?.state?.trim().orEmpty()
+        val index = request?.index ?: 0
+        val firstName = request?.name?.first?.trim().orEmpty()
+        val middleName = request?.name?.middle?.trim().orEmpty()
+        val lastName = request?.name?.last?.trim().orEmpty()
 
-        // attempting to add an empty address should return success=false
-        if (city.isBlank() || state.isBlank()) {
-            logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: missing city and/or state" }
+        if (firstName.isBlank() || lastName.isBlank()) {
+            logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: missing first and/or last name" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.ERROR,
@@ -65,8 +64,14 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
         }
 
         // attempting to add a duplicate address should return success=false
-        if (!pirWebOnboardingStateHolder.addAddress(city, state)) {
-            logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
+        if (!pirWebOnboardingStateHolder.setNameAtIndex(
+                index = index,
+                firstName = firstName,
+                middleName = middleName,
+                lastName = lastName,
+            )
+        ) {
+            logcat { "PIR-WEB: PirWebSetNameAtIndexInCurrentUserProfileMessageHandler: failed to set name at index $index" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.ERROR,

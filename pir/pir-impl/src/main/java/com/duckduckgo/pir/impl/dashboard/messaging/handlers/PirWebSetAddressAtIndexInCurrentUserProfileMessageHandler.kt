@@ -28,35 +28,32 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
 
-/**
- * Handles the message from Web to add an address the user inputted to the current user profile.
- */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
+class PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
 
-    override val message = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE
+    override val message: PirDashboardWebMessages = PirDashboardWebMessages.SET_ADDRESS_AT_INDEX_IN_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler: process $message" }
 
-        val request =
-            jsMessage.toRequestMessage(PirWebMessageRequest.AddAddressToCurrentUserProfileRequest::class)
+        val request = jsMessage.toRequestMessage(PirWebMessageRequest.SetAddressAtIndexForCurrentUserProfileRequest::class)
 
-        val city = request?.city?.trim().orEmpty()
-        val state = request?.state?.trim().orEmpty()
+        val index = request?.index ?: 0
+        val city = request?.address?.city?.trim().orEmpty()
+        val state = request?.address?.state?.trim().orEmpty()
 
-        // attempting to add an empty address should return success=false
         if (city.isBlank() || state.isBlank()) {
-            logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: missing city and/or state" }
+            logcat { "PIR-WEB: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler: missing city and/or state" }
+
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.ERROR,
@@ -65,8 +62,14 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
         }
 
         // attempting to add a duplicate address should return success=false
-        if (!pirWebOnboardingStateHolder.addAddress(city, state)) {
-            logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
+        if (!pirWebOnboardingStateHolder.setAddressAtIndex(
+                index = index,
+                city = city,
+                state = state,
+            )
+        ) {
+            logcat { "PIR-WEB: PirWebSetAddressAtIndexInCurrentUserProfileMessageHandler: failed to set address at index $index" }
+
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.ERROR,

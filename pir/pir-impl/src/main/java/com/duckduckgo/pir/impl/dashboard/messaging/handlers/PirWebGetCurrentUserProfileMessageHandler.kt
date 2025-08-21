@@ -24,8 +24,8 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder.Name
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.db.UserName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +67,13 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
                 return@launch
             }
 
-            val names = profiles.map { Name(it.firstName, it.middleName, it.lastName) }
+            val names = profiles.map {
+                UserName(
+                    firstName = it.firstName,
+                    lastName = it.lastName,
+                    middleName = it.middleName,
+                )
+            }
             val addresses = profiles.map { it.addresses }.flatten()
             val birthYear = profiles.firstOrNull()?.birthYear ?: 0
 
@@ -80,13 +86,13 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
                             middle = it.middleName ?: "",
                             last = it.lastName,
                         )
-                    },
+                    }.distinct(),
                     addresses = addresses.map {
                         PirWebMessageResponse.GetCurrentUserProfileResponse.Address(
                             city = it.city,
                             state = it.state,
                         )
-                    },
+                    }.distinct(),
                     birthYear = birthYear,
                 ),
             )

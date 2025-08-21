@@ -53,7 +53,7 @@ class PirWebSetBirthYearForCurrentUserProfile @Inject constructor(
         )?.year ?: 0
 
         // store the new birth year in the current user profile
-        pirWebOnboardingStateHolder.birthYear = birthYear
+        pirWebOnboardingStateHolder.setBirthYear(birthYear)
 
         jsMessaging.sendResponse(
             jsMessage = jsMessage,

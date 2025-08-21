@@ -17,25 +17,126 @@
 package com.duckduckgo.pir.impl.dashboard.state
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.store.db.Address
+import com.duckduckgo.pir.impl.store.db.UserName
+import com.duckduckgo.pir.impl.store.db.UserProfile
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @SingleInstanceIn(ActivityScope::class)
 class PirWebOnboardingStateHolder @Inject constructor() {
 
-    val names: MutableList<Name> = mutableListOf()
-    val addresses: MutableList<Address> = mutableListOf()
-    var birthYear: Int? = null
+    private val names: MutableList<UserName> = mutableListOf()
+    private val addresses: MutableList<Address> = mutableListOf()
+    private var birthYear: Int? = null
 
-    data class Name(
-        val firstName: String,
-        val middleName: String? = null,
-        val lastName: String,
-    ) {
-        val fullName: String
-            get() = middleName?.let { middleName ->
-                "$firstName $middleName $lastName"
-            } ?: "$firstName $lastName"
+    val isProfileComplete: Boolean
+        get() = names.isNotEmpty() && addresses.isNotEmpty() && (birthYear ?: 0) > 0
+
+    fun addAddress(
+        city: String,
+        state: String,
+    ): Boolean {
+        if (addresses.any { it.city == city && it.state == state }) {
+            return false
+        }
+        addresses.add(Address(city, state))
+        return true
+    }
+
+    fun addName(
+        firstName: String,
+        middleName: String? = null,
+        lastName: String,
+    ): Boolean {
+        if (names.any { it.firstName == firstName && it.middleName == middleName && it.lastName == lastName }) {
+            return false
+        }
+        names.add(
+            UserName(
+                firstName = firstName,
+                lastName = lastName,
+                middleName = middleName,
+            ),
+        )
+        return true
+    }
+
+    fun setBirthYear(year: Int): Boolean {
+        birthYear = year
+        return true
+    }
+
+    fun setNameAtIndex(
+        index: Int,
+        firstName: String,
+        middleName: String? = null,
+        lastName: String,
+    ): Boolean {
+        if (index !in names.indices) {
+            return false
+        }
+
+        // duplicates not allowed
+        if (names.any { it.firstName == firstName && it.middleName == middleName && it.lastName == lastName }) {
+            return false
+        }
+
+        names[index] = UserName(
+            firstName = firstName,
+            lastName = lastName,
+            middleName = middleName,
+        )
+        return true
+    }
+
+    fun setAddressAtIndex(
+        index: Int,
+        city: String,
+        state: String,
+    ): Boolean {
+        if (index !in addresses.indices) {
+            return false
+        }
+
+        // duplicates not allowed
+        if (addresses.any { it.city == city && it.state == state }) {
+            return false
+        }
+
+        addresses[index] = Address(city, state)
+        return true
+    }
+
+    fun removeAddressAtIndex(index: Int): Boolean {
+        if (index in addresses.indices) {
+            addresses.removeAt(index)
+            return true
+        }
+        return false
+    }
+
+    fun removeNameAtIndex(index: Int): Boolean {
+        if (index in names.indices) {
+            names.removeAt(index)
+            return true
+        }
+        return false
+    }
+
+    fun toUserProfiles(): List<UserProfile> {
+        val profiles = mutableListOf<UserProfile>()
+        names.forEach { name ->
+            addresses.forEach { address ->
+                profiles.add(
+                    UserProfile(
+                        userName = name,
+                        birthYear = birthYear ?: 0,
+                        addresses = address,
+                    ),
+                )
+            }
+        }
+        return profiles
     }
 }

@@ -28,45 +28,26 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
 
-/**
- * Handles the message from Web to add an address the user inputted to the current user profile.
- */
 @ContributesMultibinding(
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
+class PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
 
-    override val message = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE
+    override val message: PirDashboardWebMessages = PirDashboardWebMessages.REMOVE_ADDRESS_AT_INDEX_FROM_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
         jsMessaging: JsMessaging,
         jsMessageCallback: JsMessageCallback?,
     ) {
-        logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: process $jsMessage" }
+        logcat { "PIR-WEB: PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler: process $message" }
 
-        val request =
-            jsMessage.toRequestMessage(PirWebMessageRequest.AddAddressToCurrentUserProfileRequest::class)
-
-        val city = request?.city?.trim().orEmpty()
-        val state = request?.state?.trim().orEmpty()
-
-        // attempting to add an empty address should return success=false
-        if (city.isBlank() || state.isBlank()) {
-            logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: missing city and/or state" }
-            jsMessaging.sendResponse(
-                jsMessage = jsMessage,
-                response = PirWebMessageResponse.DefaultResponse.ERROR,
-            )
-            return
-        }
-
-        // attempting to add a duplicate address should return success=false
-        if (!pirWebOnboardingStateHolder.addAddress(city, state)) {
-            logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
+        val request = jsMessage.toRequestMessage(PirWebMessageRequest.RemoveAddressAtIndexFromCurrentUserProfileRequest::class)
+        if (request == null || !pirWebOnboardingStateHolder.removeAddressAtIndex(request.index)) {
+            logcat { "PIR-WEB: PirWebRemoveAddressAtIndexFromCurrentUserProfileMessageHandler: failed to remove address at index ${request?.index}" }
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.ERROR,
