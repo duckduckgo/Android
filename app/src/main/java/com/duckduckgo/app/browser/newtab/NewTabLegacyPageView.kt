@@ -41,6 +41,8 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Launc
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelFactory
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
@@ -55,9 +57,14 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelFactory
+import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel.InputScreenViewModelProviderFactory
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
+import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -76,9 +83,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     private val showLogo: Boolean = true,
     private val onHasContent: ((Boolean) -> Unit)? = null,
 ) : LinearLayout(context, attrs, defStyle) {
-
-    @Inject
-    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -102,8 +106,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
 
+    @Inject
+    lateinit var viewModelFactory: NewTabLegacyPageViewModelFactory
+
     private val viewModel: NewTabLegacyPageViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabLegacyPageViewModel::class.java]
+        val providerFactory = NewTabLegacyPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo)
+        ViewModelProvider(owner = findViewTreeViewModelStoreOwner()!!, factory = providerFactory)[NewTabLegacyPageViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
@@ -134,18 +142,10 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private fun render(viewState: ViewState) {
         logcat { "New Tab: render $viewState" }
-        val hasContentThatDisplacesHomoLogo = viewState.onboardingComplete &&
-            viewState.message != null ||
-            viewState.favourites.isNotEmpty()
-        val shouldShowLogo = !hasContentThatDisplacesHomoLogo && showLogo
-        val isAppTpEnabled = viewState.appTpEnabled
-        val hasLowPriorityMessage = viewState.lowPriorityMessage != null
 
-        val hasContent = shouldShowLogo || hasContentThatDisplacesHomoLogo || isAppTpEnabled || hasLowPriorityMessage
-        isVisible = hasContent
-        onHasContent?.invoke(hasContent)
+        onHasContent?.invoke(viewState.hasContent)
 
-        if (shouldShowLogo) {
+        if (viewState.shouldShowLogo) {
             homeBackgroundLogo.showLogo()
         } else {
             homeBackgroundLogo.hideLogo()

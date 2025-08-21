@@ -20,8 +20,8 @@ import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.CtaId
@@ -29,7 +29,6 @@ import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardi
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
-import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.api.RemoteMessageModel
@@ -37,7 +36,9 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -53,8 +54,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
-@ContributesViewModel(ViewScope::class)
-class NewTabLegacyPageViewModel @Inject constructor(
+class NewTabLegacyPageViewModel @AssistedInject constructor(
+    @Assisted private val showDaxLogo: Boolean,
     private val dispatchers: DispatcherProvider,
     private val remoteMessagingModel: RemoteMessageModel,
     private val playStoreUtils: PlayStoreUtils,
@@ -69,13 +70,23 @@ class NewTabLegacyPageViewModel @Inject constructor(
 ) : ViewModel(), DefaultLifecycleObserver {
 
     data class ViewState(
+        private val showDaxLogo: Boolean,
+        private val appTpEnabled: Boolean = false,
         val message: RemoteMessage? = null,
         val newMessage: Boolean = false,
         val onboardingComplete: Boolean = false,
         val favourites: List<Favorite> = emptyList(),
         val lowPriorityMessage: LowPriorityMessage? = null,
-        val appTpEnabled: Boolean = false,
-    )
+    ) {
+
+        private val hasContentThatDisplacesHomoLogo = onboardingComplete &&
+            message != null ||
+            favourites.isNotEmpty()
+        private val hasLowPriorityMessage = lowPriorityMessage != null
+
+        val shouldShowLogo = !hasContentThatDisplacesHomoLogo && showDaxLogo
+        val hasContent = shouldShowLogo || hasContentThatDisplacesHomoLogo || appTpEnabled || hasLowPriorityMessage
+    }
 
     private data class ViewStateSnapshot(
         val favourites: List<Favorite>,
@@ -100,7 +111,7 @@ class NewTabLegacyPageViewModel @Inject constructor(
     }
 
     private var lastRemoteMessageSeen: RemoteMessage? = null
-    private val _viewState = MutableStateFlow(ViewState())
+    private val _viewState = MutableStateFlow(ViewState(showDaxLogo = showDaxLogo))
     val viewState = _viewState.asStateFlow()
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
@@ -206,5 +217,23 @@ class NewTabLegacyPageViewModel @Inject constructor(
         viewModelScope.launch {
             lowPriorityMessagingModel.getPrimaryButtonCommand()?.let { command.send(it) }
         }
+    }
+
+    class NewTabLegacyPageViewModelProviderFactory(
+        private val assistedFactory: NewTabLegacyPageViewModelFactory,
+        private val showDaxLogo: Boolean,
+    ) : ViewModelProvider.Factory {
+
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return assistedFactory.create(showDaxLogo) as T
+        }
+    }
+
+    @AssistedFactory
+    interface NewTabLegacyPageViewModelFactory {
+        fun create(
+            showDaxLogo: Boolean,
+        ): NewTabLegacyPageViewModel
     }
 }
