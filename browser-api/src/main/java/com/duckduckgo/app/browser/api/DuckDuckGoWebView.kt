@@ -50,4 +50,6 @@ abstract class DuckDuckGoWebView(
         script: String,
         allowedOriginRules: Set<String>,
     ): ScriptHandler?
+
+    abstract fun isDestroyed(): Boolean
 }

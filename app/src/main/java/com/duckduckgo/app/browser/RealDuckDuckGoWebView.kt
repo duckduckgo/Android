@@ -426,7 +426,7 @@ class RealDuckDuckGoWebView : DuckDuckGoWebView, NestedScrollingChild3 {
         }
     }
 
-    fun isDestroyed(): Boolean {
+    override fun isDestroyed(): Boolean {
         return isDestroyed
     }
 

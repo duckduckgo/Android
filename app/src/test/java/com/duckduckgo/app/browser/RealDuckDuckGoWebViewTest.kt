@@ -25,6 +25,7 @@ class RealDuckDuckGoWebViewTest {
     @Before
     fun setUp() {
         testee.webViewCompatWrapper = mockWebViewCompatWrapper
+        testee.webViewCapabilityChecker = mockWebViewCapabilityChecker
     }
 
     @Test

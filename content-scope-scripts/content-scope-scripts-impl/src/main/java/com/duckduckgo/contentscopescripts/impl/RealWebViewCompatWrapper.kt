@@ -23,7 +23,12 @@ import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
-@SuppressLint("RequiresFeature")
+@SuppressLint(
+    "RequiresFeature",
+    "AddWebMessageListenerUsage",
+    "AddDocumentStartJavaScriptUsage",
+    "RemoveWebMessageListenerUsage",
+)
 @ContributesBinding(AppScope::class)
 class RealWebViewCompatWrapper @Inject constructor() : WebViewCompatWrapper {
     override fun addDocumentStartJavaScript(
