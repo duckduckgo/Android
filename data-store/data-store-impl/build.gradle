@@ -30,6 +30,7 @@ dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
     implementation project(':di')
+    implementation project(':feature-toggles-api')
     ksp AndroidX.room.compiler
 
     implementation KotlinX.coroutines.android
