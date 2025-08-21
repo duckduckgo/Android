@@ -81,7 +81,7 @@ class NewTabLegacyPageViewModelTest {
         testee = createTestee()
     }
 
-    private fun createTestee(showLogo: Boolean = true) : NewTabLegacyPageViewModel {
+    private fun createTestee(showLogo: Boolean = true): NewTabLegacyPageViewModel {
         return NewTabLegacyPageViewModel(
             showDaxLogo = showLogo,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
@@ -388,7 +388,7 @@ class NewTabLegacyPageViewModelTest {
     @Test
     fun `when favorites available, then hide logo`() = runTest {
         val favorites = listOf(
-            SavedSite.Favorite("1", "Test", "https://test.com", lastModified = "2024-01-01", 0)
+            SavedSite.Favorite("1", "Test", "https://test.com", lastModified = "2024-01-01", 0),
         )
         whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(favorites))
         whenever(mockDismissedCtaDao.exists(DAX_END)).thenReturn(true)
