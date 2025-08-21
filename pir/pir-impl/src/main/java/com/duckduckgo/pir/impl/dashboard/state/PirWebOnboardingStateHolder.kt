@@ -139,4 +139,10 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         }
         return profiles
     }
+
+    fun clear() {
+        names.clear()
+        addresses.clear()
+        birthYear = null
+    }
 }

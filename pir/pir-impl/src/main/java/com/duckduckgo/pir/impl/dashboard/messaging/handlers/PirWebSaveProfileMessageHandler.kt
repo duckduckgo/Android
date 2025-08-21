@@ -73,16 +73,29 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
             val profiles = pirWebOnboardingStateHolder.toUserProfiles()
-            repository.saveUserProfiles(profiles)
+            if (!repository.saveUserProfiles(profiles)) {
+                logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: failed to save all user profiles" }
+                jsMessaging.sendResponse(
+                    jsMessage = jsMessage,
+                    response = PirWebMessageResponse.DefaultResponse.ERROR,
+                )
+                return@launch
+            }
 
-            // TODO check if all profiles were saved successfully
             jsMessaging.sendResponse(
                 jsMessage,
                 response = PirWebMessageResponse.DefaultResponse.SUCCESS,
             )
 
-            context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
-            scanScheduler.scheduleScans()
+            // start the initial scan at this point as startScanAndOptOut message is not reliable
+            startAndScheduleInitialScan()
+
+            pirWebOnboardingStateHolder.clear()
         }
+    }
+
+    private fun startAndScheduleInitialScan() {
+        context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
+        scanScheduler.scheduleScans()
     }
 }
