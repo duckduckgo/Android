@@ -523,11 +523,20 @@
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetFavoriteFavicon">
-        <item name="android:layout_width">@dimen/savedSiteGridItemFavicon</item>
-        <item name="android:layout_height">@dimen/savedSiteGridItemFavicon</item>
+        <item name="android:layout_width">@dimen/searchWidgetFavoritesGridItemFavicon</item>
+        <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:layout_gravity">center_horizontal|top</item>
-        <item name="android:layout_marginStart">8dp</item>
-        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:elevation">4dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.SearchEmptyWidgetFavoriteFavicon">
+        <item name="android:layout_width">@dimen/searchWidgetFavoritesGridItemFavicon</item>
+        <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
+        <item name="android:layout_gravity">center_horizontal|top</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">12dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetFavoriteTitle">
@@ -540,6 +549,8 @@
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:layout_marginTop">8dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetContainer">
@@ -549,8 +560,8 @@
         <item name="android:paddingTop">@dimen/searchWidgetPadding</item>
         <item name="android:paddingBottom">@dimen/searchWidgetPadding</item>
         <item name="android:elevation">2dp</item>
-        <item name="android:layout_marginStart">1dp</item>
-        <item name="android:layout_marginEnd">1dp</item>
+        <item name="android:layout_marginStart">4dp</item>
+        <item name="android:layout_marginEnd">4dp</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchWidgetSearchBarContainer">
@@ -571,6 +582,7 @@
         <item name="android:layout_gravity">top</item>
         <item name="android:paddingStart">12dp</item>
         <item name="android:paddingEnd">12dp</item>
+        <item name="android:elevation">4dp</item>
         <item name="android:layout_marginStart">@dimen/searchWidgetSearchBarSideMargin</item>
         <item name="android:layout_marginEnd">@dimen/searchWidgetSearchBarSideMargin</item>
     </style>
@@ -602,6 +614,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_marginTop">@dimen/searchWidgetFavoritesTopMargin</item>
+        <item name="android:layout_marginStart">@dimen/searchWidgetFavoritesSideMargin</item>
+        <item name="android:layout_marginEnd">@dimen/searchWidgetFavoritesSideMargin</item>
         <item name="android:verticalSpacing">@dimen/searchWidgetFavoritesVerticalSpacing</item>
         <item name="android:horizontalSpacing">@dimen/searchWidgetFavoritesHorizontalSpacing</item>
         <item name="android:scrollbars">none</item>
@@ -611,7 +625,7 @@
     <style name="Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer">
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/savedSiteGridItemFavicon</item>
+        <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:visibility">invisible</item>
