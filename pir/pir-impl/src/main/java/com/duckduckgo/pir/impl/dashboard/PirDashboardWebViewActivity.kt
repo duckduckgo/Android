@@ -40,6 +40,7 @@ import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.Se
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.flow.launchIn
@@ -57,6 +58,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirWebJsMessaging: JsMessaging
 
+    @Inject
+    lateinit var pirNotificationManager: PirNotificationManager
+
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
@@ -67,6 +71,8 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
         setupWebView()
         observeCommands()
+
+        pirNotificationManager.createNotificationChannel()
     }
 
     override fun onDestroy() {

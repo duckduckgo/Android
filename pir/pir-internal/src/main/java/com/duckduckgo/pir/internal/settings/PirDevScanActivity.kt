@@ -33,10 +33,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.pir.impl.PirConstants.NOTIF_ID_STATUS_COMPLETE
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirRemoteWorkerService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -125,7 +125,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     private fun setupViews() {
         binding.debugRunScan.setOnClickListener {
-            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            notificationManagerCompat.cancel(PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }
             lifecycleScope.launch {
                 if (useUserInput()) {
@@ -198,7 +198,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     private fun killRunningWork() {
         stopService(Intent(this, PirForegroundScanService::class.java))
-        notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+        notificationManagerCompat.cancel(PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
         stopService(Intent(this, PirRemoteWorkerService::class.java))
         pirScanScheduler.cancelScheduledScans(this)
     }

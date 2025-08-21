@@ -27,10 +27,10 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.ServiceScope
-import com.duckduckgo.pir.impl.PirConstants
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -88,7 +88,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
             if (result.isSuccess) {
                 notificationManagerCompat.checkPermissionAndNotify(
                     applicationContext,
-                    PirConstants.NOTIF_ID_STATUS_COMPLETE,
+                    PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE,
                     createNotification(getString(R.string.pirOptOutNotificationMessageComplete)),
                 )
             }
@@ -116,7 +116,7 @@ class PirForegroundOptOutService : Service(), CoroutineScope by MainScope() {
             PendingIntent.FLAG_IMMUTABLE,
         )
 
-        return NotificationCompat.Builder(this, PirConstants.NOTIF_CHANNEL_ID)
+        return NotificationCompat.Builder(this, PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(getString(R.string.pirOptOutNotificationTitle))
             .setContentText(message)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
