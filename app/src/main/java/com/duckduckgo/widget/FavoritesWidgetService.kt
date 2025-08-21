@@ -132,12 +132,11 @@ class FavoritesWidgetService : RemoteViewsService() {
                 if (item.bitmap != null) {
                     remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap)
                 }
-                remoteViews.setViewVisibility(R.id.quickAccessTitle, View.VISIBLE)
+                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
                 remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
                 configureClickListener(remoteViews, item.url)
             } else {
-                remoteViews.setViewVisibility(R.id.quickAccessTitle, View.GONE)
-                remoteViews.setImageViewResource(R.id.quickAccessFavicon, getEmptyBackgroundDrawable())
+                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.INVISIBLE)
             }
 
             return remoteViews

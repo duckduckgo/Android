@@ -29,7 +29,7 @@
     <TextView
         android:id="@+id/quickAccessTitle"
         style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteTitle"
-        android:textColor="@color/white60"
+        android:textColor="@color/text_secondary_dark"
         tools:text="Super long favorite title" />
 
 </LinearLayout>

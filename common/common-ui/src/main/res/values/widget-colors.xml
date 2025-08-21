@@ -33,7 +33,7 @@
 
 <resources>
     <!-- Widget colors -->
-    <color name="favoriteTitleTextColor">@color/black60</color>
+    <color name="favoriteTitleTextColor">@color/text_secondary_light</color>
     <color name="emptyFavoriteFaviconBackgroundColor">@color/black6</color>
     <color name="favoriteFaviconBackgroundColor">@color/white</color>
     <color name="searchWidgetBackgroundColor">@color/searchWidgetBackgroundColorLight</color>
