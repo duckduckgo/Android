@@ -28,6 +28,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
@@ -36,7 +37,10 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RoomDatabaseProviderImpl @Inject constructor(
     private val context: Context,
+    databaseProviderFeature: DatabaseProviderFeature,
 ) : DatabaseProvider {
+
+    private val featureFlagEnabled: Boolean = databaseProviderFeature.self().isEnabled()
 
     private val defaultPoolSize = 6
     private val defaultExecutor: Executor by lazy {
@@ -84,26 +88,36 @@ class RoomDatabaseProviderImpl @Inject constructor(
                 if (config.fallbackToDestructiveMigrationFromVersion.isNotEmpty()) {
                     fallbackToDestructiveMigrationFrom(*config.fallbackToDestructiveMigrationFromVersion.toIntArray())
                 }
+
                 when (config.executor) {
                     is Custom -> {
                         (config.executor as? Custom)?.let { executor ->
-                            setQueryExecutor(
+                            val queryExecutor = if (featureFlagEnabled) {
                                 createExecutor(
                                     executor.queryPoolSize,
                                     executor.queryQueueSize,
-                                ),
-                            )
-                            setTransactionExecutor(
+                                )
+                            } else {
+                                Executors.newFixedThreadPool(4)
+                            }
+
+                            val transactionExecutor = if (featureFlagEnabled) {
                                 createExecutor(
                                     executor.transactionPoolSize,
                                     executor.transactionQueueSize,
-                                ),
-                            )
+                                )
+                            } else {
+                                Executors.newSingleThreadExecutor()
+                            }
+                            setQueryExecutor(queryExecutor)
+                            setTransactionExecutor(transactionExecutor)
                         }
                     }
                     Default -> {
-                        setQueryExecutor(defaultExecutor)
-                        setTransactionExecutor(defaultExecutor)
+                        if (featureFlagEnabled) {
+                            setQueryExecutor(defaultExecutor)
+                            setTransactionExecutor(defaultExecutor)
+                        }
                     }
                 }
             }
