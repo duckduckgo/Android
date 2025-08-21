@@ -1,0 +1,70 @@
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="88dp"
+    android:viewportWidth="160"
+    android:viewportHeight="88">
+  <group>
+    <clip-path
+        android:pathData="M0,0h160v88H0z"/>
+    <group>
+      <clip-path
+          android:pathData="M26,0L134,0A26,26 0,0 1,160 26L160,62A26,26 0,0 1,134 88L26,88A26,26 0,0 1,0 62L0,26A26,26 0,0 1,26 0z"/>
+      <path
+          android:pathData="M0,0h160v88H0z"
+          android:fillColor="#fff"
+          android:fillAlpha="0.08"/>
+      <path
+          android:pathData="M16,38c0,-14.36 11.64,-26 26,-26h76c14.36,0 26,11.64 26,26v50H16V38Z"
+          android:fillColor="#fff"
+          android:fillAlpha="0.1"/>
+      <path
+          android:pathData="M16,38c0,-14.36 11.64,-26 26,-26h76c14.36,0 26,11.64 26,26v50H16V38Z"
+          android:fillColor="#000"
+          android:fillAlpha="0.3"/>
+      <group>
+        <clip-path
+            android:pathData="M16,38c0,-14.36 11.64,-26 26,-26h76c14.36,0 26,11.64 26,26v50H16V38Z"/>
+        <path
+            android:pathData="M11,38C11,20.88 24.88,7 42,7h76c17.12,0 31,13.88 31,31h-10c0,-11.6 -9.4,-21 -21,-21L42,17c-11.6,0 -21,9.4 -21,21L11,38ZM144,88L16,88h128ZM11,88L11,38C11,20.88 24.88,7 42,7v10c-11.6,0 -21,9.4 -21,21v50L11,88ZM118,7c17.12,0 31,13.88 31,31v50h-10L139,38c0,-11.6 -9.4,-21 -21,-21L118,7Z"
+            android:fillColor="#fff"
+            android:fillAlpha="0.2"/>
+      </group>
+      <path
+          android:pathData="M62,26L98,26A10,10 0,0 1,108 36L108,36A10,10 0,0 1,98 46L62,46A10,10 0,0 1,52 36L52,36A10,10 0,0 1,62 26z"
+          android:fillColor="#fff"
+          android:fillAlpha="0.08"/>
+      <path
+          android:pathData="M93,30c3.31,0 6,2.39 6,5.34 0,2.24 -1.55,4.16 -3.74,4.95 -1.42,0.65 -4.91,1.31 -6.9,1.65a0.53,0.53 0,0 1,-0.49 -0.88l0.97,-1.12c0.21,-0.24 0.17,-0.61 -0.07,-0.82C87.68,38.16 87,36.82 87,35.34 87,32.39 89.69,30 93,30ZM93,31c-2.87,0 -5,2.05 -5,4.34 0,1.16 0.53,2.24 1.43,3.04 0.6,0.53 0.78,1.52 0.17,2.22l-0.11,0.12a68.24,68.24 0,0 0,2.32 -0.47c1.3,-0.29 2.43,-0.6 3.04,-0.88l0.04,-0.02 0.04,-0.01c1.87,-0.68 3.08,-2.26 3.08,-4.01C98,33.05 95.87,31 93,31ZM92.71,32.45c0.07,-0.3 0.5,-0.3 0.57,0l0.16,0.66c0.22,0.88 0.91,1.56 1.78,1.78l0.66,0.16c0.3,0.07 0.3,0.5 0,0.57l-0.66,0.17a2.45,2.45 0,0 0,-1.78 1.78l-0.16,0.66c-0.07,0.3 -0.5,0.3 -0.57,0l-0.17,-0.66a2.45,2.45 0,0 0,-1.78 -1.78l-0.66,-0.17c-0.3,-0.07 -0.3,-0.5 0,-0.57l0.66,-0.16a2.45,2.45 0,0 0,1.78 -1.78l0.17,-0.66Z"
+          android:fillColor="#000"
+          android:fillAlpha="0.4"/>
+      <path
+          android:pathData="M38,52L122,52A8,8 0,0 1,130 60L130,64A8,8 0,0 1,122 72L38,72A8,8 0,0 1,30 64L30,60A8,8 0,0 1,38 52z"
+          android:fillColor="#fff"
+          android:fillAlpha="0.08"/>
+      <path
+          android:pathData="M72,28a8,8 0,1 1,0 16L62,44a8,8 0,1 1,0 -16h10ZM66.25,30a5.25,5.25 0,1 0,3.34 9.3l2.56,2.55 0.08,0.06a0.5,0.5 0,0 0,0.69 -0.69l-0.06,-0.08 -2.55,-2.56A5.25,5.25 0,0 0,66.25 30ZM66.25,31a4.25,4.25 0,1 1,0 8.5,4.25 4.25,0 0,1 0,-8.5Z"
+          android:fillColor="#000"
+          android:fillAlpha="0.3"/>
+      <path
+          android:pathData="M38.5,56L38.5,56A0.5,0.5 0,0 1,39 56.5L39,67.5A0.5,0.5 0,0 1,38.5 68L38.5,68A0.5,0.5 0,0 1,38 67.5L38,56.5A0.5,0.5 0,0 1,38.5 56z"
+          android:fillColor="#000"
+          android:fillAlpha="0.4"/>
+    </group>
+  </group>
+</vector>

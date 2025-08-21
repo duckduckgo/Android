@@ -21,6 +21,9 @@
     <!-- Inside each category there are different colors, which define where are applied -->
 
     <!-- Dark Palette -->
+    <!-- Accents -->
+    <color name="accent_content_primary_dark">@color/blue80</color>
+
     <!-- Backgrounds -->
     <color name="background_background_dark">#27282A</color>
     <color name="background_surface_dark">#333538</color>
@@ -47,6 +50,9 @@
     <color name="controls_decoration_tertiary_dark">#B8F9F9F9</color>
 
     <!-- Light Palette -->
+    <!-- Accents -->
+    <color name="accent_content_primary_light">@color/white</color>
+
     <!-- Backgrounds -->
     <color name="background_background_light">#F2F2F2</color>
     <color name="background_surface_light">#F9F9F9</color>
