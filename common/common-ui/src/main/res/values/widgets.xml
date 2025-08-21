@@ -569,6 +569,8 @@
         <item name="android:layout_height">@dimen/searchWidgetSearchBarHeight</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">top</item>
+        <item name="android:paddingStart">12dp</item>
+        <item name="android:paddingEnd">12dp</item>
         <item name="android:layout_marginStart">@dimen/searchWidgetSearchBarSideMargin</item>
         <item name="android:layout_marginEnd">@dimen/searchWidgetSearchBarSideMargin</item>
     </style>
