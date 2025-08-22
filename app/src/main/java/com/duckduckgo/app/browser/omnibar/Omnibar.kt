@@ -68,52 +68,19 @@ import logcat.logcat
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
-    val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
 ) {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                when (omnibarType) {
-                    SCROLLING -> {
-                        // remove bottom variant
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove all single omnibars
-                        binding.rootView.removeView(binding.singleOmnibar)
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-                    }
-                    else -> {
-                        // remove bottom variant
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-
-                        // remove all scrolling omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-                    }
-                }
+                // remove bottom variant
+                binding.rootView.removeView(binding.singleOmnibarBottom)
             }
 
             OmnibarPosition.BOTTOM -> {
-                when (omnibarType) {
-                    SCROLLING -> {
-                        // remove top variant
-                        binding.rootView.removeView(binding.newOmnibar)
-
-                        // remove all single omnibars
-                        binding.rootView.removeView(binding.singleOmnibar)
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-                    }
-                    else -> {
-                        // remove top variant
-                        binding.rootView.removeView(binding.singleOmnibar)
-
-                        // remove all scrolling omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-                    }
-                }
+                // remove top variant
+                binding.rootView.removeView(binding.singleOmnibar)
 
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
@@ -186,17 +153,11 @@ class Omnibar(
     val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                when (omnibarType) {
-                    SCROLLING -> binding.newOmnibar
-                    SINGLE -> binding.singleOmnibar
-                }
+                binding.singleOmnibar
             }
 
             OmnibarPosition.BOTTOM -> {
-                when (omnibarType) {
-                    SCROLLING -> binding.newOmnibarBottom
-                    SINGLE -> binding.singleOmnibarBottom
-                }
+                binding.singleOmnibarBottom
             }
         }
     }

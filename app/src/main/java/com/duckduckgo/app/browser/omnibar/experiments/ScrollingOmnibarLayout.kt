@@ -26,7 +26,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import dagger.android.support.AndroidSupportInjection
 
 @InjectWith(FragmentScope::class)
-class ScrollingOmnibarLayout @JvmOverloads constructor(
+class ScrollingOmnibarLayout @JvmOverloads constructor( // todo lp - remove the class
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,

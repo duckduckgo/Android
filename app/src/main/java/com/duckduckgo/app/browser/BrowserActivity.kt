@@ -54,7 +54,6 @@ import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
-import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
@@ -62,8 +61,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBotto
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -202,9 +199,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     lateinit var syncUrlIdentifier: SyncUrlIdentifier
 
     @Inject
-    lateinit var omnibarTypeResolver: OmnibarTypeResolver
-
-    @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
@@ -254,10 +248,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         TabPagerAdapter(activity = this)
     }
 
-    private lateinit var toolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
     private lateinit var experimentalToolbarMockupBinding: IncludeExperimentalOmnibarToolbarMockupBinding
     private lateinit var experimentalToolbarMockupBottomBinding: IncludeExperimentalOmnibarToolbarMockupBottomBinding
-    private lateinit var singleToolBarMockupBinding: IncludeSingleOmnibarToolbarMockupBinding
+    private lateinit var singleToolBarMockupBinding: IncludeSingleOmnibarToolbarMockupBinding // todo lp - rename single omnibar to toolbar
     private lateinit var singleToolBarMockupBottomBinding: IncludeSingleOmnibarToolbarMockupBottomBinding
 
     private var openMessageInNewTabJob: Job? = null
@@ -914,9 +907,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // Delaying this code to avoid race condition when fragment and activity recreated
         Handler(Looper.getMainLooper()).postDelayed(
             {
-                if (this::toolbarMockupBinding.isInitialized) {
-                    toolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
-                }
                 if (this::experimentalToolbarMockupBinding.isInitialized) {
                     experimentalToolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
@@ -1294,72 +1284,49 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun bindMockupToolbars() {
-        when (omnibarTypeResolver.getOmnibarType()) {
-            OmnibarType.SCROLLING -> {
-                toolbarMockupBinding = when (settingsDataStore.omnibarPosition) {
-                    TOP -> {
-                        binding.bottomMockupToolbar.appBarLayoutMockup.gone()
-                        binding.topMockupToolbar
-                    }
-                    BOTTOM -> {
-                        binding.topMockupToolbar.appBarLayoutMockup.gone()
-                        binding.bottomMockupToolbar
-                    }
+        when (settingsDataStore.omnibarPosition) {
+            TOP -> {
+                if (Build.VERSION.SDK_INT < 28) {
+                    binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
+                }
+
+                binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
+                singleToolBarMockupBinding = binding.topMockupSingleToolbar
+
+                if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                    singleToolBarMockupBinding.aiChatIconMockup.isVisible = false
+                }
+
+                if (Build.VERSION.SDK_INT >= 28) {
+                    singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
+                        shadowSizeDp = 12f,
+                        offsetYDp = 3f,
+                        insetDp = 3f,
+                        shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
+                    )
+                }
+            }
+
+            BOTTOM -> {
+                if (Build.VERSION.SDK_INT < 28) {
+                    binding.bottomMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
                 }
 
                 binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
+                singleToolBarMockupBottomBinding = binding.bottomMockupSingleToolbar
 
-                toolbarMockupBinding.aiChatIconMenuMockup.isVisible = duckAiFeatureState.showOmnibarShortcutInAllStates.value
-            }
-            else -> {
-                when (settingsDataStore.omnibarPosition) {
-                    TOP -> {
-                        if (Build.VERSION.SDK_INT < 28) {
-                            binding.topMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 2f.toPx(this)
-                        }
-
-                        binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
-                        singleToolBarMockupBinding = binding.topMockupSingleToolbar
-
-                        if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
-                            singleToolBarMockupBinding.aiChatIconMockup.isVisible = false
-                        }
-
-                        if (Build.VERSION.SDK_INT >= 28) {
-                            singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
-                                shadowSizeDp = 12f,
-                                offsetYDp = 3f,
-                                insetDp = 3f,
-                                shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-                            )
-                        }
-                    }
-                    BOTTOM -> {
-                        if (Build.VERSION.SDK_INT < 28) {
-                            binding.bottomMockupSingleToolbar.mockOmniBarContainerShadow.cardElevation = 0.5f.toPx(this)
-                        }
-
-                        binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                        singleToolBarMockupBottomBinding = binding.bottomMockupSingleToolbar
-
-                        if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
-                            singleToolBarMockupBottomBinding.aiChatIconMockup.isVisible = false
-                        }
-
-                        if (Build.VERSION.SDK_INT >= 28) {
-                            singleToolBarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow(
-                                shadowSizeDp = 12f,
-                                offsetYDp = 3f,
-                                insetDp = 3f,
-                                shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-                            )
-                        }
-                    }
+                if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
+                    singleToolBarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
 
-                binding.bottomMockupToolbar.appBarLayoutMockup.gone()
-                binding.topMockupToolbar.appBarLayoutMockup.gone()
+                if (Build.VERSION.SDK_INT >= 28) {
+                    singleToolBarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow(
+                        shadowSizeDp = 12f,
+                        offsetYDp = 3f,
+                        insetDp = 3f,
+                        shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
+                    )
+                }
             }
         }
     }

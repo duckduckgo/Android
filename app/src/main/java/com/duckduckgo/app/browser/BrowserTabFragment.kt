@@ -152,7 +152,6 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.omnibar.model.OmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -573,9 +572,6 @@ class BrowserTabFragment :
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
-    lateinit var omnibarTypeResolver: OmnibarTypeResolver
-
-    @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
     @Inject
@@ -886,25 +882,26 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private fun showTrackersExperimentShieldPopAnimation() {
-        experimentTrackersAnimationHelper.startShieldPopAnimation(
-            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
-            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == TOP) {
-                listOf(
-                    binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
-                    binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
-                )
-            } else {
-                listOf(
-                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
-                )
-            },
-            omnibarTextInput = if (omnibar.omnibarPosition == TOP) {
-                binding.newOmnibar.omnibarTextInput
-            } else {
-                binding.newOmnibarBottom.omnibarTextInput
-            },
-        )
+        // todo lp - what to do with this function? it only used the old omnibar
+        // experimentTrackersAnimationHelper.startShieldPopAnimation(
+        //     omnibarShieldAnimationView = omnibar.shieldIconExperiment,
+        //     trackersCountAndBlockedViews = if (omnibar.omnibarPosition == TOP) {
+        //         listOf(
+        //             binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
+        //             binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
+        //         )
+        //     } else {
+        //         listOf(
+        //             binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
+        //             binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
+        //         )
+        //     },
+        //     omnibarTextInput = if (omnibar.omnibarPosition == TOP) {
+        //         binding.newOmnibar.omnibarTextInput
+        //     } else {
+        //         binding.newOmnibarBottom.omnibarTextInput
+        //     },
+        // )
     }
 
     private val inputScreenLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -1005,8 +1002,7 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val omnibarType = omnibarTypeResolver.getOmnibarType()
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarType, binding)
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1425,8 +1421,7 @@ class BrowserTabFragment :
         }
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        val hasOmnibarTypeChanged = omnibar.omnibarType != omnibarTypeResolver.getOmnibarType()
-        if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
+        if (hasOmnibarPositionChanged) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
