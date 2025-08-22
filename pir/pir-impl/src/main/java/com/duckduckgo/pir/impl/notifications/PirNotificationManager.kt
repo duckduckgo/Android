@@ -109,7 +109,7 @@ class RealPirNotificationManager @Inject constructor(
         private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME = "Personal Information Removal Status"
         private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION = "Status updates for Personal Information Removal"
 
-        const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pir.PirNotificationChannel"
-        const val PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE = 987
+        private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pir.PirNotificationChannel"
+        private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE = 987
     }
 }
