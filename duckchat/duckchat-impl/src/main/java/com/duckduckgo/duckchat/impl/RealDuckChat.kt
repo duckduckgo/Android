@@ -214,7 +214,6 @@ data class DuckChatSettingJson(
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckChatFeature: DuckChatFeature,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
@@ -252,12 +251,6 @@ class RealDuckChat @Inject constructor(
     init {
         if (isMainProcess) {
             cacheConfig()
-            experimentalThemingDataStore.isSingleOmnibarEnabled.onEach { isExperimentEnabled ->
-                if (!isExperimentEnabled) {
-                    // the new input screen feature is only available when the visual design experiment is enabled
-                    setInputScreenUserSetting(false)
-                }
-            }.launchIn(appCoroutineScope)
         }
     }
 
@@ -565,7 +558,7 @@ class RealDuckChat @Inject constructor(
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
         val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-            experimentalThemingDataStore.isSingleOmnibarEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+            duckChatFeatureRepository.isInputScreenUserSettingEnabled()
         _showInputScreen.emit(showInputScreen)
 
         val showInBrowserMenu = duckChatFeatureRepository.shouldShowInBrowserMenu() &&
