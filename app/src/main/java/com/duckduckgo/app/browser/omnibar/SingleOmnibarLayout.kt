@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.omnibar.experiments
+package com.duckduckgo.app.browser.omnibar
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -30,12 +30,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.IncludeFadeOmnibarFindInPageBinding
-import com.duckduckgo.app.browser.omnibar.FindInPage
-import com.duckduckgo.app.browser.omnibar.FindInPageImpl
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
-import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.addBottomShadow
@@ -59,7 +54,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
@@ -68,9 +62,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
 
-    override val findInPage: FindInPage by lazy {
-        FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
-    }
     private var isFindInPageVisible = false
     private val findInPageLayoutVisibilityChangeListener = OnGlobalLayoutListener {
         val isVisible = findInPage.findInPageContainer.isVisible
@@ -85,15 +76,15 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     }
 
     private val experimentalOmnibarCardMarginTop by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop)
+        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
     }
 
     private val experimentalOmnibarCardMarginBottom by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom)
+        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
     }
 
-    private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
-    private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
+    private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.omnibarOutlineWidth) }
+    private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.omnibarOutlineFocusedWidth) }
 
     private var focusAnimator: ValueAnimator? = null
 
@@ -178,13 +169,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
     override fun renderButtons(viewState: ViewState) {
         super.renderButtons(viewState)
-
-        clearTextButton.isVisible = viewState.showClearButton
-        voiceSearchButton.isVisible = viewState.showVoiceSearch
-        spacer.isVisible = false
-
-        aiChatMenu?.isVisible = viewState.showChatMenu
-        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
 
         val showBackArrow = viewState.hasFocus
         if (showBackArrow) {

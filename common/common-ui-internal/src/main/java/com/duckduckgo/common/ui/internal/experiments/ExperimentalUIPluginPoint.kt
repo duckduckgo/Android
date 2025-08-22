@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.common.ui.internal.experiments.visual
+package com.duckduckgo.common.ui.internal.experiments
 
-import android.content.Context
-import android.view.View
-import com.duckduckgo.common.ui.internal.experiments.ExperimentalUIPlugin
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-class VisualDesignExperimentPlugin @Inject constructor() : ExperimentalUIPlugin {
-
-    override fun getView(context: Context): View {
-        return VisualDesignExperimentView(context)
-    }
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = ExperimentalUIPlugin::class,
+)
+@Suppress("unused")
+interface ExperimentalUIPluginPoint

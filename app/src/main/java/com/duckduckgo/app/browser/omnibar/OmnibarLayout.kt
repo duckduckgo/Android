@@ -63,17 +63,13 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmni
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
-import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.NewTabScrollingState
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.PrivacyShieldChanged
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.QueueCookiesAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2OrVariant3Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartTrackersAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartVisualDesignTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
@@ -96,7 +92,6 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -139,11 +134,6 @@ open class OmnibarLayout @JvmOverloads constructor(
         ) : Decoration()
 
         data class DisableVoiceSearch(val url: String) : Decoration()
-        data class NewTabScrollingState(
-            val canScrollUp: Boolean,
-            val canScrollDown: Boolean,
-            val topOfPage: Boolean,
-        ) : Decoration()
     }
 
     sealed class StateChange {
@@ -210,13 +200,14 @@ open class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
-    internal open val findInPage: FindInPage by lazy {
-        FindInPageImpl(IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)))
+    internal val findInPage: IncludeFindInPageBinding by lazy {
+        IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
     }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }
     internal val fireIconMenu: FrameLayout by lazy { findViewById(R.id.fireIconMenu) }
     internal val aiChatMenu: View? by lazy { findViewById(R.id.aiChatIconMenu) }
+    private val aiChatDivider: View by lazy { findViewById(R.id.verticalDivider) }
     internal val browserMenu: FrameLayout by lazy { findViewById(R.id.browserMenu) }
     internal val browserMenuHighlight: View by lazy { findViewById(R.id.browserMenuHighlight) }
     internal val cookieDummyView: View by lazy { findViewById(R.id.cookieDummyView) }
@@ -232,7 +223,6 @@ open class OmnibarLayout @JvmOverloads constructor(
     }
     internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
     internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
-    internal val shieldIconExperiment: LottieAnimationView by lazy { findViewById(R.id.shieldIconExperiment) }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
@@ -241,11 +231,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     internal val fireIconImageView: ImageView by lazy { findViewById(R.id.fireIconImageView) }
     internal val placeholder: View by lazy { findViewById(R.id.placeholder) }
     internal val voiceSearchButton: ImageView by lazy { findViewById(R.id.voiceSearchButton) }
-    internal val spacer: View by lazy { findViewById(R.id.spacer) }
     internal val trackersAnimation: LottieAnimationView by lazy { findViewById(R.id.trackersAnimation) }
     internal val duckPlayerIcon: ImageView by lazy { findViewById(R.id.duckPlayerIcon) }
-    internal val spacer1X: View? by lazy { findViewById(R.id.spacer1X) }
-    internal val spacer2X: View? by lazy { findViewById(R.id.spacer2X) }
     internal val omniBarButtonTransitionSet: TransitionSet by lazy {
         TransitionSet().apply {
             ordering = TransitionSet.ORDERING_TOGETHER
@@ -278,7 +265,6 @@ open class OmnibarLayout @JvmOverloads constructor(
 
     internal fun shieldViews(): List<View> = listOf(
         shieldIcon,
-        shieldIconExperiment,
     )
 
     var isScrollingEnabled: Boolean
@@ -487,12 +473,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             }
             omnibarItemPressedListener?.onPrivacyShieldPressed()
         }
-        shieldIconExperiment.setOnClickListener {
-            if (isAttachedToWindow) {
-                viewModel.onPrivacyShieldButtonPressed()
-            }
-            omnibarItemPressedListener?.onPrivacyShieldPressed()
-        }
         clearTextButton.setOnClickListener {
             if (isAttachedToWindow) {
                 viewModel.onClearTextButtonPressed()
@@ -515,7 +495,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
 
         if (viewState.leadingIconState == PRIVACY_SHIELD) {
-            renderPrivacyShield(viewState.privacyShield, viewState.viewMode, viewState.isExperimentalThemingEnabled)
+            renderPrivacyShield(viewState.privacyShield, viewState.viewMode)
         } else {
             lastSeenPrivacyShield = null
         }
@@ -533,10 +513,6 @@ open class OmnibarLayout @JvmOverloads constructor(
                 cancelTrackersAnimation()
             }
 
-            is StartTrackersAnimation -> {
-                startTrackersAnimation(command.entities)
-            }
-
             is StartCookiesAnimation -> {
                 createCookiesAnimation(command.isCosmetic)
             }
@@ -545,16 +521,8 @@ open class OmnibarLayout @JvmOverloads constructor(
                 moveCaretToFront()
             }
 
-            is StartVisualDesignTrackersAnimation -> {
+            is StartTrackersAnimation -> {
                 startVisualDesignTrackersAnimation(command.entities)
-            }
-
-            is StartExperimentVariant1Animation -> {
-                startExperimentVariant1Animation()
-            }
-
-            is StartExperimentVariant2OrVariant3Animation -> {
-                startExperimentVariant2OrVariant3Animation(command.entities)
             }
 
             is LaunchInputScreen -> {
@@ -581,20 +549,13 @@ open class OmnibarLayout @JvmOverloads constructor(
             OmnibarLayoutViewModel.LeadingIconState.SEARCH -> {
                 searchIcon.show()
                 shieldIcon.gone()
-                shieldIconExperiment.gone()
                 daxIcon.gone()
                 globeIcon.gone()
                 duckPlayerIcon.gone()
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                if (shouldShowUpdatedPrivacyShield(viewState.isExperimentalThemingEnabled)) {
-                    shieldIcon.gone()
-                    shieldIconExperiment.show()
-                } else {
-                    shieldIcon.show()
-                    shieldIconExperiment.gone()
-                }
+                shieldIcon.show()
                 searchIcon.gone()
                 daxIcon.gone()
                 globeIcon.gone()
@@ -604,7 +565,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             OmnibarLayoutViewModel.LeadingIconState.DAX -> {
                 daxIcon.show()
                 shieldIcon.gone()
-                shieldIconExperiment.gone()
                 searchIcon.gone()
                 globeIcon.gone()
                 duckPlayerIcon.gone()
@@ -614,7 +574,6 @@ open class OmnibarLayout @JvmOverloads constructor(
                 globeIcon.show()
                 daxIcon.gone()
                 shieldIcon.gone()
-                shieldIconExperiment.gone()
                 searchIcon.gone()
                 duckPlayerIcon.gone()
             }
@@ -623,15 +582,10 @@ open class OmnibarLayout @JvmOverloads constructor(
                 globeIcon.gone()
                 daxIcon.gone()
                 shieldIcon.gone()
-                shieldIconExperiment.gone()
                 searchIcon.gone()
                 duckPlayerIcon.show()
             }
         }
-    }
-
-    private fun shouldShowUpdatedPrivacyShield(navigationBarEnabled: Boolean): Boolean {
-        return runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() } || navigationBarEnabled
     }
 
     open fun renderButtons(viewState: ViewState) {
@@ -653,26 +607,14 @@ open class OmnibarLayout @JvmOverloads constructor(
             TransitionManager.beginDelayedTransition(toolbarContainer, omniBarButtonTransitionSet)
         }
 
-        if (!newTransitionState.showVoiceSearch) {
-            clearTextButton.isInvisible = !newTransitionState.showClearButton
-            spacer1X?.isVisible = newTransitionState.showSpacer
-            spacer2X?.isVisible = false
-        } else {
-            clearTextButton.isVisible = newTransitionState.showClearButton
-            if (newTransitionState.showClearButton) {
-                spacer2X?.isVisible = newTransitionState.showSpacer
-                spacer1X?.isVisible = false
-            } else {
-                spacer1X?.isVisible = newTransitionState.showSpacer
-                spacer2X?.isVisible = false
-            }
-        }
-        voiceSearchButton.isInvisible = !newTransitionState.showVoiceSearch
+        clearTextButton.isVisible = viewState.showClearButton
+        voiceSearchButton.isVisible = viewState.showVoiceSearch
         tabsMenu.isVisible = newTransitionState.showTabsMenu
         fireIconMenu.isVisible = newTransitionState.showFireIcon
         browserMenu.isVisible = newTransitionState.showBrowserMenu
         browserMenuHighlight.isVisible = newTransitionState.showBrowserMenuHighlight
         aiChatMenu?.isVisible = newTransitionState.showChatMenu
+        aiChatDivider.isVisible = (viewState.showVoiceSearch || viewState.showClearButton) && viewState.showChatMenu
 
         if (omnibarAnimationManager.isFeatureEnabled()) {
             toolbarContainer.requestLayout()
@@ -777,10 +719,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             is DisableVoiceSearch -> {
                 viewModel.onVoiceSearchDisabled(decoration.url)
             }
-
-            is NewTabScrollingState -> {
-                viewModel.onNewTabScrollingStateChanged(decoration)
-            }
         }
     }
 
@@ -850,7 +788,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         }
     }
 
-    private fun startTrackersAnimation(events: List<Entity>?) {
+    private fun startVisualDesignTrackersAnimation(events: List<Entity>?) {
         animatorHelper.startTrackersAnimation(
             context = context,
             shieldAnimationView = shieldIcon,
@@ -860,54 +798,14 @@ open class OmnibarLayout @JvmOverloads constructor(
         )
     }
 
-    private fun startVisualDesignTrackersAnimation(events: List<Entity>?) {
-        animatorHelper.startTrackersAnimation(
-            context = context,
-            shieldAnimationView = shieldIconExperiment,
-            trackersAnimationView = trackersAnimation,
-            omnibarViews = omnibarViews(),
-            entities = events,
-            visualDesignExperimentEnabled = true,
-        )
-    }
-
-    private fun startExperimentVariant1Animation() {
-        if (this::animatorHelper.isInitialized) {
-            animatorHelper.startExperimentVariant1Animation(
-                context = context,
-                shieldAnimationView = shieldIcon,
-                omnibarViews = omnibarViews(),
-            )
-        }
-    }
-
-    private fun startExperimentVariant2OrVariant3Animation(events: List<Entity>?) {
-        if (this::animatorHelper.isInitialized) {
-            val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
-            val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
-
-            animatorHelper.startExperimentVariant2OrVariant3Animation(
-                context = context,
-                shieldAnimationView = shieldIconExperiment,
-                trackersBlockedAnimationView = trackersBlockedAnimation,
-                trackersBlockedCountAnimationView = trackersBlockedCountAnimation,
-                omnibarViews = omnibarViews(),
-                shieldViews = shieldViews(),
-                entities = events,
-            )
-        }
-    }
-
     private fun renderPrivacyShield(
         privacyShield: PrivacyShield,
         viewMode: ViewMode,
-        navigationBarEnabled: Boolean,
     ) {
         renderIfChanged(privacyShield, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShield
             val shieldIconView = if (viewMode is ViewMode.Browser) {
-                val isExperimentEnabled = shouldShowUpdatedPrivacyShield(navigationBarEnabled)
-                if (isExperimentEnabled) shieldIconExperiment else shieldIcon
+                shieldIcon
             } else {
                 customTabToolbarContainer.customTabShieldIcon
             }

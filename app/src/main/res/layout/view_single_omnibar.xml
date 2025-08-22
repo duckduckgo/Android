@@ -40,7 +40,7 @@
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/experimentalToolbarSize"
+                android:layout_height="@dimen/toolbarSize"
                 android:clipChildren="false"
                 app:contentInsetEnd="0dp"
                 app:contentInsetStart="0dp"
@@ -54,10 +54,10 @@
                     android:id="@+id/omniBarContainerShadow"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginStart="@dimen/experimentalOmnibarCardMarginHorizontal"
-                    android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
-                    android:layout_marginEnd="@dimen/experimentalOmnibarCardMarginEnd"
-                    android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
+                    android:layout_marginStart="@dimen/omnibarCardMarginHorizontal"
+                    android:layout_marginTop="@dimen/omnibarCardMarginTop"
+                    android:layout_marginEnd="@dimen/omnibarCardMarginEnd"
+                    android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
                     app:cardCornerRadius="@dimen/largeShapeCornerRadius">
 
                     <com.google.android.material.card.MaterialCardView
@@ -67,7 +67,7 @@
                         android:layout_height="match_parent"
                         app:cardElevation="0dp"
                         app:strokeColor="?daxColorAccentBlue"
-                        app:strokeWidth="@dimen/experimentalOmnibarOutlineWidth">
+                        app:strokeWidth="@dimen/omnibarOutlineWidth">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:id="@+id/omniBarContentContainer"
@@ -105,15 +105,6 @@
 
                             <com.airbnb.lottie.LottieAnimationView
                                 android:id="@+id/shieldIcon"
-                                android:layout_width="wrap_content"
-                                android:layout_height="match_parent"
-                                android:importantForAccessibility="no"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="@id/omniBarContentContainer"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <com.airbnb.lottie.LottieAnimationView
-                                android:id="@+id/shieldIconExperiment"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent"
                                 android:importantForAccessibility="no"
@@ -286,15 +277,6 @@
                                     tools:visibility="visible" />
 
                                 <View
-                                    android:id="@+id/spacer"
-                                    android:layout_width="5dp"
-                                    android:layout_height="0dp"
-                                    android:importantForAccessibility="no"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@id/verticalDivider"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <View
                                     android:id="@+id/verticalDivider"
                                     android:layout_width="1dp"
                                     android:layout_height="20dp"
@@ -341,7 +323,7 @@
 
                         <include
                             android:id="@+id/findInPage"
-                            layout="@layout/include_fade_omnibar_find_in_page"
+                            layout="@layout/include_find_in_page"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:visibility="gone" />
@@ -356,8 +338,8 @@
                 android:id="@+id/shieldIconPulseAnimationContainer"
                 android:layout_width="74dp"
                 android:layout_height="match_parent"
-                android:paddingTop="@dimen/experimentalOmnibarCardMarginTop"
-                android:paddingBottom="@dimen/experimentalOmnibarCardMarginBottom"
+                android:paddingTop="@dimen/omnibarCardMarginTop"
+                android:paddingBottom="@dimen/omnibarCardMarginBottom"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -381,7 +363,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/customTabToolbarContainerWrapper"
                 android:layout_width="0dp"
-                android:layout_height="@dimen/experimentalToolbarSize"
+                android:layout_height="@dimen/toolbarSize"
                 android:layout_marginHorizontal="@dimen/keyline_2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/iconsContainer"
@@ -401,9 +383,9 @@
                 android:id="@+id/iconsContainer"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/toolbarIcon"
-                android:layout_marginTop="@dimen/experimentalOmnibarCardMarginTop"
+                android:layout_marginTop="@dimen/omnibarCardMarginTop"
                 android:layout_marginEnd="@dimen/keyline_1"
-                android:layout_marginBottom="@dimen/experimentalOmnibarCardMarginBottom"
+                android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/toolbar"
@@ -470,7 +452,7 @@
                 </FrameLayout>
 
                 <Space
-                    android:layout_width="@dimen/experimentalOmnibarCardExtendedMarginEnd"
+                    android:layout_width="@dimen/omnibarCardExtendedMarginEnd"
                     android:layout_height="match_parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

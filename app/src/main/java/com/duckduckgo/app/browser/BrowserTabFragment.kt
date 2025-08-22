@@ -107,7 +107,6 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -151,8 +150,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarItemPressedListener
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarTypeResolver
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
@@ -249,7 +246,6 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.store.BrowserAppTheme
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.DaxDialog
@@ -348,7 +344,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
@@ -564,19 +559,10 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
-
-    @Inject
-    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
-
-    @Inject
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
-
-    @Inject
-    lateinit var omnibarTypeResolver: OmnibarTypeResolver
 
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
@@ -888,28 +874,6 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private fun showTrackersExperimentShieldPopAnimation() {
-        experimentTrackersAnimationHelper.startShieldPopAnimation(
-            omnibarShieldAnimationView = omnibar.shieldIconExperiment,
-            trackersCountAndBlockedViews = if (omnibar.omnibarPosition == TOP) {
-                listOf(
-                    binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
-                    binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
-                )
-            } else {
-                listOf(
-                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-                    binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
-                )
-            },
-            omnibarTextInput = if (omnibar.omnibarPosition == TOP) {
-                binding.newOmnibar.omnibarTextInput
-            } else {
-                binding.newOmnibarBottom.omnibarTextInput
-            },
-        )
-    }
-
     private val inputScreenLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val data = result.data ?: return@registerForActivityResult
 
@@ -1008,14 +972,7 @@ class BrowserTabFragment :
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        val omnibarType = omnibarTypeResolver.getOmnibarType()
-        omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarType, binding)
-
-        if (omnibarType == OmnibarType.SINGLE) {
-            lifecycleScope.launch {
-                experimentalThemingDataStore.countSingleOmnibarUser()
-            }
-        }
+        omnibar = Omnibar(settingsDataStore.omnibarPosition, binding)
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -1389,11 +1346,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
-                omnibar.shieldIconExperiment
-            } else {
-                omnibar.shieldIcon
-            },
+            anchor = omnibar.shieldIcon,
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
@@ -1434,8 +1387,7 @@ class BrowserTabFragment :
         }
 
         val hasOmnibarPositionChanged = viewModel.hasOmnibarPositionChanged(omnibar.omnibarPosition)
-        val hasOmnibarTypeChanged = omnibar.omnibarType != omnibarTypeResolver.getOmnibarType()
-        if (hasOmnibarPositionChanged || hasOmnibarTypeChanged) {
+        if (hasOmnibarPositionChanged) {
             viewModel.resetTrackersCount()
             if (swipingTabsFeature.isEnabled && requireActivity() is BrowserActivity) {
                 (requireActivity() as BrowserActivity).clearTabsAndRecreate()
@@ -1464,7 +1416,6 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
-        experimentTrackersAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -2205,7 +2156,6 @@ class BrowserTabFragment :
                 browserActivity?.launchBookmarks()
             }
 
-            is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
@@ -2817,7 +2767,6 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             ),
         )
     }
@@ -2827,13 +2776,6 @@ class BrowserTabFragment :
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
-
-            // Check if it can scroll up
-            val canScrollUp = v.canScrollVertically(-1)
-            val canScrollDown = v.canScrollVertically(1)
-            val topOfPage = scrollY == 0
-
-            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 
@@ -2951,7 +2893,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onTrackersCountFinished() {
-                    viewModel.onAnimationFinished()
+                    // no-op
                 }
             },
         )

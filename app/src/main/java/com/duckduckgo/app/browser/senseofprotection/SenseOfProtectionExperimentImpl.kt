@@ -22,7 +22,6 @@ import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionToggles.Coh
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.UserBrowserProperties
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.MetricsPixel
@@ -32,7 +31,6 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import logcat.logcat
 
 private const val EXISTING_USER_DAY_COUNT_THRESHOLD = 28
 
@@ -59,7 +57,6 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
     private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
 
@@ -75,7 +72,8 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private suspend fun canBeEnrolledInExistingUserExperiment(): Boolean {
-        return !isEnrolledInNewUserExperiment() && !seesNewVisualDesign()
+        // return !isEnrolledInNewUserExperiment()
+        return false // the experiment was only compatible with the old app design which is now fully replaced
     }
 
     override suspend fun enrolUserInNewExperimentIfEligible(): Boolean {
@@ -87,20 +85,24 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun canBeEnrolledInNewUserExperiment(): Boolean {
-        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) && !seesNewVisualDesign()
+        // return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD)
+        return false // the experiment was only compatible with the old app design which is now fully replaced
     }
 
     override suspend fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
-        getNewUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isNewUserExperimentEnabled(MODIFIED_CONTROL) ||
-            getExistingUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isExistingUserExperimentEnabled(MODIFIED_CONTROL)
+        // getNewUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isNewUserExperimentEnabled(MODIFIED_CONTROL) ||
+        //     getExistingUserExperimentCohortName() == MODIFIED_CONTROL.cohortName && isExistingUserExperimentEnabled(MODIFIED_CONTROL)
+        false // the experiment was only compatible with the old app design which is now fully replaced
 
     override suspend fun isUserEnrolledInVariant1CohortAndExperimentEnabled(): Boolean =
-        getNewUserExperimentCohortName() == VARIANT_1.cohortName && isNewUserExperimentEnabled(VARIANT_1) ||
-            getExistingUserExperimentCohortName() == VARIANT_1.cohortName && isExistingUserExperimentEnabled(VARIANT_1)
+        // getNewUserExperimentCohortName() == VARIANT_1.cohortName && isNewUserExperimentEnabled(VARIANT_1) ||
+        //     getExistingUserExperimentCohortName() == VARIANT_1.cohortName && isExistingUserExperimentEnabled(VARIANT_1)
+        false // the experiment was only compatible with the old app design which is now fully replaced
 
     override suspend fun isUserEnrolledInVariant2CohortAndExperimentEnabled(): Boolean =
-        getNewUserExperimentCohortName() == VARIANT_2.cohortName && isNewUserExperimentEnabled(VARIANT_2) ||
-            getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
+        // getNewUserExperimentCohortName() == VARIANT_2.cohortName && isNewUserExperimentEnabled(VARIANT_2) ||
+        //     getExistingUserExperimentCohortName() == VARIANT_2.cohortName && isExistingUserExperimentEnabled(VARIANT_2)
+        false // the experiment was only compatible with the old app design which is now fully replaced
 
     override suspend fun shouldShowNewPrivacyShield(): Boolean {
         return isUserEnrolledInVariant1CohortAndExperimentEnabled() || isUserEnrolledInVariant2CohortAndExperimentEnabled()
@@ -206,11 +208,5 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
-    }
-
-    private fun seesNewVisualDesign(): Boolean {
-        val seesNewVisualDesign = experimentalThemingDataStore.isSingleOmnibarEnabled.value
-        logcat { "VisualDesign: seesNewVisualDesign $seesNewVisualDesign" }
-        return seesNewVisualDesign
     }
 }
