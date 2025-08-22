@@ -20,7 +20,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Process
 import android.widget.Toast
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,10 +32,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.pir.impl.PirConstants.NOTIF_ID_STATUS_COMPLETE
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirRemoteWorkerService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
@@ -67,7 +66,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
     lateinit var dispatcherProvider: DispatcherProvider
 
     @Inject
-    lateinit var notificationManagerCompat: NotificationManagerCompat
+    lateinit var pirNotificationManager: PirNotificationManager
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -125,7 +124,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     private fun setupViews() {
         binding.debugRunScan.setOnClickListener {
-            notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+            pirNotificationManager.cancelNotifications()
             logcat { "PIR-SCAN: Attempting to start PirForegroundScanService from ${Process.myPid()}" }
             lifecycleScope.launch {
                 if (useUserInput()) {
@@ -198,7 +197,7 @@ class PirDevScanActivity : DuckDuckGoActivity() {
 
     private fun killRunningWork() {
         stopService(Intent(this, PirForegroundScanService::class.java))
-        notificationManagerCompat.cancel(NOTIF_ID_STATUS_COMPLETE)
+        pirNotificationManager.cancelNotifications()
         stopService(Intent(this, PirRemoteWorkerService::class.java))
         pirScanScheduler.cancelScheduledScans(this)
     }
