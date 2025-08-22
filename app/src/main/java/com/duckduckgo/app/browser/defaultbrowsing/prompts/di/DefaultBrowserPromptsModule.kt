@@ -32,7 +32,7 @@ import javax.inject.Qualifier
 object DefaultBrowserPromptsModule {
 
     private val Context.defaultBrowserPromptsDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "default_browser_prompts",
+        name = "default_browser_prompts_datastore",
     )
 
     @Provides
