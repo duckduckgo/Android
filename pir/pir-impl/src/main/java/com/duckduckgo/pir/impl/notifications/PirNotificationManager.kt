@@ -16,26 +16,36 @@
 
 package com.duckduckgo.pir.impl.notifications
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
-import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.impl.notifications.PirNotificationManager.Companion.PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID
-import com.squareup.anvil.annotations.ContributesBinding
+import android.content.Intent
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
+import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
 import javax.inject.Inject
 
 interface PirNotificationManager {
     fun createNotificationChannel()
+    fun showScanStatusNotification(
+        title: String,
+        message: String,
+    )
 
-    companion object {
-        const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pir.PirNotificationChannel"
-        const val PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE = 987
-    }
+    fun createScanStatusNotification(
+        title: String,
+        message: String,
+    ): Notification
+
+    fun cancelNotifications()
 }
 
-@ContributesBinding(ActivityScope::class)
 class RealPirNotificationManager @Inject constructor(
     private val context: Context,
+    private val notificationManagerCompat: NotificationManagerCompat,
 ) : PirNotificationManager {
 
     override fun createNotificationChannel() {
@@ -54,8 +64,52 @@ class RealPirNotificationManager @Inject constructor(
         notificationManager?.createNotificationChannel(channel)
     }
 
+    override fun showScanStatusNotification(
+        title: String,
+        message: String,
+    ) {
+        notificationManagerCompat.checkPermissionAndNotify(
+            context,
+            PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE,
+            createScanStatusNotification(
+                title = title,
+                message = message,
+            ),
+        )
+    }
+
+    override fun createScanStatusNotification(
+        title: String,
+        message: String,
+    ): Notification {
+        val notificationIntent = Intent(
+            context,
+            PirDashboardWebViewActivity::class.java,
+        )
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            notificationIntent,
+            PendingIntent.FLAG_IMMUTABLE,
+        )
+
+        return NotificationCompat.Builder(context, PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
+            .setContentIntent(pendingIntent)
+            .build()
+    }
+
+    override fun cancelNotifications() {
+        notificationManagerCompat.cancel(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
+    }
+
     companion object {
         private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_NAME = "Personal Information Removal Status"
         private const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_DESCRIPTION = "Status updates for Personal Information Removal"
+
+        const val PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pir.PirNotificationChannel"
+        const val PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE = 987
     }
 }

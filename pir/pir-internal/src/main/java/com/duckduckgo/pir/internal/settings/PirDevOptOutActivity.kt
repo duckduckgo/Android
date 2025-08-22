@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -50,7 +49,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
-    lateinit var notificationManagerCompat: NotificationManagerCompat
+    lateinit var pirNotificationManager: PirNotificationManager
 
     @Inject
     lateinit var eventsRepository: PirEventsRepository
@@ -78,7 +77,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
         binding.optOutList.adapter = optOutAdapter
         binding.optOut.setOnClickListener {
             if (selectedBroker != null) {
-                notificationManagerCompat.cancel(PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
+                pirNotificationManager.cancelNotifications()
                 Intent(this, PirForegroundOptOutService::class.java).apply {
                     putExtra(EXTRA_BROKER_TO_OPT_OUT, selectedBroker)
                 }.also {
@@ -88,7 +87,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
         }
 
         binding.optOutDebug.setOnClickListener {
-            notificationManagerCompat.cancel(PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
+            pirNotificationManager.cancelNotifications()
             if (selectedBroker != null) {
                 globalActivityStarter.start(
                     this,
@@ -102,7 +101,7 @@ class PirDevOptOutActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 eventsRepository.deleteAllOptOutData()
             }
-            notificationManagerCompat.cancel(PirNotificationManager.PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
+            pirNotificationManager.cancelNotifications()
         }
 
         binding.viewResults.setOnClickListener {
