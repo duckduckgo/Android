@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
@@ -49,6 +50,7 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
     private val scanScheduler: PirScanScheduler,
+    private val currentTimeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
 
@@ -72,8 +74,8 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val profiles = pirWebOnboardingStateHolder.toUserProfiles()
-            if (!repository.saveUserProfiles(profiles)) {
+            val profileQueries = pirWebOnboardingStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
+            if (!repository.saveProfileQueries(profileQueries)) {
                 logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: failed to save all user profiles" }
                 jsMessaging.sendResponse(
                     jsMessage = jsMessage,

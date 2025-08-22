@@ -38,6 +38,7 @@ import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
 import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
+import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import java.util.concurrent.TimeUnit
@@ -122,9 +123,9 @@ interface PirRepository {
 
     suspend fun deleteAllUserProfilesQueries()
 
-    suspend fun replaceUserProfile(userProfile: UserProfile)
+    suspend fun replaceUserProfile(profileQuery: ProfileQuery)
 
-    suspend fun saveUserProfiles(userProfiles: List<UserProfile>): Boolean
+    suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -429,15 +430,18 @@ internal class RealPirRepository(
         )
     }
 
-    override suspend fun replaceUserProfile(userProfile: UserProfile) {
+    override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
-            userProfileDao.insertUserProfile(userProfile)
+            userProfileDao.insertUserProfile(profileQuery.toUserProfile())
         }
     }
 
-    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>): Boolean =
+    override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
         withContext(dispatcherProvider.io()) {
+            val userProfiles = profileQueries.map { query ->
+                query.toUserProfile()
+            }
             val insertResult = userProfileDao.insertUserProfiles(userProfiles)
             insertResult.size == userProfiles.size
         }
@@ -505,6 +509,21 @@ internal class RealPirRepository(
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
+        )
+    }
+
+    private fun ProfileQuery.toUserProfile(): UserProfile {
+        return UserProfile(
+            userName = UserName(
+                firstName = this.firstName,
+                lastName = this.lastName,
+                middleName = this.middleName,
+            ),
+            addresses = com.duckduckgo.pir.impl.store.db.Address(
+                city = this.city,
+                state = this.state,
+            ),
+            birthYear = this.birthYear,
         )
     }
 }

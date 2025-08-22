@@ -17,21 +17,20 @@
 package com.duckduckgo.pir.impl.dashboard.state
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.impl.store.db.Address
-import com.duckduckgo.pir.impl.store.db.UserName
-import com.duckduckgo.pir.impl.store.db.UserProfile
+import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.ProfileQuery
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
 @SingleInstanceIn(ActivityScope::class)
 class PirWebOnboardingStateHolder @Inject constructor() {
 
-    private val names: MutableList<UserName> = mutableListOf()
+    private val names: MutableList<Name> = mutableListOf()
     private val addresses: MutableList<Address> = mutableListOf()
-    private var birthYear: Int? = null
+    private var birthYear: Int = 0
 
     val isProfileComplete: Boolean
-        get() = names.isNotEmpty() && addresses.isNotEmpty() && (birthYear ?: 0) > 0
+        get() = names.isNotEmpty() && addresses.isNotEmpty() && birthYear > 0
 
     fun addAddress(
         city: String,
@@ -53,7 +52,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
             return false
         }
         names.add(
-            UserName(
+            Name(
                 firstName = firstName,
                 lastName = lastName,
                 middleName = middleName,
@@ -82,7 +81,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
             return false
         }
 
-        names[index] = UserName(
+        names[index] = Name(
             firstName = firstName,
             lastName = lastName,
             middleName = middleName,
@@ -124,15 +123,25 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return false
     }
 
-    fun toUserProfiles(): List<UserProfile> {
-        val profiles = mutableListOf<UserProfile>()
+    fun toProfileQueries(currentYear: Int): List<ProfileQuery> {
+        val profiles = mutableListOf<ProfileQuery>()
         names.forEach { name ->
             addresses.forEach { address ->
                 profiles.add(
-                    UserProfile(
-                        userName = name,
-                        birthYear = birthYear ?: 0,
-                        addresses = address,
+                    ProfileQuery(
+                        id = 0, // ID is auto-generated in the database
+                        firstName = name.firstName,
+                        lastName = name.lastName,
+                        middleName = name.middleName,
+                        city = address.city,
+                        state = address.state,
+                        addresses = listOf(address),
+                        birthYear = birthYear,
+                        fullName = name.middleName?.let { middleName ->
+                            "${name.firstName} $middleName ${name.lastName}"
+                        } ?: "${name.firstName} ${name.lastName}",
+                        age = currentYear - birthYear,
+                        deprecated = false,
                     ),
                 )
             }
@@ -143,6 +152,12 @@ class PirWebOnboardingStateHolder @Inject constructor() {
     fun clear() {
         names.clear()
         addresses.clear()
-        birthYear = null
+        birthYear = 0
     }
+
+    private data class Name(
+        val firstName: String,
+        val lastName: String,
+        val middleName: String? = null,
+    )
 }
