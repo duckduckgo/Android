@@ -31,6 +31,7 @@ import com.duckduckgo.common.ui.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
 import com.duckduckgo.mobile.android.R
 
+// todo lp - once I remove this, make sure that the pref doesn't reset for users
 enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,

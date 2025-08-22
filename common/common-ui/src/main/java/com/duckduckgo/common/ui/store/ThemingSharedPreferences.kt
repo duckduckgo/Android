@@ -26,7 +26,6 @@ import javax.inject.Inject
 
 class ThemingSharedPreferences @Inject constructor(
     private val context: Context,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : ThemingDataStore {
 
     private val themePrefMapper = ThemePrefsMapper()
@@ -45,7 +44,6 @@ class ThemingSharedPreferences @Inject constructor(
             savedValue,
             DuckDuckGoTheme.SYSTEM_DEFAULT,
             context.isInNightMode(),
-            experimentalThemingDataStore.isSingleOmnibarEnabled.value,
         )
     }
 
@@ -70,31 +68,17 @@ class ThemingSharedPreferences @Inject constructor(
             value: String?,
             defValue: DuckDuckGoTheme,
             isInNightMode: Boolean,
-            isNewDesignEnabled: Boolean,
         ) =
             when (value) {
-                THEME_LIGHT -> if (isNewDesignEnabled) {
-                    DuckDuckGoTheme.EXPERIMENT_LIGHT
-                } else {
-                    DuckDuckGoTheme.LIGHT
-                }
+                THEME_LIGHT -> DuckDuckGoTheme.EXPERIMENT_LIGHT // todo lp - rename
 
-                THEME_DARK -> if (isNewDesignEnabled) {
+                THEME_DARK -> DuckDuckGoTheme.EXPERIMENT_DARK
+
+                else -> if (isInNightMode) {
                     DuckDuckGoTheme.EXPERIMENT_DARK
                 } else {
-                    DuckDuckGoTheme.DARK
+                    DuckDuckGoTheme.EXPERIMENT_LIGHT
                 }
-
-                else ->
-                    if (isNewDesignEnabled) {
-                        if (isInNightMode) {
-                            DuckDuckGoTheme.EXPERIMENT_DARK
-                        } else {
-                            DuckDuckGoTheme.EXPERIMENT_LIGHT
-                        }
-                    } else {
-                        DuckDuckGoTheme.SYSTEM_DEFAULT
-                    }
             }
     }
 
