@@ -25,7 +25,9 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
+import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
 interface PirNotificationManager {
@@ -43,6 +45,7 @@ interface PirNotificationManager {
     fun cancelNotifications()
 }
 
+@ContributesBinding(AppScope::class)
 class RealPirNotificationManager @Inject constructor(
     private val context: Context,
     private val notificationManagerCompat: NotificationManagerCompat,

@@ -17,7 +17,6 @@
 package com.duckduckgo.pir.impl.di
 
 import android.content.Context
-import androidx.core.app.NotificationManagerCompat
 import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -31,8 +30,6 @@ import com.duckduckgo.pir.impl.common.RealNativeBrokerActionHandler
 import com.duckduckgo.pir.impl.common.actions.EventHandler
 import com.duckduckgo.pir.impl.common.actions.PirActionsRunnerStateEngineFactory
 import com.duckduckgo.pir.impl.common.actions.RealPirActionsRunnerStateEngineFactory
-import com.duckduckgo.pir.impl.notifications.PirNotificationManager
-import com.duckduckgo.pir.impl.notifications.RealPirNotificationManager
 import com.duckduckgo.pir.impl.scripts.BrokerActionProcessor
 import com.duckduckgo.pir.impl.scripts.PirMessagingInterface
 import com.duckduckgo.pir.impl.scripts.RealBrokerActionProcessor
@@ -170,17 +167,6 @@ class PirModule {
             eventHandlers,
             dispatcherProvider,
             coroutineScope,
-        )
-    }
-
-    @Provides
-    fun providePirNotificationManager(
-        context: Context,
-        notificationManagerCompat: NotificationManagerCompat,
-    ): PirNotificationManager {
-        return RealPirNotificationManager(
-            context,
-            notificationManagerCompat,
         )
     }
 }
