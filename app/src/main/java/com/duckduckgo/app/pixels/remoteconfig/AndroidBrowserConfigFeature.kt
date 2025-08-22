@@ -128,14 +128,6 @@ interface AndroidBrowserConfigFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun glideSuspend(): Toggle
 
-    /**
-     * @return `true` when the remote config has the global "omnibarAnimation" androidBrowserConfig
-     * sub-feature flag enabled
-     * If the remote feature is not present defaults to `false`
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun omnibarAnimation(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun storeFaviconSuspend(): Toggle
 
