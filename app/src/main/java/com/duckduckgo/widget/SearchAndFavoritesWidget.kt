@@ -104,7 +104,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onUpdate" }
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
@@ -119,7 +119,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
@@ -172,7 +172,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             )
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
-// TODO: can this be moved to io?
+
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)

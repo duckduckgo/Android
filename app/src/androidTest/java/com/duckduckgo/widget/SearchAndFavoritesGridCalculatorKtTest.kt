@@ -57,8 +57,8 @@ class SearchAndFavoritesGridCalculatorKtTest {
                     TestCase(3, 280),
                     TestCase(4, 348),
                     TestCase(5, 416),
-                    TestCase(5, 484),
-                    TestCase(6, 552),
+                    TestCase(6, 484),
+                    TestCase(7, 552),
                 )
             }
         }
