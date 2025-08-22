@@ -35,19 +35,15 @@ import org.mockito.kotlin.whenever
 
 class LottiePrivacyShieldAnimationHelperTest {
 
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
-
     private val browserViewMode = Omnibar.ViewMode.Browser("cnn.com")
     private val customTabViewMode = Omnibar.ViewMode.CustomTab(0, "cnn.com", "cnn.com")
 
     @Test
     fun whenLightModeAndPrivacyShieldProtectedThenSetLightShieldAnimation() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode)
 
@@ -56,12 +52,10 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Test
     fun whenDarkModeAndPrivacyShieldProtectedThenSetDarkShieldAnimation() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, browserViewMode)
 
@@ -70,12 +64,10 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Test
     fun whenLightModeAndPrivacyShieldUnProtectedThenUseLightAnimation() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, browserViewMode)
 
@@ -85,12 +77,10 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Test
     fun whenDarkModeAndPrivacyShieldUnProtectedThenUseDarkAnimation() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, browserViewMode)
 
@@ -100,12 +90,10 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Test
     fun whenLightModeAndPrivacyShieldMaliciousThenUseLightAnimation() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, MALICIOUS, browserViewMode)
 
@@ -115,12 +103,10 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @Test
     fun whenDarkModeAndPrivacyShieldMaliciousThenUseDarkAnimation() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, MALICIOUS, browserViewMode)
 
@@ -130,95 +116,12 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
-
-        testee.setAnimationView(holder, PROTECTED, browserViewMode)
-
-        verify(holder).setAnimation(R.raw.protected_shield_experiment)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenLightModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
-
-        testee.setAnimationView(holder, UNPROTECTED, browserViewMode)
-
-        verify(holder).setAnimation(R.raw.unprotected_shield_experiment)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenDarkModeAndProtectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
-
-        testee.setAnimationView(holder, PROTECTED, browserViewMode)
-
-        verify(holder).setAnimation(R.raw.protected_shield_experiment)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenDarkModeAndUnprotectedAndSelfEnabledAndShouldShowNewShieldThenUseExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(true)
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(false)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
-
-        testee.setAnimationView(holder, UNPROTECTED, browserViewMode)
-
-        verify(holder).setAnimation(R.raw.unprotected_shield_experiment_dark)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenLightModeAndProtectedAndSelfEnabledAndShouldShowNotNewShieldThenUseNonExperimentAssets() = runTest {
-        whenever(senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(false)
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
-        val holder: LottieAnimationView = mock()
-        val appTheme: AppTheme = mock()
-        whenever(appTheme.isLightModeEnabled()).thenReturn(true)
-
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
-
-        testee.setAnimationView(holder, PROTECTED, browserViewMode)
-
-        verify(holder).setAnimation(R.raw.protected_shield)
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
     fun whenLightModeAndProtectedAndCustomTabViewModeThenUseCustomTabAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode)
 
@@ -228,13 +131,11 @@ class LottiePrivacyShieldAnimationHelperTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenDarkModeAndProtectedAndCustomTabViewModeThenUseCustomTabAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode)
 
@@ -244,13 +145,11 @@ class LottiePrivacyShieldAnimationHelperTest {
     @SuppressLint("DenyListedApi")
     @Test
     fun whenLightModeAndUnprotectedAndCustomTabViewModeThenUseVisualUpdatesAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, customTabViewMode)
 
@@ -259,14 +158,12 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndUnprotectedAndCustomTabViewModeAndExperimentDisabledThenUseDefaultAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
+    fun whenDarkModeAndUnprotectedAndCustomTabViewModeThenUseDefaultAssets() = runTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, UNPROTECTED, customTabViewMode)
 
@@ -275,14 +172,12 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenLightModeAndProtectedAndCustomTabViewModeAndExperimentDisabledThenUseDefaultAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
+    fun whenLightModeAndProtectedAndCustomTabViewModeThenUseDefaultAssets() = runTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(true)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode)
 
@@ -291,14 +186,12 @@ class LottiePrivacyShieldAnimationHelperTest {
 
     @SuppressLint("DenyListedApi")
     @Test
-    fun whenDarkModeAndProtectedAndCustomTabViewModeAndExperimentDisabledThenUseDefaultAssets() = runTest {
-        whenever(senseOfProtectionExperiment.shouldShowNewPrivacyShield()).thenReturn(false)
-
+    fun whenDarkModeAndProtectedAndCustomTabViewModeThenUseDefaultAssets() = runTest {
         val holder: LottieAnimationView = mock()
         val appTheme: AppTheme = mock()
         whenever(appTheme.isLightModeEnabled()).thenReturn(false)
 
-        val testee = LottiePrivacyShieldAnimationHelper(appTheme, senseOfProtectionExperiment)
+        val testee = LottiePrivacyShieldAnimationHelper(appTheme)
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode)
 

@@ -159,7 +159,6 @@ import com.duckduckgo.app.browser.commands.Command.ShowVideoCamera
 import com.duckduckgo.app.browser.commands.Command.ShowWarningMaliciousSite
 import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
-import com.duckduckgo.app.browser.commands.Command.StartTrackersExperimentShieldPopAnimation
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
@@ -4241,14 +4240,6 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun launchBookmarksActivity() {
         command.value = LaunchBookmarksActivity
-    }
-
-    fun onAnimationFinished() {
-        viewModelScope.launch {
-            if (senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()) {
-                command.value = StartTrackersExperimentShieldPopAnimation
-            }
-        }
     }
 
     fun trackersCount(): String = site?.trackerCount?.takeIf { it > 0 }?.toString() ?: ""

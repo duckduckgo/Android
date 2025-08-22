@@ -6449,15 +6449,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
-
-        testee.onAnimationFinished()
-
-        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
-    }
-
-    @Test
     fun whenOpenDuckChatWithNonEmptyQueryThenOpenWithAutoPrompt() = runTest {
         val query = "example"
 

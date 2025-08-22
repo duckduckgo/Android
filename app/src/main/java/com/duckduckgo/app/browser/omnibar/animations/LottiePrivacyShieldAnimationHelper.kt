@@ -37,7 +37,6 @@ import logcat.logcat
 @SingleInstanceIn(AppScope::class)
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -47,24 +46,15 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
     ) {
         val protectedShield: Int
         val protectedShieldDark: Int
-        val unprotectedShield: Int
-        val unprotectedShieldDark: Int
-        if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
-            protectedShield = R.raw.protected_shield_experiment
-            protectedShieldDark = R.raw.protected_shield_experiment
-            unprotectedShield = R.raw.unprotected_shield_experiment
-            unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
-        } else {
-            if (viewMode is Omnibar.ViewMode.CustomTab) {
+        if (viewMode is Omnibar.ViewMode.CustomTab) {
                 protectedShield = R.raw.protected_shield_custom_tab
                 protectedShieldDark = R.raw.dark_protected_shield_custom_tab
             } else {
                 protectedShield = R.raw.protected_shield
                 protectedShieldDark = R.raw.dark_protected_shield
             }
-            unprotectedShield = R.raw.unprotected_shield
-            unprotectedShieldDark = R.raw.dark_unprotected_shield
-        }
+        val unprotectedShield: Int = R.raw.unprotected_shield
+        val unprotectedShieldDark: Int = R.raw.dark_unprotected_shield
 
         val currentAnimation = holder.tag as? Int
         val newAnimation = when (privacyShield) {

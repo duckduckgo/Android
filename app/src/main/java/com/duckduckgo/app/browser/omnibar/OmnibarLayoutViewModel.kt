@@ -179,8 +179,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         data object CancelAnimations : Command()
         data class StartVisualDesignTrackersAnimation(val entities: List<Entity>?) : Command() // todo lp - rename to StartTrackersAnimation?
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
-        data object StartExperimentVariant1Animation : Command()
-        data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
     }
@@ -697,23 +695,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                             )
                         }
                         viewModelScope.launch {
-                            when {
-                                senseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled() -> {
-                                    command.send(Command.StartExperimentVariant1Animation)
-                                }
-
-                                senseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled() -> {
-                                    command.send(
-                                        Command.StartExperimentVariant2OrVariant3Animation(decoration.entities),
-                                    )
-                                }
-
-                                else -> {
-                                    command.send(
-                                        Command.StartVisualDesignTrackersAnimation(decoration.entities)
-                                    )
-                                }
-                            }
+                            command.send(
+                                Command.StartVisualDesignTrackersAnimation(decoration.entities)
+                            )
                         }
                     }
                 }

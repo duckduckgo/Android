@@ -277,7 +277,6 @@ sealed class Command {
     data object LaunchPopupMenu : Command()
     data class ShowAutoconsentAnimation(val isCosmetic: Boolean) : Command()
     data object LaunchBookmarksActivity : Command()
-    data object StartTrackersExperimentShieldPopAnimation : Command()
     data object RefreshOmnibar : Command()
     data object LaunchInputScreen : Command()
 }

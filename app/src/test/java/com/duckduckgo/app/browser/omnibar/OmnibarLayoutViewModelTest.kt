@@ -963,41 +963,6 @@ class OmnibarLayoutViewModelTest {
         }
     }
 
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1EnabledThenStartExperimentVariant1AnimationCommandSent() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(true)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()).thenReturn(false)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant1CohortAndExperimentEnabled()).thenReturn(false)
-
-        testee.onOmnibarFocusChanged(false, SERP_URL)
-        val trackers = givenSomeTrackers()
-
-        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
-
-        testee.commands().test {
-            awaitItem().assertCommand(Command.StartExperimentVariant1Animation::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2Or3AnimationCommandSent() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
-
-        testee.onOmnibarFocusChanged(false, SERP_URL)
-        val trackers = givenSomeTrackers()
-
-        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
-
-        testee.commands().test {
-            awaitItem().assertCommand(Command.StartExperimentVariant2OrVariant3Animation::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
     @Test
     fun whenOmnibarFocusedAndAnimationPlayingThenAnimationsCanceled() = runTest {
         givenSiteLoaded(RANDOM_URL)

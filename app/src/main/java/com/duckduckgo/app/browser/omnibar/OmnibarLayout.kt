@@ -70,8 +70,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.MoveCaretToFront
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartCookiesAnimation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant1Animation
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartExperimentVariant2OrVariant3Animation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.StartVisualDesignTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.ViewState
@@ -491,14 +489,6 @@ open class OmnibarLayout @JvmOverloads constructor(
                 startVisualDesignTrackersAnimation(command.entities)
             }
 
-            is StartExperimentVariant1Animation -> {
-                startExperimentVariant1Animation()
-            }
-
-            is StartExperimentVariant2OrVariant3Animation -> {
-                startExperimentVariant2OrVariant3Animation(command.entities)
-            }
-
             is LaunchInputScreen -> {
                 omnibarInputScreenLaunchListener?.launchInputScreen(query = command.query)
             }
@@ -741,35 +731,6 @@ open class OmnibarLayout @JvmOverloads constructor(
             omnibarViews = omnibarViews(),
             entities = events,
         )
-    }
-
-    // todo lp - was this function ever called?
-    private fun startExperimentVariant1Animation() {
-        // if (this::animatorHelper.isInitialized) {
-        //     animatorHelper.startExperimentVariant1Animation(
-        //         context = context,
-        //         shieldAnimationView = shieldIcon,
-        //         omnibarViews = omnibarViews(),
-        //     )
-        // }
-    }
-
-    private fun startExperimentVariant2OrVariant3Animation(events: List<Entity>?) {
-        if (this::animatorHelper.isInitialized) {
-            // todo lp - clean up
-            // val trackersBlockedAnimation: DaxTextView = findViewById(R.id.trackersBlockedTextView)
-            // val trackersBlockedCountAnimation: DaxTextView = findViewById(R.id.trackersBlockedCountView)
-
-            // animatorHelper.startExperimentVariant2OrVariant3Animation(
-            //     context = context,
-            //     shieldAnimationView = shieldIconExperiment,
-            //     trackersBlockedAnimationView = trackersBlockedAnimation,
-            //     trackersBlockedCountAnimationView = trackersBlockedCountAnimation,
-            //     omnibarViews = omnibarViews(),
-            //     shieldViews = shieldViews(),
-            //     entities = events,
-            // )
-        }
     }
 
     private fun renderPrivacyShield(

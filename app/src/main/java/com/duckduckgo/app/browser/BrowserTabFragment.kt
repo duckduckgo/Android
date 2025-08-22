@@ -107,7 +107,6 @@ import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.animations.ExperimentTrackersAnimationHelper
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.applinks.AppLinksLauncher
@@ -561,9 +560,6 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
-
-    @Inject
     lateinit var senseOfProtectionExperiment: SenseOfProtectionExperiment
 
     @Inject
@@ -878,29 +874,6 @@ class BrowserTabFragment :
     private val jsOrientationHandler = JsOrientationHandler()
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
-
-    private fun showTrackersExperimentShieldPopAnimation() {
-        // todo lp - what to do with this function? it only used the old omnibar
-        // experimentTrackersAnimationHelper.startShieldPopAnimation(
-        //     omnibarShieldAnimationView = omnibar.shieldIconExperiment,
-        //     trackersCountAndBlockedViews = if (omnibar.omnibarPosition == TOP) {
-        //         listOf(
-        //             binding.newOmnibar.findViewById(R.id.trackersBlockedCountView),
-        //             binding.newOmnibar.findViewById(R.id.trackersBlockedTextView),
-        //         )
-        //     } else {
-        //         listOf(
-        //             binding.newOmnibarBottom.findViewById(R.id.trackersBlockedCountView),
-        //             binding.newOmnibarBottom.findViewById(R.id.trackersBlockedTextView),
-        //         )
-        //     },
-        //     omnibarTextInput = if (omnibar.omnibarPosition == TOP) {
-        //         binding.newOmnibar.omnibarTextInput
-        //     } else {
-        //         binding.newOmnibarBottom.omnibarTextInput
-        //     },
-        // )
-    }
 
     private val inputScreenLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         val data = result.data ?: return@registerForActivityResult
@@ -1374,12 +1347,7 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            // anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
-            //     omnibar.shieldIconExperiment
-            // } else {
-            //     omnibar.shieldIcon
-            // },
-            anchor = omnibar.shieldIconExperiment // todo lp - assuming this is correct becasue the sense of protection is disabled now
+            anchor = omnibar.shieldIconExperiment,
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)
@@ -1449,7 +1417,6 @@ class BrowserTabFragment :
 
     override fun onStop() {
         alertDialog?.dismiss()
-        experimentTrackersAnimationHelper.cancelAnimations()
         super.onStop()
     }
 
@@ -2190,7 +2157,6 @@ class BrowserTabFragment :
                 browserActivity?.launchBookmarks()
             }
 
-            is Command.StartTrackersExperimentShieldPopAnimation -> showTrackersExperimentShieldPopAnimation()
             is Command.RefreshOmnibar -> renderer.refreshOmnibar()
             is Command.LaunchInputScreen -> {
                 // if the fire button is used, prevent automatically launching the input screen until the process reloads
@@ -2935,7 +2901,7 @@ class BrowserTabFragment :
                 }
 
                 override fun onTrackersCountFinished() {
-                    viewModel.onAnimationFinished()
+                    // no-op
                 }
             },
         )
