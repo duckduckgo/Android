@@ -39,7 +39,6 @@ import logcat.logcat
 class LottiePrivacyShieldAnimationHelper @Inject constructor(
     private val appTheme: AppTheme,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : PrivacyShieldAnimationHelper {
 
     override fun setAnimationView(
@@ -56,19 +55,14 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             protectedShieldDark = R.raw.protected_shield_experiment
             unprotectedShield = R.raw.unprotected_shield_experiment
             unprotectedShieldDark = R.raw.unprotected_shield_experiment_dark
-        } else if (experimentalThemingDataStore.isSingleOmnibarEnabled.value) {
+        } else {
             if (viewMode is Omnibar.ViewMode.CustomTab) {
                 protectedShield = R.raw.protected_shield_custom_tab
                 protectedShieldDark = R.raw.dark_protected_shield_custom_tab
             } else {
-                protectedShield = R.raw.protected_shield_new_design
-                protectedShieldDark = R.raw.dark_protected_shield_new_design
+                protectedShield = R.raw.protected_shield
+                protectedShieldDark = R.raw.dark_protected_shield
             }
-            unprotectedShield = R.raw.unprotected_shield_visual_updates
-            unprotectedShieldDark = R.raw.dark_unprotected_shield_visual_updates
-        } else {
-            protectedShield = R.raw.protected_shield // todo lp - merge resources
-            protectedShieldDark = R.raw.dark_protected_shield
             unprotectedShield = R.raw.unprotected_shield
             unprotectedShieldDark = R.raw.dark_unprotected_shield
         }
