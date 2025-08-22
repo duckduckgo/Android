@@ -56,6 +56,10 @@ android {
     }
     namespace 'com.duckduckgo.privacy.config.internal'
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         def patchFiles = getConfigPatchFiles()
         def patchFileNames = []
