@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -200,7 +201,7 @@ class RealContentScopeScripts @Inject constructor(
     }
 
     private fun getVersionNumberKeyValuePair() = "\"versionNumber\":${appBuildConfig.versionCode}"
-    private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\"}"
+    private fun getPlatformKeyValuePair() = "\"platform\":{\"name\":\"android\",\"internal\":${appBuildConfig.isInternalBuild()}}"
     private fun getLanguageKeyValuePair() = "\"locale\":\"${Locale.getDefault().language}\""
     private fun getDesktopModeKeyValuePair(isDesktopMode: Boolean) = "\"desktopModeEnabled\":$isDesktopMode"
     private fun getSessionKeyValuePair() = "\"sessionKey\":\"${fingerprintProtectionManager.getSeed()}\""
