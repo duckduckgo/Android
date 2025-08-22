@@ -264,6 +264,8 @@ class SyncActivityViewModel @Inject constructor(
 
     fun onTurnOffSyncConfirmed(connectedDevice: ConnectedDevice) {
         viewModelScope.launch(dispatchers.io()) {
+            syncPixels.fireUserConfirmedToTurnOffSync()
+
             viewState.value = viewState.value.hideAccount()
             when (val result = syncAccountRepository.logout(connectedDevice.deviceId)) {
                 is Error -> {
