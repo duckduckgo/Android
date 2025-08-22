@@ -37,7 +37,7 @@ class FileBasedWebViewPreviewGenerator(private val dispatchers: DispatcherProvid
             disableScrollbars(webView)
             val fullSizeBitmap = createBitmap(webView)
 
-            val scaledHeight = webView.context.resources.getDimension(R.dimen.gridItemPreviewHeight).toPx()
+            val scaledHeight = webView.context.resources.getDimension(R.dimen.gridItemPreviewHeightNew).toPx()
             val scaledWidth = scaledHeight / fullSizeBitmap.height * fullSizeBitmap.width
             return scaleBitmap(fullSizeBitmap, scaledHeight.roundToInt(), scaledWidth.roundToInt())
         } finally {

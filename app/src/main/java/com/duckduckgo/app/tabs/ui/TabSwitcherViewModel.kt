@@ -100,7 +100,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
-    experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -126,7 +125,7 @@ class TabSwitcherViewModel @Inject constructor(
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
 
     val isNewDesignEnabled: Boolean by lazy {
-        tabManagerFeatureFlags.newToolbarFeature().isEnabled() && experimentalThemingDataStore.isSingleOmnibarEnabled.value
+        tabManagerFeatureFlags.newToolbarFeature().isEnabled()
     }
 
     private val _selectionViewState = MutableStateFlow(SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
