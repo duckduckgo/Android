@@ -31,7 +31,8 @@
 
         <GridView
             android:id="@+id/emptyfavoritesGrid"
-            style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid" />
+            style="@style/Widget.DuckDuckGo.SearchWidgetFavoritesGrid"
+            android:numColumns="3" />
 
         <GridView
             android:id="@+id/favoritesGrid"
