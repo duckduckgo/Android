@@ -176,17 +176,17 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     sealed class Command {
-        object SyncWithAnotherDevice : Command()
-        object AddAnotherDevice : Command()
+        data object SyncWithAnotherDevice : Command()
+        data object AddAnotherDevice : Command()
         data class DeepLinkIntoSetup(val barcodeSyncUrl: SyncBarcodeUrl) : Command()
         data class AskSetupSyncDeepLink(val syncBarcodeUrl: SyncBarcodeUrl) : Command()
-        object IntroCreateAccount : Command()
-        object IntroRecoverSyncData : Command()
-        object ShowRecoveryCode : Command()
-        object ShowDeviceConnected : Command()
+        data object IntroCreateAccount : Command()
+        data object IntroRecoverSyncData : Command()
+        data object ShowRecoveryCode : Command()
+        data object ShowDeviceConnected : Command()
         data class AskTurnOffSync(val device: ConnectedDevice) : Command()
-        object AskDeleteAccount : Command()
-        object CheckIfUserHasStoragePermission : Command()
+        data object AskDeleteAccount : Command()
+        data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class AskRemoveDevice(val device: ConnectedDevice) : Command()
         data class AskEditDevice(val device: ConnectedDevice) : Command()
@@ -195,8 +195,8 @@ class SyncActivityViewModel @Inject constructor(
             val reason: String = "",
         ) : Command()
 
-        object ShowDeviceUnsupported : Command()
-        object RequestSetupAuthentication : Command()
+        data object ShowDeviceUnsupported : Command()
+        data object RequestSetupAuthentication : Command()
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
     }
 

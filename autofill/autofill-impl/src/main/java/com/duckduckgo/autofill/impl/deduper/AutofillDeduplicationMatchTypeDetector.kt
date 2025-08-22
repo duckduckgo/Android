@@ -31,9 +31,9 @@ interface AutofillDeduplicationMatchTypeDetector {
     ): MatchType
 
     sealed interface MatchType {
-        object PerfectMatch : MatchType
-        object PartialMatch : MatchType
-        object NotAMatch : MatchType
+        data object PerfectMatch : MatchType
+        data object PartialMatch : MatchType
+        data object NotAMatch : MatchType
     }
 }
 

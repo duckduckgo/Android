@@ -138,10 +138,10 @@ sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
 }
 
 sealed class ParseFailureReason {
-    object FeatureNotSupported : ParseFailureReason()
-    object ServiceUnavailable : ParseFailureReason()
-    object DeveloperError : ParseFailureReason()
-    object ServiceDisconnected : ParseFailureReason()
-    object UnknownError : ParseFailureReason()
-    object ReferralServiceUnavailable : ParseFailureReason()
+    data object FeatureNotSupported : ParseFailureReason()
+    data object ServiceUnavailable : ParseFailureReason()
+    data object DeveloperError : ParseFailureReason()
+    data object ServiceDisconnected : ParseFailureReason()
+    data object UnknownError : ParseFailureReason()
+    data object ReferralServiceUnavailable : ParseFailureReason()
 }

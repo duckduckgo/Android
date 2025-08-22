@@ -1736,11 +1736,11 @@ sealed class HomePanelCta(
         AppPixelName.WIDGET_CTA_DISMISSED,
     )
 
-    object AddWidgetAuto : AddWidgetAutoBase()
+    data object AddWidgetAuto : AddWidgetAutoBase()
 
-    object AddWidgetAutoOnboardingExperiment : AddWidgetAutoBase()
+    data object AddWidgetAutoOnboardingExperiment : AddWidgetAutoBase()
 
-    object AddWidgetInstructions : HomePanelCta(
+    data object AddWidgetInstructions : HomePanelCta(
         CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,
         R.string.addWidgetCtaTitle,

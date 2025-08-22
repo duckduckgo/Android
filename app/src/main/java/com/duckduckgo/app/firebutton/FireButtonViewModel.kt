@@ -61,7 +61,7 @@ class FireButtonViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchFireproofWebsites : Command()
+        data object LaunchFireproofWebsites : Command()
         data class ShowClearWhatDialog(val option: ClearWhatOption) : Command()
         data class ShowClearWhenDialog(val option: ClearWhenOption) : Command()
         data class LaunchFireAnimationSettings(val animation: FireAnimation) : Command()
