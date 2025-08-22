@@ -26,6 +26,11 @@
         style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteFavicon"
         android:background="@drawable/search_widget_favorite_favicon_light_background" />
 
+    <ImageView
+        android:id="@+id/placeholderFavicon"
+        style="@style/Widget.DuckDuckGo.SearchWidgetFavoritePlaceholderFavicon"
+        android:background="@drawable/search_empty_widget_favorite_favicon_light_background" />
+
     <TextView
         android:id="@+id/quickAccessTitle"
         style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteTitle"

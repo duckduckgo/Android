@@ -518,6 +518,7 @@
     <style name="Widget.DuckDuckGo.SearchWidgetFavoriteContainer">
         <item name="android:layout_width">@dimen/searchWidgetFavoriteItemContainerWidth</item>
         <item name="android:layout_height">@dimen/searchWidgetFavoriteItemContainerHeight</item>
+        <item name="android:gravity">center</item>
         <item name="android:clipToPadding">false</item>
         <item name="android:colorBackground">@color/white</item>
     </style>
@@ -529,6 +530,15 @@
         <item name="android:layout_margin">8dp</item>
         <item name="android:padding">12dp</item>
         <item name="android:elevation">4dp</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.SearchWidgetFavoritePlaceholderFavicon">
+        <item name="android:layout_width">@dimen/searchWidgetFavoritesGridItemFavicon</item>
+        <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
+        <item name="android:layout_gravity">center_horizontal|top</item>
+        <item name="android:layout_margin">8dp</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:visibility">gone</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SearchEmptyWidgetFavoriteFavicon">
@@ -624,7 +634,7 @@
     <style name="Widget.DuckDuckGo.SearchWidgetEmptyFavoritesHintContainer">
         <item name="android:layout_marginTop">16dp</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/searchWidgetFavoritesGridItemFavicon</item>
+        <item name="android:layout_height">match_parent</item>
         <item name="android:orientation">vertical</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:visibility">invisible</item>
