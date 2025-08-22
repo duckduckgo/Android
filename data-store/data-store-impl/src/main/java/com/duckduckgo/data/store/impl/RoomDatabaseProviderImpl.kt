@@ -43,8 +43,9 @@ class RoomDatabaseProviderImpl @Inject constructor(
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory,
 ) : DatabaseProvider {
 
-    private val featureFlagEnabled: Boolean
-        get() = databaseProviderFeature.get().self().isEnabled()
+    private val featureFlagEnabled: Boolean by lazy {
+        databaseProviderFeature.get().self().isEnabled()
+    }
 
     private val defaultPoolSize = 6
     private val defaultExecutor: Executor by lazy {
