@@ -20,44 +20,21 @@ import android.content.Context
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteOpenHelper
-import com.duckduckgo.data.store.api.DatabaseExecutor.Custom
-import com.duckduckgo.data.store.api.DatabaseExecutor.Default
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.Lazy
-import dagger.SingleInstanceIn
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
-import java.util.concurrent.ThreadPoolExecutor
-import java.util.concurrent.TimeUnit.SECONDS
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RoomDatabaseProviderImpl @Inject constructor(
     private val context: Context,
-    private val databaseProviderFeature: Lazy<DatabaseProviderFeature>,
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory,
+    lazyDatabaseExecutorProvider: Lazy<DatabaseExecutorProvider>,
 ) : DatabaseProvider {
 
-    private val featureFlagEnabled: Boolean by lazy {
-        databaseProviderFeature.get().self().isEnabled()
-    }
-
-    private val defaultPoolSize = 6
-    private val defaultExecutor: Executor by lazy {
-        ThreadPoolExecutor(
-            defaultPoolSize,
-            defaultPoolSize,
-            0L,
-            SECONDS,
-            ArrayBlockingQueue(defaultPoolSize * 2),
-            ThreadPoolExecutor.CallerRunsPolicy(),
-        )
-    }
+    private val databaseExecutorProvider by lazy { lazyDatabaseExecutorProvider.get() }
 
     override fun<T : RoomDatabase> buildRoomDatabase(
         klass: Class<T>,
@@ -115,79 +92,10 @@ class RoomDatabaseProviderImpl @Inject constructor(
     }
 
     private fun RoomDatabase.Builder<*>.applyExecutors(executor: com.duckduckgo.data.store.api.DatabaseExecutor) {
-        val queryExecutor = when (executor) {
-            is Custom -> {
-                val customExecutor = executor
-                if (featureFlagEnabled) {
-                    createCustomExecutor(
-                        customExecutor.queryPoolSize,
-                        customExecutor.queryQueueSize,
-                    )
-                } else {
-                    createLegacyQueryExecutor()
-                }
-            }
-            Default -> {
-                if (featureFlagEnabled) {
-                    defaultExecutor
-                } else {
-                    null
-                }
-            }
-        }
-
-        val transactionExecutor = when (executor) {
-            is Custom -> {
-                val customExecutor = executor
-                if (featureFlagEnabled) {
-                    createCustomExecutor(
-                        customExecutor.transactionPoolSize,
-                        customExecutor.transactionQueueSize,
-                    )
-                } else {
-                    createLegacyTransactionExecutor()
-                }
-            }
-            Default -> {
-                if (featureFlagEnabled) {
-                    defaultExecutor
-                } else {
-                    null
-                }
-            }
-        }
+        val queryExecutor = databaseExecutorProvider.createQueryExecutor(executor)
+        val transactionExecutor = databaseExecutorProvider.createTransactionExecutor(executor)
 
         queryExecutor?.let { setQueryExecutor(it) }
         transactionExecutor?.let { setTransactionExecutor(it) }
-    }
-
-    private fun createCustomExecutor(
-        poolSize: Int,
-        queueSize: Int,
-    ): Executor {
-        val queue = object : ArrayBlockingQueue<Runnable>(queueSize) {
-            override fun add(element: Runnable): Boolean {
-                return super.add(element)
-            }
-        }
-
-        return ThreadPoolExecutor(
-            poolSize,
-            poolSize,
-            60L,
-            SECONDS,
-            queue,
-            ThreadPoolExecutor.CallerRunsPolicy(),
-        ).apply {
-            allowCoreThreadTimeOut(true)
-        }
-    }
-
-    private fun createLegacyQueryExecutor(): Executor {
-        return Executors.newFixedThreadPool(4)
-    }
-
-    private fun createLegacyTransactionExecutor(): Executor {
-        return Executors.newSingleThreadExecutor()
     }
 }
