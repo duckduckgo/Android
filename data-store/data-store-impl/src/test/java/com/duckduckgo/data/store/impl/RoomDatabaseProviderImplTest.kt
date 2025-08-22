@@ -16,6 +16,7 @@
 
 package com.duckduckgo.data.store.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
@@ -52,6 +53,7 @@ private const val CUSTOM_KEEP_ALIVE = 60L
 private const val DEFAULT_KEEP_ALIVE = 0L
 private const val DEFAULT_QUEUE_SIZE = DEFAULT_POOL_SIZE * 2
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class RoomDatabaseProviderImplTest {
 
