@@ -38,9 +38,3 @@ data class Address(
     val city: String,
     val state: String,
 )
-
-data class Name(
-    val firstName: String,
-    val lastName: String,
-    val middleName: String? = null,
-)
