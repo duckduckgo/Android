@@ -17,14 +17,16 @@
 package com.duckduckgo.data.store.impl
 
 import android.content.Context
-import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.duckduckgo.data.store.api.DatabaseExecutor.Custom
 import com.duckduckgo.data.store.api.DatabaseExecutor.Default
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.Lazy
 import dagger.SingleInstanceIn
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.Executor
@@ -37,10 +39,12 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class RoomDatabaseProviderImpl @Inject constructor(
     private val context: Context,
-    databaseProviderFeature: DatabaseProviderFeature,
+    private val databaseProviderFeature: Lazy<DatabaseProviderFeature>,
+    private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory,
 ) : DatabaseProvider {
 
-    private val featureFlagEnabled: Boolean = databaseProviderFeature.self().isEnabled()
+    private val featureFlagEnabled: Boolean
+        get() = databaseProviderFeature.get().self().isEnabled()
 
     private val defaultPoolSize = 6
     private val defaultExecutor: Executor by lazy {
@@ -59,72 +63,104 @@ class RoomDatabaseProviderImpl @Inject constructor(
         name: String,
         config: RoomDatabaseConfig,
     ): T {
-        return Room.databaseBuilder(context, klass, name)
+        return roomDatabaseBuilderFactory.createBuilder(context, klass, name)
             .apply {
-                if (config.migrations.isNotEmpty()) {
-                    addMigrations(*config.migrations.toTypedArray())
-                }
-
-                if (config.fallbackToDestructiveMigration) {
-                    fallbackToDestructiveMigration()
-                }
-
-                config.openHelperFactory?.let { factory ->
-                    openHelperFactory(factory)
-                }
-
-                if (config.enableMultiInstanceInvalidation) {
-                    enableMultiInstanceInvalidation()
-                }
-
-                config.journalMode?.let { mode ->
-                    setJournalMode(mode)
-                }
-
-                config.callbacks.forEach { callback ->
-                    addCallback(callback)
-                }
-
-                if (config.fallbackToDestructiveMigrationFromVersion.isNotEmpty()) {
-                    fallbackToDestructiveMigrationFrom(*config.fallbackToDestructiveMigrationFromVersion.toIntArray())
-                }
-
-                when (config.executor) {
-                    is Custom -> {
-                        (config.executor as? Custom)?.let { executor ->
-                            val queryExecutor = if (featureFlagEnabled) {
-                                createExecutor(
-                                    executor.queryPoolSize,
-                                    executor.queryQueueSize,
-                                )
-                            } else {
-                                Executors.newFixedThreadPool(4)
-                            }
-
-                            val transactionExecutor = if (featureFlagEnabled) {
-                                createExecutor(
-                                    executor.transactionPoolSize,
-                                    executor.transactionQueueSize,
-                                )
-                            } else {
-                                Executors.newSingleThreadExecutor()
-                            }
-                            setQueryExecutor(queryExecutor)
-                            setTransactionExecutor(transactionExecutor)
-                        }
-                    }
-                    Default -> {
-                        if (featureFlagEnabled) {
-                            setQueryExecutor(defaultExecutor)
-                            setTransactionExecutor(defaultExecutor)
-                        }
-                    }
-                }
+                applyMigrations(config.migrations)
+                applyFallbackToDestructiveMigration(config.fallbackToDestructiveMigration)
+                applyOpenHelperFactory(config.openHelperFactory)
+                applyMultiInstanceInvalidation(config.enableMultiInstanceInvalidation)
+                applyJournalMode(config.journalMode)
+                applyCallbacks(config.callbacks)
+                applyFallbackToDestructiveMigrationFromVersion(config.fallbackToDestructiveMigrationFromVersion)
+                applyExecutors(config.executor)
             }
             .build()
     }
 
-    private fun createExecutor(
+    private fun RoomDatabase.Builder<*>.applyMigrations(migrations: List<Migration>) {
+        if (migrations.isNotEmpty()) {
+            addMigrations(*migrations.toTypedArray())
+        }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyFallbackToDestructiveMigration(fallback: Boolean) {
+        if (fallback) {
+            fallbackToDestructiveMigration()
+        }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyOpenHelperFactory(factory: SupportSQLiteOpenHelper.Factory?) {
+        factory?.let { openHelperFactory(it) }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyMultiInstanceInvalidation(enable: Boolean) {
+        if (enable) {
+            enableMultiInstanceInvalidation()
+        }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyJournalMode(journalMode: RoomDatabase.JournalMode?) {
+        journalMode?.let { setJournalMode(it) }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyCallbacks(callbacks: List<RoomDatabase.Callback>) {
+        callbacks.forEach { addCallback(it) }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyFallbackToDestructiveMigrationFromVersion(versions: List<Int>) {
+        if (versions.isNotEmpty()) {
+            fallbackToDestructiveMigrationFrom(*versions.toIntArray())
+        }
+    }
+
+    private fun RoomDatabase.Builder<*>.applyExecutors(executor: com.duckduckgo.data.store.api.DatabaseExecutor) {
+        val queryExecutor = when (executor) {
+            is Custom -> {
+                val customExecutor = executor
+                if (featureFlagEnabled) {
+                    createCustomExecutor(
+                        customExecutor.queryPoolSize,
+                        customExecutor.queryQueueSize,
+                    )
+                } else {
+                    createLegacyQueryExecutor()
+                }
+            }
+            Default -> {
+                if (featureFlagEnabled) {
+                    defaultExecutor
+                } else {
+                    null
+                }
+            }
+        }
+
+        val transactionExecutor = when (executor) {
+            is Custom -> {
+                val customExecutor = executor
+                if (featureFlagEnabled) {
+                    createCustomExecutor(
+                        customExecutor.transactionPoolSize,
+                        customExecutor.transactionQueueSize,
+                    )
+                } else {
+                    createLegacyTransactionExecutor()
+                }
+            }
+            Default -> {
+                if (featureFlagEnabled) {
+                    defaultExecutor
+                } else {
+                    null
+                }
+            }
+        }
+
+        queryExecutor?.let { setQueryExecutor(it) }
+        transactionExecutor?.let { setTransactionExecutor(it) }
+    }
+
+    private fun createCustomExecutor(
         poolSize: Int,
         queueSize: Int,
     ): Executor {
@@ -144,5 +180,13 @@ class RoomDatabaseProviderImpl @Inject constructor(
         ).apply {
             allowCoreThreadTimeOut(true)
         }
+    }
+
+    private fun createLegacyQueryExecutor(): Executor {
+        return Executors.newFixedThreadPool(4)
+    }
+
+    private fun createLegacyTransactionExecutor(): Executor {
+        return Executors.newSingleThreadExecutor()
     }
 }
