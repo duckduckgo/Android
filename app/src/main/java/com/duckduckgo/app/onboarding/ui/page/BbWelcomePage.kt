@@ -94,7 +94,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
     private var welcomeTitleEntryAnimator: ViewPropertyAnimator? = null
-    private var welcomeTitleAnimator: ViewPropertyAnimator? = null
+    private var welcomeTitleExitAnimator: ViewPropertyAnimator? = null
     private var daxDialogAnimator: ValueAnimator? = null
     private var daxDialogAnimationStarted = false
     private var backgroundSceneManager: BbOnboardingBackgroundSceneManager? = null
@@ -180,7 +180,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         super.onDestroyView()
         welcomeAnimation?.cancel()
         welcomeTitleEntryAnimator?.cancel()
-        welcomeTitleAnimator?.cancel()
+        welcomeTitleExitAnimator?.cancel()
         daxDialogAnimator?.cancel()
     }
 
@@ -544,7 +544,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 it.start()
             }
 
-        welcomeTitleAnimator = binding.welcomeTitle.animate()
+        welcomeTitleExitAnimator = binding.welcomeTitle.animate()
             .translationX(-resources.displayMetrics.widthPixels.toFloat())
             .setDuration(transitionDuration.inWholeMilliseconds)
             .setStartDelay(transitionDelay.inWholeMilliseconds)
