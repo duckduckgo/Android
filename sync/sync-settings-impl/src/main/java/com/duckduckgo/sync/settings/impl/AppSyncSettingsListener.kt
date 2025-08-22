@@ -23,12 +23,16 @@ import dagger.*
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
+import javax.inject.Provider
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AppSyncSettingsListener @Inject constructor(
-    private val syncMetadataDao: SettingsSyncMetadataDao,
+    syncMetadataDaoProvider: Provider<SettingsSyncMetadataDao>,
 ) : SyncSettingsListener {
+
+    private val syncMetadataDao by lazy { syncMetadataDaoProvider.get() }
+
     override fun onSettingChanged(settingKey: String) {
         logcat(INFO) { "Sync-Settings: onSettingChanged($settingKey)" }
         val entity = SettingsSyncMetadataEntity(
