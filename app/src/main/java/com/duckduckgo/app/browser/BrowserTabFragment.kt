@@ -1376,11 +1376,12 @@ class BrowserTabFragment :
 
     private fun initPrivacyProtectionsPopup() {
         privacyProtectionsPopup = privacyProtectionsPopupFactory.createPopup(
-            anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
-                omnibar.shieldIconExperiment
-            } else {
-                omnibar.shieldIcon
-            },
+            // anchor = if (runBlocking { senseOfProtectionExperiment.shouldShowNewPrivacyShield() }) {
+            //     omnibar.shieldIconExperiment
+            // } else {
+            //     omnibar.shieldIcon
+            // },
+            anchor = omnibar.shieldIconExperiment // todo lp - assuming this is correct becasue the sense of protection is disabled now
         )
         privacyProtectionsPopup.events
             .onEach(viewModel::onPrivacyProtectionsPopupUiEvent)

@@ -202,11 +202,7 @@ class Omnibar(
         newOmnibar.toolbar
     }
 
-    val shieldIcon: LottieAnimationView by lazy {
-        newOmnibar.shieldIcon
-    }
-
-    val shieldIconExperiment: LottieAnimationView by lazy {
+    val shieldIconExperiment: LottieAnimationView by lazy { // todo lp - rename
         newOmnibar.shieldIconExperiment
     }
 

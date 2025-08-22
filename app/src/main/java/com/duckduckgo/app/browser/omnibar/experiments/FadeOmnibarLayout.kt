@@ -58,7 +58,7 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
-class FadeOmnibarLayout @JvmOverloads constructor(
+class FadeOmnibarLayout @JvmOverloads constructor( // todo lp - remove
     context: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
@@ -217,7 +217,6 @@ class FadeOmnibarLayout @JvmOverloads constructor(
         if (showBackArrow) {
             backIcon.show()
             searchIcon.gone()
-            shieldIcon.gone()
             daxIcon.gone()
             globeIcon.gone()
             duckPlayerIcon.gone()

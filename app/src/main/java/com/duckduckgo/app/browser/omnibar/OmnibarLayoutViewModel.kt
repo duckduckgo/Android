@@ -94,7 +94,6 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
@@ -112,14 +111,12 @@ class OmnibarLayoutViewModel @Inject constructor(
         _viewState,
         tabRepository.flowTabs,
         additionalDefaultBrowserPrompts.highlightPopupMenu,
-        experimentalThemingDataStore.isSingleOmnibarEnabled,
-    ) { state, tabs, highlightOverflowMenu, isSingleOmnibarEnabled ->
+    ) { state, tabs, highlightOverflowMenu ->
         state.copy(
             shouldUpdateTabsCount = tabs.size != state.tabCount && tabs.isNotEmpty(),
             tabCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
             showBrowserMenuHighlight = highlightOverflowMenu,
-            isExperimentalThemingEnabled = isSingleOmnibarEnabled,
         )
     }.flowOn(dispatcherProvider.io()).stateIn(viewModelScope, SharingStarted.Eagerly, _viewState.value)
 
@@ -170,7 +167,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val loadingProgress: Int = 0,
         val highlightPrivacyShield: HighlightableButton = HighlightableButton.Visible(enabled = false),
         val highlightFireButton: HighlightableButton = HighlightableButton.Visible(),
-        val isExperimentalThemingEnabled: Boolean = false,
         val trackersBlocked: Int = 0,
         val previouslyTrackersBlocked: Int = 0,
         val showShadows: Boolean = false,
@@ -184,8 +180,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     sealed class Command {
         data object CancelAnimations : Command()
-        data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
-        data class StartVisualDesignTrackersAnimation(val entities: List<Entity>?) : Command()
+        data class StartVisualDesignTrackersAnimation(val entities: List<Entity>?) : Command() // todo lp - rename to StartTrackersAnimation?
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object StartExperimentVariant1Animation : Command()
         data class StartExperimentVariant2OrVariant3Animation(val entities: List<Entity>?) : Command()
@@ -479,12 +474,13 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         }
-        if (!_viewState.value.isExperimentalThemingEnabled) {
-            pixel.fire(
-                AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-                mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
-            )
-        }
+        // todo lp - do we need this pixel, it wasn't sent from new design at all
+        // if (!_viewState.value.isExperimentalThemingEnabled) {
+        //     pixel.fire(
+        //         AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+        //         mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
+        //     )
+        // }
     }
 
     fun onPrivacyShieldButtonPressed() {
@@ -697,7 +693,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             is LaunchTrackersAnimation -> {
                 if (!decoration.entities.isNullOrEmpty()) {
                     val hasFocus = _viewState.value.hasFocus
-                    val visualDesignExperiment = viewState.value.isExperimentalThemingEnabled
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
@@ -706,12 +701,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                         }
                         viewModelScope.launch {
                             when {
-                                visualDesignExperiment -> {
-                                    command.send(
-                                        Command.StartVisualDesignTrackersAnimation(decoration.entities),
-                                    )
-                                }
-
                                 senseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled() -> {
                                     command.send(Command.StartExperimentVariant1Animation)
                                 }
@@ -723,7 +712,9 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 }
 
                                 else -> {
-                                    command.send(Command.StartTrackersAnimation(decoration.entities))
+                                    command.send(
+                                        Command.StartVisualDesignTrackersAnimation(decoration.entities)
+                                    )
                                 }
                             }
                         }
@@ -820,13 +811,14 @@ class OmnibarLayoutViewModel @Inject constructor(
                 putAll(launchSourceParams)
             }
 
-            val pixelName = if (viewState.value.isExperimentalThemingEnabled) {
-                DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN
-            } else {
-                DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
-            }
-
-            pixel.fire(pixelName, parameters = params)
+            // todo lp - which pixel should we use?
+            // val pixelName = if (viewState.value.isExperimentalThemingEnabled) {
+            //     DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN
+            // } else {
+            //     DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
+            // }
+            //
+            // pixel.fire(pixelName, parameters = params)
         }
     }
 

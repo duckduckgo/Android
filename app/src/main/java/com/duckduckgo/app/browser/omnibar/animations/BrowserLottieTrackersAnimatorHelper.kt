@@ -87,7 +87,6 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
-        visualDesignExperimentEnabled: Boolean,
     ) {
         if (isCookiesAnimationRunning) return // If cookies animation is running let it finish to avoid weird glitches with the other animations
         if (trackersAnimationView.isAnimating) return
@@ -106,11 +105,7 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
             return
         }
 
-        val animationRawRes = if (visualDesignExperimentEnabled) {
-            getVisualDesignAnimationRawRes(logos, theme)
-        } else {
-            getAnimationRawRes(logos, theme)
-        }
+        val animationRawRes = getVisualDesignAnimationRawRes(logos, theme)
 
         with(trackersAnimationView) {
             this.setCacheComposition(false) // ensure assets are not cached
@@ -449,25 +444,13 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
         return slideInCookiesTransition
     }
 
-    private fun getAnimationRawRes(
-        logos: List<TrackerLogo>,
-        theme: AppTheme,
-    ): Int {
-        val trackers = logos.size
-        return when {
-            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1 else R.raw.dark_trackers_1
-            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2 else R.raw.dark_trackers_2
-            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
-            else -> TODO()
-        }
-    }
-
     private fun getVisualDesignAnimationRawRes(
         logos: List<TrackerLogo>,
         theme: AppTheme,
     ): Int {
         val trackers = logos.size
         return when {
+            // todo lp - drop the new design from names
             trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
             trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1_visual_updates else R.raw.dark_trackers_1_visual_updates
             trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2_visual_updates else R.raw.dark_trackers_2_visual_updates
