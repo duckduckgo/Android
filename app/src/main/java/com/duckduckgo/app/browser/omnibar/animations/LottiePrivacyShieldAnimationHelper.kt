@@ -67,7 +67,7 @@ class LottiePrivacyShieldAnimationHelper @Inject constructor(
             unprotectedShield = R.raw.unprotected_shield_visual_updates
             unprotectedShieldDark = R.raw.dark_unprotected_shield_visual_updates
         } else {
-            protectedShield = R.raw.protected_shield
+            protectedShield = R.raw.protected_shield // todo lp - merge resources
             protectedShieldDark = R.raw.dark_protected_shield
             unprotectedShield = R.raw.unprotected_shield
             unprotectedShieldDark = R.raw.dark_unprotected_shield

@@ -28,7 +28,7 @@ class OmnibarTypeResolver @Inject constructor(
         return if (experimentsDataStore.isSingleOmnibarEnabled.value) {
             SINGLE
         } else {
-            SCROLLING
+            SCROLLING // todo lp - remove enum
         }
     }
 }

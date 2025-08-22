@@ -564,9 +564,6 @@ class BrowserTabFragment :
     lateinit var swipingTabsFeature: SwipingTabsFeatureProvider
 
     @Inject
-    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
-
-    @Inject
     lateinit var experimentTrackersAnimationHelper: ExperimentTrackersAnimationHelper
 
     @Inject
@@ -1010,12 +1007,6 @@ class BrowserTabFragment :
 
         val omnibarType = omnibarTypeResolver.getOmnibarType()
         omnibar = Omnibar(settingsDataStore.omnibarPosition, omnibarType, binding)
-
-        if (omnibarType == OmnibarType.SINGLE) {
-            lifecycleScope.launch {
-                experimentalThemingDataStore.countSingleOmnibarUser()
-            }
-        }
 
         webViewContainer = binding.webViewContainer
         configureObservers()
@@ -2817,7 +2808,6 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.addItemDecoration(
             SuggestionItemDecoration(
                 divider = ContextCompat.getDrawable(context, R.drawable.suggestions_divider)!!,
-                addExtraDividerPadding = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             ),
         )
     }

@@ -59,7 +59,6 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
     private val senseOfProtectionToggles: SenseOfProtectionToggles,
     private val senseOfProtectionPixelsPlugin: SenseOfProtectionPixelsPlugin,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val pixel: Pixel,
 ) : SenseOfProtectionExperiment {
 
@@ -75,7 +74,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private suspend fun canBeEnrolledInExistingUserExperiment(): Boolean {
-        return !isEnrolledInNewUserExperiment() && !seesNewVisualDesign()
+        return !isEnrolledInNewUserExperiment()
     }
 
     override suspend fun enrolUserInNewExperimentIfEligible(): Boolean {
@@ -87,7 +86,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun canBeEnrolledInNewUserExperiment(): Boolean {
-        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) && !seesNewVisualDesign()
+        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD)
     }
 
     override suspend fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =
@@ -206,11 +205,5 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     private fun MetricsPixel.fire() = getPixelDefinitions().forEach {
         pixel.fire(it.pixelName, it.params)
-    }
-
-    private fun seesNewVisualDesign(): Boolean {
-        val seesNewVisualDesign = experimentalThemingDataStore.isSingleOmnibarEnabled.value
-        logcat { "VisualDesign: seesNewVisualDesign $seesNewVisualDesign" }
-        return seesNewVisualDesign
     }
 }
