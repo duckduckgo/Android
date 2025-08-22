@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
@@ -41,6 +42,7 @@ import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
 import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
+import com.squareup.moshi.Moshi
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -153,6 +155,8 @@ internal class RealPirRepository(
     private val dbpService: DbpService,
     private val extractedProfileDao: ExtractedProfileDao,
 ) : PirRepository {
+
+    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -475,7 +479,9 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses,
+            addresses = this.addresses.mapNotNull {
+                addressCityStateAdapter.fromJson(it)
+            },
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
             identifier = this.identifier,
@@ -495,7 +501,9 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses,
+            addresses = this.addresses.mapNotNull {
+                addressCityStateAdapter.toJson(it)
+            },
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
             reportId = this.reportId,
