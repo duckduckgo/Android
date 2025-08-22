@@ -16,6 +16,7 @@
 
 package com.duckduckgo.data.store.impl
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -39,6 +40,7 @@ interface RoomDatabaseBuilderFactory {
  */
 @ContributesBinding(AppScope::class)
 class RealRoomDatabaseBuilderFactory @Inject constructor() : RoomDatabaseBuilderFactory {
+    @SuppressLint("DenyListedApi")
     override fun <T : RoomDatabase> createBuilder(
         context: Context,
         klass: Class<T>,
