@@ -26,7 +26,6 @@ import com.duckduckgo.data.store.api.DatabaseExecutor
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import dagger.Lazy
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ThreadPoolExecutor
@@ -59,15 +58,14 @@ class RoomDatabaseProviderImplTest {
 
     private val context: Context = mock()
     private val databaseProviderFeature: DatabaseProviderFeature = FakeFeatureToggleFactory.create(DatabaseProviderFeature::class.java)
-    private val lazyDatabaseProviderFeature: Lazy<DatabaseProviderFeature> = mock()
+    private val databaseExecutorProvider: DatabaseExecutorProvider = RealDatabaseExecutorProvider({ databaseProviderFeature })
     private val roomDatabaseBuilderFactory: RoomDatabaseBuilderFactory = mock()
     private val mockDatabase = mock<TestDatabase>()
     private val mockRoomBuilder: RoomDatabase.Builder<TestDatabase> = mock()
-    private val subject: RoomDatabaseProviderImpl = RoomDatabaseProviderImpl(context, lazyDatabaseProviderFeature, roomDatabaseBuilderFactory)
+    private val subject: RoomDatabaseProviderImpl = RoomDatabaseProviderImpl(context, roomDatabaseBuilderFactory, { databaseExecutorProvider })
 
     @Before
     fun setUp() {
-        whenever(lazyDatabaseProviderFeature.get()).thenReturn(databaseProviderFeature)
         whenever(roomDatabaseBuilderFactory.createBuilder(eq(context), eq(TestDatabase::class.java), eq("test.db")))
             .thenReturn(mockRoomBuilder)
         whenever(mockRoomBuilder.addMigrations(any())).thenReturn(mockRoomBuilder)
