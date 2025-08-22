@@ -168,9 +168,6 @@ class TabSwitcherViewModelTest {
         State.Cohort(name = VARIANT_2.cohortName, weight = 1),
     )
 
-    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-    private val defaultVisualExperimentStateFlow = MutableStateFlow(false)
-
     private lateinit var testee: TabSwitcherViewModel
 
     private var tabList = listOf(
@@ -200,7 +197,6 @@ class TabSwitcherViewModelTest {
         }
         whenever(mockTabRepository.tabSwitcherData).thenReturn(flowOf(tabSwitcherData))
 
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(defaultVisualExperimentStateFlow)
         whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
 
         fakeSenseOfProtectionToggles = FeatureToggles.Builder(
@@ -214,7 +210,6 @@ class TabSwitcherViewModelTest {
             userBrowserProperties = FakeUserBrowserProperties(),
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             pixel = FakePixel(),
         )
 
@@ -242,7 +237,6 @@ class TabSwitcherViewModelTest {
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
-            mockExperimentalThemingDataStore,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -1980,31 +1974,6 @@ class TabSwitcherViewModelTest {
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertTrue(items.find { it is TabSwitcherItem.TrackerAnimationInfoPanel } == null)
-    }
-
-    @Test
-    fun `when visual design enabled and show duck chat in address bar false then AI fab not visible`() = runTest {
-        defaultVisualExperimentStateFlow.value = true
-
-        initializeViewModel()
-
-        testee.selectionViewState.test {
-            assertFalse(awaitItem().dynamicInterface.isAIFabVisible)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `when visual design enabled and show duck chat in address bar true then AI fab visible`() = runTest {
-        defaultVisualExperimentStateFlow.value = true
-        whenever(duckAiFeatureStateMock.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(true))
-
-        initializeViewModel()
-
-        testee.selectionViewState.test {
-            assertTrue(awaitItem().dynamicInterface.isAIFabVisible)
-            cancelAndIgnoreRemainingEvents()
-        }
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {

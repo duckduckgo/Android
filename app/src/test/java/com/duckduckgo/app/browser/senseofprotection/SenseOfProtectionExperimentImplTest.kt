@@ -36,6 +36,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mock
@@ -49,9 +50,6 @@ class SenseOfProtectionExperimentImplTest {
 
     @Mock
     private lateinit var senseOfProtectionPixelsPluginMock: SenseOfProtectionPixelsPlugin
-
-    @Mock
-    private lateinit var mockExperimentDataStore: ExperimentalThemingDataStore
 
     private lateinit var testee: SenseOfProtectionExperimentImpl
     private lateinit var fakeUserBrowserProperties: FakeUserBrowserProperties
@@ -77,14 +75,13 @@ class SenseOfProtectionExperimentImplTest {
             userBrowserProperties = fakeUserBrowserProperties,
             senseOfProtectionToggles = fakeSenseOfProtectionToggles,
             senseOfProtectionPixelsPlugin = senseOfProtectionPixelsPluginMock,
-            experimentalThemingDataStore = mockExperimentDataStore,
             pixel = FakePixel(),
         )
     }
 
     @Test
+    @Ignore("new visual design is now always enabled")
     fun `when user is new and and visual design updates not enabled then user can be enrolled`() = runTest {
-        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -101,8 +98,7 @@ class SenseOfProtectionExperimentImplTest {
     }
 
     @Test
-    fun `when user is new and and visual design updates not enabled then user can't be enrolled`() = runTest {
-        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(true))
+    fun `when user is new and and visual design updates enabled then user can't be enrolled`() = runTest {
         fakeUserBrowserProperties.setDaysSinceInstalled(28)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -119,8 +115,8 @@ class SenseOfProtectionExperimentImplTest {
     }
 
     @Test
+    @Ignore("new visual design is now always enabled")
     fun `when user is new and experiment is enabled but for different cohort then isEnabled returns false`() = runTest {
-        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(20)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(
@@ -135,8 +131,8 @@ class SenseOfProtectionExperimentImplTest {
     }
 
     @Test
+    @Ignore("new visual design is now always enabled")
     fun `when user is new and experiment is disabled then isEnabled returns false`() = runTest {
-        whenever(mockExperimentDataStore.isSingleOmnibarEnabled).thenReturn(MutableStateFlow(false))
         fakeUserBrowserProperties.setDaysSinceInstalled(10)
         fakeSenseOfProtectionToggles.senseOfProtectionNewUserExperiment27May25().setRawStoredState(
             State(

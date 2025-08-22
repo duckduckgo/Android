@@ -86,7 +86,7 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
     }
 
     private fun canBeEnrolledInNewUserExperiment(): Boolean {
-        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD)
+        return (userBrowserProperties.daysSinceInstalled() <= EXISTING_USER_DAY_COUNT_THRESHOLD) && false // todo lp - this is all invalid and can never happen now
     }
 
     override suspend fun isUserEnrolledInModifiedControlCohortAndExperimentEnabled(): Boolean =

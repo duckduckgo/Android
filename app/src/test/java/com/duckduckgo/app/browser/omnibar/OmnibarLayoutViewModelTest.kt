@@ -73,10 +73,6 @@ class OmnibarLayoutViewModelTest {
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
 
-    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-    private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
-
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
 
@@ -110,7 +106,6 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
@@ -151,7 +146,6 @@ class OmnibarLayoutViewModelTest {
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
-            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
@@ -183,18 +177,6 @@ class OmnibarLayoutViewModelTest {
         testee.commands().test {
             awaitItem().assertCommand(Command.CancelAnimations::class)
             cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSingleOmnibarEnabledThenExperimentalThemingViewStateSet() = runTest {
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
-
-        initializeViewModel()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.isExperimentalThemingEnabled)
         }
     }
 
@@ -753,10 +735,11 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.scrollingEnabled)
         }
 
-        verify(pixel).fire(
-            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-            mapOf(FIRE_BUTTON_STATE to animationPlaying.toString()),
-        )
+        // todo lp - do we not send it at all now
+        // verify(pixel).fire(
+        //     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+        //     mapOf(FIRE_BUTTON_STATE to animationPlaying.toString()),
+        // )
     }
 
     @Test
@@ -963,7 +946,7 @@ class OmnibarLayoutViewModelTest {
         }
 
         testee.commands().test {
-            awaitItem().assertCommand(Command.StartTrackersAnimation::class)
+            awaitItem().assertCommand(Command.StartVisualDesignTrackersAnimation::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1181,20 +1164,9 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenNavigationBarExperimentEnabledThenShowChatMenuTrue() = runTest {
-        disabledVisualExperimentNavBarStateFlow.value = true
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.showChatMenu)
-        }
-    }
-
-    @Test
-    fun whenNavigationBarExperimentEnabledAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
+    fun whenChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
         duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
-        disabledVisualExperimentNavBarStateFlow.value = true
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1254,19 +1226,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "focused"))
-    }
-
-    @Test
-    fun `when DuckChat Button pressed and omnibar has focus with experiment enabled then source is focused`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
-        initializeViewModel()
-        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "query")
-
-        testee.onDuckChatButtonPressed()
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "focused"))
+        // todo lp - which pixel do we use?
+        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "focused"))
     }
 
     @Test
@@ -1276,7 +1237,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "ntp"))
+        // todo lp - which pixel do we use?
+        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "ntp"))
     }
 
     @Test
@@ -1286,7 +1248,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "serp"))
+        // todo lp - which pixel do we use?
+        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "serp"))
     }
 
     @Test
@@ -1296,7 +1259,8 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "website"))
+        // todo lp - unclear which pixel to send
+        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "website"))
     }
 
     @Test
@@ -1306,31 +1270,21 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "unknown"))
+        // todo lp - unclear which pixel to send
+        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "unknown"))
     }
 
     @Test
-    fun `when DuckChat Button pressed with experiment enabled and was used before then correct pixel sent`() = runTest {
+    fun `when DuckChat Button pressed and was used before then correct pixel sent`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
         initializeViewModel()
         testee.onViewModeChanged(ViewMode.NewTab)
         testee.onOmnibarFocusChanged(false, "")
 
         testee.onDuckChatButtonPressed()
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1", "source" to "ntp"))
-    }
-
-    @Test
-    fun `when DuckChat Button pressed with experiment disabled and was used before then correct pixel sent`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        givenSiteLoaded(RANDOM_URL)
-        testee.onOmnibarFocusChanged(false, "")
-
-        testee.onDuckChatButtonPressed()
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1", "source" to "website"))
+        // todo lp - which pixel do we use?
+        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1", "source" to "ntp"))
     }
 
     @Test

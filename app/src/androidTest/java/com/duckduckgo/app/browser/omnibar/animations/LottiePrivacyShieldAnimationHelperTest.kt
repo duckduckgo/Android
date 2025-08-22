@@ -287,7 +287,7 @@ class LottiePrivacyShieldAnimationHelperTest {
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode)
 
-        verify(holder).setAnimation(R.raw.protected_shield)
+        verify(holder).setAnimation(R.raw.protected_shield_custom_tab)
     }
 
     @SuppressLint("DenyListedApi")
@@ -303,6 +303,6 @@ class LottiePrivacyShieldAnimationHelperTest {
 
         testee.setAnimationView(holder, PROTECTED, customTabViewMode)
 
-        verify(holder).setAnimation(R.raw.dark_protected_shield)
+        verify(holder).setAnimation(R.raw.dark_protected_shield_custom_tab)
     }
 }
