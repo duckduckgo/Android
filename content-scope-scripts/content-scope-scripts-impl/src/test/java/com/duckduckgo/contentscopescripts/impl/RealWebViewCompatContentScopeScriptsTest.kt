@@ -19,6 +19,7 @@ package com.duckduckgo.contentscopescripts.impl
 import android.annotation.SuppressLint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor.INTERNAL
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
@@ -78,6 +79,7 @@ class RealWebViewCompatContentScopeScriptsTest {
         whenever(mockUserAllowListRepository.domainsInUserAllowList()).thenReturn(listOf(exampleUrl))
         whenever(mockContentScopeJsReader.getContentScopeJS()).thenReturn(contentScopeJS)
         whenever(mockAppBuildConfig.versionCode).thenReturn(versionCode)
+        whenever(mockAppBuildConfig.flavor).thenReturn(INTERNAL)
         whenever(mockUnprotectedTemporary.unprotectedTemporaryExceptions)
             .thenReturn(listOf(unprotectedTemporaryException, unprotectedTemporaryException2))
         whenever(mockFingerprintProtectionManager.getSeed()).thenReturn(sessionKey)
@@ -108,7 +110,8 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"foo\\.com\"\\], " +
-                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\",\"internal\":true\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -135,7 +138,8 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"globalPrivacyControlValue\":false,\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\\{\"globalPrivacyControlValue\":false,\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -162,7 +166,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
                 "\\{\"globalPrivacyControlValue\":true,\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
-                "\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\"platform\":\\{\"name\":\"android\",\"internal\":true\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -189,7 +193,8 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"config2\":\\{\"state\":\"disabled\"\\}\\}," +
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
@@ -218,7 +223,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
                 "\\{\"currentCohorts\":\\[\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}]," +
-                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -251,7 +256,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\\{\"currentCohorts\":\\[" +
                 "\\{\"cohort\":\"treatment\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}," +
                 "\\{\"cohort\":\"control\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"bloops\"}\\]," +
-                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -337,7 +342,7 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
                 "\\{\"currentCohorts\":\\[" +
                 "\\{\"cohort\":\"treatment\",\"feature\":\"contentScopeExperiments\",\"subfeature\":\"test\"}\\]," +
-                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\}," +
+                "\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\",\"internal\":true\\}," +
                 "\"locale\":\"en\",\"sessionKey\":\"5678\"," +
                 "\"desktopModeEnabled\":false,\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
@@ -399,7 +404,8 @@ class RealWebViewCompatContentScopeScriptsTest {
                 "\"unprotectedTemporary\":\\[" +
                 "\\{\"domain\":\"example\\.com\",\"reason\":\"reason\"\\}," +
                 "\\{\"domain\":\"foo\\.com\",\"reason\":\"reason2\"\\}\\]\\}, \\[\"example\\.com\"\\], " +
-                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234,\"platform\":\\{\"name\":\"android\"\\},\"locale\":\"en\"," +
+                "\\{\"currentCohorts\":\\[\\],\"versionNumber\":1234," +
+                "\"platform\":\\{\"name\":\"android\",\"internal\":true\\},\"locale\":\"en\"," +
                 "\"sessionKey\":\"5678\",\"desktopModeEnabled\":false," +
                 "\"messageSecret\":\"([\\da-f]{32})\"," +
                 "\"messageCallback\":\"([\\da-f]{32})\"," +
