@@ -21,6 +21,7 @@ import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import logcat.logcat
 
@@ -35,6 +36,7 @@ class DuckDuckGoRequestRewriter(
     private val statisticsStore: StatisticsDataStore,
     private val variantManager: VariantManager,
     private val appReferrerDataStore: AppReferrerDataStore,
+    private val duckChat: DuckChat,
 ) : RequestRewriter {
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
@@ -74,6 +76,9 @@ class DuckDuckGoRequestRewriter(
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
+        if (!duckChat.isEnabled()) {
+            builder.appendQueryParameter(ParamKey.HIDE_DUCK_AI, ParamValue.HIDE_DUCK_AI)
+        }
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)
     }
 }

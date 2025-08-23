@@ -39,6 +39,7 @@ class AppUrl {
         const val EMAIL = "email"
         const val COUNTRY = "co"
         const val HIDE_SERP = "ko"
+        const val HIDE_DUCK_AI = "kbg"
         const val VERTICAL = "ia"
         const val VERTICAL_REWRITE = "iar"
     }
@@ -47,6 +48,7 @@ class AppUrl {
         const val SOURCE = "ddg_android"
         const val SOURCE_EU_AUCTION = "ddg_androideu"
         const val HIDE_SERP = "-1"
+        const val HIDE_DUCK_AI = "-1"
         const val CHAT_VERTICAL = "chat"
     }
 

@@ -23,6 +23,8 @@ import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.AppUrl.ParamValue
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import org.junit.Assert.*
 import org.junit.Before
@@ -38,18 +40,21 @@ class DuckDuckGoRequestRewriterTest {
     private val mockStatisticsStore: StatisticsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
+    private val duckChat: DuckChat = mock()
     private lateinit var builder: Uri.Builder
-    private val currentUrl = "http://www.duckduckgo.com"
 
     @Before
     fun before() {
         whenever(mockVariantManager.getVariantKey()).thenReturn("")
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
+        whenever(duckChat.isEnabled()).thenReturn(true)
+
         testee = DuckDuckGoRequestRewriter(
             DuckDuckGoUrlDetectorImpl(),
             mockStatisticsStore,
             mockVariantManager,
             mockAppReferrerDataStore,
+            duckChat,
         )
         builder = Uri.Builder()
     }
@@ -95,6 +100,25 @@ class DuckDuckGoRequestRewriterTest {
 
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
+    }
+
+    @Test
+    fun whenDuckAiIsDisabledThenHideSerpDuckChat() {
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
+        assertEquals(ParamValue.HIDE_DUCK_AI, uri.getQueryParameter(ParamKey.HIDE_DUCK_AI))
+    }
+
+    @Test
+    fun whenDuckAiIsEnabledThenDoNotHideSerpDuckChat() {
+        whenever(duckChat.isEnabled()).thenReturn(true)
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
     }
 
     @Test

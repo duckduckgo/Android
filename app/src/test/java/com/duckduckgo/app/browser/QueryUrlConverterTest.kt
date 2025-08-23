@@ -22,6 +22,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
 import org.junit.Assert.*
 import org.junit.Before
@@ -36,17 +37,20 @@ class QueryUrlConverterTest {
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
+    private val duckChat: DuckChat = mock()
     private val requestRewriter = DuckDuckGoRequestRewriter(
         DuckDuckGoUrlDetectorImpl(),
         mockStatisticsStore,
         variantManager,
         mockAppReferrerDataStore,
+        duckChat,
     )
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
     @Before
     fun setup() {
         whenever(variantManager.getVariantKey()).thenReturn("")
+        whenever(duckChat.isEnabled()).thenReturn(true)
     }
 
     @Test
