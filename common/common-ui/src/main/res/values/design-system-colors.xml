@@ -48,6 +48,7 @@
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
+    <attr name="daxColorCanvas" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
@@ -58,6 +59,7 @@
     <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
+    <attr name="daxColorShade" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorAccentContentPrimary" format="color"/>
