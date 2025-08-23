@@ -31,6 +31,7 @@
   var functionToString = Function.prototype.toString;
   var TypeError2 = globalThis.TypeError;
   var Symbol2 = globalThis.Symbol;
+  var hasOwnProperty = Object.prototype.hasOwnProperty;
   var dispatchEvent = globalThis.dispatchEvent?.bind(globalThis);
   var addEventListener = globalThis.addEventListener?.bind(globalThis);
   var removeEventListener = globalThis.removeEventListener?.bind(globalThis);
@@ -53,6 +54,9 @@
   }
   function getGlobal() {
     return globalObj;
+  }
+  function nextRandom(v2) {
+    return Math.abs(v2 >> 1 | (v2 << 62 ^ v2 << 61) & ~(~0 << 63) << 62);
   }
   var exemptionLists = {};
   function shouldExemptUrl(type, url) {
@@ -143,6 +147,20 @@
       }
     }
     return false;
+  }
+  function iterateDataKey(key, callback) {
+    let item = key.charCodeAt(0);
+    for (const i in key) {
+      let byte = key.charCodeAt(i);
+      for (let j2 = 8; j2 >= 0; j2--) {
+        const res = callback(item, byte);
+        if (res === null) {
+          return;
+        }
+        item = nextRandom(item);
+        byte = byte >> 1;
+      }
+    }
   }
   function isFeatureBroken(args, feature) {
     const isFeatureEnabled = args.site.enabledFeatures?.includes(feature) ?? false;
@@ -469,32 +487,6 @@
     return originalWindowDispatchEvent && originalWindowDispatchEvent(
       createCustomEvent("sendMessageProxy" + messageSecret, { detail: JSON.stringify({ messageType, options }) })
     );
-  }
-  function withExponentialBackoff(fn, maxAttempts = 4, delay = 500) {
-    return new Promise((resolve, reject) => {
-      let attempts = 0;
-      const tryFn = () => {
-        attempts += 1;
-        const error = new Error3("Element not found");
-        try {
-          const element = fn();
-          if (element) {
-            resolve(element);
-          } else if (attempts < maxAttempts) {
-            setTimeout(tryFn, delay * Math.pow(2, attempts));
-          } else {
-            reject(error);
-          }
-        } catch {
-          if (attempts < maxAttempts) {
-            setTimeout(tryFn, delay * Math.pow(2, attempts));
-          } else {
-            reject(error);
-          }
-        }
-      };
-      tryFn();
-    });
   }
 
   // src/features.js
@@ -3756,445 +3748,1772 @@
   _isDebugFlagSet = new WeakMap();
   _importConfig = new WeakMap();
 
-  // src/features/autofill-password-import.js
-  var ANIMATION_DURATION_MS = 1e3;
-  var ANIMATION_ITERATIONS = Infinity;
-  var BACKGROUND_COLOR_START = "rgba(85, 127, 243, 0.10)";
-  var BACKGROUND_COLOR_END = "rgba(85, 127, 243, 0.25)";
-  var OVERLAY_ID = "ddg-password-import-overlay";
-  var _exportButtonSettings, _settingsButtonSettings, _signInButtonSettings, _elementToCenterOn, _currentOverlay, _currentElementConfig, _domLoaded, _tappedElements;
-  var AutofillPasswordImport = class extends ContentFeature {
+  // src/features/api-manipulation.js
+  var ApiManipulation = class extends ContentFeature {
     constructor() {
       super(...arguments);
-      __privateAdd(this, _exportButtonSettings);
-      __privateAdd(this, _settingsButtonSettings);
-      __privateAdd(this, _signInButtonSettings);
-      /** @type {HTMLElement|Element|SVGElement|null} */
-      __privateAdd(this, _elementToCenterOn);
-      /** @type {HTMLElement|null} */
-      __privateAdd(this, _currentOverlay);
-      /** @type {ElementConfig|null} */
-      __privateAdd(this, _currentElementConfig);
-      __privateAdd(this, _domLoaded);
-      /** @type {WeakSet<Element>} */
-      __privateAdd(this, _tappedElements, /* @__PURE__ */ new WeakSet());
-    }
-    /**
-     * @returns {ButtonAnimationStyle}
-     */
-    get settingsButtonAnimationStyle() {
-      return {
-        transform: {
-          start: "scale(0.90)",
-          mid: "scale(0.96)"
-        },
-        zIndex: "984",
-        borderRadius: "100%",
-        offsetLeftEm: 0.01,
-        offsetTopEm: 0
-      };
-    }
-    /**
-     * @returns {ButtonAnimationStyle}
-     */
-    get exportButtonAnimationStyle() {
-      return {
-        transform: {
-          start: "scale(1)",
-          mid: "scale(1.01)"
-        },
-        zIndex: "984",
-        borderRadius: "100%",
-        offsetLeftEm: 0,
-        offsetTopEm: 0
-      };
-    }
-    /**
-     * @returns {ButtonAnimationStyle}
-     */
-    get signInButtonAnimationStyle() {
-      return {
-        transform: {
-          start: "scale(1)",
-          mid: "scale(1.3, 1.5)"
-        },
-        zIndex: "999",
-        borderRadius: "2px",
-        offsetLeftEm: 0,
-        offsetTopEm: -0.05
-      };
-    }
-    /**
-     * @param {HTMLElement|null} overlay
-     */
-    set currentOverlay(overlay) {
-      __privateSet(this, _currentOverlay, overlay);
-    }
-    /**
-     * @returns {HTMLElement|null}
-     */
-    get currentOverlay() {
-      return __privateGet(this, _currentOverlay) ?? null;
-    }
-    /**
-     * @returns {ElementConfig|null}
-     */
-    get currentElementConfig() {
-      return __privateGet(this, _currentElementConfig);
-    }
-    /**
-     * @returns {Promise<void>}
-     */
-    get domLoaded() {
-      return __privateGet(this, _domLoaded);
-    }
-    /**
-     * Takes a path and returns the element and style to animate.
-     * @param {string} path
-     * @returns {Promise<ElementConfig | null>}
-     */
-    async getElementAndStyleFromPath(path) {
-      if (path === "/") {
-        const element = await this.findSettingsElement();
-        return element != null ? {
-          animationStyle: this.settingsButtonAnimationStyle,
-          element,
-          shouldTap: __privateGet(this, _settingsButtonSettings)?.shouldAutotap ?? false,
-          shouldWatchForRemoval: false,
-          tapOnce: false
-        } : null;
-      } else if (path === "/options") {
-        const element = await this.findExportElement();
-        return element != null ? {
-          animationStyle: this.exportButtonAnimationStyle,
-          element,
-          shouldTap: __privateGet(this, _exportButtonSettings)?.shouldAutotap ?? false,
-          shouldWatchForRemoval: true,
-          tapOnce: true
-        } : null;
-      } else if (path === "/intro") {
-        const element = await this.findSignInButton();
-        return element != null ? {
-          animationStyle: this.signInButtonAnimationStyle,
-          element,
-          shouldTap: __privateGet(this, _signInButtonSettings)?.shouldAutotap ?? false,
-          shouldWatchForRemoval: false,
-          tapOnce: false
-        } : null;
-      } else {
-        return null;
-      }
-    }
-    /**
-     * Removes the overlay if it exists.
-     */
-    removeOverlayIfNeeded() {
-      if (this.currentOverlay != null) {
-        this.currentOverlay.style.display = "none";
-        this.currentOverlay.remove();
-        this.currentOverlay = null;
-        document.removeEventListener("scroll", this);
-        if (this.currentElementConfig?.element) {
-          __privateGet(this, _tappedElements).delete(this.currentElementConfig?.element);
-        }
-      }
-    }
-    /**
-     * Updates the position of the overlay based on the element to center on.
-     */
-    updateOverlayPosition() {
-      if (this.currentOverlay != null && this.currentElementConfig?.animationStyle != null && this.elementToCenterOn != null) {
-        const animations = this.currentOverlay.getAnimations();
-        animations.forEach((animation) => animation.pause());
-        const { top, left, width, height } = this.elementToCenterOn.getBoundingClientRect();
-        this.currentOverlay.style.position = "absolute";
-        const { animationStyle } = this.currentElementConfig;
-        const isRound = animationStyle.borderRadius === "100%";
-        const widthOffset = isRound ? width / 2 : 0;
-        const heightOffset = isRound ? height / 2 : 0;
-        this.currentOverlay.style.top = `calc(${top}px + ${window.scrollY}px - ${widthOffset}px - 1px - ${animationStyle.offsetTopEm}em)`;
-        this.currentOverlay.style.left = `calc(${left}px + ${window.scrollX}px - ${heightOffset}px - 1px - ${animationStyle.offsetLeftEm}em)`;
-        this.currentOverlay.style.pointerEvents = "none";
-        animations.forEach((animation) => animation.play());
-      }
-    }
-    /**
-     * Creates an overlay element to animate, by adding a div to the body
-     * and styling it based on the found element.
-     * @param {HTMLElement|Element} mainElement
-     * @param {any} style
-     */
-    createOverlayElement(mainElement, style) {
-      this.removeOverlayIfNeeded();
-      const overlay = document.createElement("div");
-      overlay.setAttribute("id", OVERLAY_ID);
-      if (this.elementToCenterOn != null) {
-        this.currentOverlay = overlay;
-        this.updateOverlayPosition();
-        const mainElementRect = mainElement.getBoundingClientRect();
-        overlay.style.width = `${mainElementRect.width}px`;
-        overlay.style.height = `${mainElementRect.height}px`;
-        overlay.style.zIndex = style.zIndex;
-        overlay.style.pointerEvents = "none";
-        document.body.appendChild(overlay);
-        document.addEventListener("scroll", this, { passive: true });
-      } else {
-        this.currentOverlay = null;
-      }
-    }
-    /**
-     * Observes the removal of an element from the DOM.
-     * @param {HTMLElement|Element} element
-     * @param {any} onRemoveCallback
-     */
-    observeElementRemoval(element, onRemoveCallback) {
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (mutation.type === "childList" && !document.contains(element)) {
-            onRemoveCallback();
-            observer.disconnect();
-          }
-        });
-      });
-      observer.observe(document.body, { childList: true, subtree: true });
-    }
-    /**
-     *
-     * @param {HTMLElement|Element|SVGElement} element
-     * @param {ButtonAnimationStyle} style
-     */
-    setElementToCenterOn(element, style) {
-      const svgElement = element.parentNode?.querySelector("svg") ?? element.querySelector("svg");
-      __privateSet(this, _elementToCenterOn, style.borderRadius === "100%" && svgElement != null ? svgElement : element);
-    }
-    /**
-     * @returns {HTMLElement|Element|SVGElement|null}
-     */
-    get elementToCenterOn() {
-      return __privateGet(this, _elementToCenterOn);
-    }
-    /**
-     * Moves the element into view and animates it.
-     * @param {HTMLElement|Element} element
-     * @param {ButtonAnimationStyle} style
-     */
-    animateElement(element, style) {
-      this.createOverlayElement(element, style);
-      if (this.currentOverlay != null) {
-        this.currentOverlay.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center"
-        });
-        const keyframes = [
-          {
-            backgroundColor: BACKGROUND_COLOR_START,
-            offset: 0,
-            borderRadius: style.borderRadius,
-            border: `1px solid ${BACKGROUND_COLOR_START}`,
-            transform: style.transform.start
-          },
-          // Start: 10% blue
-          {
-            backgroundColor: BACKGROUND_COLOR_END,
-            offset: 0.5,
-            borderRadius: style.borderRadius,
-            border: `1px solid ${BACKGROUND_COLOR_END}`,
-            transform: style.transform.mid,
-            transformOrigin: "center"
-          },
-          // Middle: 25% blue
-          {
-            backgroundColor: BACKGROUND_COLOR_START,
-            offset: 1,
-            borderRadius: style.borderRadius,
-            border: `1px solid ${BACKGROUND_COLOR_START}`,
-            transform: style.transform.start
-          }
-          // End: 10% blue
-        ];
-        const options = {
-          duration: ANIMATION_DURATION_MS,
-          iterations: ANIMATION_ITERATIONS
-        };
-        this.currentOverlay.animate(keyframes, options);
-      }
-    }
-    autotapElement(element) {
-      element.click();
-    }
-    /**
-     * On passwords.google.com the export button is in a container that is quite ambiguious.
-     * To solve for that we first try to find the container and then the button inside it.
-     * If that fails, we look for the button based on it's label.
-     * @returns {Promise<HTMLElement|Element|null>}
-     */
-    async findExportElement() {
-      const findInContainer = () => {
-        const exportButtonContainer = document.querySelector(this.exportButtonContainerSelector);
-        return exportButtonContainer && exportButtonContainer.querySelectorAll("button")[1];
-      };
-      const findWithLabel = () => {
-        return document.querySelector(this.exportButtonLabelTextSelector);
-      };
-      return await withExponentialBackoff(() => findInContainer() ?? findWithLabel());
-    }
-    /**
-     * @returns {Promise<HTMLElement|Element|null>}
-     */
-    async findSettingsElement() {
-      const fn = () => {
-        const settingsButton = document.querySelector(this.settingsButtonSelector);
-        return settingsButton;
-      };
-      return await withExponentialBackoff(fn);
-    }
-    /**
-     * @returns {Promise<HTMLElement|Element|null>}
-     */
-    async findSignInButton() {
-      return await withExponentialBackoff(() => document.querySelector(this.signinButtonSelector));
-    }
-    /**
-     * @param {Event} event
-     */
-    handleEvent(event) {
-      if (event.type === "scroll") {
-        requestAnimationFrame(() => this.updateOverlayPosition());
-      }
-    }
-    /**
-     * @param {ElementConfig|null} config
-     */
-    setCurrentElementConfig(config) {
-      if (config != null) {
-        __privateSet(this, _currentElementConfig, config);
-        this.setElementToCenterOn(config.element, config.animationStyle);
-      }
-    }
-    /**
-     * Checks if the path is supported for animation.
-     * @param {string} path
-     * @returns {boolean}
-     */
-    isSupportedPath(path) {
-      return [__privateGet(this, _exportButtonSettings)?.path, __privateGet(this, _settingsButtonSettings)?.path, __privateGet(this, _signInButtonSettings)?.path].includes(path);
-    }
-    async handlePath(path) {
-      this.removeOverlayIfNeeded();
-      if (this.isSupportedPath(path)) {
-        try {
-          this.setCurrentElementConfig(await this.getElementAndStyleFromPath(path));
-          if (this.currentElementConfig?.element && !__privateGet(this, _tappedElements).has(this.currentElementConfig?.element)) {
-            await this.animateOrTapElement();
-            if (this.currentElementConfig?.shouldTap && this.currentElementConfig?.tapOnce) {
-              __privateGet(this, _tappedElements).add(this.currentElementConfig.element);
-            }
-          }
-        } catch {
-          console.error("password-import: failed for path:", path);
-        }
-      }
-    }
-    /**
-     * Based on the current element config, animates the element or taps it.
-     * If the element should be watched for removal, it sets up a mutation observer.
-     */
-    async animateOrTapElement() {
-      const { element, animationStyle, shouldTap, shouldWatchForRemoval } = this.currentElementConfig ?? {};
-      if (element != null && animationStyle != null) {
-        if (shouldTap) {
-          this.autotapElement(element);
-        } else {
-          await this.domLoaded;
-          this.animateElement(element, animationStyle);
-        }
-        if (shouldWatchForRemoval) {
-          this.observeElementRemoval(element, () => {
-            this.removeOverlayIfNeeded();
-          });
-        }
-      }
-    }
-    /**
-     * @returns {string}
-     */
-    get exportButtonContainerSelector() {
-      return __privateGet(this, _exportButtonSettings)?.selectors?.join(",");
-    }
-    /**
-     * @returns {string}
-     */
-    get exportButtonLabelTextSelector() {
-      return __privateGet(this, _exportButtonSettings)?.labelTexts.map((text) => `button[aria-label="${text}"]`).join(",");
-    }
-    /**
-     * @returns {string}
-     */
-    get signinLabelTextSelector() {
-      return __privateGet(this, _signInButtonSettings)?.labelTexts.map((text) => `a[aria-label="${text}"]:not([target="_top"])`).join(",");
-    }
-    /**
-     * @returns {string}
-     */
-    get signinButtonSelector() {
-      return `${__privateGet(this, _signInButtonSettings)?.selectors?.join(",")}, ${this.signinLabelTextSelector}`;
-    }
-    /**
-     * @returns {string}
-     */
-    get settingsLabelTextSelector() {
-      return __privateGet(this, _settingsButtonSettings)?.labelTexts.map((text) => `a[aria-label="${text}"]`).join(",");
-    }
-    /**
-     * @returns {string}
-     */
-    get settingsButtonSelector() {
-      return `${__privateGet(this, _settingsButtonSettings)?.selectors?.join(",")}, ${this.settingsLabelTextSelector}`;
-    }
-    setButtonSettings() {
-      __privateSet(this, _exportButtonSettings, this.getFeatureSetting("exportButton"));
-      __privateSet(this, _signInButtonSettings, this.getFeatureSetting("signInButton"));
-      __privateSet(this, _settingsButtonSettings, this.getFeatureSetting("settingsButton"));
-    }
-    urlChanged() {
-      this.handlePath(window.location.pathname);
+      __publicField(this, "listenForUrlChanges", true);
     }
     init() {
-      if (isBeingFramed()) {
+      const apiChanges = this.getFeatureSetting("apiChanges");
+      if (apiChanges) {
+        for (const scope in apiChanges) {
+          const change = apiChanges[scope];
+          if (!this.checkIsValidAPIChange(change)) {
+            continue;
+          }
+          this.applyApiChange(scope, change);
+        }
+      }
+    }
+    urlChanged() {
+      this.init();
+    }
+    /**
+     * Checks if the config API change is valid.
+     * @param {any} change
+     * @returns {change is APIChange}
+     */
+    checkIsValidAPIChange(change) {
+      if (typeof change !== "object") {
+        return false;
+      }
+      if (change.type === "remove") {
+        return true;
+      }
+      if (change.type === "descriptor") {
+        if (change.enumerable && typeof change.enumerable !== "boolean") {
+          return false;
+        }
+        if (change.configurable && typeof change.configurable !== "boolean") {
+          return false;
+        }
+        if ("define" in change && typeof change.define !== "boolean") {
+          return false;
+        }
+        return typeof change.getterValue !== "undefined";
+      }
+      return false;
+    }
+    // TODO move this to schema definition imported from the privacy-config
+    // Additionally remove checkIsValidAPIChange when this change happens.
+    // See: https://app.asana.com/0/1201614831475344/1208715421518231/f
+    /**
+     * @typedef {Object} APIChange
+     * @property {"remove"|"descriptor"} type
+     * @property {import('../utils.js').ConfigSetting} [getterValue] - The value returned from a getter.
+     * @property {boolean} [enumerable] - Whether the property is enumerable.
+     * @property {boolean} [configurable] - Whether the property is configurable.
+     * @property {boolean} [define] - Whether to define the property if it does not exist.
+     */
+    /**
+     * Applies a change to DOM APIs.
+     * @param {string} scope
+     * @param {APIChange} change
+     * @returns {void}
+     */
+    applyApiChange(scope, change) {
+      const response = this.getGlobalObject(scope);
+      if (!response) {
         return;
       }
-      this.setButtonSettings();
-      const handlePath = this.handlePath.bind(this);
-      __privateSet(this, _domLoaded, new Promise((resolve) => {
-        if (document.readyState !== "loading") {
-          resolve();
+      const [obj, key] = response;
+      if (change.type === "remove") {
+        this.removeApiMethod(obj, key);
+      } else if (change.type === "descriptor") {
+        this.wrapApiDescriptor(obj, key, change);
+      }
+    }
+    /**
+     * Removes a method from an API.
+     * @param {object} api
+     * @param {string} key
+     */
+    removeApiMethod(api, key) {
+      try {
+        if (hasOwnProperty.call(api, key)) {
+          delete api[key];
+        }
+      } catch (e) {
+      }
+    }
+    /**
+     * Wraps a property with descriptor.
+     * @param {object} api
+     * @param {string} key
+     * @param {APIChange} change
+     */
+    wrapApiDescriptor(api, key, change) {
+      const getterValue = change.getterValue;
+      if (getterValue) {
+        const descriptor = {
+          get: () => processAttr(getterValue, void 0)
+        };
+        if ("enumerable" in change) {
+          descriptor.enumerable = change.enumerable;
+        }
+        if ("configurable" in change) {
+          descriptor.configurable = change.configurable;
+        }
+        if (change.define === true && !(key in api)) {
+          const defineDescriptor = {
+            ...descriptor,
+            enumerable: typeof descriptor.enumerable !== "boolean" ? true : descriptor.enumerable,
+            configurable: typeof descriptor.configurable !== "boolean" ? true : descriptor.configurable
+          };
+          this.defineProperty(api, key, defineDescriptor);
           return;
         }
-        document.addEventListener(
-          "DOMContentLoaded",
-          async () => {
-            resolve();
-            const path = window.location.pathname;
-            await handlePath(path);
-          },
-          { once: true }
-        );
-      }));
+        this.wrapProperty(api, key, descriptor);
+      }
+    }
+    /**
+     * Looks up a global object from a scope, e.g. 'Navigator.prototype'.
+     * @param {string} scope the scope of the object to get to.
+     * @returns {[object, string]|null} the object at the scope.
+     */
+    getGlobalObject(scope) {
+      const parts = scope.split(".");
+      const lastPart = parts.pop();
+      if (!lastPart) {
+        return null;
+      }
+      let obj = window;
+      for (const part of parts) {
+        obj = obj[part];
+        if (!obj) {
+          return null;
+        }
+      }
+      return [obj, lastPart];
     }
   };
-  _exportButtonSettings = new WeakMap();
-  _settingsButtonSettings = new WeakMap();
-  _signInButtonSettings = new WeakMap();
-  _elementToCenterOn = new WeakMap();
-  _currentOverlay = new WeakMap();
-  _currentElementConfig = new WeakMap();
-  _domLoaded = new WeakMap();
-  _tappedElements = new WeakMap();
+
+  // src/features/web-compat.js
+  function windowSizingFix() {
+    if (window.outerHeight !== 0 && window.outerWidth !== 0) {
+      return;
+    }
+    window.outerHeight = window.innerHeight;
+    window.outerWidth = window.innerWidth;
+  }
+  var MSG_WEB_SHARE = "webShare";
+  var MSG_PERMISSIONS_QUERY = "permissionsQuery";
+  var MSG_SCREEN_LOCK = "screenLock";
+  var MSG_SCREEN_UNLOCK = "screenUnlock";
+  var MSG_DEVICE_ENUMERATION = "deviceEnumeration";
+  function canShare(data) {
+    if (typeof data !== "object") return false;
+    data = Object.assign({}, data);
+    for (const key of ["url", "title", "text", "files"]) {
+      if (data[key] === void 0 || data[key] === null) {
+        delete data[key];
+      }
+    }
+    if (!("url" in data) && !("title" in data) && !("text" in data)) return false;
+    if ("files" in data) {
+      if (!(Array.isArray(data.files) || data.files instanceof FileList)) return false;
+      if (data.files.length > 0) return false;
+    }
+    if ("title" in data && typeof data.title !== "string") return false;
+    if ("text" in data && typeof data.text !== "string") return false;
+    if ("url" in data) {
+      if (typeof data.url !== "string") return false;
+      try {
+        const url = new URL2(data.url, location.href);
+        if (url.protocol !== "http:" && url.protocol !== "https:") return false;
+      } catch (err) {
+        return false;
+      }
+    }
+    return true;
+  }
+  function cleanShareData(data) {
+    const dataToSend = {};
+    for (const key of ["title", "text", "url"]) {
+      if (key in data) dataToSend[key] = data[key];
+    }
+    if ("url" in data) {
+      dataToSend.url = new URL2(data.url, location.href).href;
+    }
+    if ("url" in dataToSend && "text" in dataToSend) {
+      dataToSend.text = `${dataToSend.text} ${dataToSend.url}`;
+      delete dataToSend.url;
+    }
+    if (!("url" in dataToSend) && !("text" in dataToSend)) {
+      dataToSend.text = "";
+    }
+    return dataToSend;
+  }
+  var _activeShareRequest, _activeScreenLockRequest;
+  var WebCompat = class extends ContentFeature {
+    constructor() {
+      super(...arguments);
+      /** @type {Promise<any> | null} */
+      __privateAdd(this, _activeShareRequest, null);
+      /** @type {Promise<any> | null} */
+      __privateAdd(this, _activeScreenLockRequest, null);
+    }
+    init() {
+      if (this.getFeatureSettingEnabled("windowSizing")) {
+        windowSizingFix();
+      }
+      if (this.getFeatureSettingEnabled("navigatorCredentials")) {
+        this.navigatorCredentialsFix();
+      }
+      if (this.getFeatureSettingEnabled("safariObject")) {
+        this.safariObjectFix();
+      }
+      if (this.getFeatureSettingEnabled("messageHandlers")) {
+        this.messageHandlersFix();
+      }
+      if (this.getFeatureSettingEnabled("notification")) {
+        this.notificationFix();
+      }
+      if (this.getFeatureSettingEnabled("permissions")) {
+        const settings = this.getFeatureSetting("permissions");
+        this.permissionsFix(settings);
+      }
+      if (this.getFeatureSettingEnabled("cleanIframeValue")) {
+        this.cleanIframeValue();
+      }
+      if (this.getFeatureSettingEnabled("mediaSession")) {
+        this.mediaSessionFix();
+      }
+      if (this.getFeatureSettingEnabled("presentation")) {
+        this.presentationFix();
+      }
+      if (this.getFeatureSettingEnabled("webShare")) {
+        this.shimWebShare();
+      }
+      if (this.getFeatureSettingEnabled("viewportWidth")) {
+        this.viewportWidthFix();
+      }
+      if (this.getFeatureSettingEnabled("screenLock")) {
+        this.screenLockFix();
+      }
+      if (this.getFeatureSettingEnabled("modifyLocalStorage")) {
+        this.modifyLocalStorage();
+      }
+      if (this.getFeatureSettingEnabled("modifyCookies")) {
+        this.modifyCookies();
+      }
+      if (this.getFeatureSettingEnabled("disableDeviceEnumeration")) {
+        this.preventDeviceEnumeration();
+      }
+      if (this.getFeatureSettingEnabled("enumerateDevices")) {
+        this.deviceEnumerationFix();
+      }
+    }
+    /** Shim Web Share API in Android WebView */
+    shimWebShare() {
+      if (typeof navigator.canShare === "function" || typeof navigator.share === "function") return;
+      this.defineProperty(Navigator.prototype, "canShare", {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: canShare
+      });
+      this.defineProperty(Navigator.prototype, "share", {
+        configurable: true,
+        enumerable: true,
+        writable: true,
+        value: async (data) => {
+          if (!canShare(data)) return Promise.reject(new TypeError("Invalid share data"));
+          if (__privateGet(this, _activeShareRequest)) {
+            return Promise.reject(new DOMException("Share already in progress", "InvalidStateError"));
+          }
+          if (!navigator.userActivation.isActive) {
+            return Promise.reject(new DOMException("Share must be initiated by a user gesture", "InvalidStateError"));
+          }
+          const dataToSend = cleanShareData(data);
+          __privateSet(this, _activeShareRequest, this.request(MSG_WEB_SHARE, dataToSend));
+          let resp;
+          try {
+            resp = await __privateGet(this, _activeShareRequest);
+          } catch (err) {
+            throw new DOMException(err.message, "DataError");
+          } finally {
+            __privateSet(this, _activeShareRequest, null);
+          }
+          if (resp.failure) {
+            switch (resp.failure.name) {
+              case "AbortError":
+              case "NotAllowedError":
+              case "DataError":
+                throw new DOMException(resp.failure.message, resp.failure.name);
+              default:
+                throw new DOMException(resp.failure.message, "DataError");
+            }
+          }
+        }
+      });
+    }
+    /**
+     * Notification fix for adding missing API for Android WebView.
+     */
+    notificationFix() {
+      if (window.Notification) {
+        return;
+      }
+      this.defineProperty(window, "Notification", {
+        value: () => {
+        },
+        writable: true,
+        configurable: true,
+        enumerable: false
+      });
+      this.defineProperty(window.Notification, "requestPermission", {
+        value: () => {
+          return Promise.resolve("denied");
+        },
+        writable: true,
+        configurable: true,
+        enumerable: true
+      });
+      this.defineProperty(window.Notification, "permission", {
+        get: () => "denied",
+        configurable: true,
+        enumerable: false
+      });
+      this.defineProperty(window.Notification, "maxActions", {
+        get: () => 2,
+        configurable: true,
+        enumerable: true
+      });
+    }
+    cleanIframeValue() {
+      function cleanValueData(val) {
+        const clone = Object.assign({}, val);
+        const deleteKeys = ["iframeProto", "iframeData", "remap"];
+        for (const key of deleteKeys) {
+          if (key in clone) {
+            delete clone[key];
+          }
+        }
+        val.iframeData = clone;
+        return val;
+      }
+      window.XMLHttpRequest.prototype.send = new Proxy(window.XMLHttpRequest.prototype.send, {
+        apply(target, thisArg, args) {
+          const body = args[0];
+          const cleanKey = "bi_wvdp";
+          if (body && typeof body === "string" && body.includes(cleanKey)) {
+            const parts = body.split("&").map((part) => {
+              return part.split("=");
+            });
+            if (parts.length > 0) {
+              parts.forEach((part) => {
+                if (part[0] === cleanKey) {
+                  const val = JSON.parse(decodeURIComponent(part[1]));
+                  part[1] = encodeURIComponent(JSON.stringify(cleanValueData(val)));
+                }
+              });
+              args[0] = parts.map((part) => {
+                return part.join("=");
+              }).join("&");
+            }
+          }
+          return Reflect.apply(target, thisArg, args);
+        }
+      });
+    }
+    /**
+     * Adds missing permissions API for Android WebView.
+     */
+    permissionsFix(settings) {
+      if (window.navigator.permissions) {
+        return;
+      }
+      const permissions = {};
+      class PermissionStatus extends EventTarget {
+        constructor(name, state) {
+          super();
+          this.name = name;
+          this.state = state;
+          this.onchange = null;
+        }
+      }
+      permissions.query = new Proxy(
+        async (query) => {
+          this.addDebugFlag();
+          if (!query) {
+            throw new TypeError("Failed to execute 'query' on 'Permissions': 1 argument required, but only 0 present.");
+          }
+          if (!query.name) {
+            throw new TypeError(
+              "Failed to execute 'query' on 'Permissions': Failed to read the 'name' property from 'PermissionDescriptor': Required member is undefined."
+            );
+          }
+          if (!settings.supportedPermissions || !(query.name in settings.supportedPermissions)) {
+            throw new TypeError(
+              `Failed to execute 'query' on 'Permissions': Failed to read the 'name' property from 'PermissionDescriptor': The provided value '${query.name}' is not a valid enum value of type PermissionName.`
+            );
+          }
+          const permSetting = settings.supportedPermissions[query.name];
+          const returnName = permSetting.name || query.name;
+          let returnStatus = settings.permissionResponse || "prompt";
+          if (permSetting.native) {
+            try {
+              const response = await this.messaging.request(MSG_PERMISSIONS_QUERY, query);
+              returnStatus = response.state || "prompt";
+            } catch (err) {
+            }
+          }
+          return Promise.resolve(new PermissionStatus(returnName, returnStatus));
+        },
+        {
+          get(target, name) {
+            return Reflect.get(target, name);
+          }
+        }
+      );
+      window.navigator.permissions = permissions;
+    }
+    /**
+     * Fixes screen lock/unlock APIs for Android WebView.
+     */
+    screenLockFix() {
+      const validOrientations = [
+        "any",
+        "natural",
+        "landscape",
+        "portrait",
+        "portrait-primary",
+        "portrait-secondary",
+        "landscape-primary",
+        "landscape-secondary",
+        "unsupported"
+      ];
+      this.wrapProperty(globalThis.ScreenOrientation.prototype, "lock", {
+        value: async (requestedOrientation) => {
+          if (!requestedOrientation) {
+            return Promise.reject(
+              new TypeError("Failed to execute 'lock' on 'ScreenOrientation': 1 argument required, but only 0 present.")
+            );
+          }
+          if (!validOrientations.includes(requestedOrientation)) {
+            return Promise.reject(
+              new TypeError(
+                `Failed to execute 'lock' on 'ScreenOrientation': The provided value '${requestedOrientation}' is not a valid enum value of type OrientationLockType.`
+              )
+            );
+          }
+          if (__privateGet(this, _activeScreenLockRequest)) {
+            return Promise.reject(new DOMException("Screen lock already in progress", "AbortError"));
+          }
+          __privateSet(this, _activeScreenLockRequest, this.messaging.request(MSG_SCREEN_LOCK, { orientation: requestedOrientation }));
+          let resp;
+          try {
+            resp = await __privateGet(this, _activeScreenLockRequest);
+          } catch (err) {
+            throw new DOMException(err.message, "DataError");
+          } finally {
+            __privateSet(this, _activeScreenLockRequest, null);
+          }
+          if (resp.failure) {
+            switch (resp.failure.name) {
+              case "TypeError":
+                return Promise.reject(new TypeError(resp.failure.message));
+              case "InvalidStateError":
+                return Promise.reject(new DOMException(resp.failure.message, resp.failure.name));
+              default:
+                return Promise.reject(new DOMException(resp.failure.message, "DataError"));
+            }
+          }
+          return Promise.resolve();
+        }
+      });
+      this.wrapProperty(globalThis.ScreenOrientation.prototype, "unlock", {
+        value: () => {
+          this.messaging.request(MSG_SCREEN_UNLOCK, {});
+        }
+      });
+    }
+    /**
+     * Add missing navigator.credentials API
+     */
+    navigatorCredentialsFix() {
+      try {
+        if ("credentials" in navigator && "get" in navigator.credentials) {
+          return;
+        }
+        const value = {
+          get() {
+            return Promise.reject(new Error());
+          }
+        };
+        this.defineProperty(Navigator.prototype, "credentials", {
+          value,
+          configurable: true,
+          enumerable: true,
+          writable: true
+        });
+      } catch {
+      }
+    }
+    safariObjectFix() {
+      try {
+        if (window.safari) {
+          return;
+        }
+        this.defineProperty(window, "safari", {
+          value: {},
+          writable: true,
+          configurable: true,
+          enumerable: true
+        });
+        this.defineProperty(window.safari, "pushNotification", {
+          value: {},
+          configurable: true,
+          enumerable: true
+        });
+        this.defineProperty(window.safari.pushNotification, "toString", {
+          value: () => {
+            return "[object SafariRemoteNotification]";
+          },
+          configurable: true,
+          enumerable: true
+        });
+        class SafariRemoteNotificationPermission {
+          constructor() {
+            this.deviceToken = null;
+            this.permission = "denied";
+          }
+        }
+        this.defineProperty(window.safari.pushNotification, "permission", {
+          value: () => {
+            return new SafariRemoteNotificationPermission();
+          },
+          configurable: true,
+          enumerable: true
+        });
+        this.defineProperty(window.safari.pushNotification, "requestPermission", {
+          value: (_name, _domain, _options, callback) => {
+            if (typeof callback === "function") {
+              callback(new SafariRemoteNotificationPermission());
+              return;
+            }
+            const reason = "Invalid 'callback' value passed to safari.pushNotification.requestPermission(). Expected a function.";
+            throw new Error(reason);
+          },
+          configurable: true,
+          enumerable: true
+        });
+      } catch {
+      }
+    }
+    mediaSessionFix() {
+      try {
+        if (window.navigator.mediaSession && this.injectName !== "integration") {
+          return;
+        }
+        class MyMediaSession {
+          constructor() {
+            __publicField(this, "metadata", null);
+            /** @type {MediaSession['playbackState']} */
+            __publicField(this, "playbackState", "none");
+          }
+          setActionHandler() {
+          }
+          setCameraActive() {
+          }
+          setMicrophoneActive() {
+          }
+          setPositionState() {
+          }
+        }
+        this.shimInterface("MediaSession", MyMediaSession, {
+          disallowConstructor: true,
+          allowConstructorCall: false,
+          wrapToString: true
+        });
+        this.shimProperty(Navigator.prototype, "mediaSession", new MyMediaSession(), true);
+        this.shimInterface(
+          "MediaMetadata",
+          class {
+            constructor(metadata = {}) {
+              this.title = metadata.title;
+              this.artist = metadata.artist;
+              this.album = metadata.album;
+              this.artwork = metadata.artwork;
+            }
+          },
+          {
+            disallowConstructor: false,
+            allowConstructorCall: false,
+            wrapToString: true
+          }
+        );
+      } catch {
+      }
+    }
+    presentationFix() {
+      try {
+        if (window.navigator.presentation && this.injectName !== "integration") {
+          return;
+        }
+        const MyPresentation = class {
+          get defaultRequest() {
+            return null;
+          }
+          get receiver() {
+            return null;
+          }
+        };
+        this.shimInterface("Presentation", MyPresentation, {
+          disallowConstructor: true,
+          allowConstructorCall: false,
+          wrapToString: true
+        });
+        this.shimInterface(
+          // @ts-expect-error Presentation API is still experimental, TS types are missing
+          "PresentationAvailability",
+          class {
+            // class definition is empty because there's no way to get an instance of it anyways
+          },
+          {
+            disallowConstructor: true,
+            allowConstructorCall: false,
+            wrapToString: true
+          }
+        );
+        this.shimInterface(
+          // @ts-expect-error Presentation API is still experimental, TS types are missing
+          "PresentationRequest",
+          class {
+            // class definition is empty because there's no way to get an instance of it anyways
+          },
+          {
+            disallowConstructor: true,
+            allowConstructorCall: false,
+            wrapToString: true
+          }
+        );
+        this.shimProperty(Navigator.prototype, "presentation", new MyPresentation(), true);
+      } catch {
+      }
+    }
+    /**
+     * Support for modifying localStorage entries
+     */
+    modifyLocalStorage() {
+      const settings = this.getFeatureSetting("modifyLocalStorage");
+      if (!settings || !settings.changes) return;
+      settings.changes.forEach((change) => {
+        if (change.action === "delete") {
+          localStorage.removeItem(change.key);
+        }
+      });
+    }
+    /**
+     * Support for modifying cookies
+     */
+    modifyCookies() {
+      const settings = this.getFeatureSetting("modifyCookies");
+      if (!settings || !settings.changes) return;
+      settings.changes.forEach((change) => {
+        if (change.action === "delete") {
+          const pathValue = change.path ? `; path=${change.path}` : "";
+          const domainValue = change.domain ? `; domain=${change.domain}` : "";
+          document.cookie = `${change.key}=; expires=Thu, 01 Jan 1970 00:00:00 GMT${pathValue}${domainValue}`;
+        }
+      });
+    }
+    /**
+     * Support for proxying `window.webkit.messageHandlers`
+     */
+    messageHandlersFix() {
+      const settings = this.getFeatureSetting("messageHandlers");
+      if (!globalThis.webkit?.messageHandlers) return;
+      if (!settings) return;
+      const proxy = new Proxy(globalThis.webkit.messageHandlers, {
+        get(target, messageName, receiver) {
+          const handlerName = String(messageName);
+          if (settings.handlerStrategies.reflect.includes(handlerName)) {
+            return Reflect.get(target, messageName, receiver);
+          }
+          if (settings.handlerStrategies.undefined.includes(handlerName)) {
+            return void 0;
+          }
+          if (settings.handlerStrategies.polyfill.includes("*") || settings.handlerStrategies.polyfill.includes(handlerName)) {
+            return {
+              postMessage() {
+                return Promise.resolve({});
+              }
+            };
+          }
+        }
+      });
+      globalThis.webkit = {
+        ...globalThis.webkit,
+        messageHandlers: proxy
+      };
+    }
+    viewportWidthFix() {
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => this.viewportWidthFixInner());
+      } else {
+        this.viewportWidthFixInner();
+      }
+    }
+    /**
+     * create or update a viewport tag with the given content
+     * @param {HTMLMetaElement|null} viewportTag
+     * @param {string} forcedValue
+     */
+    forceViewportTag(viewportTag, forcedValue) {
+      const viewportTagExists = Boolean(viewportTag);
+      if (!viewportTag) {
+        viewportTag = document.createElement("meta");
+        viewportTag.setAttribute("name", "viewport");
+      }
+      viewportTag.setAttribute("content", forcedValue);
+      if (!viewportTagExists) {
+        document.head.appendChild(viewportTag);
+      }
+    }
+    viewportWidthFixInner() {
+      const viewportTags = document.querySelectorAll("meta[name=viewport i]");
+      const viewportTag = viewportTags.length === 0 ? null : viewportTags[viewportTags.length - 1];
+      const viewportContent = viewportTag?.getAttribute("content") || "";
+      const viewportContentParts = viewportContent ? viewportContent.split(/,|;/) : [];
+      const parsedViewportContent = viewportContentParts.map((part) => {
+        const [key, value] = part.split("=").map((p) => p.trim().toLowerCase());
+        return [key, value];
+      });
+      const { forcedDesktopValue, forcedMobileValue } = this.getFeatureSetting("viewportWidth");
+      if (typeof forcedDesktopValue === "string" && this.desktopModeEnabled) {
+        this.forceViewportTag(viewportTag, forcedDesktopValue);
+        return;
+      } else if (typeof forcedMobileValue === "string" && !this.desktopModeEnabled) {
+        this.forceViewportTag(viewportTag, forcedMobileValue);
+        return;
+      }
+      const forcedValues = {};
+      if (this.forcedZoomEnabled) {
+        forcedValues["initial-scale"] = 1;
+        forcedValues["user-scalable"] = "yes";
+        forcedValues["maximum-scale"] = 10;
+      }
+      if (this.getFeatureSettingEnabled("plainTextViewPort") && document.contentType === "text/plain") {
+        forcedValues.width = "device-width";
+        forcedValues["initial-scale"] = 1;
+      } else if (!viewportTag || this.desktopModeEnabled) {
+        forcedValues.width = screen.width >= 1280 ? 1280 : 980;
+        forcedValues["initial-scale"] = (screen.width / forcedValues.width).toFixed(3);
+        forcedValues["user-scalable"] = "yes";
+        const minimumScalePart = parsedViewportContent.find(([key]) => key === "minimum-scale");
+        if (minimumScalePart) {
+          forcedValues["minimum-scale"] = 0;
+        }
+      } else {
+        const widthPart = parsedViewportContent.find(([key]) => key === "width");
+        const initialScalePart = parsedViewportContent.find(([key]) => key === "initial-scale");
+        if (!widthPart && initialScalePart) {
+          const parsedInitialScale = parseFloat(initialScalePart[1]);
+          if (parsedInitialScale !== 1) {
+            forcedValues.width = "device-width";
+          }
+        }
+      }
+      const newContent = [];
+      Object.keys(forcedValues).forEach((key) => {
+        newContent.push(`${key}=${forcedValues[key]}`);
+      });
+      if (newContent.length > 0) {
+        parsedViewportContent.forEach(([key], idx) => {
+          if (!(key in forcedValues)) {
+            newContent.push(viewportContentParts[idx].trim());
+          }
+        });
+        this.forceViewportTag(viewportTag, newContent.join(", "));
+      }
+    }
+    /**
+     * Prevents device enumeration by returning an empty array when enabled
+     */
+    preventDeviceEnumeration() {
+      if (!window.MediaDevices) {
+        return;
+      }
+      let disableDeviceEnumeration = false;
+      const isFrame = window.self !== window.top;
+      if (isFrame) {
+        disableDeviceEnumeration = this.getFeatureSettingEnabled("disableDeviceEnumerationFrames");
+      } else {
+        disableDeviceEnumeration = this.getFeatureSettingEnabled("disableDeviceEnumeration");
+      }
+      if (disableDeviceEnumeration) {
+        const enumerateDevicesProxy = new DDGProxy(this, MediaDevices.prototype, "enumerateDevices", {
+          /**
+           * @returns {Promise<MediaDeviceInfo[]>}
+           */
+          apply() {
+            return Promise.resolve([]);
+          }
+        });
+        enumerateDevicesProxy.overload();
+      }
+    }
+    /**
+     * Creates a valid MediaDeviceInfo or InputDeviceInfo object that passes instanceof checks
+     * @param {'videoinput' | 'audioinput' | 'audiooutput'} kind - The device kind
+     * @returns {MediaDeviceInfo | InputDeviceInfo}
+     */
+    createMediaDeviceInfo(kind) {
+      let deviceInfo;
+      if (kind === "videoinput" || kind === "audioinput") {
+        if (typeof InputDeviceInfo !== "undefined" && InputDeviceInfo.prototype) {
+          deviceInfo = Object.create(InputDeviceInfo.prototype);
+        } else {
+          deviceInfo = Object.create(MediaDeviceInfo.prototype);
+        }
+      } else {
+        deviceInfo = Object.create(MediaDeviceInfo.prototype);
+      }
+      Object.defineProperties(deviceInfo, {
+        deviceId: {
+          value: "default",
+          writable: false,
+          configurable: false,
+          enumerable: true
+        },
+        kind: {
+          value: kind,
+          writable: false,
+          configurable: false,
+          enumerable: true
+        },
+        label: {
+          value: "",
+          writable: false,
+          configurable: false,
+          enumerable: true
+        },
+        groupId: {
+          value: "default-group",
+          writable: false,
+          configurable: false,
+          enumerable: true
+        },
+        toJSON: {
+          value: function() {
+            return {
+              deviceId: this.deviceId,
+              kind: this.kind,
+              label: this.label,
+              groupId: this.groupId
+            };
+          },
+          writable: false,
+          configurable: false,
+          enumerable: true
+        }
+      });
+      return deviceInfo;
+    }
+    /**
+     * Fixes device enumeration to handle permission prompts gracefully
+     */
+    deviceEnumerationFix() {
+      if (!window.MediaDevices) {
+        return;
+      }
+      const enumerateDevicesProxy = new DDGProxy(this, MediaDevices.prototype, "enumerateDevices", {
+        /**
+         * @param {MediaDevices['enumerateDevices']} target
+         * @param {MediaDevices} thisArg
+         * @param {Parameters<MediaDevices['enumerateDevices']>} args
+         * @returns {Promise<MediaDeviceInfo[]>}
+         */
+        apply: async (target, thisArg, args) => {
+          try {
+            const response = await this.messaging.request(MSG_DEVICE_ENUMERATION, {});
+            if (response.willPrompt) {
+              const devices = [];
+              if (response.videoInput) {
+                devices.push(this.createMediaDeviceInfo("videoinput"));
+              }
+              if (response.audioInput) {
+                devices.push(this.createMediaDeviceInfo("audioinput"));
+              }
+              if (response.audioOutput) {
+                devices.push(this.createMediaDeviceInfo("audiooutput"));
+              }
+              return Promise.resolve(devices);
+            } else {
+              return DDGReflect.apply(target, thisArg, args);
+            }
+          } catch (err) {
+            return DDGReflect.apply(target, thisArg, args);
+          }
+        }
+      });
+      enumerateDevicesProxy.overload();
+    }
+  };
+  _activeShareRequest = new WeakMap();
+  _activeScreenLockRequest = new WeakMap();
+  var web_compat_default = WebCompat;
+
+  // src/features/fingerprinting-hardware.js
+  var FingerprintingHardware = class extends ContentFeature {
+    init() {
+      this.wrapProperty(globalThis.Navigator.prototype, "keyboard", {
+        get: () => {
+          return this.getFeatureAttr("keyboard");
+        }
+      });
+      this.wrapProperty(globalThis.Navigator.prototype, "hardwareConcurrency", {
+        get: () => {
+          return this.getFeatureAttr("hardwareConcurrency", 2);
+        }
+      });
+      this.wrapProperty(globalThis.Navigator.prototype, "deviceMemory", {
+        get: () => {
+          return this.getFeatureAttr("deviceMemory", 8);
+        }
+      });
+    }
+  };
+
+  // src/features/fingerprinting-screen-size.js
+  var FingerprintingScreenSize = class extends ContentFeature {
+    constructor() {
+      super(...arguments);
+      __publicField(this, "origPropertyValues", {});
+    }
+    init() {
+      this.origPropertyValues.availTop = globalThis.screen.availTop;
+      this.wrapProperty(globalThis.Screen.prototype, "availTop", {
+        get: () => this.getFeatureAttr("availTop", 0)
+      });
+      this.origPropertyValues.availLeft = globalThis.screen.availLeft;
+      this.wrapProperty(globalThis.Screen.prototype, "availLeft", {
+        get: () => this.getFeatureAttr("availLeft", 0)
+      });
+      this.origPropertyValues.availWidth = globalThis.screen.availWidth;
+      const forcedAvailWidthValue = globalThis.screen.width;
+      this.wrapProperty(globalThis.Screen.prototype, "availWidth", {
+        get: () => forcedAvailWidthValue
+      });
+      this.origPropertyValues.availHeight = globalThis.screen.availHeight;
+      const forcedAvailHeightValue = globalThis.screen.height;
+      this.wrapProperty(globalThis.Screen.prototype, "availHeight", {
+        get: () => forcedAvailHeightValue
+      });
+      this.origPropertyValues.colorDepth = globalThis.screen.colorDepth;
+      this.wrapProperty(globalThis.Screen.prototype, "colorDepth", {
+        get: () => this.getFeatureAttr("colorDepth", 24)
+      });
+      this.origPropertyValues.pixelDepth = globalThis.screen.pixelDepth;
+      this.wrapProperty(globalThis.Screen.prototype, "pixelDepth", {
+        get: () => this.getFeatureAttr("pixelDepth", 24)
+      });
+      globalThis.window.addEventListener("resize", () => {
+        this.setWindowDimensions();
+      });
+      this.setWindowDimensions();
+    }
+    /**
+     * normalize window dimensions, if more than one monitor is in play.
+     *  X/Y values are set in the browser based on distance to the main monitor top or left, which
+     * can mean second or more monitors have very large or negative values. This function maps a given
+     * given coordinate value to the proper place on the main screen.
+     */
+    normalizeWindowDimension(value, targetDimension) {
+      if (value > targetDimension) {
+        return value % targetDimension;
+      }
+      if (value < 0) {
+        return targetDimension + value;
+      }
+      return value;
+    }
+    setWindowPropertyValue(property, value) {
+      try {
+        this.defineProperty(globalThis, property, {
+          get: () => value,
+          set: () => {
+          },
+          configurable: true,
+          enumerable: true
+        });
+      } catch (e) {
+      }
+    }
+    /**
+     * Fix window dimensions. The extension runs in a different JS context than the
+     * page, so we can inject the correct screen values as the window is resized,
+     * ensuring that no information is leaked as the dimensions change, but also that the
+     * values change correctly for valid use cases.
+     */
+    setWindowDimensions() {
+      try {
+        const window2 = globalThis;
+        const top = globalThis.top;
+        const normalizedY = this.normalizeWindowDimension(window2.screenY, window2.screen.height);
+        const normalizedX = this.normalizeWindowDimension(window2.screenX, window2.screen.width);
+        if (normalizedY <= this.origPropertyValues.availTop) {
+          this.setWindowPropertyValue("screenY", 0);
+          this.setWindowPropertyValue("screenTop", 0);
+        } else {
+          this.setWindowPropertyValue("screenY", normalizedY);
+          this.setWindowPropertyValue("screenTop", normalizedY);
+        }
+        if (top.window.outerHeight >= this.origPropertyValues.availHeight - 1) {
+          this.setWindowPropertyValue("outerHeight", top.window.screen.height);
+        } else {
+          try {
+            this.setWindowPropertyValue("outerHeight", top.window.outerHeight);
+          } catch (e) {
+          }
+        }
+        if (normalizedX <= this.origPropertyValues.availLeft) {
+          this.setWindowPropertyValue("screenX", 0);
+          this.setWindowPropertyValue("screenLeft", 0);
+        } else {
+          this.setWindowPropertyValue("screenX", normalizedX);
+          this.setWindowPropertyValue("screenLeft", normalizedX);
+        }
+        if (top.window.outerWidth >= this.origPropertyValues.availWidth - 1) {
+          this.setWindowPropertyValue("outerWidth", top.window.screen.width);
+        } else {
+          try {
+            this.setWindowPropertyValue("outerWidth", top.window.outerWidth);
+          } catch (e) {
+          }
+        }
+      } catch (e) {
+      }
+    }
+  };
+
+  // src/features/fingerprinting-temporary-storage.js
+  var FingerprintingTemporaryStorage = class extends ContentFeature {
+    init() {
+      const navigator2 = globalThis.navigator;
+      const Navigator2 = globalThis.Navigator;
+      if (navigator2.webkitTemporaryStorage) {
+        try {
+          const org = navigator2.webkitTemporaryStorage.queryUsageAndQuota;
+          const tStorage = navigator2.webkitTemporaryStorage;
+          tStorage.queryUsageAndQuota = function queryUsageAndQuota(callback, err) {
+            const modifiedCallback = function(usedBytes, grantedBytes) {
+              const maxBytesGranted = 4 * 1024 * 1024 * 1024;
+              const spoofedGrantedBytes = Math.min(grantedBytes, maxBytesGranted);
+              callback(usedBytes, spoofedGrantedBytes);
+            };
+            org.call(navigator2.webkitTemporaryStorage, modifiedCallback, err);
+          };
+          this.defineProperty(Navigator2.prototype, "webkitTemporaryStorage", {
+            get: () => tStorage,
+            enumerable: true,
+            configurable: true
+          });
+        } catch (e) {
+        }
+      }
+    }
+  };
+
+  // lib/sjcl.js
+  var sjcl = (() => {
+    "use strict";
+    var sjcl2 = {
+      /**
+       * Symmetric ciphers.
+       * @namespace
+       */
+      cipher: {},
+      /**
+       * Hash functions.  Right now only SHA256 is implemented.
+       * @namespace
+       */
+      hash: {},
+      /**
+       * Key exchange functions.  Right now only SRP is implemented.
+       * @namespace
+       */
+      keyexchange: {},
+      /**
+       * Cipher modes of operation.
+       * @namespace
+       */
+      mode: {},
+      /**
+       * Miscellaneous.  HMAC and PBKDF2.
+       * @namespace
+       */
+      misc: {},
+      /**
+       * Bit array encoders and decoders.
+       * @namespace
+       *
+       * @description
+       * The members of this namespace are functions which translate between
+       * SJCL's bitArrays and other objects (usually strings).  Because it
+       * isn't always clear which direction is encoding and which is decoding,
+       * the method names are "fromBits" and "toBits".
+       */
+      codec: {},
+      /**
+       * Exceptions.
+       * @namespace
+       */
+      exception: {
+        /**
+         * Ciphertext is corrupt.
+         * @constructor
+         */
+        corrupt: function(message) {
+          this.toString = function() {
+            return "CORRUPT: " + this.message;
+          };
+          this.message = message;
+        },
+        /**
+         * Invalid parameter.
+         * @constructor
+         */
+        invalid: function(message) {
+          this.toString = function() {
+            return "INVALID: " + this.message;
+          };
+          this.message = message;
+        },
+        /**
+         * Bug or missing feature in SJCL.
+         * @constructor
+         */
+        bug: function(message) {
+          this.toString = function() {
+            return "BUG: " + this.message;
+          };
+          this.message = message;
+        },
+        /**
+         * Something isn't ready.
+         * @constructor
+         */
+        notReady: function(message) {
+          this.toString = function() {
+            return "NOT READY: " + this.message;
+          };
+          this.message = message;
+        }
+      }
+    };
+    sjcl2.bitArray = {
+      /**
+       * Array slices in units of bits.
+       * @param {bitArray} a The array to slice.
+       * @param {Number} bstart The offset to the start of the slice, in bits.
+       * @param {Number} bend The offset to the end of the slice, in bits.  If this is undefined,
+       * slice until the end of the array.
+       * @return {bitArray} The requested slice.
+       */
+      bitSlice: function(a2, bstart, bend) {
+        a2 = sjcl2.bitArray._shiftRight(a2.slice(bstart / 32), 32 - (bstart & 31)).slice(1);
+        return bend === void 0 ? a2 : sjcl2.bitArray.clamp(a2, bend - bstart);
+      },
+      /**
+       * Extract a number packed into a bit array.
+       * @param {bitArray} a The array to slice.
+       * @param {Number} bstart The offset to the start of the slice, in bits.
+       * @param {Number} blength The length of the number to extract.
+       * @return {Number} The requested slice.
+       */
+      extract: function(a2, bstart, blength) {
+        var x2, sh = Math.floor(-bstart - blength & 31);
+        if ((bstart + blength - 1 ^ bstart) & -32) {
+          x2 = a2[bstart / 32 | 0] << 32 - sh ^ a2[bstart / 32 + 1 | 0] >>> sh;
+        } else {
+          x2 = a2[bstart / 32 | 0] >>> sh;
+        }
+        return x2 & (1 << blength) - 1;
+      },
+      /**
+       * Concatenate two bit arrays.
+       * @param {bitArray} a1 The first array.
+       * @param {bitArray} a2 The second array.
+       * @return {bitArray} The concatenation of a1 and a2.
+       */
+      concat: function(a1, a2) {
+        if (a1.length === 0 || a2.length === 0) {
+          return a1.concat(a2);
+        }
+        var last2 = a1[a1.length - 1], shift = sjcl2.bitArray.getPartial(last2);
+        if (shift === 32) {
+          return a1.concat(a2);
+        } else {
+          return sjcl2.bitArray._shiftRight(a2, shift, last2 | 0, a1.slice(0, a1.length - 1));
+        }
+      },
+      /**
+       * Find the length of an array of bits.
+       * @param {bitArray} a The array.
+       * @return {Number} The length of a, in bits.
+       */
+      bitLength: function(a2) {
+        var l = a2.length, x2;
+        if (l === 0) {
+          return 0;
+        }
+        x2 = a2[l - 1];
+        return (l - 1) * 32 + sjcl2.bitArray.getPartial(x2);
+      },
+      /**
+       * Truncate an array.
+       * @param {bitArray} a The array.
+       * @param {Number} len The length to truncate to, in bits.
+       * @return {bitArray} A new array, truncated to len bits.
+       */
+      clamp: function(a2, len) {
+        if (a2.length * 32 < len) {
+          return a2;
+        }
+        a2 = a2.slice(0, Math.ceil(len / 32));
+        var l = a2.length;
+        len = len & 31;
+        if (l > 0 && len) {
+          a2[l - 1] = sjcl2.bitArray.partial(len, a2[l - 1] & 2147483648 >> len - 1, 1);
+        }
+        return a2;
+      },
+      /**
+       * Make a partial word for a bit array.
+       * @param {Number} len The number of bits in the word.
+       * @param {Number} x The bits.
+       * @param {Number} [_end=0] Pass 1 if x has already been shifted to the high side.
+       * @return {Number} The partial word.
+       */
+      partial: function(len, x2, _end) {
+        if (len === 32) {
+          return x2;
+        }
+        return (_end ? x2 | 0 : x2 << 32 - len) + len * 1099511627776;
+      },
+      /**
+       * Get the number of bits used by a partial word.
+       * @param {Number} x The partial word.
+       * @return {Number} The number of bits used by the partial word.
+       */
+      getPartial: function(x2) {
+        return Math.round(x2 / 1099511627776) || 32;
+      },
+      /**
+       * Compare two arrays for equality in a predictable amount of time.
+       * @param {bitArray} a The first array.
+       * @param {bitArray} b The second array.
+       * @return {boolean} true if a == b; false otherwise.
+       */
+      equal: function(a2, b2) {
+        if (sjcl2.bitArray.bitLength(a2) !== sjcl2.bitArray.bitLength(b2)) {
+          return false;
+        }
+        var x2 = 0, i;
+        for (i = 0; i < a2.length; i++) {
+          x2 |= a2[i] ^ b2[i];
+        }
+        return x2 === 0;
+      },
+      /** Shift an array right.
+       * @param {bitArray} a The array to shift.
+       * @param {Number} shift The number of bits to shift.
+       * @param {Number} [carry=0] A byte to carry in
+       * @param {bitArray} [out=[]] An array to prepend to the output.
+       * @private
+       */
+      _shiftRight: function(a2, shift, carry, out) {
+        var i, last2 = 0, shift2;
+        if (out === void 0) {
+          out = [];
+        }
+        for (; shift >= 32; shift -= 32) {
+          out.push(carry);
+          carry = 0;
+        }
+        if (shift === 0) {
+          return out.concat(a2);
+        }
+        for (i = 0; i < a2.length; i++) {
+          out.push(carry | a2[i] >>> shift);
+          carry = a2[i] << 32 - shift;
+        }
+        last2 = a2.length ? a2[a2.length - 1] : 0;
+        shift2 = sjcl2.bitArray.getPartial(last2);
+        out.push(sjcl2.bitArray.partial(shift + shift2 & 31, shift + shift2 > 32 ? carry : out.pop(), 1));
+        return out;
+      },
+      /** xor a block of 4 words together.
+       * @private
+       */
+      _xor4: function(x2, y) {
+        return [x2[0] ^ y[0], x2[1] ^ y[1], x2[2] ^ y[2], x2[3] ^ y[3]];
+      },
+      /** byteswap a word array inplace.
+       * (does not handle partial words)
+       * @param {sjcl.bitArray} a word array
+       * @return {sjcl.bitArray} byteswapped array
+       */
+      byteswapM: function(a2) {
+        var i, v2, m = 65280;
+        for (i = 0; i < a2.length; ++i) {
+          v2 = a2[i];
+          a2[i] = v2 >>> 24 | v2 >>> 8 & m | (v2 & m) << 8 | v2 << 24;
+        }
+        return a2;
+      }
+    };
+    sjcl2.codec.utf8String = {
+      /** Convert from a bitArray to a UTF-8 string. */
+      fromBits: function(arr) {
+        var out = "", bl = sjcl2.bitArray.bitLength(arr), i, tmp;
+        for (i = 0; i < bl / 8; i++) {
+          if ((i & 3) === 0) {
+            tmp = arr[i / 4];
+          }
+          out += String.fromCharCode(tmp >>> 8 >>> 8 >>> 8);
+          tmp <<= 8;
+        }
+        return decodeURIComponent(escape(out));
+      },
+      /** Convert from a UTF-8 string to a bitArray. */
+      toBits: function(str) {
+        str = unescape(encodeURIComponent(str));
+        var out = [], i, tmp = 0;
+        for (i = 0; i < str.length; i++) {
+          tmp = tmp << 8 | str.charCodeAt(i);
+          if ((i & 3) === 3) {
+            out.push(tmp);
+            tmp = 0;
+          }
+        }
+        if (i & 3) {
+          out.push(sjcl2.bitArray.partial(8 * (i & 3), tmp));
+        }
+        return out;
+      }
+    };
+    sjcl2.codec.hex = {
+      /** Convert from a bitArray to a hex string. */
+      fromBits: function(arr) {
+        var out = "", i;
+        for (i = 0; i < arr.length; i++) {
+          out += ((arr[i] | 0) + 263882790666240).toString(16).substr(4);
+        }
+        return out.substr(0, sjcl2.bitArray.bitLength(arr) / 4);
+      },
+      /** Convert from a hex string to a bitArray. */
+      toBits: function(str) {
+        var i, out = [], len;
+        str = str.replace(/\s|0x/g, "");
+        len = str.length;
+        str = str + "00000000";
+        for (i = 0; i < str.length; i += 8) {
+          out.push(parseInt(str.substr(i, 8), 16) ^ 0);
+        }
+        return sjcl2.bitArray.clamp(out, len * 4);
+      }
+    };
+    sjcl2.hash.sha256 = function(hash) {
+      if (!this._key[0]) {
+        this._precompute();
+      }
+      if (hash) {
+        this._h = hash._h.slice(0);
+        this._buffer = hash._buffer.slice(0);
+        this._length = hash._length;
+      } else {
+        this.reset();
+      }
+    };
+    sjcl2.hash.sha256.hash = function(data) {
+      return new sjcl2.hash.sha256().update(data).finalize();
+    };
+    sjcl2.hash.sha256.prototype = {
+      /**
+       * The hash's block size, in bits.
+       * @constant
+       */
+      blockSize: 512,
+      /**
+       * Reset the hash state.
+       * @return this
+       */
+      reset: function() {
+        this._h = this._init.slice(0);
+        this._buffer = [];
+        this._length = 0;
+        return this;
+      },
+      /**
+       * Input several words to the hash.
+       * @param {bitArray|String} data the data to hash.
+       * @return this
+       */
+      update: function(data) {
+        if (typeof data === "string") {
+          data = sjcl2.codec.utf8String.toBits(data);
+        }
+        var i, b2 = this._buffer = sjcl2.bitArray.concat(this._buffer, data), ol = this._length, nl = this._length = ol + sjcl2.bitArray.bitLength(data);
+        if (nl > 9007199254740991) {
+          throw new sjcl2.exception.invalid("Cannot hash more than 2^53 - 1 bits");
+        }
+        if (typeof Uint32Array !== "undefined") {
+          var c = new Uint32Array(b2);
+          var j2 = 0;
+          for (i = 512 + ol - (512 + ol & 511); i <= nl; i += 512) {
+            this._block(c.subarray(16 * j2, 16 * (j2 + 1)));
+            j2 += 1;
+          }
+          b2.splice(0, 16 * j2);
+        } else {
+          for (i = 512 + ol - (512 + ol & 511); i <= nl; i += 512) {
+            this._block(b2.splice(0, 16));
+          }
+        }
+        return this;
+      },
+      /**
+       * Complete hashing and output the hash value.
+       * @return {bitArray} The hash value, an array of 8 big-endian words.
+       */
+      finalize: function() {
+        var i, b2 = this._buffer, h = this._h;
+        b2 = sjcl2.bitArray.concat(b2, [sjcl2.bitArray.partial(1, 1)]);
+        for (i = b2.length + 2; i & 15; i++) {
+          b2.push(0);
+        }
+        b2.push(Math.floor(this._length / 4294967296));
+        b2.push(this._length | 0);
+        while (b2.length) {
+          this._block(b2.splice(0, 16));
+        }
+        this.reset();
+        return h;
+      },
+      /**
+       * The SHA-256 initialization vector, to be precomputed.
+       * @private
+       */
+      _init: [],
+      /*
+      _init:[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19],
+      */
+      /**
+       * The SHA-256 hash key, to be precomputed.
+       * @private
+       */
+      _key: [],
+      /*
+      _key:
+        [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+         0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+         0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+         0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+         0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+         0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+         0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+         0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2],
+      */
+      /**
+       * Function to precompute _init and _key.
+       * @private
+       */
+      _precompute: function() {
+        var i = 0, prime = 2, factor, isPrime;
+        function frac(x2) {
+          return (x2 - Math.floor(x2)) * 4294967296 | 0;
+        }
+        for (; i < 64; prime++) {
+          isPrime = true;
+          for (factor = 2; factor * factor <= prime; factor++) {
+            if (prime % factor === 0) {
+              isPrime = false;
+              break;
+            }
+          }
+          if (isPrime) {
+            if (i < 8) {
+              this._init[i] = frac(Math.pow(prime, 1 / 2));
+            }
+            this._key[i] = frac(Math.pow(prime, 1 / 3));
+            i++;
+          }
+        }
+      },
+      /**
+       * Perform one cycle of SHA-256.
+       * @param {Uint32Array|bitArray} w one block of words.
+       * @private
+       */
+      _block: function(w2) {
+        var i, tmp, a2, b2, h = this._h, k = this._key, h0 = h[0], h1 = h[1], h2 = h[2], h3 = h[3], h4 = h[4], h5 = h[5], h6 = h[6], h7 = h[7];
+        for (i = 0; i < 64; i++) {
+          if (i < 16) {
+            tmp = w2[i];
+          } else {
+            a2 = w2[i + 1 & 15];
+            b2 = w2[i + 14 & 15];
+            tmp = w2[i & 15] = (a2 >>> 7 ^ a2 >>> 18 ^ a2 >>> 3 ^ a2 << 25 ^ a2 << 14) + (b2 >>> 17 ^ b2 >>> 19 ^ b2 >>> 10 ^ b2 << 15 ^ b2 << 13) + w2[i & 15] + w2[i + 9 & 15] | 0;
+          }
+          tmp = tmp + h7 + (h4 >>> 6 ^ h4 >>> 11 ^ h4 >>> 25 ^ h4 << 26 ^ h4 << 21 ^ h4 << 7) + (h6 ^ h4 & (h5 ^ h6)) + k[i];
+          h7 = h6;
+          h6 = h5;
+          h5 = h4;
+          h4 = h3 + tmp | 0;
+          h3 = h2;
+          h2 = h1;
+          h1 = h0;
+          h0 = tmp + (h1 & h2 ^ h3 & (h1 ^ h2)) + (h1 >>> 2 ^ h1 >>> 13 ^ h1 >>> 22 ^ h1 << 30 ^ h1 << 19 ^ h1 << 10) | 0;
+        }
+        h[0] = h[0] + h0 | 0;
+        h[1] = h[1] + h1 | 0;
+        h[2] = h[2] + h2 | 0;
+        h[3] = h[3] + h3 | 0;
+        h[4] = h[4] + h4 | 0;
+        h[5] = h[5] + h5 | 0;
+        h[6] = h[6] + h6 | 0;
+        h[7] = h[7] + h7 | 0;
+      }
+    };
+    sjcl2.misc.hmac = function(key, Hash) {
+      this._hash = Hash = Hash || sjcl2.hash.sha256;
+      var exKey = [[], []], i, bs = Hash.prototype.blockSize / 32;
+      this._baseHash = [new Hash(), new Hash()];
+      if (key.length > bs) {
+        key = Hash.hash(key);
+      }
+      for (i = 0; i < bs; i++) {
+        exKey[0][i] = key[i] ^ 909522486;
+        exKey[1][i] = key[i] ^ 1549556828;
+      }
+      this._baseHash[0].update(exKey[0]);
+      this._baseHash[1].update(exKey[1]);
+      this._resultHash = new Hash(this._baseHash[0]);
+    };
+    sjcl2.misc.hmac.prototype.encrypt = sjcl2.misc.hmac.prototype.mac = function(data) {
+      if (!this._updated) {
+        this.update(data);
+        return this.digest(data);
+      } else {
+        throw new sjcl2.exception.invalid("encrypt on already updated hmac called!");
+      }
+    };
+    sjcl2.misc.hmac.prototype.reset = function() {
+      this._resultHash = new this._hash(this._baseHash[0]);
+      this._updated = false;
+    };
+    sjcl2.misc.hmac.prototype.update = function(data) {
+      this._updated = true;
+      this._resultHash.update(data);
+    };
+    sjcl2.misc.hmac.prototype.digest = function() {
+      var w2 = this._resultHash.finalize(), result = new this._hash(this._baseHash[1]).update(w2).finalize();
+      this.reset();
+      return result;
+    };
+    return sjcl2;
+  })();
+
+  // src/crypto.js
+  function getDataKeySync(sessionKey, domainKey, inputData) {
+    const hmac = new sjcl.misc.hmac(sjcl.codec.utf8String.toBits(sessionKey + domainKey), sjcl.hash.sha256);
+    return sjcl.codec.hex.fromBits(hmac.encrypt(inputData));
+  }
+
+  // src/features/fingerprinting-audio.js
+  var FingerprintingAudio = class extends ContentFeature {
+    init(args) {
+      const { sessionKey, site } = args;
+      const domainKey = site.domain;
+      function transformArrayData(channelData, domainKey2, sessionKey2, thisArg) {
+        let { audioKey } = getCachedResponse(thisArg, args);
+        if (!audioKey) {
+          let cdSum = 0;
+          for (const k in channelData) {
+            cdSum += channelData[k];
+          }
+          if (cdSum === 0) {
+            return;
+          }
+          audioKey = getDataKeySync(sessionKey2, domainKey2, cdSum);
+          setCache(thisArg, args, audioKey);
+        }
+        iterateDataKey(audioKey, (item, byte) => {
+          const itemAudioIndex = item % channelData.length;
+          let factor = byte * 1e-7;
+          if (byte ^ 1) {
+            factor = 0 - factor;
+          }
+          channelData[itemAudioIndex] = channelData[itemAudioIndex] + factor;
+        });
+      }
+      const copyFromChannelProxy = new DDGProxy(this, AudioBuffer.prototype, "copyFromChannel", {
+        apply(target, thisArg, args2) {
+          const [source, channelNumber, startInChannel] = args2;
+          if (
+            // If channelNumber is longer than arrayBuffer number of channels then call the default method to throw
+            // @ts-expect-error - error TS18048: 'thisArg' is possibly 'undefined'
+            channelNumber > thisArg.numberOfChannels || // If startInChannel is longer than the arrayBuffer length then call the default method to throw
+            // @ts-expect-error - error TS18048: 'thisArg' is possibly 'undefined'
+            startInChannel > thisArg.length
+          ) {
+            return DDGReflect.apply(target, thisArg, args2);
+          }
+          try {
+            thisArg.getChannelData(channelNumber).slice(startInChannel).forEach((val, index) => {
+              source[index] = val;
+            });
+          } catch {
+            return DDGReflect.apply(target, thisArg, args2);
+          }
+        }
+      });
+      copyFromChannelProxy.overload();
+      const cacheExpiry = 60;
+      const cacheData = /* @__PURE__ */ new WeakMap();
+      function getCachedResponse(thisArg, args2) {
+        const data = cacheData.get(thisArg);
+        const timeNow = Date.now();
+        if (data && data.args === JSON.stringify(args2) && data.expires > timeNow) {
+          data.expires = timeNow + cacheExpiry;
+          cacheData.set(thisArg, data);
+          return data;
+        }
+        return { audioKey: null };
+      }
+      function setCache(thisArg, args2, audioKey) {
+        cacheData.set(thisArg, { args: JSON.stringify(args2), expires: Date.now() + cacheExpiry, audioKey });
+      }
+      const getChannelDataProxy = new DDGProxy(this, AudioBuffer.prototype, "getChannelData", {
+        apply(target, thisArg, args2) {
+          const channelData = DDGReflect.apply(target, thisArg, args2);
+          try {
+            transformArrayData(channelData, domainKey, sessionKey, thisArg, args2);
+          } catch {
+          }
+          return channelData;
+        }
+      });
+      getChannelDataProxy.overload();
+      const audioMethods = ["getByteTimeDomainData", "getFloatTimeDomainData", "getByteFrequencyData", "getFloatFrequencyData"];
+      for (const methodName of audioMethods) {
+        const proxy = new DDGProxy(this, AnalyserNode.prototype, methodName, {
+          apply(target, thisArg, args2) {
+            DDGReflect.apply(target, thisArg, args2);
+            try {
+              transformArrayData(args2[0], domainKey, sessionKey, thisArg, args2);
+            } catch {
+            }
+          }
+        });
+        proxy.overload();
+      }
+    }
+  };
+
+  // src/features/fingerprinting-battery.js
+  var FingerprintingBattery = class extends ContentFeature {
+    init() {
+      if (globalThis.navigator.getBattery) {
+        const BatteryManager = globalThis.BatteryManager;
+        const spoofedValues = {
+          charging: true,
+          chargingTime: 0,
+          dischargingTime: Infinity,
+          level: 1
+        };
+        const eventProperties = ["onchargingchange", "onchargingtimechange", "ondischargingtimechange", "onlevelchange"];
+        for (const [prop, val] of Object.entries(spoofedValues)) {
+          try {
+            this.defineProperty(BatteryManager.prototype, prop, {
+              enumerable: true,
+              configurable: true,
+              get: () => {
+                return val;
+              }
+            });
+          } catch (e) {
+          }
+        }
+        for (const eventProp of eventProperties) {
+          try {
+            this.defineProperty(BatteryManager.prototype, eventProp, {
+              enumerable: true,
+              configurable: true,
+              set: (x2) => x2,
+              // noop
+              get: () => {
+                return null;
+              }
+            });
+          } catch (e) {
+          }
+        }
+      }
+    }
+  };
+
+  // src/features/gpc.js
+  var GlobalPrivacyControl = class extends ContentFeature {
+    init(args) {
+      try {
+        if (args.globalPrivacyControlValue) {
+          if (navigator.globalPrivacyControl) return;
+          this.defineProperty(Navigator.prototype, "globalPrivacyControl", {
+            get: () => true,
+            configurable: true,
+            enumerable: true
+          });
+        } else {
+          if (typeof navigator.globalPrivacyControl !== "undefined") return;
+          this.defineProperty(Navigator.prototype, "globalPrivacyControl", {
+            get: () => false,
+            configurable: true,
+            enumerable: true
+          });
+        }
+      } catch {
+      }
+    }
+  };
+
+  // src/features/breakage-reporting/utils.js
+  function getJsPerformanceMetrics() {
+    const paintResources = performance.getEntriesByType("paint");
+    const firstPaint = paintResources.find((entry) => entry.name === "first-contentful-paint");
+    return firstPaint ? [firstPaint.startTime] : [];
+  }
+
+  // src/features/breakage-reporting.js
+  var BreakageReporting = class extends ContentFeature {
+    init() {
+      this.messaging.subscribe("getBreakageReportValues", () => {
+        const jsPerformance = getJsPerformanceMetrics();
+        const referrer = document.referrer;
+        this.messaging.notify("breakageReportResult", {
+          jsPerformance,
+          referrer
+        });
+      });
+    }
+  };
 
   // ddg:platformFeatures:ddg:platformFeatures
   var ddg_platformFeatures_default = {
-    ddg_feature_autofillPasswordImport: AutofillPasswordImport
+    ddg_feature_apiManipulation: ApiManipulation,
+    ddg_feature_webCompat: web_compat_default,
+    ddg_feature_fingerprintingHardware: FingerprintingHardware,
+    ddg_feature_fingerprintingScreenSize: FingerprintingScreenSize,
+    ddg_feature_fingerprintingTemporaryStorage: FingerprintingTemporaryStorage,
+    ddg_feature_fingerprintingAudio: FingerprintingAudio,
+    ddg_feature_fingerprintingBattery: FingerprintingBattery,
+    ddg_feature_gpc: GlobalPrivacyControl,
+    ddg_feature_breakageReporting: BreakageReporting
   };
 
   // src/url-change.js
@@ -4254,7 +5573,7 @@
     }
     const importConfig = {
       trackerLookup: define_import_meta_trackerLookup_default,
-      injectName: "android-autofill-password-import"
+      injectName: "android-adsjs"
     };
     const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] : [];
     const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
@@ -4315,20 +5634,16 @@
     });
   }
 
-  // entry-points/android.js
+  // entry-points/android-adsjs.js
   function initCode() {
     const config = $CONTENT_SCOPE$;
     const userUnprotectedDomains = $USER_UNPROTECTED_DOMAINS$;
     const userPreferences = $USER_PREFERENCES$;
     const processedConfig = processConfig(config, userUnprotectedDomains, userPreferences);
     const configConstruct = processedConfig;
-    const messageCallback = configConstruct.messageCallback;
-    const messageSecret2 = configConstruct.messageSecret;
-    const javascriptInterface = configConstruct.javascriptInterface;
-    processedConfig.messagingConfig = new AndroidMessagingConfig({
-      messageSecret: messageSecret2,
-      messageCallback,
-      javascriptInterface,
+    const objectName = configConstruct.objectName || "contentScopeAdsjs";
+    processedConfig.messagingConfig = new AndroidAdsjsMessagingConfig({
+      objectName,
       target: globalThis,
       debug: processedConfig.debug
     });
