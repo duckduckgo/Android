@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
@@ -78,6 +79,7 @@ import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.DaxListItem.IconSize.Small
+import com.duckduckgo.common.ui.view.listitem.OneLineListItem
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -196,6 +198,25 @@ class SettingsActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    private fun sortSettingItemsAlphabetically() {
+        // sort the children by their primary text
+        val items = viewsMain.settingsSectionGeneral.children.drop(ITEMS_TO_SKIP_WHEN_SORTING_SETTING_ITEMS).toMutableList()
+
+        items.sortBy { child ->
+            if (child is OneLineListItem) {
+                child.primaryTextString.lowercase()
+            } else if (child is LinearLayout && child.childCount == 1 && child.children.elementAt(0) is OneLineListItem) {
+                // this is used for settings that are injected from plugins
+                (child.children.elementAt(0) as OneLineListItem).primaryTextString.lowercase()
+            } else {
+                ""
+            }
+        }
+
+        items.forEach { viewsMain.settingsSectionGeneral.removeView(it) }
+        items.forEach { viewsMain.settingsSectionGeneral.addView(it) }
+    }
+
     private fun configureCompleteSetupSettings() {
         watchForCompleteSetupSettingsChanges()
         updateCompleteSetupSettings()
@@ -301,6 +322,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     updateDuckChat(it.isDuckChatEnabled, it.isAiFeaturesRebrandingEnabled)
                     updateVoiceSearchVisibility(it.isVoiceSearchVisible)
                     updateAddWidgetInProtections(it.isAddWidgetInProtectionsVisible, it.widgetsInstalled)
+                    sortSettingItemsAlphabetically()
                 }
             }.launchIn(lifecycleScope)
 
@@ -347,8 +369,8 @@ class SettingsActivity : DuckDuckGoActivity() {
                 titleRes = R.string.settingsDuckAi
             }
             viewsMain.includeDuckChatSetting.duckChatSetting.show()
-            viewsMain.includeDuckChatSetting.leadingIcon.setImageResource(imageRes)
-            viewsMain.includeDuckChatSetting.primaryText.setText(titleRes)
+            viewsMain.includeDuckChatSetting.duckChatSetting.setLeadingIconResource(imageRes)
+            viewsMain.includeDuckChatSetting.duckChatSetting.setPrimaryTextResource(titleRes)
         } else {
             viewsMain.includeDuckChatSetting.duckChatSetting.gone()
         }
@@ -480,6 +502,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        // header, divider and "General" item
+        const val ITEMS_TO_SKIP_WHEN_SORTING_SETTING_ITEMS = 3
+
         fun intent(context: Context): Intent {
             return Intent(context, SettingsActivity::class.java)
         }
