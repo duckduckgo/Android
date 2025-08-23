@@ -22,6 +22,7 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.file.FileDeleter
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
+import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.moshi.Moshi
@@ -50,6 +51,7 @@ class IndexedDBManagerTest {
     private val mockFireproofToggle: Toggle = mock()
     private val mockFireproofRepository: FireproofWebsiteRepository = mock()
     private val mockFileDeleter: FileDeleter = mock()
+    private val mockSettingsDataStore: SettingsDataStore = mock()
     private val moshi: Moshi = Moshi.Builder().build()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
 
@@ -61,6 +63,7 @@ class IndexedDBManagerTest {
             mockFileDeleter,
             moshi,
             dispatcherProvider,
+            mockSettingsDataStore,
         )
     }
 
