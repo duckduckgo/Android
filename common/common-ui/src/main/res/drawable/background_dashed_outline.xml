@@ -20,5 +20,5 @@
         android:dashWidth="4dp"
         android:dashGap="4dp"
         android:color="?attr/daxColorLines" />
-    <corners android:radius="@dimen/smallShapeCornerRadius" />
+    <corners android:radius="@dimen/mediumShapeCornerRadius" />
 </shape>
