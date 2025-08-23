@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2023 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.browser.viewstate
+package com.duckduckgo.site.permissions.api
 
-import com.duckduckgo.app.browser.easteregglogos.SerpLogo
+interface SerpLogos {
 
-data class OmnibarViewState(
-    val omnibarText: String = "",
-    val queryOrFullUrl: String = "",
-    val isEditing: Boolean = false,
-    val navigationChange: Boolean = false,
-    val forceExpand: Boolean = true,
-    val serpLogo: SerpLogo? = null,
-)
+    /**
+     * Checks if the user is currently signed in.
+     *
+     * Note: A signed-in user does not necessarily have an active subscription.
+     *
+     * @return `true` if the user is signed in; `false` otherwise
+     */
+    suspend fun evaluateLogo(): Boolean
+}

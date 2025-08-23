@@ -88,6 +88,7 @@ import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
+import com.duckduckgo.app.browser.commands.Command.ExtractDDGLogo
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -169,6 +170,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
+import com.duckduckgo.app.browser.easteregglogos.EasterEggLogosToggles
+import com.duckduckgo.app.browser.easteregglogos.SerpLogo
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.favicon.FaviconSource.ImageFavicon
 import com.duckduckgo.app.browser.favicon.FaviconSource.UrlFavicon
@@ -476,6 +479,7 @@ class BrowserTabViewModel @Inject constructor(
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val easterEggLogosToggles: EasterEggLogosToggles,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1911,6 +1915,18 @@ class BrowserTabViewModel @Inject constructor(
 
             viewModelScope.launch {
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
+            }
+
+            evaluateSerpLogoState(url)
+        }
+    }
+
+    private fun evaluateSerpLogoState(url: String?) {
+        if (easterEggLogosToggles.feature().isEnabled()) {
+            if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+                command.value = ExtractDDGLogo
+            } else {
+                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
             }
         }
     }
@@ -4306,6 +4322,15 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             onboardingDesignExperimentManager.fireSiteSuggestionOptionSelectedPixel(index)
         }
+    }
+
+    fun onLogoReceived(serpLogo: SerpLogo) {
+        logcat { "BrowserTabFragment: Received Serp Logo: $serpLogo" }
+        omnibarViewState.postValue(currentOmnibarViewState().copy(serpLogo = serpLogo))
+    }
+
+    fun onDynamicLogoClicked(url: String) {
+        command.value = Command.ShowEnlargedLogo(url)
     }
 
     companion object {

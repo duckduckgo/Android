@@ -280,4 +280,6 @@ sealed class Command {
     data object StartTrackersExperimentShieldPopAnimation : Command()
     data object RefreshOmnibar : Command()
     data object LaunchInputScreen : Command()
+    data object ExtractDDGLogo : Command()
+    data class ShowEnlargedLogo(val url: String) : Command()
 }

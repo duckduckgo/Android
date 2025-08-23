@@ -405,6 +405,8 @@ dependencies {
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
 
+    implementation project(':serp-logos-api')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
