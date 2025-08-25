@@ -184,11 +184,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         if (showBackArrow) {
             backIcon.show()
             searchIcon.gone()
-
-            // todo lp - is this change correct?
-            // shieldIcon.gone()
             shieldIcon.gone()
-
             daxIcon.gone()
             globeIcon.gone()
             duckPlayerIcon.gone()
