@@ -35,6 +35,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -1187,8 +1188,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        // todo lp - which pixel do we use?
-        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "focused"))
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "focused"))
     }
 
     @Test
@@ -1198,8 +1198,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        // todo lp - which pixel do we use?
-        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "ntp"))
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "ntp"))
     }
 
     @Test
@@ -1209,8 +1208,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        // todo lp - which pixel do we use?
-        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "serp"))
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "serp"))
     }
 
     @Test
@@ -1220,8 +1218,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        // todo lp - unclear which pixel to send
-        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "website"))
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "website"))
     }
 
     @Test
@@ -1231,21 +1228,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.onDuckChatButtonPressed()
 
-        // todo lp - unclear which pixel to send
-        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "unknown"))
-    }
-
-    @Test
-    fun `when DuckChat Button pressed and was used before then correct pixel sent`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        initializeViewModel()
-        testee.onViewModeChanged(ViewMode.NewTab)
-        testee.onOmnibarFocusChanged(false, "")
-
-        testee.onDuckChatButtonPressed()
-
-        // todo lp - which pixel do we use?
-        // verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1", "source" to "ntp"))
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "unknown"))
     }
 
     @Test

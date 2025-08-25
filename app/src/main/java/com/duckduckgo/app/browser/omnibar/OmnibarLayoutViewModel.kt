@@ -60,6 +60,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
 import com.duckduckgo.voice.api.VoiceSearchAvailability
@@ -790,14 +791,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                 putAll(launchSourceParams)
             }
 
-            // todo lp - which pixel should we use?
-            // val pixelName = if (viewState.value.isExperimentalThemingEnabled) {
-            //     DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN
-            // } else {
-            //     DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN
-            // }
-            //
-            // pixel.fire(pixelName, parameters = params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, parameters = params)
         }
     }
 
