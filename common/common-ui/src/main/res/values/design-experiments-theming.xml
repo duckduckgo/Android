@@ -23,6 +23,7 @@
         <item name="daxColorBackground">@color/background_background_dark</item>
         <item name="daxColorSurface">@color/background_surface_dark</item>
         <item name="daxColorWindow">@color/background_window_dark</item>
+        <item name="daxColorCanvas">@color/background_canvas_dark</item>
 
         <!-- Text -->
         <item name="daxColorPrimaryText">@color/text_primary_dark</item>
@@ -33,8 +34,11 @@
         <item name="daxColorSecondaryIcon">@color/icon_secondary_dark</item>
         <item name="daxColorIconDisabled">@color/icon_tertiary_dark</item>
 
-        <!-- Lines-->
+        <!-- Lines -->
         <item name="daxColorLines">@color/lines_dark</item>
+
+        <!-- Tone -->
+        <item name="daxColorShade">@color/shade_dark</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
@@ -67,6 +71,7 @@
         <item name="daxColorBackground">@color/background_background_light</item>
         <item name="daxColorSurface">@color/background_surface_light</item>
         <item name="daxColorWindow">@color/background_window_light</item>
+        <item name="daxColorCanvas">@color/background_canvas_light</item>
 
         <!-- Text -->
         <item name="daxColorPrimaryText">@color/text_primary_light</item>
@@ -79,6 +84,9 @@
 
         <!-- Lines-->
         <item name="daxColorLines">@color/lines_light</item>
+
+        <!-- Tone -->
+        <item name="daxColorShade">@color/shade_light</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>
