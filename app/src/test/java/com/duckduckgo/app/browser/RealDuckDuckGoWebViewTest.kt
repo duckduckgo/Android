@@ -2,7 +2,9 @@ package com.duckduckgo.app.browser
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatWrapper
 import kotlinx.coroutines.test.runTest
@@ -21,6 +23,7 @@ class RealDuckDuckGoWebViewTest {
 
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
+    private val mockWebMessageListener: WebMessageListener = mock()
 
     @Before
     fun setUp() {
@@ -44,5 +47,40 @@ class RealDuckDuckGoWebViewTest {
         testee.safeAddDocumentStartJavaScript("script", setOf("*"))
 
         verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(testee, "script", setOf("*"))
+    }
+
+    @Test
+    fun whenSafeAddWebMessageListenerWithFeatureEnabledThenAddListener() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(true)
+
+        testee.safeAddWebMessageListener("test", setOf("*"), mockWebMessageListener)
+        verify(mockWebViewCompatWrapper)
+            .addWebMessageListener(testee, "test", setOf("*"), mockWebMessageListener)
+    }
+
+    @Test
+    fun whenSafeAddWebMessageListenerWithFeatureDisabledThenDoNotAddListener() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(false)
+
+        testee.safeAddWebMessageListener("test", setOf("*"), mockWebMessageListener)
+        verify(mockWebViewCompatWrapper, never())
+            .addWebMessageListener(testee, "test", setOf("*"), mockWebMessageListener)
+    }
+
+    @Test
+    fun whenSafeRemoveWebMessageListenerWithFeatureEnabledThenRemoveListener() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(true)
+
+        testee.safeRemoveWebMessageListener("test")
+
+        verify(mockWebViewCompatWrapper).removeWebMessageListener(testee, "test")
+    }
+
+    @Test
+    fun whenSafeRemoveWebMessageListenerWithFeatureDisabledThenDoNotRemoveListener() = runTest {
+        whenever(mockWebViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)).thenReturn(false)
+
+        testee.safeRemoveWebMessageListener("test")
+        verify(mockWebViewCompatWrapper, never()).removeWebMessageListener(testee, "test")
     }
 }

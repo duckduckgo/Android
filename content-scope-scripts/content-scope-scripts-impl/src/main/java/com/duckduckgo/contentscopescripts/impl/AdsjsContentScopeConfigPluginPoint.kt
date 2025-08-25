@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,13 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
-import android.webkit.WebView
-import androidx.webkit.ScriptHandler
-import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.contentscopescripts.api.AdsjsContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.di.scopes.AppScope
 
-interface WebViewCompatWrapper {
-
-    fun addDocumentStartJavaScript(
-        webView: WebView,
-        script: String,
-        allowedOriginRules: Set<String>,
-    ): ScriptHandler
-
-    fun removeWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
-    )
-
-    fun addWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
-        allowedOriginRules: Set<String>,
-        listener: WebMessageListener,
-    )
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = AdsjsContentScopeJsMessageHandlersPlugin::class,
+)
+@Suppress("unused")
+interface AdsjsContentScopeJsMessageHandlersPluginPoint

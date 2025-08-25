@@ -19,6 +19,7 @@ package com.duckduckgo.contentscopescripts.impl
 import android.annotation.SuppressLint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -33,6 +34,7 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -41,6 +43,10 @@ import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
 class RealAdsjsContentScopeScriptsTest {
+
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
 
     private val mockPluginPoint: PluginPoint<ContentScopeConfigPlugin> = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
@@ -64,6 +70,7 @@ class RealAdsjsContentScopeScriptsTest {
             mockUnprotectedTemporary,
             mockFingerprintProtectionManager,
             contentScopeScriptsFeature,
+            coroutineRule.testDispatcherProvider,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
