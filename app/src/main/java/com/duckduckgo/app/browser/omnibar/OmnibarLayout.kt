@@ -190,8 +190,8 @@ open class OmnibarLayout @JvmOverloads constructor(
     private var lastViewMode: Mode? = null
     private var stateBuffer: MutableList<StateChange> = mutableListOf()
 
-    internal open val findInPage: FindInPage by lazy {
-        FindInPageImpl(IncludeFindInPageBinding.bind(findViewById(R.id.findInPage)))
+    internal val findInPage: IncludeFindInPageBinding by lazy {
+        IncludeFindInPageBinding.bind(findViewById(R.id.findInPage))
     }
     internal val omnibarTextInput: KeyboardAwareEditText by lazy { findViewById(R.id.omnibarTextInput) }
     internal val tabsMenu: TabSwitcherButton by lazy { findViewById(R.id.tabsMenu) }

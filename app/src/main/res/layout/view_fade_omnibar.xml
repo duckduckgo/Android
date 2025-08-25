@@ -333,7 +333,7 @@
 
                     <include
                         android:id="@+id/findInPage"
-                        layout="@layout/include_fade_omnibar_find_in_page"
+                        layout="@layout/include_find_in_page"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:visibility="gone" />

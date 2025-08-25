@@ -8114,19 +8114,8 @@
         errorLine1="    &lt;EditText"
         errorLine2="     ~~~~~~~~">
         <location
-            file="src/main/res/layout/include_fade_omnibar_find_in_page.xml"
-            line="41"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="    &lt;EditText"
-        errorLine2="     ~~~~~~~~">
-        <location
             file="src/main/res/layout/include_find_in_page.xml"
-            line="38"
+            line="41"
             column="6"/>
     </issue>
 
