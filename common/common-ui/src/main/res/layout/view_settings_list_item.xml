@@ -37,7 +37,7 @@
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/primaryText"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/keyline_4"
         android:breakStrategy="balanced"
@@ -47,7 +47,7 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/leadingIcon"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="wrap"
+        app:layout_constrainedWidth="true"
         app:typography="body1"
         tools:text="Primary Text" />
 
