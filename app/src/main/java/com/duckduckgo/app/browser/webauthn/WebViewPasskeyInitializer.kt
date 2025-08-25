@@ -21,7 +21,7 @@ import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebSettingsCompat.WEB_AUTHENTICATION_SUPPORT_FOR_BROWSER
 import androidx.webkit.WebViewFeature
 import androidx.webkit.WebViewFeature.WEB_AUTHENTICATION
-import com.duckduckgo.app.browser.DuckDuckGoWebView
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope

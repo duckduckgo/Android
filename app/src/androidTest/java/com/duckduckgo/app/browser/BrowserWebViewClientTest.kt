@@ -61,7 +61,6 @@ import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
 import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
-import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -73,7 +72,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -111,6 +109,8 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+
+private val mockToggle: Toggle = mock()
 
 class BrowserWebViewClientTest {
 
@@ -166,15 +166,12 @@ class BrowserWebViewClientTest {
         mock(),
     )
     private val mockDuckChat: DuckChat = mock()
-    private val mockContentScopeExperiments: ContentScopeExperiments = mock()
 
     @UiThreadTest
     @Before
     fun setup() = runTest {
         webView = TestWebView(context)
         whenever(mockDuckPlayer.observeShouldOpenInNewTab()).thenReturn(openInNewTabFlow)
-        val toggle: Toggle = mock()
-        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
         testee = BrowserWebViewClient(
             webViewHttpAuthStore,
             trustedCertificateStore,
@@ -207,7 +204,6 @@ class BrowserWebViewClientTest {
             mockUriLoadedManager,
             mockAndroidFeaturesHeaderPlugin,
             mockDuckChat,
-            mockContentScopeExperiments,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -227,11 +223,8 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenOnPageStartedCalledThenListenerNotified() = runTest {
-        val toggle: Toggle = mock()
-        whenever(mockContentScopeExperiments.getActiveExperiments()).thenReturn(listOf(toggle))
-
         testee.onPageStarted(webView, EXAMPLE_URL, null)
-        verify(listener).pageStarted(any(), eq(listOf(toggle)))
+        verify(listener).pageStarted(any(), eq(listOf(mockToggle)))
     }
 
     @UiThreadTest
@@ -331,6 +324,23 @@ class BrowserWebViewClientTest {
         testee.onPageFinished(webView, EXAMPLE_URL)
         assertEquals(1, jsPlugins.plugin.countFinished)
         assertEquals(0, jsPlugins.plugin.countStarted)
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenOnPageStartedThenReturnActiveExperiments() {
+        val captor = argumentCaptor<List<Toggle>>()
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageStarted(any(), captor.capture())
+        assertTrue(captor.firstValue.contains(mockToggle))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenTriggerJsInitThenInjectJsCode() {
+        assertEquals(0, jsPlugins.plugin.countStarted)
+        testee.triggerJSInit(webView)
+        assertEquals(1, jsPlugins.plugin.countInitted)
     }
 
     @UiThreadTest
@@ -1193,17 +1203,27 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        var countInitted = 0
 
-        override fun onPageStarted(
+        override suspend fun onInit(
+            webView: WebView,
+        ) {
+            countInitted++
+        }
+
+        override suspend fun onPageStarted(
             webView: WebView,
             url: String?,
             isDesktopMode: Boolean?,
-            activeExperiments: List<Toggle>,
-        ) {
+        ): List<Toggle> {
             countStarted++
+            return listOf(mockToggle)
         }
 
-        override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
+        override suspend fun onPageFinished(
+            webView: WebView,
+            url: String?,
+        ) {
             countFinished++
         }
     }

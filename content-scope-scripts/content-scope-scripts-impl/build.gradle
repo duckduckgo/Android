@@ -36,6 +36,7 @@ dependencies {
     implementation project(':js-messaging-api')
     implementation project(':duckplayer-api')
     implementation project(':data-store-api')
+    implementation AndroidX.webkit
 
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')

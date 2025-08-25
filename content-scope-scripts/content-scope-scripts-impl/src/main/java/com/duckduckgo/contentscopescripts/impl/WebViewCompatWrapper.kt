@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2024 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,14 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import android.webkit.WebView
+import androidx.webkit.ScriptHandler
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "clientContentFeatures",
-)
+interface WebViewCompatWrapper {
 
-interface ContentScopeScriptsFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useNewWebCompatApis(): Toggle
+    fun addDocumentStartJavaScript(
+        webView: WebView,
+        script: String,
+        allowedOriginRules: Set<String>,
+    ): ScriptHandler
 }

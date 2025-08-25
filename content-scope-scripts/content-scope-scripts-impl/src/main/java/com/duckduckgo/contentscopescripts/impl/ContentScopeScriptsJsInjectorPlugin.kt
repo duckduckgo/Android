@@ -16,30 +16,80 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
-import com.duckduckgo.app.global.model.Site
+import androidx.webkit.ScriptHandler
+import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.browser.api.JsInjectorPlugin
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(AppScope::class)
 class ContentScopeScriptsJsInjectorPlugin @Inject constructor(
     private val coreContentScopeScripts: CoreContentScopeScripts,
+    private val adsJsContentScopeScripts: AdsJsContentScopeScripts,
+    private val contentScopeExperiments: ContentScopeExperiments,
+    private val dispatcherProvider: DispatcherProvider,
 ) : JsInjectorPlugin {
-    override fun onPageStarted(
+    private var script: ScriptHandler? = null
+    private var currentScriptString: String? = null
+
+    private var activeExperiments: List<Toggle> = emptyList()
+
+    @SuppressLint("RequiresFeature")
+    private suspend fun reloadJSIfNeeded(
         webView: WebView,
-        url: String?,
-        isDesktopMode: Boolean?,
-        activeExperiments: List<Toggle>,
     ) {
-        if (coreContentScopeScripts.isEnabled()) {
-            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+        activeExperiments = withContext(dispatcherProvider.io()) { contentScopeExperiments.getActiveExperiments() }
+
+        withContext(dispatcherProvider.main()) {
+            val scriptString = adsJsContentScopeScripts.getScript(activeExperiments)
+            if (scriptString == currentScriptString) {
+                return@withContext
+            }
+            script?.let {
+                it.remove()
+                script = null
+            }
+            if (adsJsContentScopeScripts.isEnabled()) {
+                (webView as? DuckDuckGoWebView)?.safeAddDocumentStartJavaScript(
+                    scriptString,
+                    setOf("*"),
+                )?.let {
+                    script = it
+                    currentScriptString = scriptString
+                }
+            }
         }
     }
 
-    override fun onPageFinished(webView: WebView, url: String?, site: Site?) {
-        // NOOP
+    override suspend fun onInit(
+        webView: WebView,
+    ) {
+        reloadJSIfNeeded(webView)
+    }
+
+    override suspend fun onPageStarted(
+        webView: WebView,
+        url: String?,
+        isDesktopMode: Boolean?,
+    ): List<Toggle> {
+        if (coreContentScopeScripts.isEnabled()) {
+            webView.evaluateJavascript("javascript:${coreContentScopeScripts.getScript(isDesktopMode, activeExperiments)}", null)
+            return activeExperiments
+        }
+        return listOf()
+    }
+
+    override suspend fun onPageFinished(
+        webView: WebView,
+        url: String?,
+    ) {
+        reloadJSIfNeeded(webView)
     }
 }

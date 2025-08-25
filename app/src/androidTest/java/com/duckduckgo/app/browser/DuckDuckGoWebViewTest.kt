@@ -27,7 +27,7 @@ class DuckDuckGoWebViewTest {
     @UiThreadTest
     fun whenWebViewInitialisedThenSafeBrowsingDisabled() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
-        val testee = DuckDuckGoWebView(context)
+        val testee = RealDuckDuckGoWebView(context)
         assertFalse(testee.settings.safeBrowsingEnabled)
     }
 }

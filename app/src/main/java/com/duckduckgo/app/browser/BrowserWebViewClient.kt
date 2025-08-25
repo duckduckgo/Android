@@ -70,7 +70,6 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -125,7 +124,6 @@ class BrowserWebViewClient @Inject constructor(
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
-    private val contentScopeExperiments: ContentScopeExperiments,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -441,10 +439,10 @@ class BrowserWebViewClient @Inject constructor(
         val navigationList = webView.safeCopyBackForwardList() ?: return
 
         appCoroutineScope.launch(dispatcherProvider.main()) {
-            val activeExperiments = contentScopeExperiments.getActiveExperiments()
-            webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
-            jsPlugins.getPlugins().forEach {
-                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+            jsPlugins.getPlugins().map {
+                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode)
+            }.flatten().distinct().let { activeExperiments ->
+                webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
             }
         }
         if (url != null && url == lastPageStarted) {
@@ -463,14 +461,27 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
+    fun triggerJSInit(webView: WebView) {
+        appCoroutineScope.launch {
+            jsPlugins.getPlugins().forEach {
+                it.onInit(webView)
+            }
+        }
+    }
+
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            jsPlugins.getPlugins().forEach {
-                it.onPageFinished(webView, url, webViewClientListener?.getSite())
+            appCoroutineScope.launch {
+                jsPlugins.getPlugins().forEach {
+                    it.onPageFinished(
+                        webView,
+                        url,
+                    )
+                }
             }
 
             url?.let {
