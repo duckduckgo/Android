@@ -18,24 +18,30 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
+import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.app.browser.api.DuckDuckGoWebView
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.AdsjsContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.api.GlobalContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.AdsJsContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.AdsjsJsMessageCallback
 import com.duckduckgo.js.messaging.api.AdsjsMessaging
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import javax.inject.Named
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
@@ -46,6 +52,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val adsJsContentScopeScripts: AdsJsContentScopeScripts,
     private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AdsjsMessaging {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -58,7 +65,8 @@ class AdsjsContentScopeMessaging @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun process(
         message: String,
-        jsMessageCallback: JsMessageCallback,
+        jsMessageCallback: AdsjsJsMessageCallback,
+        replyProxy: JavaScriptReplyProxy,
     ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
@@ -71,13 +79,22 @@ class AdsjsContentScopeMessaging @Inject constructor(
                         .map { it.getGlobalJsMessageHandler() }
                         .filter { it.method == jsMessage.method }
                         .forEach { handler ->
-                            handler.process(jsMessage, jsMessageCallback)
+                                handler.process(jsMessage, jsMessageCallback) {
+                            }
                         }
 
                     // Process with feature handlers
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, jsMessageCallback)
+                    }?.process(jsMessage, jsMessageCallback) { response: JSONObject ->
+                        val callbackData = JsCallbackData(
+                            id = jsMessage.id ?: "",
+                            params = response,
+                            featureName = jsMessage.featureName,
+                            method = jsMessage.method,
+                        )
+                        onResponse(callbackData, replyProxy)
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -85,7 +102,10 @@ class AdsjsContentScopeMessaging @Inject constructor(
         }
     }
 
-    override suspend fun register(webView: WebView, jsMessageCallback: JsMessageCallback?) {
+    override suspend fun register(
+        webView: WebView,
+        jsMessageCallback: AdsjsJsMessageCallback?,
+    ) {
         if (withContext(dispatcherProvider.io()) { !adsJsContentScopeScripts.isEnabled() }) return
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
         this.webView = webView
@@ -99,6 +119,7 @@ class AdsjsContentScopeMessaging @Inject constructor(
                     process(
                         message.data ?: "",
                         jsMessageCallback,
+                        replyProxy,
                     )
                 }
             } ?: false
@@ -118,6 +139,23 @@ class AdsjsContentScopeMessaging @Inject constructor(
                 logcat(ERROR) {
                     "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
                 }
+            }
+        }
+    }
+
+    private fun onResponse(response: JsCallbackData, replyProxy: JavaScriptReplyProxy) {
+        runCatching {
+            val responseWithId = JSONObject().apply {
+                put("id", response.id)
+                put("result", response.params)
+                put("featureName", response.featureName)
+                put("context", context)
+            }
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                (webView as? DuckDuckGoWebView)?.safePostMessage(
+                    replyProxy,
+                    responseWithId,
+                )
             }
         }
     }
