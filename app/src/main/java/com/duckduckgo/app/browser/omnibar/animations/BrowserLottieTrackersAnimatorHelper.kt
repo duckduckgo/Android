@@ -450,12 +450,11 @@ class BrowserLottieTrackersAnimatorHelper @Inject constructor(
     ): Int {
         val trackers = logos.size
         return when {
-            // todo lp - drop the new design from names
-            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
-            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1_visual_updates else R.raw.dark_trackers_1_visual_updates
-            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2_visual_updates else R.raw.dark_trackers_2_visual_updates
+            trackers == 1 -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
+            trackers == 2 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_1 else R.raw.dark_trackers_1
+            trackers >= 3 -> if (theme.isLightModeEnabled()) R.raw.light_trackers_2 else R.raw.dark_trackers_2
             // we shouldn't be here but we also don't want to crash so we'll show the default
-            else -> if (theme.isLightModeEnabled()) R.raw.light_trackers_visual_updates else R.raw.dark_trackers_visual_updates
+            else -> if (theme.isLightModeEnabled()) R.raw.light_trackers else R.raw.dark_trackers
         }
     }
 
