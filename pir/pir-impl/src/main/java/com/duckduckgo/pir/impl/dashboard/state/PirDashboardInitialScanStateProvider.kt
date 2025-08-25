@@ -19,11 +19,9 @@ package com.duckduckgo.pir.impl.dashboard.state
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBroker
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.COMPLETED
 import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardBrokerWithStatus.Status.IN_PROGRESS
-import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider.DashboardExtractedProfileResult
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
 import com.duckduckgo.pir.impl.models.isExtant
@@ -64,13 +62,6 @@ interface PirDashboardInitialScanStateProvider {
      */
     suspend fun getScanResults(): List<DashboardExtractedProfileResult>
 
-    data class DashboardBroker(
-        val name: String,
-        val url: String,
-        val parentUrl: String? = null,
-        val optOutUrl: String? = null,
-    )
-
     data class DashboardBrokerWithStatus(
         val broker: DashboardBroker,
         val status: Status,
@@ -88,18 +79,6 @@ interface PirDashboardInitialScanStateProvider {
             COMPLETED("completed"),
         }
     }
-
-    /**
-     * This class represents a valid [ExtractedProfile] that should be displayed in the dashboard.
-     */
-    data class DashboardExtractedProfileResult(
-        val extractedProfile: ExtractedProfile,
-        val broker: DashboardBroker,
-        val optOutSubmittedDateInMillis: Long? = null,
-        val optOutRemovedDateInMillis: Long? = null,
-        val estimatedRemovalDateInMillis: Long? = null,
-        val hasMatchingRecordOnParentBroker: Boolean = false,
-    )
 }
 
 @ContributesBinding(ActivityScope::class)
