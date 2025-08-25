@@ -74,6 +74,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -226,16 +227,16 @@ class OmnibarLayoutViewModel @Inject constructor(
                 isFireButtonVisible = it.showFireIcon,
                 isBrowserMenuButtonVisible = it.showBrowserMenu,
             )
-        }.distinctUntilChanged().onEach {
-            if (it.isFocused && it.isNtp) {
+        }.distinctUntilChanged()
+            .filter { it.isNtp && it.isFocused }
+            .onEach {
                 val params = mapOf(
                     Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to it.isTabSwitcherButtonVisible.toString(),
                     Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to it.isFireButtonVisible.toString(),
                     Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to it.isBrowserMenuButtonVisible.toString(),
                 )
                 pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
-            }
-        }.launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun onFindInPageRequested() {
