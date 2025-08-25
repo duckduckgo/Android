@@ -768,6 +768,38 @@ class RealDuckChatTest {
         assertTrue(testee.showSettings.value)
     }
 
+    @Test
+    fun `when input screen disabled then don't show input screen automatically`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(false))
+        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreenAutomaticallyOnNewTab.value)
+    }
+
+    @Test
+    fun `when input screen enabled but feature disabled then don't show input screen automatically`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreenAutomaticallyOnNewTab.value)
+    }
+
+    @Test
+    fun `when input screen enabled and feature flag enabled then show input screen automatically`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showInputScreenAutomaticallyOnNewTab.value)
+    }
+
     companion object {
         val SETTINGS_JSON = """
         {
