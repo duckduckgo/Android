@@ -51,6 +51,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -469,13 +470,10 @@ class OmnibarLayoutViewModel @Inject constructor(
                 )
             }
         }
-        // todo lp - do we need this pixel, it wasn't sent from new design at all
-        // if (!_viewState.value.isExperimentalThemingEnabled) {
-        //     pixel.fire(
-        //         AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-        //         mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
-        //     )
-        // }
+        pixel.fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to pulseAnimationPlaying.toString()),
+        )
     }
 
     fun onPrivacyShieldButtonPressed() {
