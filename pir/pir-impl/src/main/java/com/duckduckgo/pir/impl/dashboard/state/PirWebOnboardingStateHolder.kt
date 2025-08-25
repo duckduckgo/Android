@@ -25,6 +25,7 @@ import javax.inject.Inject
 
 interface PirWebOnboardingStateHolder {
     val isProfileComplete: Boolean
+
     fun addAddress(
         city: String,
         state: String,
