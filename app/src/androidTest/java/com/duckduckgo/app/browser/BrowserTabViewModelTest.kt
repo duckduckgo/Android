@@ -448,6 +448,8 @@ class BrowserTabViewModelTest {
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
 
+    private val mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow = MutableStateFlow(false)
+
     private val mockAppBuildConfig: AppBuildConfig = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
@@ -645,6 +647,7 @@ class BrowserTabViewModelTest {
         whenever(subscriptions.isEligible()).thenReturn(false)
         whenever(mockDuckAiFeatureState.showPopupMenuShortcut).thenReturn(MutableStateFlow(false))
         whenever(mockDuckAiFeatureState.showInputScreen).thenReturn(mockDuckAiFeatureStateInputScreenFlow)
+        whenever(mockDuckAiFeatureState.showInputScreenAutomaticallyOnNewTab).thenReturn(mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow)
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
@@ -6992,7 +6995,7 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
         flowSelectedTab.emit(ntpTab)
 
@@ -7005,7 +7008,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenInputScreenDisabledAndSwitchToNewTabThenLaunchInputScreenCommandTriggered() = runTest {
+    fun whenInputScreenDisabledAndSwitchToNewTabThenLaunchInputScreenCommandNotTriggered() = runTest {
         val initialTabId = "initial-tab"
         val initialTab = TabEntity(tabId = initialTabId, url = "https://example.com", title = "EX", skipHome = false, viewed = true, position = 0)
         val ntpTabId = "ntp-tab"
@@ -7015,7 +7018,7 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(false)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
 
         flowSelectedTab.emit(ntpTab)
 
@@ -7038,7 +7041,7 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = targetTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
         flowSelectedTab.emit(targetTab)
 
@@ -7061,7 +7064,7 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = initialTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
         flowSelectedTab.emit(ntpTab)
 
@@ -7084,10 +7087,10 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(false)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(false)
 
         flowSelectedTab.emit(ntpTab)
-        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val commands = commandCaptor.allValues
@@ -7109,7 +7112,7 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
         flowSelectedTab.emit(ntpTab)
 
@@ -7132,7 +7135,7 @@ class BrowserTabViewModelTest {
         flowSelectedTab.emit(initialTab)
 
         testee.loadData(tabId = ntpTabId, initialUrl = null, skipHome = false, isExternal = false)
-        mockDuckAiFeatureStateInputScreenFlow.emit(true)
+        mockDuckAiFeatureStateInputScreenOpenAutomaticallyFlow.emit(true)
 
         flowSelectedTab.emit(ntpTab)
 

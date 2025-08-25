@@ -738,9 +738,10 @@ class BrowserTabViewModel @Inject constructor(
             .filter { selectedTab ->
                 // fire event when activating a genuinely new tab
                 // (has no URL and wasn't opened from another tab)
+                val showInputScreenAutomatically = duckAiFeatureState.showInputScreenAutomaticallyOnNewTab.value
                 val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
                 val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
-                duckAiFeatureState.showInputScreen.value && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
+                showInputScreenAutomatically && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
             }
             .flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
             .onEach {
