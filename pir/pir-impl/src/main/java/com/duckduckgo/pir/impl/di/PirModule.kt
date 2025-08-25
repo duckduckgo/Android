@@ -16,12 +16,12 @@
 
 package com.duckduckgo.pir.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.CaptchaResolver
@@ -58,11 +58,15 @@ class PirModule {
 
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun bindPirDatabase(context: Context): PirDatabase {
-        return Room.databaseBuilder(context, PirDatabase::class.java, "pir.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .build()
+    fun bindPirDatabase(databaseProvider: DatabaseProvider): PirDatabase {
+        return databaseProvider.buildRoomDatabase(
+            PirDatabase::class.java,
+            "pir.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                enableMultiInstanceInvalidation = true,
+            ),
+        )
     }
 
     @SingleInstanceIn(AppScope::class)

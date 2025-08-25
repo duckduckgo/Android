@@ -30,6 +30,7 @@ dependencies {
     implementation project(':di')
     implementation project(':common-utils')
     implementation project(':browser-api')
+    implementation project(':data-store-api')
     implementation project(':feature-toggles-api')
     implementation project(':privacy-config-api')
     implementation project(':app-build-config-api')
