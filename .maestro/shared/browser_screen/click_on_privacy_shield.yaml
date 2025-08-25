@@ -17,6 +17,6 @@ appId: com.duckduckgo.mobile.android
               id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"
       commands:
           - assertVisible:
-                id: "com.duckduckgo.mobile.android:id/shieldIconExperiment"
+                id: "com.duckduckgo.mobile.android:id/shieldIcon"
           - tapOn:
                 id: "com.duckduckgo.mobile.android:id/shieldIconPulseAnimationContainer"

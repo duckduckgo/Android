@@ -21,15 +21,10 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.text.Editable
-import android.transition.ChangeBounds
-import android.transition.Fade
-import android.transition.TransitionManager
-import android.transition.TransitionSet
 import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.OvershootInterpolator
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -37,7 +32,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.transition.doOnEnd
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -92,7 +86,6 @@ import com.duckduckgo.common.ui.view.KeyboardAwareEditText.ShowSuggestionsListen
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -211,7 +204,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         )
     }
     internal val browserMenuImageView: ImageView by lazy { findViewById(R.id.browserMenuImageView) }
-    internal val shieldIconExperiment: LottieAnimationView by lazy { findViewById(R.id.shieldIconExperiment) } // todo lp - rename to just shieldIcon
+    internal val shieldIcon: LottieAnimationView by lazy { findViewById(R.id.shieldIcon) }
     internal val pageLoadingIndicator: ProgressBar by lazy { findViewById(R.id.pageLoadingIndicator) }
     internal val searchIcon: ImageView by lazy { findViewById(R.id.searchIcon) }
     internal val daxIcon: ImageView by lazy { findViewById(R.id.daxIcon) }
@@ -232,7 +225,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     )
 
     internal fun shieldViews(): List<View> = listOf(
-        shieldIconExperiment,
+        shieldIcon,
     )
 
     var isScrollingEnabled: Boolean
@@ -435,7 +428,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             viewModel.onDuckChatButtonPressed()
             omnibarItemPressedListener?.onDuckChatButtonPressed()
         }
-        shieldIconExperiment.setOnClickListener {
+        shieldIcon.setOnClickListener {
             if (isAttachedToWindow) {
                 viewModel.onPrivacyShieldButtonPressed()
             }
@@ -512,14 +505,14 @@ open class OmnibarLayout @JvmOverloads constructor(
         when (viewState.leadingIconState) {
             OmnibarLayoutViewModel.LeadingIconState.SEARCH -> {
                 searchIcon.show()
-                shieldIconExperiment.gone()
+                shieldIcon.gone()
                 daxIcon.gone()
                 globeIcon.gone()
                 duckPlayerIcon.gone()
             }
 
             OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD -> {
-                shieldIconExperiment.show()
+                shieldIcon.show()
                 searchIcon.gone()
                 daxIcon.gone()
                 globeIcon.gone()
@@ -528,7 +521,7 @@ open class OmnibarLayout @JvmOverloads constructor(
 
             OmnibarLayoutViewModel.LeadingIconState.DAX -> {
                 daxIcon.show()
-                shieldIconExperiment.gone()
+                shieldIcon.gone()
                 searchIcon.gone()
                 globeIcon.gone()
                 duckPlayerIcon.gone()
@@ -537,7 +530,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             OmnibarLayoutViewModel.LeadingIconState.GLOBE -> {
                 globeIcon.show()
                 daxIcon.gone()
-                shieldIconExperiment.gone()
+                shieldIcon.gone()
                 searchIcon.gone()
                 duckPlayerIcon.gone()
             }
@@ -545,7 +538,7 @@ open class OmnibarLayout @JvmOverloads constructor(
             OmnibarLayoutViewModel.LeadingIconState.DUCK_PLAYER -> {
                 globeIcon.gone()
                 daxIcon.gone()
-                shieldIconExperiment.gone()
+                shieldIcon.gone()
                 searchIcon.gone()
                 duckPlayerIcon.show()
             }
@@ -726,7 +719,7 @@ open class OmnibarLayout @JvmOverloads constructor(
     private fun startVisualDesignTrackersAnimation(events: List<Entity>?) {
         animatorHelper.startTrackersAnimation(
             context = context,
-            shieldAnimationView = shieldIconExperiment,
+            shieldAnimationView = shieldIcon,
             trackersAnimationView = trackersAnimation,
             omnibarViews = omnibarViews(),
             entities = events,
@@ -740,7 +733,7 @@ open class OmnibarLayout @JvmOverloads constructor(
         renderIfChanged(privacyShield, lastSeenPrivacyShield) {
             lastSeenPrivacyShield = privacyShield
             val shieldIconView = if (viewMode is ViewMode.Browser) {
-                shieldIconExperiment
+                shieldIcon
             } else {
                 customTabToolbarContainer.customTabShieldIcon
             }

@@ -187,7 +187,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
 
             // todo lp - is this change correct?
             // shieldIcon.gone()
-            shieldIconExperiment.gone()
+            shieldIcon.gone()
 
             daxIcon.gone()
             globeIcon.gone()
