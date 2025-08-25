@@ -20,7 +20,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
+    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
         android:id="@+id/singleOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -142,7 +142,7 @@
 
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
+    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
         android:id="@+id/singleOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
