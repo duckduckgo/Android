@@ -16,13 +16,13 @@
 
 package com.duckduckgo.privacy.config.impl.di
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.store.ALL_MIGRATIONS
 import com.duckduckgo.privacy.config.store.PrivacyConfigDatabase
@@ -66,18 +66,17 @@ object DatabaseModule {
         return context.getSharedPreferences("com.duckduckgo.privacy.config.persister.preferences.v1", Context.MODE_PRIVATE)
     }
 
-    @SuppressLint("DenyListedApi")
     @SingleInstanceIn(AppScope::class)
     @Provides
-    fun providePrivacyConfigDatabase(context: Context): PrivacyConfigDatabase {
-        return Room.databaseBuilder(
-            context,
+    fun providePrivacyConfigDatabase(databaseProvider: DatabaseProvider): PrivacyConfigDatabase {
+        return databaseProvider.buildRoomDatabase(
             PrivacyConfigDatabase::class.java,
             "privacy_config.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
         )
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
-            .build()
     }
 
     @SingleInstanceIn(AppScope::class)
