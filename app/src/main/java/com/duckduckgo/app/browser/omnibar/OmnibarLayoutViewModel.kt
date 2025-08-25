@@ -76,6 +76,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -214,6 +215,25 @@ class OmnibarLayoutViewModel @Inject constructor(
         showDuckAiButton.onEach { showDuckAiButton ->
             _viewState.update {
                 it.copy(showChatMenu = showDuckAiButton)
+            }
+        }.launchIn(viewModelScope)
+
+        viewState.map {
+            NewTabPixelParams(
+                isNtp = it.viewMode == NewTab,
+                isFocused = it.hasFocus,
+                isDuckAIButtonVisible = it.showChatMenu,
+                isFireButtonVisible = it.showFireIcon,
+                isBrowserMenuButtonVisible = it.showBrowserMenu,
+            )
+        }.distinctUntilChanged().onEach {
+            if (it.isFocused && it.isNtp) {
+                val params = mapOf(
+                    Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to it.isDuckAIButtonVisible.toString(),
+                    Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to it.isFireButtonVisible.toString(),
+                    Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to it.isBrowserMenuButtonVisible.toString(),
+                )
+                pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
             }
         }.launchIn(viewModelScope)
     }
@@ -867,4 +887,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             command.send(Command.LaunchInputScreen(query = textToPreFill))
         }
     }
+
+    private data class NewTabPixelParams(
+        val isNtp: Boolean,
+        val isFocused: Boolean,
+        val isDuckAIButtonVisible: Boolean,
+        val isFireButtonVisible: Boolean,
+        val isBrowserMenuButtonVisible: Boolean,
+    )
 }
