@@ -47,14 +47,18 @@ import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -1705,5 +1709,90 @@ class OmnibarLayoutViewModelTest {
 
     private fun Command.assertCommand(expectedType: KClass<out Command>) {
         assertTrue(String.format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnNewTabThenAddressBarNtpFocusedPixelSent() = runTest {
+        givenSiteLoaded("")
+        testee.onViewModeChanged(ViewMode.NewTab)
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel).fire(
+            AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
+            mapOf(
+                Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnWebsiteThenAddressBarNtpFocusedPixelNotSent() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel, never()).fire(
+            eq(AppPixelName.ADDRESS_BAR_NTP_FOCUSED),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnSerpThenAddressBarNtpFocusedPixelNotSent() = runTest {
+        givenSiteLoaded(SERP_URL)
+        testee.onViewModeChanged(ViewMode.Browser(SERP_URL))
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel, never()).fire(
+            eq(AppPixelName.ADDRESS_BAR_NTP_FOCUSED),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnNewTabWithDuckAiButtonDisabledThenCorrectParametersSent() = runTest {
+        givenSiteLoaded("")
+        testee.onViewModeChanged(ViewMode.NewTab)
+        whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
+        whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(MutableStateFlow(false))
+
+        // Re-initialize the viewModel with the updated configuration
+        initializeViewModel()
+
+        testee.onViewModeChanged(ViewMode.NewTab)
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel).fire(
+            AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
+            mapOf(
+                Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to "false",
+                Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnNewTabWithFireButtonDisabledThenCorrectParametersSent() = runTest {
+        givenSiteLoaded("")
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        // Simulate focusing the omnibar with text, which hides the fire button
+        testee.onOmnibarFocusChanged(true, "some query")
+
+        verify(pixel).fire(
+            AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
+            mapOf(
+                Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "false",
+                Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "false",
+            ),
+        )
     }
 }
