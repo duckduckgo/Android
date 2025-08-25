@@ -1720,7 +1720,7 @@ class OmnibarLayoutViewModelTest {
         verify(pixel).fire(
             AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
             mapOf(
-                Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "true",
                 Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "true",
                 Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "true",
             ),
@@ -1771,7 +1771,7 @@ class OmnibarLayoutViewModelTest {
         verify(pixel).fire(
             AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
             mapOf(
-                Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to "false",
+                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "false",
                 Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "true",
                 Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "true",
             ),
@@ -1789,7 +1789,7 @@ class OmnibarLayoutViewModelTest {
         verify(pixel).fire(
             AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
             mapOf(
-                Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "true",
                 Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "false",
                 Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "false",
             ),

@@ -222,14 +222,14 @@ class OmnibarLayoutViewModel @Inject constructor(
             NewTabPixelParams(
                 isNtp = it.viewMode == NewTab,
                 isFocused = it.hasFocus,
-                isDuckAIButtonVisible = it.showChatMenu,
+                isTabSwitcherButtonVisible = it.showTabsMenu,
                 isFireButtonVisible = it.showFireIcon,
                 isBrowserMenuButtonVisible = it.showBrowserMenu,
             )
         }.distinctUntilChanged().onEach {
             if (it.isFocused && it.isNtp) {
                 val params = mapOf(
-                    Pixel.PixelParameter.IS_DUCK_AI_BUTTON_SHOWN to it.isDuckAIButtonVisible.toString(),
+                    Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to it.isTabSwitcherButtonVisible.toString(),
                     Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to it.isFireButtonVisible.toString(),
                     Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to it.isBrowserMenuButtonVisible.toString(),
                 )
@@ -891,7 +891,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private data class NewTabPixelParams(
         val isNtp: Boolean,
         val isFocused: Boolean,
-        val isDuckAIButtonVisible: Boolean,
+        val isTabSwitcherButtonVisible: Boolean,
         val isFireButtonVisible: Boolean,
         val isBrowserMenuButtonVisible: Boolean,
     )
