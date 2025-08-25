@@ -26,6 +26,7 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -732,11 +733,10 @@ class OmnibarLayoutViewModelTest {
             assertTrue(viewState.scrollingEnabled)
         }
 
-        // todo lp - do we not send it at all now
-        // verify(pixel).fire(
-        //     AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
-        //     mapOf(FIRE_BUTTON_STATE to animationPlaying.toString()),
-        // )
+        verify(pixel).fire(
+            AppPixelName.MENU_ACTION_FIRE_PRESSED.pixelName,
+            mapOf(FIRE_BUTTON_STATE to animationPlaying.toString()),
+        )
     }
 
     @Test
