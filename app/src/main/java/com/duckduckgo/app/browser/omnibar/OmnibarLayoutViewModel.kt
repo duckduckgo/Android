@@ -177,7 +177,7 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     sealed class Command {
         data object CancelAnimations : Command()
-        data class StartVisualDesignTrackersAnimation(val entities: List<Entity>?) : Command() // todo lp - rename to StartTrackersAnimation?
+        data class StartTrackersAnimation(val entities: List<Entity>?) : Command()
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
@@ -696,7 +696,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                         }
                         viewModelScope.launch {
                             command.send(
-                                Command.StartVisualDesignTrackersAnimation(decoration.entities)
+                                Command.StartTrackersAnimation(decoration.entities)
                             )
                         }
                     }
