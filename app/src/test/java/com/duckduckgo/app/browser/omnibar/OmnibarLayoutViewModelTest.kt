@@ -1756,30 +1756,7 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenOmnibarFocusedOnNewTabWithDuckAiButtonDisabledThenCorrectParametersSent() = runTest {
-        givenSiteLoaded("")
-        testee.onViewModeChanged(ViewMode.NewTab)
-        whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(MutableStateFlow(false))
-        whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(MutableStateFlow(false))
-
-        // Re-initialize the viewModel with the updated configuration
-        initializeViewModel()
-
-        testee.onViewModeChanged(ViewMode.NewTab)
-        testee.onOmnibarFocusChanged(true, "")
-
-        verify(pixel).fire(
-            AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
-            mapOf(
-                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "false",
-                Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "true",
-                Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "true",
-            ),
-        )
-    }
-
-    @Test
-    fun whenOmnibarFocusedOnNewTabWithFireButtonDisabledThenCorrectParametersSent() = runTest {
+    fun whenOmnibarFocusedOnNewTabWithAllButtonsDisabledThenCorrectParametersSent() = runTest {
         givenSiteLoaded("")
         testee.onViewModeChanged(ViewMode.NewTab)
 
@@ -1789,7 +1766,7 @@ class OmnibarLayoutViewModelTest {
         verify(pixel).fire(
             AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
             mapOf(
-                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "false",
                 Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "false",
                 Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "false",
             ),
