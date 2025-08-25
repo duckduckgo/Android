@@ -19,20 +19,55 @@ package com.duckduckgo.pir.impl.dashboard.state
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
+import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 
+interface PirWebOnboardingStateHolder {
+    val isProfileComplete: Boolean
+    fun addAddress(
+        city: String,
+        state: String,
+    ): Boolean
+
+    fun addName(
+        firstName: String,
+        middleName: String? = null,
+        lastName: String,
+    ): Boolean
+
+    fun setBirthYear(year: Int): Boolean
+    fun setNameAtIndex(
+        index: Int,
+        firstName: String,
+        middleName: String? = null,
+        lastName: String,
+    ): Boolean
+
+    fun setAddressAtIndex(
+        index: Int,
+        city: String,
+        state: String,
+    ): Boolean
+
+    fun removeAddressAtIndex(index: Int): Boolean
+    fun removeNameAtIndex(index: Int): Boolean
+    fun toProfileQueries(currentYear: Int): List<ProfileQuery>
+    fun clear()
+}
+
+@ContributesBinding(ActivityScope::class)
 @SingleInstanceIn(ActivityScope::class)
-class PirWebOnboardingStateHolder @Inject constructor() {
+class RealPirWebOnboardingStateHolder @Inject constructor() : PirWebOnboardingStateHolder {
 
     private val names: MutableList<Name> = mutableListOf()
     private val addresses: MutableList<Address> = mutableListOf()
     private var birthYear: Int = 0
 
-    val isProfileComplete: Boolean
+    override val isProfileComplete: Boolean
         get() = names.isNotEmpty() && addresses.isNotEmpty() && birthYear > 0
 
-    fun addAddress(
+    override fun addAddress(
         city: String,
         state: String,
     ): Boolean {
@@ -43,9 +78,9 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return true
     }
 
-    fun addName(
+    override fun addName(
         firstName: String,
-        middleName: String? = null,
+        middleName: String?,
         lastName: String,
     ): Boolean {
         if (names.any { it.firstName == firstName && it.middleName == middleName && it.lastName == lastName }) {
@@ -61,15 +96,15 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return true
     }
 
-    fun setBirthYear(year: Int): Boolean {
+    override fun setBirthYear(year: Int): Boolean {
         birthYear = year
         return true
     }
 
-    fun setNameAtIndex(
+    override fun setNameAtIndex(
         index: Int,
         firstName: String,
-        middleName: String? = null,
+        middleName: String?,
         lastName: String,
     ): Boolean {
         if (index !in names.indices) {
@@ -89,7 +124,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return true
     }
 
-    fun setAddressAtIndex(
+    override fun setAddressAtIndex(
         index: Int,
         city: String,
         state: String,
@@ -107,7 +142,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return true
     }
 
-    fun removeAddressAtIndex(index: Int): Boolean {
+    override fun removeAddressAtIndex(index: Int): Boolean {
         if (index in addresses.indices) {
             addresses.removeAt(index)
             return true
@@ -115,7 +150,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return false
     }
 
-    fun removeNameAtIndex(index: Int): Boolean {
+    override fun removeNameAtIndex(index: Int): Boolean {
         if (index in names.indices) {
             names.removeAt(index)
             return true
@@ -123,7 +158,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return false
     }
 
-    fun toProfileQueries(currentYear: Int): List<ProfileQuery> {
+    override fun toProfileQueries(currentYear: Int): List<ProfileQuery> {
         val profiles = mutableListOf<ProfileQuery>()
         names.forEach { name ->
             addresses.forEach { address ->
@@ -149,7 +184,7 @@ class PirWebOnboardingStateHolder @Inject constructor() {
         return profiles
     }
 
-    fun clear() {
+    override fun clear() {
         names.clear()
         addresses.clear()
         birthYear = 0
