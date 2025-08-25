@@ -39,7 +39,6 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -256,9 +255,7 @@ class Omnibar(
 
     fun configureOmnibarItemPressedListeners(listener: OmnibarItemPressedListener) {
         val omnibar = newOmnibar
-        if (omnibar is FadeOmnibarLayout) {
-            omnibar.setFadeOmnibarItemPressedListener(listener)
-        } else if (omnibar is SingleOmnibarLayout) {
+        if (omnibar is SingleOmnibarLayout) {
             omnibar.setSingleOmnibarItemPressedListener(listener)
         }
     }

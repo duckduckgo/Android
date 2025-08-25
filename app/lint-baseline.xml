@@ -8804,28 +8804,6 @@
     <issue
         id="RtlSymmetry"
         message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                            android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_fade_omnibar.xml"
-            line="87"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                            android:paddingStart=&quot;5dp&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_fade_omnibar.xml"
-            line="231"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
         errorLine1="                    android:paddingStart=&quot;@dimen/keyline_4&quot;"
         errorLine2="                    ~~~~~~~~~~~~~~~~~~~~">
         <location

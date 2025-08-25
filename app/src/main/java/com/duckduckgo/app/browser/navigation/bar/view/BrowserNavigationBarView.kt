@@ -47,8 +47,6 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.Command.NotifyTabsButtonLongClicked
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -66,7 +64,7 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     private val context: Context,
     private val attrs: AttributeSet? = null,
     defStyle: Int = 0,
-) : FrameLayout(context, attrs, defStyle), AttachedBehavior {
+) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
@@ -195,10 +193,6 @@ class BrowserNavigationBarView @JvmOverloads constructor(
         conflatedStateJob.cancel()
     }
 
-    override fun getBehavior(): Behavior<*> {
-        return BottomViewBehavior(context, attrs)
-    }
-
     private fun renderView(viewState: ViewState) {
         binding.shadowView.isVisible = showShadows
         binding.root.isVisible = viewState.isVisible
@@ -247,40 +241,5 @@ class BrowserNavigationBarView @JvmOverloads constructor(
     enum class ViewMode {
         NewTab,
         Browser,
-    }
-
-    /**
-     * Behavior that offsets the navigation bar proportionally to the offset of the top omnibar.
-     *
-     * This practically applies only when paired with the top omnibar because if the bottom omnibar is used, it comes with the navigation bar embedded.
-     */
-    private class BottomViewBehavior(
-        context: Context,
-        attrs: AttributeSet?,
-    ) : Behavior<View>(context, attrs) {
-
-        override fun layoutDependsOn(
-            parent: CoordinatorLayout,
-            child: View,
-            dependency: View,
-        ): Boolean {
-            return dependency is FadeOmnibarLayout && dependency.omnibarPosition == OmnibarPosition.TOP
-        }
-
-        override fun onDependentViewChanged(
-            parent: CoordinatorLayout,
-            child: View,
-            dependency: View,
-        ): Boolean {
-            if (dependency is FadeOmnibarLayout && dependency.omnibarPosition == OmnibarPosition.TOP) {
-                val dependencyOffset = abs(dependency.top)
-                val offsetPercentage = dependencyOffset.toFloat() / dependency.measuredHeight.toFloat()
-                val childHeight = child.measuredHeight
-                val childOffset = childHeight * offsetPercentage
-                child.translationY = childOffset
-                return true
-            }
-            return false
-        }
     }
 }
