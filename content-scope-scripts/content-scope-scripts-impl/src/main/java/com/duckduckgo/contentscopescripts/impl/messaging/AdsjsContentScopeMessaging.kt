@@ -17,6 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import android.webkit.WebView
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.browser.api.DuckDuckGoWebView
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -54,7 +55,8 @@ class AdsjsContentScopeMessaging @Inject constructor(
     override val context: String = "contentScopeScripts"
     override val allowedDomains: Set<String> = setOf("*")
 
-    private fun process(
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal fun process(
         message: String,
         jsMessageCallback: JsMessageCallback,
     ) {
