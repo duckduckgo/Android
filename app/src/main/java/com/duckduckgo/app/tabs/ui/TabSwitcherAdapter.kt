@@ -39,8 +39,8 @@ import com.bumptech.glide.load.engine.Resource
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.ItemTabGridNewBinding // todo lp - rename to regular thing instead of new
-import com.duckduckgo.app.browser.databinding.ItemTabListNewBinding
+import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
+import com.duckduckgo.app.browser.databinding.ItemTabListBinding
 import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -103,11 +103,11 @@ class TabSwitcherAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             GRID_TAB -> {
-                val binding = ItemTabGridNewBinding.inflate(inflater, parent, false)
+                val binding = ItemTabGridBinding.inflate(inflater, parent, false)
                 TabSwitcherViewHolder.GridTabViewHolder(binding)
             }
             LIST_TAB -> {
-                val binding = ItemTabListNewBinding.inflate(inflater, parent, false)
+                val binding = ItemTabListBinding.inflate(inflater, parent, false)
                 TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
@@ -481,7 +481,7 @@ class TabSwitcherAdapter(
             val tabPreview: ImageView,
         ) : TabSwitcherViewHolder(rootView), TabViewHolder {
 
-            constructor(binding: ItemTabGridNewBinding) : this(
+            constructor(binding: ItemTabGridBinding) : this(
                 rootView = binding.root,
                 favicon = binding.favicon,
                 title = binding.title,
@@ -502,7 +502,7 @@ class TabSwitcherAdapter(
             val url: TextView,
         ) : TabSwitcherViewHolder(rootView), TabViewHolder {
 
-            constructor(binding: ItemTabListNewBinding) : this(
+            constructor(binding: ItemTabListBinding) : this(
                 rootView = binding.root,
                 favicon = binding.favicon,
                 title = binding.title,
