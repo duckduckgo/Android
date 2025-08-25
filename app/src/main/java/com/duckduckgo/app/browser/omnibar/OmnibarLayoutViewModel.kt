@@ -795,17 +795,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onNewTabScrollingStateChanged(scrollingState: Decoration.NewTabScrollingState) {
-        val viewMode = viewState.value.viewMode
-        // if (viewMode is NewTab) {
-        //     _viewState.update {
-        //         it.copy(
-        //             showShadows = (scrollingState.canScrollUp || scrollingState.canScrollDown) && !scrollingState.topOfPage,
-        //         )
-        //     }
-        // }
-    }
-
     fun setDraftTextIfNtpOrSerp(query: String) {
         val isNtp = _viewState.value.viewMode is NewTab
         val isSerp = _viewState.value.viewMode is Browser && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(_viewState.value.url)

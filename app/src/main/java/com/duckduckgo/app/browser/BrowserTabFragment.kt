@@ -2776,13 +2776,6 @@ class BrowserTabFragment :
             if (omnibar.isEditing()) {
                 hideKeyboard()
             }
-
-            // Check if it can scroll up
-            val canScrollUp = v.canScrollVertically(-1)
-            val canScrollDown = v.canScrollVertically(1)
-            val topOfPage = scrollY == 0
-
-            omnibar.setContentCanScroll(canScrollUp, canScrollDown, topOfPage)
         }
     }
 

@@ -406,14 +406,6 @@ class Omnibar(
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
     }
 
-    fun setContentCanScroll(
-        canScrollUp: Boolean,
-        canScrollDown: Boolean,
-        topOfPage: Boolean,
-    ) {
-        newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown, topOfPage))
-    }
-
     fun setDraftTextIfNtpOrSerp(query: String) {
         newOmnibar.setDraftTextIfNtpOrSerp(query)
     }
