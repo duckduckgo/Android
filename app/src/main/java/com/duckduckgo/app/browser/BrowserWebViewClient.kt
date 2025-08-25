@@ -469,7 +469,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    // TODO check new API
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }

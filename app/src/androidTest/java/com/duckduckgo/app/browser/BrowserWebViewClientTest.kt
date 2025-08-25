@@ -328,6 +328,23 @@ class BrowserWebViewClientTest {
 
     @UiThreadTest
     @Test
+    fun whenOnPageStartedThenReturnActiveExperiments() {
+        val captor = argumentCaptor<List<Toggle>>()
+        testee.onPageStarted(webView, EXAMPLE_URL, null)
+        verify(listener).pageStarted(any(), captor.capture())
+        assertTrue(captor.firstValue.contains(mockToggle))
+    }
+
+    @UiThreadTest
+    @Test
+    fun whenTriggerJsInitThenInjectJsCode() {
+        assertEquals(0, jsPlugins.plugin.countStarted)
+        testee.triggerJSInit(webView)
+        assertEquals(1, jsPlugins.plugin.countInitted)
+    }
+
+    @UiThreadTest
+    @Test
     fun whenOnReceivedHttpAuthRequestThenListenerNotified() {
         val mockHandler = mock<HttpAuthHandler>()
         val authenticationRequest = BasicAuthenticationRequest(mockHandler, "example.com", EXAMPLE_URL, EXAMPLE_URL)
@@ -1186,10 +1203,12 @@ class BrowserWebViewClientTest {
     private class FakeJsInjectorPlugin : JsInjectorPlugin {
         var countFinished = 0
         var countStarted = 0
+        var countInitted = 0
 
         override suspend fun onInit(
             webView: WebView,
         ) {
+            countInitted++
         }
 
         override suspend fun onPageStarted(
