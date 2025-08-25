@@ -26,7 +26,6 @@ import android.webkit.WebView
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat.WebMessageListener
-import org.json.JSONObject
 
 abstract class DuckDuckGoWebView(
     context: Context,
@@ -61,6 +60,6 @@ abstract class DuckDuckGoWebView(
 
     abstract suspend fun safePostMessage(
         replyProxy: JavaScriptReplyProxy,
-        response: JSONObject,
+        response: String,
     )
 }

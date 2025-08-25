@@ -33,6 +33,7 @@ import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -47,6 +48,9 @@ class RealJsMessageHelper @Inject constructor(
         val jsonAdapter: JsonAdapter<SubscriptionEvent> = moshi.adapter(SubscriptionEvent::class.java)
         val message = jsonAdapter.toJson(subscriptionEvent).toString()
         val response = buildJsResponse(message, callbackName, secret)
+
+        logcat("Cris") { "$response" }
+
         sendResponse(response, webView)
     }
 

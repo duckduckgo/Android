@@ -16,6 +16,7 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
 import androidx.webkit.JavaScriptReplyProxy
@@ -31,6 +32,8 @@ import com.duckduckgo.js.messaging.api.AdsjsJsMessageCallback
 import com.duckduckgo.js.messaging.api.AdsjsMessaging
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -62,6 +65,8 @@ class AdsjsContentScopeMessaging @Inject constructor(
     override val context: String = "contentScopeScripts"
     override val allowedDomains: Set<String> = setOf("*")
 
+    private var globalReplyProxy: JavaScriptReplyProxy? = null
+
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun process(
         message: String,
@@ -74,13 +79,17 @@ class AdsjsContentScopeMessaging @Inject constructor(
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
+                    // Setup reply proxy so we can send subscription events
+                    if (jsMessage.featureName == "messaging" || jsMessage.method == "initialPing") {
+                        globalReplyProxy = replyProxy
+                    }
+
                     // Process global handlers first (always processed regardless of feature handlers)
                     globalHandlers.getPlugins()
                         .map { it.getGlobalJsMessageHandler() }
                         .filter { it.method == jsMessage.method }
                         .forEach { handler ->
-                                handler.process(jsMessage, jsMessageCallback) {
-                            }
+                            handler.process(jsMessage, jsMessageCallback) { }
                         }
 
                     // Process with feature handlers
@@ -154,8 +163,30 @@ class AdsjsContentScopeMessaging @Inject constructor(
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 (webView as? DuckDuckGoWebView)?.safePostMessage(
                     replyProxy,
-                    responseWithId,
+                    responseWithId.toString(),
                 )
+            }
+        }
+    }
+
+    override fun postMessage(subscriptionEventData: SubscriptionEventData) {
+        runCatching {
+            val subscriptionEvent = SubscriptionEvent(
+                context = context,
+                featureName = subscriptionEventData.featureName,
+                subscriptionName = subscriptionEventData.subscriptionName,
+                params = subscriptionEventData.params,
+            ).let {
+                moshi.adapter(SubscriptionEvent::class.java).toJson(it)
+            }
+
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                globalReplyProxy?.let {
+                    (webView as? DuckDuckGoWebView)?.safePostMessage(
+                        it,
+                        subscriptionEvent,
+                    )
+                }
             }
         }
     }
