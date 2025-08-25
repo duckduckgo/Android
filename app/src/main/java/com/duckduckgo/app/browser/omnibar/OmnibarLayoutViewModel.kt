@@ -74,8 +74,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -216,6 +218,25 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(showChatMenu = showDuckAiButton)
             }
         }.launchIn(viewModelScope)
+
+        viewState.map {
+            NewTabPixelParams(
+                isNtp = it.viewMode == NewTab,
+                isFocused = it.hasFocus,
+                isTabSwitcherButtonVisible = it.showTabsMenu,
+                isFireButtonVisible = it.showFireIcon,
+                isBrowserMenuButtonVisible = it.showBrowserMenu,
+            )
+        }.distinctUntilChanged()
+            .filter { it.isNtp && it.isFocused }
+            .onEach {
+                val params = mapOf(
+                    Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to it.isTabSwitcherButtonVisible.toString(),
+                    Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to it.isFireButtonVisible.toString(),
+                    Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to it.isBrowserMenuButtonVisible.toString(),
+                )
+                pixel.fire(pixel = AppPixelName.ADDRESS_BAR_NTP_FOCUSED, parameters = params)
+            }.launchIn(viewModelScope)
     }
 
     fun onFindInPageRequested() {
@@ -867,4 +888,12 @@ class OmnibarLayoutViewModel @Inject constructor(
             command.send(Command.LaunchInputScreen(query = textToPreFill))
         }
     }
+
+    private data class NewTabPixelParams(
+        val isNtp: Boolean,
+        val isFocused: Boolean,
+        val isTabSwitcherButtonVisible: Boolean,
+        val isFireButtonVisible: Boolean,
+        val isBrowserMenuButtonVisible: Boolean,
+    )
 }
