@@ -736,9 +736,11 @@ class BrowserTabViewModel @Inject constructor(
         tabRepository.flowSelectedTab
             .distinctUntilChangedBy { selectedTab -> selectedTab?.tabId } // only observe when the tab changes and ignore further updates
             .filter { selectedTab ->
-                // if the tab managed by this view model has just been activated, and it's a new tab (it has no URL), then fire an event
+                // fire event when activating a genuinely new tab
+                // (has no URL and wasn't opened from another tab)
                 val isActiveTab = ::tabId.isInitialized && selectedTab?.tabId == tabId
-                duckAiFeatureState.showInputScreen.value && isActiveTab && selectedTab?.url.isNullOrBlank()
+                val isOpenedFromAnotherTab = selectedTab?.sourceTabId != null
+                duckAiFeatureState.showInputScreen.value && isActiveTab && selectedTab?.url.isNullOrBlank() && !isOpenedFromAnotherTab
             }
             .flowOn(dispatchers.main()) // don't use the immediate dispatcher so that the tabId field has a chance to initialize
             .onEach {
