@@ -41,7 +41,7 @@ class ReportBreakageCategorySingleChoiceViewModel @Inject constructor() : ViewMo
     )
 
     sealed class Command {
-        object ConfirmAndFinish : Command()
+        data object ConfirmAndFinish : Command()
     }
 
     val viewState = MutableStateFlow(ViewState())

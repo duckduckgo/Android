@@ -66,9 +66,9 @@ data class JsonTargetPercentile(
 )
 
 sealed class JsonMessageType(val jsonValue: String) {
-    object SMALL : JsonMessageType("small")
-    object MEDIUM : JsonMessageType("medium")
-    object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
-    object BIG_TWO_ACTION : JsonMessageType("big_two_action")
-    object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
+    data object SMALL : JsonMessageType("small")
+    data object MEDIUM : JsonMessageType("medium")
+    data object BIG_SINGLE_ACTION : JsonMessageType("big_single_action")
+    data object BIG_TWO_ACTION : JsonMessageType("big_two_action")
+    data object PROMO_SINGLE_ACTION : JsonMessageType("promo_single_action")
 }
