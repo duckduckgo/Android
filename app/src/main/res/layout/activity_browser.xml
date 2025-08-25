@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/experimentalToolbarSize"
         android:layout_alignParentTop="true"
-        layout="@layout/include_single_omnibar_toolbar_mockup" />
+        layout="@layout/include_omnibar_toolbar_mockup" />
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
@@ -58,6 +58,6 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/experimentalToolbarSize"
         android:layout_alignParentBottom="true"
-        layout="@layout/include_single_omnibar_toolbar_mockup_bottom" />
+        layout="@layout/include_omnibar_toolbar_mockup_bottom" />
 
 </RelativeLayout>

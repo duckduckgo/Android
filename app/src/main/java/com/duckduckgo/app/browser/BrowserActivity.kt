@@ -52,10 +52,8 @@ import com.duckduckgo.app.browser.animations.slideAndFadeInFromRight
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToLeft
 import com.duckduckgo.app.browser.animations.slideAndFadeOutToRight
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
-import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBinding
-import com.duckduckgo.app.browser.databinding.IncludeExperimentalOmnibarToolbarMockupBottomBinding
-import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBinding
-import com.duckduckgo.app.browser.databinding.IncludeSingleOmnibarToolbarMockupBottomBinding
+import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
+import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBottomBinding
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.DefaultBrowserBottomSheetDialog.EventListener
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
@@ -248,10 +246,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         TabPagerAdapter(activity = this)
     }
 
-    private lateinit var experimentalToolbarMockupBinding: IncludeExperimentalOmnibarToolbarMockupBinding
-    private lateinit var experimentalToolbarMockupBottomBinding: IncludeExperimentalOmnibarToolbarMockupBottomBinding
-    private lateinit var singleToolBarMockupBinding: IncludeSingleOmnibarToolbarMockupBinding // todo lp - rename single omnibar to toolbar
-    private lateinit var singleToolBarMockupBottomBinding: IncludeSingleOmnibarToolbarMockupBottomBinding
+    private lateinit var omnibarToolbarMockupBinding: IncludeOmnibarToolbarMockupBinding
+    private lateinit var omnibarToolbarMockupBottomBinding: IncludeOmnibarToolbarMockupBottomBinding
 
     private var openMessageInNewTabJob: Job? = null
 
@@ -907,17 +903,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         // Delaying this code to avoid race condition when fragment and activity recreated
         Handler(Looper.getMainLooper()).postDelayed(
             {
-                if (this::experimentalToolbarMockupBinding.isInitialized) {
-                    experimentalToolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
+                if (this::omnibarToolbarMockupBinding.isInitialized) {
+                    omnibarToolbarMockupBinding.appBarLayoutMockup.visibility = View.GONE
                 }
-                if (this::experimentalToolbarMockupBottomBinding.isInitialized) {
-                    experimentalToolbarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
-                }
-                if (this::singleToolBarMockupBinding.isInitialized) {
-                    singleToolBarMockupBinding.appBarLayoutMockup.visibility = View.GONE
-                }
-                if (this::singleToolBarMockupBottomBinding.isInitialized) {
-                    singleToolBarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
+                if (this::omnibarToolbarMockupBottomBinding.isInitialized) {
+                    omnibarToolbarMockupBottomBinding.appBarLayoutMockup.visibility = View.GONE
                 }
             },
             300,
@@ -1291,14 +1281,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 binding.bottomMockupSingleToolbar.appBarLayoutMockup.gone()
-                singleToolBarMockupBinding = binding.topMockupSingleToolbar
+                omnibarToolbarMockupBinding = binding.topMockupSingleToolbar
 
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
-                    singleToolBarMockupBinding.aiChatIconMockup.isVisible = false
+                    omnibarToolbarMockupBinding.aiChatIconMockup.isVisible = false
                 }
 
                 if (Build.VERSION.SDK_INT >= 28) {
-                    singleToolBarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
+                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
                         shadowSizeDp = 12f,
                         offsetYDp = 3f,
                         insetDp = 3f,
@@ -1313,14 +1303,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 binding.topMockupSingleToolbar.appBarLayoutMockup.gone()
-                singleToolBarMockupBottomBinding = binding.bottomMockupSingleToolbar
+                omnibarToolbarMockupBottomBinding = binding.bottomMockupSingleToolbar
 
                 if (!duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus.value) {
-                    singleToolBarMockupBottomBinding.aiChatIconMockup.isVisible = false
+                    omnibarToolbarMockupBottomBinding.aiChatIconMockup.isVisible = false
                 }
 
                 if (Build.VERSION.SDK_INT >= 28) {
-                    singleToolBarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow(
+                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow(
                         shadowSizeDp = 12f,
                         offsetYDp = 3f,
                         insetDp = 3f,
