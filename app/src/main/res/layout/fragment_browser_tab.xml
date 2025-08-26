@@ -30,6 +30,9 @@
         android:id="@+id/singleOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:outlineProvider="none"
         app:omnibarPosition="top" />
 
     <FrameLayout
@@ -82,6 +85,8 @@
         android:id="@+id/browserLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="-0.5dp"
+        android:layout_marginBottom="-0.5dp"
         android:clipChildren="false"
         android:orientation="vertical"
         app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
@@ -159,6 +164,7 @@
         android:id="@+id/singleOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:outlineProvider="none"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 

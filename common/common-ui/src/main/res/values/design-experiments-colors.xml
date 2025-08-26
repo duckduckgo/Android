@@ -42,7 +42,7 @@
     <color name="lines_dark">#1FF9F9F9</color>
 
     <!-- Tone -->
-    <color name="shade_dark">#52171718</color>
+    <color name="shade_dark">#1FF9F9F9</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -72,7 +72,7 @@
     <color name="lines_light">#171F1F1F</color>
 
     <!-- Tone -->
-    <color name="shade_light">#2E1F1F1F</color>
+    <color name="shade_light">#29000000</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
