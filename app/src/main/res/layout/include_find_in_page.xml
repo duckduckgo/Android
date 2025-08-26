@@ -24,7 +24,7 @@
     android:orientation="horizontal"
     android:paddingHorizontal="2dp"
     tools:ignore="KeyboardInaccessibleWidget"
-    tools:layout_height="@dimen/experimentalToolbarSize">
+    tools:layout_height="@dimen/toolbarSize">
 
     <!-- The expected horizontal padding for content is 6dp but we're applying only 2dp
     because the remaining 4dp are added by the omnibar selection animation -->

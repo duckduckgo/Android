@@ -77,15 +77,15 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     }
 
     private val experimentalOmnibarCardMarginTop by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginTop)
+        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginTop)
     }
 
     private val experimentalOmnibarCardMarginBottom by lazy {
-        resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarCardMarginBottom)
+        resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginBottom)
     }
 
-    private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineWidth) }
-    private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.experimentalOmnibarOutlineFocusedWidth) }
+    private val omnibarOutlineWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.omnibarOutlineWidth) }
+    private val omnibarOutlineFocusedWidth by lazy { resources.getDimensionPixelSize(CommonR.dimen.omnibarOutlineFocusedWidth) }
 
     private var focusAnimator: ValueAnimator? = null
 

@@ -205,11 +205,11 @@
         <item name="autocompleteListItemEndPadding">22dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
 
-        <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
-        <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+        <item name="cookiesAnimationRadius">@dimen/cookiesAnimationRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/cookiesAnimationHeight</item>
 
         <item name="toolbarExtraPadding">@dimen/keyline_1</item>
-        <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
+        <item name="actionBarSize">@dimen/toolbarSize</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -340,11 +340,11 @@
         <item name="autocompleteListItemWithoutTrailIconEndPadding">46dp</item>
         <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
 
-        <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
-        <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+        <item name="cookiesAnimationRadius">@dimen/cookiesAnimationRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/cookiesAnimationHeight</item>
 
         <item name="toolbarExtraPadding">@dimen/keyline_1</item>
-        <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
+        <item name="actionBarSize">@dimen/toolbarSize</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->
@@ -467,7 +467,7 @@
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
 
-    <style name="TabSwitcher.Widget.Toolbar.Experimental" parent="Widget.DuckDuckGo.ToolbarTheme">
+    <style name="TabSwitcher.Widget.Toolbar" parent="Widget.DuckDuckGo.ToolbarTheme">
         <item name="actionButtonStyle">@style/TabSwitcher.ActionButton</item>
         <item name="android:actionButtonStyle">@style/TabSwitcher.ActionButton</item>
     </style>
