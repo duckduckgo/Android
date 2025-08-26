@@ -137,7 +137,8 @@
     <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
 
     <dimen name="searchWidgetFavoritesGridItemFavicon">62dp</dimen>
-    <dimen name="searchWidgetFavoritesSideMargin">4dp</dimen>
+    <dimen name="searchWidgetFavoriteMargin">4dp</dimen>
+    <dimen name="searchWidgetFavoritesSideMargin">8dp</dimen>
     <dimen name="searchWidgetPadding">16dp</dimen>
     <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>
     <dimen name="searchWidgetFavoriteItemContainerWidth">72dp</dimen>
