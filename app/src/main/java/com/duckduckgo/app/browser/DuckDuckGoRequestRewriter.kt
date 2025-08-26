@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
@@ -37,7 +38,10 @@ class DuckDuckGoRequestRewriter(
     private val variantManager: VariantManager,
     private val appReferrerDataStore: AppReferrerDataStore,
     private val duckChat: DuckChat,
+    private val androidConfigFeatures: AndroidBrowserConfigFeature,
 ) : RequestRewriter {
+
+    private val hideDuckAiSerpKillSwitch by lazy { androidConfigFeatures.hideDuckAiInSerpKillSwitch().isEnabled() }
 
     override fun rewriteRequestWithCustomQueryParams(request: Uri): Uri {
         val builder = Uri.Builder()
@@ -76,7 +80,7 @@ class DuckDuckGoRequestRewriter(
         val sourceValue = if (appReferrerDataStore.installedFromEuAuction) ParamValue.SOURCE_EU_AUCTION else ParamValue.SOURCE
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
-        if (!duckChat.isEnabled()) {
+        if (!duckChat.isEnabled() && hideDuckAiSerpKillSwitch) {
             builder.appendQueryParameter(ParamKey.HIDE_DUCK_AI, ParamValue.HIDE_DUCK_AI)
         }
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)

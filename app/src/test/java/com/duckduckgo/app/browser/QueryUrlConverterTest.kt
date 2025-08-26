@@ -16,14 +16,18 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -32,18 +36,21 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi") // fake toggle store
 class QueryUrlConverterTest {
 
     private var mockStatisticsStore: StatisticsDataStore = mock()
     private val variantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
     private val duckChat: DuckChat = mock()
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val requestRewriter = DuckDuckGoRequestRewriter(
         DuckDuckGoUrlDetectorImpl(),
         mockStatisticsStore,
         variantManager,
         mockAppReferrerDataStore,
         duckChat,
+        androidBrowserConfigFeature,
     )
     private val testee: QueryUrlConverter = QueryUrlConverter(requestRewriter)
 
@@ -51,6 +58,7 @@ class QueryUrlConverterTest {
     fun setup() {
         whenever(variantManager.getVariantKey()).thenReturn("")
         whenever(duckChat.isEnabled()).thenReturn(true)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
     }
 
     @Test

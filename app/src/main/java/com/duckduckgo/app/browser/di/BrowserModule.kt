@@ -112,8 +112,9 @@ class BrowserModule {
         variantManager: VariantManager,
         appReferrerDataStore: AppReferrerDataStore,
         duckChat: DuckChat,
+        androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     ): RequestRewriter {
-        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore, duckChat)
+        return DuckDuckGoRequestRewriter(urlDetector, statisticsStore, variantManager, appReferrerDataStore, duckChat, androidBrowserConfigFeature)
     }
 
     @Provides
