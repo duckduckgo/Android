@@ -66,4 +66,10 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun showInputScreenAutomaticallyOnNewTab(): Toggle
+
+    /**
+     * @return `true` when the user is eligible to see the RMF promotion about the Input Screen.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun inputScreenRmf202508(): Toggle
 }
