@@ -162,29 +162,54 @@
         <item name="appTPHeaderBackground">@color/black</item>
 
         <!-- Design System Reference Colors Dark -->
-        <item name="daxColorBackground">@color/gray100</item>
+        <item name="preferredStatusBarColor">@color/background_background_dark</item>
+        <item name="preferredNavigationBarColor">@color/background_background_dark</item>
+        <item name="daxColorBackground">@color/background_background_dark</item>
         <item name="daxColorBackgroundInverted">@color/gray0</item>
-        <item name="daxColorSurface">@color/gray90</item>
+        <item name="daxColorSurface">@color/background_surface_dark</item>
         <item name="daxColorContainer">@color/white12</item>
-        <item name="daxColorWindow">@color/gray85</item>
-        <item name="daxColorPrimaryText">@color/white84</item>
+        <item name="daxColorWindow">@color/background_window_dark</item>
+        <item name="daxColorPrimaryText">@color/text_primary_dark</item>
         <item name="daxColorPrimaryInvertedText">@color/black84</item>
-        <item name="daxColorSecondaryText">@color/white60</item>
+        <item name="daxColorSecondaryText">@color/text_secondary_dark</item>
         <item name="daxColorSecondaryInvertedText">@color/black60</item>
         <item name="daxColorTertiaryText">@color/white48</item>
-        <item name="daxColorPrimaryIcon">@color/white84</item>
-        <item name="daxColorSecondaryIcon">@color/white60</item>
+        <item name="daxColorPrimaryIcon">@color/icon_primary_dark</item>
+        <item name="daxColorSecondaryIcon">@color/icon_secondary_dark</item>
         <item name="daxColorDestructive">@color/alertRedOnDarkDefault</item>
-        <item name="daxColorIconDisabled">@color/white40</item>
+        <item name="daxColorIconDisabled">@color/icon_tertiary_dark</item>
         <item name="daxColorContainerDisabled">@color/white18</item>
         <item name="daxColorTextDisabled">@color/white36</item>
-        <item name="daxColorLines">@color/white9</item>
+        <item name="daxColorLines">@color/lines_dark</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorAccentContentPrimary">@color/accent_content_primary_dark</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue30_20</item>
+
+        <!-- Controls -->
+        <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
+        <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_dark</item>
+        <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_dark</item>
+        <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_dark</item>
+
+        <!-- Widgets -->
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+        <item name="daxColorWebViewScrollbarTrack">@android:color/transparent</item>
+
+        <item name="autocompleteListItemHorizontalPadding">26dp</item>
+        <item name="autocompleteListItemStartPadding">26dp</item>
+        <item name="autocompleteListItemEndPadding">22dp</item>
+        <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
+
+        <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+
+        <item name="toolbarExtraPadding">@dimen/keyline_1</item>
+        <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
 
         <!-- Design System Component Colors Dark -->
         <!-- Buttons -->
@@ -271,29 +296,55 @@
         <item name="appTPHeaderBackground">@color/white_60</item>
 
         <!-- Design System Reference Colors Light -->
-        <item name="daxColorBackground">@color/gray0</item>
+        <item name="preferredStatusBarColor">@color/background_background_light</item>
+        <item name="preferredNavigationBarColor">@color/background_background_light</item>
+        <item name="daxColorBackground">@color/background_background_light</item>
         <item name="daxColorBackgroundInverted">@color/gray100</item>
-        <item name="daxColorSurface">@color/white</item>
+        <item name="daxColorSurface">@color/background_surface_light</item>
         <item name="daxColorContainer">@color/black6</item>
-        <item name="daxColorWindow">@color/white</item>
-        <item name="daxColorPrimaryText">@color/black84</item>
+        <item name="daxColorWindow">@color/background_window_light</item>
+        <item name="daxColorPrimaryText">@color/text_primary_light</item>
         <item name="daxColorPrimaryInvertedText">@color/white84</item>
-        <item name="daxColorSecondaryText">@color/black60</item>
+        <item name="daxColorSecondaryText">@color/text_secondary_light</item>
         <item name="daxColorSecondaryInvertedText">@color/white60</item>
         <item name="daxColorTertiaryText">@color/black48</item>
-        <item name="daxColorPrimaryIcon">@color/black84</item>
-        <item name="daxColorSecondaryIcon">@color/black60</item>
-        <item name="daxColorIconDisabled">@color/black40</item>
+        <item name="daxColorPrimaryIcon">@color/icon_primary_light</item>
+        <item name="daxColorSecondaryIcon">@color/icon_secondary_light</item>
+        <item name="daxColorIconDisabled">@color/icon_tertiary_light</item>
         <item name="daxColorDestructive">@color/alertRedOnLightDefault</item>
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
-        <item name="daxColorLines">@color/black9</item>
+        <item name="daxColorLines">@color/lines_light</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorAccentContentPrimary">@color/accent_content_primary_light</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
+
+        <!-- Controls -->
+        <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>
+        <item name="daxColorControlFillSecondary">@color/controls_fill_secondary_light</item>
+        <item name="daxColorControlFillTertiary">@color/controls_fill_tertiary_light</item>
+        <item name="daxColorControlDecorationTertiary">@color/controls_decoration_tertiary_light</item>
+
+        <!-- Widgets -->
+        <item name="daxColorToolbar">?attr/daxColorBackground</item>
+        <item name="daxColorBrowserOverlay">?attr/daxColorBackground</item>
+
+        <item name="daxColorWebViewScrollbarTrack">@android:color/transparent</item>
+
+        <item name="autocompleteListItemHorizontalPadding">26dp</item>
+        <item name="autocompleteListItemStartPadding">26dp</item>
+        <item name="autocompleteListItemEndPadding">22dp</item>
+        <item name="autocompleteListItemWithoutTrailIconEndPadding">46dp</item>
+        <item name="autocompleteListItemIconMargin">@dimen/keyline_2</item>
+
+        <item name="cookiesAnimationRadius">@dimen/experimentalCookiesAnimationRadius</item>
+        <item name="cookiesAnimationHeight">@dimen/experimentalCookiesAnimationHeight</item>
+
+        <item name="toolbarExtraPadding">@dimen/keyline_1</item>
+        <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
 
         <!-- Design System Component Colors Light -->
         <!-- Buttons -->
@@ -414,6 +465,15 @@
     <style name="ShapeAppearance.DuckDuckGo.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
+    </style>
+
+    <style name="TabSwitcher.Widget.Toolbar.Experimental" parent="Widget.DuckDuckGo.ToolbarTheme">
+        <item name="actionButtonStyle">@style/TabSwitcher.ActionButton</item>
+        <item name="android:actionButtonStyle">@style/TabSwitcher.ActionButton</item>
+    </style>
+
+    <style name="TabSwitcher.ActionButton" parent="Widget.AppCompat.ActionButton">
+        <item name="android:minWidth">44dp</item>
     </style>
 
 </resources>
