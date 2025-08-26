@@ -102,7 +102,7 @@ sealed interface PirWebMessageResponse {
         }
 
         data class ScanProgress(
-            val currentScan: Int,
+            val currentScans: Int,
             val totalScans: Int,
             val scannedBrokers: List<ScannedBroker>,
         ) {
