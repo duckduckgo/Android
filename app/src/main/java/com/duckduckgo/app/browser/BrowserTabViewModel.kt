@@ -88,6 +88,7 @@ import com.duckduckgo.app.browser.commands.Command.DownloadImage
 import com.duckduckgo.app.browser.commands.Command.EditWithSelectedQuery
 import com.duckduckgo.app.browser.commands.Command.EmailSignEvent
 import com.duckduckgo.app.browser.commands.Command.EscapeMaliciousSite
+import com.duckduckgo.app.browser.commands.Command.ExtractSerpLogo
 import com.duckduckgo.app.browser.commands.Command.ExtractUrlFromCloakedAmpLink
 import com.duckduckgo.app.browser.commands.Command.FindInPageCommand
 import com.duckduckgo.app.browser.commands.Command.GenerateWebViewPreviewImage
@@ -344,6 +345,8 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -473,6 +476,7 @@ class BrowserTabViewModel @Inject constructor(
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -1610,6 +1614,7 @@ class BrowserTabViewModel @Inject constructor(
             queryOrFullUrl = omnibarTextForUrl(url, true),
             omnibarText = omnibarTextForUrl(url, settingsDataStore.isFullUrlEnabled),
             forceExpand = true,
+            serpLogo = null,
         )
         val currentBrowserViewState = currentBrowserViewState()
         val domain = site?.domain
@@ -1911,6 +1916,18 @@ class BrowserTabViewModel @Inject constructor(
 
             viewModelScope.launch {
                 onboardingDesignExperimentManager.onWebPageFinishedLoading(url)
+            }
+
+            evaluateSerpLogoState(url)
+        }
+    }
+
+    private fun evaluateSerpLogoState(url: String?) {
+        if (serpEasterEggLogosToggles.feature().isEnabled()) {
+            if (url != null && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
+                command.value = ExtractSerpLogo(url)
+            } else {
+                omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = null)
             }
         }
     }
@@ -4298,6 +4315,14 @@ class BrowserTabViewModel @Inject constructor(
         viewModelScope.launch {
             onboardingDesignExperimentManager.fireSiteSuggestionOptionSelectedPixel(index)
         }
+    }
+
+    fun onLogoReceived(serpLogo: SerpLogo) {
+        omnibarViewState.value = currentOmnibarViewState().copy(serpLogo = serpLogo)
+    }
+
+    fun onDynamicLogoClicked(url: String) {
+        command.value = Command.ShowSerpEasterEggLogo(url)
     }
 
     companion object {
