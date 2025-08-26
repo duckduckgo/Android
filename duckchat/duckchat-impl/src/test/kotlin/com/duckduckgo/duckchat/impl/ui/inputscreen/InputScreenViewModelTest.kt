@@ -913,4 +913,18 @@ class InputScreenViewModelTest {
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
     }
+
+    @Test
+    fun `when onChatSelected then new line button is visible`() {
+        val viewModel = createViewModel()
+        viewModel.onChatSelected()
+        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
+    }
+
+    @Test
+    fun `when onSearchSelected then new line button is not visible`() {
+        val viewModel = createViewModel()
+        viewModel.onSearchSelected()
+        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
+    }
 }
