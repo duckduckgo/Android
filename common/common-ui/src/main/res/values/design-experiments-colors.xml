@@ -43,6 +43,7 @@
 
     <!-- Tone -->
     <color name="shade_dark">#1FF9F9F9</color>
+    <color name="shade_dark_solid">#414141</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
@@ -73,6 +74,7 @@
 
     <!-- Tone -->
     <color name="shade_light">#29000000</color>
+    <color name="shade_light_solid">#CBCBCB</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>

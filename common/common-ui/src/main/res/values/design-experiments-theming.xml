@@ -39,6 +39,7 @@
 
         <!-- Tone -->
         <item name="daxColorShade">@color/shade_dark</item>
+        <item name="daxColorShadeSolid">@color/shade_dark_solid</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_dark</item>
@@ -86,6 +87,7 @@
 
         <!-- Tone -->
         <item name="daxColorShade">@color/shade_light</item>
+        <item name="daxColorShadeSolid">@color/shade_light_solid</item>
 
         <!-- Controls -->
         <item name="daxColorControlFillPrimary">@color/controls_fill_primary_light</item>

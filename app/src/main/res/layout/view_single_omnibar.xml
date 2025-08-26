@@ -32,12 +32,6 @@
         android:background="@android:color/transparent"
         app:layout_scrollFlags="scroll|enterAlways|snap">
 
-        <View
-            android:id="@+id/topOutlineStroke"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="?attr/daxColorShade"/>
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/toolbarContainer"
             android:layout_width="match_parent"
@@ -486,12 +480,6 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <View
-            android:id="@+id/bottomOutlineStroke"
-            android:layout_width="match_parent"
-            android:layout_height="0.5dp"
-            android:background="?attr/daxColorShade"/>
 
     </LinearLayout>
 </merge>

@@ -68,9 +68,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     private val backIcon: ImageView by lazy { findViewById(R.id.backIcon) }
     private val customTabToolbarContainerWrapper: ViewGroup by lazy { findViewById(R.id.customTabToolbarContainerWrapper) }
 
-    private val topOutlineStroke: View by lazy { findViewById(R.id.topOutlineStroke) }
-    private val bottomOutlineStroke: View by lazy { findViewById(R.id.bottomOutlineStroke) }
-
     override val findInPage: FindInPage by lazy {
         FindInPageImpl(IncludeFadeOmnibarFindInPageBinding.bind(findViewById(R.id.findInPage)))
     }
@@ -124,11 +121,8 @@ class SingleOmnibarLayout @JvmOverloads constructor(
                 if (Build.VERSION.SDK_INT < 28) {
                     omnibarCardShadow.cardElevation = 2f.toPx(context)
                 }
-                topOutlineStroke.isVisible = false
             }
             OmnibarPosition.BOTTOM -> {
-                bottomOutlineStroke.isVisible = false
-
                 // When omnibar is at the bottom, we're adding an additional space at the top
                 omnibarCardShadow.updateLayoutParams {
                     (this as MarginLayoutParams).apply {
