@@ -148,6 +148,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     data class ViewState(
         val viewMode: ViewMode = Browser(null),
         val leadingIconState: LeadingIconState = Search,
+        val previousLeadingIconState: LeadingIconState? = null,
         val privacyShield: PrivacyShieldState = PrivacyShieldState.UNKNOWN,
         val hasFocus: Boolean = false,
         val query: String = "",
@@ -278,6 +279,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasFocus = true,
                     expanded = true,
                     leadingIconState = Search,
+                    previousLeadingIconState = it.leadingIconState,
                     highlightPrivacyShield = HighlightableButton.Gone,
                     showClearButton = showClearButton,
                     showTabsMenu = showControls,
@@ -314,8 +316,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                     it.omnibarText
                 }
 
-                val currentLogoUrl = when (val leadingIconState = it.leadingIconState) {
-                    is EasterEggLogo -> leadingIconState.logoUrl
+                val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
+                    is EasterEggLogo -> previousState.logoUrl
                     else -> null
                 }
 
@@ -323,6 +325,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     hasFocus = false,
                     expanded = false,
                     leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
+                    previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
                     showTabsMenu = true,
