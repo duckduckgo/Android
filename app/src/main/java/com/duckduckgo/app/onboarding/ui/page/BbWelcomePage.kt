@@ -70,8 +70,10 @@ import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_bb) {
@@ -91,7 +93,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private var welcomeAnimation: ViewPropertyAnimatorCompat? = null
-    private var welcomeTitleAnimator: ViewPropertyAnimator? = null
+    private var welcomeTitleEntryAnimator: ViewPropertyAnimator? = null
+    private var welcomeTitleExitAnimator: ViewPropertyAnimator? = null
     private var daxDialogAnimator: ValueAnimator? = null
     private var daxDialogAnimationStarted = false
     private var backgroundSceneManager: BbOnboardingBackgroundSceneManager? = null
@@ -176,7 +179,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     override fun onDestroyView() {
         super.onDestroyView()
         welcomeAnimation?.cancel()
-        welcomeTitleAnimator?.cancel()
+        welcomeTitleEntryAnimator?.cancel()
+        welcomeTitleExitAnimator?.cancel()
         daxDialogAnimator?.cancel()
     }
 
@@ -445,13 +449,14 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private fun startWelcomeAnimation() {
-        binding.daxLogo.postDelayed(400) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(400.milliseconds)
             binding.daxLogo.setMaxFrame(13)
             binding.daxLogo.playAnimation()
         }
 
         binding.welcomeTitle.translationY = 32f.toPx()
-        binding.welcomeTitle.animate()
+        welcomeTitleEntryAnimator = binding.welcomeTitle.animate()
             .alpha(MAX_ALPHA)
             .translationY(0f)
             .setDuration(800)
@@ -472,7 +477,8 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
         val transitionDelay = 1300.milliseconds
         val transitionDuration = SCENE_TRANSITION_DURATION
 
-        binding.daxLogo.postDelayed(winkDelay.inWholeMilliseconds) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(winkDelay)
             binding.daxLogo.setMaxFrame(42)
             binding.daxLogo.resumeAnimation()
         }
@@ -538,7 +544,7 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
                 it.start()
             }
 
-        welcomeTitleAnimator = binding.welcomeTitle.animate()
+        welcomeTitleExitAnimator = binding.welcomeTitle.animate()
             .translationX(-resources.displayMetrics.widthPixels.toFloat())
             .setDuration(transitionDuration.inWholeMilliseconds)
             .setStartDelay(transitionDelay.inWholeMilliseconds)
