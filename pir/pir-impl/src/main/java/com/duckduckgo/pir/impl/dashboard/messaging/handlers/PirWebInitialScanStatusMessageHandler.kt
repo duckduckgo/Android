@@ -105,7 +105,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
     }
 
     private suspend fun getScannedBrokers(): List<ScannedBroker> {
-        return stateProvider.getInProgressAndCompletedBrokersAndMirrorSites().map {
+        return stateProvider.getAllScannedBrokersStatus().map {
             ScannedBroker(
                 name = it.broker.name,
                 url = it.broker.url,
