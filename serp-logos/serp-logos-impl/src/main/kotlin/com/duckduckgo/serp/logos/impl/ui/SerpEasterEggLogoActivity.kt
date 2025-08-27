@@ -55,6 +55,8 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
 
         ViewCompat.setTransitionName(binding.enlargedLogoImage, transitionName)
 
+        window.returnTransition?.setDuration(100)
+
         Glide.with(this)
             .load(logoUrl)
             .dontAnimate()
@@ -80,6 +82,13 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
                         isFirstResource: Boolean,
                     ): Boolean {
                         supportStartPostponedEnterTransition()
+                        
+                        binding.closeIcon.animate()
+                            .alpha(1f)
+                            .setStartDelay(150)
+                            .setDuration(150)
+                            .start()
+
                         return false
                     }
                 },

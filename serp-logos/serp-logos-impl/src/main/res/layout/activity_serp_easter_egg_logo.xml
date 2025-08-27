@@ -30,6 +30,7 @@
         android:layout_height="48dp"
         android:contentDescription="@string/cdClose"
         android:padding="8dp"
+        android:alpha="0"
         app:layout_constraintBottom_toTopOf="@id/enlargedLogoImage"
         app:layout_constraintEnd_toEndOf="@id/enlargedLogoImage"
         app:layout_constraintStart_toEndOf="@id/enlargedLogoImage"
