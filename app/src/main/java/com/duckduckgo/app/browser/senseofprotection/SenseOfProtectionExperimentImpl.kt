@@ -62,13 +62,14 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
 
     init {
         // enrol users in the existing user experiment if they are not already enrolled in the new user experiment
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
-                if (canBeEnrolledInExistingUserExperiment()) {
-                    enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
-                }
-            }
-        }
+        // the experiment was only compatible with the old app design which is now fully replaced
+        // appCoroutineScope.launch(dispatcherProvider.io()) {
+        //     if (userBrowserProperties.daysSinceInstalled() > EXISTING_USER_DAY_COUNT_THRESHOLD) {
+        //         if (canBeEnrolledInExistingUserExperiment()) {
+        //             enrollInExistingUserExperiment(cohortName = MODIFIED_CONTROL)
+        //         }
+        //     }
+        // }
     }
 
     private suspend fun canBeEnrolledInExistingUserExperiment(): Boolean {
@@ -105,7 +106,9 @@ class SenseOfProtectionExperimentImpl @Inject constructor(
         false // the experiment was only compatible with the old app design which is now fully replaced
 
     override suspend fun shouldShowNewPrivacyShield(): Boolean {
-        return isUserEnrolledInVariant1CohortAndExperimentEnabled() || isUserEnrolledInVariant2CohortAndExperimentEnabled()
+        // return isUserEnrolledInVariant1CohortAndExperimentEnabled() || isUserEnrolledInVariant2CohortAndExperimentEnabled()
+        // the experiment was only compatible with the old app design which is now fully replaced
+        return false
     }
 
     override suspend fun getTabManagerPixelParams(): Map<String, String> {
