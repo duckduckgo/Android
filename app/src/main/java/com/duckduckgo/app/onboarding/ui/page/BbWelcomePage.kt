@@ -587,10 +587,10 @@ class BbWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome
     }
 
     private fun scheduleTypingAnimation(textView: TypeAnimationTextView, text: String, afterAnimation: () -> Unit = {}) {
-        textView.postDelayed(
-            { textView.startTypingAnimation(text, afterAnimation = afterAnimation) },
-            ANIMATION_DURATION,
-        )
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(ANIMATION_DURATION)
+            textView.startTypingAnimation(text, afterAnimation = afterAnimation)
+        }
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {
