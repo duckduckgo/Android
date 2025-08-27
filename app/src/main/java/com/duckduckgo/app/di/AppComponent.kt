@@ -30,6 +30,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.widget.EmptyFavoritesWidgetService
 import com.duckduckgo.widget.FavoritesWidgetService
 import com.duckduckgo.widget.SearchAndFavoritesWidget
+import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
 import com.squareup.anvil.annotations.MergeComponent
 import dagger.BindsInstance
@@ -84,6 +85,8 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     }
 
     fun inject(searchWidget: SearchWidget)
+
+    fun inject(searchOnlyWidget: SearchOnlyWidget)
 
     fun inject(searchAndFavsWidget: SearchAndFavoritesWidget)
 

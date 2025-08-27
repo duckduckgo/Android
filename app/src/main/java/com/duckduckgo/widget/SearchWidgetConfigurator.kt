@@ -41,25 +41,27 @@ class SearchWidgetConfigurator @Inject constructor(
         context: Context,
         remoteViews: RemoteViews,
         fromFavWidget: Boolean,
+        fromSearchOnlyWidget: Boolean = false,
     ) {
         val (voiceSearchEnabled, duckAiEnabled) = withContext(dispatcherProvider.io()) {
             voiceSearchAvailability.isVoiceSearchAvailable to (duckChat.isEnabled() && duckChat.wasOpenedBefore())
         }
 
-        logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled" }
+        logcat { "SearchWidgetConfigurator voiceSearchEnabled=$voiceSearchEnabled, duckAiEnabled=$duckAiEnabled, searchOnly=$fromSearchOnlyWidget" }
 
+        val showDuckAi = !fromSearchOnlyWidget && duckAiEnabled
         withContext(dispatcherProvider.main()) {
             remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.duckAi, if (duckAiEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && duckAiEnabled) View.VISIBLE else View.GONE)
-            remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !duckAiEnabled) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.duckAi, if (showDuckAi) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && showDuckAi) View.VISIBLE else View.GONE)
+            remoteViews.setViewVisibility(R.id.search, if (!voiceSearchEnabled && !showDuckAi) View.VISIBLE else View.GONE)
 
             if (voiceSearchEnabled) {
                 val pendingIntent = buildVoiceSearchPendingIntent(context, fromFavWidget)
                 remoteViews.setOnClickPendingIntent(R.id.voiceSearch, pendingIntent)
             }
 
-            if (duckAiEnabled) {
+            if (showDuckAi) {
                 val pendingIntent = buildDuckAiPendingIntent(context)
                 remoteViews.setOnClickPendingIntent(R.id.duckAi, pendingIntent)
             }
