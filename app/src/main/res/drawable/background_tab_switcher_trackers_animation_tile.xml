@@ -14,6 +14,6 @@
   ~ limitations under the License.
   -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/green0" />
-    <corners android:radius="@dimen/smallShapeCornerRadius"/>
+    <solid android:color="?attr/tabSwitcherTrackersAnimationInfoPanelBackgroundColor" />
+    <corners android:radius="@dimen/mediumShapeCornerRadius"/>
 </shape>
