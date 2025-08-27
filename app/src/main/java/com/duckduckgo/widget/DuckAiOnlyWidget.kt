@@ -28,7 +28,7 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.pixels.AppPixelName.DUCKAI_ONLY_WIDGET_ADDED
-import com.duckduckgo.app.pixels.AppPixelName.SEARCH_ONLY_WIDGET_DELETED
+import com.duckduckgo.app.pixels.AppPixelName.DUCKAI_ONLY_WIDGET_DELETED
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -117,7 +117,7 @@ class DuckAiOnlyWidget : AppWidgetProvider() {
 
     override fun onDisabled(context: Context?) {
         super.onDisabled(context)
-        searchWidgetLifecycleDelegate.handleOnWidgetDisabled(SEARCH_ONLY_WIDGET_DELETED)
+        searchWidgetLifecycleDelegate.handleOnWidgetDisabled(DUCKAI_ONLY_WIDGET_DELETED)
     }
 
     companion object {
