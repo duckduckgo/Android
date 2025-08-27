@@ -279,6 +279,8 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -580,6 +582,7 @@ class BrowserTabViewModelTest {
     }
 
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
+    private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
 
     private val EXAMPLE_URL = "http://example.com"
     private val SHORT_EXAMPLE_URL = "example.com"
@@ -648,6 +651,7 @@ class BrowserTabViewModelTest {
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
+        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(false)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -793,6 +797,7 @@ class BrowserTabViewModelTest {
             tabManager = tabManager,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             autoCompleteSettings = mockAutoCompleteSettings,
+            serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
         )
 
         testee.loadData("abc", null, false, false)
@@ -7132,6 +7137,64 @@ class BrowserTabViewModelTest {
             "LaunchInputScreen command should be triggered when switching to new tab that was NOT opened from another tab",
             commands.any { it is Command.LaunchInputScreen },
         )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandIssued() {
+        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+        
+        testee.pageFinished(webViewNavState, ddgUrl)
+        
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when SERP logos feature is enabled and URL is DuckDuckGo query",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl }
+        )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureDisabledThenExtractSerpLogoCommandNotIssued() {
+        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(false)
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(webViewNavState, ddgUrl)
+        
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued when SERP logos feature is disabled",
+            commands.any { it is Command.ExtractSerpLogo }
+        )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandNotIssued() {
+        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(webViewNavState, nonDdgUrl)
+        
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued for non-DuckDuckGo URLs even when feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo }
+        )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenSerpLogoIsCleared() {
+        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+        
+        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
+        testee.pageFinished(webViewNavState, nonDdgUrl)
+        
+        assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
     }
 
     private fun aCredential(): LoginCredentials {
