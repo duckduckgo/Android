@@ -531,6 +531,18 @@
         </receiver>
 
         <receiver
+            android:name="com.duckduckgo.widget.DuckAiOnlyWidget"
+            android:exported="false"
+            android:label="@string/duckAiOnlyWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/duckai_only_widget_info" />
+        </receiver>
+
+        <receiver
             android:name="com.duckduckgo.widget.SearchAndFavoritesWidget"
             android:exported="false"
             android:label="@string/favoritesWidgetLabel">

@@ -66,4 +66,6 @@
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel">Search Only</string>
     <string name="searchOnlyWidgetDescription">Quickly launch a private search with DuckDuckGo</string>
+    <string name="duckAiOnlyWidgetText">Duck.ai</string>
+    <string name="duckAiOnlyWidgetLabel">Duck.ai</string>
 </resources>
