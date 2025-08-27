@@ -387,6 +387,10 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(newLineButtonVisible = true)
             }
         }
+        if (userSelectedMode == SEARCH) {
+            fireModeSwitchedPixel()
+        }
+        userSelectedMode = CHAT
     }
 
     fun onSearchSelected() {
@@ -395,13 +399,6 @@ class InputScreenViewModel @AssistedInject constructor(
                 it.copy(newLineButtonVisible = false)
             }
         }
-        if (userSelectedMode == SEARCH) {
-            fireModeSwitchedPixel()
-        }
-        userSelectedMode = CHAT
-    }
-
-    fun onSearchSelected() {
         if (userSelectedMode == CHAT) {
             fireModeSwitchedPixel()
         }
