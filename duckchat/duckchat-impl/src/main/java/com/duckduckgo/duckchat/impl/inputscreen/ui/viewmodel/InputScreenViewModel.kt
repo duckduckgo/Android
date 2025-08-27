@@ -124,6 +124,7 @@ class InputScreenViewModel @AssistedInject constructor(
             autoCompleteSuggestionsVisible = false,
             showChatLogo = true,
             showSearchLogo = true,
+            newLineButtonVisible = false,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -382,6 +383,9 @@ class InputScreenViewModel @AssistedInject constructor(
             _submitButtonIconState.update {
                 it.copy(icon = SubmitButtonIcon.SEND)
             }
+            _visibilityState.update {
+                it.copy(newLineButtonVisible = true)
+            }
         }
         if (userSelectedMode == SEARCH) {
             fireModeSwitchedPixel()
@@ -390,6 +394,11 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSelected() {
+        viewModelScope.launch {
+            _visibilityState.update {
+                it.copy(newLineButtonVisible = false)
+            }
+        }
         if (userSelectedMode == CHAT) {
             fireModeSwitchedPixel()
         }
