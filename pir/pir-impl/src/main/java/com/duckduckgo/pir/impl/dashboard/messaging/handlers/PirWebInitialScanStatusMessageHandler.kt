@@ -64,7 +64,7 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
                 response = PirWebMessageResponse.InitialScanResponse(
                     resultsFound = getResultsFound(),
                     scanProgress = PirWebMessageResponse.InitialScanResponse.ScanProgress(
-                        currentScan = stateProvider.getFullyCompletedBrokersTotal(),
+                        currentScans = stateProvider.getFullyCompletedBrokersTotal(),
                         totalScans = stateProvider.getActiveBrokersAndMirrorSitesTotal(),
                         scannedBrokers = getScannedBrokers(),
                     ),
