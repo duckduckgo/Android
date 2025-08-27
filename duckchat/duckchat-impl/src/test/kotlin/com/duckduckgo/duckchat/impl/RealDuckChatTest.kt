@@ -27,7 +27,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -40,7 +39,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -80,8 +78,6 @@ class RealDuckChatTest {
     private val mockIntent: Intent = mock()
     private val mockBrowserNav: BrowserNav = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
-    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-    private val isVisualDesignEnabledStateFlow = MutableStateFlow(false)
 
     private lateinit var testee: RealDuckChat
 
@@ -91,10 +87,8 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
-        isVisualDesignEnabledStateFlow.value = true
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(isVisualDesignEnabledStateFlow)
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
@@ -103,7 +97,6 @@ class RealDuckChatTest {
             RealDuckChat(
                 mockDuckChatFeatureRepository,
                 duckChatFeature,
-                mockExperimentalThemingDataStore,
                 moshi,
                 dispatcherProvider,
                 mockGlobalActivityStarter,
@@ -722,14 +715,6 @@ class RealDuckChatTest {
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInputScreen.value)
-    }
-
-    @Test
-    fun `input screen feature - when visual design experiment disabled then emit disabled`() = runTest {
-        isVisualDesignEnabledStateFlow.value = false
-
-        verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(false)
         assertFalse(testee.showInputScreen.value)
     }
 
