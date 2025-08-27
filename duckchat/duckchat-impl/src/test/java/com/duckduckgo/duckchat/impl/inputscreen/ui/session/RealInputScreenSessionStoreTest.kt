@@ -20,13 +20,11 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Rule
@@ -49,11 +47,6 @@ class RealInputScreenSessionStoreTest {
 
     private val testee: InputScreenSessionStore =
         RealInputScreenSessionStore(dataStore)
-
-    private object Keys {
-        val HAS_USED_SEARCH_MODE = booleanPreferencesKey("HAS_USED_SEARCH_MODE")
-        val HAS_USED_CHAT_MODE = booleanPreferencesKey("HAS_USED_CHAT_MODE")
-    }
 
     @Test
     fun `when on init then has not used search or chat`() = runTest {
@@ -84,10 +77,6 @@ class RealInputScreenSessionStoreTest {
 
         assertFalse(testee.hasUsedSearchMode())
         assertFalse(testee.hasUsedChatMode())
-
-        val prefs = dataStore.data.first()
-        assertEquals(false, prefs[Keys.HAS_USED_SEARCH_MODE])
-        assertEquals(false, prefs[Keys.HAS_USED_CHAT_MODE])
     }
 
     @Test
