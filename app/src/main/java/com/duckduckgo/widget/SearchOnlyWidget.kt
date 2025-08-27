@@ -34,7 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 
-class SearchOnlyWidget(val layoutId: Int = R.layout.search_only_widget_daynight) : AppWidgetProvider() {
+class SearchOnlyWidget : AppWidgetProvider() {
 
     @Inject
     lateinit var searchWidgetConfigurator: SearchWidgetConfigurator
@@ -97,7 +97,7 @@ class SearchOnlyWidget(val layoutId: Int = R.layout.search_only_widget_daynight)
     ) {
         logcat { "SearchOnlyWidget updateAppWidget called for widget id = $appWidgetId" }
 
-        val views = RemoteViews(context.packageName, layoutId)
+        val views = RemoteViews(context.packageName, R.layout.search_only_widget_daynight)
         views.setOnClickPendingIntent(R.id.widgetContainer, buildPendingIntent(context))
 
         appCoroutineScope.launch {
