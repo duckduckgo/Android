@@ -37,7 +37,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
-        app:lottie_rawRes="@raw/shield_tabswitcher"
+        app:lottie_rawRes="@raw/shield_tabs"
         tools:srcCompat="@drawable/ic_info_panel_info" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
