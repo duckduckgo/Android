@@ -17,7 +17,9 @@
 package com.duckduckgo.privacy.config.api
 
 /** List of [PrivacyFeatureName] that belong to the Privacy Configuration */
-enum class PrivacyFeatureName(val value: String) {
+enum class PrivacyFeatureName(
+    val value: String,
+) {
     ContentBlockingFeatureName("contentBlocking"),
     GpcFeatureName("gpc"),
     HttpsFeatureName("https"),
@@ -27,4 +29,5 @@ enum class PrivacyFeatureName(val value: String) {
     TrackingParametersFeatureName("trackingParameters"),
 }
 
-const val PRIVACY_REMOTE_CONFIG_URL = "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/android-config.json"
+// const val PRIVACY_REMOTE_CONFIG_URL = "https://staticcdn.duckduckgo.com/trackerblocking/config/v4/android-config.json"
+const val PRIVACY_REMOTE_CONFIG_URL = "https://duckduckgo.github.io/privacy-configuration/pr-3757/v4/android-config.json"

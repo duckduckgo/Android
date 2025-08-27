@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2024 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,15 +14,15 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".importing.takeout.webflow.ImportGoogleBookmarksWebFlowActivity">
 
-    <!-- Import Bookmarks Strings -->
-    <string name="autofillImportBookmarksChromeFolderName">Imported from Chrome</string>
+    <WebView
+        android:id="@+id/web_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-
-    <!-- Import Bookmarks Strings -->
-    <string name="autofillManagementImportBookmarks">Import Bookmarks</string>
-    <string name="autofillManagementImportBookmarksTitle">Import Your Bookmarks</string>
-
-
-</resources>
+</FrameLayout>
