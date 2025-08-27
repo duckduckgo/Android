@@ -132,6 +132,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.actionNewLine.setOnClickListener {
             binding.inputModeWidget.printNewLine()
         }
+
+        viewModel.fireShownPixel()
     }
 
     private fun configureObservers() {
@@ -204,6 +206,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
         onSearchSelected = {
             binding.viewPager.setCurrentItem(0, true)
+            viewModel.onSearchSelected()
             viewModel.onSearchInputTextChanged(binding.inputModeWidget.text)
             binding.ddgLogo.apply {
                 setImageResource(com.duckduckgo.mobile.android.R.drawable.logo_full)
