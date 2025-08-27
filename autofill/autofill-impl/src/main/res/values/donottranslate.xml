@@ -16,4 +16,16 @@
 
 <resources>
 
+    <!-- Import Bookmarks Strings -->
+    <string name="autofillManagementImportBookmarks">Import Bookmarks</string>
+    <string name="autofillManagementImportBookmarksTitle">Import Your Bookmarks</string>
+    <string name="autofillManagementImportBookmarksHowToInstruction">Import your bookmarks from Google using Google Takeout to easily transfer them to DuckDuckGo.</string>
+    <string name="autofillManagementImportBookmarksImportFromGoogleTakeoutTitle">Import from Google Takeout:</string>
+    <string name="autofillManagementImportBookmarksImportFromGoogleTakeoutInstructionOne">Go to Google Takeout and sign in to your Google account</string>
+    <string name="autofillManagementImportBookmarksImportFromGoogleTakeoutInstructionTwo">Select <![CDATA[<b>Bookmarks</b>]]> from the list of data to export</string>
+    <string name="autofillManagementImportBookmarksImportFromGoogleTakeoutInstructionThree">Choose your delivery method and file format preferences</string>
+    <string name="autofillManagementImportBookmarksImportFromGoogleTakeoutInstructionFour">Download the export file and we\'ll help you import your bookmarks</string>
+    <string name="autofillManagementImportBookmarksImportViaGoogleTakeoutButtonText">Start Import Process</string>
+
+
 </resources>

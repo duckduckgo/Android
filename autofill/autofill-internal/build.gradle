@@ -39,6 +39,7 @@ dependencies {
     implementation project(':internal-features-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':navigation-api')
+    implementation project(':saved-sites-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
