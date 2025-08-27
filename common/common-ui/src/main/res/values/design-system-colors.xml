@@ -60,6 +60,7 @@
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
+    <attr name="daxColorAccentContentPrimary" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
@@ -74,6 +75,7 @@
     <attr name="daxColorControlFillPrimary" format="color"/>
     <attr name="daxColorControlFillSecondary" format="color"/>
     <attr name="daxColorControlFillTertiary" format="color"/>
+    <attr name="daxColorControlDecorationTertiary" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
@@ -191,6 +193,7 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
+    <color name="blue80">#14307E</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>

@@ -24,13 +24,15 @@ import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
-import com.duckduckgo.pir.impl.store.PirEventsRepository
-import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_STARTED
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanProgress.ScannedBroker
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanResult
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.InitialScanResponse.ScanResult.ScanResultAddress
+import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
 
@@ -42,9 +44,9 @@ import logcat.logcat
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebInitialScanStatusMessageHandler @Inject constructor(
-    private val eventsRepository: PirEventsRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val stateProvider: PirDashboardInitialScanStateProvider,
 ) : PirWebJsMessageHandler() {
 
     override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
@@ -57,19 +59,59 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
         logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val eventLogs = eventsRepository.getAllEventLogsFlow().firstOrNull().orEmpty()
-
-            // TODO get actual scan progress results from the repository
             jsMessaging.sendResponse(
                 jsMessage = jsMessage,
                 response = PirWebMessageResponse.InitialScanResponse(
-                    resultsFound = listOf(),
+                    resultsFound = getResultsFound(),
                     scanProgress = PirWebMessageResponse.InitialScanResponse.ScanProgress(
-                        currentScan = eventLogs.count { it.eventType == MANUAL_SCAN_COMPLETED },
-                        totalScans = eventLogs.count { it.eventType == MANUAL_SCAN_STARTED },
-                        scannedBrokers = listOf(),
+                        currentScans = stateProvider.getFullyCompletedBrokersTotal(),
+                        totalScans = stateProvider.getActiveBrokersAndMirrorSitesTotal(),
+                        scannedBrokers = getScannedBrokers(),
                     ),
                 ),
+            )
+        }
+    }
+
+    private suspend fun getResultsFound(): List<ScanResult> {
+        return stateProvider.getScanResults().map {
+            ScanResult(
+                dataBroker = DataBroker(
+                    name = it.broker.name,
+                    url = it.broker.url,
+                    optOutUrl = it.broker.optOutUrl,
+                    parentURL = it.broker.parentUrl,
+                ),
+                name = it.extractedProfile.name,
+                addresses = it.extractedProfile.addresses.map { address ->
+                    ScanResultAddress(
+                        city = address.city,
+                        state = address.state,
+                    )
+                },
+                alternativeNames = it.extractedProfile.alternativeNames,
+                relatives = it.extractedProfile.relatives,
+                foundDate = it.extractedProfile.dateAddedInMillis.convertToSeconds(),
+                optOutSubmittedDate = it.optOutSubmittedDateInMillis?.convertToSeconds(),
+                estimatedRemovalDate = it.estimatedRemovalDateInMillis?.convertToSeconds(),
+                removedDate = it.optOutRemovedDateInMillis?.convertToSeconds(),
+                hasMatchingRecordOnParentBroker = it.hasMatchingRecordOnParentBroker,
+            )
+        }
+    }
+
+    private fun Long.convertToSeconds(): Long {
+        return TimeUnit.MILLISECONDS.toSeconds(this)
+    }
+
+    private suspend fun getScannedBrokers(): List<ScannedBroker> {
+        return stateProvider.getInProgressAndCompletedBrokersAndMirrorSites().map {
+            ScannedBroker(
+                name = it.broker.name,
+                url = it.broker.url,
+                optOutUrl = it.broker.optOutUrl,
+                parentURL = it.broker.parentUrl,
+                status = it.status.statusName,
             )
         }
     }

@@ -75,8 +75,4 @@ object PirConstants {
             deprecated = false,
         ),
     )
-
-    // TODO: This is moved from pir-internal, consider updating it
-    const val NOTIF_CHANNEL_ID = "PirDevNotificationChannel"
-    const val NOTIF_ID_STATUS_COMPLETE = 987
 }

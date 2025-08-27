@@ -29,10 +29,10 @@ interface TrustedCertificateStore {
 }
 
 sealed class CertificateValidationState {
-    object IssuerExpired : CertificateValidationState()
-    object IssuerNotYetValid : CertificateValidationState()
-    object UntrustedChain : CertificateValidationState()
-    object TrustedChain : CertificateValidationState()
+    data object IssuerExpired : CertificateValidationState()
+    data object IssuerNotYetValid : CertificateValidationState()
+    data object UntrustedChain : CertificateValidationState()
+    data object TrustedChain : CertificateValidationState()
 }
 
 class TrustedCertificateStoreImpl(

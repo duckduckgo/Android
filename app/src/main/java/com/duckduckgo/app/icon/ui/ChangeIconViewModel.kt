@@ -58,7 +58,7 @@ class ChangeIconViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object IconChanged : Command()
+        data object IconChanged : Command()
         data class ShowConfirmationDialog(val viewData: IconViewData) : Command()
     }
 

@@ -56,9 +56,9 @@ class SslWarningLayout @JvmOverloads constructor(
     sealed class Action {
 
         data class Shown(val errorType: SSLErrorType) : Action()
-        object Proceed : Action()
-        object Advance : Action()
-        object LeaveSite : Action()
+        data object Proceed : Action()
+        data object Advance : Action()
+        data object LeaveSite : Action()
     }
 
     private val binding: ViewSslWarningBinding by viewBinding()

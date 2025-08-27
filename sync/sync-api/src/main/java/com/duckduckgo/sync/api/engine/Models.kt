@@ -19,7 +19,7 @@ package com.duckduckgo.sync.api.engine
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
 
 sealed class ModifiedSince(open val value: String) {
-    object FirstSync : ModifiedSince(value = "0")
+    data object FirstSync : ModifiedSince(value = "0")
     data class Timestamp(override val value: String) : ModifiedSince(value)
 }
 
@@ -101,7 +101,7 @@ sealed class SyncDataValidationResult<out R> {
 
     data class Success<out T>(val data: T) : SyncDataValidationResult<T>()
 
-    object NoChanges : SyncDataValidationResult<Nothing>()
+    data object NoChanges : SyncDataValidationResult<Nothing>()
 
     data class Error(
         val reason: String,

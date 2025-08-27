@@ -28,8 +28,8 @@ import javax.inject.Inject
 class AddWidgetInstructionsViewModel @Inject constructor() : ViewModel() {
 
     sealed class Command {
-        object ShowHome : Command()
-        object Close : Command()
+        data object ShowHome : Command()
+        data object Close : Command()
     }
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()

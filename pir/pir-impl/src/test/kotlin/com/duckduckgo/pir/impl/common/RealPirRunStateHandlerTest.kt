@@ -22,6 +22,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
@@ -81,7 +82,13 @@ class RealPirRunStateHandlerTest {
         name = "John Doe",
         alternativeNames = listOf("Johnny", "J. Doe"),
         age = "30",
-        addresses = listOf("""{"city":"New York","state":"NY","fullAddress":"123 Main St"}"""),
+        addresses = listOf(
+            AddressCityState(
+                city = "New York",
+                state = "NY",
+                fullAddress = "123 Main St",
+            ),
+        ),
         phoneNumbers = listOf("555-1234"),
         relatives = listOf("Jane Doe"),
         reportId = "report123",
@@ -270,7 +277,13 @@ class RealPirRunStateHandlerTest {
             name = "John Doe",
             alternativeNames = listOf("Johnny", "J. Doe"),
             age = "30",
-            addresses = listOf("""{"city":"New York","state":"NY","fullAddress":"123 Main St"}"""),
+            addresses = listOf(
+                AddressCityState(
+                    city = "New York",
+                    state = "NY",
+                    fullAddress = "123 Main St",
+                ),
+            ),
             phoneNumbers = listOf("555-1234"),
             relatives = listOf("Jane Doe"),
             identifier = "id123",

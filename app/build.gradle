@@ -72,6 +72,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true

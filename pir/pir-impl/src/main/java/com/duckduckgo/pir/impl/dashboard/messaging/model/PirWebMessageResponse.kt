@@ -17,6 +17,7 @@
 package com.duckduckgo.pir.impl.dashboard.messaging.model
 
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
 
 /**
  * Represents the response body sent by the client back to the JS layer in Pir Web UI.
@@ -80,16 +81,42 @@ sealed interface PirWebMessageResponse {
         val scanProgress: ScanProgress,
     ) : PirWebMessageResponse {
 
-        // TODO add fields
-        class ScanResult
+        data class ScanResult(
+            val id: Long? = 0L,
+            val dataBroker: DataBroker,
+            val name: String,
+            val addresses: List<ScanResultAddress>,
+            val alternativeNames: List<String>,
+            val relatives: List<String>,
+            val foundDate: Long,
+            val optOutSubmittedDate: Long?,
+            val estimatedRemovalDate: Long?,
+            val removedDate: Long?,
+            val hasMatchingRecordOnParentBroker: Boolean,
+        ) {
+            data class ScanResultAddress(
+                val street: String? = null,
+                val city: String?,
+                val state: String?,
+            )
+        }
 
         data class ScanProgress(
-            val currentScan: Int,
+            val currentScans: Int,
             val totalScans: Int,
             val scannedBrokers: List<ScannedBroker>,
         ) {
-            // TODO add fields
-            class ScannedBroker
+            data class ScannedBroker(
+                val name: String,
+                val url: String,
+                val optOutUrl: String? = null,
+                val parentURL: String? = null,
+                val status: String,
+            )
         }
     }
+
+    data class GetFeatureConfigResponse(
+        val useUnifiedFeedback: Boolean,
+    ) : PirWebMessageResponse
 }
