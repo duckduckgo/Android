@@ -25,20 +25,20 @@
     tools:ignore="InvalidColorAttribute">
 
     <ImageView
-        android:id="@+id/close_icon"
+        android:id="@+id/closeIcon"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:contentDescription="@string/cdClose"
         android:padding="8dp"
-        app:layout_constraintBottom_toTopOf="@id/enlarged_logo_image"
-        app:layout_constraintEnd_toEndOf="@id/enlarged_logo_image"
-        app:layout_constraintStart_toEndOf="@id/enlarged_logo_image"
+        app:layout_constraintBottom_toTopOf="@id/enlargedLogoImage"
+        app:layout_constraintEnd_toEndOf="@id/enlargedLogoImage"
+        app:layout_constraintStart_toEndOf="@id/enlargedLogoImage"
         app:srcCompat="@drawable/ic_close_24_solid_color"
         app:tint="@color/white"
         tools:ignore="InvalidColorAttribute" />
 
     <ImageView
-        android:id="@+id/enlarged_logo_image"
+        android:id="@+id/enlargedLogoImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="@dimen/keyline_5"
