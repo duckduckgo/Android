@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
+import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -24,22 +25,33 @@ import java.io.BufferedReader
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
 
-interface PasswordImporterScriptLoader {
-    suspend fun getScript(): String
+interface GoogleImporterScriptLoader {
+    suspend fun getScriptForPasswordImport(): String
+    suspend fun getScriptForBookmarkImport(): String
 }
 
 @ContributesBinding(FragmentScope::class)
-class PasswordImporterCssScriptLoader @Inject constructor(
+class GoogleImporterScriptLoaderImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
-    private val configStore: AutofillImportPasswordConfigStore,
-) : PasswordImporterScriptLoader {
+    private val passwordConfigStore: AutofillImportPasswordConfigStore,
+    private val bookmarkConfigStore: BookmarkImportConfigStore,
+) : GoogleImporterScriptLoader {
 
     private lateinit var contentScopeJS: String
 
-    override suspend fun getScript(): String {
+    override suspend fun getScriptForPasswordImport(): String {
         return withContext(dispatchers.io()) {
             getContentScopeJS()
-                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeJson(loadSettingsJson()))
+                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeScriptJson(loadSettingsJsonPassword()))
+                .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
+                .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
+        }
+    }
+
+    override suspend fun getScriptForBookmarkImport(): String {
+        return withContext(dispatchers.io()) {
+            getContentScopeJS()
+                .replace(CONTENT_SCOPE_PLACEHOLDER, getContentScopeScriptJson(loadSettingsJsonBookmark()))
                 .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, getUnprotectedDomainsJson())
                 .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferencesJson())
         }
@@ -49,10 +61,10 @@ class PasswordImporterCssScriptLoader @Inject constructor(
      * This enables the password import hints feature in C-S-S.
      * These settings are for enabling it; the check for whether it should be enabled or not is done elsewhere.
      */
-    private fun getContentScopeJson(settingsJson: String): String {
+    private fun getContentScopeScriptJson(settingsJson: String): String {
         return """{
             "features":{
-                "autofillPasswordImport" : {
+                "autofillImport" : {
                     "state": "enabled",
                     "exceptions": [],
                     "settings": $settingsJson
@@ -64,8 +76,12 @@ class PasswordImporterCssScriptLoader @Inject constructor(
         """.trimMargin()
     }
 
-    private suspend fun loadSettingsJson(): String {
-        return configStore.getConfig().javascriptConfigGooglePasswords
+    private suspend fun loadSettingsJsonPassword(): String {
+        return passwordConfigStore.getConfig().javascriptConfigGooglePasswords
+    }
+
+    private suspend fun loadSettingsJsonBookmark(): String {
+        return bookmarkConfigStore.getConfig().javascriptConfigGoogleTakeout
     }
 
     private fun getUserPreferencesJson(): String {
@@ -84,7 +100,7 @@ class PasswordImporterCssScriptLoader @Inject constructor(
 
     private fun getContentScopeJS(): String {
         if (!this::contentScopeJS.isInitialized) {
-            contentScopeJS = loadJs("autofillPasswordImport.js")
+            contentScopeJS = loadJs("autofillImport.js")
         }
         return contentScopeJS
     }

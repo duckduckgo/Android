@@ -1,5 +1,6 @@
 package com.duckduckgo.autofill.impl.importing.takeout.processor
 
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
@@ -7,8 +8,10 @@ import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.service.ImportSavedSitesResult
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter
 import com.duckduckgo.savedsites.api.service.SavedSitesImporter.ImportFolder
+import java.io.File
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -46,22 +49,49 @@ class TakeoutBookmarkImporterTest {
     @Test
     fun whenImportingToRootThenCallsSavedSitesImporterWithRoot() = runTest {
         configureSuccessfulResult()
-        testee.importBookmarks(loadHtmlFile("valid_chrome_bookmarks_netscape"), ImportFolder.Root)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+        testee.importBookmarks(tempFileUri, ImportFolder.Root)
+
         verify(mockSavedSitesImporter).import(any(), eq(ImportFolder.Root))
+    }
+
+    @Test
+    fun whenImportingToRootThenCallsSavedSitesImporterWithTempFile() = runTest {
+        configureSuccessfulResult()
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+        testee.importBookmarks(tempFileUri, ImportFolder.Root)
+
+        verify(mockSavedSitesImporter).import(eq(tempFileUri), any())
     }
 
     @Test
     fun whenImportingToFolderThenCallsSavedSitesImporterWithFolder() = runTest {
         configureSuccessfulResult()
-        testee.importBookmarks(loadHtmlFile("valid_chrome_bookmarks_netscape"), testFolder)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+        testee.importBookmarks(tempFileUri, testFolder)
+
         verify(mockSavedSitesImporter).import(any(), eq(testFolder))
+    }
+
+    @Test
+    fun whenImportingToFolderThenCallsSavedSitesImporterWithTempFile() = runTest {
+        configureSuccessfulResult()
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+        testee.importBookmarks(tempFileUri, testFolder)
+
+        verify(mockSavedSitesImporter).import(eq(tempFileUri), any())
     }
 
     @Test
     fun whenImportSucceedsWithMultipleImportsThenReturnsSuccessResult() = runTest {
         configureResult(successfulResultWithImports)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
 
-        val result = testee.importBookmarks(loadHtmlFile("valid_chrome_bookmarks_netscape"), ImportFolder.Root)
+        val result = testee.importBookmarks(tempFileUri, ImportFolder.Root)
 
         assertTrue(result is ImportSavedSitesResult.Success)
         assertEquals(2, (result as ImportSavedSitesResult.Success).savedSites.size)
@@ -70,8 +100,9 @@ class TakeoutBookmarkImporterTest {
     @Test
     fun whenImportSucceedsWithNoImportsThenReturnsSuccessResult() = runTest {
         configureResult(successfulResultNoneImported)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
 
-        val result = testee.importBookmarks(loadHtmlFile("valid_chrome_bookmarks_netscape"), ImportFolder.Root)
+        val result = testee.importBookmarks(tempFileUri, ImportFolder.Root)
 
         assertTrue(result is ImportSavedSitesResult.Success)
         assertEquals(0, (result as ImportSavedSitesResult.Success).savedSites.size)
@@ -80,8 +111,9 @@ class TakeoutBookmarkImporterTest {
     @Test
     fun whenImportFailsThenReturnsErrorResult() = runTest {
         configureResult(failedResult)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
 
-        val result = testee.importBookmarks(loadHtmlFile("valid_chrome_bookmarks_netscape"), ImportFolder.Root)
+        val result = testee.importBookmarks(tempFileUri, ImportFolder.Root)
 
         assertTrue(result is ImportSavedSitesResult.Error)
     }
@@ -89,8 +121,44 @@ class TakeoutBookmarkImporterTest {
     @Test
     fun whenSavedSitesImporterThrowsExceptionThenReturnsErrorResult() = runTest {
         whenever(mockSavedSitesImporter.import(any(), any())).thenThrow(RuntimeException("Unexpected error"))
-        val result = testee.importBookmarks(loadHtmlFile("valid_chrome_bookmarks_netscape"), ImportFolder.Root)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+
+        val result = testee.importBookmarks(tempFileUri, ImportFolder.Root)
+
         assertTrue(result is ImportSavedSitesResult.Error)
+    }
+
+    @Test
+    fun whenImportSucceedsThenTempFileIsDeleted() = runTest {
+        configureSuccessfulResult()
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+        val tempFile = File(tempFileUri.path!!)
+
+        assertTrue("Temp file should exist before import", tempFile.exists())
+        testee.importBookmarks(tempFileUri, ImportFolder.Root)
+        assertFalse("Temp file should be deleted after import", tempFile.exists())
+    }
+
+    @Test
+    fun whenImportFailsThenTempFileIsStillDeleted() = runTest {
+        configureResult(failedResult)
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+        val tempFile = File(tempFileUri.path!!)
+
+        assertTrue("Temp file should exist before import", tempFile.exists())
+        testee.importBookmarks(tempFileUri, ImportFolder.Root)
+        assertFalse("Temp file should be deleted even after failed import", tempFile.exists())
+    }
+
+    @Test
+    fun whenImportThrowsExceptionThenTempFileIsStillDeleted() = runTest {
+        whenever(mockSavedSitesImporter.import(any(), any())).thenThrow(RuntimeException("Unexpected error"))
+        val tempFileUri = createTempFileWithContent(loadHtmlFile("valid_chrome_bookmarks_netscape"))
+        val tempFile = File(tempFileUri.path!!)
+
+        assertTrue("Temp file should exist before import", tempFile.exists())
+        testee.importBookmarks(tempFileUri, ImportFolder.Root)
+        assertFalse("Temp file should be deleted even when exception is thrown", tempFile.exists())
     }
 
     private suspend fun configureResult(result: ImportSavedSitesResult) {
@@ -106,5 +174,10 @@ class TakeoutBookmarkImporterTest {
             TakeoutBookmarkImporterTest::class.java.classLoader!!,
             "html/$filename.html",
         )
+    }
+
+    private fun createTempFileWithContent(content: String): Uri {
+        val tempFile = File.createTempFile("test_bookmarks", ".html").also { it.writeText(content) }
+        return Uri.fromFile(tempFile)
     }
 }

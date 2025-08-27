@@ -48,6 +48,7 @@ dependencies {
     implementation project(path: ':settings-api') // temporary until we release new settings
     implementation project(':library-loader-api')
     implementation project(':saved-sites-api')
+    implementation project(':cookies-api')
 
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
