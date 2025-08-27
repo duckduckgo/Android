@@ -158,4 +158,7 @@ interface AndroidBrowserConfigFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun handleIntentScheme(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun hideDuckAiInSerpKillSwitch(): Toggle
 }
