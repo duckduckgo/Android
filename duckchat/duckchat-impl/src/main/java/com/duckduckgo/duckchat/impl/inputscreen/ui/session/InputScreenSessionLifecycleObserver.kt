@@ -34,6 +34,12 @@ class InputScreenSessionLifecycleObserver @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
+    override fun onCreate(owner: LifecycleOwner) {
+        appCoroutineScope.launch {
+            sessionStore.resetSession()
+        }
+    }
+
     override fun onStop(owner: LifecycleOwner) {
         appCoroutineScope.launch {
             sessionStore.resetSession()
