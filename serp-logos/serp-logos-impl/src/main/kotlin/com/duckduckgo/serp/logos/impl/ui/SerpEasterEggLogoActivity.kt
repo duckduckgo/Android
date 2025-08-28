@@ -16,6 +16,7 @@
 
 package com.duckduckgo.serp.logos.impl.ui
 
+import android.animation.ValueAnimator
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import androidx.core.view.ViewCompat
@@ -96,7 +97,23 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
             .into(binding.enlargedLogoImage)
 
         binding.root.setOnClickListener {
+            animateBackgroundDimFadeOut()
             supportFinishAfterTransition()
+        }
+    }
+
+    private fun animateBackgroundDimFadeOut() {
+        ValueAnimator.ofFloat(window.attributes.dimAmount, 0f).apply {
+            duration = 500
+            addUpdateListener { animator ->
+                val dimAmount = animator.animatedValue as Float
+                window.setDimAmount(dimAmount)
+                window.attributes = window.attributes.apply {
+                    this.dimAmount = dimAmount
+                }
+                window.attributes = window.attributes
+            }
+            start()
         }
     }
 }
