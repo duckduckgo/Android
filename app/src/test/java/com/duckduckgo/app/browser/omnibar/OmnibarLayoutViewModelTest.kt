@@ -39,6 +39,8 @@ import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlin.reflect.KClass
@@ -93,6 +95,7 @@ class OmnibarLayoutViewModelTest {
             }
         }
     }
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -112,6 +115,8 @@ class OmnibarLayoutViewModelTest {
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
+        whenever(serpEasterEggLogosToggles.feature()).thenReturn(mock())
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
 
         initializeViewModel()
     }
@@ -153,6 +158,7 @@ class OmnibarLayoutViewModelTest {
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
+            serpEasterEggLogosToggles = serpEasterEggLogosToggles,
         )
     }
 
@@ -1669,5 +1675,235 @@ class OmnibarLayoutViewModelTest {
                 Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "false",
             ),
         )
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithEasterEggLogoThenLeadingIconStateUpdated() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(logoUrl, easterEggState.logoUrl)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithNormalLogoThenLeadingIconStateIsNotEasterEgg() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.Normal,
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            assertTrue(viewState.leadingIconState == Search)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithNullLogoThenLeadingIconStateIsNotEasterEgg() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = null,
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            assertTrue(viewState.leadingIconState == Search)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureDisabledAndExternalStateChangeWithEasterEggLogoThenLeadingIconStateRemainsUnchanged() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        val initialState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // When feature is disabled, leadingIconState logic is completely bypassed
+            // so it should remain exactly the same as the initial state
+            assertEquals(initialState, viewState.leadingIconState)
+            assertTrue(viewState.leadingIconState == Search) // Initial state is Search
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndNavigationChangeThenLeadingIconStateNotUpdatedWithLogo() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val initialLeadingIconState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            navigationChange = true,
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // Navigation and text updates work
+            assertTrue(viewState.expanded)
+            assertTrue(viewState.expandedAnimated)
+            assertTrue(viewState.omnibarText == QUERY)
+            assertTrue(viewState.updateOmnibarText)
+            // BUT leadingIconState logic is completely bypassed - it doesn't get updated at all
+            assertEquals(initialLeadingIconState, viewState.leadingIconState)
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureDisabledAndNavigationChangeThenLeadingIconLogicBypassedButOtherStateUpdated() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        val initialLeadingIconState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            navigationChange = true,
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // Navigation and text updates still work when feature is disabled
+            assertTrue(viewState.expanded)
+            assertTrue(viewState.expandedAnimated)
+            assertTrue(viewState.omnibarText == QUERY)
+            assertTrue(viewState.updateOmnibarText)
+            // BUT leadingIconState logic is completely bypassed - it doesn't get updated at all
+            assertEquals(initialLeadingIconState, viewState.leadingIconState)
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndForceRenderThenFollowsEnabledPath() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            queryOrFullUrl = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(logoUrl, easterEggState.logoUrl)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureDisabledAndForceRenderThenLeadingIconLogicBypassed() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        val initialLeadingIconState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            queryOrFullUrl = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // Text update works even when feature is disabled
+            assertTrue(viewState.updateOmnibarText)
+            // BUT leadingIconState is not updated at all - disabled path completely bypasses this logic
+            assertEquals(initialLeadingIconState, viewState.leadingIconState)
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenLogoClickedAndLeadingIconIsEasterEggLogoThenEasterEggLogoClickedCommandSent() = runTest {
+        val logoUrl = "https://example.com/logo.png"
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.onLogoClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.EasterEggLogoClicked)
+            assertEquals(logoUrl, (command as Command.EasterEggLogoClicked).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLogoClickedAndLeadingIconIsNotEasterEggLogoThenNoCommandSent() = runTest {
+        testee.onLogoClicked()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
     }
 }
