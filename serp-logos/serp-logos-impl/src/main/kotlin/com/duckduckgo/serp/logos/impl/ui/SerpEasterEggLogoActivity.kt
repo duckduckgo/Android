@@ -17,8 +17,11 @@
 package com.duckduckgo.serp.logos.impl.ui
 
 import android.animation.ValueAnimator
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -42,6 +45,7 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
     private lateinit var binding: ActivitySerpEasterEggLogoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge(navigationBarStyle = SystemBarStyle.dark( Color.TRANSPARENT))
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_DuckDuckGo_DynamicLogo)
         binding = ActivitySerpEasterEggLogoBinding.inflate(layoutInflater)

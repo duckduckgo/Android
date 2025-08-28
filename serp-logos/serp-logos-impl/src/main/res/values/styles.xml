@@ -14,13 +14,10 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Theme.DuckDuckGo.DynamicLogo" parent="Theme.AppCompat.Transparent.NoActionBar">
         <item name="android:windowIsFloating">false</item>
         <item name="android:backgroundDimEnabled">true</item>
-        <item name="enableEdgeToEdge">true</item>
-        <item name="android:statusBarColor">@color/transparent</item>
-        <item name="android:navigationBarColor">@color/transparent</item>
     </style>
 </resources>
