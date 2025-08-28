@@ -72,7 +72,8 @@ abstract class PirDashboardStateProvider(
             val broker = activeBrokerMap[it.key] ?: return@mapNotNull null
             val scanJobsForBroker = it.value
 
-            val hasAtLeastOneInProgress = scanJobsForBroker.any { job -> job.lastScanDateInMillis != 0L }
+            val hasAtLeastOneInProgress =
+                scanJobsForBroker.any { job -> job.lastScanDateInMillis != 0L }
 
             if (!hasAtLeastOneInProgress) {
                 return@mapNotNull null
@@ -80,7 +81,8 @@ abstract class PirDashboardStateProvider(
 
             // In progress if at least one scan job is not completed.
             val isInProgress = scanJobsForBroker.any { job -> job.lastScanDateInMillis == 0L }
-            val firstScanDateInMillis = scanJobsForBroker.maxOfOrNull { job -> job.lastScanDateInMillis } ?: 0L
+            val firstScanDateInMillis =
+                scanJobsForBroker.maxOfOrNull { job -> job.lastScanDateInMillis } ?: 0L
 
             DashboardBrokerWithStatus(
                 broker = DashboardBroker(
@@ -118,9 +120,10 @@ abstract class PirDashboardStateProvider(
         }
     }
 
-    suspend fun getAllExtantMirrorSites(currentTimeMillis: Long): List<MirrorSite> = pirRepository.getAllMirrorSites().filter {
-        it.isExtant(currentTimeMillis)
-    }
+    suspend fun getAllExtantMirrorSites(currentTimeMillis: Long): List<MirrorSite> =
+        pirRepository.getAllMirrorSites().filter {
+            it.isExtant(currentTimeMillis)
+        }
 
     private suspend fun getExtractedProfileResultForBrokers(
         extractedProfiles: List<ExtractedProfile>,
@@ -176,7 +179,8 @@ abstract class PirDashboardStateProvider(
         }
 
         return activeMirrorSites.mapNotNull { mirrorSite ->
-            val parentBrokerResults = dashboardResultMap[mirrorSite.parentSite] ?: return@mapNotNull null
+            val parentBrokerResults =
+                dashboardResultMap[mirrorSite.parentSite] ?: return@mapNotNull null
 
             parentBrokerResults.map { result ->
                 DashboardExtractedProfileResult(
@@ -205,14 +209,15 @@ abstract class PirDashboardStateProvider(
     }
 
     private fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boolean {
-        // TODO: Add address check
         return this.name == extractedProfile.name &&
             this.age == extractedProfile.age &&
-            (
-                this.alternativeNames.containsAll(extractedProfile.alternativeNames) ||
-                    extractedProfile.alternativeNames.containsAll(this.alternativeNames)
-                ) &&
-            (this.relatives.containsAll(extractedProfile.relatives) || extractedProfile.relatives.containsAll(this.relatives))
+            this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
+            this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
+            this.addresses.isASubSetOrSuperSetOf(extractedProfile.addresses)
+    }
+
+    private fun <T> List<T>.isASubSetOrSuperSetOf(other: List<T>): Boolean {
+        return this.containsAll(other) || other.containsAll(this)
     }
 
     private fun getEstimatedRemovalDateInMillis(
