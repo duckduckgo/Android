@@ -153,7 +153,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             }
         }
 
-        if (viewState.favourites.isEmpty()) {
+        if (viewState.favourites.isNullOrEmpty()) {
             binding.focusedFavourites.gone()
         } else {
             binding.focusedFavourites.show()
