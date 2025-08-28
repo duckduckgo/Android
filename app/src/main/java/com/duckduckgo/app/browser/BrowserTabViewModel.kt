@@ -1508,10 +1508,6 @@ class BrowserTabViewModel @Inject constructor(
 
         if (!currentBrowserViewState().browserShowing) return
 
-        if (settingsDataStore.omnibarPosition == BOTTOM) {
-            showOmniBar()
-        }
-
         canAutofillSelectCredentialsDialogCanAutomaticallyShow = true
 
         browserViewState.value = currentBrowserViewState().copy(
@@ -4001,12 +3997,6 @@ class BrowserTabViewModel @Inject constructor(
         if (cta is OnboardingDaxDialogCta) {
             onDismissOnboardingDaxDialog(cta)
         }
-    }
-
-    private fun showOmniBar() {
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            navigationChange = true,
-        )
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
