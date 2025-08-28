@@ -50,10 +50,10 @@
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHeight_max="264dp"
+        app:layout_constraintHeight_max="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_max="264dp"
+        app:layout_constraintWidth_max="200dp"
         tools:src="@drawable/ic_ddg_logo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
