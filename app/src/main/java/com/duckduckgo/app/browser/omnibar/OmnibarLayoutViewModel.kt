@@ -664,9 +664,11 @@ class OmnibarLayoutViewModel @Inject constructor(
                                 url = _viewState.value.url,
                                 logoUrl = omnibarViewState.serpLogo.logoUrl,
                             )
-                            SerpLogo.Normal,
-                            null,
-                            -> getLeadingIconState(hasFocus = omnibarViewState.isEditing, url = _viewState.value.url, logoUrl = null)
+                            SerpLogo.Normal, null -> getLeadingIconState(
+                                hasFocus = omnibarViewState.isEditing,
+                                url = _viewState.value.url,
+                                logoUrl = null,
+                            )
                         },
                     )
                 }
