@@ -80,43 +80,66 @@ sealed interface PirWebMessageResponse {
         val resultsFound: List<ScanResult>,
         val scanProgress: ScanProgress,
     ) : PirWebMessageResponse {
-
-        data class ScanResult(
-            val id: Long? = 0L,
-            val dataBroker: DataBroker,
-            val name: String,
-            val addresses: List<ScanResultAddress>,
-            val alternativeNames: List<String>,
-            val relatives: List<String>,
-            val foundDate: Long,
-            val optOutSubmittedDate: Long?,
-            val estimatedRemovalDate: Long?,
-            val removedDate: Long?,
-            val hasMatchingRecordOnParentBroker: Boolean,
-        ) {
-            data class ScanResultAddress(
-                val street: String? = null,
-                val city: String?,
-                val state: String?,
-            )
-        }
-
         data class ScanProgress(
             val currentScans: Int,
             val totalScans: Int,
             val scannedBrokers: List<ScannedBroker>,
-        ) {
-            data class ScannedBroker(
-                val name: String,
-                val url: String,
-                val optOutUrl: String? = null,
-                val parentURL: String? = null,
-                val status: String,
-            )
-        }
+        )
     }
+
+    data class ScanResult(
+        val id: Long? = 0L,
+        val dataBroker: DataBroker,
+        val name: String,
+        val addresses: List<ScanResultAddress>,
+        val alternativeNames: List<String>,
+        val relatives: List<String>,
+        val foundDate: Long,
+        val optOutSubmittedDate: Long?,
+        val estimatedRemovalDate: Long?,
+        val removedDate: Long?,
+        val hasMatchingRecordOnParentBroker: Boolean,
+        val date: Long? = null,
+        val matches: Int? = null,
+    ) {
+        data class ScanResultAddress(
+            val street: String? = null,
+            val city: String?,
+            val state: String?,
+        )
+    }
+
+    data class ScannedBroker(
+        val name: String,
+        val url: String,
+        val optOutUrl: String? = null,
+        val parentURL: String? = null,
+        val status: String? = null,
+        val date: Long? = null,
+    )
 
     data class GetFeatureConfigResponse(
         val useUnifiedFeedback: Boolean,
     ) : PirWebMessageResponse
+
+    data class MaintenanceScanStatusResponse(
+        val inProgressOptOuts: List<ScanResult>,
+        val completedOptOuts: List<ScanResult>,
+        val scanSchedule: ScanSchedule,
+        val scanHistory: ScanHistory,
+    ) : PirWebMessageResponse {
+        data class ScanSchedule(
+            val lastScan: ScanDetail,
+            val nextScan: ScanDetail,
+        )
+
+        data class ScanDetail(
+            val date: Long,
+            val dataBrokers: List<ScannedBroker>,
+        )
+
+        data class ScanHistory(
+            val sitesScanned: Int,
+        )
+    }
 }
