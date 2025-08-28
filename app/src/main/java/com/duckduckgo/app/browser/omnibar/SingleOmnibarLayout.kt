@@ -26,6 +26,7 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -164,7 +165,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
             animateOmnibarFocusedState(focused = false)
         }
 
-        omnibarCardShadow.isVisible = viewState.viewMode !is ViewMode.CustomTab
+        omnibarCardShadow.isGone = viewState.viewMode is ViewMode.CustomTab && !isFindInPageVisible
     }
 
     override fun renderButtons(viewState: ViewState) {
