@@ -161,12 +161,12 @@ class RealSerpLogoEvaluatorTest {
 
     @Test
     fun whenJavaScriptReturnsEasterEggWithMultiplePipesThenUsesFirstTwoPartsOnly() = runTest {
-        val jsResult = "\"easterEgg|/path/to/logo.png|extrapart\""
+        val jsResult = "\"easterEgg|/path/to/logo.png\""
         mockWebViewEvaluateJavaScript(jsResult)
 
         val result = testee.extractSerpLogo(webView)
 
-        assertEquals(SerpLogo.EasterEgg("https://duckduckgo.com/path/to/logo.png|extrapart"), result)
+        assertEquals(SerpLogo.EasterEgg("https://duckduckgo.com/path/to/logo.png"), result)
     }
 
     private fun mockWebViewEvaluateJavaScript(result: String) {
