@@ -62,7 +62,4 @@
     <!-- Duck.ai updates - O-A -->
     <string name="duckAIUpdateTitle">Duck.ai PoC</string>
     <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
-
-    <!--Serp Logo-->
-    <string name="cdClose" translatable="false">Close</string>
 </resources>
