@@ -7144,14 +7144,14 @@ class BrowserTabViewModelTest {
         whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
-        
+
         testee.pageFinished(webViewNavState, ddgUrl)
-        
+
         verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
         val commands = commandCaptor.allValues
         assertTrue(
             "ExtractSerpLogo command should be issued when SERP logos feature is enabled and URL is DuckDuckGo query",
-            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl }
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
         )
     }
 
@@ -7162,11 +7162,11 @@ class BrowserTabViewModelTest {
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
         testee.pageFinished(webViewNavState, ddgUrl)
-        
+
         val commands = commandCaptor.allValues
         assertFalse(
             "ExtractSerpLogo command should NOT be issued when SERP logos feature is disabled",
-            commands.any { it is Command.ExtractSerpLogo }
+            commands.any { it is Command.ExtractSerpLogo },
         )
     }
 
@@ -7177,11 +7177,11 @@ class BrowserTabViewModelTest {
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
         testee.pageFinished(webViewNavState, nonDdgUrl)
-        
+
         val commands = commandCaptor.allValues
         assertFalse(
             "ExtractSerpLogo command should NOT be issued for non-DuckDuckGo URLs even when feature is enabled",
-            commands.any { it is Command.ExtractSerpLogo }
+            commands.any { it is Command.ExtractSerpLogo },
         )
     }
 
@@ -7190,10 +7190,10 @@ class BrowserTabViewModelTest {
         whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
-        
+
         testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
         testee.pageFinished(webViewNavState, nonDdgUrl)
-        
+
         assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
     }
 

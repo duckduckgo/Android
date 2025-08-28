@@ -45,7 +45,7 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
     private lateinit var binding: ActivitySerpEasterEggLogoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge(navigationBarStyle = SystemBarStyle.dark( Color.TRANSPARENT))
+        enableEdgeToEdge(navigationBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_DuckDuckGo_DynamicLogo)
         binding = ActivitySerpEasterEggLogoBinding.inflate(layoutInflater)
@@ -87,7 +87,7 @@ class SerpEasterEggLogoActivity : DuckDuckGoActivity() {
                         isFirstResource: Boolean,
                     ): Boolean {
                         supportStartPostponedEnterTransition()
-                        
+
                         binding.closeIcon.animate()
                             .alpha(1f)
                             .setStartDelay(150)
