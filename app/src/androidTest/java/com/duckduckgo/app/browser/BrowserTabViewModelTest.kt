@@ -651,7 +651,7 @@ class BrowserTabViewModelTest {
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
-        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(false)
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
 
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
@@ -7141,7 +7141,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7157,7 +7157,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureDisabledThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(false)
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
         val ddgUrl = "https://duckduckgo.com/?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7172,7 +7172,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandNotIssued() {
-        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
@@ -7187,7 +7187,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenSerpLogoIsCleared() {
-        whenever(mockSerpEasterEggLogoToggles.feature().isEnabled()).thenReturn(true)
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
         val nonDdgUrl = "https://example.com/search?q=test"
         val webViewNavState = WebViewNavigationState(mockStack, 100)
 
