@@ -37,16 +37,17 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchCookies
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.LaunchTrackersAnimation
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange.OmnibarStateChange
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DAX
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DUCK_PLAYER
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.GLOBE
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PRIVACY_SHIELD
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Dax
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.DuckPlayer
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.EasterEggLogo
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Globe
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.PrivacyShield
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
 import com.duckduckgo.app.browser.viewstate.OmnibarViewState
-import com.duckduckgo.app.global.model.PrivacyShield
+import com.duckduckgo.app.global.model.PrivacyShield as PrivacyShieldState
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.settings.db.SettingsDataStore
@@ -61,8 +62,9 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
-import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import javax.inject.Inject
@@ -90,7 +92,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val voiceSearchAvailability: VoiceSearchAvailability,
     private val voiceSearchPixelLogger: VoiceSearchAvailabilityPixelLogger,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val duckPlayer: DuckPlayer,
+    private val duckPlayer: com.duckduckgo.duckplayer.api.DuckPlayer,
     private val pixel: Pixel,
     private val userBrowserProperties: UserBrowserProperties,
     private val dispatcherProvider: DispatcherProvider,
@@ -100,6 +102,7 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val settingsDataStore: SettingsDataStore,
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(
@@ -144,8 +147,9 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     data class ViewState(
         val viewMode: ViewMode = Browser(null),
-        val leadingIconState: LeadingIconState = LeadingIconState.SEARCH,
-        val privacyShield: PrivacyShield = PrivacyShield.UNKNOWN,
+        val leadingIconState: LeadingIconState = Search,
+        val previousLeadingIconState: LeadingIconState? = null,
+        val privacyShield: PrivacyShieldState = PrivacyShieldState.UNKNOWN,
         val hasFocus: Boolean = false,
         val query: String = "",
         val omnibarText: String = "",
@@ -185,14 +189,19 @@ class OmnibarLayoutViewModel @Inject constructor(
         data class StartCookiesAnimation(val isCosmetic: Boolean) : Command()
         data object MoveCaretToFront : Command()
         data class LaunchInputScreen(val query: String) : Command()
+        data class EasterEggLogoClicked(val url: String) : Command()
     }
 
-    enum class LeadingIconState {
-        SEARCH,
-        PRIVACY_SHIELD,
-        DAX,
-        DUCK_PLAYER,
-        GLOBE,
+    sealed class LeadingIconState {
+        object Search : LeadingIconState()
+        object PrivacyShield : LeadingIconState()
+        object Dax : LeadingIconState()
+        object DuckPlayer : LeadingIconState()
+        object Globe : LeadingIconState()
+        data class EasterEggLogo(
+            val logoUrl: String,
+            val serpUrl: String,
+        ) : LeadingIconState()
     }
 
     init {
@@ -269,7 +278,8 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(
                     hasFocus = true,
                     expanded = true,
-                    leadingIconState = SEARCH,
+                    leadingIconState = Search,
+                    previousLeadingIconState = it.leadingIconState,
                     highlightPrivacyShield = HighlightableButton.Gone,
                     showClearButton = showClearButton,
                     showTabsMenu = showControls,
@@ -306,10 +316,16 @@ class OmnibarLayoutViewModel @Inject constructor(
                     it.omnibarText
                 }
 
+                val currentLogoUrl = when (val previousState = it.previousLeadingIconState) {
+                    is EasterEggLogo -> previousState.logoUrl
+                    else -> null
+                }
+
                 it.copy(
                     hasFocus = false,
                     expanded = false,
-                    leadingIconState = getLeadingIconState(false, it.url),
+                    leadingIconState = getLeadingIconState(false, it.url, currentLogoUrl),
+                    previousLeadingIconState = null,
                     highlightFireButton = HighlightableButton.Visible(highlighted = false),
                     showClearButton = false,
                     showTabsMenu = true,
@@ -349,22 +365,25 @@ class OmnibarLayoutViewModel @Inject constructor(
     private fun getLeadingIconState(
         hasFocus: Boolean,
         url: String,
+        logoUrl: String?,
     ): LeadingIconState {
         return when (_viewState.value.viewMode) {
-            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
-            NewTab -> SEARCH
+            Error, SSLWarning, MaliciousSiteWarning -> Globe
+            NewTab -> Search
             else -> {
                 if (hasFocus) {
-                    SEARCH
+                    Search
+                } else if (logoUrl != null) {
+                    EasterEggLogo(logoUrl = logoUrl, serpUrl = url)
                 } else if (shouldShowDaxIcon(url)) {
-                    DAX
+                    Dax
                 } else if (shouldShowDuckPlayerIcon(url)) {
-                    DUCK_PLAYER
+                    DuckPlayer
                 } else {
                     if (url.isEmpty()) {
-                        SEARCH
+                        Search
                     } else {
-                        PRIVACY_SHIELD
+                        PrivacyShield
                     }
                 }
             }
@@ -420,12 +439,12 @@ class OmnibarLayoutViewModel @Inject constructor(
                     val scrollingEnabled = viewMode != NewTab
                     val hasFocus = _viewState.value.hasFocus
                     val leadingIcon = if (hasFocus) {
-                        LeadingIconState.SEARCH
+                        Search
                     } else {
                         when (viewMode) {
-                            Error, SSLWarning, MaliciousSiteWarning -> GLOBE
-                            NewTab -> SEARCH
-                            else -> SEARCH
+                            Error, SSLWarning, MaliciousSiteWarning -> Globe
+                            NewTab -> Search
+                            else -> Search
                         }
                     }
 
@@ -448,11 +467,11 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    fun onPrivacyShieldChanged(privacyShield: PrivacyShield) {
-        logcat { "Omnibar: onPrivacyShieldChanged $privacyShield" }
+    fun onPrivacyShieldChanged(privacyShieldState: PrivacyShieldState) {
+        logcat { "Omnibar: onPrivacyShieldChanged $privacyShieldState" }
         _viewState.update {
             it.copy(
-                privacyShield = privacyShield,
+                privacyShield = privacyShieldState,
             )
         }
     }
@@ -594,34 +613,44 @@ class OmnibarLayoutViewModel @Inject constructor(
         }
     }
 
-    private fun onExternalOmnibarStateChanged(omnibarViewState: OmnibarViewState, forceRender: Boolean) {
-        logcat { "Omnibar: onExternalOmnibarStateChanged $omnibarViewState" }
-        if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
-            val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
-                if (settingsDataStore.isFullUrlEnabled) {
-                    omnibarViewState.queryOrFullUrl
+    private fun onExternalOmnibarStateChanged(
+        omnibarViewState: OmnibarViewState,
+        forceRender: Boolean,
+    ) {
+        if (serpEasterEggLogosToggles.feature().isEnabled()) {
+            val state = if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+                if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                    val url = if (settingsDataStore.isFullUrlEnabled) {
+                        omnibarViewState.queryOrFullUrl
+                    } else {
+                        addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                    }
+                    _viewState.value.copy(
+                        omnibarText = url,
+                        updateOmnibarText = true,
+                    )
                 } else {
-                    addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                    _viewState.value.copy(
+                        omnibarText = omnibarViewState.omnibarText,
+                    )
                 }
             } else {
-                omnibarViewState.omnibarText
+                _viewState.value
             }
 
             if (omnibarViewState.navigationChange) {
                 _viewState.update {
-                    it.copy(
+                    state.copy(
                         expanded = true,
                         expandedAnimated = true,
-                        omnibarText = omnibarText,
                         updateOmnibarText = true,
                     )
                 }
             } else {
                 _viewState.update {
-                    it.copy(
+                    state.copy(
                         expanded = omnibarViewState.forceExpand,
                         expandedAnimated = omnibarViewState.forceExpand,
-                        omnibarText = omnibarText,
                         updateOmnibarText = true,
                         showVoiceSearch = shouldShowVoiceSearch(
                             hasFocus = omnibarViewState.isEditing,
@@ -629,7 +658,57 @@ class OmnibarLayoutViewModel @Inject constructor(
                             hasQueryChanged = true,
                             urlLoaded = _viewState.value.url,
                         ),
+                        leadingIconState = when (omnibarViewState.serpLogo) {
+                            is SerpLogo.EasterEgg -> getLeadingIconState(
+                                hasFocus = omnibarViewState.isEditing,
+                                url = _viewState.value.url,
+                                logoUrl = omnibarViewState.serpLogo.logoUrl,
+                            )
+                            SerpLogo.Normal, null -> getLeadingIconState(
+                                hasFocus = omnibarViewState.isEditing,
+                                url = _viewState.value.url,
+                                logoUrl = null,
+                            )
+                        },
                     )
+                }
+            }
+        } else {
+            if (shouldUpdateOmnibarTextInput(omnibarViewState, _viewState.value.omnibarText) || forceRender) {
+                val omnibarText = if (forceRender && !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(omnibarViewState.queryOrFullUrl)) {
+                    if (settingsDataStore.isFullUrlEnabled) {
+                        omnibarViewState.queryOrFullUrl
+                    } else {
+                        addressDisplayFormatter.getShortUrl(omnibarViewState.queryOrFullUrl)
+                    }
+                } else {
+                    omnibarViewState.omnibarText
+                }
+
+                if (omnibarViewState.navigationChange) {
+                    _viewState.update {
+                        it.copy(
+                            expanded = true,
+                            expandedAnimated = true,
+                            omnibarText = omnibarText,
+                            updateOmnibarText = true,
+                        )
+                    }
+                } else {
+                    _viewState.update {
+                        it.copy(
+                            expanded = omnibarViewState.forceExpand,
+                            expandedAnimated = omnibarViewState.forceExpand,
+                            omnibarText = omnibarText,
+                            updateOmnibarText = true,
+                            showVoiceSearch = shouldShowVoiceSearch(
+                                hasFocus = omnibarViewState.isEditing,
+                                query = omnibarViewState.omnibarText,
+                                hasQueryChanged = true,
+                                urlLoaded = _viewState.value.url,
+                            ),
+                        )
+                    }
                 }
             }
         }
@@ -637,12 +716,17 @@ class OmnibarLayoutViewModel @Inject constructor(
 
     private fun onExternalLoadingStateChanged(loadingState: LoadingViewState) {
         logcat { "Omnibar: onExternalLoadingStateChanged $loadingState" }
+        val currentLogoUrl = when (val leadingIconState = _viewState.value.leadingIconState) {
+            is EasterEggLogo -> leadingIconState.logoUrl
+            else -> null
+        }
+
         _viewState.update {
             it.copy(
                 url = loadingState.url,
                 isLoading = loadingState.isLoading,
                 loadingProgress = loadingState.progress,
-                leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url),
+                leadingIconState = getLeadingIconState(it.hasFocus, loadingState.url, currentLogoUrl),
                 showVoiceSearch = shouldShowVoiceSearch(
                     hasFocus = _viewState.value.hasFocus,
                     query = _viewState.value.omnibarText,
@@ -711,7 +795,7 @@ class OmnibarLayoutViewModel @Inject constructor(
                     if (!hasFocus) {
                         _viewState.update {
                             it.copy(
-                                leadingIconState = PRIVACY_SHIELD,
+                                leadingIconState = PrivacyShield,
                             )
                         }
                         viewModelScope.launch {
@@ -829,6 +913,15 @@ class OmnibarLayoutViewModel @Inject constructor(
                 omnibarText
             }
             command.send(Command.LaunchInputScreen(query = textToPreFill))
+        }
+    }
+
+    fun onLogoClicked() {
+        viewModelScope.launch {
+            val state = _viewState.value.leadingIconState
+            if (state is EasterEggLogo) {
+                command.send(Command.EasterEggLogoClicked(state.logoUrl))
+            }
         }
     }
 

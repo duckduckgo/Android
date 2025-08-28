@@ -129,10 +129,11 @@
                                     android:layout_height="@dimen/toolbarIcon"
                                     android:layout_gravity="center"
                                     android:importantForAccessibility="no"
-                                    android:padding="@dimen/keyline_1"
-                                    android:scaleType="center"
+                                    android:padding="@dimen/keyline_2"
+                                    android:scaleType="fitCenter"
                                     android:visibility="gone"
-                                    app:srcCompat="@drawable/ic_ddg_logo" />
+                                    app:srcCompat="@drawable/ic_ddg_logo"
+                                    tools:visibility="visible" />
 
                                 <ImageView
                                     android:id="@+id/duckPlayerIcon"
