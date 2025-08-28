@@ -22,7 +22,7 @@
     android:gravity="center"
     android:orientation="vertical"
     android:padding="8dp"
-    tools:ignore="UseCompoundDrawables">
+    tools:ignore="UseCompoundDrawables, DeprecatedWidgetInXml">
 
     <ImageView
         android:id="@+id/widgetIcon"
@@ -37,5 +37,6 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="@string/duckAiOnlyWidgetText"
-        android:textColor="@color/white" />
+        android:textColor="@color/white"
+        tools:ignore="InvalidColorAttribute" />
 </LinearLayout>
