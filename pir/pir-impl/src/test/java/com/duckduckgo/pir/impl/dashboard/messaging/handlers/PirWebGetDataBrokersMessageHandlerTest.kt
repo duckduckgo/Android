@@ -79,9 +79,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
         verifyDataBrokersResponse(jsMessage, expectedBrokers = emptyList())
     }
 
@@ -99,10 +96,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
-
         val expectedBrokers = listOf(
             ExpectedDataBroker(
                 url = "https://testbroker.com",
@@ -129,10 +122,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
-
         val expectedBrokers = listOf(
             ExpectedDataBroker(
                 url = "https://parent.com",
@@ -170,10 +159,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
-
         val expectedBrokers = listOf(
             ExpectedDataBroker(
                 url = "https://active.com",
@@ -207,10 +192,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
-
         val expectedBrokers = listOf(
             ExpectedDataBroker(
                 url = "https://broker1.com",
@@ -262,10 +243,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
-
         // Should deduplicate based on the distinct() call in the implementation
         val expectedBrokers = listOf(
             ExpectedDataBroker(
@@ -297,10 +274,6 @@ class PirWebGetDataBrokersMessageHandlerTest {
         testee.process(jsMessage, mockJsMessaging, mockJsMessageCallback)
 
         // Then
-        verify(mockRepository).getAllActiveBrokerObjects()
-        verify(mockRepository).getAllMirrorSites()
-        verify(mockRepository).getAllBrokerOptOutUrls()
-
         val expectedBrokers = listOf(
             ExpectedDataBroker(
                 url = "https://test.com",
