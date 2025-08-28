@@ -81,7 +81,7 @@ interface PirDashboardInitialScanStateProvider {
     boundType = PirDashboardInitialScanStateProvider::class,
 )
 @SingleInstanceIn(ActivityScope::class)
-class RealPirDashboardInitialScanStateProviderProvider @Inject constructor(
+class RealPirDashboardInitialScanStateProvider @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val currentTimeProvider: CurrentTimeProvider,
     private val pirRepository: PirRepository,

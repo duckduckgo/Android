@@ -33,7 +33,6 @@ import dagger.SingleInstanceIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
-import logcat.logcat
 
 interface PirDashboardMaintenanceScanDataProvider {
     /**
@@ -127,9 +126,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         return DashboardScanDetails(
             dateInMillis = allValidBrokerMatches.firstOrNull()?.dateInMillis ?: 0L,
             brokerMatches = allValidBrokerMatches,
-        ).also {
-            logcat { "KLDIMSUM last: $it" }
-        }
+        )
     }
 
     override suspend fun getNextScanDetails(): DashboardScanDetails {
@@ -151,9 +148,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         return DashboardScanDetails(
             dateInMillis = allValidBrokerMatches.firstOrNull()?.dateInMillis ?: 0L,
             brokerMatches = allValidBrokerMatches,
-        ).also {
-            logcat { "KLDIMSUM next: $it" }
-        }
+        )
     }
 
     override suspend fun getScannedBrokerCount(): Int {
@@ -183,8 +178,6 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 // Canceled, so no next run
                 0L
             }
-        }.also {
-            logcat { "KLDIMSUM: ${this.brokerName} with ${this.status} -> $it" }
         }
     }
 
