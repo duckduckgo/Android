@@ -136,13 +136,15 @@
     <dimen name="savedSiteGridItemFavicon">56dp</dimen>
     <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
 
-    <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>
-    <dimen name="searchWidgetPadding">16dp</dimen>
+    <dimen name="searchWidgetFavoritesGridItemFavicon">62dp</dimen>
+    <dimen name="searchWidgetFavoriteMargin">4dp</dimen>
+    <dimen name="searchWidgetFavoritesSideMargin">8dp</dimen>
+    <dimen name="searchWidgetPadding">12dp</dimen>
     <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>
-    <dimen name="searchWidgetFavoriteItemContainerWidth">64dp</dimen>
-    <dimen name="searchWidgetFavoriteItemContainerHeight">78dp</dimen>
+    <dimen name="searchWidgetFavoriteItemContainerWidth">72dp</dimen>
+    <dimen name="searchWidgetFavoriteItemContainerHeight">94dp</dimen>
     <dimen name="searchWidgetSearchBarHeight">48dp</dimen>
-    <dimen name="searchWidgetFavoritesTopMargin">16dp</dimen>
+    <dimen name="searchWidgetFavoritesTopMargin">10dp</dimen>
     <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
     <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
     <dimen name="searchWidgetFavoritesCornerRadius">10dp</dimen>

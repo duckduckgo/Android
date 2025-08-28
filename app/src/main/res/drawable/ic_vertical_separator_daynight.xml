@@ -15,12 +15,12 @@
   -->
 
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="20dp"
+    android:width="2dp"
     android:height="20dp"
-    android:viewportWidth="20"
+    android:viewportWidth="2"
     android:viewportHeight="20">
-  <path
-      android:pathData="M9,2C5.134,2 2,5.134 2,9C2,12.866 5.134,16 9,16C10.663,16 12.19,15.42 13.391,14.452L16.72,17.78C17.013,18.073 17.487,18.073 17.78,17.78C18.073,17.487 18.073,17.013 17.78,16.72L14.452,13.391C15.42,12.19 16,10.663 16,9C16,5.134 12.866,2 9,2ZM3.5,9C3.5,5.962 5.962,3.5 9,3.5C12.038,3.5 14.5,5.962 14.5,9C14.5,12.038 12.038,14.5 9,14.5C5.962,14.5 3.5,12.038 3.5,9Z"
-      android:fillColor="@color/searchWidgetSearchBarTrailingIconColor"
-      android:fillType="evenOdd"/>
+    <path
+        android:fillAlpha="0.09"
+        android:fillColor="@color/searchWidgetSearchBarTrailingIconColor"
+        android:pathData="M0.5,0.5C0.5,0.224 0.724,0 1,0C1.276,0 1.5,0.224 1.5,0.5V19.5C1.5,19.776 1.276,20 1,20C0.724,20 0.5,19.776 0.5,19.5V0.5Z" />
 </vector>

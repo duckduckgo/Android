@@ -16,12 +16,12 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widgetSearchBarContainer"
-    style="@style/Widget.DuckDuckGo.SearchWithFavoritesWidgetSearchBarContainer"
-    android:background="@drawable/search_widget_background_light"
+    android:id="@+id/widgetContainer"
+    style="@style/Widget.DuckDuckGo.SearchWidgetSearchBarContainer"
+    android:background="@drawable/search_widget_background_daynight"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    tools:ignore="DeprecatedWidgetInXml">
+    tools:ignore="DeprecatedWidgetInXml, InvalidColorAttribute">
 
     <ImageView
         android:id="@+id/logo"
@@ -37,34 +37,20 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/black60"
+        android:textColor="@color/searchWidgetSearchBarHintColor"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/voiceSearch"
         style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_microphone_light"
-        android:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/separator"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_vertical_separator_light"
-        android:visibility="gone"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/duckAi"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_duck_ai_24_light"
+        android:src="@drawable/ic_microphone_widget_daynight"
         android:visibility="gone"
         tools:ignore="ContentDescription" />
 
     <ImageView
         android:id="@+id/search"
         style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_find_search_24_light"
+        android:src="@drawable/ic_find_search_24_daynight"
         android:visibility="visible"
         tools:ignore="ContentDescription" />
 

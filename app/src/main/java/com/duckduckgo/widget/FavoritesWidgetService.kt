@@ -40,7 +40,6 @@ import kotlinx.coroutines.runBlocking
 class FavoritesWidgetService : RemoteViewsService() {
 
     companion object {
-        const val MAX_ITEMS_EXTRAS = "MAX_ITEMS_EXTRAS"
         const val THEME_EXTRAS = "THEME_EXTRAS"
     }
 
@@ -129,15 +128,27 @@ class FavoritesWidgetService : RemoteViewsService() {
             val item = if (position >= domains.size) null else domains[position]
             val remoteViews = RemoteViews(context.packageName, getItemLayout())
             if (item != null) {
+                // This item has a favorite. Show the favorite view.
                 if (item.bitmap != null) {
+                    remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.VISIBLE)
                     remoteViews.setImageViewBitmap(R.id.quickAccessFavicon, item.bitmap)
                 }
-                remoteViews.setViewVisibility(R.id.quickAccessTitle, View.VISIBLE)
+                remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
                 remoteViews.setTextViewText(R.id.quickAccessTitle, item.title)
+                remoteViews.setViewVisibility(R.id.quickAccessTitle, View.VISIBLE)
+                remoteViews.setViewVisibility(R.id.placeholderFavicon, View.GONE)
                 configureClickListener(remoteViews, item.url)
             } else {
+                if (domains.isEmpty()) {
+                    // We don't have any favorites, show placeholder view.
+                    remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.quickAccessFavicon, View.GONE)
+                    remoteViews.setViewVisibility(R.id.placeholderFavicon, View.VISIBLE)
+                } else {
+                    // We had at least one favorite, but not in this view. Don't show anything.
+                    remoteViews.setViewVisibility(R.id.quickAccessFaviconContainer, View.INVISIBLE)
+                }
                 remoteViews.setViewVisibility(R.id.quickAccessTitle, View.GONE)
-                remoteViews.setImageViewResource(R.id.quickAccessFavicon, getEmptyBackgroundDrawable())
             }
 
             return remoteViews
@@ -148,14 +159,6 @@ class FavoritesWidgetService : RemoteViewsService() {
                 WidgetTheme.LIGHT -> R.layout.view_favorite_widget_light_item
                 WidgetTheme.DARK -> R.layout.view_favorite_widget_dark_item
                 WidgetTheme.SYSTEM_DEFAULT -> R.layout.view_favorite_widget_daynight_item
-            }
-        }
-
-        private fun getEmptyBackgroundDrawable(): Int {
-            return when (theme) {
-                WidgetTheme.LIGHT -> R.drawable.search_widget_favorite_favicon_light_background
-                WidgetTheme.DARK -> R.drawable.search_widget_favorite_favicon_dark_background
-                WidgetTheme.SYSTEM_DEFAULT -> R.drawable.search_widget_favorite_favicon_daynight_background
             }
         }
 

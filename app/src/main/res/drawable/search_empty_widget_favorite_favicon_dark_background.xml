@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-
 <!--
-  ~ Copyright (c) 2018 DuckDuckGo
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,14 +14,7 @@
   ~ limitations under the License.
   -->
 
-
-<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialKeyguardLayout="@layout/search_widget_light"
-    android:initialLayout="@layout/search_widget_light"
-    android:minWidth="348dp"
-    android:minHeight="40dp"
-    android:minResizeWidth="110dp"
-    android:previewImage="@drawable/search_widget_light_preview"
-    android:resizeMode="horizontal"
-    android:updatePeriodMillis="86400000"
-    android:widgetCategory="home_screen|keyguard" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/white6" />
+    <corners android:radius="@dimen/searchWidgetFavoritesCornerRadius" />
+</shape>

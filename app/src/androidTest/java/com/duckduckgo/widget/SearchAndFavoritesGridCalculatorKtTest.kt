@@ -52,13 +52,13 @@ class SearchAndFavoritesGridCalculatorKtTest {
                 return arrayOf(
                     TestCase(2, 100),
                     TestCase(2, 144),
-                    TestCase(3, 212),
+                    TestCase(2, 212),
                     TestCase(3, 279),
-                    TestCase(4, 280),
-                    TestCase(5, 348),
-                    TestCase(6, 416),
-                    TestCase(7, 484),
-                    TestCase(8, 552),
+                    TestCase(3, 280),
+                    TestCase(4, 348),
+                    TestCase(4, 416),
+                    TestCase(4, 484),
+                    TestCase(4, 552),
                 )
             }
         }
