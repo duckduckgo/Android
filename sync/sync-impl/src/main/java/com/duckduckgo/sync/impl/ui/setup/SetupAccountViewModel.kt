@@ -75,12 +75,12 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
     )
 
     sealed class ViewMode {
-        object CreateAccount : ViewMode()
-        object AskSaveRecoveryCode : ViewMode()
-        object SyncSetupCompleted : ViewMode()
+        data object CreateAccount : ViewMode()
+        data object AskSaveRecoveryCode : ViewMode()
+        data object SyncSetupCompleted : ViewMode()
 
-        object IntroCreateAccount : ViewMode()
-        object IntroRecoveryCode : ViewMode()
+        data object IntroCreateAccount : ViewMode()
+        data object IntroRecoveryCode : ViewMode()
     }
 
     sealed class Command {

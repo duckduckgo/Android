@@ -35,4 +35,33 @@ sealed interface PirWebMessageRequest {
     data class SetBirthYearForCurrentUserProfileRequest(
         val year: Int,
     ) : PirWebMessageRequest
+
+    data class RemoveAddressAtIndexFromCurrentUserProfileRequest(
+        val index: Int,
+    ) : PirWebMessageRequest
+
+    data class RemoveNameAtIndexFromCurrentUserProfileRequest(
+        val index: Int,
+    ) : PirWebMessageRequest
+
+    data class SetNameAtIndexInCurrentUserProfileRequest(
+        val index: Int,
+        val name: Name,
+    ) : PirWebMessageRequest {
+        data class Name(
+            val first: String,
+            val middle: String? = null,
+            val last: String,
+        )
+    }
+
+    data class SetAddressAtIndexForCurrentUserProfileRequest(
+        val index: Int,
+        val address: Address,
+    ) : PirWebMessageRequest {
+        data class Address(
+            val city: String,
+            val state: String,
+        )
+    }
 }

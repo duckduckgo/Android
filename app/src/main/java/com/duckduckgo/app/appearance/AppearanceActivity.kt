@@ -40,15 +40,12 @@ import com.duckduckgo.app.fire.FireActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.sendThemeChangedBroadcast
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
-import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
@@ -140,8 +137,6 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 DARK -> R.string.settingsDarkTheme
                 LIGHT -> R.string.settingsLightTheme
                 SYSTEM_DEFAULT -> R.string.settingsSystemTheme
-                EXPERIMENT_DARK -> R.string.settingsDarkTheme
-                EXPERIMENT_LIGHT -> R.string.settingsLightTheme
             },
         )
         binding.selectedThemeSetting.setSecondaryText(subtitle)

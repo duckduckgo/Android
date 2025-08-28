@@ -47,10 +47,10 @@ class AllowListViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object ShowAdd : Command()
+        data object ShowAdd : Command()
         class ShowEdit(val entry: UserAllowListedDomain) : Command()
         class ConfirmDelete(val entry: UserAllowListedDomain) : Command()
-        object ShowAllowListFormatError : Command()
+        data object ShowAllowListFormatError : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()

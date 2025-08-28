@@ -20,13 +20,11 @@ tags:
       # enable the Input Screen
       - runFlow: ../shared/open_ai_settings_screen.yaml
       - tapOn:
-          id: "trailingSwitch"
-          childOf:
-            id: "duckAiInputScreenEnabledToggle"
+          id: "duckAiInputScreenToggleWithAiImage"
       - action: back
       - action: back
 
-      # verify that the Input Screen doesn't automatically open when on new tab page
+      # verify that the Input Screen doesn't automatically open when coming back from settings
       - assertNotVisible:
           id: "inputModeWidget"
       - assertVisible:
@@ -38,6 +36,16 @@ tags:
           id: "omnibarTextInput"
       - assertVisible:
           id: "inputModeWidget"
+
+      # verify that opening new tab automatically opens the input screen
+      - inputText: "eff.org"
+      - tapOn:
+          id: "actionSend"
+      - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
+      - tapOn: "New Tab"
+      - assertVisible:
+          id: "inputModeWidget"
+      - action: back
 
       # disable global AI setting and verify the Input Screen is disabled
       - action: back

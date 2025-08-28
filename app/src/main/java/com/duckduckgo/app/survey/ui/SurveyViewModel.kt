@@ -48,9 +48,9 @@ class SurveyViewModel @Inject constructor(
 
     sealed class Command {
         class LoadSurvey(val url: String) : Command()
-        object ShowError : Command()
-        object ShowSurvey : Command()
-        object Close : Command()
+        data object ShowError : Command()
+        data object ShowSurvey : Command()
+        data object Close : Command()
     }
 
     val command: SingleLiveEvent<Command> = SingleLiveEvent()

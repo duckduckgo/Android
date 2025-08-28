@@ -40,6 +40,6 @@ class BrokenSiteNegativeFeedbackViewModel @Inject constructor() : ViewModel() {
             val brokenSite: String?,
         ) : Command()
 
-        object Exit : Command()
+        data object Exit : Command()
     }
 }

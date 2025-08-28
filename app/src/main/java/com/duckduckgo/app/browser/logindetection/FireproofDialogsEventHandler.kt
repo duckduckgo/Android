@@ -44,7 +44,7 @@ interface FireproofDialogsEventHandler {
 
     sealed class Event {
         data class FireproofWebSiteSuccess(val fireproofWebsiteEntity: FireproofWebsiteEntity) : Event()
-        object AskToDisableLoginDetection : Event()
+        data object AskToDisableLoginDetection : Event()
     }
 }
 

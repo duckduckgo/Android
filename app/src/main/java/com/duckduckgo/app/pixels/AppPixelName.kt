@@ -344,6 +344,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ADDRESS_BAR_NEW_TAB_PAGE_CLOSED("m_addressbar_focus_close_ntp"),
     ADDRESS_BAR_WEBSITE_CLOSED("m_addressbar_focus_close_website"),
     ADDRESS_BAR_SERP_CLOSED("m_addressbar_focus_close_serp"),
+    ADDRESS_BAR_NTP_FOCUSED("m_addressbar_focus_ntp"),
 
     KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
     KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),

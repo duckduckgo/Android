@@ -53,9 +53,9 @@ class SyncCreateAccountViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
-        object FinishSetupFlow : Command()
-        object AbortFlow : Command()
-        object Error : Command()
+        data object FinishSetupFlow : Command()
+        data object AbortFlow : Command()
+        data object Error : Command()
         data class ShowError(@StringRes val message: Int, val reason: String? = "") : Command()
     }
 
@@ -64,8 +64,8 @@ class SyncCreateAccountViewModel @Inject constructor(
     )
 
     sealed class ViewMode {
-        object CreatingAccount : ViewMode()
-        object SignedIn : ViewMode()
+        data object CreatingAccount : ViewMode()
+        data object SignedIn : ViewMode()
     }
 
     private fun createAccount(source: String?) = viewModelScope.launch(dispatchers.io()) {

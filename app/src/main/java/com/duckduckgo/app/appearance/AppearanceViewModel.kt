@@ -30,8 +30,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
@@ -135,8 +133,6 @@ class AppearanceViewModel @Inject constructor(
             when (selectedTheme) {
                 LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 DARK -> SETTINGS_THEME_TOGGLED_DARK
-                EXPERIMENT_DARK -> SETTINGS_THEME_TOGGLED_DARK
-                EXPERIMENT_LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)

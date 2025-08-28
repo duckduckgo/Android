@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
@@ -38,8 +39,10 @@ import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
 import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
+import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
+import com.squareup.moshi.Moshi
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -122,9 +125,9 @@ interface PirRepository {
 
     suspend fun deleteAllUserProfilesQueries()
 
-    suspend fun replaceUserProfile(userProfile: UserProfile)
+    suspend fun replaceUserProfile(profileQuery: ProfileQuery)
 
-    suspend fun saveUserProfiles(userProfiles: List<UserProfile>)
+    suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
@@ -152,6 +155,8 @@ internal class RealPirRepository(
     private val dbpService: DbpService,
     private val extractedProfileDao: ExtractedProfileDao,
 ) : PirRepository {
+
+    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -429,16 +434,20 @@ internal class RealPirRepository(
         )
     }
 
-    override suspend fun replaceUserProfile(userProfile: UserProfile) {
+    override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
-            userProfileDao.insertUserProfile(userProfile)
+            userProfileDao.insertUserProfile(profileQuery.toUserProfile())
         }
     }
 
-    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>) =
+    override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
         withContext(dispatcherProvider.io()) {
-            userProfileDao.insertUserProfiles(userProfiles)
+            val userProfiles = profileQueries.map { query ->
+                query.toUserProfile()
+            }
+            val insertResult = userProfileDao.insertUserProfiles(userProfiles)
+            insertResult.size == userProfiles.size
         }
 
     override suspend fun getEmailForBroker(dataBroker: String): String =
@@ -470,7 +479,9 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses,
+            addresses = this.addresses.mapNotNull {
+                addressCityStateAdapter.fromJson(it)
+            },
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
             identifier = this.identifier,
@@ -490,7 +501,9 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses,
+            addresses = this.addresses.mapNotNull {
+                addressCityStateAdapter.toJson(it)
+            },
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
             reportId = this.reportId,
@@ -504,6 +517,21 @@ internal class RealPirRepository(
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
+        )
+    }
+
+    private fun ProfileQuery.toUserProfile(): UserProfile {
+        return UserProfile(
+            userName = UserName(
+                firstName = this.firstName,
+                lastName = this.lastName,
+                middleName = this.middleName,
+            ),
+            addresses = com.duckduckgo.pir.impl.store.db.Address(
+                city = this.city,
+                state = this.state,
+            ),
+            birthYear = this.birthYear,
         )
     }
 }

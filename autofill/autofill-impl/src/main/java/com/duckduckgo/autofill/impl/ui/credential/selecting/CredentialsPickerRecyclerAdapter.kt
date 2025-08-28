@@ -125,6 +125,6 @@ class CredentialsPickerRecyclerAdapter(
         data class CredentialPrimaryType(val credentials: LoginCredentials) : ListItem
         data class CredentialSecondaryType(val credentials: LoginCredentials) : ListItem
         data class GroupHeading(val label: String) : ListItem
-        object VerticalSpacing : ListItem
+        data object VerticalSpacing : ListItem
     }
 }

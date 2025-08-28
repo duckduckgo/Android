@@ -31,6 +31,11 @@ interface DuckAiFeatureState {
     val showInputScreen: StateFlow<Boolean>
 
     /**
+     * Indicates whether opening a New Tab should automatically open the Input Screen. This will only be enabled if [showInputScreen] is also enabled.
+     */
+    val showInputScreenAutomaticallyOnNewTab: StateFlow<Boolean>
+
+    /**
      * Indicates whether the Duck AI shortcut should be shown in the popup menus in the main browser tabs as well as on the tab switcher screen.
      */
     val showPopupMenuShortcut: StateFlow<Boolean>
