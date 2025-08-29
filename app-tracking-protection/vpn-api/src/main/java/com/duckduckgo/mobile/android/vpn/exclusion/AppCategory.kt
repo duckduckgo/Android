@@ -17,39 +17,39 @@
 package com.duckduckgo.mobile.android.vpn.exclusion
 
 sealed class AppCategory {
-    object Undefined : AppCategory() {
+    data object Undefined : AppCategory() {
         override fun toString() = "CATEGORY_UNDEFINED"
     }
 
-    object Game : AppCategory() {
+    data object Game : AppCategory() {
         override fun toString() = "CATEGORY_GAME"
     }
 
-    object Audio : AppCategory() {
+    data object Audio : AppCategory() {
         override fun toString() = "CATEGORY_AUDIO"
     }
 
-    object Video : AppCategory() {
+    data object Video : AppCategory() {
         override fun toString() = "CATEGORY_VIDEO"
     }
 
-    object Image : AppCategory() {
+    data object Image : AppCategory() {
         override fun toString() = "CATEGORY_IMAGE"
     }
 
-    object Social : AppCategory() {
+    data object Social : AppCategory() {
         override fun toString() = "CATEGORY_SOCIAL"
     }
 
-    object News : AppCategory() {
+    data object News : AppCategory() {
         override fun toString() = "CATEGORY_NEWS"
     }
 
-    object Maps : AppCategory() {
+    data object Maps : AppCategory() {
         override fun toString() = "CATEGORY_MAPS"
     }
 
-    object Productivity : AppCategory() {
+    data object Productivity : AppCategory() {
         override fun toString() = "CATEGORY_PRODUCTIVITY"
     }
 }

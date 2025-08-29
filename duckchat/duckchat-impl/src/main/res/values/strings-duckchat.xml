@@ -38,19 +38,21 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai is an optional feature that lets you chat anonymously with popular 3rd-party Al chat models. Your chats are not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Enable Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Shortcuts</string>
     <string name="duck_chat_visibility_setting">Browser Menu</string>
     <string name="duck_chat_address_bar_visibility_setting">Address Bar</string>
     <string name="duck_chat_assist_settings_title">Assist Settings</string>
     <string name="duck_chat_assist_settings_description">Choose how often you want AI-assisted answers to appear in your searches</string>
+    <string name="duck_ai_shortcut_settings_title">Duck.ai Shortcuts</string>
+    <string name="duck_ai_shortcut_settings_description">Choose which Duck.ai shortcuts to display</string>
 
     <!-- Input Screen  -->
     <string name="input_screen_search_tab">Search</string>
     <string name="input_screen_search_hint">Search or enter address</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Ask Duck.ai</string>
-    <string name="input_screen_user_pref_title">Experimental Address Bar</string>
-    <string name="input_screen_user_pref_description">Search the web or ask Duck.ai directly from the Address Bar</string>
+    <string name="input_screen_user_pref_without_ai">Search Only\n(Default)</string>
+    <string name="input_screen_user_pref_with_ai">Search &amp; Duck.ai\n(Experimental)</string>
+    <string name="input_screen_user_pref_description">Try our experimental option to ask Duck.ai directly from the Address Bar. <annotation type="share_feedback">Share Feedback</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -63,8 +65,7 @@
     <string name="duck_chat_title_rebranding">AI Features</string>
     <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGo AI features are private and optional.\nYour data is not used to train AI.\n<annotation type="learn_more_link">Learn More</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat anonymously with popular 3rd-party AI chat models</string>
-    <string name="duck_chat_show_in_heading_rebranding">Duck.ai Shortcuts</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chat privately with popular 3rd-party AI models</string>
     <string name="duck_chat_assist_settings_title_rebranding">Search Assist Settings</string>
     <string name="duck_chat_assist_settings_description_rebranding">Choose how often you want AI-Assisted answers to appear in your searches</string>
 </resources>

@@ -112,6 +112,9 @@ android {
             includeAndroidResources = true
         }
     }
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         buildConfigField "String", "NETP_DEBUG_SERVER_TOKEN", "\"${NETP_DEBUG_SERVER_TOKEN}\""
     }

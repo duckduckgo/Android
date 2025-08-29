@@ -124,9 +124,9 @@ class VpnOnboardingViewModel @Inject constructor(
 }
 
 sealed class Command {
-    object LaunchVPN : Command()
-    object CheckVPNPermission : Command()
-    object ShowVpnConflictDialog : Command()
-    object ShowVpnAlwaysOnConflictDialog : Command()
+    data object LaunchVPN : Command()
+    data object CheckVPNPermission : Command()
+    data object ShowVpnConflictDialog : Command()
+    data object ShowVpnAlwaysOnConflictDialog : Command()
     data class RequestVPNPermission(val vpnIntent: Intent) : Command()
 }

@@ -35,22 +35,22 @@ class DefaultBrowserPageViewModel @Inject constructor(
 ) : ViewModel() {
 
     sealed class ViewState {
-        object DefaultBrowserSettingsUI : ViewState()
+        data object DefaultBrowserSettingsUI : ViewState()
         data class DefaultBrowserDialogUI(val showInstructionsCard: Boolean = false) : ViewState()
-        object ContinueToBrowser : ViewState()
+        data object ContinueToBrowser : ViewState()
     }
 
     sealed class Command {
         class OpenDialog(val url: String = DEFAULT_URL) : Command()
-        object OpenSettings : Command()
-        object ContinueToBrowser : Command()
+        data object OpenSettings : Command()
+        data object ContinueToBrowser : Command()
     }
 
     sealed class Origin {
-        object InternalBrowser : Origin()
-        object ExternalBrowser : Origin()
-        object Settings : Origin()
-        object DialogDismissed : Origin()
+        data object InternalBrowser : Origin()
+        data object ExternalBrowser : Origin()
+        data object Settings : Origin()
+        data object DialogDismissed : Origin()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()

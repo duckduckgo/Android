@@ -59,4 +59,11 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiInputScreen(): Toggle
+
+    /**
+     * @return `true` when the Input Screen should open automatically when user creates a New Tab
+     * If the remote feature is not present defaults to `enabled`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun showInputScreenAutomaticallyOnNewTab(): Toggle
 }

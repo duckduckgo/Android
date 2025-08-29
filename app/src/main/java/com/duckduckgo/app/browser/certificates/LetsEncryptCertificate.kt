@@ -25,6 +25,6 @@ interface LetsEncryptCertificate {
 }
 
 sealed class CertificateType {
-    object Root : CertificateType()
-    object Intermediate : CertificateType()
+    data object Root : CertificateType()
+    data object Intermediate : CertificateType()
 }

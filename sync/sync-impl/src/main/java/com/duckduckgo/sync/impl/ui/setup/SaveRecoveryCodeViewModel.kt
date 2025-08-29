@@ -92,17 +92,17 @@ class SaveRecoveryCodeViewModel @Inject constructor(
     )
 
     sealed class ViewMode {
-        object CreatingAccount : ViewMode()
+        data object CreatingAccount : ViewMode()
         data class SignedIn(
             val b64RecoveryCode: String,
         ) : ViewMode()
     }
 
     sealed class Command {
-        object Next : Command()
+        data object Next : Command()
         data class ShowMessage(val message: Int) : Command()
-        object FinishWithError : Command()
-        object CheckIfUserHasStoragePermission : Command()
+        data object FinishWithError : Command()
+        data object CheckIfUserHasStoragePermission : Command()
         data class RecoveryCodePDFSuccess(val recoveryCodePDFFile: File) : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }

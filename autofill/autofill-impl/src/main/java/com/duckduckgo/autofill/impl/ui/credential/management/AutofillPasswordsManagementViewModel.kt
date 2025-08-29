@@ -839,7 +839,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
      *     EditingExisting is used when the user is editing an existing credential.
      */
     sealed class CredentialMode {
-        object ListMode : CredentialMode()
+        data object ListMode : CredentialMode()
 
         data class Viewing(
             val credentialsViewed: LoginCredentials,
@@ -862,8 +862,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             override val saveable: Boolean = true,
         ) : Editing(saveable)
 
-        object Disabled : CredentialMode()
-        object Locked : CredentialMode()
+        data object Disabled : CredentialMode()
+        data object Locked : CredentialMode()
     }
 
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
@@ -873,22 +873,22 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
         class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
-        object ShowListMode : Command()
-        object ShowCredentialMode : Command()
-        object ShowDisabledMode : Command()
-        object ShowDeviceUnsupportedMode : Command()
-        object ShowLockedMode : Command()
-        object LaunchDeviceAuth : Command()
-        object ExitCredentialMode : Command()
-        object ExitListMode : Command()
-        object ExitLockedMode : Command()
-        object InitialiseViewAfterUnlock : Command()
-        object ExitDisabledMode : Command()
+        data object ShowListMode : Command()
+        data object ShowCredentialMode : Command()
+        data object ShowDisabledMode : Command()
+        data object ShowDeviceUnsupportedMode : Command()
+        data object ShowLockedMode : Command()
+        data object LaunchDeviceAuth : Command()
+        data object ExitCredentialMode : Command()
+        data object ExitListMode : Command()
+        data object ExitLockedMode : Command()
+        data object InitialiseViewAfterUnlock : Command()
+        data object ExitDisabledMode : Command()
     }
 
     sealed class CredentialModeCommand(val id: String = UUID.randomUUID().toString()) {
         data class ShowEditCredentialMode(val credentials: LoginCredentials) : CredentialModeCommand()
-        object ShowManualCredentialMode : CredentialModeCommand()
+        data object ShowManualCredentialMode : CredentialModeCommand()
     }
 
     sealed class ListModeCommand(val id: String = UUID.randomUUID().toString()) {
@@ -902,14 +902,14 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     sealed class DuckAddressStatus {
-        object NotADuckAddress : DuckAddressStatus()
+        data object NotADuckAddress : DuckAddressStatus()
         data class FetchingActivationStatus(val address: String) : DuckAddressStatus()
         data class SettingActivationStatus(val activating: Boolean) : DuckAddressStatus()
         data class Activated(val address: String) : DuckAddressStatus()
         data class Deactivated(val address: String) : DuckAddressStatus()
-        object NotManageable : DuckAddressStatus()
-        object FailedToObtainStatus : DuckAddressStatus()
-        object NotSignedIn : DuckAddressStatus()
+        data object NotManageable : DuckAddressStatus()
+        data object FailedToObtainStatus : DuckAddressStatus()
+        data object NotSignedIn : DuckAddressStatus()
     }
 }
 

@@ -17,9 +17,9 @@
 package com.duckduckgo.remote.messaging.impl.matchers
 
 sealed class EvaluationResult {
-    object Match : EvaluationResult()
-    object Fail : EvaluationResult()
-    object NextMessage : EvaluationResult()
+    data object Match : EvaluationResult()
+    data object Fail : EvaluationResult()
+    data object NextMessage : EvaluationResult()
 
     companion object {
         fun fromBoolean(result: Boolean): EvaluationResult {

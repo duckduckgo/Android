@@ -33,7 +33,7 @@ interface SavedSitesExporter {
 }
 
 sealed class ExportSavedSitesResult {
-    object Success : ExportSavedSitesResult()
+    data object Success : ExportSavedSitesResult()
     data class Error(val exception: Exception) : ExportSavedSitesResult()
-    object NoSavedSitesExported : ExportSavedSitesResult()
+    data object NoSavedSitesExported : ExportSavedSitesResult()
 }

@@ -351,9 +351,9 @@ enum class BannerContent {
 }
 
 internal sealed class Command {
-    object RestartVpn : Command()
+    data object RestartVpn : Command()
     data class LaunchFeedback(val reportBreakageScreen: ReportBreakageScreen) : Command()
-    object LaunchAllAppsProtection : Command()
+    data object LaunchAllAppsProtection : Command()
     data class ShowEnableProtectionDialog(
         val excludingReason: TrackingProtectionAppInfo,
         val position: Int,

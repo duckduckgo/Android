@@ -24,24 +24,24 @@ import androidx.room.PrimaryKey
 data class BrokerJsonEtag(
     @PrimaryKey val fileName: String,
     val etag: String,
-    val isActive: Boolean,
 )
 
 @Entity(tableName = "pir_broker_details")
-data class Broker(
+data class BrokerEntity(
     @PrimaryKey val name: String,
     val fileName: String,
     val url: String,
     val version: String,
     val parent: String?,
     val addedDatetime: Long,
+    val removedAt: Long,
 )
 
 @Entity(
     tableName = "pir_broker_scan",
     foreignKeys = [
         ForeignKey(
-            entity = Broker::class,
+            entity = BrokerEntity::class,
             parentColumns = ["name"],
             childColumns = ["brokerName"],
             onDelete = ForeignKey.CASCADE,
@@ -57,7 +57,7 @@ data class BrokerScan(
     tableName = "pir_broker_opt_out",
     foreignKeys = [
         ForeignKey(
-            entity = Broker::class,
+            entity = BrokerEntity::class,
             parentColumns = ["name"],
             childColumns = ["brokerName"],
             onDelete = ForeignKey.CASCADE,
@@ -74,7 +74,7 @@ data class BrokerOptOut(
     tableName = "pir_broker_scheduling_config",
     foreignKeys = [
         ForeignKey(
-            entity = Broker::class,
+            entity = BrokerEntity::class,
             parentColumns = ["name"],
             childColumns = ["brokerName"],
             onDelete = ForeignKey.CASCADE,
@@ -87,4 +87,14 @@ data class BrokerSchedulingConfigEntity(
     val confirmOptOutScan: Int,
     val maintenanceScan: Int,
     val maxAttempts: Int?,
+)
+
+@Entity(tableName = "pir_broker_mirror_sites")
+data class MirrorSiteEntity(
+    @PrimaryKey val name: String,
+    val url: String,
+    val addedAt: Long,
+    val removedAt: Long,
+    val optOutUrl: String,
+    val parentSite: String,
 )

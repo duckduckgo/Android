@@ -40,6 +40,7 @@ import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewViewModel.Command.Se
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebViewClient
 import com.duckduckgo.pir.impl.databinding.ActivityPirDashboardWebviewBinding
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.flow.launchIn
@@ -57,6 +58,9 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirWebJsMessaging: JsMessaging
 
+    @Inject
+    lateinit var pirNotificationManager: PirNotificationManager
+
     private val viewModel: PirDashboardWebViewViewModel by bindViewModel()
 
     private val binding: ActivityPirDashboardWebviewBinding by viewBinding()
@@ -67,6 +71,13 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
 
         setupWebView()
         observeCommands()
+
+        pirNotificationManager.createNotificationChannel()
+    }
+
+    override fun onDestroy() {
+        cleanupWebView()
+        super.onDestroy()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -121,6 +132,13 @@ class PirDashboardWebViewActivity : DuckDuckGoActivity() {
         }
 
         binding.pirWebView.loadUrl(PirDashboardWebConstants.WEB_UI_URL)
+    }
+
+    private fun cleanupWebView() {
+        binding.pirWebView.stopLoading()
+        binding.pirWebView.removeJavascriptInterface(pirWebJsMessaging.context)
+        binding.root.removeView(binding.pirWebView)
+        binding.pirWebView.destroy()
     }
 
     private fun observeCommands() {

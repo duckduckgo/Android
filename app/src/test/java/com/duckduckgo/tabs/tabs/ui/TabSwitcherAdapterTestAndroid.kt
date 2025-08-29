@@ -56,7 +56,6 @@ class TabSwitcherAdapterTestAndroid {
         listener: TabSwitcherListener,
     ): TabSwitcherAdapter {
         return TabSwitcherAdapter(
-            isVisualExperimentEnabled = true,
             itemClickListener = listener,
             webViewPreviewPersister = mock<WebViewPreviewPersister>(),
             lifecycleOwner = mock(),

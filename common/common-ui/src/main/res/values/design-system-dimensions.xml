@@ -34,15 +34,36 @@
     <dimen name="largeShapeCornerRadius">16dp</dimen>
 
     <!-- App Components -->
+    <dimen name="changeAppIconSize">75dp</dimen>
+    <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
+    <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
 
     <!-- Toolbar -->
     <dimen name="toolbarIconSize">24dp</dimen>
-    <dimen name="toolbarOverflowPadding">10dp</dimen>
     <dimen name="toolbarIconPadding">3dp</dimen>
+    <dimen name="toolbarIcon">40dp</dimen>
+    <dimen name="toolbarSize">60dp</dimen>
+    <dimen name="tabSwitcherToolbarTopSize">56dp</dimen>
 
     <!-- Navigation Bar -->
     <dimen name="experimentalNavigationBarPaddingTopWhenStandalone">12dp</dimen>
     <dimen name="experimentalNavigationBarPaddingBottom">8dp</dimen>
+    <dimen name="bottomNavIconContainer">44dp</dimen>
+    <dimen name="bottomNavFireIconContainerHeight">44dp</dimen>
+    <dimen name="bottomNavFireIconContainerWidth">80dp</dimen>
+    <dimen name="bottomNavIcon">24dp</dimen>
+
+    <!-- Omnibar -->
+    <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
+    <dimen name="omnibarCardMarginHorizontal">16dp</dimen>
+    <dimen name="omnibarCardMarginEnd">8dp</dimen>
+    <dimen name="omnibarCardExtendedMarginEnd">4dp</dimen>
+    <dimen name="omnibarCardMarginTop">4dp</dimen>
+    <dimen name="omnibarCardMarginBottom">12dp</dimen>
+    <dimen name="omnibarOutlineWidth">0dp</dimen>
+    <dimen name="omnibarOutlineFocusedWidth">2dp</dimen>
+    <dimen name="cookiesAnimationHeight">34dp</dimen>
+    <dimen name="cookiesAnimationRadius">14dp</dimen>
 
     <!-- Buttons -->
     <dimen name="buttonLargeHeight">60dp</dimen>
@@ -69,14 +90,14 @@
     <dimen name="sectionHeaderListItemImageSize">24dp</dimen>
     <dimen name="sectionHeaderListItemHeight">44dp</dimen>
     <dimen name="sectionHeaderListItemImagePadding">10dp</dimen>
+    <dimen name="checkListItemHeight">58dp</dimen>
 
     <!-- Grid Item -->
-    <dimen name="gridItemSize">80dp</dimen>
     <dimen name="gridItemImageSize">56dp</dimen>
     <dimen name="gridItemIconSize">32dp</dimen>
     <dimen name="gridItemTextWidth">72dp</dimen>
-    <dimen name="gridItemPreviewHeight">170dp</dimen>
-    <dimen name="gridItemPreviewHeightNew">162dp</dimen>
+    <dimen name="gridItemPreviewHeight">162dp</dimen>
+    <dimen name="savedSiteGridItemFavicon">56dp</dimen>
 
     <!-- Extended FAB -->
     <dimen name="fabHeight">56dp</dimen>
@@ -93,6 +114,17 @@
     <dimen name="dialogImageSize">40dp</dimen>
     <dimen name="dialogBorderRadius">@dimen/mediumShapeCornerRadius</dimen>
     <dimen name="dialogRadioGroupHeightMax">176dp</dimen>
+    <dimen name="dialogContentPaddingBottom">18dp</dimen>
+    <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
+    <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
+
+    <!-- Dax Dialog -->
+    <dimen name="daxDialogContentPaddingTop">20dp</dimen>
+    <dimen name="daxDialogButtonSpacing">10dp</dimen>
+
+    <!-- Dax Bubble -->
+    <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
+    <dimen name="daxBubbleDialogEdge">9dp</dimen>
 
     <!-- Bottom Sheet -->
     <dimen name="actionBottomSheetVerticalPadding">8dp</dimen>
@@ -114,29 +146,16 @@
     <!-- InfoPanel -->
     <dimen name="infoPanelIconSize">16dp</dimen>
 
-    <!-- Dialog  -->
-    <dimen name="dialogContentPaddingBottom">18dp</dimen>
-    <dimen name="dialogContentPaddingStart">@dimen/keyline_5</dimen>
-    <dimen name="dialogContentPaddingEnd">@dimen/keyline_5</dimen>
+    <!-- Message CTA -->
+    <dimen name="messageCtaCloseButtonSize">40dp</dimen>
+    <dimen name="messageCtaIllustrationSize">64dp</dimen>
 
-    <!-- Dax Dialog  -->
-    <dimen name="daxDialogContentPaddingTop">20dp</dimen>
-    <dimen name="daxDialogButtonSpacing">10dp</dimen>
+    <!-- Text Input -->
+    <dimen name="outlinedTextPasswordIconSize">54dp</dimen>
+    <dimen name="outlinedTextPasswordEndMarginWithEndIcon">50dp</dimen>
+    <dimen name="outlinedTextPasswordEndMarginWithoutEndIcon">@dimen/keyline_1</dimen>
 
-    <!-- Card -->
-    <dimen name="daxBubbleDialogDistanceFromEdge">22dp</dimen>
-    <dimen name="daxBubbleDialogEdge">9dp</dimen>
-
-    <!-- CheckListItem -->
-    <dimen name="checkListItemHeight">58dp</dimen>
-
-    <!-- Legacy Dimensions -->
-    <dimen name="omnibarCookieAnimationBannerHeight">38dp</dimen>
-    <dimen name="changeAppIconSize">75dp</dimen>
-    <dimen name="homeTabDdgLogoTopMargin">100dp</dimen>
-    <dimen name="savedSiteGridItemFavicon">56dp</dimen>
-    <dimen name="ntpDaxLogoIconWidth">140dp</dimen>
-
+    <!-- Search Widget -->
     <dimen name="searchWidgetFavoritesSideMargin">6dp</dimen>
     <dimen name="searchWidgetPadding">16dp</dimen>
     <dimen name="searchWidgetSearchBarSideMargin">16dp</dimen>
@@ -148,10 +167,4 @@
     <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
     <dimen name="searchWidgetFavoritesCornerRadius">10dp</dimen>
 
-    <dimen name="messageCtaCloseButtonSize">40dp</dimen>
-    <dimen name="messageCtaIllustrationSize">64dp</dimen>
-
-    <dimen name="outlinedTextPasswordIconSize">54dp</dimen>
-    <dimen name="outlinedTextPasswordEndMarginWithEndIcon">50dp</dimen>
-    <dimen name="outlinedTextPasswordEndMarginWithoutEndIcon">@dimen/keyline_1</dimen>
 </resources>

@@ -27,3 +27,4 @@ jobs:
           reporter: github-pr-review
           level: warning
           fail_level: warning
+          actionlint_flags: --config-file .github/actionlint.yaml

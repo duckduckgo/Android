@@ -16,14 +16,20 @@
 
 package com.duckduckgo.app.browser
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.statistics.model.Atb
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
+import com.duckduckgo.common.utils.AppUrl.ParamValue
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -32,24 +38,32 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
+@SuppressLint("DenyListedApi") // fake toggle store
 class DuckDuckGoRequestRewriterTest {
 
     private lateinit var testee: DuckDuckGoRequestRewriter
     private val mockStatisticsStore: StatisticsDataStore = mock()
     private val mockVariantManager: VariantManager = mock()
     private val mockAppReferrerDataStore: AppReferrerDataStore = mock()
+    private val duckChat: DuckChat = mock()
+    private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private lateinit var builder: Uri.Builder
-    private val currentUrl = "http://www.duckduckgo.com"
 
     @Before
     fun before() {
         whenever(mockVariantManager.getVariantKey()).thenReturn("")
         whenever(mockAppReferrerDataStore.installedFromEuAuction).thenReturn(false)
+        whenever(duckChat.isEnabled()).thenReturn(true)
+
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+
         testee = DuckDuckGoRequestRewriter(
             DuckDuckGoUrlDetectorImpl(),
             mockStatisticsStore,
             mockVariantManager,
             mockAppReferrerDataStore,
+            duckChat,
+            androidBrowserConfigFeature,
         )
         builder = Uri.Builder()
     }
@@ -95,6 +109,47 @@ class DuckDuckGoRequestRewriterTest {
 
         val uri = builder.build()
         assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_SERP))
+    }
+
+    @Test
+    fun whenDuckAiIsDisabledThenHideSerpDuckChat() {
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertTrue(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
+        assertEquals(ParamValue.HIDE_DUCK_AI, uri.getQueryParameter(ParamKey.HIDE_DUCK_AI))
+    }
+
+    @Test
+    fun whenDuckAiIsDisabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
+        whenever(duckChat.isEnabled()).thenReturn(false)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(false))
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
+    }
+
+    @Test
+    fun whenDuckAiIsEnabledThenDoNotHideSerpDuckChat() {
+        whenever(duckChat.isEnabled()).thenReturn(true)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(true))
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
+    }
+
+    @Test
+    fun whenDuckAiIsEnabledAndKillSwitchedThenDoNotHideSerpDuckChat() {
+        whenever(duckChat.isEnabled()).thenReturn(true)
+        androidBrowserConfigFeature.hideDuckAiInSerpKillSwitch().setRawStoredState(State(false))
+        testee.addCustomQueryParams(builder)
+
+        val uri = builder.build()
+        assertFalse(uri.queryParameterNames.contains(ParamKey.HIDE_DUCK_AI))
     }
 
     @Test

@@ -155,9 +155,8 @@ jobs:
           mattermost-team-id: ${{ secrets.MM_TEAM_ID }}
           mattermost-channel-name: ${{ vars.MM_RELEASE_NOTIFY_CHANNEL }}
           mattermost-message: |
-            ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: Tests for for tag ${{ github.event.inputs.test-tag }} PASSED successfully.
+            ${{env.emoji_success}} Release ${{ github.event.inputs.app-version }}: Tests for tag ${{ github.event.inputs.test-tag }} PASSED successfully.
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
       - name: Notify Mattermost - Maestro Tests FAILURES or ISSUES DETECTED
         # Condition: Our script detected 'failure' OR the Maestro action itself reported failure
@@ -171,7 +170,6 @@ jobs:
           mattermost-message: |
             ${{env.emoji_failure}} Release ${{ github.event.inputs.app-version }}: Tests for tag ${{ github.event.inputs.test-tag }} FAILED or encountered issues.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
       - name: Notify Mattermost - Maestro Tests CANCELED Flows Present (Informational or Warning)
         # Condition: Our script detected 'canceled_present' AND no critical 'failure' was found
@@ -186,7 +184,6 @@ jobs:
           mattermost-message: |
             :warning: Release ${{ github.event.inputs.app-version }}: Some tests for tag ${{ github.event.inputs.test-tag }} were CANCELED. Please review.          
             Console: ${{ steps.release-tests.outputs.MAESTRO_CLOUD_CONSOLE_URL }}
-            Flow Results: json ${{ steps.release-tests.outputs.MAESTRO_CLOUD_FLOW_RESULTS }}
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}

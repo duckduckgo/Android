@@ -878,8 +878,8 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Оставайтесь под защитой DuckDuckGo большую часть времени, проводимого в Интернете</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Сделайте его браузером по умолчанию, чтобы все ссылки на сайты открывались в DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Больше не спрашивать</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Чтобы ссылки всегда открывались в DuckDuckGo, назначьте его браузером по умолчанию.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Не сейчас</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo не назначен вашим браузером по умолчанию. Почему бы не поднять уровень защиты?</string>
