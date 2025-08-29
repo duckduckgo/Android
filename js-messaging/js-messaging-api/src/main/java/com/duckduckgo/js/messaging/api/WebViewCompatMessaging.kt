@@ -40,12 +40,14 @@ interface WebViewCompatMessageHandler {
      * @param onResponse A callback function to send a response back to the JavaScript code.
      */
 
-    // TODO: Simplify by removing the onResponse and callback
+    sealed interface ProcessResult {
+        data object SendToConsumer : ProcessResult
+        data class SendResponse(val response: JSONObject) : ProcessResult
+    }
+
     fun process(
         jsMessage: JsMessage,
-        jsMessageCallback: WebViewCompatMessageCallback?,
-        onResponse: (JSONObject) -> Unit,
-    )
+    ): ProcessResult?
 
     /**
      * Name of the feature

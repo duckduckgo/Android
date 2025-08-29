@@ -29,6 +29,8 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler.ProcessResult.SendResponse
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler.ProcessResult.SendToConsumer
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -70,26 +72,71 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
                         .map { it.getGlobalJsMessageHandler() }
                         .filter { it.method == jsMessage.method }
                         .forEach { handler ->
-                            handler.process(jsMessage, jsMessageCallback) { }
+                            handler.process(jsMessage)?.let { processResult ->
+                                when (processResult) {
+                                    is SendToConsumer -> {
+                                        sendToConsumer(jsMessageCallback, jsMessage, replyProxy)
+                                    }
+                                    is SendResponse -> {
+                                        onResponse(jsMessage, replyProxy)
+                                    }
+                                }
+                            }
                         }
 
                     // Process with feature handlers
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, jsMessageCallback) { response: JSONObject ->
-                        val callbackData = JsCallbackData(
-                            id = jsMessage.id ?: "",
-                            params = response,
-                            featureName = jsMessage.featureName,
-                            method = jsMessage.method,
-                        )
-                        onResponse(callbackData, replyProxy)
+                    }?.process(jsMessage)?.let { processResult ->
+                        when (processResult) {
+                            is SendToConsumer -> {
+                                sendToConsumer(jsMessageCallback, jsMessage, replyProxy)
+                            }
+                            is SendResponse -> {
+                                onResponse(jsMessage, replyProxy)
+                            }
+                        }
                     }
                 }
             }
         } catch (e: Exception) {
             logcat(ERROR) { "Exception is ${e.asLog()}" }
         }
+    }
+
+    private fun onResponse(
+        jsMessage: JsMessage,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
+        val callbackData = JsCallbackData(
+            id = jsMessage.id ?: "",
+            params = jsMessage.params,
+            featureName = jsMessage.featureName,
+            method = jsMessage.method,
+        )
+        onResponse(callbackData, replyProxy)
+    }
+
+    private fun sendToConsumer(
+        jsMessageCallback: WebViewCompatMessageCallback,
+        jsMessage: JsMessage,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
+        jsMessageCallback.process(
+            jsMessage.featureName,
+            jsMessage.method,
+            jsMessage.id ?: "",
+            jsMessage.params,
+            { response: JSONObject ->
+                val callbackData = JsCallbackData(
+                    id = jsMessage.id ?: "",
+                    params = response,
+                    featureName = jsMessage.featureName,
+                    method = jsMessage.method,
+                )
+                onResponse(callbackData, replyProxy)
+            },
+        )
     }
 
     override suspend fun register(
@@ -107,7 +154,7 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
                     process(
                         message.data ?: "",
                         jsMessageCallback,
-                        replyProxy
+                        replyProxy,
                     )
                 },
             )

@@ -26,6 +26,7 @@ import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler.ProcessResult.SendToConsumer
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest
@@ -57,16 +58,8 @@ class WebViewCompatWebCompatMessagingPluginTest {
                 return object : WebViewCompatMessageHandler {
                     override fun process(
                         jsMessage: JsMessage,
-                        jsMessageCallback: WebViewCompatMessageCallback?,
-                        onResponse: (JSONObject) -> Unit,
-                    ) {
-                        jsMessageCallback?.process(
-                            jsMessage.featureName,
-                            jsMessage.method,
-                            jsMessage.id,
-                            jsMessage.params,
-                            onResponse,
-                        )
+                    ): WebViewCompatMessageHandler.ProcessResult {
+                        return SendToConsumer
                     }
 
                     override val featureName: String = "webCompat"
@@ -88,16 +81,8 @@ class WebViewCompatWebCompatMessagingPluginTest {
 
                     override fun process(
                         jsMessage: JsMessage,
-                        jsMessageCallback: WebViewCompatMessageCallback,
-                        onResponse: (JSONObject) -> Unit,
-                    ) {
-                        jsMessageCallback.process(
-                            jsMessage.featureName,
-                            jsMessage.method,
-                            jsMessage.id,
-                            jsMessage.params,
-                            onResponse,
-                        )
+                    ): WebViewCompatMessageHandler.ProcessResult? {
+                        return SendToConsumer
                     }
 
                     override val method: String = "addDebugFlag"
