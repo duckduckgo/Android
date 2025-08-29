@@ -75,17 +75,18 @@ class NewTabLegacyPageViewModel @AssistedInject constructor(
         val message: RemoteMessage? = null,
         val newMessage: Boolean = false,
         val onboardingComplete: Boolean = false,
-        val favourites: List<Favorite> = emptyList(),
+        val favourites: List<Favorite>? = null,
         val lowPriorityMessage: LowPriorityMessage? = null,
     ) {
 
-        private val hasContentThatDisplacesHomoLogo = onboardingComplete &&
+        private val isLoadingContent = favourites == null
+        private val hasContentThatDisplacesHomeLogo = onboardingComplete &&
             message != null ||
-            favourites.isNotEmpty()
+            favourites?.isNotEmpty() == true
         private val hasLowPriorityMessage = lowPriorityMessage != null
 
-        val shouldShowLogo = !hasContentThatDisplacesHomoLogo && showDaxLogo
-        val hasContent = shouldShowLogo || hasContentThatDisplacesHomoLogo || appTpEnabled || hasLowPriorityMessage
+        val shouldShowLogo = !isLoadingContent && !hasContentThatDisplacesHomeLogo && showDaxLogo
+        val hasContent = isLoadingContent || (shouldShowLogo || hasContentThatDisplacesHomeLogo || appTpEnabled || hasLowPriorityMessage)
     }
 
     private data class ViewStateSnapshot(
