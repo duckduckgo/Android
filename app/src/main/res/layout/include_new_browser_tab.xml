@@ -39,6 +39,17 @@
         android:layout_height="match_parent"
         android:foreground="@android:color/transparent">
 
+        <View
+            android:id="@+id/topNtpOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShade"
+            android:elevation="20dp"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <androidx.core.widget.NestedScrollView
             android:id="@+id/newTabContainerScrollView"
             android:layout_width="match_parent"
@@ -53,6 +64,16 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
         </androidx.core.widget.NestedScrollView>
+
+        <View
+            android:id="@+id/bottomNtpOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShadeSolid"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
 
         <include
             android:id="@+id/includeOnboardingDaxDialogBubble"

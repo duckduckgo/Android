@@ -24,6 +24,9 @@
         android:id="@+id/singleOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:elevation="1dp"
+        android:outlineProvider="none"
         app:omnibarPosition="top" />
 
     <FrameLayout
@@ -80,6 +83,14 @@
         android:orientation="vertical"
         app:layout_behavior="com.duckduckgo.app.browser.webview.TopOmnibarBrowserContainerLayoutBehavior"
         tools:context="com.duckduckgo.app.browser.BrowserActivity">
+
+        <View
+            android:id="@+id/topBrowserOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShade"
+            android:elevation="20dp"
+            android:layout_alignParentTop="true" />
 
         <FrameLayout
             android:id="@+id/daxDialogOnboardingCtaContent"
@@ -140,12 +151,21 @@
             android:layout_below="@id/daxDialogOnboardingCtaContent"
             android:focusableInTouchMode="true" />
 
+        <View
+            android:id="@+id/bottomBrowserOutlineStroke"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShadeSolid"
+            android:elevation="1dp"
+            android:layout_alignParentBottom="true" />
+
     </RelativeLayout>
 
     <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
         android:id="@+id/singleOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:outlineProvider="none"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
 

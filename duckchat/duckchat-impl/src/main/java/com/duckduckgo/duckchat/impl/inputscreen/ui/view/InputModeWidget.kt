@@ -43,7 +43,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 
@@ -295,12 +294,7 @@ class InputModeWidget @JvmOverloads constructor(
 
     private fun configureShadow() {
         if (Build.VERSION.SDK_INT >= 28) {
-            inputModeWidgetCard.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = context.getColor(CommonR.color.background_omnibar_shadow),
-            )
+            inputModeWidgetCard.addBottomShadow()
         }
     }
 
