@@ -50,7 +50,7 @@
     <string name="input_screen_search_tab">Suche</string>
     <string name="input_screen_search_hint">Adresse suchen oder eingeben</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
-    <string name="input_screen_chat_hint">Frag Duck.ai</string>
+    <string name="input_screen_chat_hint">Privat fragen</string>
     <string name="input_screen_user_pref_without_ai">Nur suchen\n(Standard)</string>
     <string name="input_screen_user_pref_with_ai">Suchen &amp; Duck.ai\n(Experimentell)</string>
     <string name="input_screen_user_pref_description">Probiere unsere experimentelle Option aus, um Duck.ai direkt aus der Adressleiste zu fragen. <annotation type="share_feedback">Feedback teilen</annotation></string>
