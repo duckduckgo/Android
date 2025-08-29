@@ -50,6 +50,7 @@
     <string name="input_screen_search_tab">Căutare</string>
     <string name="input_screen_search_hint">Caută sau introdu adresa</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Întreabă în mod privat</string>
     <string name="input_screen_user_pref_without_ai">Doar căutare\n(implicit)</string>
     <string name="input_screen_user_pref_with_ai">Căutare și Duck.ai\n (experimental)</string>
     <string name="input_screen_user_pref_description">Încearcă opțiunea noastră experimentală de a adresa o întrebare către Duck.ai direct din bara de adrese. <annotation type="share_feedback">Trimite feedback</annotation></string>
