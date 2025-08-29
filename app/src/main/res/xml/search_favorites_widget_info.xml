@@ -25,7 +25,7 @@
     android:configure="com.duckduckgo.app.WidgetThemeConfiguration"
     android:minResizeWidth="110dp"
     android:minResizeHeight="110dp"
-    android:previewImage="@drawable/search_favorites_widget_light_preview"
+    android:previewImage="@drawable/image_preview_search_favorites_widget_daynight"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen|keyguard" />
