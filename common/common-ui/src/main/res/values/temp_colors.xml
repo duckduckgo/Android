@@ -108,4 +108,9 @@
     <!-- Input Screen -->
     <color name="daxColorBackdropDark">#080808</color>
     <color name="daxColorBackdropLight">#E0E0E0</color>
+
+    <!-- Widgets -->
+    <color name="searchWidgetBackgroundColorLight">#F2F2F2</color>
+    <color name="searchWidgetBackgroundColorDark">#282828</color>
+    <color name="searchWidgetSearchBarBackgroundColorDark">#474747</color>
 </resources>

@@ -26,10 +26,15 @@
         style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteFavicon"
         android:background="@drawable/search_widget_favorite_favicon_dark_background" />
 
+    <ImageView
+        android:id="@+id/placeholderFavicon"
+        style="@style/Widget.DuckDuckGo.SearchWidgetFavoritePlaceholderFavicon"
+        android:background="@drawable/search_empty_widget_favorite_favicon_dark_background" />
+
     <TextView
         android:id="@+id/quickAccessTitle"
         style="@style/Widget.DuckDuckGo.SearchWidgetFavoriteTitle"
-        android:textColor="@color/white60"
+        android:textColor="@color/text_secondary_dark"
         tools:text="Super long favorite title" />
 
 </LinearLayout>
