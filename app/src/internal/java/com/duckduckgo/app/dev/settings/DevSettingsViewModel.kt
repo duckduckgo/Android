@@ -56,10 +56,10 @@ class DevSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object SendTdsIntent : Command()
-        object OpenUASelector : Command()
-        object ChangePrivacyConfigUrl : Command()
-        object CustomTabs : Command()
+        data object SendTdsIntent : Command()
+        data object OpenUASelector : Command()
+        data object ChangePrivacyConfigUrl : Command()
+        data object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
         data class Toast(val message: String) : Command()

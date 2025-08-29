@@ -1,6 +1,5 @@
 package com.duckduckgo.app.browser.omnibar
 
-import android.annotation.SuppressLint
 import android.view.MotionEvent
 import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -15,7 +14,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.Command.LaunchInputScreen
 import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState
-import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.SEARCH
+import com.duckduckgo.app.browser.omnibar.OmnibarLayoutViewModel.LeadingIconState.Search
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -34,27 +33,32 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckplayer.api.DuckPlayer
 import com.duckduckgo.privacy.dashboard.impl.pixels.PrivacyDashboardPixels
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlin.reflect.KClass
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -72,10 +76,6 @@ class OmnibarLayoutViewModelTest {
     private val duckPlayer: DuckPlayer = mock()
     private val pixel: Pixel = mock()
     private val userBrowserProperties: UserBrowserProperties = mock()
-
-    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-    private val disabledVisualExperimentNavBarStateFlow = MutableStateFlow(false)
-    private val enabledVisualExperimentNavBarStateFlow = MutableStateFlow(true)
 
     private val defaultBrowserPromptsExperimentHighlightOverflowMenuFlow = MutableStateFlow(false)
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -95,6 +95,7 @@ class OmnibarLayoutViewModelTest {
             }
         }
     }
+    private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles = mock()
 
     private lateinit var testee: OmnibarLayoutViewModel
 
@@ -110,11 +111,12 @@ class OmnibarLayoutViewModelTest {
         whenever(tabRepository.flowTabs).thenReturn(flowOf(emptyList()))
         whenever(voiceSearchAvailability.shouldShowVoiceSearch(any(), any(), any(), any())).thenReturn(true)
         whenever(duckPlayer.isDuckPlayerUri(DUCK_PLAYER_URL)).thenReturn(true)
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(disabledVisualExperimentNavBarStateFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutOnNtpAndOnFocus).thenReturn(duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow)
         whenever(duckAiFeatureState.showOmnibarShortcutInAllStates).thenReturn(duckAiShowOmnibarShortcutInAllStatesFlow)
         whenever(settingsDataStore.isFullUrlEnabled).thenReturn(true)
         whenever(duckAiFeatureState.showInputScreen).thenReturn(duckAiShowInputScreenFlow)
+        whenever(serpEasterEggLogosToggles.feature()).thenReturn(mock())
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
 
         initializeViewModel()
     }
@@ -151,12 +153,12 @@ class OmnibarLayoutViewModelTest {
             userBrowserProperties = userBrowserProperties,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             additionalDefaultBrowserPrompts = additionalDefaultBrowserPrompts,
-            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             duckChat = duckChat,
             duckAiFeatureState = duckAiFeatureState,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             settingsDataStore = settingsDataStore,
+            serpEasterEggLogosToggles = serpEasterEggLogosToggles,
         )
     }
 
@@ -187,18 +189,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenSingleOmnibarEnabledThenExperimentalThemingViewStateSet() = runTest {
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
-
-        initializeViewModel()
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.isExperimentalThemingEnabled)
-        }
-    }
-
-    @Test
     fun whenOmnibarFocusedAndQueryNotBlankThenViewStateCorrect() = runTest {
         testee.onOmnibarFocusChanged(true, "query")
 
@@ -206,7 +196,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.hasFocus)
             assertTrue(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.showClearButton)
             assertFalse(viewState.showTabsMenu)
             assertFalse(viewState.showFireIcon)
@@ -224,7 +214,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = awaitItem()
             assertTrue(viewState.hasFocus)
             assertTrue(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -243,7 +233,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.hasFocus)
             assertFalse(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.DAX)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Dax)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -268,7 +258,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.hasFocus)
             assertFalse(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.DUCK_PLAYER)
+            assertTrue(viewState.leadingIconState == LeadingIconState.DuckPlayer)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -293,7 +283,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.hasFocus)
             assertFalse(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -318,7 +308,7 @@ class OmnibarLayoutViewModelTest {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.hasFocus)
             assertFalse(viewState.expanded)
-            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
             assertFalse(viewState.showClearButton)
             assertTrue(viewState.showTabsMenu)
             assertTrue(viewState.showFireIcon)
@@ -404,7 +394,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.Error)
         }
@@ -416,7 +406,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.SSLWarning)
         }
@@ -428,7 +418,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.GLOBE)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Globe)
             assertTrue(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
@@ -440,7 +430,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertFalse(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.NewTab)
         }
@@ -452,7 +442,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.scrollingEnabled)
             assertTrue(viewState.viewMode is ViewMode.Browser)
         }
@@ -465,7 +455,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.viewMode is ViewMode.Error)
         }
     }
@@ -477,7 +467,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.viewMode is ViewMode.SSLWarning)
         }
     }
@@ -489,7 +479,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.viewMode is ViewMode.MaliciousSiteWarning)
         }
     }
@@ -501,7 +491,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = expectMostRecentItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.viewMode is ViewMode.NewTab)
         }
     }
@@ -513,7 +503,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
             assertTrue(viewState.viewMode is ViewMode.Browser)
         }
     }
@@ -833,7 +823,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == EMPTY_URL)
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
         }
     }
 
@@ -844,7 +834,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == RANDOM_URL)
-            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
         }
     }
 
@@ -855,7 +845,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == SERP_URL)
-            assertTrue(viewState.leadingIconState == LeadingIconState.DAX)
+            assertTrue(viewState.leadingIconState == LeadingIconState.Dax)
         }
     }
 
@@ -866,7 +856,7 @@ class OmnibarLayoutViewModelTest {
         testee.viewState.test {
             val viewState = awaitItem()
             assertTrue(viewState.url == DUCK_PLAYER_URL)
-            assertTrue(viewState.leadingIconState == LeadingIconState.DUCK_PLAYER)
+            assertTrue(viewState.leadingIconState == LeadingIconState.DuckPlayer)
         }
     }
 
@@ -930,7 +920,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == SEARCH)
+            assertTrue(viewState.leadingIconState == Search)
             assertTrue(viewState.expandedAnimated == omnibarState.forceExpand)
             assertTrue(viewState.omnibarText == QUERY)
             assertFalse(viewState.updateOmnibarText)
@@ -959,7 +949,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.PRIVACY_SHIELD)
+            assertTrue(viewState.leadingIconState == LeadingIconState.PrivacyShield)
         }
 
         testee.commands().test {
@@ -977,42 +967,7 @@ class OmnibarLayoutViewModelTest {
 
         testee.viewState.test {
             val viewState = awaitItem()
-            assertTrue(viewState.leadingIconState == LeadingIconState.SEARCH)
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1EnabledThenStartExperimentVariant1AnimationCommandSent() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(true)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()).thenReturn(false)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInVariant1CohortAndExperimentEnabled()).thenReturn(false)
-
-        testee.onOmnibarFocusChanged(false, SERP_URL)
-        val trackers = givenSomeTrackers()
-
-        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
-
-        testee.commands().test {
-            awaitItem().assertCommand(Command.StartExperimentVariant1Animation::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    @Test
-    fun whenTrackersAnimationStartedAndOmnibarFocusedAndSelfAndVariant1DisabledThenStartExperimentVariant2Or3AnimationCommandSent() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInModifiedControlCohortAndExperimentEnabled()).thenReturn(false)
-
-        testee.onOmnibarFocusChanged(false, SERP_URL)
-        val trackers = givenSomeTrackers()
-
-        testee.onAnimationStarted(Decoration.LaunchTrackersAnimation(trackers))
-
-        testee.commands().test {
-            awaitItem().assertCommand(Command.StartExperimentVariant2OrVariant3Animation::class)
-            cancelAndIgnoreRemainingEvents()
+            assertTrue(viewState.leadingIconState == LeadingIconState.Search)
         }
     }
 
@@ -1181,20 +1136,9 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun whenNavigationBarExperimentEnabledThenShowChatMenuTrue() = runTest {
-        disabledVisualExperimentNavBarStateFlow.value = true
-
-        testee.viewState.test {
-            val viewState = awaitItem()
-            assertTrue(viewState.showChatMenu)
-        }
-    }
-
-    @Test
-    fun whenNavigationBarExperimentEnabledAndChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
+    fun whenChatEntryPointDisabledThenShowChatMenuFalse() = runTest {
         duckAiShowOmnibarShortcutInAllStatesFlow.value = false
         duckAiShowOmnibarShortcutOnNtpAndOnFocusFlow.value = false
-        disabledVisualExperimentNavBarStateFlow.value = true
 
         testee.viewState.test {
             val viewState = awaitItem()
@@ -1258,18 +1202,6 @@ class OmnibarLayoutViewModelTest {
     }
 
     @Test
-    fun `when DuckChat Button pressed and omnibar has focus with experiment enabled then source is focused`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
-        initializeViewModel()
-        testee.onOmnibarFocusChanged(hasFocus = true, inputFieldText = "query")
-
-        testee.onDuckChatButtonPressed()
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "focused"))
-    }
-
-    @Test
     fun `when DuckChat Button pressed, omnibar not focused, and viewMode is NewTab then source is ntp`() = runTest {
         whenever(duckChat.wasOpenedBefore()).thenReturn(false)
         testee.onViewModeChanged(ViewMode.NewTab)
@@ -1307,30 +1239,6 @@ class OmnibarLayoutViewModelTest {
         testee.onDuckChatButtonPressed()
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "0", "source" to "unknown"))
-    }
-
-    @Test
-    fun `when DuckChat Button pressed with experiment enabled and was used before then correct pixel sent`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(enabledVisualExperimentNavBarStateFlow)
-        initializeViewModel()
-        testee.onViewModeChanged(ViewMode.NewTab)
-        testee.onOmnibarFocusChanged(false, "")
-
-        testee.onDuckChatButtonPressed()
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1", "source" to "ntp"))
-    }
-
-    @Test
-    fun `when DuckChat Button pressed with experiment disabled and was used before then correct pixel sent`() = runTest {
-        whenever(duckChat.wasOpenedBefore()).thenReturn(true)
-        givenSiteLoaded(RANDOM_URL)
-        testee.onOmnibarFocusChanged(false, "")
-
-        testee.onDuckChatButtonPressed()
-
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_BUTTON_OPEN, mapOf("was_used_before" to "1", "source" to "website"))
     }
 
     @Test
@@ -1705,5 +1613,297 @@ class OmnibarLayoutViewModelTest {
 
     private fun Command.assertCommand(expectedType: KClass<out Command>) {
         assertTrue(String.format("Unexpected command type: %s", this::class.simpleName), this::class == expectedType)
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnNewTabThenAddressBarNtpFocusedPixelSent() = runTest {
+        givenSiteLoaded("")
+        testee.onViewModeChanged(ViewMode.NewTab)
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel).fire(
+            AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
+            mapOf(
+                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "true",
+                Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "true",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnWebsiteThenAddressBarNtpFocusedPixelNotSent() = runTest {
+        givenSiteLoaded(RANDOM_URL)
+        testee.onViewModeChanged(ViewMode.Browser(RANDOM_URL))
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel, never()).fire(
+            eq(AppPixelName.ADDRESS_BAR_NTP_FOCUSED),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnSerpThenAddressBarNtpFocusedPixelNotSent() = runTest {
+        givenSiteLoaded(SERP_URL)
+        testee.onViewModeChanged(ViewMode.Browser(SERP_URL))
+        testee.onOmnibarFocusChanged(true, "")
+
+        verify(pixel, never()).fire(
+            eq(AppPixelName.ADDRESS_BAR_NTP_FOCUSED),
+            any(),
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenOmnibarFocusedOnNewTabWithAllButtonsDisabledThenCorrectParametersSent() = runTest {
+        givenSiteLoaded("")
+        testee.onViewModeChanged(ViewMode.NewTab)
+
+        // Simulate focusing the omnibar with text, which hides the fire button
+        testee.onOmnibarFocusChanged(true, "some query")
+
+        verify(pixel).fire(
+            AppPixelName.ADDRESS_BAR_NTP_FOCUSED,
+            mapOf(
+                Pixel.PixelParameter.IS_TAB_SWITCHER_BUTTON_SHOWN to "false",
+                Pixel.PixelParameter.IS_FIRE_BUTTON_SHOWN to "false",
+                Pixel.PixelParameter.IS_BROWSER_MENU_BUTTON_SHOWN to "false",
+            ),
+        )
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithEasterEggLogoThenLeadingIconStateUpdated() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(logoUrl, easterEggState.logoUrl)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithNormalLogoThenLeadingIconStateIsNotEasterEgg() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.Normal,
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            assertTrue(viewState.leadingIconState == Search)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndExternalStateChangeWithNullLogoThenLeadingIconStateIsNotEasterEgg() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = null,
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            assertTrue(viewState.leadingIconState == Search)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureDisabledAndExternalStateChangeWithEasterEggLogoThenLeadingIconStateRemainsUnchanged() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        val initialState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // When feature is disabled, leadingIconState logic is completely bypassed
+            // so it should remain exactly the same as the initial state
+            assertEquals(initialState, viewState.leadingIconState)
+            assertTrue(viewState.leadingIconState == Search) // Initial state is Search
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndNavigationChangeThenLeadingIconStateNotUpdatedWithLogo() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val initialLeadingIconState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            navigationChange = true,
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // Navigation and text updates work
+            assertTrue(viewState.expanded)
+            assertTrue(viewState.expandedAnimated)
+            assertTrue(viewState.omnibarText == QUERY)
+            assertTrue(viewState.updateOmnibarText)
+            // BUT leadingIconState logic is completely bypassed - it doesn't get updated at all
+            assertEquals(initialLeadingIconState, viewState.leadingIconState)
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureDisabledAndNavigationChangeThenLeadingIconLogicBypassedButOtherStateUpdated() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        val initialLeadingIconState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            navigationChange = true,
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // Navigation and text updates still work when feature is disabled
+            assertTrue(viewState.expanded)
+            assertTrue(viewState.expandedAnimated)
+            assertTrue(viewState.omnibarText == QUERY)
+            assertTrue(viewState.updateOmnibarText)
+            // BUT leadingIconState logic is completely bypassed - it doesn't get updated at all
+            assertEquals(initialLeadingIconState, viewState.leadingIconState)
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureEnabledAndForceRenderThenFollowsEnabledPath() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            queryOrFullUrl = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            assertTrue(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+            val easterEggState = viewState.leadingIconState as LeadingIconState.EasterEggLogo
+            assertEquals(logoUrl, easterEggState.logoUrl)
+            assertTrue(viewState.updateOmnibarText)
+        }
+    }
+
+    @Test
+    fun whenSerpEasterEggLogosFeatureDisabledAndForceRenderThenLeadingIconLogicBypassed() = runTest {
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(false)
+        initializeViewModel()
+
+        val initialLeadingIconState = testee.viewState.value.leadingIconState
+
+        val logoUrl = "https://example.com/logo.png"
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            queryOrFullUrl = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState, forceRender = true))
+
+        testee.viewState.test {
+            val viewState = awaitItem()
+            // Text update works even when feature is disabled
+            assertTrue(viewState.updateOmnibarText)
+            // BUT leadingIconState is not updated at all - disabled path completely bypasses this logic
+            assertEquals(initialLeadingIconState, viewState.leadingIconState)
+            assertFalse(viewState.leadingIconState is LeadingIconState.EasterEggLogo)
+        }
+    }
+
+    @Test
+    fun whenLogoClickedAndLeadingIconIsEasterEggLogoThenEasterEggLogoClickedCommandSent() = runTest {
+        val logoUrl = "https://example.com/logo.png"
+        whenever(serpEasterEggLogosToggles.feature().isEnabled()).thenReturn(true)
+        initializeViewModel()
+
+        val omnibarViewState = OmnibarViewState(
+            omnibarText = QUERY,
+            serpLogo = SerpLogo.EasterEgg(logoUrl),
+            isEditing = false,
+        )
+
+        testee.onExternalStateChange(StateChange.OmnibarStateChange(omnibarViewState))
+
+        testee.onLogoClicked()
+
+        testee.commands().test {
+            val command = awaitItem()
+            assertTrue(command is Command.EasterEggLogoClicked)
+            assertEquals(logoUrl, (command as Command.EasterEggLogoClicked).url)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLogoClickedAndLeadingIconIsNotEasterEggLogoThenNoCommandSent() = runTest {
+        testee.onLogoClicked()
+
+        testee.commands().test {
+            expectNoEvents()
+        }
     }
 }

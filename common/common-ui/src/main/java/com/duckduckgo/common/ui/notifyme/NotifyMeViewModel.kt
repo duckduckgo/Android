@@ -56,12 +56,12 @@ class NotifyMeViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object UpdateNotificationsState : Command()
-        object UpdateNotificationsStateOnAndroid13Plus : Command()
-        object OpenSettingsOnAndroid8Plus : Command()
-        object CheckPermissionRationale : Command()
-        object ShowPermissionRationale : Command()
-        object DismissComponent : Command()
+        data object UpdateNotificationsState : Command()
+        data object UpdateNotificationsStateOnAndroid13Plus : Command()
+        data object OpenSettingsOnAndroid8Plus : Command()
+        data object CheckPermissionRationale : Command()
+        data object ShowPermissionRationale : Command()
+        data object DismissComponent : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)

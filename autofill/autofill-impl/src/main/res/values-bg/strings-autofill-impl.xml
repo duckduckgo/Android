@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Пароли</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Импортиране на пароли от Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Импортиране на пароли</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d пароли са импортирани от Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d пароли са импортирани от CSV</string>
 
@@ -250,7 +250,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизиране на паролите от работния плот</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизиране на паролите от работния плот</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Импортиране на вашите пароли от Google</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Импортиране на пароли от Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Импортиране от Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Избор на CSV файл</string>

@@ -34,7 +34,7 @@ interface SearchBar {
     }
 
     sealed class Action {
-        object PerformUpAction : Action()
+        data object PerformUpAction : Action()
         data class PerformSearch(val searchText: String) : Action()
     }
 }

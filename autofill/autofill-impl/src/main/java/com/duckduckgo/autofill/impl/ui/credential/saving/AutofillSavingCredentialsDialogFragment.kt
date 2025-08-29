@@ -344,9 +344,9 @@ class AutofillSavingCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
     }
 
     internal sealed interface CredentialSaveType {
-        object UsernameAndPassword : CredentialSaveType
-        object UsernameOnly : CredentialSaveType
-        object PasswordOnly : CredentialSaveType
+        data object UsernameAndPassword : CredentialSaveType
+        data object UsernameOnly : CredentialSaveType
+        data object PasswordOnly : CredentialSaveType
     }
 
     private interface DialogEvent {

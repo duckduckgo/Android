@@ -54,7 +54,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -100,7 +99,6 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
-    experimentalThemingDataStore: ExperimentalThemingDataStore,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -125,11 +123,11 @@ class TabSwitcherViewModel @Inject constructor(
 
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
 
-    val isNewDesignEnabled: Boolean by lazy {
-        tabManagerFeatureFlags.newToolbarFeature().isEnabled() && experimentalThemingDataStore.isSingleOmnibarEnabled.value
+    val isNewToolbarEnabled: Boolean by lazy {
+        tabManagerFeatureFlags.newToolbarFeature().isEnabled()
     }
 
-    private val _selectionViewState = MutableStateFlow(SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
+    private val _selectionViewState = MutableStateFlow(SelectionViewState(isNewToolbarEnabled = isNewToolbarEnabled))
     val selectionViewState = combine(
         _selectionViewState,
         tabSwitcherItemsFlow,
@@ -141,7 +139,7 @@ class TabSwitcherViewModel @Inject constructor(
             layoutType = tabSwitcherData.layoutType,
             isDuckAIButtonVisible = showDuckAiButton,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState(isNewToolbarEnabled = isNewToolbarEnabled))
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -589,7 +587,7 @@ class TabSwitcherViewModel @Inject constructor(
     fun onDuckAIButtonClicked() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
             duckChat.openDuckChat()
         }

@@ -68,7 +68,7 @@ sealed class HighlightableButton {
         val highlighted: Boolean = false,
     ) : HighlightableButton()
 
-    object Gone : HighlightableButton()
+    data object Gone : HighlightableButton()
 
     fun isHighlighted(): Boolean {
         return when (this) {

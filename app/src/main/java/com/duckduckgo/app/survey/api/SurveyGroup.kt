@@ -33,5 +33,5 @@ data class SurveyGroup(
 }
 
 sealed class SurveyUrlParameter(val parameter: String) {
-    object EmailCohortParam : SurveyUrlParameter("cohort")
+    data object EmailCohortParam : SurveyUrlParameter("cohort")
 }

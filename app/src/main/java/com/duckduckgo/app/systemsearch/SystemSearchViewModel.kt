@@ -110,8 +110,8 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     sealed class Command {
-        object ClearInputText : Command()
-        object LaunchDuckDuckGo : Command()
+        data object ClearInputText : Command()
+        data object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchBrowserAndSwitchToTab(val query: String, val tabId: String) : Command()
         data class LaunchEditDialog(val savedSite: SavedSite) : Command()
@@ -119,9 +119,9 @@ class SystemSearchViewModel @Inject constructor(
         data class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
-        object DismissKeyboard : Command()
+        data object DismissKeyboard : Command()
         data class EditQuery(val query: String) : Command()
-        object UpdateVoiceSearch : Command()
+        data object UpdateVoiceSearch : Command()
         data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
         data object AutocompleteItemRemoved : Command()
     }

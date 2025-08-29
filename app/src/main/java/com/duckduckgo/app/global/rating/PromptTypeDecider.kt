@@ -90,7 +90,7 @@ class InitialPromptTypeDecider(
 
 sealed class AppEnjoymentPromptOptions {
 
-    object ShowNothing : AppEnjoymentPromptOptions()
+    data object ShowNothing : AppEnjoymentPromptOptions()
     data class ShowEnjoymentPrompt(val promptCount: PromptCount) : AppEnjoymentPromptOptions()
     data class ShowFeedbackPrompt(val promptCount: PromptCount) : AppEnjoymentPromptOptions()
     data class ShowRatingPrompt(val promptCount: PromptCount) : AppEnjoymentPromptOptions()

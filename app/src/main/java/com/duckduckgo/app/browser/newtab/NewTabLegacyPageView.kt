@@ -41,6 +41,8 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Launc
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.LaunchScreen
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.SubmitUrl
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelFactory
+import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
@@ -54,7 +56,6 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter
@@ -77,9 +78,6 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     private val showLogo: Boolean = true,
     private val onHasContent: ((Boolean) -> Unit)? = null,
 ) : LinearLayout(context, attrs, defStyle) {
-
-    @Inject
-    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -106,8 +104,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
 
+    @Inject
+    lateinit var viewModelFactory: NewTabLegacyPageViewModelFactory
+
     private val viewModel: NewTabLegacyPageViewModel by lazy {
-        ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[NewTabLegacyPageViewModel::class.java]
+        val providerFactory = NewTabLegacyPageViewModelProviderFactory(viewModelFactory, showDaxLogo = showLogo)
+        ViewModelProvider(owner = findViewTreeViewModelStoreOwner()!!, factory = providerFactory)[NewTabLegacyPageViewModel::class.java]
     }
 
     private val conflatedStateJob = ConflatedJob()
@@ -139,20 +141,12 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     private fun render(viewState: ViewState) {
         logcat { "New Tab: render $viewState" }
 
-        val isHomeBackgroundLogoVisible = (!viewState.onboardingComplete || viewState.message == null) &&
-            viewState.favourites.isEmpty()
+        onHasContent?.invoke(viewState.hasContent)
 
-        if (!showLogo && isHomeBackgroundLogoVisible) {
-            this.gone()
-            onHasContent?.invoke(false)
+        if (viewState.shouldShowLogo) {
+            homeBackgroundLogo.showLogo(settingsDataStore.omnibarPosition)
         } else {
-            this.show()
-            onHasContent?.invoke(true)
-            if (isHomeBackgroundLogoVisible) {
-                homeBackgroundLogo.showLogo(settingsDataStore.omnibarPosition)
-            } else {
-                homeBackgroundLogo.hideLogo()
-            }
+            homeBackgroundLogo.hideLogo()
         }
         if (viewState.message != null && viewState.onboardingComplete) {
             showRemoteMessage(viewState.message, viewState.newMessage)
@@ -163,7 +157,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
             }
         }
 
-        if (viewState.favourites.isEmpty()) {
+        if (viewState.favourites.isNullOrEmpty()) {
             binding.focusedFavourites.gone()
         } else {
             binding.focusedFavourites.show()
