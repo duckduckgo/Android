@@ -431,6 +431,7 @@ dependencies {
     }
 
     implementation AndroidX.appCompat
+    implementation AndroidX.activity.compose
     implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.recyclerView

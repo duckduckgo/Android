@@ -437,11 +437,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
         super.onDestroy()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         logcat(INFO) { "onNewIntent: $intent" }
 
-        intent?.sanitize()
+        intent.sanitize()
 
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
@@ -827,7 +827,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     fun launchBookmarks() {
-        startBookmarksActivityForResult.launch(globalActivityStarter.startIntent(this, BookmarksScreenNoParams))
+        globalActivityStarter.startIntent(this, BookmarksScreenNoParams)?.let { intent ->
+            startBookmarksActivityForResult.launch(intent)
+        } ?: logcat(ERROR) { "Could not create intent to launch bookmarks" }
     }
 
     fun launchDownloads() {
