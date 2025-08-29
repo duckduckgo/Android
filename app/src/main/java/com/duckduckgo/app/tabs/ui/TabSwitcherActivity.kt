@@ -989,7 +989,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabSwitcherAnimationTileRemovalDialog = TextAlertDialogBuilder(this)
             .setTitle(R.string.tabSwitcherAnimationTileRemovalDialogTitle)
             .setMessage(R.string.tabSwitcherAnimationTileRemovalDialogBody)
-            .setPositiveButton(R.string.daxDialogGotIt)
+            .setPositiveButton(R.string.tabSwitcherAnimationTileRemovalDialogPositiveButton)
             .setNegativeButton(R.string.tabSwitcherAnimationTileRemovalDialogNegativeButton, GHOST)
             .setCancellable(true)
             .addEventListener(

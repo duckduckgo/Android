@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Ορίστε ως προεπιλογή</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Να μην ερωτηθώ ξανά</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Το DuckDuckGo αποκλείει εφαρμογές παρακολούθησης για να προστατεύσει την περιήγησή σας</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Η εκκαθάριση των καρτελών και των δεδομένων σας θα διαγράψει το ιστορικό αποκλεισμού εφαρμογών παρακολούθησης και θα μηδενίσει αυτόν τον αριθμό.\n\nΑποκρύψτε αυτό το banner αν προτιμάτε να μην το βλέπετε στην προβολή καρτελών.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Απόκρυψη banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Προειδοποίηση: Αυτός ο ιστότοπος μπορεί να είναι επικίνδυνος για την ασφάλεια</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Το DuckDuckGo μπλόκαρε αυτήν τη σελίδα επειδή μπορεί να διανέμει κακόβουλο λογισμικό, το οποίο έχει σχεδιαστεί για να θέσει σε κίνδυνο τη συσκευή σας ή να υποκλέψει τα προσωπικά στοιχεία σας.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>

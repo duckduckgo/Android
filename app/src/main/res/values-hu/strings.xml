@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Beállítás alapértelmezettként</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne kérdezzen rá újra</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">A DuckDuckGo a böngészésed védelme érdekében blokkolja a nyomkövetőket</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>

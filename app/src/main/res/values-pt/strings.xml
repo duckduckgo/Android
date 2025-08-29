@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Definir como predefinição</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Não perguntar novamente</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">O DuckDuckGo bloqueia rastreadores para proteger a tua navegação</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Limpar os separadores e os dados elimina o teu histórico de bloqueio de rastreadores e redefine este número para zero.\n\nOculta esta faixa se preferires não a ver na vista de separadores.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar faixa</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Aviso: este site pode ser um risco para a segurança</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[O DuckDuckGo bloqueou esta página porque pode estar a distribuir malware projetado para comprometer o teu dispositivo ou roubar as tuas informações pessoais.\n<a href=\"\">Sabe mais</a>]]></string>

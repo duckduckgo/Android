@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Définir par défaut</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne plus demander</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloque les traqueurs pour protéger votre navigation</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">En effaçant vos onglets et vos données, vous supprimerez votre historique de blocage des traqueurs et remettrez ce nombre à zéro.\n\nMasquez cette bannière si vous préférez ne pas la voir dans la vue des onglets.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Masquer la bannière</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Avertissement : ce site peut présenter un risque pour la sécurité</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo a bloqué cette page car elle pourrait diffuser des logiciels malveillants conçus pour compromettre votre appareil ou voler vos informations personnelles.\n<a href=\"\">En savoir plus</a>]]></string>

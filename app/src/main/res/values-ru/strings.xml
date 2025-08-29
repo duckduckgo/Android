@@ -886,11 +886,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Сделать браузером по умолчанию</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Больше не спрашивать</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">Для безопасности просмотра DuckDuckGo блокирует трекеры</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">В результате закрытия вкладок и очистки данных также будет удалена история блокировки трекеров, а их счетчик будет сброшен до нуля.\n\nЭтот баннер на вкладках можно при желании скрыть.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скрыть баннер</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: этот сайт может быть опасным</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo заблокировал эту страницу: возможно, она распространяет вредоносное ПО для взлома устройств или кражи личной информации.\n<a href=\"\">Подробнее</a>]]></string>

@@ -886,11 +886,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastaviť ako predvolený</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Už sa nepýtaj znova</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokuje sledovače, aby chránil tvoje prehliadanie</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazaním tvojich kariet a údajov sa odstráni história blokovania sledovania, a toto číslo sa vynuluje.\n\nSkry tento banner, ak ho nechceš vidieť v zobrazení kariet.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skryť banner</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Upozornenie: Táto lokalita môže predstavovať bezpečnostné riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo zablokoval túto stránku, pretože môže šíriť škodlivý softvér určený na ohrozenie tvojho zariadenia alebo krádež tvojich osobných údajov.\n<a href=\"\">Viac informácií</a>]]></string>

@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Als Standard festlegen</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nicht erneut fragen</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blockiert Tracker, um dein Browsen zu schützen.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Wenn du deine Tabs und Daten löschst, wird der Verlauf deiner Tracker-Blockade gelöscht und diese Zahl auf Null zurückgesetzt.\n\nBlende dieses Banner aus, wenn du es nicht in der Tab-Ansicht sehen willst.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner ausblenden</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warnung: Diese Website stellt möglicherweise ein Sicherheitsrisiko dar</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo hat diese Seite blockiert, weil sie möglicherweise Malware verbreitet, die darauf abzielt, dein Gerät zu kompromittieren oder deine persönlichen Daten zu stehlen.\n<a href=\"\">Mehr erfahren</a>]]></string>

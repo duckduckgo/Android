@@ -886,11 +886,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nustatyti kaip numatytąjį</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Neklausk dar kartą</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">„DuckDuckGo“ blokuoja stebėjimo priemones, kad apsaugotų tavo naršymą</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[„DuckDuckGo“ užblokavo šį puslapį, nes jame gali būti platinama kenkėjiška programinė įranga, kuria siekiama pakenkti jūsų įrenginiui arba pavogti jūsų asmeninę informaciją.\n<a href=\"\">Sužinokite daugiau</a>]]></string>

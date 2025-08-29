@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Aseta oletukseksi</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Älä kysy uudelleen</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo suojaa selaamistasi estämällä seurantatoiminnot</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>

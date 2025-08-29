@@ -854,11 +854,6 @@
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Задаване по подразбиране</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Не ме питай повече</string>
 
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
-
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo блокира тази страница, защото тя може да разпространява зловреден софтуер, който да компрометира устройството ви или да открадне личната ви информация.\n<a href=\"\">Научете повече</a>]]></string>
