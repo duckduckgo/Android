@@ -269,13 +269,9 @@
     <style name="Widget.DuckDuckGo.MessageCta">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/background_message_cta</item>
-        <item name="android:elevation">4dp</item>
-        <item name="android:layout_marginTop">@dimen/keyline_4</item>
-        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
-        <item name="android:layout_marginStart">@dimen/keyline_4</item>
-        <item name="android:layout_marginEnd">@dimen/keyline_4</item>
-        <item name="android:paddingBottom">@dimen/keyline_4</item>
+        <item name="cardElevation">4dp</item>
+        <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+        <item name="android:layout_margin">@dimen/keyline_4</item>
     </style>
 
     <!-- Dialogs -->
@@ -472,17 +468,6 @@
     <style name="Widget.DuckDuckGo.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
-    </style>
-
-    <style name="Widget.DuckDuckGo.Card">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">@drawable/background_message_cta</item>
-        <item name="android:elevation">2dp</item>
-        <item name="android:layout_marginTop">@dimen/keyline_4</item>
-        <item name="android:layout_marginBottom">@dimen/keyline_4</item>
-        <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
-        <item name="android:paddingBottom">@dimen/keyline_4</item>
     </style>
 
     <style name="Widget.DuckDuckGo.GridCard">
