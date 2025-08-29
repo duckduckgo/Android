@@ -918,4 +918,11 @@
     <string name="settingsDuckAiRebranding">Características de la IA</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="trackersCountInTabSwitcher">Recuento de rastreadores en el selector de pestañas</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">¿Ocultar el recuento de rastreadores?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Puedes volver a activarlo en Ajustes &gt; Apariencia.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ocultar</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Mantener</string>
+
 </resources>
