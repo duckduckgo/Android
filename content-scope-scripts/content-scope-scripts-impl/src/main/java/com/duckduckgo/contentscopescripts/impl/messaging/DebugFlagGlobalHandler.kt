@@ -18,11 +18,11 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
+import com.duckduckgo.js.messaging.api.ProcessResult
+import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
-import org.json.JSONObject
 
 @ContributesMultibinding(AppScope::class)
 class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessageHandlersPlugin {
@@ -32,19 +32,12 @@ class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessage
 
         override fun process(
             jsMessage: JsMessage,
-            jsMessageCallback: WebViewCompatMessageCallback,
-            onResponse: (JSONObject) -> Unit,
-        ) {
+        ): ProcessResult? {
             if (jsMessage.method == method) {
                 logcat { "DebugFlagGlobalHandler addDebugFlag: ${jsMessage.featureName}" }
-                jsMessageCallback.process(
-                    featureName = jsMessage.featureName,
-                    method = jsMessage.method,
-                    id = jsMessage.id,
-                    data = jsMessage.params,
-                    onResponse = onResponse,
-                )
+                return SendToConsumer
             }
+            return null
         }
 
         override val method: String = "addDebugFlag"

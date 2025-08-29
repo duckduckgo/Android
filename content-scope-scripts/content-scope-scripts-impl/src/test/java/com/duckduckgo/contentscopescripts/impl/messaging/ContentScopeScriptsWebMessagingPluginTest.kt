@@ -25,6 +25,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
+import com.duckduckgo.js.messaging.api.ProcessResult
+import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import junit.framework.TestCase.assertEquals
@@ -65,16 +67,8 @@ class ContentScopeScriptsWebMessagingPluginTest {
                 return object : WebViewCompatMessageHandler {
                     override fun process(
                         jsMessage: JsMessage,
-                        jsMessageCallback: WebViewCompatMessageCallback?,
-                        onResponse: (JSONObject) -> Unit,
-                    ) {
-                        jsMessageCallback?.process(
-                            jsMessage.featureName,
-                            jsMessage.method,
-                            jsMessage.id,
-                            jsMessage.params,
-                            onResponse,
-                        )
+                    ): ProcessResult {
+                        return SendToConsumer
                     }
 
                     override val featureName: String = "webCompat"
@@ -96,16 +90,8 @@ class ContentScopeScriptsWebMessagingPluginTest {
 
                     override fun process(
                         jsMessage: JsMessage,
-                        jsMessageCallback: WebViewCompatMessageCallback,
-                        onResponse: (JSONObject) -> Unit,
-                    ) {
-                        jsMessageCallback.process(
-                            jsMessage.featureName,
-                            jsMessage.method,
-                            jsMessage.id,
-                            jsMessage.params,
-                            onResponse,
-                        )
+                    ): ProcessResult {
+                        return SendToConsumer
                     }
 
                     override val method: String = "addDebugFlag"

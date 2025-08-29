@@ -16,27 +16,24 @@
 
 package com.duckduckgo.webcompat.impl.messaging.webviewcompat
 
-import com.duckduckgo.contentscopescripts.api.WebCompatContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.WebCompatMessageHandler
-import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
+import com.duckduckgo.js.messaging.api.ProcessResult
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import org.json.JSONObject
 
 @ContributesMultibinding(AppScope::class)
-class WebViewCompatWebCompatContentScopeJsMessageHandler @Inject constructor() : WebCompatContentScopeJsMessageHandlersPlugin {
+class WebViewCompatWebCompatContentScopeJsMessageHandler @Inject constructor() : WebViewCompatContentScopeJsMessageHandlersPlugin {
 
-    override fun getJsMessageHandler(): WebCompatMessageHandler = object : WebCompatMessageHandler {
+    override fun getJsMessageHandler(): WebViewCompatMessageHandler = object : WebViewCompatMessageHandler {
 
         override fun process(
             jsMessage: JsMessage,
-            jsMessageCallback: WebViewCompatMessageCallback?,
-            onResponse: (JSONObject) -> Unit,
-        ) {
-            if (jsMessage.id == null) return
-            jsMessageCallback?.process(featureName, jsMessage.method, jsMessage.id, jsMessage.params, onResponse)
+        ): ProcessResult? {
+            if (jsMessage.id == null) return null
+            return ProcessResult.SendToConsumer
         }
 
         override val featureName: String = "webCompat"
