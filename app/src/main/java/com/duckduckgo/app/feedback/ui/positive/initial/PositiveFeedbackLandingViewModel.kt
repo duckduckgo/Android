@@ -43,7 +43,7 @@ class PositiveFeedbackLandingViewModel @Inject constructor() : ViewModel() {
 data class ViewState(val canShowRatingButton: Boolean)
 
 sealed class Command {
-    object LaunchPlayStore : Command()
-    object Exit : Command()
-    object LaunchShareFeedbackPage : Command()
+    data object LaunchPlayStore : Command()
+    data object Exit : Command()
+    data object LaunchShareFeedbackPage : Command()
 }

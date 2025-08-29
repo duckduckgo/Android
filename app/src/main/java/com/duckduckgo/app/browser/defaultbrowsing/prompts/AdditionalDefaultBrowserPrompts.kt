@@ -33,13 +33,15 @@ interface AdditionalDefaultBrowserPrompts {
     fun onMessageDialogShown()
     fun onMessageDialogCanceled()
     fun onMessageDialogConfirmationButtonClicked()
-    fun onMessageDialogNotNowButtonClicked()
+    fun onMessageDialogDoNotAskAgainButtonClicked()
 
     fun onSystemDefaultBrowserDialogShown()
     fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger)
     fun onSystemDefaultBrowserDialogCanceled(trigger: SetAsDefaultActionTrigger)
 
     fun onSystemDefaultAppsActivityClosed(trigger: SetAsDefaultActionTrigger)
+
+    fun onUserMessageInteraction(doNotShowAgain: Boolean = false)
 
     sealed class Command {
         data object OpenMessageDialog : Command()
@@ -55,8 +57,9 @@ interface AdditionalDefaultBrowserPrompts {
     }
 
     enum class SetAsDefaultActionTrigger {
-        DIALOG,
+        PROMPT,
         MENU,
+        MESSAGE,
         UNKNOWN,
     }
 }

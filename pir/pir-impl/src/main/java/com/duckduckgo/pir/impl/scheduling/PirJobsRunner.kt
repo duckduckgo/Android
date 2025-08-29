@@ -75,8 +75,7 @@ class RealPirJobsRunner @Inject constructor(
         val startTimeInMillis = currentTimeProvider.currentTimeMillis()
         emitStartPixel(executionType)
 
-        // This should be all brokers since all brokers have scan steps and inactive brokers are removed
-        val activeBrokers = pirRepository.getAllBrokersForScan().toHashSet()
+        val activeBrokers = pirRepository.getAllActiveBrokers().toHashSet()
 
         // Multiple profile support
         val profileQueries = obtainProfiles()
@@ -88,6 +87,7 @@ class RealPirJobsRunner @Inject constructor(
             emitCompletedPixel(executionType, startTimeInMillis)
             return@withContext Result.success(Unit)
         }
+
         if (activeBrokers.isEmpty()) {
             logcat { "PIR-JOB-RUNNER: No active brokers available. Completing run." }
             pixelSender.reportScanStats(0)
@@ -98,8 +98,19 @@ class RealPirJobsRunner @Inject constructor(
 
         attemptCreateScanJobs(activeBrokers, profileQueries)
         executeScanJobs(context, executionType, activeBrokers)
-        attemptCreateOptOutJobs(activeBrokers)
-        executeOptOutJobs(context)
+
+        val formOptOutBrokers = pirRepository.getBrokersForOptOut(true).toSet()
+        val activeFormOptOutBrokers = formOptOutBrokers.intersect(activeBrokers)
+
+        if (activeFormOptOutBrokers.isEmpty()) {
+            logcat { "PIR-JOB-RUNNER: No active parent brokers available for optout. Completing run." }
+            pixelSender.reportOptOutStats(0)
+            emitCompletedPixel(executionType, startTimeInMillis)
+            return@withContext Result.success(Unit)
+        }
+
+        attemptCreateOptOutJobs(activeFormOptOutBrokers)
+        executeOptOutJobs(context, activeFormOptOutBrokers)
 
         logcat { "PIR-JOB-RUNNER: Completed." }
         emitCompletedPixel(executionType, startTimeInMillis)
@@ -137,7 +148,7 @@ class RealPirJobsRunner @Inject constructor(
         profileQueries: List<ProfileQuery>,
     ) {
         logcat { "PIR-JOB-RUNNER: Attempting to create new scan jobs" }
-        // No scan jobs mean that this is the first time PR is being run OR all jobs have been invalidated.
+        // No scan jobs mean that this is the first time PIR is being run OR all jobs have been invalidated.
         val toCreate = mutableListOf<ScanJobRecord>()
 
         profileQueries.filter {
@@ -187,12 +198,12 @@ class RealPirJobsRunner @Inject constructor(
             }
     }
 
-    private suspend fun attemptCreateOptOutJobs(activeBrokers: Set<String>) {
+    private suspend fun attemptCreateOptOutJobs(activeFormOptOutBrokers: Set<String>) {
         val toCreate = mutableListOf<OptOutJobRecord>()
         val extractedProfiles = pirRepository.getAllExtractedProfiles()
 
         extractedProfiles.forEach {
-            if (activeBrokers.contains(it.brokerName) &&
+            if (activeFormOptOutBrokers.contains(it.brokerName) &&
                 pirSchedulingRepository.getValidOptOutJobRecord(it.dbId) == null
             ) {
                 toCreate.add(
@@ -213,12 +224,13 @@ class RealPirJobsRunner @Inject constructor(
         }
     }
 
-    private suspend fun executeOptOutJobs(context: Context) {
-        val formOptOutBrokers = pirRepository.getBrokersForOptOut(true)
-
+    private suspend fun executeOptOutJobs(
+        context: Context,
+        activeFormOptOutBrokers: Set<String>,
+    ) {
         eligibleOptOutJobProvider.getAllEligibleOptOutJobs(currentTimeProvider.currentTimeMillis())
             .filter {
-                formOptOutBrokers.contains(it.brokerName)
+                activeFormOptOutBrokers.contains(it.brokerName)
             }.also {
                 pixelSender.reportOptOutStats(it.size)
                 if (it.isNotEmpty()) {

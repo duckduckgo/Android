@@ -111,7 +111,7 @@ class RealDuckChatJSHelper @Inject constructor(
     ): JsCallbackData {
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
-            put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
+            put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
             put(PAYLOAD, runBlocking { dataStore.fetchAndClearUserPreferences() })
         }
         return JsCallbackData(jsonPayload, featureName, method, id)
@@ -124,7 +124,7 @@ class RealDuckChatJSHelper @Inject constructor(
     ): JsCallbackData {
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
-            put(IS_HANDOFF_ENABLED, duckChat.isEnabled())
+            put(IS_HANDOFF_ENABLED, duckChat.isDuckChatFeatureEnabled())
             put(SUPPORTS_CLOSING_AI_CHAT, true)
             put(SUPPORTS_OPENING_SETTINGS, true)
             put(SUPPORTS_NATIVE_CHAT_INPUT, false)

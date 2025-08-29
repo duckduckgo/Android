@@ -252,7 +252,7 @@
 
     <string name="newTabPageShortcutPasswords">Пароли</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Импорт паролей из Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Импорт паролей</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Импортировано паролей из Google: %1$d</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">Импортировано паролей из CSV: %1$d</string>
 
@@ -262,7 +262,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Взять пароли из настольного приложения</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Взять пароли из настольного приложения</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Импорт паролей из Google</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Импортировать пароли из Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google может попросить вас войти в систему или ввести пароль для подтверждения.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Импортировать из Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Выбрать CSV-файл</string>

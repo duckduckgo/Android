@@ -40,6 +40,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_EXCLUDE
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SAVED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SELECTED
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_SELECTED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_CRASH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DISABLED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DISABLED_DAU
@@ -206,6 +208,10 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_NEVER_SAVE_FOR_THIS_SITE_OVERFLOW_MENU("autofill_reset_excluded_overflow_menu_tapped"),
 }
 
+object AutofillPixelParameters {
+    const val LAST_USED_PIXEL_KEY = "last_used"
+}
+
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PixelParamRemovalPlugin::class,
@@ -235,6 +241,9 @@ object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
             AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_UNSUCCESSFUL.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_STARTED.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_IMPORT_PASSWORDS_USER_JOURNEY_RESTARTED.pixelName to PixelParameter.removeAtb(),
+
+            AUTOFILL_SELECT_LOGIN_AUTOPROMPT_SELECTED.pixelName to PixelParameter.removeAtb(),
+            AUTOFILL_SELECT_LOGIN_PROMPT_SELECTED.pixelName to PixelParameter.removeAtb(),
 
             AUTOFILL_SITE_BREAKAGE_REPORT.pixelName to PixelParameter.removeAtb(),
             AUTOFILL_SITE_BREAKAGE_REPORT.pixelName to PixelParameter.removeAtb(),

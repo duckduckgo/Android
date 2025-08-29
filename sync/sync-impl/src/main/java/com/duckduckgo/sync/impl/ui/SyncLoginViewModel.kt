@@ -60,9 +60,9 @@ class SyncLoginViewModel @Inject constructor(
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
-        object ReadTextCode : Command()
-        object LoginSucess : Command()
-        object Error : Command()
+        data object ReadTextCode : Command()
+        data object LoginSucess : Command()
+        data object Error : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }
 

@@ -78,10 +78,10 @@ constructor(
 
     sealed class Command {
         data class ShowMessage(val message: String) : Command()
-        object ReadQR : Command()
-        object ReadConnectQR : Command()
+        data object ReadQR : Command()
+        data object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
-        object LoginSuccess : Command()
+        data object LoginSuccess : Command()
     }
 
     init {

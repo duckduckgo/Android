@@ -19,4 +19,5 @@
     <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
     <dimen name="inputModeTabIndicatorHorizontalInset">2dp</dimen>
     <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
+    <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
 </resources>

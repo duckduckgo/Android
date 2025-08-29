@@ -38,8 +38,8 @@ class InitialFeedbackFragmentViewModel @Inject constructor() : ViewModel() {
     }
 
     sealed class Command {
-        object PositiveFeedbackSelected : Command()
-        object NegativeFeedbackSelected : Command()
-        object UserCancelled : Command()
+        data object PositiveFeedbackSelected : Command()
+        data object NegativeFeedbackSelected : Command()
+        data object UserCancelled : Command()
     }
 }
