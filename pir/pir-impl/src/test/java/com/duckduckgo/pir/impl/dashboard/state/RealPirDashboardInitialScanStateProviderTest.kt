@@ -436,6 +436,8 @@ class RealPirDashboardInitialScanStateProviderTest {
             createOptOutJobRecord(
                 extractedProfileId = 2L,
                 status = OptOutJobStatus.REMOVED, // Should be filtered out
+                optOutRequestedDateInMillis = 1641254400000L,
+                optOutRemovedDateInMillis = 1641254400000L,
             ),
         )
 
@@ -449,8 +451,9 @@ class RealPirDashboardInitialScanStateProviderTest {
         val result = testee.getScanResults()
 
         // Then
-        assertEquals(1, result.size) // Only profile 1 should be included
+        assertEquals(2, result.size)
         assertEquals("John Doe", result[0].extractedProfile.name)
+        assertEquals("Jane Smith", result[1].extractedProfile.name)
     }
 
     @Test

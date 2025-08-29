@@ -110,6 +110,6 @@ class RealPirDashboardInitialScanStateProvider @Inject constructor(
     }
 
     override suspend fun getScanResults(): List<DashboardExtractedProfileResult> {
-        return getExtractedProfileResults()
+        return getAllExtractedProfileResults()
     }
 }

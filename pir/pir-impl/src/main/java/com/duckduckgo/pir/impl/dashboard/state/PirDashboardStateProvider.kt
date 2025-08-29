@@ -23,7 +23,6 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvi
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.models.MirrorSite
 import com.duckduckgo.pir.impl.models.isExtant
-import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REMOVED
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import java.util.concurrent.TimeUnit
@@ -33,11 +32,11 @@ abstract class PirDashboardStateProvider(
     private val pirRepository: PirRepository,
     private val pirSchedulingRepository: PirSchedulingRepository,
 ) {
-    suspend fun getExtractedProfileResults(): List<DashboardExtractedProfileResult> {
+    suspend fun getAllExtractedProfileResults(): List<DashboardExtractedProfileResult> {
         val extractedProfiles = pirRepository.getAllExtractedProfiles().filter {
             !it.deprecated
         }
-        val extractedProfilesFromBrokers = getExtractedProfileResultForBrokers(extractedProfiles)
+        val extractedProfilesFromBrokers = getAllExtractedProfileResultForBrokers(extractedProfiles)
         val extractedProfilesFromMirrorSites = extractedProfilesFromBrokers.getMirrorSites(
             currentTimeProvider.currentTimeMillis(),
             extractedProfiles,
@@ -125,26 +124,18 @@ abstract class PirDashboardStateProvider(
             it.isExtant(currentTimeMillis)
         }
 
-    private suspend fun getExtractedProfileResultForBrokers(
+    private suspend fun getAllExtractedProfileResultForBrokers(
         extractedProfiles: List<ExtractedProfile>,
     ): List<DashboardExtractedProfileResult> {
         // Consider only active brokers and ignore removed ones
         val activeBrokerMap = pirRepository.getAllActiveBrokerObjects().associateBy { it.name }
         val brokerOptOutUrls = pirRepository.getAllBrokerOptOutUrls()
-        // Consider only active extracted profiles, removed extracted profiles AND profileQueries should be marked as deprecated
-        val optOutJobRecords = pirSchedulingRepository.getAllValidOptOutJobRecords()
-        val removedOptOuts = optOutJobRecords.filter {
-            it.status == REMOVED
-        }.map { it.extractedProfileId }.toSet()
-        val optOutMap = pirSchedulingRepository.getAllValidOptOutJobRecords().filter {
-            it.status != REMOVED
-        }.associateBy {
+        val optOutMap = pirSchedulingRepository.getAllValidOptOutJobRecords().associateBy {
             it.extractedProfileId
         }
 
-        return extractedProfiles.filter {
-            !it.deprecated && it.dbId !in removedOptOuts
-        }.mapNotNull { extractedProfile ->
+        // Transform every extracted profile that is not deprecated and belongs to an active broker
+        return extractedProfiles.mapNotNull { extractedProfile ->
             val broker = activeBrokerMap[extractedProfile.brokerName] ?: return@mapNotNull null
             val optOutJob = optOutMap[extractedProfile.dbId]
 
@@ -209,8 +200,7 @@ abstract class PirDashboardStateProvider(
     }
 
     private fun ExtractedProfile.matches(extractedProfile: ExtractedProfile): Boolean {
-        return this.name == extractedProfile.name &&
-            this.age == extractedProfile.age &&
+        return this.name == extractedProfile.name && this.age == extractedProfile.age &&
             this.alternativeNames.isASubSetOrSuperSetOf(extractedProfile.alternativeNames) &&
             this.relatives.isASubSetOrSuperSetOf(extractedProfile.relatives) &&
             this.addresses.isASubSetOrSuperSetOf(extractedProfile.addresses)
