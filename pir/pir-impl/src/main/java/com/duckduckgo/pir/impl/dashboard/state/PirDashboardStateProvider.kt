@@ -189,7 +189,7 @@ abstract class PirDashboardStateProvider(
                         name = mirrorSite.name,
                         url = mirrorSite.url,
                         parentUrl = result.broker.url,
-                        optOutUrl = result.broker.optOutUrl,
+                        optOutUrl = mirrorSite.optOutUrl,
                     ),
                     optOutSubmittedDateInMillis = result.optOutSubmittedDateInMillis,
                     optOutRemovedDateInMillis = result.optOutRemovedDateInMillis,
