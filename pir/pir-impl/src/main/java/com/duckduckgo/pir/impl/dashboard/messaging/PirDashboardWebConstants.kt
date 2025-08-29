@@ -21,13 +21,10 @@ object PirDashboardWebConstants {
     const val CUSTOM_UA = "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko)" +
         " Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
 
-    internal const val SCRIPT_API_VERSION = 10
+    internal const val SCRIPT_API_VERSION = 11
     internal const val SCRIPT_CONTEXT_NAME = "dbpui"
     internal const val SCRIPT_FEATURE_NAME = "dbpuiCommunication"
     internal const val MESSAGE_CALLBACK = "messageCallback"
     internal const val SECRET = "duckduckgo-android-messaging-secret"
     internal const val ALLOWED_DOMAIN = "duckduckgo.com"
-
-    internal const val PARAM_SUCCESS = "success"
-    internal const val PARAM_VERSION = "version"
 }

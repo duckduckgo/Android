@@ -110,7 +110,7 @@ jobs:
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: generate_version_name
         run: |
-          output=$(./gradlew getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
+          output=$(./gradlew --no-configuration-cache getBuildVersionName -PversionNameSuffix=-nightly -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} --quiet | tail -n 1)
           echo "version=$output" >> $GITHUB_OUTPUT
 
       - name: Capture App Bundle Path

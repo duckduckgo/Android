@@ -92,26 +92,23 @@ class RealBrokerJsonUpdater @Inject constructor(
     }
 
     private suspend fun checkUpdatesFromMainConfig(pirMainConfig: PirMainConfig) {
-        val currentBrokerJson = pirRepository.getAllLocalBrokerJsons()
-        val newActiveBrokers = pirMainConfig.activeBrokers
-        val newBrokerJson = pirMainConfig.jsonEtags.current.map {
+        val existingEtags = pirRepository.getAllLocalBrokerJsons()
+        val jsonEtagsFromConfig = pirMainConfig.jsonEtags.current.map {
             BrokerJson(
                 fileName = it.key,
                 etag = it.value,
             )
-        }.associateWith { newActiveBrokers.contains(it.fileName) }
-
-        val shouldDownloadJson = currentBrokerJson.keys != newBrokerJson.keys // Broker json changed
-        val shouldUpdateLocalEtags = newBrokerJson.entries != currentBrokerJson.entries // broker state / active state changed
-
-        if (shouldDownloadJson) {
-            val diff = newBrokerJson.keys - currentBrokerJson.keys
-            brokerDataDownloader.downloadBrokerData(diff.map { it.fileName })
         }
 
-        // We update stored json etags once the actual json data have been stored.
-        if (shouldUpdateLocalEtags) {
-            pirRepository.updateBrokerJsons(newBrokerJson)
+        val updatedJsons = jsonEtagsFromConfig.toSet() - existingEtags.toSet()
+
+        pirRepository.updateBrokerJsons(jsonEtagsFromConfig)
+
+        if (updatedJsons.isNotEmpty()) {
+            logcat { "PIR-update: Downloading updated broker json files: $updatedJsons" }
+            brokerDataDownloader.downloadBrokerData(updatedJsons.map { it.fileName })
+        } else {
+            logcat { "PIR-update: No broker json files to update." }
         }
     }
 }

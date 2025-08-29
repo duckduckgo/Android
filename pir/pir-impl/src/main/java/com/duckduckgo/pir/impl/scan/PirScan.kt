@@ -34,6 +34,7 @@ import com.duckduckgo.pir.impl.common.splitIntoParts
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.EventType
 import com.duckduckgo.pir.impl.store.db.PirEventLog
@@ -94,6 +95,7 @@ interface PirScan {
 @SingleInstanceIn(AppScope::class)
 class RealPirScan @Inject constructor(
     private val repository: PirRepository,
+    private val eventsRepository: PirEventsRepository,
     private val brokerStepsParser: BrokerStepsParser,
     private val pirCssScriptLoader: PirCssScriptLoader,
     private val pirActionsRunnerFactory: RealPirActionsRunner.Factory,
@@ -285,7 +287,7 @@ class RealPirScan @Inject constructor(
             }
             runners.clear()
         }
-        repository.deleteAllScanResults()
+        eventsRepository.deleteAllScanResults()
     }
 
     private suspend fun obtainProfiles(): List<ProfileQuery> {
@@ -313,14 +315,14 @@ class RealPirScan @Inject constructor(
 
     private suspend fun emitScanStartPixel(runType: RunType) {
         if (runType == RunType.MANUAL) {
-            repository.saveScanLog(
+            eventsRepository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.MANUAL_SCAN_STARTED,
                 ),
             )
         } else {
-            repository.saveScanLog(
+            eventsRepository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.SCHEDULED_SCAN_STARTED,
@@ -333,14 +335,14 @@ class RealPirScan @Inject constructor(
         runType: RunType,
     ) {
         if (runType == RunType.MANUAL) {
-            repository.saveScanLog(
+            eventsRepository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.MANUAL_SCAN_COMPLETED,
                 ),
             )
         } else {
-            repository.saveScanLog(
+            eventsRepository.saveScanLog(
                 PirEventLog(
                     eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
                     eventType = EventType.SCHEDULED_SCAN_COMPLETED,

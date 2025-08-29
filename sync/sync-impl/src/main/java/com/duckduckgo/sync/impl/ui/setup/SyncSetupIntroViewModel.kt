@@ -53,9 +53,9 @@ class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
     fun commands(): Flow<Command> = command.receiveAsFlow()
 
     sealed class Command {
-        object StartSetupFlow : Command()
-        object RecoverDataFlow : Command()
-        object AbortFlow : Command()
+        data object StartSetupFlow : Command()
+        data object RecoverDataFlow : Command()
+        data object AbortFlow : Command()
     }
 
     data class ViewState(
@@ -63,8 +63,8 @@ class SyncSetupIntroViewModel @Inject constructor() : ViewModel() {
     )
 
     sealed class ViewMode {
-        object CreateAccountIntro : ViewMode()
-        object RecoverAccountIntro : ViewMode()
+        data object CreateAccountIntro : ViewMode()
+        data object RecoverAccountIntro : ViewMode()
     }
 
     fun onTurnSyncOnClicked() {

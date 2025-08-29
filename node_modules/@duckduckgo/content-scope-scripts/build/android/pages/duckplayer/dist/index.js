@@ -836,6 +836,279 @@
     }
   };
 
+  // ../injected/src/captured-globals.js
+  var Set2 = globalThis.Set;
+  var Reflect2 = globalThis.Reflect;
+  var customElementsGet = globalThis.customElements?.get.bind(globalThis.customElements);
+  var customElementsDefine = globalThis.customElements?.define.bind(globalThis.customElements);
+  var URL2 = globalThis.URL;
+  var Proxy2 = globalThis.Proxy;
+  var functionToString = Function.prototype.toString;
+  var TypeError2 = globalThis.TypeError;
+  var Symbol2 = globalThis.Symbol;
+  var dispatchEvent = globalThis.dispatchEvent?.bind(globalThis);
+  var addEventListener = globalThis.addEventListener?.bind(globalThis);
+  var removeEventListener = globalThis.removeEventListener?.bind(globalThis);
+  var CustomEvent2 = globalThis.CustomEvent;
+  var Promise2 = globalThis.Promise;
+  var String2 = globalThis.String;
+  var Map2 = globalThis.Map;
+  var Error2 = globalThis.Error;
+  var randomUUID = globalThis.crypto?.randomUUID?.bind(globalThis.crypto);
+
+  // ../injected/src/utils.js
+  var globalObj = typeof window === "undefined" ? globalThis : window;
+  var Error3 = globalObj.Error;
+  var originalWindowDispatchEvent = typeof window === "undefined" ? null : window.dispatchEvent.bind(window);
+  function isBeingFramed() {
+    if (globalThis.location && "ancestorOrigins" in globalThis.location) {
+      return globalThis.location.ancestorOrigins.length > 0;
+    }
+    return globalThis.top !== globalThis.window;
+  }
+  var DDGPromise = globalObj.Promise;
+  var DDGReflect = globalObj.Reflect;
+
+  // ../messaging/lib/android-adsjs.js
+  var AndroidAdsjsMessagingTransport = class {
+    /**
+     * @param {AndroidAdsjsMessagingConfig} config
+     * @param {MessagingContext} messagingContext
+     * @internal
+     */
+    constructor(config, messagingContext) {
+      this.messagingContext = messagingContext;
+      this.config = config;
+      this.config.sendInitialPing(messagingContext);
+    }
+    /**
+     * @param {NotificationMessage} msg
+     */
+    notify(msg) {
+      try {
+        this.config.sendMessageThrows?.(msg);
+      } catch (e3) {
+        console.error(".notify failed", e3);
+      }
+    }
+    /**
+     * @param {RequestMessage} msg
+     * @return {Promise<any>}
+     */
+    request(msg) {
+      return new Promise((resolve, reject) => {
+        const unsub = this.config.subscribe(msg.id, handler);
+        try {
+          this.config.sendMessageThrows?.(msg);
+        } catch (e3) {
+          unsub();
+          reject(new Error("request failed to send: " + e3.message || "unknown error"));
+        }
+        function handler(data) {
+          if (isResponseFor(msg, data)) {
+            if (data.result) {
+              resolve(data.result || {});
+              return unsub();
+            }
+            if (data.error) {
+              reject(new Error(data.error.message));
+              return unsub();
+            }
+            unsub();
+            throw new Error("unreachable: must have `result` or `error` key by this point");
+          }
+        }
+      });
+    }
+    /**
+     * @param {Subscription} msg
+     * @param {(value: unknown | undefined) => void} callback
+     */
+    subscribe(msg, callback) {
+      const unsub = this.config.subscribe(msg.subscriptionName, (data) => {
+        if (isSubscriptionEventFor(msg, data)) {
+          callback(data.params || {});
+        }
+      });
+      return () => {
+        unsub();
+      };
+    }
+  };
+  var AndroidAdsjsMessagingConfig = class {
+    /** @type {{
+     * postMessage: (message: string) => void,
+     * addEventListener: (type: string, listener: (event: MessageEvent) => void) => void,
+     * } | null} */
+    _capturedHandler;
+    /**
+     * @param {object} params
+     * @param {Record<string, any>} params.target
+     * @param {boolean} params.debug
+     * @param {string} params.objectName - the object name for addWebMessageListener
+     */
+    constructor(params) {
+      this.target = params.target;
+      this.debug = params.debug;
+      this.objectName = params.objectName;
+      this.listeners = new globalThis.Map();
+      this._captureGlobalHandler();
+      this._setupEventListener();
+    }
+    /**
+     * The transport can call this to transmit a JSON payload along with a secret
+     * to the native Android handler via postMessage.
+     *
+     * Note: This can throw - it's up to the transport to handle the error.
+     *
+     * @type {(json: object) => void}
+     * @throws
+     * @internal
+     */
+    sendMessageThrows(message) {
+      if (!this.objectName) {
+        throw new Error("Object name not set for WebMessageListener");
+      }
+      if (this._capturedHandler && this._capturedHandler.postMessage) {
+        this._capturedHandler.postMessage(JSON.stringify(message));
+      } else {
+        throw new Error("postMessage not available");
+      }
+    }
+    /**
+     * A subscription on Android is just a named listener. All messages from
+     * android -> are delivered through a single function, and this mapping is used
+     * to route the messages to the correct listener.
+     *
+     * Note: Use this to implement request->response by unsubscribing after the first
+     * response.
+     *
+     * @param {string} id
+     * @param {(msg: MessageResponse | SubscriptionEvent) => void} callback
+     * @returns {() => void}
+     * @internal
+     */
+    subscribe(id, callback) {
+      this.listeners.set(id, callback);
+      return () => {
+        this.listeners.delete(id);
+      };
+    }
+    /**
+     * Accept incoming messages and try to deliver it to a registered listener.
+     *
+     * This code is defensive to prevent any single handler from affecting another if
+     * it throws (producer interference).
+     *
+     * @param {MessageResponse | SubscriptionEvent} payload
+     * @internal
+     */
+    _dispatch(payload) {
+      if (!payload) return this._log("no response");
+      if ("id" in payload) {
+        if (this.listeners.has(payload.id)) {
+          this._tryCatch(() => this.listeners.get(payload.id)?.(payload));
+        } else {
+          this._log("no listeners for ", payload);
+        }
+      }
+      if ("subscriptionName" in payload) {
+        if (this.listeners.has(payload.subscriptionName)) {
+          this._tryCatch(() => this.listeners.get(payload.subscriptionName)?.(payload));
+        } else {
+          this._log("no subscription listeners for ", payload);
+        }
+      }
+    }
+    /**
+     *
+     * @param {(...args: any[]) => any} fn
+     * @param {string} [context]
+     */
+    _tryCatch(fn, context = "none") {
+      try {
+        return fn();
+      } catch (e3) {
+        if (this.debug) {
+          console.error("AndroidAdsjsMessagingConfig error:", context);
+          console.error(e3);
+        }
+      }
+    }
+    /**
+     * @param {...any} args
+     */
+    _log(...args) {
+      if (this.debug) {
+        console.log("AndroidAdsjsMessagingConfig", ...args);
+      }
+    }
+    /**
+     * Capture the global handler and remove it from the global object.
+     */
+    _captureGlobalHandler() {
+      const { target, objectName } = this;
+      if (Object.prototype.hasOwnProperty.call(target, objectName)) {
+        this._capturedHandler = target[objectName];
+        delete target[objectName];
+      } else {
+        this._capturedHandler = null;
+        this._log("Android adsjs messaging interface not available", objectName);
+      }
+    }
+    /**
+     * Set up event listener for incoming messages from the captured handler.
+     */
+    _setupEventListener() {
+      if (!this._capturedHandler || !this._capturedHandler.addEventListener) {
+        this._log("No event listener support available");
+        return;
+      }
+      this._capturedHandler.addEventListener("message", (event) => {
+        try {
+          const data = (
+            /** @type {MessageEvent} */
+            event.data
+          );
+          if (typeof data === "string") {
+            const parsedData = JSON.parse(data);
+            this._dispatch(parsedData);
+          }
+        } catch (e3) {
+          this._log("Error processing incoming message:", e3);
+        }
+      });
+    }
+    /**
+     * Send an initial ping message to the platform to establish communication.
+     * This is a fire-and-forget notification that signals the JavaScript side is ready.
+     * Only sends in top context (not in frames) and if the messaging interface is available.
+     *
+     * @param {MessagingContext} messagingContext
+     * @returns {boolean} true if ping was sent, false if in frame or interface not ready
+     */
+    sendInitialPing(messagingContext) {
+      if (isBeingFramed()) {
+        this._log("Skipping initial ping - running in frame context");
+        return false;
+      }
+      try {
+        const message = new RequestMessage({
+          id: "initialPing",
+          context: messagingContext.context,
+          featureName: "messaging",
+          method: "initialPing"
+        });
+        this.sendMessageThrows(message);
+        this._log("Initial ping sent successfully");
+        return true;
+      } catch (e3) {
+        this._log("Failed to send initial ping:", e3);
+        return false;
+      }
+    }
+  };
+
   // ../messaging/lib/typed-messages.js
   function createTypedMessages(_base, _messaging) {
     const asAny = (
@@ -975,6 +1248,9 @@
     }
     if (config instanceof AndroidMessagingConfig) {
       return new AndroidMessagingTransport(config, messagingContext);
+    }
+    if (config instanceof AndroidAdsjsMessagingConfig) {
+      return new AndroidAdsjsMessagingTransport(config, messagingContext);
     }
     if (config instanceof TestTransportConfig) {
       return new TestTransport(config, messagingContext);

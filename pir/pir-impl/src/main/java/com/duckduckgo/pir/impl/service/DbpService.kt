@@ -97,6 +97,16 @@ interface DbpService {
         @field:Json(name = "steps")
         val steps: List<String>,
         val schedulingConfig: PirJsonBrokerSchedulingConfig,
+        val removedAt: Long?,
+        val mirrorSites: List<PirJsonMirrorSites> = emptyList(),
+    )
+
+    data class PirJsonMirrorSites(
+        val name: String,
+        val url: String,
+        val addedAt: Long,
+        val removedAt: Long? = null,
+        val optOutUrl: String? = null,
     )
 
     data class PirJsonBrokerSchedulingConfig(

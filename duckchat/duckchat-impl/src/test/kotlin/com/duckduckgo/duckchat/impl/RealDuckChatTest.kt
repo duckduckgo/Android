@@ -27,11 +27,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivityWithParams
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -41,7 +39,6 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
@@ -60,7 +57,6 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.spy
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -82,8 +78,6 @@ class RealDuckChatTest {
     private val mockIntent: Intent = mock()
     private val mockBrowserNav: BrowserNav = mock()
     private val imageUploadFeature: AIChatImageUploadFeature = FakeFeatureToggleFactory.create(AIChatImageUploadFeature::class.java)
-    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-    private val isVisualDesignEnabledStateFlow = MutableStateFlow(false)
 
     private lateinit var testee: RealDuckChat
 
@@ -93,10 +87,8 @@ class RealDuckChatTest {
         whenever(mockDuckChatFeatureRepository.shouldShowInAddressBar()).thenReturn(false)
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
         whenever(mockDuckChatFeatureRepository.isInputScreenUserSettingEnabled()).thenReturn(true)
-        isVisualDesignEnabledStateFlow.value = true
         whenever(mockDuckChatFeatureRepository.sessionDeltaInMinutes()).thenReturn(10L)
         whenever(mockContext.getString(any())).thenReturn("Duck.ai")
-        whenever(mockExperimentalThemingDataStore.isSingleOmnibarEnabled).thenReturn(isVisualDesignEnabledStateFlow)
         duckChatFeature.self().setRawStoredState(State(enable = true))
         duckChatFeature.duckAiInputScreen().setRawStoredState(State(enable = true))
         imageUploadFeature.self().setRawStoredState(State(enable = true))
@@ -105,7 +97,6 @@ class RealDuckChatTest {
             RealDuckChat(
                 mockDuckChatFeatureRepository,
                 duckChatFeature,
-                mockExperimentalThemingDataStore,
                 moshi,
                 dispatcherProvider,
                 mockGlobalActivityStarter,
@@ -123,33 +114,9 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenSetShowInBrowserMenuSetTrueThenPixelOnIsSent() = runTest {
-        testee.setShowInBrowserMenuUserSetting(true)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_ON)
-    }
-
-    @Test
-    fun whenSetShowInBrowserMenuSetFalseThenPixelOffIsSent() = runTest {
-        testee.setShowInBrowserMenuUserSetting(false)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_MENU_SETTING_OFF)
-    }
-
-    @Test
     fun whenSetShowInBrowserMenuUserSettingThenRepositorySetCalled() = runTest {
         testee.setShowInBrowserMenuUserSetting(true)
         verify(mockDuckChatFeatureRepository).setShowInBrowserMenu(true)
-    }
-
-    @Test
-    fun whenSetShowInAddressBarSetTrueThenPixelOnIsSent() = runTest {
-        testee.setShowInAddressBarUserSetting(true)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_ON)
-    }
-
-    @Test
-    fun whenSetShowInAddressBarSetFalseThenPixelOffIsSent() = runTest {
-        testee.setShowInAddressBarUserSetting(false)
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_SEARCHBAR_SETTING_OFF)
     }
 
     @Test
@@ -159,13 +126,39 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenDuckChatIsEnabledThenReturnTrue() = runTest {
+    fun whenDuckChatFeatureEnabledAndUserEnabledThenIsEnabledReturnsTrue() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
         assertTrue(testee.isEnabled())
     }
 
     @Test
-    fun whenDuckChatIsDisabledThenReturnFalse() = runTest {
+    fun whenDuckChatFeatureDisabledAndUserEnabledThenIsEnabledReturnsFalse() = runTest {
         duckChatFeature.self().setRawStoredState(State(false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isEnabled())
+    }
+
+    @Test
+    fun whenDuckChatFeatureEnabledAndUserDisabledThenIsEnabledReturnsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isEnabled())
+    }
+
+    @Test
+    fun whenDuckChatFeatureDisabledAndUserDisabledThenIsEnabledReturnsFalse() = runTest {
+        duckChatFeature.self().setRawStoredState(State(false))
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
 
         testee.onPrivacyConfigDownloaded()
 
@@ -404,6 +397,14 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenDuckChatFeatureDisabledThenIsDuckChatUrlReturnsFalse() {
+        duckChatFeature.self().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.isDuckChatUrl("https://duckduckgo.com/?ia=chat".toUri()))
+    }
+
+    @Test
     fun whenWasOpenedBeforeQueriedThenRepoStateIsReturned() = runTest {
         whenever(mockDuckChatFeatureRepository.wasOpenedBefore()).thenReturn(true)
 
@@ -457,23 +458,21 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun whenSetEnableDuckChatUserSettingTrueThenEnabledPixelSentAndRepositoryUpdated() = runTest {
+    fun whenSetEnableDuckChatUserSettingTrueThenRepositoryUpdated() = runTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(true)
 
         testee.setEnableDuckChatUserSetting(true)
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_ENABLED)
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(true)
         assertTrue(testee.isDuckChatUserEnabled())
     }
 
     @Test
-    fun whenSetEnableDuckChatUserSettingFalseThenDisabledPixelSentAndRepositoryUpdated() = runTest {
+    fun whenSetEnableDuckChatUserSettingFalseThenRepositoryUpdated() = runTest {
         whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
 
         testee.setEnableDuckChatUserSetting(false)
 
-        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_USER_DISABLED)
         verify(mockDuckChatFeatureRepository).setDuckChatUserEnabled(false)
         assertFalse(testee.isDuckChatUserEnabled())
     }
@@ -674,23 +673,17 @@ class RealDuckChatTest {
     }
 
     @Test
-    fun `when enable input screen user setting then repository updated and pixel fired`() = runTest {
+    fun `when enable input screen user setting then repository updated`() = runTest {
         testee.setInputScreenUserSetting(true)
 
-        val inOrder = inOrder(mockDuckChatFeatureRepository, mockPixel)
-        inOrder.verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_ON)
-        inOrder.verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(true)
-        inOrder.verify(mockDuckChatFeatureRepository).isInputScreenUserSettingEnabled()
+        verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(true)
     }
 
     @Test
-    fun `when disable input screen user setting then repository updated and pixel fired`() = runTest {
+    fun `when disable input screen user setting then repository updated`() = runTest {
         testee.setInputScreenUserSetting(false)
 
-        val inOrder = inOrder(mockDuckChatFeatureRepository, mockPixel)
-        inOrder.verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF)
-        inOrder.verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(false)
-        inOrder.verify(mockDuckChatFeatureRepository).isInputScreenUserSettingEnabled()
+        verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(false)
     }
 
     @Test
@@ -722,14 +715,6 @@ class RealDuckChatTest {
 
         testee.onPrivacyConfigDownloaded()
 
-        assertFalse(testee.showInputScreen.value)
-    }
-
-    @Test
-    fun `input screen feature - when visual design experiment disabled then emit disabled`() = runTest {
-        isVisualDesignEnabledStateFlow.value = false
-
-        verify(mockDuckChatFeatureRepository).setInputScreenUserSetting(false)
         assertFalse(testee.showInputScreen.value)
     }
 
@@ -766,6 +751,38 @@ class RealDuckChatTest {
         testee.onPrivacyConfigDownloaded()
 
         assertTrue(testee.showSettings.value)
+    }
+
+    @Test
+    fun `when input screen disabled then don't show input screen automatically`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(false))
+        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreenAutomaticallyOnNewTab.value)
+    }
+
+    @Test
+    fun `when input screen enabled but feature disabled then don't show input screen automatically`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(false))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showInputScreenAutomaticallyOnNewTab.value)
+    }
+
+    @Test
+    fun `when input screen enabled and feature flag enabled then show input screen automatically`() = runTest {
+        duckChatFeature.duckAiInputScreen().setRawStoredState(State(true))
+        whenever(mockDuckChatFeatureRepository.observeInputScreenUserSettingEnabled()).thenReturn(flowOf(true))
+        duckChatFeature.showInputScreenAutomaticallyOnNewTab().setRawStoredState(State(true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showInputScreenAutomaticallyOnNewTab.value)
     }
 
     companion object {

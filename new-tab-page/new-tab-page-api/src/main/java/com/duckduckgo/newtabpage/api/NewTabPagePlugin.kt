@@ -31,7 +31,7 @@ interface NewTabPagePlugin : ActivePlugin {
      * This method returns a [View] that will be used as the NewTabPage content
      * @param context The context to create the view with
      * @param showLogo Whether to show the logo in the new tab page
-     * @param onHasContent Optional callback to notify when the view has content
+     * @param onHasContent Optional callback to notify when the view has content. View assumes it has content while loading data.
      * @return [View]
      */
     fun getView(

@@ -35,7 +35,7 @@ interface SavedSitesDuplicateFinder {
 }
 
 sealed class SavedSitesDuplicateResult {
-    object NotDuplicate : SavedSitesDuplicateResult()
+    data object NotDuplicate : SavedSitesDuplicateResult()
     data class Duplicate(val id: String) : SavedSitesDuplicateResult()
 }
 

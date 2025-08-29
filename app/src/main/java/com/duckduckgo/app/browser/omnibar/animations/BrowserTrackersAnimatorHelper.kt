@@ -35,7 +35,6 @@ interface BrowserTrackersAnimatorHelper {
      * @param trackersAnimationView holder of the trackers animations.
      * @param omnibarViews are the views that should be hidden while the animation is running
      * @param entities are the tracker entities detected on the current site
-     * @param visualDesignExperimentEnabled if the visual design experiment is enabled
      */
     fun startTrackersAnimation(
         context: Context,
@@ -43,7 +42,6 @@ interface BrowserTrackersAnimatorHelper {
         trackersAnimationView: LottieAnimationView,
         omnibarViews: List<View>,
         entities: List<Entity>?,
-        visualDesignExperimentEnabled: Boolean = false,
     )
 
     fun startExperimentVariant1Animation(

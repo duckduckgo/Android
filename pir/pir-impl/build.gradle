@@ -62,6 +62,7 @@ dependencies {
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
     testImplementation CashApp.turbine
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.robolectric
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation(KotlinX.coroutines.test) {
