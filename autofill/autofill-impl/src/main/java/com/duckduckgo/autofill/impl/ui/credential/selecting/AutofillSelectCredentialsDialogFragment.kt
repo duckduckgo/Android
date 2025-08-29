@@ -25,6 +25,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.CredentialAutofillPickerDialog
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -39,17 +40,22 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOG
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_DISMISSED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_SELECTED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SELECT_LOGIN_PROMPT_SHOWN
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelParameters.LAST_USED_PIXEL_KEY
 import com.duckduckgo.autofill.impl.ui.credential.dialog.animateClosed
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Dismissed
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Selected
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem
+import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
@@ -75,6 +81,16 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
     @Inject
     lateinit var autofillSelectCredentialsListBuilder: AutofillSelectCredentialsListBuilder
+
+    @Inject
+    @AppCoroutineScope
+    lateinit var appCoroutineScope: CoroutineScope
+
+    @Inject
+    lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var autofillPrefsStore: AutofillPrefsStore
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
@@ -128,7 +144,13 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
             listItems = credentials,
         ) { selectedCredentials ->
 
-            pixelNameDialogEvent(Selected)?.let { pixel.fire(it) }
+            pixelNameDialogEvent(Selected)?.let {
+                appCoroutineScope.launch(dispatchers.io()) {
+                    val lastUsed = autofillPrefsStore.dataLastAutofilledDate
+                    val params = if (lastUsed == null) emptyMap() else mapOf(LAST_USED_PIXEL_KEY to lastUsed)
+                    pixel.fire(it, parameters = params)
+                }
+            }
 
             val result = Bundle().also {
                 it.putBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED, false)

@@ -39,19 +39,21 @@
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai je volitelná funkce, která umožňuje anonymně chatovat s populárními AI chatovacími modely třetích stran. Tvoje chaty neslouží k trénování umělé inteligence.\n<annotation type="learn_more_link">Další informace</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Povolit službu Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Zkratky</string>
     <string name="duck_chat_visibility_setting">Menu prohlížeče</string>
     <string name="duck_chat_address_bar_visibility_setting">Adresní řádek</string>
     <string name="duck_chat_assist_settings_title">Nastavení funkce Assist</string>
     <string name="duck_chat_assist_settings_description">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních</string>
+    <string name="duck_ai_shortcut_settings_title">Zkratky Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Vyber, které zkratky Duck.ai se mají zobrazit</string>
 
     <!-- Input Screen  -->
     <string name="input_screen_search_tab">Vyhledávání</string>
     <string name="input_screen_search_hint">Vyhledejte nebo zadejte adresu</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
     <string name="input_screen_chat_hint">Zeptej se Duck.ai</string>
-    <string name="input_screen_user_pref_title">Experimentální adresní řádek</string>
-    <string name="input_screen_user_pref_description">Hledej na webu nebo se zeptej Duck.ai přímo v adresním řádku.</string>
+    <string name="input_screen_user_pref_without_ai">Jen vyhledávání\n(výchozí)</string>
+    <string name="input_screen_user_pref_with_ai">Vyhledávání a Duck.ai\n(experimentální)</string>
+    <string name="input_screen_user_pref_description">Vyzkoušej naši experimentální možnost zeptat se Duck.ai přímo z adresního řádku. <annotation type="share_feedback">Sdílet zpětnou vazbu</annotation></string>
 
     <!-- Duck.ai Pro settings -->
     <string name="duck_ai_paid_settings_title">Duck.ai</string>
@@ -64,8 +66,7 @@
     <string name="duck_chat_title_rebranding">Funkce AI</string>
     <string name="duck_chat_settings_activity_description_rebranding">Funkce AI na DuckDuckGo jsou soukromé a volitelné.Tvoje data se nepoužívají k trénování umělé inteligence.\n<annotation type="learn_more_link">Další informace</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
-    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">S populárními AI modely třetích stran můžeš chatovat anonymně</string>
-    <string name="duck_chat_show_in_heading_rebranding">Zkratky Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">S populárními AI modely třetích stran můžeš chatovat soukromě</string>
     <string name="duck_chat_assist_settings_title_rebranding">Nastavení vyhledávání s funkcí Assist</string>
     <string name="duck_chat_assist_settings_description_rebranding">Vyber, jak často chceš, aby se odpovědi s podporou umělé inteligence zobrazovaly ve tvých vyhledáváních</string>
 </resources>

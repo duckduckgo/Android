@@ -39,9 +39,7 @@ class BrowserAppTheme @Inject constructor(
     override fun isLightModeEnabled(): Boolean {
         val lightModeEnabled = when (themeDataStore.theme) {
             DuckDuckGoTheme.LIGHT -> true
-            DuckDuckGoTheme.EXPERIMENT_LIGHT -> true
             DuckDuckGoTheme.DARK -> false
-            DuckDuckGoTheme.EXPERIMENT_DARK -> false
             DuckDuckGoTheme.SYSTEM_DEFAULT -> {
                 !isNightMode(context)
             }

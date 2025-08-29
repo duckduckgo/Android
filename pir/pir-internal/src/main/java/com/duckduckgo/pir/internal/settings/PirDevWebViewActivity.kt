@@ -26,8 +26,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
+import com.duckduckgo.pir.impl.optout.PirOptOut
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalWebviewBinding
-import com.duckduckgo.pir.internal.optout.PirOptOut
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 

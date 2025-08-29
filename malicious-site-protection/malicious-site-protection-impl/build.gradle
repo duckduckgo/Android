@@ -101,6 +101,9 @@ android {
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         buildConfigField "String", "MALICIOUS_SITE_PROTECTION_AUTH_TOKEN", "\"${MALICIOUS_SITE_PROTECTION_AUTH_TOKEN}\""
     }

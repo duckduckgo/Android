@@ -255,6 +255,9 @@ interface PrivacyProFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun useClientWithCacheForFeatures(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun supportsAlternateStripePaymentFlow(): Toggle
 }
 
 @ContributesBinding(AppScope::class)

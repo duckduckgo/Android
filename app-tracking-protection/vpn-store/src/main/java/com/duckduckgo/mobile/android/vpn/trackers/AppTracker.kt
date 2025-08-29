@@ -128,7 +128,7 @@ data class TrackerApp(
 sealed class AppTrackerType {
     data class FirstParty(val tracker: AppTracker) : AppTrackerType()
     data class ThirdParty(val tracker: AppTracker) : AppTrackerType()
-    object NotTracker : AppTrackerType()
+    data object NotTracker : AppTrackerType()
 }
 
 data class AppTrackerBlocklist(

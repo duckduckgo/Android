@@ -26,9 +26,11 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_DI
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_ENABLED_DAU
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_OFF_SEARCH
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_TOGGLED_ON_SEARCH
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelParameters.LAST_USED_PIXEL_KEY
 import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.service.store.AutofillServiceStore
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDao
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementDatabase
 import com.duckduckgo.autofill.store.engagement.AutofillEngagementEntity
@@ -73,6 +75,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
     private val secureStorage: SecureStorage,
     private val deviceAuthenticator: DeviceAuthenticator,
     private val autofillServiceStore: AutofillServiceStore,
+    private val autofillPrefsStore: AutofillPrefsStore,
 ) : AutofillEngagementRepository {
 
     private val autofillEngagementDao: AutofillEngagementDao = engagementDb.autofillEngagementDao()
@@ -82,6 +85,7 @@ class DefaultAutofillEngagementRepository @Inject constructor(
             val engagement = todaysEngagement().copy(autofilled = true)
             logcat(VERBOSE) { "upserting $engagement because user autofilled" }
             processEvent(engagement)
+            autofillPrefsStore.dataLastAutofilledDate = engagement.date
         }
     }
 
@@ -121,9 +125,13 @@ class DefaultAutofillEngagementRepository @Inject constructor(
 
     private suspend fun AutofillEngagementEntity.sendPixelsIfCriteriaMet() {
         val numberStoredPasswords = getNumberStoredPasswords()
+        val lastUsed = autofillPrefsStore.dataLastAutofilledDate
 
         if (autofilled && searched) {
-            pixel.fire(AUTOFILL_ENGAGEMENT_ACTIVE_USER, type = Daily())
+            logcat { "User autofilled and searched today, sending engagement pixels. lastAutofilled=$lastUsed" }
+
+            val activeUserParams = if (lastUsed == null) emptyMap() else mapOf(LAST_USED_PIXEL_KEY to lastUsed)
+            pixel.fire(AUTOFILL_ENGAGEMENT_ACTIVE_USER, parameters = activeUserParams, type = Daily())
 
             val bucket = engagementBucketing.bucketNumberOfCredentials(numberStoredPasswords)
             pixel.fire(AUTOFILL_ENGAGEMENT_STACKED_LOGINS, mapOf("count_bucket" to bucket), type = Daily())

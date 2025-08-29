@@ -16,13 +16,11 @@
 
 package com.duckduckgo.app.onboardingdesignexperiment
 
-import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.cta.ui.Cta
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
 import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BB
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentToggles.OnboardingDesignExperimentCohort.BUCK
@@ -40,6 +38,7 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -64,12 +63,10 @@ interface OnboardingDesignExperimentManager {
     suspend fun fireSiteSuggestionOptionSelectedPixel(index: Int)
     suspend fun onWebPageFinishedLoading(url: String?)
     fun getCohort(): String?
+    suspend fun waitForPrivacyConfig(): Boolean
+    suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean
 }
 
-@ContributesMultibinding(
-    scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
-)
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = PrivacyConfigCallbackPlugin::class,
@@ -89,12 +86,26 @@ class RealOnboardingDesignExperimentManager @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val deviceInfo: DeviceInfo,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-) : OnboardingDesignExperimentManager, MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
+) : OnboardingDesignExperimentManager, PrivacyConfigCallbackPlugin {
 
     private var isExperimentEnabled: Boolean? = null
     private var onboardingDesignExperimentCohort: OnboardingDesignExperimentCohort? = null
 
-    override fun onCreate(owner: LifecycleOwner) {
+    private var privacyPersisted: Boolean = false
+
+    override suspend fun waitForPrivacyConfig(): Boolean {
+        while (!privacyPersisted) {
+            delay(10)
+        }
+        return true
+    }
+
+    override suspend fun isWaitForLocalPrivacyConfigEnabled(): Boolean {
+        return onboardingDesignExperimentToggles.waitForLocalPrivacyConfig().isEnabled()
+    }
+
+    override fun onPrivacyConfigPersisted() {
+        privacyPersisted = true
         coroutineScope.launch {
             setCachedProperties()
         }

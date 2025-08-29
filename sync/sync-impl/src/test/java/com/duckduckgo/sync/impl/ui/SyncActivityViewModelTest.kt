@@ -264,6 +264,16 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenTurnOffSyncConfirmedThenPixelFired() = runTest {
+        whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
+        whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
+
+        testee.onTurnOffSyncConfirmed(connectedDevice)
+
+        verify(syncPixels).fireUserConfirmedToTurnOffSync()
+    }
+
+    @Test
     fun whenLogoutSuccessThenUpdateViewState() = runTest {
         givenAuthenticatedUser()
 

@@ -73,9 +73,9 @@ class FavoritesQuickAccessAdapter(
         private var popupMenu: PopupMenu? = null
 
         sealed class ItemState {
-            object Stale : ItemState()
-            object LongPress : ItemState()
-            object Drag : ItemState()
+            data object Stale : ItemState()
+            data object LongPress : ItemState()
+            data object Drag : ItemState()
         }
 
         private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(

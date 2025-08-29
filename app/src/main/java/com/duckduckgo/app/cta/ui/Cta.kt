@@ -485,7 +485,8 @@ sealed class OnboardingDaxDialogCta(
                 onboardingDesignExperimentManager.isBbEnrolledAndEnabled() -> {
                     setBBOnboardingDialogView(
                         title = getTrackersDescription(context, trackers),
-                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription),
+                        description = context.getString(R.string.bbOnboardingTrackersBlockedDialogDescription)
+                            .getStringForOmnibarPosition(settingsDataStore.omnibarPosition),
                         primaryCtaText = buttonText?.let { context.getString(it) },
                         binding = binding,
                         onTypingAnimationFinished = onTypingAnimationFinished,
@@ -912,11 +913,14 @@ sealed class OnboardingDaxDialogCta(
 
                     optionsViews.forEachIndexed { index, buttonView ->
                         options[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                        buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index], index)
-                            wingAnimation.gone()
-                        }
+                        buttonView.animate().alpha(MAX_ALPHA)
+                            .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
+                            .withEndAction {
+                                buttonView.setOnClickListener {
+                                    onSuggestedOptionClicked?.invoke(options[index], index)
+                                    wingAnimation.gone()
+                                }
+                            }
                     }
 
                     showAndPlayWingAnimation()
@@ -1004,10 +1008,13 @@ sealed class OnboardingDaxDialogCta(
 
                     optionsViews.forEachIndexed { index, buttonView ->
                         options[index].setOptionView(buttonView)
-                        buttonView.animate().alpha(MAX_ALPHA).duration = DAX_DIALOG_APPEARANCE_ANIMATION
-                        buttonView.setOnClickListener {
-                            onSuggestedOptionClicked?.invoke(options[index], index)
-                        }
+                        buttonView.animate().alpha(MAX_ALPHA)
+                            .setDuration(DAX_DIALOG_APPEARANCE_ANIMATION)
+                            .withEndAction {
+                                buttonView.setOnClickListener {
+                                    onSuggestedOptionClicked?.invoke(options[index], index)
+                                }
+                            }
                     }
                 }
 
@@ -1264,10 +1271,18 @@ sealed class DaxBubbleCta(
             binding.daxDialogOption3,
         )
 
-        if (configuration is DaxEndCta) {
-            binding.headerImage.show()
-            binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
-            binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+        when (configuration) {
+            is DaxEndCta -> {
+                binding.headerImage.show()
+                binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
+                binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+            }
+            is DaxPrivacyProCta -> {
+                binding.headerImage.gone()
+                binding.daxBubbleDialogTitle.gravity = Gravity.CENTER_HORIZONTAL
+                binding.dialogTextCta.gravity = Gravity.CENTER_HORIZONTAL
+            }
+            else -> Unit
         }
 
         primaryCta?.let { primaryCtaRes ->
@@ -1283,6 +1298,13 @@ sealed class DaxBubbleCta(
                 show()
                 alpha = 0f
                 text = context.getString(secondaryCtaRes)
+            }
+        }
+
+        placeholder?.let {
+            with(binding.placeholderImageView) {
+                show()
+                alpha = 0f
             }
         }
 
@@ -1311,6 +1333,7 @@ sealed class DaxBubbleCta(
             val afterAnimation = {
                 daxBubbleDialogTitle.finishAnimation()
                 dialogTextCta.finishAnimation()
+                placeholder?.let { placeholderImageView.fadeIn() }
                 primaryCta.fadeIn()
                 secondaryCta.fadeIn()
                 options?.let {
@@ -1387,6 +1410,13 @@ sealed class DaxBubbleCta(
             }
         }
 
+        placeholder?.let {
+            with(binding.placeholderImageView) {
+                show()
+                alpha = 0f
+            }
+        }
+
         options?.let { options ->
             // Buck dialog has a max of 3 options and if successful we'll only have 3 options and can remove this
             val buckOptions = options
@@ -1432,6 +1462,7 @@ sealed class DaxBubbleCta(
 
             val afterAnimation = {
                 dialogTextCta.finishAnimation()
+                placeholder?.let { placeholderImageView.fadeIn() }
                 primaryCta.fadeIn()
                 secondaryCta.fadeIn()
                 options?.let {
@@ -1705,11 +1736,11 @@ sealed class HomePanelCta(
         AppPixelName.WIDGET_CTA_DISMISSED,
     )
 
-    object AddWidgetAuto : AddWidgetAutoBase()
+    data object AddWidgetAuto : AddWidgetAutoBase()
 
-    object AddWidgetAutoOnboardingExperiment : AddWidgetAutoBase()
+    data object AddWidgetAutoOnboardingExperiment : AddWidgetAutoBase()
 
-    object AddWidgetInstructions : HomePanelCta(
+    data object AddWidgetInstructions : HomePanelCta(
         CtaId.ADD_WIDGET,
         R.drawable.add_widget_cta_icon,
         R.string.addWidgetCtaTitle,

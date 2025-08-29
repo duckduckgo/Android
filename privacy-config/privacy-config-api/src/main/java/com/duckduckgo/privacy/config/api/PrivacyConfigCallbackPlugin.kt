@@ -24,4 +24,12 @@ interface PrivacyConfigCallbackPlugin {
      * This method will be called every time it downloads a new version of the privacy config.
      */
     fun onPrivacyConfigDownloaded()
+
+    /**
+     * Notifies that onPrivacyConfigPersisted event occurred.
+     * This method will be called every time it persists a new version of the privacy config.
+     */
+    fun onPrivacyConfigPersisted() {
+        // Default NO-OP
+    }
 }

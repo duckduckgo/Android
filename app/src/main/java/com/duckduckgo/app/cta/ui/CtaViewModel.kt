@@ -269,7 +269,7 @@ class CtaViewModel @Inject constructor(
             }
 
             // Privacy Pro
-            canShowPrivacyProCta() && !onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled() -> {
+            canShowPrivacyProCta() -> {
                 val titleRes: Int = R.string.onboardingPrivacyProDaxDialogTitle
                 val descriptionRes: Int = if (rebrandingFeatureToggle.isSubscriptionRebrandingEnabled()) {
                     R.string.onboardingPrivacyProDaxDialogDescriptionRebranding

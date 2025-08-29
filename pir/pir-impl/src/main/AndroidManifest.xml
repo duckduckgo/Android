@@ -16,12 +16,34 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application>
         <activity
             android:name=".dashboard.PirDashboardWebViewActivity"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
             android:label="@string/activityPirDashboard" />
+
+        <service
+            android:name="com.duckduckgo.pir.impl.scan.PirForegroundScanService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":pir" />
+
+        <service
+            android:name=".optout.PirForegroundOptOutService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse"
+            android:process=":pir" />
+
+        <service
+            android:name=".scan.PirRemoteWorkerService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            android:process=":pir" />
     </application>
 </manifest>

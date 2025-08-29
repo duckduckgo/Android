@@ -878,8 +878,8 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Naj DuckDuckGo zaščiti več vaše dejavnosti na spletu.</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Nastavite nas kot privzeti brskalnik, da se vse povezave do spletnih mest odprejo v DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne vprašaj več</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Spremenite privzeti brskalnik, da se bodo povezave odpirale v DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne zdaj</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ni vaš privzeti brskalnik. Pridobite več zaščite.</string>

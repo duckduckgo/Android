@@ -26,6 +26,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessageHelper
+import com.duckduckgo.js.messaging.api.JsMessaging
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
@@ -59,7 +60,7 @@ class ContentScopeScriptsJsMessagingTest {
                 return object : JsMessageHandler {
                     override fun process(
                         jsMessage: JsMessage,
-                        secret: String,
+                        jsMessaging: JsMessaging,
                         jsMessageCallback: JsMessageCallback?,
                     ) {
                         jsMessageCallback?.process(jsMessage.featureName, jsMessage.method, jsMessage.id, jsMessage.params)
