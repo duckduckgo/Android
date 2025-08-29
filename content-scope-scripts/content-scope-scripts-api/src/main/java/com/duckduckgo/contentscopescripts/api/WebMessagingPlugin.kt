@@ -17,6 +17,7 @@
 package com.duckduckgo.contentscopescripts.api
 
 import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 
 interface WebMessagingPlugin {
@@ -28,4 +29,6 @@ interface WebMessagingPlugin {
     suspend fun unregister(
         unregisterer: suspend (objectName: String) -> Boolean,
     )
+
+    fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean
 }
