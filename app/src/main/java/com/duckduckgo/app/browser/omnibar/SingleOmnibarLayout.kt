@@ -186,27 +186,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun animateOmnibarFocusedState(focused: Boolean) {
-        if (Build.VERSION.SDK_INT >= 28) {
-            focusAnimator?.cancel()
-
-            val startColor = omnibarCardShadow.outlineSpotShadowColor
-            val endColor: Int = if (focused) {
-                getColor(context, com.duckduckgo.mobile.android.R.attr.daxColorShade, Color.BLACK)
-            } else {
-                ContextCompat.getColor(context, android.R.color.transparent)
-            }
-
-            val animator = ValueAnimator.ofArgb(startColor, endColor)
-            animator.duration = DEFAULT_ANIMATION_DURATION
-            animator.interpolator = DecelerateInterpolator()
-            animator.addUpdateListener { colorAnimator ->
-                val shadowColor = colorAnimator.animatedValue as Int
-                omnibarCardShadow.outlineSpotShadowColor = shadowColor
-            }
-
-            animator.start()
-            focusAnimator = animator
-        }
+        // temporarily disable focus animation
     }
 
     private fun onFindInPageShown() {
