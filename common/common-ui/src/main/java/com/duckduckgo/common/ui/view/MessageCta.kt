@@ -17,6 +17,7 @@
 package com.duckduckgo.common.ui.view
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.DrawableRes
@@ -61,6 +62,11 @@ class MessageCta : FrameLayout {
     ) : super(context, attrs, defStyle) {
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            binding.remoteMessage.remoteMessage.addBottomShadow()
+            binding.promoRemoteMessage.promoMessage.addBottomShadow()
+        }
     }
 
     fun setMessage(message: Message) {
