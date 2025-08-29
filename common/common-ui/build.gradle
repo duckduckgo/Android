@@ -78,6 +78,8 @@ dependencies {
     api(AndroidX.compose.ui)
     api(AndroidX.compose.ui.tooling)
 
+    api("org.jetbrains.kotlinx:kotlinx-collections-immutable:_")
+
     api lintChecks("com.slack.lint.compose:compose-lint-checks:_")
 
     // Lottie
