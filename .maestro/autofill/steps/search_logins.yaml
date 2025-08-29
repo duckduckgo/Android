@@ -16,6 +16,16 @@ name: "Autofill: Search credentials"
     commands:
       - tapOn: "No thanks"
 
+- runFlow:
+    when:
+      visible: "Bring your passwords from
+
+        Google to DuckDuckGo"
+    commands:
+        - tapOn:
+            id: "com.duckduckgo.mobile.android:id/close"
+
+
 - tapOn:
     id: searchLogins
 

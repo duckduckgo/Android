@@ -446,7 +446,7 @@ data class ViewState(
 )
 
 internal sealed class Command {
-    object RestartVpn : Command()
+    data object RestartVpn : Command()
     data class ShowIssueReportingPage(val params: OpenVpnBreakageCategoryWithBrokenApp) : Command()
     data object ShowUnifiedPproFeedback : Command()
 

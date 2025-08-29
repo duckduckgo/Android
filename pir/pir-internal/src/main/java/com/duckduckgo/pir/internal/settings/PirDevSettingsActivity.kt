@@ -16,8 +16,6 @@
 
 package com.duckduckgo.pir.internal.settings
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
@@ -28,8 +26,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
-import com.duckduckgo.pir.impl.PirConstants.NOTIF_CHANNEL_ID
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
+import com.duckduckgo.pir.impl.notifications.PirNotificationManager
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.internal.databinding.ActivityPirInternalSettingsBinding
 import com.duckduckgo.pir.internal.settings.PirResultsScreenParams.PirEventsResultsScreen
@@ -52,6 +50,9 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var pirWorkHandler: PirWorkHandler
 
+    @Inject
+    lateinit var pirNotificationManager: PirNotificationManager
+
     private val binding: ActivityPirInternalSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +60,8 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
         setContentView(binding.root)
         setupToolbar(binding.toolbar)
         setupViews()
-        createNotificationChannel()
         bindViews()
+        pirNotificationManager.createNotificationChannel()
     }
 
     private fun setupViews() {
@@ -84,22 +85,6 @@ class PirDevSettingsActivity : DuckDuckGoActivity() {
                 binding.pirDebugOptOut.isEnabled = canRunPir && repository.getBrokersForOptOut(true).isNotEmpty()
             }
         }
-    }
-
-    private fun createNotificationChannel() {
-        // Define the importance level of the notification channel
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-
-        // Create the NotificationChannel with a unique ID, name, and importance level
-        val channel =
-            NotificationChannel(NOTIF_CHANNEL_ID, "Pir Dev Notifications", importance)
-        channel.description = "Notifications for Pir Dev"
-
-        // Register the channel with the system
-        val notificationManager = getSystemService(
-            NotificationManager::class.java,
-        )
-        notificationManager?.createNotificationChannel(channel)
     }
 }
 

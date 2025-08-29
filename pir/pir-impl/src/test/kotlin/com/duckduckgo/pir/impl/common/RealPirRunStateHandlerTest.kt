@@ -22,6 +22,7 @@ import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecor
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerRecordOptOutStarted
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScanActionSucceeded
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerScheduledScanCompleted
+import com.duckduckgo.pir.impl.models.AddressCityState
 import com.duckduckgo.pir.impl.models.ExtractedProfile
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.scheduling.JobRecordUpdater
@@ -29,6 +30,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptAddressCityState
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedResponse.ScriptExtractedProfile
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
 import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
@@ -50,6 +52,7 @@ class RealPirRunStateHandlerTest {
     private lateinit var testee: RealPirRunStateHandler
 
     private val mockRepository: PirRepository = mock()
+    private val mockEventsRepository: PirEventsRepository = mock()
     private val mockPixelSender: PirPixelSender = mock()
     private val mockJobRecordUpdater: JobRecordUpdater = mock()
 
@@ -57,6 +60,7 @@ class RealPirRunStateHandlerTest {
     fun setUp() {
         testee = RealPirRunStateHandler(
             repository = mockRepository,
+            eventsRepository = mockEventsRepository,
             pixelSender = mockPixelSender,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             jobRecordUpdater = mockJobRecordUpdater,
@@ -78,7 +82,13 @@ class RealPirRunStateHandlerTest {
         name = "John Doe",
         alternativeNames = listOf("Johnny", "J. Doe"),
         age = "30",
-        addresses = listOf("""{"city":"New York","state":"NY","fullAddress":"123 Main St"}"""),
+        addresses = listOf(
+            AddressCityState(
+                city = "New York",
+                state = "NY",
+                fullAddress = "123 Main St",
+            ),
+        ),
         phoneNumbers = listOf("555-1234"),
         relatives = listOf("Jane Doe"),
         reportId = "report123",
@@ -121,14 +131,14 @@ class RealPirRunStateHandlerTest {
 
         testee.handleState(state)
 
-        verify(mockRepository).saveBrokerScanLog(
+        verify(mockEventsRepository).saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = testEventTimeInMillis,
                 brokerName = testBrokerName,
                 eventType = BROKER_SUCCESS,
             ),
         )
-        verify(mockRepository).saveScanCompletedBroker(
+        verify(mockEventsRepository).saveScanCompletedBroker(
             brokerName = testBrokerName,
             profileQueryId = testProfileQueryId,
             startTimeInMillis = testStartTimeInMillis,
@@ -156,14 +166,14 @@ class RealPirRunStateHandlerTest {
 
         testee.handleState(state)
 
-        verify(mockRepository).saveBrokerScanLog(
+        verify(mockEventsRepository).saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = testEventTimeInMillis,
                 brokerName = testBrokerName,
                 eventType = BROKER_ERROR,
             ),
         )
-        verify(mockRepository).saveScanCompletedBroker(
+        verify(mockEventsRepository).saveScanCompletedBroker(
             brokerName = testBrokerName,
             profileQueryId = testProfileQueryId,
             startTimeInMillis = testStartTimeInMillis,
@@ -196,14 +206,14 @@ class RealPirRunStateHandlerTest {
             totalTimeInMillis = testTotalTimeMillis,
             isSuccess = true,
         )
-        verify(mockRepository).saveBrokerScanLog(
+        verify(mockEventsRepository).saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = testEventTimeInMillis,
                 brokerName = testBrokerName,
                 eventType = BROKER_SUCCESS,
             ),
         )
-        verify(mockRepository).saveScanCompletedBroker(
+        verify(mockEventsRepository).saveScanCompletedBroker(
             brokerName = testBrokerName,
             profileQueryId = testProfileQueryId,
             startTimeInMillis = testStartTimeInMillis,
@@ -231,14 +241,14 @@ class RealPirRunStateHandlerTest {
             totalTimeInMillis = testTotalTimeMillis,
             isSuccess = false,
         )
-        verify(mockRepository).saveBrokerScanLog(
+        verify(mockEventsRepository).saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = testEventTimeInMillis,
                 brokerName = testBrokerName,
                 eventType = BROKER_ERROR,
             ),
         )
-        verify(mockRepository).saveScanCompletedBroker(
+        verify(mockEventsRepository).saveScanCompletedBroker(
             brokerName = testBrokerName,
             profileQueryId = testProfileQueryId,
             startTimeInMillis = testStartTimeInMillis,
@@ -267,7 +277,13 @@ class RealPirRunStateHandlerTest {
             name = "John Doe",
             alternativeNames = listOf("Johnny", "J. Doe"),
             age = "30",
-            addresses = listOf("""{"city":"New York","state":"NY","fullAddress":"123 Main St"}"""),
+            addresses = listOf(
+                AddressCityState(
+                    city = "New York",
+                    state = "NY",
+                    fullAddress = "123 Main St",
+                ),
+            ),
             phoneNumbers = listOf("555-1234"),
             relatives = listOf("Jane Doe"),
             identifier = "id123",
@@ -357,7 +373,7 @@ class RealPirRunStateHandlerTest {
         testee.handleState(state)
 
         verify(mockJobRecordUpdater).updateOptOutRequested(testExtractedProfileId)
-        verify(mockRepository).saveOptOutCompleted(
+        verify(mockEventsRepository).saveOptOutCompleted(
             brokerName = testBrokerName,
             extractedProfile = testExtractedProfile,
             startTimeInMillis = testStartTimeInMillis,
@@ -384,7 +400,7 @@ class RealPirRunStateHandlerTest {
         testee.handleState(state)
 
         verify(mockJobRecordUpdater).updateOptOutError(testExtractedProfileId)
-        verify(mockRepository).saveOptOutCompleted(
+        verify(mockEventsRepository).saveOptOutCompleted(
             brokerName = testBrokerName,
             extractedProfile = testExtractedProfile,
             startTimeInMillis = testStartTimeInMillis,

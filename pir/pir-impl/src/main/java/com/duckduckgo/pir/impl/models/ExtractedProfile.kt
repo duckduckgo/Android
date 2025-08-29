@@ -32,7 +32,7 @@ data class ExtractedProfile(
     val name: String = "",
     val alternativeNames: List<String> = emptyList(),
     val age: String = "",
-    val addresses: List<String> = emptyList(),
+    val addresses: List<AddressCityState> = emptyList(),
     val phoneNumbers: List<String> = emptyList(),
     val relatives: List<String> = emptyList(),
     val reportId: String = "",
@@ -42,4 +42,10 @@ data class ExtractedProfile(
     val identifier: String = "",
     val dateAddedInMillis: Long = 0L,
     val deprecated: Boolean = false,
+)
+
+data class AddressCityState(
+    val city: String,
+    val state: String,
+    val fullAddress: String? = null,
 )

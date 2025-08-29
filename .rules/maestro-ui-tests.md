@@ -28,7 +28,8 @@ The Maestro tests are organized into the following (non-exhaustive) main categor
 - `custom_tabs` - Custom tabs functionality tests 
 - `duckplayer` - DuckPlayer tests. Some of these can only be run locally.
 - `favorites` - Favorites management tests 
-- `fire_button` - Fire button (data clearing) tests 
+- `fire_button` - Fire button (data clearing) tests
+- `input_screen` - Input Screen and Experimental Address Bar that provides Search and Duck.ai toggle switch tests
 - `notifications_permissions_android13_plus` - Notification permission tests (Android 13+ only)
 - `onboarding` - User onboarding flow tests 
 - `ppro` - Privacy Pro subscription tests 

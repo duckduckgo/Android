@@ -135,6 +135,6 @@ class PrivacyConfigInternalViewModel @Inject constructor(
     sealed class Command {
         data class ConfigError(val message: String) : Command()
         data class ConfigDownloaded(val url: String) : Command()
-        object Loading : Command()
+        data object Loading : Command()
     }
 }

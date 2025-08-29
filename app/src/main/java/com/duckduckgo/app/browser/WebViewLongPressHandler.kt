@@ -44,7 +44,7 @@ interface LongPressHandler {
     ): RequiredAction
 
     sealed class RequiredAction {
-        object None : RequiredAction()
+        data object None : RequiredAction()
         class OpenInNewTab(val url: String) : RequiredAction()
         class OpenInNewBackgroundTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()

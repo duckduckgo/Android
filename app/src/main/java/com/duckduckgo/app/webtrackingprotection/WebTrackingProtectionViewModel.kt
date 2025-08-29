@@ -47,8 +47,8 @@ class WebTrackingProtectionViewModel @Inject constructor(
 
     sealed class Command {
         class LaunchLearnMoreWebPage(val url: String = LEARN_MORE_URL) : Command()
-        object LaunchGlobalPrivacyControl : Command()
-        object LaunchAllowList : Command()
+        data object LaunchGlobalPrivacyControl : Command()
+        data object LaunchAllowList : Command()
     }
 
     private val viewState = MutableStateFlow(ViewState())

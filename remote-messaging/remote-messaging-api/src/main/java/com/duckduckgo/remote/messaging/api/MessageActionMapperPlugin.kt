@@ -27,12 +27,12 @@ data class JsonMessageAction(
 )
 
 sealed class JsonActionType(val jsonValue: String) {
-    object URL : JsonActionType("url")
-    object PLAYSTORE : JsonActionType("playstore")
-    object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
-    object DISMISS : JsonActionType("dismiss")
-    object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
-    object SHARE : JsonActionType("share")
-    object NAVIGATION : JsonActionType("navigation")
-    object SURVEY : JsonActionType("survey")
+    data object URL : JsonActionType("url")
+    data object PLAYSTORE : JsonActionType("playstore")
+    data object DEFAULT_BROWSER : JsonActionType("defaultBrowser")
+    data object DISMISS : JsonActionType("dismiss")
+    data object APP_TP_ONBOARDING : JsonActionType("atpOnboarding")
+    data object SHARE : JsonActionType("share")
+    data object NAVIGATION : JsonActionType("navigation")
+    data object SURVEY : JsonActionType("survey")
 }
