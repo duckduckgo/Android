@@ -17,17 +17,17 @@
 package com.duckduckgo.app.browser
 
 import android.view.View
-import android.view.ViewGroup.MarginLayoutParams
 import android.view.animation.AccelerateInterpolator
-import androidx.core.view.updateLayoutParams
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
-import com.duckduckgo.common.ui.view.toPx
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
-class HomeBackgroundLogo(private var ddgLogoView: View) {
+class HomeBackgroundLogo(
+    private val ddgLogoView: View,
+    private val container: View,
+) {
 
     private var readyToShowLogo = false
 
@@ -53,6 +53,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     private fun fadeLogoIn() {
         logcat(VERBOSE) { "showLogo" }
         // To avoid glitches when calling show/hide logo within a small amount of time we keep this 50ms animation
+        container.show()
         ddgLogoView.animate().apply {
             duration = FADE_IN_DURATION
             interpolator = AccelerateInterpolator()
@@ -64,6 +65,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     private fun fadeLogoOut() {
         logcat(VERBOSE) { "hideLogo" }
         ddgLogoView.gone()
+        container.gone()
     }
 
     private fun updateLogoConstraint(omnibarPosition: OmnibarPosition) {

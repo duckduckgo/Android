@@ -102,7 +102,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
 
     private val binding: ViewNewTabLegacyBinding by viewBinding()
 
-    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo) }
+    private val homeBackgroundLogo by lazy { HomeBackgroundLogo(binding.ddgLogo, binding.ddgLogoContainer) }
 
     @Inject
     lateinit var viewModelFactory: NewTabLegacyPageViewModelFactory
