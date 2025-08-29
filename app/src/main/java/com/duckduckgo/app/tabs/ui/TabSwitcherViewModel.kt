@@ -598,18 +598,18 @@ class TabSwitcherViewModel @Inject constructor(
 
     fun onTrackerAnimationTilePositiveButtonClicked() {
         viewModelScope.launch {
-            command.value = DismissAnimatedTileDismissalDialog
-        }
-    }
-
-    fun onTrackerAnimationTileNegativeButtonClicked() {
-        viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
             pixel.fire(
                 pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
                 parameters = mapOf("trackerCount" to trackerCount.toString())
             )
+        }
+    }
+
+    fun onTrackerAnimationTileNegativeButtonClicked() {
+        viewModelScope.launch {
+            command.value = DismissAnimatedTileDismissalDialog
         }
     }
 
