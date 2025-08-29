@@ -625,7 +625,7 @@ class DeviceShieldTrackerActivity :
     }
 
     private sealed class VpnPermissionStatus {
-        object Granted : VpnPermissionStatus()
+        data object Granted : VpnPermissionStatus()
         data class Denied(val intent: Intent) : VpnPermissionStatus()
     }
 

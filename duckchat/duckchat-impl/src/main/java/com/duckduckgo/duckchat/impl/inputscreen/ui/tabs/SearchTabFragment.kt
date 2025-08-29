@@ -104,6 +104,7 @@ class SearchTabFragment : DuckDuckGoFragment(R.layout.fragment_search_tab) {
             newTabPagePlugins.getPlugins().firstOrNull()?.let { plugin ->
                 val newTabPageView = plugin.getView(requireContext(), showLogo = false) { hasContent ->
                     viewModel.onNewTabPageContentChanged(hasContent)
+                    binding.newTabContainerLayout.isVisible = hasContent
                 }
                 binding.newTabContainerLayout.addView(newTabPageView)
             }

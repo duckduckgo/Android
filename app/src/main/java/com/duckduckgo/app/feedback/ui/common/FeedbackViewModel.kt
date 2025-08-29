@@ -328,7 +328,7 @@ sealed class FragmentState(open val forwardDirection: Boolean) {
 
 sealed class Command {
     data class Exit(val feedbackSubmitted: Boolean) : Command()
-    object HideKeyboard : Command()
+    data object HideKeyboard : Command()
 }
 
 data class UpdateViewCommand(

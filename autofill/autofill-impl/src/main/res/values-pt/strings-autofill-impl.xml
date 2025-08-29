@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Palavras-passe</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importar palavras-passe do Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importar palavras-passe</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d palavras-passe importadas do Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d palavras-passe importadas do CSV</string>
 
@@ -250,7 +250,7 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar palavras-passe com o computador</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar palavras-passe com o computador</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importa as tuas palavras-passe do Google</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Importar palavras-passe do Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">O Google pode pedir-te para iniciares sessão ou introduzires a tua palavra-passe para confirmação.</string>
     <string name="importPasswordsChooseMethodDialogGpmButton">Importar do Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Escolher um ficheiro CSV</string>

@@ -421,7 +421,7 @@ class AutofillManagementActivity : DuckDuckGoActivity(), PasswordsScreenPromotio
     }
 
     private sealed interface CopiedToClipboardDataType {
-        object Username : CopiedToClipboardDataType
-        object Password : CopiedToClipboardDataType
+        data object Username : CopiedToClipboardDataType
+        data object Password : CopiedToClipboardDataType
     }
 }

@@ -173,5 +173,78 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/favoritesCountHeader"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center"
+            android:text="@string/devSettingsTabsFavoritesScreenHeader"
+            app:typography="caption_allCaps" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:id="@+id/generateFavoritesItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/favoritesCount"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:primaryText="@string/devSettingsTabsScreenFavoritesToAdd" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextInput
+                android:id="@+id/favoritesCount"
+                style="@style/Widget.DuckDuckGo.TextInput"
+                android:layout_width="72dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/keyline_4"
+                android:gravity="center"
+                android:inputType="number"
+                android:text="25"
+                app:layout_constraintBottom_toBottomOf="@id/generateFavoritesItem"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/generateFavoritesItem"
+                app:layout_constraintTop_toTopOf="@id/generateFavoritesItem"
+                app:type="single_line"
+                tools:ignore="HardcodedText" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/addFavoritesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsTabsScreenAddFavoritesButtonText"
+                app:daxButtonSize="large" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/clearFavoritesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/devSettingsTabsScreenClearFavoritesButtonText"
+                app:daxButtonSize="large" />
+
+            <androidx.constraintlayout.helper.widget.Flow
+                android:id="@+id/favoritesFlowView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/keyline_4"
+                app:constraint_referenced_ids="addFavoritesButton,clearFavoritesButton"
+                app:flow_horizontalStyle="spread"
+                app:flow_wrapMode="chain"
+                app:layout_constraintTop_toBottomOf="@id/generateFavoritesItem" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </LinearLayout>
 </LinearLayout>

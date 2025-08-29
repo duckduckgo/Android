@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.text.Editable
 import android.view.MotionEvent
 import android.view.View
+import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.postDelayed
@@ -28,6 +29,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.KEYBOARD_DELAY
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
+import com.duckduckgo.app.browser.databinding.IncludeFindInPageBinding
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.CustomTab
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.Error
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode.MaliciousSiteWarning
@@ -38,12 +40,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.DisableVoiceS
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.HighlightOmnibarItem
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.Decoration.Mode
 import com.duckduckgo.app.browser.omnibar.OmnibarLayout.StateChange
-import com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-import com.duckduckgo.app.browser.omnibar.experiments.SingleOmnibarLayout
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SCROLLING
-import com.duckduckgo.app.browser.omnibar.model.OmnibarType.SINGLE
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.LoadingViewState
@@ -68,52 +65,19 @@ import logcat.logcat
 @SuppressLint("ClickableViewAccessibility")
 class Omnibar(
     val omnibarPosition: OmnibarPosition,
-    val omnibarType: OmnibarType,
     private val binding: FragmentBrowserTabBinding,
 ) {
 
     init {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                when (omnibarType) {
-                    SCROLLING -> {
-                        // remove bottom variant
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-
-                        // remove all single omnibars
-                        binding.rootView.removeView(binding.singleOmnibar)
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-                    }
-                    else -> {
-                        // remove bottom variant
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-
-                        // remove all scrolling omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-                    }
-                }
+                // remove bottom variant
+                binding.rootView.removeView(binding.singleOmnibarBottom)
             }
 
             OmnibarPosition.BOTTOM -> {
-                when (omnibarType) {
-                    SCROLLING -> {
-                        // remove top variant
-                        binding.rootView.removeView(binding.newOmnibar)
-
-                        // remove all single omnibars
-                        binding.rootView.removeView(binding.singleOmnibar)
-                        binding.rootView.removeView(binding.singleOmnibarBottom)
-                    }
-                    else -> {
-                        // remove top variant
-                        binding.rootView.removeView(binding.singleOmnibar)
-
-                        // remove all scrolling omnibars
-                        binding.rootView.removeView(binding.newOmnibar)
-                        binding.rootView.removeView(binding.newOmnibarBottom)
-                    }
-                }
+                // remove top variant
+                binding.rootView.removeView(binding.singleOmnibar)
 
                 adjustCoordinatorLayoutBehaviorForBottomOmnibar()
             }
@@ -164,6 +128,10 @@ class Omnibar(
         )
     }
 
+    interface LogoClickListener {
+        fun onClick(url: String)
+    }
+
     data class OmnibarTextState(
         val text: String,
         val hasFocus: Boolean,
@@ -186,17 +154,11 @@ class Omnibar(
     val newOmnibar: OmnibarLayout by lazy {
         when (omnibarPosition) {
             OmnibarPosition.TOP -> {
-                when (omnibarType) {
-                    SCROLLING -> binding.newOmnibar
-                    SINGLE -> binding.singleOmnibar
-                }
+                binding.singleOmnibar
             }
 
             OmnibarPosition.BOTTOM -> {
-                when (omnibarType) {
-                    SCROLLING -> binding.newOmnibarBottom
-                    SINGLE -> binding.singleOmnibarBottom
-                }
+                binding.singleOmnibarBottom
             }
         }
     }
@@ -225,7 +187,7 @@ class Omnibar(
         }
     }
 
-    private val findInPage: FindInPage by lazy {
+    private val findInPage: IncludeFindInPageBinding by lazy {
         newOmnibar.findInPage
     }
 
@@ -245,8 +207,8 @@ class Omnibar(
         newOmnibar.shieldIcon
     }
 
-    val shieldIconExperiment: LottieAnimationView by lazy {
-        newOmnibar.shieldIconExperiment
+    val daxIcon: ImageView by lazy {
+        newOmnibar.daxIcon
     }
 
     val textInputRootView: View by lazy {
@@ -299,11 +261,13 @@ class Omnibar(
         newOmnibar.setOmnibarItemPressedListener(listener)
     }
 
+    fun configureLogoClickListener(logoClickListener: LogoClickListener) {
+        newOmnibar.setLogoClickListener(logoClickListener)
+    }
+
     fun configureOmnibarItemPressedListeners(listener: OmnibarItemPressedListener) {
         val omnibar = newOmnibar
-        if (omnibar is FadeOmnibarLayout) {
-            omnibar.setFadeOmnibarItemPressedListener(listener)
-        } else if (omnibar is SingleOmnibarLayout) {
+        if (omnibar is SingleOmnibarLayout) {
             omnibar.setSingleOmnibarItemPressedListener(listener)
         }
     }
@@ -453,14 +417,6 @@ class Omnibar(
 
     fun voiceSearchDisabled(url: String?) {
         newOmnibar.decorate(DisableVoiceSearch(url ?: ""))
-    }
-
-    fun setContentCanScroll(
-        canScrollUp: Boolean,
-        canScrollDown: Boolean,
-        topOfPage: Boolean,
-    ) {
-        newOmnibar.decorate(Decoration.NewTabScrollingState(canScrollUp, canScrollDown, topOfPage))
     }
 
     fun setDraftTextIfNtpOrSerp(query: String) {

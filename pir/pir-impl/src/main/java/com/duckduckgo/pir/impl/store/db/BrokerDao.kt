@@ -25,7 +25,10 @@ import androidx.room.Transaction
 @Dao
 interface BrokerDao {
     @Query("SELECT * from pir_broker_details where name = :brokerName")
-    fun getBrokerDetails(brokerName: String): Broker?
+    fun getBrokerDetails(brokerName: String): BrokerEntity?
+
+    @Query("SELECT * FROM pir_broker_details WHERE removedAt = 0")
+    fun getAllActiveBrokers(): List<BrokerEntity>
 
     @Query("SELECT stepsJson from pir_broker_scan where brokerName = :brokerName")
     fun getScanJson(brokerName: String): String?
@@ -45,8 +48,32 @@ interface BrokerDao {
     @Query("DELETE from pir_broker_details where name = :brokerName")
     fun deleteBroker(brokerName: String)
 
+    @Query("SELECT * FROM pir_broker_opt_out")
+    fun getAllBrokerOptOuts(): List<BrokerOptOut>
+
+    @Query("SELECT * from pir_broker_mirror_sites")
+    fun getAllMirrorSites(): List<MirrorSiteEntity>
+
+    @Query("SELECT * from pir_broker_mirror_sites where removedAt = 0")
+    fun getAllActiveMirrorSites(): List<MirrorSiteEntity>
+
+    @Query("SELECT * from pir_broker_mirror_sites where removedAt = 0 AND parentSite = :brokerName")
+    fun getAllActiveMirrorSitesForBroker(brokerName: String): List<MirrorSiteEntity>
+
+    @Query("SELECT * from pir_broker_mirror_sites where parentSite = :brokerName")
+    fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSiteEntity>
+
+    @Query("DELETE from pir_broker_mirror_sites")
+    fun deleteAllMirrorSites()
+
+    @Query("DELETE from pir_broker_mirror_sites where parentSite = :brokerName")
+    fun deleteMirrorSitesForBroker(brokerName: String)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertBroker(broker: Broker)
+    fun insertMirrorSites(mirrorSiteEntity: List<MirrorSiteEntity>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBroker(broker: BrokerEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertScanSteps(brokerScan: BrokerScan)
@@ -59,16 +86,19 @@ interface BrokerDao {
 
     @Transaction
     fun upsert(
-        broker: Broker,
+        broker: BrokerEntity,
         brokerScan: BrokerScan,
         brokerOptOut: BrokerOptOut,
         schedulingConfig: BrokerSchedulingConfigEntity,
+        mirrorSiteEntity: List<MirrorSiteEntity>,
     ) {
         deleteBroker(broker.name)
+        deleteMirrorSitesForBroker(broker.name)
         insertBroker(broker)
         insertScanSteps(brokerScan)
         insertOptOutSteps(brokerOptOut)
         insertBrokerSchedulingConfig(schedulingConfig)
+        insertMirrorSites(mirrorSiteEntity)
     }
 
     @Query("SELECT brokerName from pir_broker_scan")

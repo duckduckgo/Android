@@ -41,7 +41,7 @@ class MacOsViewModel @Inject constructor(
 
     sealed class Command {
         data class ShareLink(val originEnabled: Boolean) : Command()
-        object GoToWindowsClientSettings : Command()
+        data object GoToWindowsClientSettings : Command()
     }
 
     data class ViewState(val windowsFeatureEnabled: Boolean)

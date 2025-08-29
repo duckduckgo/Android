@@ -23,9 +23,9 @@ import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfigura
 abstract class FakeAuthenticator : DeviceAuthenticator {
 
     sealed interface Result {
-        object Success : Result
-        object Cancelled : Result
-        object Failure : Result
+        data object Success : Result
+        data object Cancelled : Result
+        data object Failure : Result
     }
 
     var authenticateCalled: Boolean = false

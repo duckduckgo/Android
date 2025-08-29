@@ -42,6 +42,7 @@ interface AutofillPrefsStore {
     var timestampUserLastPromptedToDisableAutofill: Long?
     var domainTargetDatasetVersion: Long
     var inBrowserImportPromoShownCount: Int
+    var dataLastAutofilledDate: String?
 
     /**
      * Returns if Autofill was enabled by default.
@@ -198,6 +199,12 @@ class RealAutofillPrefsStore(
         }
     }
 
+    override var dataLastAutofilledDate: String?
+        get() = prefs.getString(DATA_LAST_AUTOFILLED_DATE, null)
+        set(value) {
+            prefs.edit { putString(DATA_LAST_AUTOFILLED_DATE, value) }
+        }
+
     companion object {
         const val FILENAME = "com.duckduckgo.autofill.store.autofill_store"
         const val AUTOFILL_ENABLED = "autofill_enabled"
@@ -212,5 +219,6 @@ class RealAutofillPrefsStore(
         const val MONITOR_AUTOFILL_DECLINES = "monitor_autofill_declines"
         const val ORIGINAL_AUTOFILL_DEFAULT_STATE_ENABLED = "original_autofill_default_state_enabled"
         const val DOMAIN_TARGET_DATASET_VERSION = "domain_target_dataset_version"
+        const val DATA_LAST_AUTOFILLED_DATE = "data_last_autofilled_date"
     }
 }

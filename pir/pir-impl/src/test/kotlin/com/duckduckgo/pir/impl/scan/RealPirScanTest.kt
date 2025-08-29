@@ -30,6 +30,7 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord.ScanJobStatus
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -50,6 +51,7 @@ class RealPirScanTest {
     private lateinit var testee: RealPirScan
 
     private val mockRepository: PirRepository = mock()
+    private val mockEventsRepository: PirEventsRepository = mock()
     private val mockBrokerStepsParser: BrokerStepsParser = mock()
     private val mockPirCssScriptLoader: PirCssScriptLoader = mock()
     private val mockPirActionsRunnerFactory: RealPirActionsRunner.Factory = mock()
@@ -64,6 +66,7 @@ class RealPirScanTest {
 
         testee = RealPirScan(
             repository = mockRepository,
+            eventsRepository = mockEventsRepository,
             brokerStepsParser = mockBrokerStepsParser,
             pirCssScriptLoader = mockPirCssScriptLoader,
             pirActionsRunnerFactory = mockPirActionsRunnerFactory,
@@ -140,8 +143,8 @@ class RealPirScanTest {
     fun whenEmptyJobRecordsThenDontCreateRunners() = runTest {
         // Given
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(0)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(emptyList(), mockContext, RunType.MANUAL)
@@ -159,8 +162,8 @@ class RealPirScanTest {
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(null)
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(0)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
@@ -178,8 +181,8 @@ class RealPirScanTest {
         whenever(mockRepository.getBrokerScanSteps(testBrokerName)).thenReturn(testStepsJson)
         whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(emptyList())
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(0)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
@@ -198,8 +201,8 @@ class RealPirScanTest {
         whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
         whenever(mockRepository.getUserProfileQueries()).thenReturn(emptyList())
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(0)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
@@ -221,8 +224,8 @@ class RealPirScanTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(1)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(1)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         val jobRecordWithDefaultProfile = testScanJobRecord.copy(userProfileId = DEFAULT_PROFILE_QUERIES[0].id)
 
@@ -243,8 +246,8 @@ class RealPirScanTest {
         whenever(mockBrokerStepsParser.parseStep(testBrokerName, testStepsJson)).thenReturn(listOf(testScanStep))
         whenever(mockRepository.getUserProfileQueries()).thenReturn(testUserProfileQueries)
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(0)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(unknownProfileJobRecord), mockContext, RunType.MANUAL)
@@ -261,8 +264,8 @@ class RealPirScanTest {
         val unknownBrokerJobRecord = testScanJobRecord.copy(brokerName = "unknown-broker")
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTime)
         whenever(mockRepository.getBrokerScanSteps("unknown-broker")).thenReturn(null)
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(0)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(unknownBrokerJobRecord), mockContext, RunType.MANUAL)
@@ -284,8 +287,8 @@ class RealPirScanTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(testProfileQuery, listOf(testScanStep))).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(1)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(1)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
@@ -311,8 +314,8 @@ class RealPirScanTest {
             .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(2)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(2)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord, testScanJobRecord2), mockContext, RunType.MANUAL)
@@ -338,8 +341,8 @@ class RealPirScanTest {
             .thenReturn(mockPirActionsRunner, mock<RealPirActionsRunner>())
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(2)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(2)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord, duplicateJobRecord), mockContext, RunType.MANUAL)
@@ -361,8 +364,8 @@ class RealPirScanTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.SCHEDULED)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(1)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(1)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.SCHEDULED)
@@ -382,14 +385,14 @@ class RealPirScanTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(1)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(1)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)
 
         // Then
-        verify(mockRepository).deleteAllScanResults()
+        verify(mockEventsRepository).deleteAllScanResults()
     }
 
     @Test
@@ -402,8 +405,8 @@ class RealPirScanTest {
         whenever(mockPirActionsRunnerFactory.create(mockContext, testScript, RunType.MANUAL)).thenReturn(mockPirActionsRunner)
         whenever(mockPirActionsRunner.start(any(), any())).thenReturn(Result.success(Unit))
 
-        whenever(mockRepository.getScanSuccessResultsCount()).thenReturn(1)
-        whenever(mockRepository.getScanErrorResultsCount()).thenReturn(0)
+        whenever(mockEventsRepository.getScanSuccessResultsCount()).thenReturn(1)
+        whenever(mockEventsRepository.getScanErrorResultsCount()).thenReturn(0)
 
         // When
         testee.executeScanForJobs(listOf(testScanJobRecord), mockContext, RunType.MANUAL)

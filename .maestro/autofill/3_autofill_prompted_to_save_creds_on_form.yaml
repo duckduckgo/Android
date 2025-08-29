@@ -23,6 +23,12 @@ tags:
 
         - tapOn:
             id: "username"
+
+        - runFlow: steps/decline_in_browser_password_import.promo.yaml
+
+        - tapOn:
+            id: "username"
+
         - inputText: "user"
         - tapOn:
             id: "password"
