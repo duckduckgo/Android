@@ -21,4 +21,8 @@
         <item name="android:layout_height">match_parent</item>
         <item name="isExpandable">true</item>
     </style>
+    <style name="Widget.DuckDuckGo.FavouritesItemFavicon">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/smallShapeCornerRadius</item>
+    </style>
 </resources>
