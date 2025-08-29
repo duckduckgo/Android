@@ -85,7 +85,6 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailab
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
-import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
