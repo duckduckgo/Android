@@ -17,6 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.di.scopes.AppScope
@@ -37,5 +38,21 @@ class RealWebViewCompatWrapper @Inject constructor() : WebViewCompatWrapper {
         allowedOriginRules: Set<String>,
     ): ScriptHandler {
         return WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+    }
+
+    override fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
+        WebViewCompat.removeWebMessageListener(
+            webView,
+            jsObjectName,
+        )
+    }
+
+    override fun addWebMessageListener(
+        webView: WebView,
+        jsObjectName: String,
+        allowedOriginRules: Set<String>,
+        listener: WebViewCompat.WebMessageListener,
+    ) {
+        return WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
     }
 }

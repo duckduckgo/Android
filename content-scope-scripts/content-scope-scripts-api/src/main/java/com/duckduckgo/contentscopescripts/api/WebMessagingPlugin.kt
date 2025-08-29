@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl
+package com.duckduckgo.contentscopescripts.api
 
-import android.webkit.WebView
-import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.js.messaging.api.JsMessageCallback
 
-interface WebViewCompatWrapper {
-
-    fun addDocumentStartJavaScript(
-        webView: WebView,
-        script: String,
-        allowedOriginRules: Set<String>,
-    ): ScriptHandler
-
-    fun removeWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
+interface WebMessagingPlugin {
+    suspend fun register(
+        jsMessageCallback: JsMessageCallback?,
+        registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
     )
 
-    fun addWebMessageListener(
-        webView: WebView,
-        jsObjectName: String,
-        allowedOriginRules: Set<String>,
-        listener: WebMessageListener,
+    suspend fun unregister(
+        unregisterer: suspend (objectName: String) -> Boolean,
     )
 }
