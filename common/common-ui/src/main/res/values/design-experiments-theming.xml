@@ -113,7 +113,7 @@
         <item name="actionBarSize">@dimen/experimentalToolbarSize</item>
     </style>
 
-    <style name="TabSwitcher.Widget.Toolbar.Experimental" parent="Widget.DuckDuckGo.ToolbarTheme">
+    <style name="TabSwitcher.Widget.Toolbar" parent="Widget.DuckDuckGo.ToolbarTheme">
         <item name="actionButtonStyle">@style/TabSwitcher.ActionButton</item>
         <item name="android:actionButtonStyle">@style/TabSwitcher.ActionButton</item>
     </style>
