@@ -176,7 +176,7 @@ class InputScreenViewModel @AssistedInject constructor(
         .flatMapLatest { shouldShow ->
             if (shouldShow) {
                 merge(
-                    searchInputTextState.debounceExceptFirst(300),
+                    searchInputTextState.debounceExceptFirst(timeoutMillis = 100),
                     refreshSuggestions.map { searchInputTextState.value },
                 ).flatMapLatest { autoComplete.autoComplete(it) }
             } else {
