@@ -18,16 +18,21 @@ package com.duckduckgo.app.browser
 
 import android.view.View
 import android.view.animation.AccelerateInterpolator
+import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
-class HomeBackgroundLogo(private var ddgLogoView: View) {
+class HomeBackgroundLogo(
+    private val ddgLogoView: View,
+    private val container: View,
+) {
 
     private var readyToShowLogo = false
 
-    fun showLogo() {
+    fun showLogo(omnibarPosition: OmnibarPosition) {
+        updateLogoConstraint(omnibarPosition)
         this.readyToShowLogo = true
         update()
     }
@@ -48,6 +53,7 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     private fun fadeLogoIn() {
         logcat(VERBOSE) { "showLogo" }
         // To avoid glitches when calling show/hide logo within a small amount of time we keep this 50ms animation
+        container.show()
         ddgLogoView.animate().apply {
             duration = FADE_IN_DURATION
             interpolator = AccelerateInterpolator()
@@ -59,6 +65,24 @@ class HomeBackgroundLogo(private var ddgLogoView: View) {
     private fun fadeLogoOut() {
         logcat(VERBOSE) { "hideLogo" }
         ddgLogoView.gone()
+        container.gone()
+    }
+
+    private fun updateLogoConstraint(omnibarPosition: OmnibarPosition) {
+        val params = ddgLogoView.layoutParams
+        if (params is androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
+            when (omnibarPosition) {
+                OmnibarPosition.TOP -> {
+                    params.topToTop = R.id.guidelineTop
+                    params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                }
+                OmnibarPosition.BOTTOM -> {
+                    params.topToTop = R.id.guidelineBottom
+                    params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+                }
+            }
+            ddgLogoView.layoutParams = params
+        }
     }
 
     companion object {
