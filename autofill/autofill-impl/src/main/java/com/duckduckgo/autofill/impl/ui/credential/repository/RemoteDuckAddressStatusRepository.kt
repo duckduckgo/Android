@@ -56,11 +56,11 @@ interface DuckAddressStatusRepository {
     suspend fun setActivationStatus(privateDuckAddress: String, isActivated: Boolean): Boolean
 
     sealed interface ActivationStatusResult {
-        object NotSignedIn : ActivationStatusResult
-        object Activated : ActivationStatusResult
-        object Deactivated : ActivationStatusResult
-        object Unmanageable : ActivationStatusResult
-        object GeneralError : ActivationStatusResult
+        data object NotSignedIn : ActivationStatusResult
+        data object Activated : ActivationStatusResult
+        data object Deactivated : ActivationStatusResult
+        data object Unmanageable : ActivationStatusResult
+        data object GeneralError : ActivationStatusResult
     }
 }
 

@@ -183,7 +183,7 @@ class AppTPCompanyTrackersViewModel @Inject constructor(
     )
 
     internal sealed class Command {
-        object RestartVpn : Command()
+        data object RestartVpn : Command()
     }
 
     enum class BannerState {

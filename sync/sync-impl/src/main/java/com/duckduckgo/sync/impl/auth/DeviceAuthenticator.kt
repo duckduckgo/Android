@@ -68,8 +68,8 @@ interface DeviceAuthenticator {
     fun launchDeviceAuthEnrollment(context: Context)
 
     sealed class AuthResult {
-        object Success : AuthResult()
-        object UserCancelled : AuthResult()
+        data object Success : AuthResult()
+        data object UserCancelled : AuthResult()
         data class Error(val reason: String) : AuthResult()
     }
 

@@ -340,6 +340,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ADDRESS_BAR_NEW_TAB_PAGE_CLOSED("m_addressbar_focus_close_ntp"),
     ADDRESS_BAR_WEBSITE_CLOSED("m_addressbar_focus_close_website"),
     ADDRESS_BAR_SERP_CLOSED("m_addressbar_focus_close_serp"),
+    ADDRESS_BAR_NTP_FOCUSED("m_addressbar_focus_ntp"),
 
     KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
     KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
@@ -437,10 +438,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SET_AS_DEFAULT_PROMPT_IMPRESSION("m_set-as-default_prompt_impression"),
     SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
     SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
+    SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK("m_set-as-default_prompt_do_not_ask_again_click"),
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
     SET_AS_DEFAULT_MESSAGE_IMPRESSION("m_set-as-default_message_impression"),
     SET_AS_DEFAULT_MESSAGE_CLICK("m_set-as-default_message_click"),
     SET_AS_DEFAULT_MESSAGE_DISMISSED("m_set-as-default_message_dismissed"),
+    SET_AS_DEFAULT_MESSAGE_DO_NOT_ASK_AGAIN_CLICK("m_set-as-default_message_do_not_ask_again_click"),
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
 

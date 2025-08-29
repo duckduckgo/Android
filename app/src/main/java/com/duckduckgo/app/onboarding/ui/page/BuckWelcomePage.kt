@@ -73,8 +73,10 @@ import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 @InjectWith(FragmentScope::class)
 class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welcome_page_buck) {
@@ -458,10 +460,10 @@ class BuckWelcomePage : OnboardingPageFragment(R.layout.content_onboarding_welco
     }
 
     private fun scheduleTypingAnimation(textView: TypeAnimationTextView, text: String, afterAnimation: () -> Unit = {}) {
-        textView.postDelayed(
-            { textView.startTypingAnimation(text, afterAnimation = afterAnimation) },
-            ANIMATION_DURATION,
-        )
+        viewLifecycleOwner.lifecycleScope.launch {
+            delay(ANIMATION_DURATION)
+            textView.startTypingAnimation(text, afterAnimation = afterAnimation)
+        }
     }
 
     private fun showDefaultBrowserDialog(intent: Intent) {

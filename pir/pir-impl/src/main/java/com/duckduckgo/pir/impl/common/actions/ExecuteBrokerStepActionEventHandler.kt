@@ -135,7 +135,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor() : EventHandler {
     }
 
     private fun hasEmail(optOutStep: OptOutStep): Boolean {
-        return optOutStep.profileToOptOut.email != null
+        return optOutStep.profileToOptOut.email.isNotEmpty()
     }
 
     private fun completeRequestData(

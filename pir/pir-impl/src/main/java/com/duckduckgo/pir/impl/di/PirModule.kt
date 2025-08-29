@@ -40,13 +40,13 @@ import com.duckduckgo.pir.impl.store.RealPirDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
 import com.duckduckgo.pir.impl.store.db.BrokerDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
+import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
 import com.duckduckgo.pir.impl.store.db.ScanLogDao
 import com.duckduckgo.pir.impl.store.db.ScanResultsDao
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -107,6 +107,12 @@ class PirModule {
         return database.jobSchedulingDao()
     }
 
+    @SingleInstanceIn(AppScope::class)
+    @Provides
+    fun provideExtractedProfileDao(database: PirDatabase): ExtractedProfileDao {
+        return database.extractedProfileDao()
+    }
+
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providePirRepository(
@@ -114,25 +120,19 @@ class PirModule {
         dispatcherProvider: DispatcherProvider,
         brokerJsonDao: BrokerJsonDao,
         brokerDao: BrokerDao,
-        scanResultsDao: ScanResultsDao,
         currentTimeProvider: CurrentTimeProvider,
-        moshi: Moshi,
         userProfileDao: UserProfileDao,
-        scanLogDao: ScanLogDao,
         dbpService: DbpService,
-        outResultsDao: OptOutResultsDao,
+        extractedProfileDao: ExtractedProfileDao,
     ): PirRepository = RealPirRepository(
-        moshi,
         dispatcherProvider,
         RealPirDataStore(sharedPreferencesProvider),
         currentTimeProvider,
         brokerJsonDao,
         brokerDao,
-        scanResultsDao,
         userProfileDao,
-        scanLogDao,
         dbpService,
-        outResultsDao,
+        extractedProfileDao,
     )
 
     @Provides

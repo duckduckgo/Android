@@ -89,7 +89,7 @@ jobs:
       - name: Decode secret
         env:
           FLANK: ${{ secrets.FLANK }}
-        run: echo $FLANK > flank.json
+        run: echo "$FLANK" > flank.json
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -98,7 +98,7 @@ jobs:
         run: ./gradlew androidTestsBuild
 
       - name: Run Android Tests
-        run: ./gradlew runFlankAndroidTests
+        run: ./gradlew runFlankAndroidTests --no-configuration-cache
 
       - name: Bundle the Android CI tests report
         if: always()
@@ -106,7 +106,7 @@ jobs:
 
       - name: Generate json file with failures
         if: ${{ failure() }}
-        run: cat build/fladle/fladleResults/HtmlErrorReport.html | cut -d\`  -f2 >> results.json
+        run: cut -d\`  -f2 < build/fladle/fladleResults/HtmlErrorReport.html >> results.json
 
       - name: Print failure report
         if: ${{ failure() }}

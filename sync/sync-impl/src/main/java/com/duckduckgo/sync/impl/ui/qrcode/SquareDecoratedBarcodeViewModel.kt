@@ -46,17 +46,17 @@ class PermissionDeniedWrapper @Inject constructor() {
 class SquareDecoratedBarcodeViewModel(private val permissionDeniedWrapper: PermissionDeniedWrapper) : ViewModel(), MainProcessLifecycleObserver {
 
     sealed class Command {
-        object CheckCameraAvailable : Command()
-        object CheckPermissions : Command()
-        object OpenSettings : Command()
-        object RequestPermissions : Command()
+        data object CheckCameraAvailable : Command()
+        data object CheckPermissions : Command()
+        data object OpenSettings : Command()
+        data object RequestPermissions : Command()
     }
 
     sealed class ViewState {
-        object Unknown : ViewState()
-        object PermissionsGranted : ViewState()
-        object PermissionsNotGranted : ViewState()
-        object CameraUnavailable : ViewState()
+        data object Unknown : ViewState()
+        data object PermissionsGranted : ViewState()
+        data object PermissionsNotGranted : ViewState()
+        data object CameraUnavailable : ViewState()
     }
 
     private val command = Channel<Command>(1, DROP_OLDEST)

@@ -19,8 +19,8 @@ package com.duckduckgo.downloads.api
 /** Each failed download has a specific reason represented by a [DownloadFailReason] object. */
 sealed class DownloadFailReason {
 
-    object UnsupportedUrlType : DownloadFailReason()
-    object Other : DownloadFailReason()
-    object DataUriParseException : DownloadFailReason()
-    object ConnectionRefused : DownloadFailReason()
+    data object UnsupportedUrlType : DownloadFailReason()
+    data object Other : DownloadFailReason()
+    data object DataUriParseException : DownloadFailReason()
+    data object ConnectionRefused : DownloadFailReason()
 }
