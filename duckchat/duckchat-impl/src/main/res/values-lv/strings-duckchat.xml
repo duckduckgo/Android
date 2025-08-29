@@ -50,7 +50,6 @@
     <string name="input_screen_search_tab">Meklēt</string>
     <string name="input_screen_search_hint">Meklē vai ievadi adresi</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
-    <string name="input_screen_chat_hint">Pajautā Duck.ai</string>
     <string name="input_screen_user_pref_without_ai">Meklēt tikai\n(pēc noklusējuma)</string>
     <string name="input_screen_user_pref_with_ai">Meklēšana &amp; Duck.ai\n(Eksperimentāls)</string>
     <string name="input_screen_user_pref_description">Izmēģini mūsu eksperimentālo iespēju jautāt Duck.ai tieši no adreses joslas. <annotation type="share_feedback">Dalies ar atsauksmi</annotation></string>

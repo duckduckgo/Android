@@ -50,7 +50,6 @@
     <string name="input_screen_search_tab">Αναζήτηση</string>
     <string name="input_screen_search_hint">Αναζήτηση ή εισαγωγή διεύθυνσης</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
-    <string name="input_screen_chat_hint">Ρωτήστε το Duck.ai</string>
     <string name="input_screen_user_pref_without_ai">Μόνο αναζήτηση\n(Προεπιλογή)</string>
     <string name="input_screen_user_pref_with_ai">Αναζήτηση και Duck.ai\n (Πειραματικό)</string>
     <string name="input_screen_user_pref_description">Δοκιμάστε την πειραματική επιλογή μας για να ρωτήσετε το Duck.ai απευθείας από τη Γραμμή διευθύνσεων. <annotation type="share_feedback">Κοινοποίηση σχολίων</annotation></string>

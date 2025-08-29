@@ -50,7 +50,6 @@
     <string name="input_screen_search_tab">Søg</string>
     <string name="input_screen_search_hint">Søg eller indtast adresse</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
-    <string name="input_screen_chat_hint">Spørg Duck.ai</string>
     <string name="input_screen_user_pref_without_ai">Kun søgning\n(Standard)</string>
     <string name="input_screen_user_pref_with_ai">Søgning og Duck.ai\n(Eksperimentel)</string>
     <string name="input_screen_user_pref_description">Prøv vores eksperimentelle mulighed for at spørge Duck.ai direkte fra adresselinjen. <annotation type="share_feedback">Del feedback</annotation></string>
