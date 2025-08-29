@@ -48,6 +48,7 @@
     <attr name="daxColorSurface" format="color"/>
     <attr name="daxColorContainer" format="color"/>
     <attr name="daxColorWindow" format="color"/>
+    <attr name="daxColorCanvas" format="color"/>
     <attr name="daxColorPrimaryText" format="color"/>
     <attr name="daxColorPrimaryInvertedText" format="color"/>
     <attr name="daxColorSecondaryText" format="color"/>
@@ -58,6 +59,7 @@
     <attr name="daxColorIconDisabled" format="color"/>
     <attr name="daxColorDestructive" format="color"/>
     <attr name="daxColorLines" format="color"/>
+    <attr name="daxColorShade" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
     <attr name="daxColorAccentContentPrimary" format="color"/>
@@ -263,9 +265,10 @@
     <color name="accent_content_primary_dark">@color/blue80</color>
 
     <!-- Backgrounds -->
-    <color name="background_background_dark">#27282A</color>
-    <color name="background_surface_dark">#333538</color>
-    <color name="background_window_dark">#404145</color>
+    <color name="background_background_dark">#282828</color>
+    <color name="background_surface_dark">#373737</color>
+    <color name="background_window_dark">#474747</color>
+    <color name="background_canvas_dark">#1F1F1F</color>
     <color name="background_container_dark">#404145</color>
 
     <!-- Text -->
@@ -281,6 +284,9 @@
     <!-- Lines-->
     <color name="lines_dark">#1FF9F9F9</color>
 
+    <!-- Tone -->
+    <color name="shade_dark">#52171718</color>
+
     <!-- Controls -->
     <color name="controls_fill_primary_dark">#1FF9F9F9</color>
     <color name="controls_fill_secondary_dark">#2EF9F9F9</color>
@@ -295,6 +301,7 @@
     <color name="background_background_light">#F2F2F2</color>
     <color name="background_surface_light">#F9F9F9</color>
     <color name="background_window_light">#FFFFFF</color>
+    <color name="background_canvas_light">#FFFFFF</color>
     <color name="background_container_light">#FFFFFF</color>
 
     <!-- Text -->
@@ -309,6 +316,9 @@
 
     <!-- Lines-->
     <color name="lines_light">#171F1F1F</color>
+
+    <!-- Tone -->
+    <color name="shade_light">#2E1F1F1F</color>
 
     <!-- Controls -->
     <color name="controls_fill_primary_light">#171F1F1F</color>
