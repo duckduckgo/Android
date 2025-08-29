@@ -20,6 +20,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/keyline_2"
     android:minHeight="72dp"
+    style="@style/Widget.DuckDuckGo.TabCardView"
     app:cardCornerRadius="@dimen/mediumShapeCornerRadius">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -61,7 +62,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/closeContentDescription"
             android:padding="@dimen/keyline_2"
-            android:src="@drawable/ic_close_solid_16"
+            android:src="@drawable/ic_close_16"
             android:background="@drawable/selectable_circular_ripple"
             app:tint="?attr/daxColorTabHighlight"
             app:layout_constraintBottom_toBottomOf="parent"
