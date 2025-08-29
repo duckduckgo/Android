@@ -19,32 +19,27 @@ package com.duckduckgo.pir.impl.store
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pir.impl.models.Address
+import com.duckduckgo.pir.impl.models.AddressCityState
+import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.ExtractedProfile
+import com.duckduckgo.pir.impl.models.MirrorSite
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.BrokerSchedulingConfig
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
 import com.duckduckgo.pir.impl.store.PirRepository.BrokerJson
 import com.duckduckgo.pir.impl.store.PirRepository.ConfirmationStatus
-import com.duckduckgo.pir.impl.store.db.Broker
 import com.duckduckgo.pir.impl.store.db.BrokerDao
+import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
-import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_ERROR
-import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
-import com.duckduckgo.pir.impl.store.db.OptOutActionLog
-import com.duckduckgo.pir.impl.store.db.OptOutCompletedBroker
-import com.duckduckgo.pir.impl.store.db.OptOutResultsDao
-import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
-import com.duckduckgo.pir.impl.store.db.PirEventLog
-import com.duckduckgo.pir.impl.store.db.ScanCompletedBroker
-import com.duckduckgo.pir.impl.store.db.ScanLogDao
-import com.duckduckgo.pir.impl.store.db.ScanResultsDao
 import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
+import com.duckduckgo.pir.impl.store.db.UserName
 import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.duckduckgo.pir.impl.store.db.UserProfileDao
 import com.squareup.moshi.Moshi
@@ -68,7 +63,16 @@ interface PirRepository {
 
     suspend fun getAllActiveBrokerObjects(): List<Broker>
 
+    suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite>
+
+    suspend fun getAllMirrorSites(): List<MirrorSite>
+
     suspend fun getAllBrokersForScan(): List<String>
+
+    /**
+     * Returns a map of broker names to their opt-out URLs.
+     */
+    suspend fun getAllBrokerOptOutUrls(): Map<String, String?>
 
     suspend fun getEtagForFilename(fileName: String): String?
 
@@ -115,70 +119,19 @@ interface PirRepository {
 
     suspend fun getAllExtractedProfiles(): List<ExtractedProfile>
 
-    suspend fun getScanErrorResultsCount(): Int
-
-    suspend fun getScanSuccessResultsCount(): Int
-
-    suspend fun deleteAllScanResults()
-
     suspend fun getUserProfileQueries(): List<ProfileQuery>
 
     suspend fun getUserProfileQueriesWithIds(ids: List<Long>): List<ProfileQuery>
 
     suspend fun deleteAllUserProfilesQueries()
 
-    suspend fun replaceUserProfile(userProfile: UserProfile)
+    suspend fun replaceUserProfile(profileQuery: ProfileQuery)
 
-    suspend fun saveUserProfiles(userProfiles: List<UserProfile>)
-
-    fun getAllEventLogsFlow(): Flow<List<PirEventLog>>
-
-    suspend fun saveScanLog(pirScanLog: PirEventLog)
-
-    suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog)
-
-    suspend fun deleteEventLogs()
+    suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean
 
     suspend fun getEmailForBroker(dataBroker: String): String
 
     suspend fun getEmailConfirmation(email: String): Pair<ConfirmationStatus, String?>
-
-    fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>>
-
-    fun getTotalScannedBrokersFlow(): Flow<Int>
-
-    fun getTotalOptOutCompletedFlow(): Flow<Int>
-
-    fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>>
-
-    fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>>
-
-    suspend fun saveScanCompletedBroker(
-        brokerName: String,
-        profileQueryId: Long,
-        startTimeInMillis: Long,
-        endTimeInMillis: Long,
-        isSuccess: Boolean,
-    )
-
-    suspend fun saveOptOutCompleted(
-        brokerName: String,
-        extractedProfile: ExtractedProfile,
-        startTimeInMillis: Long,
-        endTimeInMillis: Long,
-        isSubmitSuccess: Boolean,
-    )
-
-    suspend fun saveOptOutActionLog(
-        brokerName: String,
-        extractedProfile: ExtractedProfile,
-        completionTimeInMillis: Long,
-        actionType: String,
-        isError: Boolean,
-        result: String,
-    )
-
-    suspend fun deleteAllOptOutData()
 
     data class BrokerJson(
         val fileName: String,
@@ -193,19 +146,17 @@ interface PirRepository {
 }
 
 internal class RealPirRepository(
-    val moshi: Moshi,
     private val dispatcherProvider: DispatcherProvider,
     private val pirDataStore: PirDataStore,
     private val currentTimeProvider: CurrentTimeProvider,
     private val brokerJsonDao: BrokerJsonDao,
     private val brokerDao: BrokerDao,
-    private val scanResultsDao: ScanResultsDao,
     private val userProfileDao: UserProfileDao,
-    private val scanLogDao: ScanLogDao,
     private val dbpService: DbpService,
-    private val optOutResultsDao: OptOutResultsDao,
+    private val extractedProfileDao: ExtractedProfileDao,
 ) : PirRepository {
-    private val extractedProfileAdapter by lazy { moshi.adapter(ExtractedProfile::class.java) }
+
+    private val addressCityStateAdapter by lazy { Moshi.Builder().build().adapter(AddressCityState::class.java) }
 
     override suspend fun getCurrentMainEtag(): String? = pirDataStore.mainConfigEtag
 
@@ -249,12 +200,54 @@ internal class RealPirRepository(
 
     override suspend fun getAllActiveBrokerObjects(): List<Broker> =
         withContext(dispatcherProvider.io()) {
-            return@withContext brokerDao.getAllActiveBrokers()
+            return@withContext brokerDao.getAllActiveBrokers().map {
+                Broker(
+                    name = it.name,
+                    fileName = it.fileName,
+                    url = it.url,
+                    version = it.version,
+                    parent = it.parent,
+                    addedDatetime = it.addedDatetime,
+                    removedAt = it.removedAt,
+                )
+            }
         }
+
+    override suspend fun getAllMirrorSitesForBroker(brokerName: String): List<MirrorSite> {
+        return brokerDao.getAllMirrorSitesForBroker(brokerName).map {
+            MirrorSite(
+                name = it.name,
+                url = it.url,
+                addedAt = it.addedAt,
+                removedAt = it.removedAt,
+                optOutUrl = it.optOutUrl,
+                parentSite = it.parentSite,
+            )
+        }
+    }
+
+    override suspend fun getAllMirrorSites(): List<MirrorSite> {
+        return brokerDao.getAllMirrorSites().map {
+            MirrorSite(
+                name = it.name,
+                url = it.url,
+                addedAt = it.addedAt,
+                removedAt = it.removedAt,
+                optOutUrl = it.optOutUrl,
+                parentSite = it.parentSite,
+            )
+        }
+    }
 
     override suspend fun getAllBrokersForScan(): List<String> =
         withContext(dispatcherProvider.io()) {
             return@withContext brokerDao.getAllBrokersNamesWithScanSteps()
+        }
+
+    override suspend fun getAllBrokerOptOutUrls(): Map<String, String?> =
+        withContext(dispatcherProvider.io()) {
+            val brokerOptOuts = brokerDao.getAllBrokerOptOuts()
+            return@withContext brokerOptOuts.associate { it.brokerName to it.optOutUrl }
         }
 
     override suspend fun getEtagForFilename(fileName: String): String =
@@ -268,7 +261,7 @@ internal class RealPirRepository(
     ) {
         withContext(dispatcherProvider.io()) {
             brokerDao.upsert(
-                broker = Broker(
+                broker = BrokerEntity(
                     name = broker.name,
                     fileName = fileName,
                     url = broker.url,
@@ -345,7 +338,7 @@ internal class RealPirRepository(
 
     override suspend fun getBrokersForOptOut(formOptOutOnly: Boolean): List<String> =
         withContext(dispatcherProvider.io()) {
-            scanResultsDao.getAllExtractedProfiles().map {
+            extractedProfileDao.getAllExtractedProfiles().map {
                 it.brokerName
             }.distinct().run {
                 if (formOptOutOnly) {
@@ -366,7 +359,7 @@ internal class RealPirRepository(
             extractedProfiles.map {
                 it.toStoredExtractedProfile()
             }.also {
-                scanResultsDao.insertNewExtractedProfiles(it)
+                extractedProfileDao.insertNewExtractedProfiles(it)
             }
         }
     }
@@ -375,7 +368,7 @@ internal class RealPirRepository(
         brokerName: String,
         profileQueryId: Long,
     ): List<ExtractedProfile> = withContext(dispatcherProvider.io()) {
-        return@withContext scanResultsDao.getExtractedProfilesForBrokerAndProfile(
+        return@withContext extractedProfileDao.getExtractedProfilesForBrokerAndProfile(
             brokerName,
             profileQueryId,
         ).map {
@@ -384,7 +377,7 @@ internal class RealPirRepository(
     }
 
     override fun getAllExtractedProfilesFlow(): Flow<List<ExtractedProfile>> {
-        return scanResultsDao.getAllExtractedProfileFlow().map { list ->
+        return extractedProfileDao.getAllExtractedProfileFlow().map { list ->
             list.map {
                 it.toExtractedProfile()
             }
@@ -393,17 +386,10 @@ internal class RealPirRepository(
 
     override suspend fun getAllExtractedProfiles(): List<ExtractedProfile> =
         withContext(dispatcherProvider.io()) {
-            return@withContext scanResultsDao.getAllExtractedProfiles().map {
+            return@withContext extractedProfileDao.getAllExtractedProfiles().map {
                 it.toExtractedProfile()
             }
         }
-
-    override suspend fun deleteAllScanResults() {
-        withContext(dispatcherProvider.io()) {
-            scanResultsDao.deleteAllScanCompletedBroker()
-            scanLogDao.deleteAllBrokerScanEvents()
-        }
-    }
 
     override suspend fun getUserProfileQueries(): List<ProfileQuery> =
         withContext(dispatcherProvider.io()) {
@@ -422,7 +408,7 @@ internal class RealPirRepository(
     override suspend fun deleteAllUserProfilesQueries() {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
-            scanResultsDao.deleteAllExtractedProfiles()
+            extractedProfileDao.deleteAllExtractedProfiles()
         }
     }
 
@@ -448,47 +434,21 @@ internal class RealPirRepository(
         )
     }
 
-    override suspend fun getScanErrorResultsCount(): Int = withContext(dispatcherProvider.io()) {
-        scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_ERROR }.size
-    }
-
-    override suspend fun getScanSuccessResultsCount(): Int = withContext(dispatcherProvider.io()) {
-        scanLogDao.getAllBrokerScanEvents().filter { it.eventType == BROKER_SUCCESS }.size
-    }
-
-    override suspend fun replaceUserProfile(userProfile: UserProfile) {
+    override suspend fun replaceUserProfile(profileQuery: ProfileQuery) {
         withContext(dispatcherProvider.io()) {
             userProfileDao.deleteAllProfiles()
-            userProfileDao.insertUserProfile(userProfile)
+            userProfileDao.insertUserProfile(profileQuery.toUserProfile())
         }
     }
 
-    override suspend fun saveUserProfiles(userProfiles: List<UserProfile>) =
+    override suspend fun saveProfileQueries(profileQueries: List<ProfileQuery>): Boolean =
         withContext(dispatcherProvider.io()) {
-            userProfileDao.insertUserProfiles(userProfiles)
+            val userProfiles = profileQueries.map { query ->
+                query.toUserProfile()
+            }
+            val insertResult = userProfileDao.insertUserProfiles(userProfiles)
+            insertResult.size == userProfiles.size
         }
-
-    override fun getAllEventLogsFlow(): Flow<List<PirEventLog>> {
-        return scanLogDao.getAllEventLogsFlow()
-    }
-
-    override suspend fun saveScanLog(pirScanLog: PirEventLog) {
-        withContext(dispatcherProvider.io()) {
-            scanLogDao.insertEventLog(pirScanLog)
-        }
-    }
-
-    override suspend fun saveBrokerScanLog(pirBrokerScanLog: PirBrokerScanLog) {
-        withContext(dispatcherProvider.io()) {
-            scanLogDao.insertBrokerScanEvent(pirBrokerScanLog)
-        }
-    }
-
-    override suspend fun deleteEventLogs() {
-        withContext(dispatcherProvider.io()) {
-            scanLogDao.deleteAllEventLogs()
-        }
-    }
 
     override suspend fun getEmailForBroker(dataBroker: String): String =
         withContext(dispatcherProvider.io()) {
@@ -510,96 +470,6 @@ internal class RealPirRepository(
         }
     }
 
-    override fun getScannedBrokersFlow(): Flow<List<ScanCompletedBroker>> {
-        return scanResultsDao.getScanCompletedBrokerFlow()
-    }
-
-    override fun getTotalScannedBrokersFlow(): Flow<Int> {
-        return scanResultsDao.getScanCompletedBrokerFlow().map { it.size }
-    }
-
-    override fun getTotalOptOutCompletedFlow(): Flow<Int> {
-        return optOutResultsDao.getOptOutCompletedBrokerFlow().map { it.size }
-    }
-
-    override fun getAllSuccessfullySubmittedOptOutFlow(): Flow<Map<String, String>> {
-        return optOutResultsDao.getOptOutCompletedBrokerFlow().map {
-            it.filter {
-                it.isSubmitSuccess
-            }.map {
-                (
-                    extractedProfileAdapter.fromJson(it.extractedProfile)?.identifier
-                        ?: "Unknown"
-                    ) to it.brokerName
-            }.distinct().toMap()
-        }
-    }
-
-    override fun getAllOptOutActionLogFlow(): Flow<List<OptOutActionLog>> {
-        return optOutResultsDao.getOptOutActionLogFlow()
-    }
-
-    override suspend fun saveScanCompletedBroker(
-        brokerName: String,
-        profileQueryId: Long,
-        startTimeInMillis: Long,
-        endTimeInMillis: Long,
-        isSuccess: Boolean,
-    ) = withContext(dispatcherProvider.io()) {
-        scanResultsDao.insertScanCompletedBroker(
-            ScanCompletedBroker(
-                brokerName = brokerName,
-                profileQueryId = profileQueryId,
-                startTimeInMillis = startTimeInMillis,
-                endTimeInMillis = endTimeInMillis,
-                isSuccess = isSuccess,
-            ),
-        )
-    }
-
-    override suspend fun saveOptOutCompleted(
-        brokerName: String,
-        extractedProfile: ExtractedProfile,
-        startTimeInMillis: Long,
-        endTimeInMillis: Long,
-        isSubmitSuccess: Boolean,
-    ) = withContext(dispatcherProvider.io()) {
-        optOutResultsDao.insertOptOutCompletedBroker(
-            OptOutCompletedBroker(
-                brokerName = brokerName,
-                extractedProfile = extractedProfileAdapter.toJson(extractedProfile),
-                startTimeInMillis = startTimeInMillis,
-                endTimeInMillis = endTimeInMillis,
-                isSubmitSuccess = isSubmitSuccess,
-            ),
-        )
-    }
-
-    override suspend fun saveOptOutActionLog(
-        brokerName: String,
-        extractedProfile: ExtractedProfile,
-        completionTimeInMillis: Long,
-        actionType: String,
-        isError: Boolean,
-        result: String,
-    ) = withContext(dispatcherProvider.io()) {
-        optOutResultsDao.insertOptOutActionLog(
-            OptOutActionLog(
-                brokerName = brokerName,
-                extractedProfile = extractedProfileAdapter.toJson(extractedProfile),
-                completionTimeInMillis = completionTimeInMillis,
-                actionType = actionType,
-                isError = isError,
-                result = result,
-            ),
-        )
-    }
-
-    override suspend fun deleteAllOptOutData() = withContext(dispatcherProvider.io()) {
-        optOutResultsDao.deleteAllOptOutActionLog()
-        optOutResultsDao.deleteAllOptOutCompletedBroker()
-    }
-
     private fun StoredExtractedProfile.toExtractedProfile(): ExtractedProfile {
         return ExtractedProfile(
             dbId = this.id,
@@ -609,7 +479,9 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses,
+            addresses = this.addresses.mapNotNull {
+                addressCityStateAdapter.fromJson(it)
+            },
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
             identifier = this.identifier,
@@ -629,7 +501,9 @@ internal class RealPirRepository(
             name = this.name,
             alternativeNames = this.alternativeNames,
             age = this.age,
-            addresses = this.addresses,
+            addresses = this.addresses.mapNotNull {
+                addressCityStateAdapter.toJson(it)
+            },
             phoneNumbers = this.phoneNumbers,
             relatives = this.relatives,
             reportId = this.reportId,
@@ -643,6 +517,21 @@ internal class RealPirRepository(
                 this.dateAddedInMillis
             },
             deprecated = this.deprecated,
+        )
+    }
+
+    private fun ProfileQuery.toUserProfile(): UserProfile {
+        return UserProfile(
+            userName = UserName(
+                firstName = this.firstName,
+                lastName = this.lastName,
+                middleName = this.middleName,
+            ),
+            addresses = com.duckduckgo.pir.impl.store.db.Address(
+                city = this.city,
+                state = this.state,
+            ),
+            birthYear = this.birthYear,
         )
     }
 }

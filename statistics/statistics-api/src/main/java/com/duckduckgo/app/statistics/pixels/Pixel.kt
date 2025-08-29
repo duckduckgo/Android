@@ -68,6 +68,9 @@ interface Pixel {
         const val TAB_INACTIVE_3W = "tab_inactive_3w"
         const val IS_ENABLED = "is_enabled"
         const val FROM_FOCUSED_NTP = "from_focused_ntp"
+        const val IS_TAB_SWITCHER_BUTTON_SHOWN = "is_tab_switcher_button_shown"
+        const val IS_FIRE_BUTTON_SHOWN = "is_fire_button_shown"
+        const val IS_BROWSER_MENU_BUTTON_SHOWN = "is_browser_menu_button_shown"
     }
 
     object PixelValues {

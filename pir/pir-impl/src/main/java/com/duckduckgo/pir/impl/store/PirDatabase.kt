@@ -21,13 +21,14 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
-import com.duckduckgo.pir.impl.store.db.Broker
 import com.duckduckgo.pir.impl.store.db.BrokerDao
+import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.BrokerJsonEtag
 import com.duckduckgo.pir.impl.store.db.BrokerOptOut
 import com.duckduckgo.pir.impl.store.db.BrokerScan
 import com.duckduckgo.pir.impl.store.db.BrokerSchedulingConfigEntity
+import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.JobSchedulingDao
 import com.duckduckgo.pir.impl.store.db.MirrorSiteEntity
 import com.duckduckgo.pir.impl.store.db.OptOutActionLog
@@ -52,7 +53,7 @@ import com.squareup.moshi.Types
     version = 8,
     entities = [
         BrokerJsonEtag::class,
-        Broker::class,
+        BrokerEntity::class,
         BrokerOptOut::class,
         BrokerScan::class,
         BrokerSchedulingConfigEntity::class,
@@ -77,6 +78,7 @@ abstract class PirDatabase : RoomDatabase() {
     abstract fun scanLogDao(): ScanLogDao
     abstract fun optOutResultsDao(): OptOutResultsDao
     abstract fun jobSchedulingDao(): JobSchedulingDao
+    abstract fun extractedProfileDao(): ExtractedProfileDao
 
     companion object {
         val ALL_MIGRATIONS: List<Migration> = emptyList()

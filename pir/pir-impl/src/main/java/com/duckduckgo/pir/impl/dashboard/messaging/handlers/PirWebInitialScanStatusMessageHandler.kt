@@ -23,17 +23,18 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
-import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_COMPLETED
-import com.duckduckgo.pir.impl.store.db.EventType.MANUAL_SCAN_STARTED
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult.ScanResultAddress
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
+import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import logcat.logcat
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Handles the initial scan status message from Web which is used to retrieve the status of the initial scan.
@@ -43,13 +44,12 @@ import org.json.JSONObject
     boundType = PirWebJsMessageHandler::class,
 )
 class PirWebInitialScanStatusMessageHandler @Inject constructor(
-    private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) :
-    PirWebJsMessageHandler() {
+    private val stateProvider: PirDashboardInitialScanStateProvider,
+) : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.INITIAL_SCAN_STATUS)
+    override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
 
     override fun process(
         jsMessage: JsMessage,
@@ -59,29 +59,60 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor(
         logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val eventLogs = repository.getAllEventLogsFlow().firstOrNull().orEmpty()
-
-            // TODO get actual scan progress results from the repository
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = true,
-                customParams = mapOf(
-                    PARAM_RESULTS_FOUND to JSONArray(),
-                    PARAM_SCAN_PROGRESS to JSONObject().apply {
-                        put(PARAM_CURRENT_SCAN, eventLogs.count { it.eventType == MANUAL_SCAN_COMPLETED })
-                        put(PARAM_TOTAL_SCANS, eventLogs.count { it.eventType == MANUAL_SCAN_STARTED })
-                        put(PARAM_SCANNED_BROKERS, JSONArray())
-                    },
+                response = PirWebMessageResponse.InitialScanResponse(
+                    resultsFound = getResultsFound(),
+                    scanProgress = PirWebMessageResponse.InitialScanResponse.ScanProgress(
+                        currentScans = stateProvider.getFullyCompletedBrokersTotal(),
+                        totalScans = stateProvider.getActiveBrokersAndMirrorSitesTotal(),
+                        scannedBrokers = getScannedBrokers(),
+                    ),
                 ),
             )
         }
     }
 
-    companion object {
-        private const val PARAM_RESULTS_FOUND = "resultsFound"
-        private const val PARAM_SCAN_PROGRESS = "scanProgress"
-        private const val PARAM_CURRENT_SCAN = "currentScan"
-        private const val PARAM_TOTAL_SCANS = "totalScans"
-        private const val PARAM_SCANNED_BROKERS = "scannedBrokers"
+    private suspend fun getResultsFound(): List<ScanResult> {
+        return stateProvider.getScanResults().map {
+            ScanResult(
+                dataBroker = DataBroker(
+                    name = it.broker.name,
+                    url = it.broker.url,
+                    optOutUrl = it.broker.optOutUrl,
+                    parentURL = it.broker.parentUrl,
+                ),
+                name = it.extractedProfile.name,
+                addresses = it.extractedProfile.addresses.map { address ->
+                    ScanResultAddress(
+                        city = address.city,
+                        state = address.state,
+                    )
+                },
+                alternativeNames = it.extractedProfile.alternativeNames,
+                relatives = it.extractedProfile.relatives,
+                foundDate = it.extractedProfile.dateAddedInMillis.convertToSeconds(),
+                optOutSubmittedDate = it.optOutSubmittedDateInMillis?.convertToSeconds(),
+                estimatedRemovalDate = it.estimatedRemovalDateInMillis?.convertToSeconds(),
+                removedDate = it.optOutRemovedDateInMillis?.convertToSeconds(),
+                hasMatchingRecordOnParentBroker = it.hasMatchingRecordOnParentBroker,
+            )
+        }
+    }
+
+    private fun Long.convertToSeconds(): Long {
+        return TimeUnit.MILLISECONDS.toSeconds(this)
+    }
+
+    private suspend fun getScannedBrokers(): List<ScannedBroker> {
+        return stateProvider.getAllScannedBrokersStatus().map {
+            ScannedBroker(
+                name = it.broker.name,
+                url = it.broker.url,
+                optOutUrl = it.broker.optOutUrl,
+                parentURL = it.broker.parentUrl,
+                status = it.status.statusName,
+            )
+        }
     }
 }

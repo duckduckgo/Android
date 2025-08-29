@@ -31,11 +31,11 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsAppUsageRepository
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.ENROLLED
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_1
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_2
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
@@ -205,7 +205,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         appCoroutineScope.launch {
             defaultBrowserPromptsDataStore.storeShowSetAsDefaultMessageState(false)
             if (doNotShowAgain) {
-                defaultBrowserPromptsDataStore.storeExperimentStage(STOPPED)
+                defaultBrowserPromptsDataStore.storeStage(STOPPED)
             }
         }
     }
@@ -244,17 +244,17 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
             logcat { "evaluate: DuckDuckGo is default browser. Set the stage to STOPPED." }
             STOPPED
-        } else if (currentStage == NOT_ENROLLED) {
-            logcat { "evaluate: new stage is ENROLLED" }
-            ENROLLED
+        } else if (currentStage == NOT_STARTED) {
+            logcat { "evaluate: new stage is STARTED" }
+            STARTED
         } else {
-            logcat { "evaluate: current stage is other than NOT_ENROLLED and DuckDuckGo is NOT default browser." }
-            val appActiveDaysUsedSinceEnrollment = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceEnrollment().getOrElse { throwable ->
+            logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
+            val appActiveDaysUsedSinceStart = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return
             }
 
-            logcat { "evaluate: active days used since enrollment = $appActiveDaysUsedSinceEnrollment" }
+            logcat { "evaluate: active days used since flow started = $appActiveDaysUsedSinceStart" }
 
             val configSettings = featureSettings ?: run {
                 // If feature settings weren't cached before, deserialize and cache them now.
@@ -269,11 +269,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             when (userType) {
                 DefaultBrowserPromptsDataStore.UserType.NEW -> {
                     logcat { "evaluate: user is new" }
-                    getNewStageForNewUser(currentStage, appActiveDaysUsedSinceEnrollment, configSettings)
+                    getNewStageForNewUser(currentStage, appActiveDaysUsedSinceStart, configSettings)
                 }
                 DefaultBrowserPromptsDataStore.UserType.EXISTING -> {
                     logcat { "evaluate: user is existing" }
-                    getNewStageForExistingUser(currentStage, appActiveDaysUsedSinceEnrollment, configSettings)
+                    getNewStageForExistingUser(currentStage, appActiveDaysUsedSinceStart, configSettings)
                 }
                 else -> {
                     logcat { "evaluate: user type is not known, skipping evaluation" }
@@ -283,7 +283,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         }
 
         if (newStage != null) {
-            defaultBrowserPromptsDataStore.storeExperimentStage(newStage)
+            defaultBrowserPromptsDataStore.storeStage(newStage)
 
             val action = stageEvaluator.evaluate(newStage)
             logcat { "evaluate: action = $action show message dialog = ${action.showMessageDialog}" }
@@ -325,7 +325,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK)
         appCoroutineScope.launch {
             // The user does not want to see the prompt again, so we jump to stage 2.
-            defaultBrowserPromptsDataStore.storeExperimentStage(STAGE_2)
+            defaultBrowserPromptsDataStore.storeStage(STAGE_2)
         }
     }
 
@@ -406,13 +406,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     private fun getNewStageForNewUser(
         currentStage: Stage?,
-        appActiveDaysUsedSinceEnrollment: Long,
+        appActiveDaysUsedSinceStart: Long,
         configSettings: FeatureSettings,
     ): Stage? {
         return when (currentStage) {
-            ENROLLED -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage1) {
-                    logcat { "evaluate: user is new, go from ENROLLED to STAGE_1." }
+            STARTED -> {
+                if (appActiveDaysUsedSinceStart >= configSettings.newUserActiveDaysUntilStage1) {
+                    logcat { "evaluate: user is new, go from STARTED to STAGE_1." }
                     STAGE_1
                 } else {
                     null
@@ -420,7 +420,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_1 -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage2) {
+                if (appActiveDaysUsedSinceStart >= configSettings.newUserActiveDaysUntilStage2) {
                     logcat { "evaluate: user is new, go from STAGE_1 to STAGE_2." }
                     STAGE_2
                 } else {
@@ -429,7 +429,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_2 -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.newUserActiveDaysUntilStage3) {
+                if (appActiveDaysUsedSinceStart >= configSettings.newUserActiveDaysUntilStage3) {
                     logcat { "evaluate: user is new, go from STAGE_2 to STAGE_3." }
                     STAGE_3
                 } else {
@@ -451,13 +451,13 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     private fun getNewStageForExistingUser(
         currentStage: Stage?,
-        appActiveDaysUsedSinceEnrollment: Long,
+        appActiveDaysUsedSinceStart: Long,
         configSettings: FeatureSettings,
     ): Stage? {
         return when (currentStage) {
-            ENROLLED -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage1) {
-                    logcat { "evaluate: user is existing, go from ENROLLED to STAGE_1." }
+            STARTED -> {
+                if (appActiveDaysUsedSinceStart >= configSettings.existingUserActiveDaysUntilStage1) {
+                    logcat { "evaluate: user is existing, go from STARTED to STAGE_1." }
                     STAGE_1
                 } else {
                     null
@@ -465,7 +465,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             }
 
             STAGE_1 -> {
-                if (appActiveDaysUsedSinceEnrollment >= configSettings.existingUserActiveDaysUntilStage3) {
+                if (appActiveDaysUsedSinceStart >= configSettings.existingUserActiveDaysUntilStage3) {
                     logcat { "evaluate: user is existing, skip STAGE_2 and go from STAGE_1 to STAGE_3." }
                     STAGE_3
                 } else {

@@ -50,14 +50,12 @@ class RealClientBrandHintProvider @Inject constructor(
     private var currentBranding: ClientBrandsHints = DDG
 
     override fun setDefault(settings: WebSettings) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            if (clientBrandHintFeature.self().isEnabled()) {
-                logcat(VERBOSE) { "ClientBrandHintProvider: branding enabled, initialising metadata with DuckDuckGo branding" }
-                setUserAgentMetadata(settings, DEFAULT_ENABLED_BRANDING)
-            } else {
-                logcat(VERBOSE) { "ClientBrandHintProvider: branding disabled, initialising metadata with Google Chrome branding" }
-                setUserAgentMetadata(settings, DEFAULT_DISABLED_BRANDING)
-            }
+        if (clientBrandHintFeature.self().isEnabled()) {
+            logcat(VERBOSE) { "ClientBrandHintProvider: branding enabled, initialising metadata with DuckDuckGo branding" }
+            setUserAgentMetadata(settings, DEFAULT_ENABLED_BRANDING)
+        } else {
+            logcat(VERBOSE) { "ClientBrandHintProvider: branding disabled, initialising metadata with Google Chrome branding" }
+            setUserAgentMetadata(settings, DEFAULT_DISABLED_BRANDING)
         }
     }
 
@@ -136,6 +134,12 @@ class RealClientBrandHintProvider @Inject constructor(
         settings: WebSettings,
         branding: ClientBrandsHints,
     ) {
+        // Check if WebView supports user agent metadata
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
+            logcat(VERBOSE) { "ClientBrandHintProvider: USER_AGENT_METADATA not supported by WebView, skipping" }
+            return
+        }
+
         currentBranding = branding
         val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
         val finalBrandList = metadata.brandVersionList.map {

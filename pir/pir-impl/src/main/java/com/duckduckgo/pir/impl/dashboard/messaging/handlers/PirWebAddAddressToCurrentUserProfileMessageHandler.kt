@@ -21,8 +21,9 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
-import com.duckduckgo.pir.impl.models.Address
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import logcat.logcat
@@ -37,8 +38,8 @@ import logcat.logcat
 class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
     private val pirWebOnboardingStateHolder: PirWebOnboardingStateHolder,
 ) : PirWebJsMessageHandler() {
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE)
+
+    override val message = PirDashboardWebMessages.ADD_ADDRESS_TO_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -47,39 +48,35 @@ class PirWebAddAddressToCurrentUserProfileMessageHandler @Inject constructor(
     ) {
         logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: process $jsMessage" }
 
-        val city = jsMessage.params.getStringParam("city")
-        val state = jsMessage.params.getStringParam("state")
+        val request =
+            jsMessage.toRequestMessage(PirWebMessageRequest.AddAddressToCurrentUserProfileRequest::class)
+
+        val city = request?.city?.trim().orEmpty()
+        val state = request?.state?.trim().orEmpty()
 
         // attempting to add an empty address should return success=false
-        if (city == null || state == null) {
+        if (city.isBlank() || state.isBlank()) {
             logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: missing city and/or state" }
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = false,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
             )
             return
         }
 
         // attempting to add a duplicate address should return success=false
-        if (pirWebOnboardingStateHolder.addresses.any { it.city == city && it.state == state }) {
+        if (!pirWebOnboardingStateHolder.addAddress(city, state)) {
             logcat { "PIR-WEB: PirWebAddAddressToCurrentUserProfileMessageHandler: address already exists" }
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = false,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
             )
             return
         }
 
-        pirWebOnboardingStateHolder.addresses.add(
-            Address(
-                city = city,
-                state = state,
-            ),
-        )
-
-        jsMessaging.sendPirResponse(
+        jsMessaging.sendResponse(
             jsMessage = jsMessage,
-            success = true,
+            response = PirWebMessageResponse.DefaultResponse.SUCCESS,
         )
     }
 }

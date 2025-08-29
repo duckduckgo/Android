@@ -38,7 +38,7 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
 
-    @Mock private lateinit var experimentAppUsageDaoMock: ExperimentAppUsageDao
+    @Mock private lateinit var defaultBrowserPromptsAppUsageDaoMock: DefaultBrowserPromptsAppUsageDao
 
     @Before
     fun setup() {
@@ -47,30 +47,30 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
 
     @Test
     fun `when record usage, then insert ET time`() = runTest {
-        val expected = ExperimentAppUsageEntity(
+        val expected = DefaultBrowserPromptsAppUsageEntity(
             isoDateET = ZonedDateTime.now(ZoneId.of("America/New_York"))
                 .truncatedTo(ChronoUnit.DAYS)
                 .format(DateTimeFormatter.ISO_LOCAL_DATE),
         )
         val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            experimentAppUsageDao = experimentAppUsageDaoMock,
+            defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDaoMock,
         )
 
         testee.recordAppUsedNow()
 
-        verify(experimentAppUsageDaoMock).insert(expected)
+        verify(defaultBrowserPromptsAppUsageDaoMock).insert(expected)
     }
 
     @Test
     fun `when active days since enrollment queried and first day is null, return failure`() = runTest {
-        whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(null)
+        whenever(defaultBrowserPromptsAppUsageDaoMock.getFirstDay()).thenReturn(null)
         val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            experimentAppUsageDao = experimentAppUsageDaoMock,
+            defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDaoMock,
         )
 
-        val result = testee.getActiveDaysUsedSinceEnrollment()
+        val result = testee.getActiveDaysUsedSinceStart()
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is IllegalStateException)
@@ -79,13 +79,13 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
     @Test
     fun `when active days since enrollment queried and first day is malformed date, return failure`() = runTest {
         val invalidDate = "not-a-valid-date"
-        whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(invalidDate)
+        whenever(defaultBrowserPromptsAppUsageDaoMock.getFirstDay()).thenReturn(invalidDate)
         val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            experimentAppUsageDao = experimentAppUsageDaoMock,
+            defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDaoMock,
         )
 
-        val result = testee.getActiveDaysUsedSinceEnrollment()
+        val result = testee.getActiveDaysUsedSinceStart()
 
         assertTrue(result.isFailure)
         assertTrue(result.exceptionOrNull() is DateTimeParseException)
@@ -95,15 +95,15 @@ class DefaultBrowserPromptsAppUsageRepositoryImplTest {
     fun `when active days since enrollment queried and first day is correct, return success`() = runTest {
         val validDate = "2023-01-01"
         val expectedDaysUsed = 2L
-        whenever(experimentAppUsageDaoMock.getFirstDay()).thenReturn(validDate)
-        whenever(experimentAppUsageDaoMock.getNumberOfDaysAppUsedSinceDateET(validDate)).thenReturn(expectedDaysUsed)
+        whenever(defaultBrowserPromptsAppUsageDaoMock.getFirstDay()).thenReturn(validDate)
+        whenever(defaultBrowserPromptsAppUsageDaoMock.getNumberOfDaysAppUsedSinceDateET(validDate)).thenReturn(expectedDaysUsed)
 
         val testee = DefaultBrowserPromptsAppUsageRepositoryImpl(
             dispatchers = coroutinesTestRule.testDispatcherProvider,
-            experimentAppUsageDao = experimentAppUsageDaoMock,
+            defaultBrowserPromptsAppUsageDao = defaultBrowserPromptsAppUsageDaoMock,
         )
 
-        val result = testee.getActiveDaysUsedSinceEnrollment()
+        val result = testee.getActiveDaysUsedSinceStart()
 
         assertTrue(result.isSuccess)
         Assert.assertEquals(expectedDaysUsed, result.getOrThrow())

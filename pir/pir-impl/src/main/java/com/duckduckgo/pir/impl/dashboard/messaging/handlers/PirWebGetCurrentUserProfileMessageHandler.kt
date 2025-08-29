@@ -22,17 +22,15 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
-import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder.Name
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.store.PirRepository
+import com.duckduckgo.pir.impl.store.db.UserName
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Handles the initial getCurrentUserProfile message from Web which is used to retrieve the current user profile
@@ -46,10 +44,9 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
     private val repository: PirRepository,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) :
-    PirWebJsMessageHandler() {
+) : PirWebJsMessageHandler() {
 
-    override val messageNames: List<PirDashboardWebMessages> = listOf(PirDashboardWebMessages.GET_CURRENT_USER_PROFILE)
+    override val message = PirDashboardWebMessages.GET_CURRENT_USER_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -63,51 +60,42 @@ class PirWebGetCurrentUserProfileMessageHandler @Inject constructor(
 
             if (profiles.isEmpty()) {
                 logcat { "PIR-WEB: GetCurrentUserProfileMessageHandler: no user profiles found" }
-                jsMessaging.sendPirResponse(
+                jsMessaging.sendResponse(
                     jsMessage = jsMessage,
-                    success = true,
+                    response = PirWebMessageResponse.DefaultResponse.SUCCESS,
                 )
                 return@launch
             }
 
-            val names = profiles.map { Name(it.firstName, it.middleName, it.lastName) }
+            val names = profiles.map {
+                UserName(
+                    firstName = it.firstName,
+                    lastName = it.lastName,
+                    middleName = it.middleName,
+                )
+            }
             val addresses = profiles.map { it.addresses }.flatten()
             val birthYear = profiles.firstOrNull()?.birthYear ?: 0
 
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = true,
-                customParams = mapOf(
-                    PARAM_ADDRESSES to JSONArray().apply {
-                        addresses.forEach { address ->
-                            put(
-                                JSONObject().apply {
-                                    put(PirDashboardWebConstants.PARAM_CITY, address.city)
-                                    put(PirDashboardWebConstants.PARAM_STATE, address.state)
-                                },
-                            )
-                        }
-                    },
-                    PARAM_BIRTH_YEAR to birthYear,
-                    PARAM_NAMES to JSONArray().apply {
-                        names.forEach { name ->
-                            put(
-                                JSONObject().apply {
-                                    put(PirDashboardWebConstants.PARAM_FIRST_NAME, name.firstName)
-                                    put(PirDashboardWebConstants.PARAM_MIDDLE_NAME, name.middleName ?: "")
-                                    put(PirDashboardWebConstants.PARAM_LAST_NAME, name.lastName)
-                                },
-                            )
-                        }
-                    },
+                response = PirWebMessageResponse.GetCurrentUserProfileResponse(
+                    names = names.map {
+                        PirWebMessageResponse.GetCurrentUserProfileResponse.Name(
+                            first = it.firstName,
+                            middle = it.middleName ?: "",
+                            last = it.lastName,
+                        )
+                    }.distinct(),
+                    addresses = addresses.map {
+                        PirWebMessageResponse.GetCurrentUserProfileResponse.Address(
+                            city = it.city,
+                            state = it.state,
+                        )
+                    }.distinct(),
+                    birthYear = birthYear,
                 ),
             )
         }
-    }
-
-    companion object {
-        private const val PARAM_ADDRESSES = "addresses"
-        private const val PARAM_BIRTH_YEAR = "birthYear"
-        private const val PARAM_NAMES = "names"
     }
 }

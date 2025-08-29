@@ -40,7 +40,7 @@ data class AppTrackerBlocklist(
 )
 
 sealed class ETag {
-    object InvalidETag : ETag()
+    data object InvalidETag : ETag()
     data class ValidETag(val value: String) : ETag()
 }
 

@@ -19,19 +19,18 @@ package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 import android.content.Context
 import android.content.Intent
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebOnboardingStateHolder
 import com.duckduckgo.pir.impl.scan.PirForegroundScanService
 import com.duckduckgo.pir.impl.scan.PirScanScheduler
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.duckduckgo.pir.impl.store.db.Address
-import com.duckduckgo.pir.impl.store.db.UserName
-import com.duckduckgo.pir.impl.store.db.UserProfile
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
@@ -51,10 +50,11 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val context: Context,
     private val scanScheduler: PirScanScheduler,
+    private val currentTimeProvider: CurrentTimeProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : PirWebJsMessageHandler() {
-    override val messageNames: List<PirDashboardWebMessages> =
-        listOf(PirDashboardWebMessages.SAVE_PROFILE)
+
+    override val message = PirDashboardWebMessages.SAVE_PROFILE
 
     override fun process(
         jsMessage: JsMessage,
@@ -64,55 +64,40 @@ class PirWebSaveProfileMessageHandler @Inject constructor(
         logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: process $jsMessage" }
 
         // validate that we have the complete profile information
-        if (pirWebOnboardingStateHolder.names.isEmpty() ||
-            pirWebOnboardingStateHolder.addresses.isEmpty() ||
-            (pirWebOnboardingStateHolder.birthYear ?: 0) == 0
-        ) {
+        if (!pirWebOnboardingStateHolder.isProfileComplete) {
             logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: incomplete profile information" }
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage = jsMessage,
-                success = false,
+                response = PirWebMessageResponse.DefaultResponse.ERROR,
             )
             return
         }
 
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val profiles = prepareUserProfiles()
-            repository.saveUserProfiles(profiles)
+            val profileQueries = pirWebOnboardingStateHolder.toProfileQueries(currentTimeProvider.localDateTimeNow().year)
+            if (!repository.saveProfileQueries(profileQueries)) {
+                logcat { "PIR-WEB: PirWebSaveProfileMessageHandler: failed to save all user profiles" }
+                jsMessaging.sendResponse(
+                    jsMessage = jsMessage,
+                    response = PirWebMessageResponse.DefaultResponse.ERROR,
+                )
+                return@launch
+            }
 
-            // TODO check if all profiles were saved successfully
-            jsMessaging.sendPirResponse(
+            jsMessaging.sendResponse(
                 jsMessage,
-                success = true,
+                response = PirWebMessageResponse.DefaultResponse.SUCCESS,
             )
 
-            context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
-            scanScheduler.scheduleScans()
+            // start the initial scan at this point as startScanAndOptOut message is not reliable
+            startAndScheduleInitialScan()
+
+            pirWebOnboardingStateHolder.clear()
         }
     }
 
-    private fun prepareUserProfiles(): List<UserProfile> {
-        val profiles = mutableListOf<UserProfile>()
-
-        pirWebOnboardingStateHolder.names.forEach { name ->
-            pirWebOnboardingStateHolder.addresses.forEach { address ->
-                profiles.add(
-                    UserProfile(
-                        userName = UserName(
-                            firstName = name.firstName,
-                            middleName = name.middleName,
-                            lastName = name.lastName,
-                        ),
-                        birthYear = pirWebOnboardingStateHolder.birthYear ?: 0,
-                        addresses = Address(
-                            city = address.city,
-                            state = address.state,
-                        ),
-                    ),
-                )
-            }
-        }
-
-        return profiles
+    private fun startAndScheduleInitialScan() {
+        context.startForegroundService(Intent(context, PirForegroundScanService::class.java))
+        scanScheduler.scheduleScans()
     }
 }

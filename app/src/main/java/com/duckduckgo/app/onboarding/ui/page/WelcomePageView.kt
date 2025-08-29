@@ -20,14 +20,14 @@ import android.content.Intent
 
 object WelcomePageView {
     sealed class Event {
-        object OnPrimaryCtaClicked : Event()
-        object OnDefaultBrowserSet : Event()
-        object OnDefaultBrowserNotSet : Event()
+        data object OnPrimaryCtaClicked : Event()
+        data object OnDefaultBrowserSet : Event()
+        data object OnDefaultBrowserNotSet : Event()
     }
 
     sealed class State {
-        object Idle : State()
+        data object Idle : State()
         data class ShowDefaultBrowserDialog(val intent: Intent) : State()
-        object Finish : State()
+        data object Finish : State()
     }
 }

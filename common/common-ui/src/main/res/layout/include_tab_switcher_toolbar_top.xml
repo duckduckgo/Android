@@ -27,10 +27,10 @@
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/expreimentalTabSwitcherToolbarTopSize"
+        android:layout_height="@dimen/tabSwitcherToolbarTopSize"
         android:background="?attr/daxColorToolbar"
         android:layout_marginBottom="?attr/toolbarExtraPadding"
-        android:theme="@style/TabSwitcher.Widget.Toolbar.Experimental"
+        android:theme="@style/TabSwitcher.Widget.Toolbar"
         app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu" />
 
 </com.google.android.material.appbar.AppBarLayout>

@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Launc
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.view.MessageCta.Message
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -62,7 +63,7 @@ class LowPriorityMessagingModelImpl @Inject constructor(
                 DefaultBrowserMessage(
                     Message(
                         topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_device_mobile_default,
-                        title = context.getString(R.string.newTabPageDefaultBrowserMessageHeading),
+                        title = context.getString(R.string.newTabPageDefaultBrowserMessageHeading).preventWidows(),
                         action = context.getString(R.string.newTabPageDefaultBrowserMessagePrimaryCta),
                         action2 = context.getString(R.string.newTabPageDefaultBrowserMessageSecondaryCta),
                     ),

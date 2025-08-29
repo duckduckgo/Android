@@ -31,6 +31,7 @@ import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.scripts.PirCssScriptLoader
+import com.duckduckgo.pir.impl.store.PirEventsRepository
 import com.duckduckgo.pir.impl.store.PirRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -53,6 +54,7 @@ class RealPirOptOutTest {
     private lateinit var testee: RealPirOptOut
 
     private val mockRepository: PirRepository = mock()
+    private val mockEventsRepository: PirEventsRepository = mock()
     private val mockBrokerStepsParser: BrokerStepsParser = mock()
     private val mockPirCssScriptLoader: PirCssScriptLoader = mock()
     private val mockPirActionsRunnerFactory: RealPirActionsRunner.Factory = mock()
@@ -67,6 +69,7 @@ class RealPirOptOutTest {
 
         testee = RealPirOptOut(
             repository = mockRepository,
+            eventsRepository = mockEventsRepository,
             brokerStepsParser = mockBrokerStepsParser,
             pirCssScriptLoader = mockPirCssScriptLoader,
             pirActionsRunnerFactory = mockPirActionsRunnerFactory,
@@ -156,7 +159,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(emptyList(), mockContext)
 
         // Then
-        verify(mockRepository, atLeast(1)).saveScanLog(any())
+        verify(mockEventsRepository, atLeast(1)).saveScanLog(any())
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirActionsRunnerFactory)
     }
@@ -171,7 +174,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
 
         // Then
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
@@ -221,7 +224,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
 
         // Then
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
         verifyNoInteractions(mockBrokerStepsParser)
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
@@ -239,7 +242,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(listOf(unknownProfileJobRecord), mockContext)
 
         // Then
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
         verify(mockBrokerStepsParser, never()).parseStep(any(), any(), any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
@@ -263,7 +266,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
 
         // Then
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
     }
@@ -288,7 +291,7 @@ class RealPirOptOutTest {
         testee.executeOptOutForJobs(listOf(testOptOutJobRecord), mockContext)
 
         // Then
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
         verifyNoInteractions(mockPirCssScriptLoader)
         verifyNoInteractions(mockPirActionsRunnerFactory)
     }
@@ -322,7 +325,7 @@ class RealPirOptOutTest {
         verify(mockPirActionsRunnerFactory).create(mockContext, testScript, OPTOUT)
         verify(mockPirActionsRunner).start(testProfileQuery, listOf(testOptOutStep))
         verify(mockPirActionsRunner).stop()
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
     }
 
     @Test
@@ -357,6 +360,6 @@ class RealPirOptOutTest {
         // Verify parseStep is called only once, not twice (caching works)
         verify(mockBrokerStepsParser).parseStep(testBrokerName, testStepsJson, testProfileQuery.id)
         verify(mockPirCssScriptLoader).getScript()
-        verify(mockRepository, times(2)).saveScanLog(any())
+        verify(mockEventsRepository, times(2)).saveScanLog(any())
     }
 }

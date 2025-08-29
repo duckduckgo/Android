@@ -485,10 +485,9 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenDuckChatIsEnabledAndIsDuckChatUrlThenReturnShouldLaunchDuckChatLink() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+    fun whenIsDuckChatUrlThenReturnShouldLaunchDuckChatLink() = runTest {
         whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
-        val type = testee.determineType("https://example.com")
+        val type = testee.determineType("https://duck.ai")
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
             listOf(
@@ -501,9 +500,8 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenDuckChatIsDisabledAndIsDuckChatUrlThenDoNotReturnShouldLaunchDuckChatLink() = runTest {
-        whenever(mockDuckChat.isEnabled()).thenReturn(false)
-        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(true)
+    fun whenIsNotDuckChatUrlThenDoNotReturnShouldLaunchDuckChatLink() = runTest {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenReturn(false)
         val type = testee.determineType("https://example.com")
         whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(

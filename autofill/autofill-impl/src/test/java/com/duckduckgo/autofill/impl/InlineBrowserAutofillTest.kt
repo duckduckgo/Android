@@ -119,7 +119,7 @@ class InlineBrowserAutofillTest {
         sealed class Actions {
             data class GetAutoFillData(val requestString: String) : Actions()
             data class CredentialsInjected(val credentials: LoginCredentials) : Actions()
-            object NoCredentialsInjected : Actions()
+            data object NoCredentialsInjected : Actions()
         }
 
         var lastAction: Actions? = null

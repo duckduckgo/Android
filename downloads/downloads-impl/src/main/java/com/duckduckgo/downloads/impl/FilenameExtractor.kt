@@ -128,8 +128,8 @@ class FilenameExtractor @Inject constructor(
     }
 
     sealed class GuessQuality {
-        object NotGoodEnough : GuessQuality()
-        object TriedAllOptions : GuessQuality()
+        data object NotGoodEnough : GuessQuality()
+        data object TriedAllOptions : GuessQuality()
     }
 
     sealed class FilenameExtractionResult {

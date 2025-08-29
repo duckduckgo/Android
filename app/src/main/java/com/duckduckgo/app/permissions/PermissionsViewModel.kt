@@ -65,8 +65,8 @@ class PermissionsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchLocation : Command()
-        object LaunchNotificationsSettings : Command()
+        data object LaunchLocation : Command()
+        data object LaunchNotificationsSettings : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
     }
 

@@ -96,7 +96,7 @@ class DataUriParser @Inject constructor() {
 
     sealed class ParseResult {
 
-        object Invalid : ParseResult()
+        data object Invalid : ParseResult()
 
         data class ParsedDataUri(
             val fileTypeGeneral: String,

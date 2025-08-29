@@ -172,11 +172,11 @@ class SyncWithAnotherActivityViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object ReadTextCode : Command()
+        data object ReadTextCode : Command()
         data class LoginSuccess(val showRecovery: Boolean) : Command()
-        object SwitchAccountSuccess : Command()
+        data object SwitchAccountSuccess : Command()
         data class ShowMessage(val messageId: Int) : Command()
-        object FinishWithError : Command()
+        data object FinishWithError : Command()
         data class ShowError(
             @StringRes val message: Int,
             val reason: String = "",

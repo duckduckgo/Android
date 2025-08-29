@@ -123,6 +123,9 @@ android {
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         if (project.hasProperty("$autofillDisableAuthRequirementBuildFlag")) {
             buildConfigField "boolean", "AUTH_REQUIRED", "false"

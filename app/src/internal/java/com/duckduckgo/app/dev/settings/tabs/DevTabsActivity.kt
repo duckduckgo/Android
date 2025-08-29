@@ -25,11 +25,15 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDevTabsBinding
+import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command
+import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForBookmarks
+import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForFavorites
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.ViewState
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import com.google.android.material.snackbar.Snackbar
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -66,7 +70,16 @@ class DevTabsActivity : DuckDuckGoActivity() {
             viewModel.clearBookmarks()
         }
 
+        binding.addFavoritesButton.setOnClickListener {
+            viewModel.addFavorites(binding.favoritesCount.text.toInt())
+        }
+
+        binding.clearFavoritesButton.setOnClickListener {
+            viewModel.clearFavorites()
+        }
+
         observeViewState()
+        observeCommands()
     }
 
     private fun observeViewState() {
@@ -74,9 +87,26 @@ class DevTabsActivity : DuckDuckGoActivity() {
             .launchIn(lifecycleScope)
     }
 
+    private fun observeCommands() {
+        viewModel.commands.flowWithLifecycle(lifecycle, STARTED).onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
     private fun render(viewState: ViewState) {
         binding.tabCountHeader.text = getString(R.string.devSettingsTabsScreenHeader, viewState.tabCount)
         binding.bookmarksCountHeader.text = getString(R.string.devSettingsTabsBookmarksScreenHeader, viewState.bookmarkCount)
+        binding.favoritesCountHeader.text = getString(R.string.devSettingsTabsFavoritesScreenHeader, viewState.favoritesCount)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            NoMoreCandidatesForBookmarks -> {
+                Snackbar.make(binding.root, "No more bookmark candidates", Snackbar.LENGTH_LONG).show()
+            }
+            NoMoreCandidatesForFavorites -> {
+                Snackbar.make(binding.root, "No more favorite candidates", Snackbar.LENGTH_LONG).show()
+            }
+        }
     }
 
     companion object {

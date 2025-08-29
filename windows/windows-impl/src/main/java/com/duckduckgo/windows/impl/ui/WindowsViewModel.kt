@@ -41,7 +41,7 @@ class WindowsViewModel @Inject constructor(
 
     sealed class Command {
         data class ShareLink(val originEnabled: Boolean) : Command()
-        object GoToMacClientSettings : Command()
+        data object GoToMacClientSettings : Command()
     }
 
     fun onShareClicked() {
