@@ -33,6 +33,7 @@ dependencies {
 
     implementation project(path: ':common-utils')
     implementation project(path: ':browser-api')
+    implementation project(path: ':data-store-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
     implementation project(path: ':app-build-config-api')
