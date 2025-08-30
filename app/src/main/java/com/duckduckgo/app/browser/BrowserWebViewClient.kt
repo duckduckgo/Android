@@ -70,6 +70,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
@@ -126,6 +127,7 @@ class BrowserWebViewClient @Inject constructor(
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
     private val contentScopeExperiments: ContentScopeExperiments,
+    private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -463,14 +465,41 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
+    fun configureWebView(webView: DuckDuckGoWebView) {
+        appCoroutineScope.launch {
+            val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
+                plugin.configureAddDocumentStartJavaScript(activeExperiments) { scriptString, allowedOrigins ->
+                    webView.safeAddDocumentStartJavaScript(scriptString, allowedOrigins)
+                }
+            }
+        }
+    }
+
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
         logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            jsPlugins.getPlugins().forEach {
-                it.onPageFinished(webView, url, webViewClientListener?.getSite())
+            appCoroutineScope.launch {
+                jsPlugins.getPlugins().forEach {
+                    it.onPageFinished(
+                        webView,
+                        url,
+                        webViewClientListener?.getSite(),
+                    )
+                }
+                (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
+                    val activeExperiments = webViewClientListener?.getSite()?.activeContentScopeExperiments ?: listOf()
+                    addDocumentStartJavascriptPlugins.getPlugins().forEach {
+                        it.configureAddDocumentStartJavaScript(
+                            activeExperiments,
+                        ) { scriptString, allowedOrigins ->
+                            (webView as? DuckDuckGoWebView)?.safeAddDocumentStartJavaScript(scriptString, allowedOrigins)
+                        }
+                    }
+                }
             }
 
             url?.let {
