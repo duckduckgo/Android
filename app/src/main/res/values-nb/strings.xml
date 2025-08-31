@@ -918,4 +918,11 @@
     <string name="settingsDuckAiRebranding">AI-funksjoner</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="trackersCountInTabSwitcher">Antall sporere i fanebytteren</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vil du skjule antall sporere?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå på dette igjen i Innstillinger &gt; Utseende.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skjul</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behold</string>
+
 </resources>
