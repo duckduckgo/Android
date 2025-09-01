@@ -24,8 +24,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
-import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
-import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -96,7 +94,8 @@ class TabSwitcherViewModel @Inject constructor(
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
-) : ViewModel() {
+    private val tabSwitcherAnimationInfoPanelPixels: TabSwitcherAnimationInfoPanelPixels,
+    ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
@@ -591,31 +590,14 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTrackerAnimationInfoPanelClicked() {
-        pixel.fire(pixel = TAB_MANAGER_INFO_PANEL_TAPPED)
+        tabSwitcherAnimationInfoPanelPixels.fireInfoPanelTapped()
         command.value = ShowAnimatedTileDismissalDialog
     }
 
     fun onTrackerAnimationTilePositiveButtonClicked() {
         viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
-            val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-            val bucketSize: Int = when (trackerCount) {
-                0 -> BUCKET_SIZE_0
-                in 1..9 -> BUCKET_SIZE_1
-                in 10..24 -> BUCKET_SIZE_10
-                in 25..49 -> BUCKET_SIZE_25
-                in 50..74 -> BUCKET_SIZE_50
-                in 75..99 -> BUCKET_SIZE_75
-                in 100..149 -> BUCKET_SIZE_100
-                in 150..199 -> BUCKET_SIZE_150
-                in 200..499 -> BUCKET_SIZE_200
-                else -> BUCKET_SIZE_500
-            }
-
-            pixel.fire(
-                pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
-                parameters = mapOf("trackerCount" to bucketSize.toString())
-            )
+            tabSwitcherAnimationInfoPanelPixels.fireInfoPanelDismissed()
         }
     }
 
@@ -626,7 +608,7 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
     fun onTrackerAnimationInfoPanelVisible() {
-        pixel.fire(pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS)
+        tabSwitcherAnimationInfoPanelPixels.fireInfoPanelImpression()
     }
 
     private suspend fun getTabItems(
@@ -788,16 +770,4 @@ class TabSwitcherViewModel @Inject constructor(
     }
 
 
-    companion object {
-        private const val BUCKET_SIZE_0 = 0
-        private const val BUCKET_SIZE_1 = 1
-        private const val BUCKET_SIZE_10 = 10
-        private const val BUCKET_SIZE_25 = 40
-        private const val BUCKET_SIZE_50 = 50
-        private const val BUCKET_SIZE_75 = 75
-        private const val BUCKET_SIZE_100 = 100
-        private const val BUCKET_SIZE_150 = 150
-        private const val BUCKET_SIZE_200 = 200
-        private const val BUCKET_SIZE_500 = 500
-    }
 }
