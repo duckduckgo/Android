@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.api
+package com.duckduckgo.js.messaging.api
 
 import androidx.webkit.ScriptHandler
 import com.duckduckgo.feature.toggles.api.Toggle
