@@ -140,7 +140,7 @@ class TabSwitcherViewModelTest {
     private lateinit var mockTabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore
 
     @Mock
-    private lateinit var mockTabSwitcherAnimationInfoPanelPixels: TabSwitcherAnimationInfoPanelPixels
+    private lateinit var mockTrackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels
 
     private val tabManagerFeatureFlags = FakeFeatureToggleFactory.create(TabManagerFeatureFlags::class.java)
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
@@ -167,7 +167,7 @@ class TabSwitcherViewModelTest {
         tabManagerFeatureFlags.newToolbarFeature().setRawStoredState(State(enable = false))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
-        whenever(mockTabSwitcherPrefsDataStore.isAnimationTileDismissed()).thenReturn(flowOf(false))
+        whenever(mockTabSwitcherPrefsDataStore.isTrackersAnimationInfoTileHidden()).thenReturn(flowOf(false))
         whenever(statisticsDataStore.variant).thenReturn("")
         whenever(mockTabRepository.flowDeletableTabs).thenReturn(repoDeletableTabs.consumeAsFlow())
         runBlocking {
@@ -201,7 +201,7 @@ class TabSwitcherViewModelTest {
             tabSwitcherDataStore,
             faviconManager,
             savedSitesRepository,
-            mockTabSwitcherAnimationInfoPanelPixels,
+            mockTrackersAnimationInfoPanelPixels,
         )
         testee.command.observeForever(mockCommandObserver)
         testee.tabSwitcherItemsLiveData.observeForever(mockTabSwitcherItemsObserver)
@@ -1701,9 +1701,9 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when animated info panel then tab switcher items include animation tile and tabs`() = runTest {
+    fun `when animated info panel has not been hidden then tab switcher items include animation tile and tabs`() = runTest {
         val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
-            setIsAnimationTileDismissed(false)
+            setTrackersAnimationInfoTileHidden(false)
         }
 
         val tab1 = TabEntity("1", position = 1)
@@ -1718,15 +1718,15 @@ class TabSwitcherViewModelTest {
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
         assertEquals(3, items.size)
-        assert(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+        assert(items.first() is TabSwitcherItem.TrackersAnimationInfoPanel)
         assert(items[1] is TabSwitcherItem.Tab)
         assert(items[2] is TabSwitcherItem.Tab)
     }
 
     @Test
-    fun `when animated info panel not visible then tab switcher items contain only tabs`() = runTest {
+    fun `when animated info panel has been hidden then tab switcher items contain only tabs`() = runTest {
         val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
-            setIsAnimationTileDismissed(true)
+            setTrackersAnimationInfoTileHidden(true)
         }
 
         val tab1 = TabEntity("1", position = 1)
@@ -1745,23 +1745,6 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
-    fun `when tab switcher animation feature disabled then tab switcher items contain only tabs`() = runTest {
-        val fakeTabSwitcherDataStore = FakeTabSwitcherDataStore().apply {
-            setIsAnimationTileDismissed(true)
-        }
-
-        initializeMockTabEntitesData()
-        initializeViewModel(fakeTabSwitcherDataStore)
-
-        val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
-
-        assertEquals(tabList.size, items.size)
-        items.forEach { item ->
-            assert(item is TabSwitcherItem.Tab)
-        }
-    }
-
-    @Test
     fun `when animated info panel positive button clicked then animated info panel is hidden`() = runTest {
         val tab1 = TabEntity("1", position = 1)
         val tab2 = TabEntity("2", position = 2)
@@ -1774,7 +1757,7 @@ class TabSwitcherViewModelTest {
 
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
-        assertFalse(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+        assertFalse(items.first() is TabSwitcherItem.TrackersAnimationInfoPanel)
     }
 
     @Test
@@ -1789,7 +1772,7 @@ class TabSwitcherViewModelTest {
 
         val items = testee.tabSwitcherItemsLiveData.blockingObserve() ?: listOf()
 
-        assertTrue(items.first() is TabSwitcherItem.TrackerAnimationInfoPanel)
+        assertTrue(items.first() is TabSwitcherItem.TrackersAnimationInfoPanel)
     }
 
     @Test
@@ -1799,7 +1782,7 @@ class TabSwitcherViewModelTest {
 
         testee.onTrackerAnimationInfoPanelVisible()
 
-        verify(mockTabSwitcherAnimationInfoPanelPixels).fireInfoPanelImpression()
+        verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelImpression()
     }
 
     @Test
@@ -1810,7 +1793,7 @@ class TabSwitcherViewModelTest {
 
         testee.onTrackerAnimationInfoPanelClicked()
 
-        verify(mockTabSwitcherAnimationInfoPanelPixels).fireInfoPanelTapped()
+        verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelTapped()
     }
 
     @Test
@@ -1820,7 +1803,7 @@ class TabSwitcherViewModelTest {
 
         testee.onTrackerAnimationTilePositiveButtonClicked()
 
-        verify(mockTabSwitcherAnimationInfoPanelPixels).fireInfoPanelDismissed()
+        verify(mockTrackersAnimationInfoPanelPixels).fireInfoPanelDismissed()
     }
 
     private class FakeTabSwitcherDataStore : TabSwitcherDataStore {
@@ -1834,10 +1817,10 @@ class TabSwitcherViewModelTest {
 
         override suspend fun setTabLayoutType(layoutType: LayoutType) {}
 
-        override fun isAnimationTileDismissed(): Flow<Boolean> = animationTileDismissedFlow
+        override fun isTrackersAnimationInfoTileHidden(): Flow<Boolean> = animationTileDismissedFlow
 
-        override suspend fun setIsAnimationTileDismissed(isDismissed: Boolean) {
-            animationTileDismissedFlow.value = isDismissed
+        override suspend fun setTrackersAnimationInfoTileHidden(isHidden: Boolean) {
+            animationTileDismissedFlow.value = isHidden
         }
     }
 

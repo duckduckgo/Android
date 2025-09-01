@@ -34,7 +34,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class TabSwitcherAnimationInfoPanelPixelsTest {
+class TrackersAnimationInfoPanelPixelsTest {
 
     @get:Rule
     var coroutinesTestRule = CoroutineTestRule()
@@ -48,14 +48,14 @@ class TabSwitcherAnimationInfoPanelPixelsTest {
     @Mock
     private lateinit var mockDispatcherProvider: DispatcherProvider
 
-    private lateinit var testee: TabSwitcherAnimationInfoPanelPixels
+    private lateinit var testee: TrackersAnimationInfoPanelPixels
 
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
         whenever(mockDispatcherProvider.io()).thenReturn(coroutinesTestRule.testDispatcherProvider.io())
 
-        testee = TabSwitcherAnimationInfoPanelPixelsImpl(
+        testee = TrackersAnimationInfoPanelPixelsImpl(
             pixel = mockPixel,
             webTrackersBlockedAppRepository = mockWebTrackersBlockedAppRepository,
             dispatcherProvider = mockDispatcherProvider,
