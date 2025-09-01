@@ -338,7 +338,8 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSubmitted(query: String) {
-        command.value = Command.SubmitSearch(query)
+        val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
+        command.value = Command.SubmitSearch(sanitizedQuery)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
 
