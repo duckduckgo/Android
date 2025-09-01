@@ -188,6 +188,28 @@
     <string name="webTrackingProtectionActivityTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Proteção contra rastreamento na internet</string>
     <string name="webTrackingProtectionTitle">Proteção contra rastreamento na internet</string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[O navegador DuckDuckGo fornece proteções contra rastreamento, que estão sempre ativas.\n<a href=\"\">Sabe mais</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Como te protegemos</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloqueia rastreadores de terceiros</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Ajuda a bloquear cookies de terceiros que te rastreiam de site para site, impedindo que os rastreadores de terceiros sejam carregados desde o início.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Bloqueia anúncios segmentados</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Bloqueia os rastreadores invasivos antes de serem carregados, eliminando eficazmente os anúncios que usam o rastreio.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Impede o rastreamento de impressões digitais</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Ajuda a impedir que as empresas de rastreamento obtenham identificadores exclusivos sobre o teu navegador e dispositivo, que usam para te seguir na Web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Bloqueia o rastreamento de links</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Remove os parâmetros de rastreamento nos links para impedir que terceiros rastreiem o teu comportamento entre sites.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protege contra rastreamento de referenciadores</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Ajuda a impedir que as empresas identifiquem o último site que visitaste.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Expira cookies principais</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Expira automaticamente os cookies originais após 30 dias, garantindo que os sites não te conseguem rastrear indefinidamente quando tens a sessão terminada.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protege contra camuflagem do DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Ajuda a bloquear rastreadores de terceiros que tentam esconder-se num site usando DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Bloqueia o rastreamento AMP da Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Substitui os links AMP da Google pelo site do publicador original.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Bloqueia os pop-ups de início de sessão da Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Bloqueia pop-ups de início de sessão da Google em sites que não são da Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Expressa direitos de exclusão em teu nome, dizendo aos sites para não venderem nem partilharem as tuas informações pessoais.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Proteção contra pop-ups de cookies</string>
