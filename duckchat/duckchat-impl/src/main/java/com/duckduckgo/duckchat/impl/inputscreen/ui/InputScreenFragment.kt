@@ -244,6 +244,8 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         onInputFieldClicked = {
             viewModel.onInputFieldTouched()
         }
+
+        setConstraintViewId(R.id.fabsTopBarrier)
     }
 
     private fun submitChatQuery(query: String) {

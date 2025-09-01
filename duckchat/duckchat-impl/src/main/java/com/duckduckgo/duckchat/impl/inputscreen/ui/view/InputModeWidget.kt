@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Build
 import android.text.Editable
 import android.text.InputType
@@ -41,6 +42,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addBottomShadow
+import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.mobile.android.R as CommonR
@@ -59,6 +61,9 @@ class InputModeWidget @JvmOverloads constructor(
     private val inputModeWidgetBack: View
     private val inputModeSwitch: TabLayout
     private val inputModeWidgetCard: MaterialCardView
+
+    private var constraintViewId: Int = 0
+    private var maxInputFieldHeight: Int? = null
 
     var onBack: (() -> Unit)? = null
     var onSearchSent: ((String) -> Unit)? = null
@@ -87,7 +92,7 @@ class InputModeWidget @JvmOverloads constructor(
             if (field != value) {
                 field = value
                 beginChangeBoundsTransition()
-                inputField.maxLines = if (value) MAX_LINES else 1
+                inputField.maxLines = if (value) Int.MAX_VALUE else 1
                 inputField.setHorizontallyScrolling(!value)
                 inputField.post {
                     inputField.requestLayout()
@@ -112,6 +117,12 @@ class InputModeWidget @JvmOverloads constructor(
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
         configureShadow()
+
+        viewTreeObserver.addOnGlobalLayoutListener {
+            if (canExpand) {
+                post { calculateAndSetMaxInputFieldHeight() }
+            }
+        }
     }
 
     fun provideInitialText(text: String) {
@@ -307,9 +318,40 @@ class InputModeWidget @JvmOverloads constructor(
         }
     }
 
+    fun setConstraintViewId(viewId: Int) {
+        constraintViewId = viewId
+    }
+
+    private fun setMaxInputFieldHeight(maxHeight: Int) {
+        val constrainedHeight = maxInputFieldHeight?.coerceAtMost(maxHeight) ?: maxHeight
+        maxInputFieldHeight = constrainedHeight
+        inputField.maxHeight = constrainedHeight
+    }
+
+    private fun calculateAndSetMaxInputFieldHeight() {
+        if (inputField.height == maxInputFieldHeight) return
+        if (constraintViewId == 0) return
+
+        val rootView = rootView as? ViewGroup ?: return
+        val constraint = rootView.findViewById<View>(constraintViewId) ?: return
+
+        fun View.toAncestorRect(): Rect = Rect().also {
+            getDrawingRect(it)
+            rootView.offsetDescendantRectToMyCoords(this, it)
+        }
+        val constraintRect = constraint.toAncestorRect()
+        val inputFieldRect = inputField.toAncestorRect()
+
+        val toTop = constraintRect.top - inputFieldRect.top
+        val toBottom = constraintRect.bottom - inputFieldRect.top
+        val available = (if (toTop > 0) toTop else toBottom) - INPUT_FIELD_BOTTOM_PADDING_DP.toPx()
+
+        setMaxInputFieldHeight(available.coerceAtLeast(0))
+    }
+
     companion object {
         private const val FADE_DURATION = 150L
         private const val EXPAND_COLLAPSE_TRANSITION_DURATION = 150L
-        private const val MAX_LINES = 8
+        private const val INPUT_FIELD_BOTTOM_PADDING_DP = 16
     }
 }
