@@ -20,9 +20,9 @@ import android.annotation.SuppressLint
 import androidx.webkit.ScriptHandler
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.contentscopescripts.api.AddDocumentStartJavaScriptPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
