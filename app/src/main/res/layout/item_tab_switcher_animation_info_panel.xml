@@ -20,9 +20,8 @@
     android:id="@+id/item_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/keyline_2"
-    android:layout_marginTop="@dimen/keyline_2"
-    android:layout_marginBottom="@dimen/keyline_4"
+    android:layout_marginHorizontal="6dp"
+    android:layout_marginVertical="@dimen/keyline_2"
     android:background="@drawable/background_tab_switcher_trackers_animation_tile">
 
     <com.airbnb.lottie.LottieAnimationView
