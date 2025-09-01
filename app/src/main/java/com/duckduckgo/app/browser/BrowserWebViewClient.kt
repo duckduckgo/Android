@@ -482,14 +482,14 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            jsPlugins.getPlugins().forEach {
+                it.onPageFinished(
+                    webView,
+                    url,
+                    webViewClientListener?.getSite(),
+                )
+            }
             appCoroutineScope.launch {
-                jsPlugins.getPlugins().forEach {
-                    it.onPageFinished(
-                        webView,
-                        url,
-                        webViewClientListener?.getSite(),
-                    )
-                }
                 (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
                     val activeExperiments = webViewClientListener?.getSite()?.activeContentScopeExperiments ?: listOf()
                     addDocumentStartJavascriptPlugins.getPlugins().forEach {
