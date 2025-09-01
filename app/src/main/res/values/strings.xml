@@ -201,7 +201,7 @@
     <string name="webTrackingProtectionReferrerTrackingTitle">Protects against referrer tracking</string>
     <string name="webTrackingProtectionReferrerTrackingDescription">Helps block companies from identifying the last website you visited.</string>
     <string name="webTrackingProtectionFirstPartyCookiesTitle">Expires 1st-party cookies</string>
-    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatically expires 1st-party cookies after 30 days, ensuring sites can\'t track you indefinitely when you're logged out.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatically expires 1st-party cookies after 30 days, ensuring sites can\'t track you indefinitely when you\'re logged out.</string>
     <string name="webTrackingProtectionDnsCnameCloakingTitle">Protects against DNS CNAME cloaking</string>
     <string name="webTrackingProtectionDnsCnameCloakingDescription">Helps block 3rd-party trackers that try to disguise themselves within a website using DNS.</string>
     <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blocks Google\'s AMP Tracking</string>
