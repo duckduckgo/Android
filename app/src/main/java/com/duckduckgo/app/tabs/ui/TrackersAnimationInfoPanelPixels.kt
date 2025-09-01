@@ -30,18 +30,18 @@ import kotlinx.coroutines.withContext
 /**
  * Handles pixel firing for tab switcher info panel interactions
  */
-interface TabSwitcherAnimationInfoPanelPixels {
+interface TrackersAnimationInfoPanelPixels {
     fun fireInfoPanelTapped()
     fun fireInfoPanelImpression()
     suspend fun fireInfoPanelDismissed()
 }
 
 @ContributesBinding(ActivityScope::class)
-class TabSwitcherAnimationInfoPanelPixelsImpl @Inject constructor(
+class TrackersAnimationInfoPanelPixelsImpl @Inject constructor(
     private val pixel: Pixel,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val dispatcherProvider: DispatcherProvider,
-) : TabSwitcherAnimationInfoPanelPixels {
+) : TrackersAnimationInfoPanelPixels {
 
     override fun fireInfoPanelTapped() {
         pixel.fire(pixel = TAB_MANAGER_INFO_PANEL_TAPPED)

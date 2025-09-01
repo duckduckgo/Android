@@ -34,11 +34,11 @@ sealed class TabSwitcherItem(val id: String) {
             get() = tabEntity.url.isNullOrBlank()
     }
 
-    data class TrackerAnimationInfoPanel(val trackerCount: Int) : TabSwitcherItem(TRACKER_ANIMATION_PANEL_ID) {
-        companion object {
+    data class TrackersAnimationInfoPanel(val trackerCount: Int) : TabSwitcherItem(TRACKER_ANIMATION_PANEL_ID) {
+        companion object Companion {
             const val ANIMATED_TILE_NO_REPLACE_ALPHA = 0.4f
             const val ANIMATED_TILE_DEFAULT_ALPHA = 1f
-            const val TRACKER_ANIMATION_PANEL_ID = "TrackerAnimationInfoPanel"
+            const val TRACKER_ANIMATION_PANEL_ID = "TrackersAnimationInfoPanel"
         }
     }
 }

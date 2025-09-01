@@ -91,7 +91,7 @@ class AppearanceViewModel @Inject constructor(
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
                     isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
-                    isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isAnimationTileDismissed().firstOrNull() != true,
+                    isTrackersCountInTabSwitcherEnabled = tabSwitcherDataStore.isTrackersAnimationInfoTileHidden().firstOrNull() != true,
                 )
             }
         }
@@ -182,7 +182,7 @@ class AppearanceViewModel @Inject constructor(
 
     fun onShowTrackersCountInTabSwitcherChanged(checked: Boolean) {
         viewModelScope.launch(dispatcherProvider.io()) {
-            tabSwitcherDataStore.setIsAnimationTileDismissed(!checked)
+            tabSwitcherDataStore.setTrackersAnimationInfoTileHidden(!checked)
             viewState.update { it.copy(isTrackersCountInTabSwitcherEnabled = checked) }
 
             val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
