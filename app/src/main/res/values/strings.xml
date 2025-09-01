@@ -187,7 +187,28 @@
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatically blocks hidden trackers as you browse the web.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[The DuckDuckGo browser provides tracking protections, which are always active.\n<a href="">Learn More</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">How We Protect You</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blocks 3rd-party trackers</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Helps block 3rd-party cookies that track you from site to site by preventing 3rd-party trackers from loading in the first place.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blocks targeted ads</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blocks invasive trackers before they load, effectively eliminating ads that rely on tracking.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Prevents fingerprint tracking</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Helps stop tracking companies from obtaining unique identifiers about your browser and device, which they use to follow you around the web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blocks link tracking</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Removes tracking parameters in links to prevent 3rd parties from tracking your behavior across sites.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protects against referrer tracking</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Helps block companies from identifying the last website you visited.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Expires 1st-party cookies</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatically expires 1st-party cookies after 30 days, ensuring sites can\'t track you indefinitely when you're logged out.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protects against DNS CNAME cloaking</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Helps block 3rd-party trackers that try to disguise themselves within a website using DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blocks Google\'s AMP Tracking</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Replaces Google AMP links with the original publisher\'s site.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blocks Google\'s sign-in pop-ups</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blocks Google sign-in pop-ups on sites Google doesn\'t own.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Expresses opt-out rights on your behalf by telling sites not to sell or share your personal info.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Cookie Pop-Up Protection</string>

@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Protección de rastreo en la web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protección de rastreo en la web</string>
     <string name="webTrackingProtectionTitle">Protección de rastreo en la web</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloquea automáticamente los rastreadores ocultos mientras navegas por la web.\n<a href=\"\">Más información</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protección contra ventanas emergentes de cookies</string>

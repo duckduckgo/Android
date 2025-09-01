@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaščita pred spletnim sledenjem</string>
     <string name="webTrackingProtectionTitle">Zaščita pred spletnim sledenjem</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo samodejno blokira skrite sledilnike med brskanjem po spletu.\n<a href=\"\">Več o tem</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaščita pred pojavnimi okni piškotkov</string>

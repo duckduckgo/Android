@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokeerib automaatselt peidetud jälgijaid, kui sa veebis sirvid.\n<a href=\"\">Loe edasi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>

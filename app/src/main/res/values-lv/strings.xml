@@ -189,7 +189,6 @@
     <string name="webTrackingProtectionActivityTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionLearnMoreTitle">Tīmekļa izsekošanas aizsardzība</string>
     <string name="webTrackingProtectionTitle">Tīmekļa izsekošanas aizsardzība</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automātiski bloķē slēptos izsekotājus tīmekļa pārlūkošanas laikā.\n<a href=\"\">Uzzināt vairāk</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Sīkfailu uznirstošo logu aizsardzība</string>

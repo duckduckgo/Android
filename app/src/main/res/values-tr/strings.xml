@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionLearnMoreTitle">Web İzleme Koruması</string>
     <string name="webTrackingProtectionTitle">Web İzleme Koruması</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo, web\'de gezinirken gizli izleyicileri otomatik olarak engeller.\n<a href=\"\">Daha Fazla Bilgi</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Çerez Açılır Pencere Engelleyici</string>

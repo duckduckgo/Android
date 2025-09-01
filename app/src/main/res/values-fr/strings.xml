@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo bloque automatiquement les traqueurs cachés lorsque vous naviguez sur le Web.\n<a href=\"\">En savoir plus</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protection contre les fenêtres contextuelles des cookies</string>

@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[Podczas przeglądania stron internetowych DuckDuckGo automatycznie blokuje ukryte mechanizmy śledzące.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrona przed wyskakującymi okienkami dotyczącymi plików cookie</string>

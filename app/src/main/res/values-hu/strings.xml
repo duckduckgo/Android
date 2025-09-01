@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[A DuckDuckGo böngészés közben automatikusan blokkolja a rejtett nyomkövetőket.\n<a href=\"\">További részletek</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>

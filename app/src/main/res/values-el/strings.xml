@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionLearnMoreTitle">Προστασία παρακολούθησης ιστού</string>
     <string name="webTrackingProtectionTitle">Προστασία παρακολούθησης ιστού</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[Το DuckDuckGo αποκλείει αυτόματα κρυφές εφαρμογές παρακολούθησης καθώς περιηγείστε στο διαδίκτυο.\n<a href=\"\">Μάθετε περισσότερα</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Προστασία αναδυόμενων παραθύρων για cookies</string>

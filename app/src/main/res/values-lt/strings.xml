@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[„DuckDuckGo“ automatiškai blokuoja paslėptas stebėjimo priemones naršant internete.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>

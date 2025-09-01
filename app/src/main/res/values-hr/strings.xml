@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Zaštita od praćenja na webu</string>
     <string name="webTrackingProtectionTitle">Zaštita od praćenja na webu</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo automatski blokira skrivene alate za praćenje dok \"surfaš\" po internetu.\n<a href=\"\">Saznaj više</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Zaštita od skočnih prozora kolačića</string>

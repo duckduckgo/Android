@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>

@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionLearnMoreTitle">Ochrana pred sledovaním webu</string>
     <string name="webTrackingProtectionTitle">Ochrana pred sledovaním webu</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo pri prehliadaní webu automaticky blokuje skryté sledovače.\n<a href=\"\">Zisti viac</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Ochrana proti automatickému otváraniu okien o súboroch cookie</string>

@@ -190,7 +190,6 @@
     <string name="webTrackingProtectionActivityTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionLearnMoreTitle">Защита от отслеживания онлайн</string>
     <string name="webTrackingProtectionTitle">Защита от отслеживания онлайн</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo автоматически блокирует скрытые трекеры, пока вы посещаете сайты.\n<a href=\"\">Подробнее...</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Защита от всплывающих окон куки</string>

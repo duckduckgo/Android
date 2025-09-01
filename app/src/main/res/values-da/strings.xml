@@ -188,7 +188,6 @@
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mod sporing på nettet</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mod sporing på nettet</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokerer automatisk skjulte trackere, når du surfer på nettet.\n<a href=\"\">Mere info</a>]]></string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mod pop op-beskeder om cookies</string>
