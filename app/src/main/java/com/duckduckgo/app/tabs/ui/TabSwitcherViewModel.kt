@@ -80,7 +80,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -600,9 +599,22 @@ class TabSwitcherViewModel @Inject constructor(
         viewModelScope.launch {
             tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
             val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            val bucketSize: Int = when (trackerCount) {
+                0 -> BUCKET_SIZE_0
+                in 1..9 -> BUCKET_SIZE_1
+                in 10..24 -> BUCKET_SIZE_10
+                in 25..49 -> BUCKET_SIZE_25
+                in 50..74 -> BUCKET_SIZE_50
+                in 75..99 -> BUCKET_SIZE_75
+                in 100..149 -> BUCKET_SIZE_100
+                in 150..199 -> BUCKET_SIZE_150
+                in 200..499 -> BUCKET_SIZE_200
+                else -> BUCKET_SIZE_500
+            }
+
             pixel.fire(
                 pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
-                parameters = mapOf("trackerCount" to trackerCount.toString())
+                parameters = mapOf("trackerCount" to bucketSize.toString())
             )
         }
     }
@@ -773,5 +785,19 @@ class TabSwitcherViewModel @Inject constructor(
                 val selectedTabs: List<String> = emptyList(),
             ) : Mode
         }
+    }
+
+
+    companion object {
+        private const val BUCKET_SIZE_0 = 0
+        private const val BUCKET_SIZE_1 = 1
+        private const val BUCKET_SIZE_10 = 10
+        private const val BUCKET_SIZE_25 = 40
+        private const val BUCKET_SIZE_50 = 50
+        private const val BUCKET_SIZE_75 = 75
+        private const val BUCKET_SIZE_100 = 100
+        private const val BUCKET_SIZE_150 = 150
+        private const val BUCKET_SIZE_200 = 200
+        private const val BUCKET_SIZE_500 = 500
     }
 }
