@@ -110,7 +110,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import logcat.logcat
 
 @InjectWith(FragmentScope::class)

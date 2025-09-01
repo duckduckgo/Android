@@ -128,7 +128,7 @@ class AppearanceActivity : DuckDuckGoActivity() {
                     binding.showFullUrlSetting.quietlySetIsChecked(viewState.isFullUrlEnabled, showFullUrlToggleListener)
                     binding.showTrackersCountInTabSwitcher.quietlySetIsChecked(
                         viewState.isTrackersCountInTabSwitcherEnabled,
-                        showTrackersCountInTabSwitcher
+                        showTrackersCountInTabSwitcher,
                     )
                 }
             }.launchIn(lifecycleScope)

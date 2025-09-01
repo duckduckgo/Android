@@ -95,7 +95,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
     private val tabSwitcherAnimationInfoPanelPixels: TabSwitcherAnimationInfoPanelPixels,
-    ) : ViewModel() {
+) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
     val deletableTabs: LiveData<List<TabEntity>> = tabRepository.flowDeletableTabs.asLiveData(
@@ -622,7 +622,7 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if(!isAnimationTileDismissed) {
+            return if (!isAnimationTileDismissed) {
                 val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
                 listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
@@ -768,6 +768,4 @@ class TabSwitcherViewModel @Inject constructor(
             ) : Mode
         }
     }
-
-
 }

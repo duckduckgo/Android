@@ -22,8 +22,6 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
-import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider

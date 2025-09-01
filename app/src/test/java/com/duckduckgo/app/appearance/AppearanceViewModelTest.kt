@@ -33,6 +33,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -44,7 +45,6 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import kotlinx.coroutines.flow.flowOf
 
 @RunWith(AndroidJUnit4::class)
 internal class AppearanceViewModelTest {

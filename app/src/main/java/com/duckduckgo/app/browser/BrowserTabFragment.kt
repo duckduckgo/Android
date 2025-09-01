@@ -735,7 +735,7 @@ class BrowserTabFragment :
                         omnibar.enqueueCookiesAnimation(isCosmetic)
                     } else {*/
                     viewModel.onAutoConsentPopUpHandled(isCosmetic)
-                    //}
+                    // }
                 }
             }
         }

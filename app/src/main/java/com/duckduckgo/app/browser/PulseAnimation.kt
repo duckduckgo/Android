@@ -32,10 +32,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.common.ui.view.setAllParentsClip
 import com.duckduckgo.common.utils.ConflatedJob
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 class PulseAnimation(

@@ -54,7 +54,7 @@ class TabSwitcherAnimationInfoPanelPixelsTest {
     fun before() {
         MockitoAnnotations.openMocks(this)
         whenever(mockDispatcherProvider.io()).thenReturn(coroutinesTestRule.testDispatcherProvider.io())
-        
+
         testee = TabSwitcherAnimationInfoPanelPixelsImpl(
             pixel = mockPixel,
             webTrackersBlockedAppRepository = mockWebTrackersBlockedAppRepository,
