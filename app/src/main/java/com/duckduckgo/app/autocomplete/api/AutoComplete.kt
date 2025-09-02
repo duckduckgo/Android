@@ -107,11 +107,9 @@ class AutoCompleteApi @Inject constructor(
                 inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
             }
 
-            val duckAIPrompt = AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query)
-
             AutoCompleteResult(
                 query = query,
-                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) + duckAIPrompt },
+                suggestions = inAppMessage + suggestions.ifEmpty { listOf(AutoCompleteDefaultSuggestion(query)) },
             )
         }
     }
