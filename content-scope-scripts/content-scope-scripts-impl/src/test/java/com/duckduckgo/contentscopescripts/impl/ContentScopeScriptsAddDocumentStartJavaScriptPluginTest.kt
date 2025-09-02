@@ -1,16 +1,18 @@
 package com.duckduckgo.contentscopescripts.impl
 
-import androidx.webkit.ScriptHandler
+import android.webkit.WebView
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
@@ -21,6 +23,8 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
     private val mockWebViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
     private val mockToggle = mock<Toggle>()
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
+    private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
+    private val mockWebView: WebView = mock()
 
     private lateinit var testee: ContentScopeScriptsAddDocumentStartJavaScriptPlugin
 
@@ -30,6 +34,8 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
             mockWebViewCompatContentScopeScripts,
             coroutineRule.testDispatcherProvider,
             mockWebViewCapabilityChecker,
+            mockWebViewCompatWrapper,
+            coroutineRule.testScope,
         )
     }
 
@@ -38,18 +44,10 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
         whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
         whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
         whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
-        var capturedScriptString: String? = null
-        var capturedAllowedOriginRules: Set<String>? = null
-        val scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler? = { scriptString, allowedOriginRules ->
-            capturedScriptString = scriptString
-            capturedAllowedOriginRules = allowedOriginRules
-            mock<ScriptHandler>()
-        }
 
-        testee.configureAddDocumentStartJavaScript(listOf(mockToggle), scriptInjector)
+        testee.addDocumentStartJavaScript(listOf(mockToggle), mockWebView)
 
-        assertEquals("script", capturedScriptString)
-        assertEquals(setOf("*"), capturedAllowedOriginRules)
+        verify(mockWebViewCompatWrapper).addDocumentStartJavaScript(mockWebView, "script", setOf("*"))
     }
 
     @Test
@@ -58,18 +56,9 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
         whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
         whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
-        var capturedScriptString: String? = null
-        var capturedAllowedOriginRules: Set<String>? = null
-        val scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler? = { scriptString, allowedOriginRules ->
-            capturedScriptString = scriptString
-            capturedAllowedOriginRules = allowedOriginRules
-            mock<ScriptHandler>()
-        }
+        testee.addDocumentStartJavaScript(listOf(mockToggle), mockWebView)
 
-        testee.configureAddDocumentStartJavaScript(listOf(mockToggle), scriptInjector)
-
-        assertEquals(null, capturedScriptString)
-        assertEquals(null, capturedAllowedOriginRules)
+        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
     }
 
     @Test
@@ -78,17 +67,8 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
         whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
         whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
-        var capturedScriptString: String? = null
-        var capturedAllowedOriginRules: Set<String>? = null
-        val scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler? = { scriptString, allowedOriginRules ->
-            capturedScriptString = scriptString
-            capturedAllowedOriginRules = allowedOriginRules
-            mock<ScriptHandler>()
-        }
+        testee.addDocumentStartJavaScript(listOf(mockToggle), mockWebView)
 
-        testee.configureAddDocumentStartJavaScript(listOf(mockToggle), scriptInjector)
-
-        assertEquals(null, capturedScriptString)
-        assertEquals(null, capturedAllowedOriginRules)
+        verify(mockWebViewCompatWrapper, never()).addDocumentStartJavaScript(any(), any(), any())
     }
 }

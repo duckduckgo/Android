@@ -21,10 +21,12 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.contentscopescripts.impl.WebViewCompatWrapper
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
@@ -35,6 +37,9 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class DuckDuckGoWebViewTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private lateinit var testee: DuckDuckGoWebView
     private val mockWebViewCapabilityChecker: WebViewCapabilityChecker = mock()
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
@@ -44,8 +49,7 @@ class DuckDuckGoWebViewTest {
     fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         testee = DuckDuckGoWebView(context)
-        testee.webViewCompatWrapper = mockWebViewCompatWrapper
-        testee.webViewCapabilityChecker = mockWebViewCapabilityChecker
+        testee.dispatcherProvider = coroutineRule.testDispatcherProvider
     }
 
     @Test

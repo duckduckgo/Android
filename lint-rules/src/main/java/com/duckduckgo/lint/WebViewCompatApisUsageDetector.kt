@@ -43,6 +43,16 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
                     )
                 }
             }
+            "safeAddDocumentStartJavaScript" -> {
+                if (context.evaluator.isMemberInClass(method, "com.duckduckgo.app.browser.DuckDuckGoWebView")) {
+                    context.report(
+                        ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE,
+                        node,
+                        context.getLocation(node),
+                        ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE.getExplanation(TextFormat.RAW)
+                    )
+                }
+            }
         }
     }
 
@@ -73,8 +83,8 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
 
         val ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE: Issue = Issue.create(
             id = "AddDocumentStartJavaScriptUsage",
-            briefDescription = "Use safe WebViewCompat methods",
-            explanation = "Use `safeAddDocumentStartJavaScript` instead of `WebViewCompat.addDocumentStartJavaScript`",
+            briefDescription = "Use safe WebViewCompatWrapper methods",
+            explanation = "Use `WebViewCompatWrapper` methods instead of `WebViewCompat.addDocumentStartJavaScript`",
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
