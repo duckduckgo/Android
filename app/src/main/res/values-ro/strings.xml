@@ -937,7 +937,6 @@
     <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="trackersCountInTabSwitcher">Numărul de tehnologii de urmărire din comutatorul de file</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ascunzi contorul tehnologiilor de urmărire?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Poți să activezi din nou această opțiune în Setări &gt; Aspect.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ascunde</string>

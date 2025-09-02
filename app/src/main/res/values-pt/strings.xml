@@ -919,7 +919,6 @@
     <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="trackersCountInTabSwitcher">Contagem de rastreadores no Comutador de separadores</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Esconder a contagem de rastreadores?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Podes voltar a ativar isto em Definições &gt; Aparência.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ocultar</string>

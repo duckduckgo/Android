@@ -919,7 +919,6 @@
     <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="trackersCountInTabSwitcher">Πλήθος εφαρμογών παρακολούθησης στην Εναλλαγή καρτελών</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Απόκρυψη πλήθους εφαρμογών παρακολούθησης;</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Μπορείτε να ενεργοποιήσετε ξανά αυτήν την επιλογή στις Ρυθμίσεις &gt; Εμφάνιση.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Αποκρυψη</string>

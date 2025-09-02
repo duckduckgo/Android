@@ -955,7 +955,6 @@
     <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="trackersCountInTabSwitcher">Broj alata za praćenje (tragača) u prebacivaču kartica (Tab Switcher)</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Sakrij broj tragača?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ovo možeš ponovno uključiti kroz Postavke &gt; Izgled.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Sakrij</string>

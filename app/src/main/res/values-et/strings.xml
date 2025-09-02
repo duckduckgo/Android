@@ -919,7 +919,6 @@
     <string name="settingsDuckAi">Duck.ai</string>
 
     <!--TabSwitcher Trackers Animation-->
-    <string name="trackersCountInTabSwitcher">Jälgijate arv vahekaardi vahetajas</string>
     <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Kas peita jälgurite arv?</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Saad selle uuesti sisse lülitada suvandis Seaded &gt; Välimus.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Peida</string>
