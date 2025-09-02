@@ -189,6 +189,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionTitle">Protection contre le pistage sur le Web</string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Le navigateur DuckDuckGo fournit des protections contre le pistage qui sont toujours actives.\n<a href=\"\">En savoir plus</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Le navigateur DuckDuckGo fournit des protections contre le pistage qui permettent de sécuriser vos données pendant que vous naviguez.\n<a href=\"\">En savoir plus</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Comment nous vous protégeons</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Bloque les traqueurs tiers</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Permet de bloquer les cookies tiers qui vous suivent d\'un site à l\'autre en empêchant dès le départ le chargement des traqueurs tiers.</string>
