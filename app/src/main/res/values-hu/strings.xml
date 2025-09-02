@@ -188,6 +188,29 @@
     <string name="webTrackingProtectionActivityTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionLearnMoreTitle">Webes követés elleni védelem</string>
     <string name="webTrackingProtectionTitle">Webes követés elleni védelem</string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[A DuckDuckGo böngésző nyomkövetés elleni védelmi megoldásokat kínál, amelyek mindig aktívak.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[A DuckDuckGo böngésző nyomkövetés elleni védelmet biztosít, hogy biztonságban legyenek az adataid böngészés közben.\n<a href=\"\">További részletek</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Így védünk téged</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkolja a harmadik féltől származó nyomkövetőket</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">A harmadik féltől származó nyomkövetők betöltésének megakadályozásával segít blokkolni a téged webhelyről webhelyre követő harmadik féltől származó sütiket.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokkolja a célzott hirdetéseket</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Még betöltés előtt blokkolja az invazív nyomkövetőket, így hatékonyan kiküszöböljük a nyomkövetésre épülő hirdetéseket.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Megakadályozza az ujjlenyomat-alapú nyomkövetést</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Segít megakadályozni, hogy a nyomkövető cégek olyan egyedi azonosítókat gyűjtsenek a böngésződről és az eszközödről, amelyek használatával nyomon követhetnek a weben.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokkolja a linkkövetést</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Eltávolítja a linkek nyomkövető paramétereit, hogy harmadik felek ne tudják nyomon követni a webhelyeken átívelő böngészési szokásaidat.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Védelmet nyújt a hivatkozó-nyomkövetés ellen</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Segít megakadályozni a vállalatokat az általad utoljára meglátogatott webhelyek azonosításában.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Lejárttá teszi az első féltől származó sütiket</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Az első féltől származó sütiket 30 nap elteltével automatikusan lejárt állapotba állítja, biztosítva ezáltal, hogy a webhelyek ne tudjanak korlátlanul követni, ha kijelentkeztél.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Védelmet nyújt a DNS CNAME-álcázás ellen</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Segít blokkolni a harmadik féltől származó olyan nyomkövetőket, amelyek DNS segítségével próbálják elrejteni magukat egy webhelyen.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokkolja a Google AMP nyomon követését</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">A Google AMP-linkeket az eredeti közzétevő webhelyére cseréli.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokkolja a Google bejelentkezéskor felugró ablakait</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokkolja az előugró Google bejelentkezési ablakokat a nem a Google tulajdonában lévő webhelyeken.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Leiratkozási jogokat gyakorol a nevedben azáltal, hogy jelzi a webhelyeknek, hogy ne adják el vagy osszák meg a személyes adataidat.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Felugró sütiablak elleni védelem</string>
