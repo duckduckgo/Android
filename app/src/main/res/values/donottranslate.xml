@@ -62,7 +62,4 @@
 
     <!-- DuckChat -->
     <string name="duckChatMenuItem">@string/duck_chat_title</string>
-
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Ask Duck.ai</string>
 </resources>

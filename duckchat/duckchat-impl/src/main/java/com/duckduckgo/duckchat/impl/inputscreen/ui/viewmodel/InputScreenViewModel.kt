@@ -267,6 +267,7 @@ class InputScreenViewModel @AssistedInject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase)
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserDuckAiPrompt(suggestion.phrase)
                 }
             }
         }
@@ -274,6 +275,10 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = SwitchToTab(tabId)
+    }
+
+    private fun onUserDuckAiPrompt(prompt: String) {
+        command.value = Command.SubmitChat(prompt)
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {

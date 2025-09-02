@@ -1007,6 +1007,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserDuckAiPrompt(suggestion.phrase)
                 }
             }
         }
@@ -4198,6 +4199,10 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onUserSwitchedToTab(tabId: String) {
         command.value = Command.SwitchToTab(tabId)
+    }
+
+    private fun onUserDuckAiPrompt(prompt: String) {
+        command.value = Command.SubmitChat(prompt)
     }
 
     fun onDuckChatMenuClicked() {
