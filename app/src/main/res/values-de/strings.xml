@@ -189,6 +189,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionTitle">Web Tracking Protection</string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Der DuckDuckGo-Browser bietet Tracking-Schutz, der immer aktiv ist.\n<a href=\"\">Mehr erfahren</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Der DuckDuckGo-Browser bietet Tracking-Schutz, der hilft, deine Daten beim Surfen sicher zu halten.\n<a href=\"\">Mehr erfahren</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Wie wir dich schützen</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blockiert Tracker von Drittanbietern</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Hilft Cookies von Drittanbietern zu blockieren, die dich von Website zu Website tracken, indem das Laden von Drittanbieter-Trackern verhindert wird.</string>
