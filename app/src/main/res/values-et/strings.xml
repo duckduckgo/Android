@@ -188,6 +188,29 @@
     <string name="webTrackingProtectionActivityTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionLearnMoreTitle">Veebijälgimise kaitse</string>
     <string name="webTrackingProtectionTitle">Veebijälgimise kaitse</string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo brauser pakub jälgimiskaitseid, mis on alati aktiivsed.\n<a href=\"\">Loe edasi</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo brauser pakub jälgimiskaitseid, mis aitavad su andmeid sirvimise ajal kaitsta.\n<a href=\"\">Loe edasi</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kuidas me sind kaitseme</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokeerib kolmanda poole jälgurid</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Aitab blokeerida kolmanda poole küpsiseid, mis jälgivad sind lehelt lehele, takistades kolmanda poole jälgijate laadimist.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokeerib suunatud reklaamid</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokeerib invasiivsed jälgijad enne nende laadimist, kõrvaldades tõhusalt reklaamid, mis tuginevad jälgimisele.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Takistab sõrmejälje jälgimist</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Aitab takistada jälgimisfirmadel hankida sinu brauseri ja seadme kohta kordumatuid tunnuseid, mida nad kasutavad sinu jälgimiseks veebis.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokeerib linkide jälgimise</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Eemaldab linkide jälgimisparameetrid, et vältida kolmandate osapoolte jälgimist sinu käitumise jälgimisel saitidel.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Kaitseb suunaja jälgimise eest</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Aitab blokeerida ettevõtetel tuvastada viimast külastatud veebisaiti.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Muudab esimese poole küpsised aegunuks</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Muudab 30 päeva pärast automaatselt esimese poole küpsised kehtetuks, tagades, et veebilehed ei saa sind piiramatult jälgida, kui oled välja loginud.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Kaitseb DNS CNAME varjamise eest</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Aitab blokeerida kolmanda poole jälgureid, mis üritavad end DNS-i abil veebisaidil maskeerida.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokeerib Google\'i AMP jälgimise</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Asendab Google AMPi lingid algse avaldaja saidiga.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokeerib Google\'i sisselogimise hüpikaknad</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokeerib Google\'i sisselogimise hüpikaknad saitidel, mida Google ei oma.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Üleilmne privaatsuskontroll (Global Privacy Control)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Väljendab sinu nimel loobumisõigusi, käskides saitidel mitte müüa ega jagada sinu isiklikke andmeid.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Küpsiste hüpikakna kaitse</string>
