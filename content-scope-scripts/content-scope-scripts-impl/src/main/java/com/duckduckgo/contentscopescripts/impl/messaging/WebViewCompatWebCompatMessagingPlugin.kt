@@ -18,7 +18,6 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import androidx.annotation.VisibleForTesting
 import androidx.webkit.WebViewCompat.WebMessageListener
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
@@ -29,7 +28,6 @@ import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
-import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -41,7 +39,6 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
-    private val dispatcherProvider: DispatcherProvider,
 ) : WebMessagingPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -83,7 +80,7 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
         jsMessageCallback: JsMessageCallback?,
         registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
     ) {
-        if (withContext(dispatcherProvider.io()) { !webViewCompatContentScopeScripts.isEnabled() }) return
+        if (!webViewCompatContentScopeScripts.isEnabled()) return
         if (jsMessageCallback == null) throw Exception("Callback cannot be null")
 
         runCatching {
@@ -107,13 +104,11 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
         unregisterer: suspend (objectName: String) -> Boolean,
     ) {
         if (!webViewCompatContentScopeScripts.isEnabled()) return
-        withContext(dispatcherProvider.main()) {
-            runCatching {
-                return@runCatching unregisterer(JS_OBJECT_NAME)
-            }.getOrElse { exception ->
-                logcat(ERROR) {
-                    "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
-                }
+        runCatching {
+            return@runCatching unregisterer(JS_OBJECT_NAME)
+        }.getOrElse { exception ->
+            logcat(ERROR) {
+                "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
             }
         }
     }

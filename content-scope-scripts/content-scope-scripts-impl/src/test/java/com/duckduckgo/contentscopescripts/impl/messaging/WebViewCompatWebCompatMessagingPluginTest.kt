@@ -18,7 +18,6 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.webkit.WebViewCompat.WebMessageListener
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
@@ -30,7 +29,6 @@ import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -38,7 +36,6 @@ import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class WebViewCompatWebCompatMessagingPluginTest {
-    @get:Rule var coroutineRule = CoroutineTestRule()
 
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
@@ -97,7 +94,6 @@ class WebViewCompatWebCompatMessagingPluginTest {
             handlers = handlers,
             globalHandlers = globalHandlers,
             webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
-            coroutineRule.testDispatcherProvider,
         )
     }
 
