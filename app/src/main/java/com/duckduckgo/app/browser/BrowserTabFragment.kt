@@ -3197,6 +3197,7 @@ class BrowserTabFragment :
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
                 webView.safeAddWebMessageListener(
+                    webViewCapabilityChecker,
                     "ddgBlobDownloadObj",
                     setOf("*"),
                     object : WebViewCompat.WebMessageListener {
