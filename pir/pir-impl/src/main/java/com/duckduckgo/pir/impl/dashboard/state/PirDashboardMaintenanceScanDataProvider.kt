@@ -176,7 +176,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                     }
                 }.filter {
                     it in startDate..endDate
-                }.min()
+                }.minOrNull()
             }
     }
 
@@ -204,7 +204,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
                 if (nextRunFromOptOutData != null) {
                     listOf(nextMaintenanceScan, nextRunFromOptOutData).filter {
                         it in startDate..endDate
-                    }.min()
+                    }.minOrNull() ?: 0L
                 } else {
                     nextMaintenanceScan
                 }
