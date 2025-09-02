@@ -48,7 +48,7 @@ ext {
         def suffix = getVersionNameSuffix()
         if (suffix?.trim()) {
             def tag = getStoredTag()
-            if (tag.contains('internal')) {
+            if (tag.contains('nightly') || tag.contains('internal')) {
                 def (major, minor, patch, internal) = tag.toLowerCase().tokenize('.')
                 (major, minor, patch, internal) = [major, minor, patch, internal].collect { it.toString() }
 

@@ -107,7 +107,7 @@ jobs:
         if: steps.check_for_changes.outputs.has_changes == 'true'
         run: ./gradlew bundleInternalRelease -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
 
-      - name: Generate nightly version name
+      - name: Generate internal version name
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: generate_version_name
         run: |
@@ -175,6 +175,6 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Nightly Release
+          asana-task-name: GH Workflow Failure - Internal Release
           asana-task-description: The Internal Release Task workflow has failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'
