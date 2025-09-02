@@ -40,10 +40,11 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
-import com.duckduckgo.contentscopescripts.impl.WebViewCompatWrapper
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -75,10 +76,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     var isSafeWebViewEnabled: Boolean = false
 
     @Inject
-    lateinit var webViewCompatWrapper: WebViewCompatWrapper
-
-    @Inject
-    lateinit var webViewCapabilityChecker: WebViewCapabilityChecker
+    lateinit var dispatcherProvider: DispatcherProvider
 
     constructor(context: Context) : this(context, null)
     constructor(
@@ -432,6 +430,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
 
     @SuppressLint("RequiresFeature", "AddWebMessageListenerUsage")
     suspend fun safeAddWebMessageListener(
+        webViewCapabilityChecker: WebViewCapabilityChecker,
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebMessageListener,
@@ -452,35 +451,24 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         false
     }
 
-    @SuppressLint("RequiresFeature", "RemoveWebMessageListenerUsage")
-    suspend fun safeRemoveWebMessageListener(
-        jsObjectName: String,
-    ): Boolean = runCatching {
-        if (webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener) && !isDestroyed) {
-            WebViewCompat.removeWebMessageListener(
-                this,
-                jsObjectName,
-            )
-            true
-        } else {
-            false
-        }
-    }.getOrElse { exception ->
-        logcat(ERROR) { "Error removing WebMessageListener: $jsObjectName: ${exception.asLog()}" }
-        false
-    }
-
     @SuppressLint("RequiresFeature")
     suspend fun safeAddDocumentStartJavaScript(
         script: String,
         allowedOriginRules: Set<String>,
     ): ScriptHandler? {
         return runCatching {
-            if (webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript) && !isDestroyed) {
-                webViewCompatWrapper.addDocumentStartJavaScript(this, script, allowedOriginRules)
-            } else {
-                null
+            if (!isDestroyed) {
+                if (::dispatcherProvider.isInitialized) {
+                    return withContext(dispatcherProvider.main()) {
+                        return@withContext WebViewCompat.addDocumentStartJavaScript(
+                            this@DuckDuckGoWebView,
+                            script,
+                            allowedOriginRules,
+                        )
+                    }
+                }
             }
+            null
         }.getOrElse { e ->
             logcat(ERROR) { "Error calling addDocumentStartJavaScript: ${e.asLog()}" }
             null

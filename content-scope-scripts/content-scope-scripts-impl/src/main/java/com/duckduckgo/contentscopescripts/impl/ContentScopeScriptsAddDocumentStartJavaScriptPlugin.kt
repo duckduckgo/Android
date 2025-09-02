@@ -17,14 +17,19 @@
 package com.duckduckgo.contentscopescripts.impl
 
 import android.annotation.SuppressLint
+import android.webkit.WebView
 import androidx.webkit.ScriptHandler
 import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @ContributesMultibinding(AppScope::class)
@@ -32,33 +37,41 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val dispatcherProvider: DispatcherProvider,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val webViewCompatWrapper: WebViewCompatWrapper,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AddDocumentStartJavaScriptPlugin {
     private var script: ScriptHandler? = null
     private var currentScriptString: String? = null
 
     @SuppressLint("RequiresFeature")
-    override suspend fun configureAddDocumentStartJavaScript(
+    override fun addDocumentStartJavaScript(
         activeExperiments: List<Toggle>,
-        scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler?,
+        webView: WebView,
     ) {
-        if (!webViewCompatContentScopeScripts.isEnabled() || !webViewCapabilityChecker.isSupported(
-                WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
-            )
-        ) {
-            return
-        }
+        appCoroutineScope.launch {
+            if (!webViewCompatContentScopeScripts.isEnabled() || !webViewCapabilityChecker.isSupported(
+                    WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript,
+                )
+            ) {
+                return@launch
+            }
 
-        val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
-        if (scriptString == currentScriptString) {
-            return
-        }
-        withContext(dispatcherProvider.main()) {
+            val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
+            if (scriptString == currentScriptString) {
+                return@launch
+            }
             script?.let {
-                it.remove()
+                withContext(dispatcherProvider.main()) {
+                    it.remove()
+                }
                 script = null
             }
 
-            scriptInjector(scriptString, setOf("*"))?.let {
+            webViewCompatWrapper.addDocumentStartJavaScript(
+                webView,
+                scriptString,
+                setOf("*"),
+            )?.let {
                 script = it
                 currentScriptString = scriptString
             }

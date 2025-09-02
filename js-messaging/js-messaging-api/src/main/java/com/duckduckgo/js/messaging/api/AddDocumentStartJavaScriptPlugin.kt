@@ -16,7 +16,7 @@
 
 package com.duckduckgo.js.messaging.api
 
-import androidx.webkit.ScriptHandler
+import android.webkit.WebView
 import com.duckduckgo.feature.toggles.api.Toggle
 
 /**
@@ -26,14 +26,8 @@ import com.duckduckgo.feature.toggles.api.Toggle
  */
 interface AddDocumentStartJavaScriptPlugin {
 
-    /**
-     * Configures JavaScript injection for addDocumentStartJavaScript and executes it through [scriptInjector].
-     * @param scriptInjector A suspend function that injects the script into the WebView.
-     *                       Returns a [ScriptHandler] that can be used to remove the script later,
-     *                       or null if injection failed.
-     */
-    suspend fun configureAddDocumentStartJavaScript(
+    fun addDocumentStartJavaScript(
         activeExperiments: List<Toggle>,
-        scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler?,
+        webView: WebView,
     )
 }
