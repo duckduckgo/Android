@@ -19,6 +19,7 @@ package com.duckduckgo.contentscopescripts.impl
 import android.annotation.SuppressLint
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -33,6 +34,7 @@ import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -42,9 +44,13 @@ import org.mockito.kotlin.whenever
 @SuppressLint("DenyListedApi")
 class RealWebViewCompatContentScopeScriptsTest {
 
+    @get:Rule
+    @Suppress("unused")
+    val coroutineRule = CoroutineTestRule()
+
     private val mockPluginPoint: PluginPoint<ContentScopeConfigPlugin> = mock()
     private val mockUserAllowListRepository: UserAllowListRepository = mock()
-    private val mockContentScopeJsReader: ContentScopeJSReader = mock()
+    private val mockContentScopeJsReader: WebViewCompatContentScopeJSReader = mock()
     private val mockPlugin1: ContentScopeConfigPlugin = mock()
     private val mockPlugin2: ContentScopeConfigPlugin = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
@@ -55,7 +61,7 @@ class RealWebViewCompatContentScopeScriptsTest {
     lateinit var testee: WebViewCompatContentScopeScripts
 
     @Before
-    fun setup() {
+    fun setup() = runTest {
         testee = RealWebViewCompatContentScopeScripts(
             mockPluginPoint,
             mockUserAllowListRepository,
@@ -64,6 +70,7 @@ class RealWebViewCompatContentScopeScriptsTest {
             mockUnprotectedTemporary,
             mockFingerprintProtectionManager,
             contentScopeScriptsFeature,
+            coroutineRule.testDispatcherProvider,
         )
         whenever(mockPlugin1.config()).thenReturn(config1)
         whenever(mockPlugin2.config()).thenReturn(config2)
@@ -77,7 +84,7 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
-    fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() {
+    fun whenGetScriptWhenVariablesAreCachedAndNoChangesThenUseCachedVariables() = runTest {
         var js = testee.getScript(listOf())
         verifyJsScript(js)
 
@@ -90,7 +97,7 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
-    fun whenGetScriptAndVariablesAreCachedAndAllowListChangedThenUseNewAllowListValue() {
+    fun whenGetScriptAndVariablesAreCachedAndAllowListChangedThenUseNewAllowListValue() = runTest {
         var js = testee.getScript(listOf())
         verifyJsScript(js)
 
@@ -117,7 +124,7 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
-    fun whenGetScriptAndVariablesAreCachedAndGpcChangedThenUseNewGpcValue() {
+    fun whenGetScriptAndVariablesAreCachedAndGpcChangedThenUseNewGpcValue() = runTest {
         var js = testee.getScript(listOf())
         verifyJsScript(js)
 
@@ -144,7 +151,7 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
-    fun whenGetScriptAndVariablesAreCachedAndConfigChangedThenUseNewConfigValue() {
+    fun whenGetScriptAndVariablesAreCachedAndConfigChangedThenUseNewConfigValue() = runTest {
         var js = testee.getScript(listOf())
         verifyJsScript(js)
 
@@ -172,7 +179,7 @@ class RealWebViewCompatContentScopeScriptsTest {
     }
 
     @Test
-    fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() {
+    fun whenGetScriptAndVariablesAreCachedAndUnprotectedTemporaryChangedThenUseNewUnprotectedTemporaryValue() = runTest {
         var js = testee.getScript(listOf())
         verifyJsScript(js)
 
