@@ -190,6 +190,29 @@
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionLearnMoreTitle">Apsauga nuo žiniatinklio sekimo</string>
     <string name="webTrackingProtectionTitle">Apsauga nuo žiniatinklio sekimo</string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[\"DuckDuckGo\" naršyklėje yra visada aktyvi stebėjimo apsauga.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[„DuckDuckGo“ naršyklė teikia sekimo apsaugos funkcijas, kurios padeda apsaugoti jūsų duomenis naršant.\n<a href=\"\">Sužinoti daugiau</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Kaip jus saugome</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuoja trečiųjų šalių stebėjimo priemones</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Padeda blokuoti 3‑iųjų šalių slapukus, kurie seka jus iš vienos svetainės į kitą, neleidžiant įkelti 3‑iųjų šalių sekimo įrenginių.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokuoja tikslines reklamas</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokuoja invazines sekimo priemones prieš jas įkeliant, todėl veiksmingai pašalina skelbimus, taikomus pagal sekimą.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Apsaugo nuo pirštų atspaudų sekimo</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Padeda neleisti stebėjimo įmonėms gauti unikalius identifikatorius apie jūsų naršyklę ir įrenginį, kuriuos jie naudoja sekti jus visame internete.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokuoja nuorodų sekimą</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Pašalinami nuorodose esantys sekimo parametrai, kad trečiosios šalys negalėtų sekti jūsų elgesio svetainėse.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Apsaugo nuo nukreipiančiojo sekimo</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Padeda neleisti įmonėms identifikuoti paskutinę aplankytą svetainę.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Panaikina pirmosios šalies slapukų galiojimą</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Automatiškai nutraukia 1‑osios šalies slapukų galiojimą po 30 dienų, kad svetainės negalėtų neribotą laiką sekti jūsų, kai esate atsijungę.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Apsauga nuo DNS CNAME slėpimo</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Padeda blokuoti trečiųjų šalių sekimo priemones, kurios bando pasislėpti svetainėje naudodamos DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokuoja „Google“ AMP sekimą</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Pakeičia „Google AMP“ nuorodas į originalią leidėjo svetainę.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokuoja „Google“ prisijungimo iššokančiuosius langus</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokuoja „Google“ prisijungimo iššokančiuosius langus svetainėse, kurios nepriklauso „Google“.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Visuotinė privatumo kontrolė</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Išreiškia atsisakymo teises jūsų vardu, liepdamas svetainėms nepardavinėti jūsų asmens informacijos ir jos nebendrinti.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Apsauga nuo slapukų iškylančiųjų langų</string>
