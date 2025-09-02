@@ -763,7 +763,7 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    fun postMessage(
+    suspend fun postMessage(
         eventData: SubscriptionEventData,
         fallback: () -> Unit,
     ) {

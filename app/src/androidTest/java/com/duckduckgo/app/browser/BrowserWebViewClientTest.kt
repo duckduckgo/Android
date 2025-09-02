@@ -1350,7 +1350,7 @@ class BrowserWebViewClientTest {
         }
 
         // TODO (cbarreiro) Test message posting
-        override fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
+        override suspend fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
             TODO("Not yet implemented")
         }
     }

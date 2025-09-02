@@ -28,5 +28,5 @@ interface WebMessagingPlugin {
         webView: WebView,
     )
 
-    fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean
+    suspend fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean
 }

@@ -40,7 +40,6 @@ import com.squareup.moshi.Moshi
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
@@ -212,14 +211,9 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature")
-    override fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
+    override suspend fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
         return runCatching {
-            // TODO (cbarreiro) temporary, remove
-            val newWebCompatApisEnabled = runBlocking {
-                webViewCompatContentScopeScripts.isEnabled()
-            }
-
-            if (!newWebCompatApisEnabled) {
+            if (!webViewCompatContentScopeScripts.isEnabled()) {
                 return false
             }
 
@@ -232,8 +226,10 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                 moshi.adapter(SubscriptionEvent::class.java).toJson(it)
             }
 
-            globalReplyProxy?.postMessage(subscriptionEvent)
-            true
+            withContext(dispatcherProvider.main()) {
+                globalReplyProxy?.postMessage(subscriptionEvent)
+                true
+            }
         }.getOrElse { false }
     }
 }
