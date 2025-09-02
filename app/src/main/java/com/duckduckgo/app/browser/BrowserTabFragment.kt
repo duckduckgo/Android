@@ -246,6 +246,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.RELOAD_THREE_TIMES_WITHIN_20_SECONDS
 import com.duckduckgo.browser.api.ui.BrowserScreens.PrivateSearchScreenNoParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.store.BrowserAppTheme
@@ -584,6 +585,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var passkeyInitializer: WebViewPasskeyInitializer
+
+    @Inject
+    lateinit var webViewCompatWrapper: WebViewCompatWrapper
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -3216,8 +3220,8 @@ class BrowserTabFragment :
                 val script = blobDownloadScript()
                 WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
 
-                webView.safeAddWebMessageListener(
-                    webViewCapabilityChecker,
+                webViewCompatWrapper.addWebMessageListener(
+                    webView,
                     "ddgBlobDownloadObj",
                     setOf("*"),
                     object : WebViewCompat.WebMessageListener {
@@ -3864,13 +3868,11 @@ class BrowserTabFragment :
 
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
-        appCoroutineScope.launch(dispatchers.main()) {
-            webView?.let {
-                webViewClient.destroy(it)
-                it.destroy()
-            }
-            webView = null
+        webView?.let {
+            webViewClient.destroy(it)
+            it.destroy()
         }
+        webView = null
     }
 
     private fun convertBlobToDataUri(blob: Command.ConvertBlobToDataUri) {

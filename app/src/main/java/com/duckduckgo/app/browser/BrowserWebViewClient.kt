@@ -472,14 +472,9 @@ class BrowserWebViewClient @Inject constructor(
         addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
             plugin.addDocumentStartJavaScript(webView)
         }
+
         webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.register(callback) { objectName, allowedOriginRules, webMessageListener ->
-                webView.safeAddWebMessageListener(
-                    objectName,
-                    allowedOriginRules,
-                    webMessageListener,
-                )
-            }
+            plugin.register(callback, webView)
         }
     }
 
@@ -761,11 +756,9 @@ class BrowserWebViewClient @Inject constructor(
         requestInterceptor.addExemptedMaliciousSite(url, feed)
     }
 
-    suspend fun destroy(webView: DuckDuckGoWebView) {
+    fun destroy(webView: DuckDuckGoWebView) {
         webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.unregister { objectName ->
-                webView.safeRemoveWebMessageListener(objectName)
-            }
+            plugin.unregister(webView)
         }
     }
 }

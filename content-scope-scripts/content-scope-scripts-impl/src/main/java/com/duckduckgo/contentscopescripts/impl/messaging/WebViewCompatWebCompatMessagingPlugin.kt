@@ -16,8 +16,10 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
-import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
@@ -28,6 +30,8 @@ import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -39,6 +43,8 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
+    private val webViewCompatWrapper: WebViewCompatWrapper,
+    @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : WebMessagingPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -76,39 +82,42 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
         }
     }
 
-    override suspend fun register(
+    override fun register(
         jsMessageCallback: JsMessageCallback?,
-        registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
+        webView: WebView,
     ) {
-        if (!webViewCompatContentScopeScripts.isEnabled()) return
-        if (jsMessageCallback == null) throw Exception("Callback cannot be null")
+        coroutineScope.launch {
+            if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
+            if (jsMessageCallback == null) throw Exception("Callback cannot be null")
 
-        runCatching {
-            return@runCatching registerer(
-                JS_OBJECT_NAME,
-                allowedDomains,
-                WebMessageListener { _, message, _, _, _ ->
+            runCatching {
+                return@runCatching webViewCompatWrapper.addWebMessageListener(
+                    webView,
+                    JS_OBJECT_NAME,
+                    allowedDomains,
+                ) { _, message, _, _, _ ->
                     process(
                         message.data ?: "",
                         jsMessageCallback,
                     )
-                },
-            )
-        }.getOrElse { exception ->
-            logcat(ERROR) { "Error adding WebMessageListener for contentScopeAdsjs: ${exception.asLog()}" }
-            false
+                }
+            }.getOrElse { exception ->
+                logcat(ERROR) { "Error adding WebMessageListener for contentScopeAdsjs: ${exception.asLog()}" }
+            }
         }
     }
 
-    override suspend fun unregister(
-        unregisterer: suspend (objectName: String) -> Boolean,
+    override fun unregister(
+        webView: WebView,
     ) {
-        if (!webViewCompatContentScopeScripts.isEnabled()) return
-        runCatching {
-            return@runCatching unregisterer(JS_OBJECT_NAME)
-        }.getOrElse { exception ->
-            logcat(ERROR) {
-                "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
+        coroutineScope.launch {
+            if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
+            runCatching {
+                return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
+            }.getOrElse { exception ->
+                logcat(ERROR) {
+                    "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
+                }
             }
         }
     }
