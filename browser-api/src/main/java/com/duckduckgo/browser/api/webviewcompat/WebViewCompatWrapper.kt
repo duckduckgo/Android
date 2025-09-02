@@ -28,12 +28,12 @@ interface WebViewCompatWrapper {
         allowedOriginRules: Set<String>,
     ): ScriptHandler?
 
-    fun removeWebMessageListener(
+    suspend fun removeWebMessageListener(
         webView: WebView,
         jsObjectName: String,
     )
 
-    fun addWebMessageListener(
+    suspend fun addWebMessageListener(
         webView: WebView,
         jsObjectName: String,
         allowedOriginRules: Set<String>,

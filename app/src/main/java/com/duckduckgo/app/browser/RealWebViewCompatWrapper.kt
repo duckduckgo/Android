@@ -44,7 +44,7 @@ class RealWebViewCompatWrapper @Inject constructor(
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : WebViewCompatWrapper {
     override suspend fun addDocumentStartJavaScript(
-        webView: android.webkit.WebView,
+        webView: WebView,
         script: String,
         allowedOriginRules: Set<String>,
     ): ScriptHandler? {
@@ -65,19 +65,23 @@ class RealWebViewCompatWrapper @Inject constructor(
         }
     }
 
-    override fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
-        WebViewCompat.removeWebMessageListener(
-            webView,
-            jsObjectName,
-        )
+    override suspend fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
+        withContext(dispatcherProvider.main()) {
+            WebViewCompat.removeWebMessageListener(
+                webView,
+                jsObjectName,
+            )
+        }
     }
 
-    override fun addWebMessageListener(
+    override suspend fun addWebMessageListener(
         webView: WebView,
         jsObjectName: String,
         allowedOriginRules: Set<String>,
         listener: WebViewCompat.WebMessageListener,
     ) {
-        return WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
+        return withContext(dispatcherProvider.main()) {
+            WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
+        }
     }
 }
