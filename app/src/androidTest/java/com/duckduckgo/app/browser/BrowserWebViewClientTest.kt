@@ -39,7 +39,6 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.webkit.ScriptHandler
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -1295,9 +1294,9 @@ class BrowserWebViewClientTest {
         var countInitted = 0
             private set
 
-        override suspend fun configureAddDocumentStartJavaScript(
+        override fun addDocumentStartJavaScript(
             activeExperiments: List<Toggle>,
-            scriptInjector: suspend (scriptString: String, allowedOriginRules: Set<String>) -> ScriptHandler?,
+            webView: WebView,
         ) {
             countInitted++
         }

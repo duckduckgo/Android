@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl
+package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
+import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 @SuppressLint(
     "RequiresFeature",
@@ -34,14 +40,27 @@ import kotlinx.coroutines.withContext
 @ContributesBinding(AppScope::class)
 class RealWebViewCompatWrapper @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
+    private val webViewCapabilityChecker: WebViewCapabilityChecker,
 ) : WebViewCompatWrapper {
     override suspend fun addDocumentStartJavaScript(
         webView: android.webkit.WebView,
         script: String,
         allowedOriginRules: Set<String>,
-    ): ScriptHandler {
-        return withContext(dispatcherProvider.main()) {
-            WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+    ): ScriptHandler? {
+        return runCatching {
+            if (!webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)) {
+                return null
+            }
+
+            if (webView is DuckDuckGoWebView) {
+                return webView.safeAddDocumentStartJavaScript(script, allowedOriginRules)
+            }
+            return withContext(dispatcherProvider.main()) {
+                WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+            }
+        }.getOrElse { e ->
+            logcat(ERROR) { "Error calling addDocumentStartJavaScript: ${e.asLog()}" }
+            null
         }
     }
 }
