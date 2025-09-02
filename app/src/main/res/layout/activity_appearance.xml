@@ -120,7 +120,7 @@
                 android:id="@+id/showTrackersCountInTabSwitcher"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/trackersCountInTabSwitcher"
+                app:primaryText="@string/showTrackerCountInTabSwitcher"
                 app:primaryTextTruncated="false"
                 app:showSwitch="true" />
 
