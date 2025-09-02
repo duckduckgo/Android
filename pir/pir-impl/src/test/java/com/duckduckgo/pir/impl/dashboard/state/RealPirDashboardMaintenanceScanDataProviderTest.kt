@@ -254,7 +254,10 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
 
         // Then
         assertEquals(2, result.brokerMatches.size) // Only scans within 8 days
-        assertEquals(currentTime - TimeUnit.DAYS.toMillis(5), result.dateInMillis) // Earliest scan within range
+        assertEquals(
+            currentTime - TimeUnit.DAYS.toMillis(5),
+            result.dateInMillis,
+        ) // Earliest scan within range
 
         val broker1Match = result.brokerMatches.find { it.broker.name == "broker1" }!!
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), broker1Match.dateInMillis)
@@ -268,6 +271,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         // Given
         setupForEmptyBrokersAndJobs()
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
 
         // When
         val result = testee.getNextScanDetails()
@@ -285,8 +289,14 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             createBroker("broker2"),
         )
         val schedulingConfigs = listOf(
-            createBrokerSchedulingConfig("broker1", maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7)),
-            createBrokerSchedulingConfig("broker2", maintenanceScanInMillis = TimeUnit.DAYS.toMillis(14)),
+            createBrokerSchedulingConfig(
+                "broker1",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7),
+            ),
+            createBrokerSchedulingConfig(
+                "broker2",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(14),
+            ),
         )
         val scanJobs = listOf(
             createScanJobRecord(
@@ -303,6 +313,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             ),
         )
 
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
@@ -328,12 +339,16 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         // Given
         val activeBrokers = listOf(createBroker("broker1"))
         val schedulingConfigs = listOf(
-            createBrokerSchedulingConfig("broker1", maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7)),
+            createBrokerSchedulingConfig(
+                "broker1",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7),
+            ),
         )
         val scanJobs = listOf(
             createScanJobRecord("broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
         )
 
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
@@ -369,6 +384,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             ),
         )
 
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
@@ -382,6 +398,313 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         assertEquals(1, result.brokerMatches.size)
         val expectedNextScan = currentTime - TimeUnit.HOURS.toMillis(1) + TimeUnit.HOURS.toMillis(2)
         assertEquals(expectedNextScan, result.brokerMatches[0].dateInMillis)
+    }
+
+    @Test
+    fun whenOptOutJobIsRequestedButOutOfRangeThenGetNextScanDetailsReturnsMaintenanceFromScanJob() =
+        runTest {
+            // Given
+            val activeBrokers = listOf(
+                createBroker("broker1"),
+            )
+            val schedulingConfigs = listOf(
+                createBrokerSchedulingConfig(
+                    "broker1",
+                    maintenanceScanInMillis = TimeUnit.DAYS.toMillis(10),
+                    confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(10),
+                ),
+            )
+            val scanJobs = listOf(
+                createScanJobRecord(
+                    // Next scan is in 7 days, in range
+                    "broker1",
+                    1L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(3), // Last scan 3 days ago
+                ),
+            )
+
+            val optOutJobs = listOf(
+                createOptOutJobRecord(
+                    // Next scan is in 10 days, out of range
+                    brokerName = "broker1",
+                    extractedProfileId = 1L,
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = currentTime, // Requested today
+                ),
+                // Next scan is in 10 days, out of rang
+                createOptOutJobRecord(
+                    brokerName = "broker1",
+                    extractedProfileId = 2L,
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(5), // Requested 5 days ago
+                    optOutRemovedDateInMillis = currentTime, // Removed today
+                ),
+            )
+
+            whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(
+                optOutJobs,
+            )
+            whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+            whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+            whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
+            whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+            whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+            // When
+            val result = testee.getNextScanDetails()
+
+            // Then
+            assertEquals(1, result.brokerMatches.size) // Only broker1 scheduled within 8 days
+
+            val broker1Match = result.brokerMatches[0]
+            assertEquals("broker1", broker1Match.broker.name)
+            // Next scan = last scan + maintenance interval = (currentTime - 3 days) + 10 days = currentTime + 7 days
+            val expectedNextScan =
+                currentTime - TimeUnit.DAYS.toMillis(3) + TimeUnit.DAYS.toMillis(10)
+            assertEquals(expectedNextScan, broker1Match.dateInMillis)
+            assertEquals(expectedNextScan, result.dateInMillis)
+        }
+
+    @Test
+    fun whenOptOutJobIsRequestedAndIsNextScanThenGetNextScanDetailsReturnsConfirmationFromOptOut() =
+        runTest {
+            // Given
+            val activeBrokers = listOf(
+                createBroker("broker1"),
+            )
+            val schedulingConfigs = listOf(
+                createBrokerSchedulingConfig(
+                    "broker1",
+                    maintenanceScanInMillis = TimeUnit.DAYS.toMillis(10),
+                    confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(5),
+                ),
+            )
+            val scanJobs = listOf(
+                // Next scan is in 7 days, in range
+                createScanJobRecord(
+                    "broker1",
+                    1L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(3), // Last scan 3 days ago
+                ),
+            )
+
+            val optOutJobs = listOf(
+                createOptOutJobRecord(
+                    // Next scan is in 4 days, in range
+                    brokerName = "broker1",
+                    extractedProfileId = 1L,
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(1), // Requested yesterday
+                ),
+                createOptOutJobRecord(
+                    // Next scan was yesterday (today - 1), out of range
+                    brokerName = "broker1",
+                    extractedProfileId = 2L,
+                    status = OptOutJobStatus.REQUESTED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(6), // Requested 6 days ago
+                ),
+            )
+
+            whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(
+                optOutJobs,
+            )
+            whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+            whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+            whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
+            whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+            whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+            // When
+            val result = testee.getNextScanDetails()
+
+            // Then
+            assertEquals(1, result.brokerMatches.size) // Only broker1 scheduled within 8 days
+
+            val broker1Match = result.brokerMatches[0]
+            assertEquals("broker1", broker1Match.broker.name)
+            // Next scan is from the opt-out job = requested date + confirm interval = (currentTime - 1 day) + 5 days = currentTime + 4 days
+            val expectedNextScan =
+                currentTime - TimeUnit.DAYS.toMillis(1) + TimeUnit.DAYS.toMillis(5)
+            assertEquals(expectedNextScan, broker1Match.dateInMillis)
+            assertEquals(expectedNextScan, result.dateInMillis)
+        }
+
+    @Test
+    fun whenOptOutJobIsRemovedAndIsNextScanThenGetNextScanDetailsReturnsMaintenanceFromOptOut() =
+        runTest {
+            // Given
+            val activeBrokers = listOf(
+                createBroker("broker1"),
+            )
+            val schedulingConfigs = listOf(
+                createBrokerSchedulingConfig(
+                    "broker1",
+                    maintenanceScanInMillis = TimeUnit.DAYS.toMillis(10),
+                    confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(5),
+                ),
+            )
+            val scanJobs = listOf(
+                createScanJobRecord(
+                    // Next Scan is in 7 days, in range
+                    "broker1",
+                    1L,
+                    ScanJobStatus.MATCHES_FOUND,
+                    currentTime - TimeUnit.DAYS.toMillis(3), // Last scan 3 days ago
+                ),
+            )
+
+            val optOutJobs = listOf(
+                createOptOutJobRecord(
+                    // Scan is yesterday, out of range
+                    brokerName = "broker1",
+                    extractedProfileId = 1L,
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(15), // Requested 15 days ago
+                    optOutRemovedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(11), // Removed 11 days ago
+                ),
+                createOptOutJobRecord(
+                    // Next scan is in 5 days, in range
+                    brokerName = "broker1",
+                    extractedProfileId = 2L,
+                    status = OptOutJobStatus.REMOVED,
+                    optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(15), // Requested 15 days ago
+                    optOutRemovedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(5), // Removed 5 days ago
+                ),
+            )
+
+            whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(
+                optOutJobs,
+            )
+            whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+            whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+            whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
+            whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+            whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+            // When
+            val result = testee.getNextScanDetails()
+
+            // Then
+            assertEquals(1, result.brokerMatches.size) // Only broker1 scheduled within 8 days
+
+            val broker1Match = result.brokerMatches[0]
+            assertEquals("broker1", broker1Match.broker.name)
+            // Next scan is from removed opt out's maintenance scan
+            val expectedNextScan =
+                currentTime - TimeUnit.DAYS.toMillis(5) + TimeUnit.DAYS.toMillis(10)
+            assertEquals(expectedNextScan, broker1Match.dateInMillis)
+            assertEquals(expectedNextScan, result.dateInMillis)
+        }
+
+    @Test
+    fun whenAllAreInRangeThenGetNextScanDetailsReturnsMaintenanceFromScan() = runTest {
+        // Given
+        val activeBrokers = listOf(
+            createBroker("broker1"),
+        )
+        val schedulingConfigs = listOf(
+            createBrokerSchedulingConfig(
+                "broker1",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(10),
+                confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(5),
+            ),
+        )
+        val scanJobs = listOf(
+            createScanJobRecord(
+                // Next scan is in 1 day, in range
+                "broker1",
+                1L,
+                ScanJobStatus.MATCHES_FOUND,
+                currentTime - TimeUnit.DAYS.toMillis(9), // Last scan 9 days ago
+            ),
+        )
+
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                // Next scan is in 7 days, in range
+                brokerName = "broker1",
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REMOVED,
+                optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(15), // Requested 15 days ago
+                optOutRemovedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(3), // Removed 3 days ago
+            ),
+            createOptOutJobRecord(
+                // Next Scan is in 2 days, in range
+                brokerName = "broker1",
+                extractedProfileId = 2L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(3), // Requested 3 days ago
+            ),
+        )
+
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+        // When
+        val result = testee.getNextScanDetails()
+
+        // Then
+        assertEquals(1, result.brokerMatches.size) // Only broker1 scheduled within 8 days
+
+        val broker1Match = result.brokerMatches[0]
+        assertEquals("broker1", broker1Match.broker.name)
+        // Next scan is from scan's maintenance scan
+        val expectedNextScan = currentTime - TimeUnit.DAYS.toMillis(9) + TimeUnit.DAYS.toMillis(10)
+        assertEquals(expectedNextScan, broker1Match.dateInMillis)
+        assertEquals(expectedNextScan, result.dateInMillis)
+    }
+
+    @Test
+    fun whenNoneInRangeThenGetNextScanDetailsReturnsEmpty() = runTest {
+        // Given
+        val activeBrokers = listOf(
+            createBroker("broker1"),
+        )
+        val schedulingConfigs = listOf(
+            createBrokerSchedulingConfig(
+                "broker1",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(10),
+                confirmOptOutScanInMillis = TimeUnit.DAYS.toMillis(5),
+            ),
+        )
+        val scanJobs = listOf(
+            // Next scan is in 9 days, out of range
+            createScanJobRecord(
+                "broker1",
+                1L,
+                ScanJobStatus.MATCHES_FOUND,
+                currentTime - TimeUnit.DAYS.toMillis(1), // Last scan 1 days ago
+            ),
+        )
+
+        val optOutJobs = listOf(
+            createOptOutJobRecord(
+                // Next scan was a day ago, out of range
+                brokerName = "broker1",
+                extractedProfileId = 1L,
+                status = OptOutJobStatus.REQUESTED,
+                optOutRequestedDateInMillis = currentTime - TimeUnit.DAYS.toMillis(6), // Requested yesterday
+            ),
+        )
+
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(optOutJobs)
+        whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
+        whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
+        whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
+        whenever(mockPirSchedulingRepository.getAllValidScanJobRecords()).thenReturn(scanJobs)
+        whenever(mockPirRepository.getAllMirrorSites()).thenReturn(emptyList())
+
+        // When
+        val result = testee.getNextScanDetails()
+
+        // Then
+        assertEquals(0, result.brokerMatches.size)
     }
 
     @Test
@@ -458,7 +781,10 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), brokerMatch.dateInMillis)
 
         val mirrorMatch = result.brokerMatches.find { it.broker.name == "mirror1" }!!
-        assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), mirrorMatch.dateInMillis) // Same as parent
+        assertEquals(
+            currentTime - TimeUnit.DAYS.toMillis(2),
+            mirrorMatch.dateInMillis,
+        ) // Same as parent
         assertEquals("https://broker1.com", mirrorMatch.broker.parentUrl)
     }
 
