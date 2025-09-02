@@ -182,6 +182,13 @@ class FavoritesWidgetService : RemoteViewsService() {
                 }
             }
 
+            oldList.indices.forEach { i ->
+                if (oldList[i].url != newList[i].url) {
+                    logcat { "isFavoritesDataChanged: order changed" }
+                    return true
+                }
+            }
+
             return false
         }
 

@@ -174,6 +174,8 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
             configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
 
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
+            appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)
         }
     }
 
