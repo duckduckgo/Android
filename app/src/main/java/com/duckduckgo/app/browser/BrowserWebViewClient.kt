@@ -763,14 +763,11 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    suspend fun postMessage(
+    fun postMessage(
         eventData: SubscriptionEventData,
-        fallback: () -> Unit,
     ) {
         webMessagingPlugins.getPlugins().forEach {
-            if (!it.postMessage(eventData)) {
-                fallback()
-            }
+            it.postMessage(eventData)
         }
     }
 }

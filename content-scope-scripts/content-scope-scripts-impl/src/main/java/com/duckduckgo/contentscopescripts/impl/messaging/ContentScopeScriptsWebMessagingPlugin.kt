@@ -53,6 +53,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
+    private val contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -211,25 +212,26 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     }
 
     @SuppressLint("RequiresFeature")
-    override suspend fun postMessage(subscriptionEventData: SubscriptionEventData): Boolean {
-        return runCatching {
-            if (!webViewCompatContentScopeScripts.isEnabled()) {
-                return false
-            }
+    override fun postMessage(subscriptionEventData: SubscriptionEventData) {
+        runCatching {
+            appCoroutineScope.launch {
+                if (!webViewCompatContentScopeScripts.isEnabled()) {
+                    contentScopeScriptsJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                }
 
-            val subscriptionEvent = SubscriptionEvent(
-                context = context,
-                featureName = subscriptionEventData.featureName,
-                subscriptionName = subscriptionEventData.subscriptionName,
-                params = subscriptionEventData.params,
-            ).let {
-                moshi.adapter(SubscriptionEvent::class.java).toJson(it)
-            }
+                val subscriptionEvent = SubscriptionEvent(
+                    context = context,
+                    featureName = subscriptionEventData.featureName,
+                    subscriptionName = subscriptionEventData.subscriptionName,
+                    params = subscriptionEventData.params,
+                ).let {
+                    moshi.adapter(SubscriptionEvent::class.java).toJson(it)
+                }
 
-            withContext(dispatcherProvider.main()) {
-                globalReplyProxy?.postMessage(subscriptionEvent)
-                true
+                withContext(dispatcherProvider.main()) {
+                    globalReplyProxy?.postMessage(subscriptionEvent)
+                }
             }
-        }.getOrElse { false }
+        }
     }
 }

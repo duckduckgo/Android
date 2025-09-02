@@ -1196,12 +1196,8 @@ class BrowserTabFragment :
     }
 
     private fun postBreakageReportingEvent() {
-        appCoroutineScope.launch {
-            val eventData = createBreakageReportingEventData()
-            webViewClient.postMessage(eventData) {
-                contentScopeScripts.sendSubscriptionEvent(eventData)
-            }
-        }
+        val eventData = createBreakageReportingEventData()
+        webViewClient.postMessage(eventData)
     }
 
     private fun onFireButtonPressed() {

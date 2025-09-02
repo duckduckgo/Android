@@ -110,6 +110,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
             webViewCompatWrapper = mockWebViewCompatWrapper,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
+            contentScopeScriptsJsMessaging = mock(),
         )
     }
 
