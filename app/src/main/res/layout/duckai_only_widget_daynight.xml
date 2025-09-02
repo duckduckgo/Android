@@ -21,7 +21,6 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="8dp"
     tools:ignore="UseCompoundDrawables, DeprecatedWidgetInXml">
 
     <ImageView
@@ -29,7 +28,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/duckAiOnlyWidgetText"
-        android:src="@drawable/duckai_96" />
+        android:src="@drawable/duckai_64" />
 
     <TextView
         android:id="@+id/widgetText"
