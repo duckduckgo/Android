@@ -217,6 +217,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
             appCoroutineScope.launch {
                 if (!webViewCompatContentScopeScripts.isEnabled()) {
                     contentScopeScriptsJsMessaging.sendSubscriptionEvent(subscriptionEventData)
+                    return@launch
                 }
 
                 val subscriptionEvent = SubscriptionEvent(

@@ -101,6 +101,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -375,6 +376,17 @@ class BrowserWebViewClientTest {
         assertTrue(fakeMessagingPlugins.plugin.registered)
         testee.destroy(webView)
         assertFalse(fakeMessagingPlugins.plugin.registered)
+    }
+
+    @Test
+    fun whenPostMessageThenCallPostMessage() = runTest {
+        val data = SubscriptionEventData("feature", "method", JSONObject())
+
+        assertFalse(fakeMessagingPlugins.plugin.messagePosted)
+
+        testee.postMessage(data)
+
+        assertTrue(fakeMessagingPlugins.plugin.messagePosted)
     }
 
     @UiThreadTest
@@ -1338,6 +1350,9 @@ class BrowserWebViewClientTest {
         var registered = false
             private set
 
+        var messagePosted = false
+            private set
+
         override fun unregister(webView: WebView) {
             registered = false
         }
@@ -1349,9 +1364,8 @@ class BrowserWebViewClientTest {
             registered = true
         }
 
-        // TODO (cbarreiro) Test message posting
         override fun postMessage(subscriptionEventData: SubscriptionEventData) {
-            TODO("Not yet implemented")
+            messagePosted = true
         }
     }
 
