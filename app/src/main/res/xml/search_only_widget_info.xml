@@ -23,7 +23,7 @@
     android:minWidth="348dp"
     android:minHeight="40dp"
     android:minResizeWidth="110dp"
-    android:previewImage="@drawable/search_widget_light_preview"
+    android:previewImage="@drawable/image_preview_search_only_widget_daynight"
     android:resizeMode="horizontal"
     android:description="@string/searchOnlyWidgetDescription"
     android:updatePeriodMillis="86400000"

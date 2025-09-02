@@ -248,8 +248,8 @@
     <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
     <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
-    <string name="favoritesWidgetLabel">Favorites</string>
-    <string name="searchWidgetLabel">Search</string>
+    <string name="favoritesWidgetLabel">Search and Favorites</string>
+    <string name="searchWidgetLabel">Search and Duck.ai</string>
 
     <!-- Home Screen Shortcuts -->
     <string name="addToHome">Add to Home Screen</string>

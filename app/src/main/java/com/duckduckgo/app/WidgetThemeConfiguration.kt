@@ -71,13 +71,16 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
         if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
             binding.widgetConfigThemeSystem.visibility = View.VISIBLE
             binding.widgetConfigThemeSystem.isChecked = true
+            binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_daynight)
         } else {
             binding.widgetConfigThemeSystem.visibility = View.GONE
             val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
             if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
                 binding.widgetConfigThemeDark.isChecked = true
+                binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_dark)
             } else {
                 binding.widgetConfigThemeLight.isChecked = true
+                binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_light)
             }
         }
 
@@ -86,16 +89,16 @@ class WidgetThemeConfiguration : DuckDuckGoActivity() {
                 R.id.widgetConfigThemeSystem -> {
                     val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
                     if (currentNightMode == Configuration.UI_MODE_NIGHT_YES) {
-                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
+                        binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_dark)
                     } else {
-                        binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_light_preview)
+                        binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_light)
                     }
                 }
                 R.id.widgetConfigThemeLight -> {
-                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_light_preview)
+                    binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_light)
                 }
                 R.id.widgetConfigThemeDark -> {
-                    binding.widgetConfigPreview.setImageResource(R.drawable.search_favorites_widget_dark_preview)
+                    binding.widgetConfigPreview.setImageResource(R.drawable.image_preview_search_favorites_widget_dark)
                 }
             }
         }

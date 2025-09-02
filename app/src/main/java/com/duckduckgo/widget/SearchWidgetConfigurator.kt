@@ -79,7 +79,7 @@ class SearchWidgetConfigurator @Inject constructor(
     private fun buildDuckAiPendingIntent(
         context: Context,
     ): PendingIntent {
-        val intent = BrowserActivity.intent(context, openDuckChat = true).also { it.action = Intent.ACTION_VIEW }
+        val intent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).also { it.action = Intent.ACTION_VIEW }
         return PendingIntent.getActivity(context, 2, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 }
