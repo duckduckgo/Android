@@ -66,11 +66,16 @@ class RealWebViewCompatWrapper @Inject constructor(
     }
 
     override suspend fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
-        withContext(dispatcherProvider.main()) {
-            WebViewCompat.removeWebMessageListener(
-                webView,
-                jsObjectName,
-            )
+        if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+            return
+        }
+
+        if (webView is DuckDuckGoWebView) {
+            webView.safeRemoveWebMessageListener(jsObjectName)
+            return
+        }
+        return withContext(dispatcherProvider.main()) {
+            WebViewCompat.removeWebMessageListener(webView, jsObjectName)
         }
     }
 
@@ -80,6 +85,14 @@ class RealWebViewCompatWrapper @Inject constructor(
         allowedOriginRules: Set<String>,
         listener: WebViewCompat.WebMessageListener,
     ) {
+        if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+            return
+        }
+
+        if (webView is DuckDuckGoWebView) {
+            webView.safeAddWebMessageListener(jsObjectName, allowedOriginRules, listener)
+            return
+        }
         return withContext(dispatcherProvider.main()) {
             WebViewCompat.addWebMessageListener(webView, jsObjectName, allowedOriginRules, listener)
         }

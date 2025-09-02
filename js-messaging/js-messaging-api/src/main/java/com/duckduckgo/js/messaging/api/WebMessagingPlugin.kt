@@ -16,15 +16,15 @@
 
 package com.duckduckgo.js.messaging.api
 
-import androidx.webkit.WebViewCompat.WebMessageListener
+import android.webkit.WebView
 
 interface WebMessagingPlugin {
-    suspend fun register(
+    fun register(
         jsMessageCallback: JsMessageCallback?,
-        registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
+        webView: WebView,
     )
 
-    suspend fun unregister(
-        unregisterer: suspend (objectName: String) -> Boolean,
+    fun unregister(
+        webView: WebView,
     )
 }

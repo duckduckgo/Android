@@ -39,7 +39,6 @@ import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
-import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
@@ -1338,13 +1337,13 @@ class BrowserWebViewClientTest {
         var registered = false
             private set
 
-        override suspend fun unregister(unregisterer: suspend (objectName: String) -> Boolean) {
+        override fun unregister(webView: WebView) {
             registered = false
         }
 
-        override suspend fun register(
+        override fun register(
             jsMessageCallback: JsMessageCallback?,
-            registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean,
+            webView: WebView,
         ) {
             registered = true
         }

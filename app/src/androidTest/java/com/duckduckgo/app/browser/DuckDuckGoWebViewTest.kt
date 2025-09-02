@@ -19,18 +19,13 @@ package com.duckduckgo.app.browser
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.common.test.CoroutineTestRule
 import org.junit.Assert.assertFalse
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class DuckDuckGoWebViewTest {
-
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
 
     private lateinit var testee: DuckDuckGoWebView
 
@@ -39,7 +34,6 @@ class DuckDuckGoWebViewTest {
     fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         testee = DuckDuckGoWebView(context)
-        testee.dispatcherProvider = coroutineRule.testDispatcherProvider
     }
 
     @Test

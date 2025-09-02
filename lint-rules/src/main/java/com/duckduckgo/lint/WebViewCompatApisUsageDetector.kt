@@ -4,7 +4,6 @@ import com.android.tools.lint.detector.api.*
 import com.intellij.psi.PsiMethod
 import org.jetbrains.kotlin.utils.mapToSetOrEmpty
 import org.jetbrains.uast.UCallExpression
-import org.jetbrains.uast.UClass
 
 data class WebViewCompatApiUsage(
     val methodName: String,
@@ -76,8 +75,18 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
                 issue = ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE
             ),
             WebViewCompatApiUsage(
+                methodName = "safeAddWebMessageListener",
+                containingClass = "com.duckduckgo.app.browser.DuckDuckGoWebView",
+                issue = ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE
+            ),
+            WebViewCompatApiUsage(
                 methodName = "removeWebMessageListener",
                 containingClass = "androidx.webkit.WebViewCompat",
+                issue = ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE
+            ),
+            WebViewCompatApiUsage(
+                methodName = "safeRemoveWebMessageListener",
+                containingClass = "com.duckduckgo.app.browser.DuckDuckGoWebView",
                 issue = ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE
             ),
             WebViewCompatApiUsage(
@@ -89,7 +98,7 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
                 methodName = "safeAddDocumentStartJavaScript",
                 containingClass = "com.duckduckgo.app.browser.DuckDuckGoWebView",
                 issue = ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE
-            )
+            ),
         )
 
         val issues = webViewCompatApiUsages.mapToSetOrEmpty { it.issue }

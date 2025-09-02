@@ -16,8 +16,10 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.webkit.WebViewCompat.WebMessageListener
+import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
@@ -25,21 +27,30 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class WebViewCompatWebCompatMessagingPluginTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts = mock()
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> = FakePluginPoint()
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> = FakeGlobalHandlersPluginPoint()
+    private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
+    private val mockWebView: WebView = mock()
     private lateinit var testee: WebViewCompatWebCompatMessagingPlugin
 
     private class FakePluginPoint : PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> {
@@ -94,6 +105,8 @@ class WebViewCompatWebCompatMessagingPluginTest {
             handlers = handlers,
             globalHandlers = globalHandlers,
             webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,
+            webViewCompatWrapper = mockWebViewCompatWrapper,
+            coroutineScope = coroutineRule.testScope,
         )
     }
 
@@ -162,67 +175,43 @@ class WebViewCompatWebCompatMessagingPluginTest {
     fun `when registering and adsjs is disabled then do not register`() = runTest {
         whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
 
-        var capturedObjectName: String? = null
-        var capturedAllowedOriginRules: Set<String>? = null
-        val registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean =
-            { objectName, allowedOriginRules, webMessageListener ->
-                capturedObjectName = objectName
-                capturedAllowedOriginRules = allowedOriginRules
-                true
-            }
+        testee.register(callback, mockWebView)
 
-        testee.register(callback, registerer)
-
-        assertNull(capturedObjectName)
-        assertNull(capturedAllowedOriginRules)
+        verify(mockWebViewCompatWrapper, never())
+            .addWebMessageListener(any(), any(), any(), any())
     }
 
     @Test
     fun `when registering and adsjs is enabled then register`() = runTest {
         whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
 
-        var capturedObjectName: String? = null
-        var capturedAllowedOriginRules: Set<String>? = null
-        val registerer: suspend (objectName: String, allowedOriginRules: Set<String>, webMessageListener: WebMessageListener) -> Boolean =
-            { objectName, allowedOriginRules, webMessageListener ->
-                capturedObjectName = objectName
-                capturedAllowedOriginRules = allowedOriginRules
-                true
-            }
+        testee.register(callback, mockWebView)
 
-        testee.register(callback, registerer)
-
-        assertEquals("contentScopeAdsjs", capturedObjectName)
-        assertEquals(setOf("*"), capturedAllowedOriginRules)
+        verify(mockWebViewCompatWrapper).addWebMessageListener(
+            eq(mockWebView),
+            eq("contentScopeAdsjs"),
+            eq(setOf("*")),
+            any(),
+        )
     }
 
     @Test
     fun `when unregistering and adsjs is disabled then do not unregister`() = runTest {
         whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-        var capturedObjectName: String? = null
-        val unregisterer: suspend (objectName: String) -> Boolean =
-            { objectName ->
-                capturedObjectName = objectName
-                true
-            }
 
-        testee.unregister(unregisterer)
+        testee.unregister(mockWebView)
 
-        assertNull(capturedObjectName)
+        verify(mockWebViewCompatWrapper, never())
+            .removeWebMessageListener(any(), any())
     }
 
     @Test
     fun `when unregistering and adsjs is enabled then unregister`() = runTest {
         whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        var capturedObjectName: String? = null
-        val unregisterer: suspend (objectName: String) -> Boolean = { objectName ->
-            capturedObjectName = objectName
-            true
-        }
 
-        testee.unregister(unregisterer)
+        testee.unregister(mockWebView)
 
-        assertEquals("contentScopeAdsjs", capturedObjectName)
+        verify(mockWebViewCompatWrapper).removeWebMessageListener(mockWebView, "contentScopeAdsjs")
     }
 
     private val callback = object : JsMessageCallback() {
@@ -233,6 +222,6 @@ class WebViewCompatWebCompatMessagingPluginTest {
     }
 
     private fun givenInterfaceIsRegistered() = runTest {
-        testee.register(callback) { _, _, _ -> true }
+        testee.register(callback, mockWebView)
     }
 }

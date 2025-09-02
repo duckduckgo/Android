@@ -37,8 +37,6 @@ import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewCompat.WebMessageListener
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
