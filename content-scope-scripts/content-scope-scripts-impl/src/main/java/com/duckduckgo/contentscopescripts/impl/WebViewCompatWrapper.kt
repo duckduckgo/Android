@@ -21,7 +21,7 @@ import androidx.webkit.ScriptHandler
 
 interface WebViewCompatWrapper {
 
-    fun addDocumentStartJavaScript(
+    suspend fun addDocumentStartJavaScript(
         webView: WebView,
         script: String,
         allowedOriginRules: Set<String>,

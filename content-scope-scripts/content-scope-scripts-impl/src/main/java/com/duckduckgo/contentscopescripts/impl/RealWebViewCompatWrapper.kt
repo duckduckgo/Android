@@ -19,9 +19,11 @@ package com.duckduckgo.contentscopescripts.impl
 import android.annotation.SuppressLint
 import androidx.webkit.ScriptHandler
 import androidx.webkit.WebViewCompat
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 @SuppressLint(
     "RequiresFeature",
@@ -30,12 +32,16 @@ import javax.inject.Inject
     "RemoveWebMessageListenerUsage",
 )
 @ContributesBinding(AppScope::class)
-class RealWebViewCompatWrapper @Inject constructor() : WebViewCompatWrapper {
-    override fun addDocumentStartJavaScript(
+class RealWebViewCompatWrapper @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+) : WebViewCompatWrapper {
+    override suspend fun addDocumentStartJavaScript(
         webView: android.webkit.WebView,
         script: String,
         allowedOriginRules: Set<String>,
     ): ScriptHandler {
-        return WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+        return withContext(dispatcherProvider.main()) {
+            WebViewCompat.addDocumentStartJavaScript(webView, script, allowedOriginRules)
+        }
     }
 }
