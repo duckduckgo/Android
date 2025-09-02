@@ -918,4 +918,11 @@
     <string name="settingsDuckAiRebranding">KI-Funktionen</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Anzahl der Tracker im Tabwechsel-Bildschirm anzeigen</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Tracker-Anzahl ausblenden?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kannst dies in den Einstellungen &gt; Erscheinungsbild wieder aktivieren.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ausblenden</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behalten</string>
+
 </resources>
