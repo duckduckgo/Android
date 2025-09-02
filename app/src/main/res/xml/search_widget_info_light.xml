@@ -23,7 +23,8 @@
     android:minWidth="348dp"
     android:minHeight="40dp"
     android:minResizeWidth="110dp"
-    android:previewImage="@drawable/search_widget_light_preview"
+    android:previewImage="@drawable/image_preview_search_widget_light"
+    android:description="@string/searchWidgetDescription"
     android:resizeMode="horizontal"
     android:updatePeriodMillis="86400000"
     android:widgetCategory="home_screen|keyguard" />

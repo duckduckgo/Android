@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/keyline_4"
-            android:src="@drawable/search_favorites_widget_light_preview" />
+            android:src="@drawable/image_preview_search_favorites_widget_light" />
 
         <RadioGroup
             android:id="@+id/widgetConfigThemeRadioGroup"

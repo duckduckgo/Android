@@ -106,7 +106,7 @@ class DuckAiOnlyWidget : AppWidgetProvider() {
     private fun buildPendingIntent(
         context: Context,
     ): PendingIntent {
-        val intent = BrowserActivity.intent(context, openDuckChat = true).also { it.action = Intent.ACTION_VIEW }
+        val intent = BrowserActivity.intent(context, openDuckChat = true, duckChatSessionActive = true).also { it.action = Intent.ACTION_VIEW }
         return PendingIntent.getActivity(
             context,
             DUCKAI_ONLY_WIDGET_REQUEST_CODE,
