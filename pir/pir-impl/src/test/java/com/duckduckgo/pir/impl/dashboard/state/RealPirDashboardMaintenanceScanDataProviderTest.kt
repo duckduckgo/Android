@@ -254,7 +254,10 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
 
         // Then
         assertEquals(2, result.brokerMatches.size) // Only scans within 8 days
-        assertEquals(currentTime - TimeUnit.DAYS.toMillis(5), result.dateInMillis) // Earliest scan within range
+        assertEquals(
+            currentTime - TimeUnit.DAYS.toMillis(5),
+            result.dateInMillis,
+        ) // Earliest scan within range
 
         val broker1Match = result.brokerMatches.find { it.broker.name == "broker1" }!!
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), broker1Match.dateInMillis)
@@ -268,6 +271,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         // Given
         setupForEmptyBrokersAndJobs()
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(emptyList())
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
 
         // When
         val result = testee.getNextScanDetails()
@@ -285,8 +289,14 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             createBroker("broker2"),
         )
         val schedulingConfigs = listOf(
-            createBrokerSchedulingConfig("broker1", maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7)),
-            createBrokerSchedulingConfig("broker2", maintenanceScanInMillis = TimeUnit.DAYS.toMillis(14)),
+            createBrokerSchedulingConfig(
+                "broker1",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7),
+            ),
+            createBrokerSchedulingConfig(
+                "broker2",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(14),
+            ),
         )
         val scanJobs = listOf(
             createScanJobRecord(
@@ -303,6 +313,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             ),
         )
 
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
@@ -328,12 +339,16 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         // Given
         val activeBrokers = listOf(createBroker("broker1"))
         val schedulingConfigs = listOf(
-            createBrokerSchedulingConfig("broker1", maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7)),
+            createBrokerSchedulingConfig(
+                "broker1",
+                maintenanceScanInMillis = TimeUnit.DAYS.toMillis(7),
+            ),
         )
         val scanJobs = listOf(
             createScanJobRecord("broker1", 1L, ScanJobStatus.NOT_EXECUTED, 0L),
         )
 
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
@@ -369,6 +384,7 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
             ),
         )
 
+        whenever(mockPirSchedulingRepository.getAllValidOptOutJobRecords()).thenReturn(emptyList())
         whenever(mockPirRepository.getAllActiveBrokerObjects()).thenReturn(activeBrokers)
         whenever(mockPirRepository.getAllBrokerOptOutUrls()).thenReturn(emptyMap())
         whenever(mockPirRepository.getAllBrokerSchedulingConfigs()).thenReturn(schedulingConfigs)
@@ -458,7 +474,10 @@ class RealPirDashboardMaintenanceScanDataProviderTest {
         assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), brokerMatch.dateInMillis)
 
         val mirrorMatch = result.brokerMatches.find { it.broker.name == "mirror1" }!!
-        assertEquals(currentTime - TimeUnit.DAYS.toMillis(2), mirrorMatch.dateInMillis) // Same as parent
+        assertEquals(
+            currentTime - TimeUnit.DAYS.toMillis(2),
+            mirrorMatch.dateInMillis,
+        ) // Same as parent
         assertEquals("https://broker1.com", mirrorMatch.broker.parentUrl)
     }
 
