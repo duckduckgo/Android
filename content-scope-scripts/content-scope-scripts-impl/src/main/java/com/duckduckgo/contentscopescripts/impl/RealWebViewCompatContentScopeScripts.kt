@@ -18,6 +18,7 @@ package com.duckduckgo.contentscopescripts.impl
 
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
@@ -33,11 +34,11 @@ import dagger.SingleInstanceIn
 import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
-import javax.inject.Named
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 interface WebViewCompatContentScopeScripts {
-    fun getScript(
+    suspend fun getScript(
         activeExperiments: List<Toggle>,
     ): String
 
@@ -53,11 +54,12 @@ interface WebViewCompatContentScopeScripts {
 class RealWebViewCompatContentScopeScripts @Inject constructor(
     private val pluginPoint: PluginPoint<ContentScopeConfigPlugin>,
     private val userAllowListRepository: UserAllowListRepository,
-    @Named("adsJS") private val adsContentScopeJSReader: ContentScopeJSReader,
+    private val webViewCompatContentScopeJSReader: WebViewCompatContentScopeJSReader,
     private val appBuildConfig: AppBuildConfig,
     private val unprotectedTemporary: UnprotectedTemporary,
     private val fingerprintProtectionManager: FingerprintProtectionManager,
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
+    private val dispatcherProvider: DispatcherProvider,
 ) : WebViewCompatContentScopeScripts {
 
     private var cachedContentScopeJson: String = getContentScopeJson("", emptyList())
@@ -76,43 +78,47 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
 
-    override fun getScript(
+    override suspend fun getScript(
         activeExperiments: List<Toggle>,
     ): String {
-        var updateJS = false
+        return withContext(dispatcherProvider.io()) {
+            var updateJS = false
 
-        val pluginParameters = getPluginParameters()
+            val pluginParameters = getPluginParameters()
 
-        if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
-            cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
-            updateJS = true
+            if (cachedUnprotectTemporaryExceptions != unprotectedTemporary.unprotectedTemporaryExceptions) {
+                cacheUserUnprotectedTemporaryExceptions(unprotectedTemporary.unprotectedTemporaryExceptions)
+                updateJS = true
+            }
+
+            val contentScopeJson = getContentScopeJson(pluginParameters.config, cachedUnprotectTemporaryExceptions)
+            if (cachedContentScopeJson != contentScopeJson) {
+                cachedContentScopeJson = contentScopeJson
+                updateJS = true
+            }
+
+            if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
+                cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
+                updateJS = true
+            }
+
+            val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, activeExperiments = activeExperiments)
+            if (cachedUserPreferencesJson != userPreferencesJson) {
+                cachedUserPreferencesJson = userPreferencesJson
+                updateJS = true
+            }
+
+            if (!this@RealWebViewCompatContentScopeScripts::cachedAdsJS.isInitialized || updateJS) {
+                cacheJs()
+            }
+            return@withContext cachedAdsJS
         }
-
-        val contentScopeJson = getContentScopeJson(pluginParameters.config, cachedUnprotectTemporaryExceptions)
-        if (cachedContentScopeJson != contentScopeJson) {
-            cachedContentScopeJson = contentScopeJson
-            updateJS = true
-        }
-
-        if (cachedUserUnprotectedDomains != userAllowListRepository.domainsInUserAllowList()) {
-            cacheUserUnprotectedDomains(userAllowListRepository.domainsInUserAllowList())
-            updateJS = true
-        }
-
-        val userPreferencesJson = getUserPreferencesJson(pluginParameters.preferences, activeExperiments = activeExperiments)
-        if (cachedUserPreferencesJson != userPreferencesJson) {
-            cachedUserPreferencesJson = userPreferencesJson
-            updateJS = true
-        }
-
-        if (!this::cachedAdsJS.isInitialized || updateJS) {
-            cacheJs()
-        }
-        return cachedAdsJS
     }
 
     override suspend fun isEnabled(): Boolean {
-        return contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+        return withContext(dispatcherProvider.io()) {
+            contentScopeScriptsFeature.self().isEnabled() && contentScopeScriptsFeature.useNewWebCompatApis().isEnabled()
+        }
     }
 
     private fun getSecretKeyValuePair() = "\"messageSecret\":\"$secret\""
@@ -159,8 +165,8 @@ class RealWebViewCompatContentScopeScripts @Inject constructor(
         }
     }
 
-    private fun cacheJs() {
-        val adsContentScopeJs = adsContentScopeJSReader.getContentScopeJS()
+    private suspend fun cacheJs() {
+        val adsContentScopeJs = webViewCompatContentScopeJSReader.getContentScopeJS()
 
         cachedAdsJS = adsContentScopeJs
             .replace(contentScope, cachedContentScopeJson)

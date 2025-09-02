@@ -48,11 +48,11 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
             return
         }
 
+        val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
+        if (scriptString == currentScriptString) {
+            return
+        }
         withContext(dispatcherProvider.main()) {
-            val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
-            if (scriptString == currentScriptString) {
-                return@withContext
-            }
             script?.let {
                 it.remove()
                 script = null
