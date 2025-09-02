@@ -22,6 +22,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
@@ -50,7 +51,8 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : WebMessagingPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -146,7 +148,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
     ) {
-        coroutineScope.launch {
+        appCoroutineScope.launch {
             if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
 
             runCatching {
@@ -170,7 +172,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     override fun unregister(
         webView: WebView,
     ) {
-        coroutineScope.launch {
+        appCoroutineScope.launch {
             if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
             runCatching {
                 return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
@@ -191,7 +193,9 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                 put("featureName", response.featureName)
                 put("context", context)
             }
-            replyProxy.postMessage(responseWithId.toString())
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                replyProxy.postMessage(responseWithId.toString())
+            }
         }
     }
 }
