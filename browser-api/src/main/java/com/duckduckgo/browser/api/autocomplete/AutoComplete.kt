@@ -75,5 +75,9 @@ interface AutoComplete {
 
             data object AutoCompleteInAppMessageSuggestion : AutoCompleteHistoryRelatedSuggestion("")
         }
+
+        data class AutoCompleteDuckAIPrompt(
+            override val phrase: String,
+        ) : AutoCompleteSuggestion(phrase)
     }
 }
