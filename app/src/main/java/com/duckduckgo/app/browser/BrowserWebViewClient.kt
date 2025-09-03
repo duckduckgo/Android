@@ -469,13 +469,15 @@ class BrowserWebViewClient @Inject constructor(
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
 
-    fun configureWebView(webView: DuckDuckGoWebView, callback: WebViewCompatMessageCallback) {
+    fun configureWebView(webView: DuckDuckGoWebView, callback: WebViewCompatMessageCallback?) {
         addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
             plugin.addDocumentStartJavaScript(webView)
         }
 
-        webMessagingPlugins.getPlugins().forEach { plugin ->
-            plugin.register(callback, webView)
+        callback?.let {
+            webMessagingPlugins.getPlugins().forEach { plugin ->
+                plugin.register(callback, webView)
+            }
         }
     }
 
