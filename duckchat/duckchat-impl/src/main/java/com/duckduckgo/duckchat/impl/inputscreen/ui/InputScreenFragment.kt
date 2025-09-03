@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.animation.LayoutTransition
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -135,6 +136,10 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         }
 
         viewModel.fireShownPixel()
+
+        // Enable CHANGING transition for smoother logo animation
+        val layoutTransition = binding.root.layoutTransition
+        layoutTransition?.enableTransitionType(LayoutTransition.CHANGING)
     }
 
     private fun configureObservers() {
