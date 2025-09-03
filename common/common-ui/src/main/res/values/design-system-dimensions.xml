@@ -28,6 +28,7 @@
     <dimen name="keyline_7">48dp</dimen>
 
     <!-- Shape radius -->
+    <dimen name="verySmallShapeCornerRadius">4dp</dimen>
     <dimen name="smallShapeCornerRadius">8dp</dimen>
     <dimen name="mediumShapeCornerRadius">12dp</dimen>
     <dimen name="largeShapeCornerRadius">16dp</dimen>

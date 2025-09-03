@@ -473,13 +473,17 @@
 
     <!-- Cards -->
     <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
 
     <style name="Widget.DuckDuckGo.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.TabCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Card">
