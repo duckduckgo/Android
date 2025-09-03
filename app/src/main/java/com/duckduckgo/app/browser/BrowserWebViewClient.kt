@@ -469,9 +469,9 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     fun configureWebView(webView: DuckDuckGoWebView, callback: WebViewCompatMessageCallback) {
-            addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
-                plugin.addDocumentStartJavaScript(webView)
-            }
+        addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
+            plugin.addDocumentStartJavaScript(webView)
+        }
 
         webMessagingPlugins.getPlugins().forEach { plugin ->
             plugin.register(callback, webView)
