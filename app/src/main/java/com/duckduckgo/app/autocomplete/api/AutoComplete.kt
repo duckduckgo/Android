@@ -44,6 +44,7 @@ import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.toStringDropScheme
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
@@ -76,6 +77,7 @@ class AutoCompleteApi @Inject constructor(
     private val tabRepository: TabRepository,
     private val userStageStore: UserStageStore,
     private val autocompleteTabsFeature: AutocompleteTabsFeature,
+    private val duckChat: DuckChat,
 ) : AutoComplete {
 
     private var isAutocompleteTabsFeatureEnabled: Boolean? = null
@@ -107,7 +109,10 @@ class AutoCompleteApi @Inject constructor(
                 inAppMessage.add(0, AutoCompleteInAppMessageSuggestion)
             }
 
-            val duckAIPrompt = AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query)
+            val duckAIPrompt = mutableListOf<AutoCompleteSuggestion>()
+            if (duckChat.isEnabled()) {
+                duckAIPrompt.add(AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query))
+            }
 
             AutoCompleteResult(
                 query = query,
