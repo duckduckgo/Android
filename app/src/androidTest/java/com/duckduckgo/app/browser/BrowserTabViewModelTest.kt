@@ -6032,6 +6032,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSelectedAutocompleteDuckAiPromptThenCommandSent() = runTest {
+        val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
+
+        testee.userSelectedAutocomplete(duckPrompt)
+        assertCommandIssued<Command.SubmitChat>()
+    }
+
+    @Test
     fun whenNavigationStateChangedCalledThenHandleResolvedUrlIsChecked() = runTest {
         testee.navigationStateChanged(buildWebNavigation("https://example.com"))
 
