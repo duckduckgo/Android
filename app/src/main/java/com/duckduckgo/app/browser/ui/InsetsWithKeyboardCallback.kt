@@ -23,7 +23,9 @@ import android.view.WindowManager
 import androidx.core.view.*
 
 // Credit: https://github.com/johncodeos-blog/MoveViewWithKeyboardAndroidExample
-class InsetsWithKeyboardCallback(window: Window) : OnApplyWindowInsetsListener, WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_CONTINUE_ON_SUBTREE) {
+class InsetsWithKeyboardCallback(window: Window) : OnApplyWindowInsetsListener, WindowInsetsAnimationCompat.Callback(
+    DISPATCH_MODE_CONTINUE_ON_SUBTREE,
+) {
     private var deferredInsets = false
     private var view: View? = null
     private var lastWindowInsets: WindowInsetsCompat? = null
@@ -76,5 +78,4 @@ class InsetsWithKeyboardCallback(window: Window) : OnApplyWindowInsetsListener, 
             }
         }
     }
-
 }

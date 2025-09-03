@@ -23,9 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.AttributeSet
 import android.view.View
-import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.core.view.ViewCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -34,7 +32,6 @@ import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.HomeBackgroundLogo
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewNewTabLegacyBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command
@@ -48,7 +45,6 @@ import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.Command.Submi
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.NewTabLegacyPageViewModelProviderFactory
 import com.duckduckgo.app.browser.newtab.NewTabLegacyPageViewModel.ViewState
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.remotemessage.asMessage
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
