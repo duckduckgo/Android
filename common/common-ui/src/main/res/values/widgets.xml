@@ -139,6 +139,7 @@
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
         <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Primary">
@@ -146,6 +147,7 @@
         <item name="backgroundTint">@color/button_primary_container_selector</item>
         <item name="rippleColor">@color/button_primary_ripple_selector</item>
         <item name="iconTint">@color/button_primary_text_color_selector</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.TextButton.Destructive">
@@ -153,6 +155,7 @@
         <item name="backgroundTint">@color/button_destructive_container_selector</item>
         <item name="rippleColor">@color/button_destructive_ripple_selector</item>
         <item name="iconTint">@color/button_primary_text_color_selector</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Secondary" parent="Widget.MaterialComponents.Button.OutlinedButton">
@@ -162,6 +165,7 @@
         <item name="rippleColor">@color/button_secondary_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
         <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
@@ -170,6 +174,7 @@
         <item name="rippleColor">@color/button_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_secondary_text_color_selector</item>
         <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhost" parent="Widget.MaterialComponents.Button.TextButton">
@@ -178,6 +183,7 @@
         <item name="rippleColor">@color/button_desctructive_ghost_ripple_selector</item>
         <item name="iconTint">@color/button_destructive_ghost_text_color_selector</item>
         <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.DaxButton.DestructiveGhostAlt" parent="Widget.MaterialComponents.Button.TextButton">
@@ -186,11 +192,13 @@
         <item name="rippleColor">@color/button_ghost_alt_ripple_selector</item>
         <item name="iconTint">@color/button_ghost_alt_text_color_selector</item>
         <item name="iconPadding">@dimen/keyline_2</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.IconButton">
         <item name="android:background">@drawable/background_icon_button</item>
         <item name="android:padding">@dimen/keyline_5</item>
+        <item name="cornerRadius">@dimen/mediumShapeCornerRadius</item>
     </style>
 
     <style name="Widget.DuckDuckGo.RadioButton" parent="Widget.MaterialComponents.CompoundButton.RadioButton">
@@ -465,13 +473,17 @@
 
     <!-- Cards -->
     <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
-        <item name="cardBackgroundColor">?attr/daxColorSurface</item>
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
     </style>
 
     <style name="Widget.DuckDuckGo.OmnibarCardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorWindow</item>
         <item name="cardCornerRadius">@dimen/largeShapeCornerRadius</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.TabCardView" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/daxColorWindow</item>
     </style>
 
     <style name="Widget.DuckDuckGo.Card">

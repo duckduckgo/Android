@@ -22,7 +22,7 @@
                 android:width="@dimen/keyline_0"
                 android:color="?attr/daxColorPreonboardingOptionSelectedBackgroundStroke" />
             <solid android:color="?attr/daxColorPreonboardingOptionSelectedBackground" />
-            <corners android:radius="@dimen/smallShapeCornerRadius" />
+            <corners android:radius="@dimen/mediumShapeCornerRadius" />
         </shape>
     </item>
 </ripple>
