@@ -21,7 +21,7 @@
             <stroke
                 android:width="1dp"
                 android:color="?attr/daxColorPreonboardingOptionBackgroundStroke" />
-            <corners android:radius="@dimen/smallShapeCornerRadius" />
+            <corners android:radius="@dimen/mediumShapeCornerRadius" />
         </shape>
     </item>
 </ripple>
