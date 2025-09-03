@@ -918,4 +918,11 @@
     <string name="settingsDuckAiRebranding">Funzionalità IA</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Mostra il numero dei sistemi di tracciamento nel Selettore schede</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Nascondere il conteggio dei sistemi di tracciamento?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Puoi riattivarlo in Impostazioni &gt; Aspetto.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Nascondi</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Tieni</string>
+
 </resources>
