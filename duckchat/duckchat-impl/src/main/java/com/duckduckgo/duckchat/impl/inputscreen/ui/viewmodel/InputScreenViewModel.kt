@@ -288,6 +288,7 @@ class InputScreenViewModel @AssistedInject constructor(
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
         }
+        duckChat.openDuckChatWithAutoPrompt(prompt)
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {
@@ -376,6 +377,8 @@ class InputScreenViewModel @AssistedInject constructor(
             sessionStore.setHasUsedChatMode(true)
             checkAndFireBothModesPixel()
         }
+
+        duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
