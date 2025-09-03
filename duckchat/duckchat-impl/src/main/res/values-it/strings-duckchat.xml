@@ -50,7 +50,7 @@
     <string name="input_screen_search_tab">Ricerca</string>
     <string name="input_screen_search_hint">Cerca o digita l\'indirizzo</string>
     <string name="input_screen_chat_tab">Duck.ai</string>
-    <string name="input_screen_chat_hint">Chiedi a Duck.ai</string>
+    <string name="input_screen_chat_hint">Chiedi in privato</string>
     <string name="input_screen_user_pref_without_ai">Solo ricerca\n(impostazione predefinita)</string>
     <string name="input_screen_user_pref_with_ai">Ricerca e Duck.ai\n(Sperimentale)</string>
     <string name="input_screen_user_pref_description">Prova la nostra opzione sperimentale per chiedere a Duck.ai direttamente dalla barra degli indirizzi. <annotation type="share_feedback">Condividi feedback</annotation></string>

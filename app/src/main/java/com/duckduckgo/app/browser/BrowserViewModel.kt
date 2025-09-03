@@ -83,7 +83,6 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
 
@@ -134,7 +133,7 @@ class BrowserViewModel @Inject constructor(
         data class ShowSystemDefaultBrowserDialog(val intent: Intent) : Command()
         data class ShowSystemDefaultAppsActivity(val intent: Intent) : Command()
         data class ShowUndoDeleteTabsMessage(val tabIds: List<String>) : Command()
-        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean) : Command()
+        data class OpenDuckChat(val duckChatUrl: String?, val duckChatSessionActive: Boolean, val withTransition: Boolean) : Command()
     }
 
     var viewState: MutableLiveData<ViewState> = MutableLiveData<ViewState>().also {
@@ -463,13 +462,9 @@ class BrowserViewModel @Inject constructor(
         command.value = ShowUndoDeleteTabsMessage(tabIds)
     }
 
-    fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean) {
+    fun openDuckChat(duckChatUrl: String?, duckChatSessionActive: Boolean, withTransition: Boolean) {
         logcat(INFO) { "Duck.ai openDuckChat duckChatSessionActive $duckChatSessionActive" }
-        viewModelScope.launch(dispatchers.io()) {
-            withContext(dispatchers.main()) {
-                command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive)
-            }
-        }
+        command.value = OpenDuckChat(duckChatUrl, duckChatSessionActive, withTransition)
     }
 }
 

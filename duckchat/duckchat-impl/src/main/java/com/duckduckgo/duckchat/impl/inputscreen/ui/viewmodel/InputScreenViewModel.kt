@@ -176,7 +176,7 @@ class InputScreenViewModel @AssistedInject constructor(
         .flatMapLatest { shouldShow ->
             if (shouldShow) {
                 merge(
-                    searchInputTextState.debounceExceptFirst(300),
+                    searchInputTextState.debounceExceptFirst(timeoutMillis = 100),
                     refreshSuggestions.map { searchInputTextState.value },
                 ).flatMapLatest { autoComplete.autoComplete(it) }
             } else {
@@ -338,7 +338,8 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSubmitted(query: String) {
-        command.value = Command.SubmitSearch(query)
+        val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
+        command.value = Command.SubmitSearch(sanitizedQuery)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
 
