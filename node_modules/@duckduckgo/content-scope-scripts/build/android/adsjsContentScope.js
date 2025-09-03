@@ -1559,7 +1559,6 @@
     constructor(config, messagingContext) {
       this.messagingContext = messagingContext;
       this.config = config;
-      this.config.sendInitialPing(messagingContext);
     }
     /**
      * @param {NotificationMessage} msg
@@ -3511,6 +3510,11 @@
        * @type {boolean}
        */
       __publicField(this, "listenForUpdateChanges", false);
+      /**
+       * Set this to true if you wish to receive configuration updates from initial ping responses (Android only).
+       * @type {boolean}
+       */
+      __publicField(this, "listenForConfigUpdates", false);
       /** @type {ImportMeta} */
       __privateAdd(this, _importConfig);
       this.setArgs(this.args);
@@ -3665,6 +3669,14 @@
      * @deprecated - use messaging instead.
      */
     update() {
+    }
+    /**
+     * Called when user preferences are merged from initial ping response. (Android only)
+     * Override this method in your feature to handle user preference updates.
+     * This only happens once during initialization when the platform responds with user-specific settings.
+     * @param {object} _updatedConfig - The configuration with merged user preferences
+     */
+    onUserPreferencesMerged(_updatedConfig) {
     }
     /**
      * Register a flag that will be added to page breakage reports
@@ -3955,6 +3967,8 @@
       __privateAdd(this, _activeShareRequest, null);
       /** @type {Promise<any> | null} */
       __privateAdd(this, _activeScreenLockRequest, null);
+      // Opt in to receive configuration updates from initial ping responses
+      __publicField(this, "listenForConfigUpdates", true);
     }
     init() {
       if (this.getFeatureSettingEnabled("windowSizing")) {
@@ -3988,9 +4002,6 @@
       if (this.getFeatureSettingEnabled("webShare")) {
         this.shimWebShare();
       }
-      if (this.getFeatureSettingEnabled("viewportWidth")) {
-        this.viewportWidthFix();
-      }
       if (this.getFeatureSettingEnabled("screenLock")) {
         this.screenLockFix();
       }
@@ -4005,6 +4016,19 @@
       }
       if (this.getFeatureSettingEnabled("enumerateDevices")) {
         this.deviceEnumerationFix();
+      }
+    }
+    /**
+     * Handle user preference updates when merged during initialization.
+     * Re-applies viewport fixes if viewport configuration has changed.
+     * @param {object} _updatedConfig - The configuration with merged user preferences
+     */
+    onUserPreferencesMerged(_updatedConfig) {
+      if (this.getFeatureSettingEnabled("viewportWidth")) {
+        if (!this._viewportWidthFixApplied) {
+          this.viewportWidthFix();
+          this._viewportWidthFixApplied = true;
+        }
       }
     }
     /** Shim Web Share API in Android WebView */
@@ -5624,6 +5648,22 @@
       performanceMonitor.measureAll();
     }
   }
+  async function updateFeatureArgs(updatedArgs) {
+    if (!isHTMLDocument) {
+      return;
+    }
+    const resolvedFeatures = await Promise.all(features);
+    resolvedFeatures.forEach(({ featureInstance }) => {
+      if (featureInstance && featureInstance.listenForConfigUpdates) {
+        if (typeof featureInstance.setArgs === "function") {
+          featureInstance.setArgs(updatedArgs);
+        }
+        if (typeof featureInstance.onUserPreferencesMerged === "function") {
+          featureInstance.onUserPreferencesMerged(updatedArgs);
+        }
+      }
+    });
+  }
   function alwaysInitExtensionFeatures(args, featureName) {
     return args.platform.name === "extension" && alwaysInitFeatures.has(featureName);
   }
@@ -5637,6 +5677,31 @@
   }
 
   // entry-points/android-adsjs.js
+  async function sendInitialPingAndUpdate(messagingConfig, processedConfig) {
+    if (isBeingFramed()) {
+      return;
+    }
+    try {
+      const messagingContext = new MessagingContext({
+        context: "contentScopeScripts",
+        env: processedConfig.debug ? "development" : "production",
+        featureName: "messaging"
+      });
+      const messaging = new Messaging(messagingContext, messagingConfig);
+      if (processedConfig.debug) {
+        console.log("AndroidAdsjs: Sending initial ping...");
+      }
+      const response = await messaging.request("initialPing", {});
+      if (response && typeof response === "object") {
+        const updatedConfig = { ...processedConfig, ...response };
+        await updateFeatureArgs(updatedConfig);
+      }
+    } catch (error) {
+      if (processedConfig.debug) {
+        console.error("AndroidAdsjs: Initial ping failed:", error);
+      }
+    }
+  }
   function initCode() {
     const config = $CONTENT_SCOPE$;
     const userUnprotectedDomains = $USER_UNPROTECTED_DOMAINS$;
@@ -5649,6 +5714,7 @@
       target: globalThis,
       debug: processedConfig.debug
     });
+    sendInitialPingAndUpdate(processedConfig.messagingConfig, processedConfig);
     load({
       platform: processedConfig.platform,
       site: processedConfig.site,
