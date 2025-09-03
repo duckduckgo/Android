@@ -35,9 +35,6 @@ import com.duckduckgo.app.browser.databinding.ActivityWebTrackingProtectionBindi
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.privacy.ui.AllowListActivity
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
-import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command.LaunchAllowList
-import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command.LaunchGlobalPrivacyControl
-import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command.LaunchLearnMoreWebPage
 import com.duckduckgo.app.webtrackingprotection.list.FeatureGridAdapter
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -149,9 +146,9 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
-            is LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
-            is LaunchAllowList -> launchAllowList()
+            is Command.LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
+            is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
+            is Command.LaunchAllowList -> launchAllowList()
         }
     }
 
