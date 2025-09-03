@@ -191,6 +191,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionTitle">Ochrona przed śledzeniem w sieci</string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[Przeglądarka DuckDuckGo zapewnia ochronę przed śledzeniem, która jest zawsze aktywna.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Przeglądarka DuckDuckGo zapewnia ochronę przed śledzeniem, która pomaga chronić Twoje dane podczas przeglądania.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">W jaki sposób Cię chronimy</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokuje mechanizmy śledzące innych firm</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Pomaga blokować pliki cookie innych firm, które śledzą Twoją aktywność na stronach, poprzez uniemożliwienie ładowania mechanizmów śledzących innych firm.</string>
