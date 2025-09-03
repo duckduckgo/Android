@@ -954,4 +954,11 @@
     <string name="settingsDuckAiRebranding">Функции ИИ</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Показывать счетчик трекеров в переключателе вкладок</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Скрыть счетчик трекеров?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Вы можете включить его снова в разделе «Настройки &gt; Внешний вид».</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрыть</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Оставить</string>
+
 </resources>
