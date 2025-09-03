@@ -69,20 +69,18 @@ class HomeBackgroundLogo(
     }
 
     private fun updateLogoConstraint(omnibarPosition: OmnibarPosition) {
-        val params = ddgLogoView.layoutParams
-        if (params is androidx.constraintlayout.widget.ConstraintLayout.LayoutParams) {
-            when (omnibarPosition) {
-                OmnibarPosition.TOP -> {
-                    params.topToTop = R.id.guidelineTop
-                    params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-                }
-                OmnibarPosition.BOTTOM -> {
-                    params.topToTop = R.id.guidelineBottom
-                    params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-                }
+        val params = ddgLogoView.layoutParams as? androidx.constraintlayout.widget.ConstraintLayout.LayoutParams ?: return
+        when (omnibarPosition) {
+            OmnibarPosition.TOP -> {
+                params.topToTop = R.id.guidelineTop
+                params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
             }
-            ddgLogoView.layoutParams = params
+            OmnibarPosition.BOTTOM -> {
+                params.topToTop = R.id.guidelineBottom
+                params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
+            }
         }
+        ddgLogoView.layoutParams = params
     }
 
     companion object {
