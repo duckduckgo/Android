@@ -27,6 +27,7 @@ import android.widget.ImageView
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.DaxSwitch
@@ -55,6 +56,9 @@ abstract class DaxListItem(
     internal abstract val itemContainer: View
     internal abstract val verticalPadding: Int
 
+    val primaryTextString: String
+        get() = primaryText.text.toString()
+
     /** Sets the item click listener */
     fun setClickListener(onClick: () -> Unit) {
         itemContainer.setOnClickListener { onClick() }
@@ -78,6 +82,11 @@ abstract class DaxListItem(
     /** Sets the primary text title */
     fun setPrimaryText(title: CharSequence?) {
         primaryText.text = title
+    }
+
+    /** Sets primary text resource */
+    fun setPrimaryTextResource(@StringRes idRes: Int) {
+        primaryText.setText(idRes)
     }
 
     /** Sets primary text color */
