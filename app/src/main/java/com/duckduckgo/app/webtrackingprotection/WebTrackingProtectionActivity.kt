@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.webtrackingprotection
 
-import android.R.attr.text
 import android.app.ActivityOptions
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -28,6 +27,7 @@ import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
@@ -35,6 +35,10 @@ import com.duckduckgo.app.browser.databinding.ActivityWebTrackingProtectionBindi
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
 import com.duckduckgo.app.privacy.ui.AllowListActivity
 import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command
+import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command.LaunchAllowList
+import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command.LaunchGlobalPrivacyControl
+import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.Command.LaunchLearnMoreWebPage
+import com.duckduckgo.app.webtrackingprotection.list.FeatureGridAdapter
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
@@ -56,6 +60,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private val viewModel: WebTrackingProtectionViewModel by bindViewModel()
     private val binding: ActivityWebTrackingProtectionBinding by viewBinding()
+    private lateinit var gridAdapter: FeatureGridAdapter
 
     // TODO eligible for extraction and use in AutoConsent as well when removing old settings
     private val clickableSpan = object : ClickableSpan() {
@@ -78,6 +83,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         configureClickableLink()
+        configureGridList()
         observeViewModel()
     }
 
@@ -111,11 +117,19 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureGridList() {
+        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        binding.protectionsList.layoutManager = layoutManager
+        gridAdapter = FeatureGridAdapter()
+        binding.protectionsList.adapter = gridAdapter
+    }
+
     private fun observeViewModel() {
         viewModel.viewState()
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 setGlobalPrivacyControlSetting(viewState.globalPrivacyControlEnabled)
+                gridAdapter.submitList(viewState.protectionItems)
             }.launchIn(lifecycleScope)
 
         viewModel.commands()
@@ -135,9 +149,9 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun processCommand(it: Command) {
         when (it) {
-            is Command.LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
-            is Command.LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
-            is Command.LaunchAllowList -> launchAllowList()
+            is LaunchLearnMoreWebPage -> launchLearnMoreWebPage(it.url)
+            is LaunchGlobalPrivacyControl -> launchGlobalPrivacyControl()
+            is LaunchAllowList -> launchAllowList()
         }
     }
 
