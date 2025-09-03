@@ -6036,7 +6036,9 @@ class BrowserTabViewModelTest {
         val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
 
         testee.userSelectedAutocomplete(duckPrompt)
-        assertCommandIssued<Command.SubmitChat>()
+        assertCommandIssued<Command.SubmitChat> {
+            assertEquals(query, "title")
+        }
     }
 
     @Test
