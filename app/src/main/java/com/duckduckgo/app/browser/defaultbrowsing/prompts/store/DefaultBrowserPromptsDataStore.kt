@@ -22,8 +22,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.di.DefaultBrowserPrompts
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.ExperimentStage.NOT_ENROLLED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.NOT_STARTED
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.UserType.UNKNOWN
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -33,21 +35,31 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface DefaultBrowserPromptsDataStore {
-    val experimentStage: Flow<ExperimentStage>
+    val stage: Flow<Stage>
+    val userType: Flow<UserType>
     val showSetAsDefaultPopupMenuItem: Flow<Boolean>
     val highlightPopupMenu: Flow<Boolean>
+    val showSetAsDefaultMessage: Flow<Boolean>
 
-    suspend fun storeExperimentStage(stage: ExperimentStage)
+    suspend fun storeStage(stage: Stage)
+    suspend fun storeUserType(userType: UserType)
     suspend fun storeShowSetAsDefaultPopupMenuItemState(show: Boolean)
     suspend fun storeHighlightPopupMenuState(highlight: Boolean)
+    suspend fun storeShowSetAsDefaultMessageState(show: Boolean)
 
-    enum class ExperimentStage {
-        NOT_ENROLLED,
-        ENROLLED,
+    enum class Stage {
+        NOT_STARTED,
+        STARTED,
         STAGE_1,
         STAGE_2,
+        STAGE_3,
         STOPPED,
-        CONVERTED,
+    }
+
+    enum class UserType {
+        NEW,
+        EXISTING,
+        UNKNOWN,
     }
 }
 
@@ -58,12 +70,18 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
 ) : DefaultBrowserPromptsDataStore {
     companion object {
         private const val PREF_KEY_EXPERIMENT_STAGE_ID = "additional_default_browser_prompts_experiment_stage_id"
+        private const val PREF_KEY_USER_TYPE_ID = "additional_default_browser_prompts_user_type_id"
         private const val PREF_KEY_SHOW_OVERFLOW_MENU_ITEM = "additional_default_browser_prompts_show_overflow_menu_item"
         private const val PREF_KEY_HIGHLIGHT_OVERFLOW_MENU_ICON = "additional_default_browser_prompts_highlight_overflow_menu_icon"
+        private const val PREF_KEY_SHOW_SET_AS_DEFAULT_MESSAGE = "additional_default_browser_prompts_show_set_as_default_message"
     }
 
-    override val experimentStage: Flow<ExperimentStage> = store.data.map { preferences ->
-        preferences[stringPreferencesKey(PREF_KEY_EXPERIMENT_STAGE_ID)]?.let { ExperimentStage.valueOf(it) } ?: NOT_ENROLLED
+    override val stage: Flow<Stage> = store.data.map { preferences ->
+        preferences[stringPreferencesKey(PREF_KEY_EXPERIMENT_STAGE_ID)]?.let { Stage.valueOf(it) } ?: NOT_STARTED
+    }
+
+    override val userType: Flow<UserType> = store.data.map { preferences ->
+        preferences[stringPreferencesKey(PREF_KEY_USER_TYPE_ID)]?.let { UserType.valueOf(it) } ?: UNKNOWN
     }
 
     override val showSetAsDefaultPopupMenuItem: Flow<Boolean> = store.data.map { preferences ->
@@ -74,10 +92,22 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
         preferences[booleanPreferencesKey(PREF_KEY_HIGHLIGHT_OVERFLOW_MENU_ICON)] ?: false
     }
 
-    override suspend fun storeExperimentStage(stage: ExperimentStage) {
+    override val showSetAsDefaultMessage: Flow<Boolean> = store.data.map { preferences ->
+        preferences[booleanPreferencesKey(PREF_KEY_SHOW_SET_AS_DEFAULT_MESSAGE)] ?: false
+    }
+
+    override suspend fun storeStage(stage: Stage) {
         withContext(dispatchers.io()) {
             store.edit { preferences ->
                 preferences[stringPreferencesKey(PREF_KEY_EXPERIMENT_STAGE_ID)] = stage.name
+            }
+        }
+    }
+
+    override suspend fun storeUserType(userType: UserType) {
+        withContext(dispatchers.io()) {
+            store.edit { preferences ->
+                preferences[stringPreferencesKey(PREF_KEY_USER_TYPE_ID)] = userType.name
             }
         }
     }
@@ -94,6 +124,14 @@ class DefaultBrowserPromptsPrefsDataStoreImpl @Inject constructor(
         withContext(dispatchers.io()) {
             store.edit { preferences ->
                 preferences[booleanPreferencesKey(PREF_KEY_HIGHLIGHT_OVERFLOW_MENU_ICON)] = highlight
+            }
+        }
+    }
+
+    override suspend fun storeShowSetAsDefaultMessageState(show: Boolean) {
+        withContext(dispatchers.io()) {
+            store.edit { preferences ->
+                preferences[booleanPreferencesKey(PREF_KEY_SHOW_SET_AS_DEFAULT_MESSAGE)] = show
             }
         }
     }

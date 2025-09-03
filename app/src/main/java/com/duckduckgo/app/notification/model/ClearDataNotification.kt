@@ -21,11 +21,11 @@ import android.content.Context
 import android.os.Bundle
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.firebutton.FireButtonActivity
 import com.duckduckgo.app.notification.NotificationRegistrar
 import com.duckduckgo.app.notification.TaskStackBuilderFactory
 import com.duckduckgo.app.notification.db.NotificationDao
 import com.duckduckgo.app.pixels.AppPixelName
-import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.clear.ClearWhatOption
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -37,7 +37,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class ClearDataNotification(
     private val context: Context,
@@ -49,12 +50,12 @@ class ClearDataNotification(
 
     override suspend fun canShow(): Boolean {
         if (notificationDao.exists(id)) {
-            Timber.v("Notification already seen")
+            logcat(VERBOSE) { "Notification already seen" }
             return false
         }
 
         if (settingsDataStore.automaticallyClearWhatOption != ClearWhatOption.CLEAR_NONE) {
-            Timber.v("No need for notification, user already has clear option set")
+            logcat(VERBOSE) { "No need for notification, user already has clear option set" }
             return false
         }
 
@@ -113,8 +114,8 @@ class ClearDataNotificationPlugin @Inject constructor(
     }
 
     override fun getLaunchIntent(): PendingIntent? {
-        val intent = SettingsActivity.intent(context).apply {
-            putExtra(SettingsActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
+        val intent = FireButtonActivity.intent(context).apply {
+            putExtra(FireButtonActivity.LAUNCH_FROM_NOTIFICATION_PIXEL_NAME, pixelName(AppPixelName.NOTIFICATION_LAUNCHED.pixelName))
         }
         val pendingIntent: PendingIntent? = taskStackBuilderFactory.createTaskBuilder().run {
             addNextIntentWithParentStack(intent)

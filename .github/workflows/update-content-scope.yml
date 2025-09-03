@@ -70,14 +70,25 @@ jobs:
             - Automated content scope scripts dependency update
 
             This PR updates the content scope scripts dependency to the latest available version and copies the necessary files.
+
+            Tests will only run if something has changed in the `node_modules/@duckduckgo/content-scope-scripts` folder.
+
+            If only the package version has changed, there is no need to run the tests.
+
             If tests have failed, see https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
 
+            _`content-scope-scripts` folder update_
             - [ ] All tests must pass
+            - [ ] Privacy tests must pass
+
+            _Only `content-scope-scripts` package update_
+            - [ ] All tests must pass
+            - [ ] Privacy tests do not need to run
 
       - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
         id: create-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -86,14 +97,18 @@ jobs:
           asana-task-description: |
             Content scope scripts have been updated and a PR created.
 
-            If tests failed check out https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
+            Tests will **only** run if something has changed in the `node_modules/@duckduckgo/content-scope-scripts` folder.
+
+            If only `content-scope-scripts` package version has changed, there is no need to run the tests.
+
+            If tests have failed, see https://app.asana.com/0/1202561462274611/1203986899650836/f for further information on what to do next.
 
             See ${{ steps.create-pr.outputs.pull-request-url }}
           action: 'create-asana-task'
 
       - name: Add Asana task to Release Board project
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_RELEASE_BOARD_PROJECT_ID }}
@@ -103,7 +118,7 @@ jobs:
 
       - name: Update PR description with Asana task
         if: ${{ steps.create-task.outputs.duplicate == 'false' }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           github-pat: ${{ secrets.GT_DAXMOBILE }}
           github-pr: ${{ steps.create-pr.outputs.pull-request-number }}
@@ -115,7 +130,7 @@ jobs:
 
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}

@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">Servidor DNS</string>
     <string name="netpPrivateDns">DNS privado</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (bloqueio de domínios de risco)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Bloqueador de fraude)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recomendado)</string>
     <string name="netpCustomDnsCustom">Personalizado</string>
     <string name="netpCustomDnsInputAddressHint">Endereço IPv4</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">O DuckDuckGo encaminha as consultas DNS através dos nossos servidores DNS para que o teu fornecedor de Internet não possa ver os sites que visitas.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Bloqueio e filtragem de conteúdo</string>
-    <string name="netpDnsBlockMalwarePrimary">Bloquear domínios arriscados</string>
+    <string name="netpDnsBlockMalwareHeader">Bloqueio de conteúdo malicioso</string>
+    <string name="netpDnsBlockMalwarePrimary">Bloqueador de fraude</string>
     <string name="netpDnsBlockMalwareByline">Bloqueia mais de 150 000 domínios identificados por alojarem malware, ataques de phishing e fraudes online com uma lista de bloqueios ao nível do DNS. <annotation type="learn_more_link">Sabe mais</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Listas de bloqueio de DNS</string>
 
@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Excluir automaticamente aplicações não compatíveis com VPNs</string>
     <string name="netpExclusionListLabelAutoExclude">Incompatível com VPNs</string>
     <string name="netpExclusionListAutoExcludeDescription">Algumas aplicações, como aplicações bancárias ou de streaming, não funcionam bem com VPNs. Quando esta definição estiver ativada, vamos excluir automaticamente essas aplicações.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN desativada devido a subscrição expirada. Subscreve a DuckDuckGo para voltares a ativar a VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Subscreve a DuckDuckGo para voltares a ativar a VPN.</string>
 </resources>

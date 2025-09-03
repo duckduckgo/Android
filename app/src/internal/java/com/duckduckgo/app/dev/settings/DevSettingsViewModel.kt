@@ -25,7 +25,6 @@ import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
 import com.duckduckgo.app.tabs.store.TabSwitcherPrefsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.traces.api.StartupTraces
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import javax.inject.Inject
@@ -36,14 +35,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class DevSettingsViewModel @Inject constructor(
     private val devSettingsDataStore: DevSettingsDataStore,
     private val startupTraces: StartupTraces,
     private val userAgentProvider: UserAgentProvider,
-    private val savedSitesRepository: SavedSitesRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val surveyEndpointDataStore: SurveyEndpointDataStore,
     private val tabSwitcherPrefsDataStore: TabSwitcherPrefsDataStore,
@@ -57,11 +56,10 @@ class DevSettingsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object SendTdsIntent : Command()
-        object OpenUASelector : Command()
-        object ShowSavedSitesClearedConfirmation : Command()
-        object ChangePrivacyConfigUrl : Command()
-        object CustomTabs : Command()
+        data object SendTdsIntent : Command()
+        data object OpenUASelector : Command()
+        data object ChangePrivacyConfigUrl : Command()
+        data object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
         data class Toast(val message: String) : Command()
@@ -92,7 +90,7 @@ class DevSettingsViewModel @Inject constructor(
     }
 
     fun onStartupTraceToggled(value: Boolean) {
-        Timber.v("User toggled startup trace, is now enabled: $value")
+        logcat(VERBOSE) { "User toggled startup trace, is now enabled: $value" }
         startupTraces.isTraceEnabled = value
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(startupTraceEnabled = value))
@@ -133,13 +131,6 @@ class DevSettingsViewModel @Inject constructor(
         devSettingsDataStore.selectedUA = userAgent
         viewModelScope.launch {
             viewState.emit(currentViewState().copy(userAgent = userAgentProvider.userAgent("", false)))
-        }
-    }
-
-    fun clearSavedSites() {
-        viewModelScope.launch(dispatcherProvider.io()) {
-            savedSitesRepository.deleteAll()
-            command.send(Command.ShowSavedSitesClearedConfirmation)
         }
     }
 

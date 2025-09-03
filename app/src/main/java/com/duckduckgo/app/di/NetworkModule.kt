@@ -22,6 +22,7 @@ import com.duckduckgo.app.feedback.api.FeedbackSubmitter
 import com.duckduckgo.app.feedback.api.FireAndForgetFeedbackSubmitter
 import com.duckduckgo.app.feedback.api.SubReasonApiMapper
 import com.duckduckgo.app.global.api.*
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -45,6 +46,8 @@ import java.net.SocketAddress
 import java.net.URI
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -52,7 +55,6 @@ import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
-import timber.log.Timber
 
 @Module
 class NetworkModule {
@@ -110,7 +112,7 @@ class NetworkModule {
             }
             // shall be the last one as it is logging the pixel request url that goes out
             .addInterceptor { chain: Interceptor.Chain ->
-                Timber.v("Pixel url request: ${chain.request().url}")
+                logcat(VERBOSE) { "Pixel url request: ${chain.request().url}" }
                 return@addInterceptor chain.proceed(chain.request())
             }
             .build()
@@ -171,6 +173,7 @@ class NetworkModule {
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
         appBuildConfig: AppBuildConfig,
         dispatcherProvider: DispatcherProvider,
+        onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     ): FeedbackSubmitter =
         FireAndForgetFeedbackSubmitter(
             feedbackService,
@@ -181,6 +184,7 @@ class NetworkModule {
             appCoroutineScope,
             appBuildConfig,
             dispatcherProvider,
+            onboardingDesignExperimentManager,
         )
 
     companion object {

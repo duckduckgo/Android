@@ -11,8 +11,7 @@ tags:
           clearState: true
       - runFlow: ../shared/skip_all_onboarding.yaml
 
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+      - runFlow: ../shared/browser_screen/click_on_menu_button.yaml
       - assertVisible: "Settings"
       - tapOn: "Settings"
 

@@ -224,7 +224,7 @@
     <string name="netpCustomDnsSettingText">DNS server</string>
     <string name="netpPrivateDns">Soukromý DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokování rizikových domén)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokování podvodů)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (doporučeno)</string>
     <string name="netpCustomDnsCustom">Vlastní</string>
     <string name="netpCustomDnsInputAddressHint">Adresa IPv4</string>
@@ -235,8 +235,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo směruje dotazy DNS přes naše DNS servery, takže tvůj poskytovatel internetu nevidí, jaké webové stránky navštěvuješ.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blokování a filtrování obsahu</string>
-    <string name="netpDnsBlockMalwarePrimary">Blokování rizikových domén</string>
+    <string name="netpDnsBlockMalwareHeader">Blokování škodlivého obsahu</string>
+    <string name="netpDnsBlockMalwarePrimary">Blokování podvodů</string>
     <string name="netpDnsBlockMalwareByline">Blokuj víc než 150 000 domén, o kterých bylo nahlášené hostování malwaru, phishingové útoky a online podvody, pomocí seznamu blokování na úrovni DNS. <annotation type="learn_more_link">Další informace</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Seznamy blokovaných DNS</string>
 
@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Automaticky vyloučit aplikace, které nejsou kompatibilní s VPN</string>
     <string name="netpExclusionListLabelAutoExclude">Nekompatibilní s VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Některé aplikace, jako jsou bankovní nebo streamovací aplikace, si s VPN moc nerozumí. Pokud je toto nastavení zapnuté, automaticky tyhle aplikace vyloučíme.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN byla odpojená, protože platnost předplatného vypršela. Pro opětovné připojení k VPN si DuckDuckGo předplať.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Pro opětovné připojení k VPN si DuckDuckGo předplať.</string>
 </resources>

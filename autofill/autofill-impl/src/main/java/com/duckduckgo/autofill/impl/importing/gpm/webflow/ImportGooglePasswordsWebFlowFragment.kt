@@ -70,7 +70,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class ImportGooglePasswordsWebFlowFragment :
@@ -263,13 +264,16 @@ class ImportGooglePasswordsWebFlowFragment :
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
             setFragmentResultListener(plugin.resultKey(CUSTOM_FLOW_TAB_ID)) { _, result ->
                 context?.let { ctx ->
-                    plugin.processResult(
-                        result = result,
-                        context = ctx,
-                        tabId = CUSTOM_FLOW_TAB_ID,
-                        fragment = this@ImportGooglePasswordsWebFlowFragment,
-                        autofillCallback = this@ImportGooglePasswordsWebFlowFragment,
-                    )
+                    lifecycleScope.launch {
+                        plugin.processResult(
+                            result = result,
+                            context = ctx,
+                            tabId = CUSTOM_FLOW_TAB_ID,
+                            fragment = this@ImportGooglePasswordsWebFlowFragment,
+                            autofillCallback = this@ImportGooglePasswordsWebFlowFragment,
+                            webView = binding?.webView,
+                        )
+                    }
                 }
             }
         }
@@ -309,7 +313,7 @@ class ImportGooglePasswordsWebFlowFragment :
         withContext(dispatchers.main()) {
             val url = binding?.webView?.url ?: return@withContext
             if (url != originalUrl) {
-                Timber.w("WebView url has changed since autofill request; bailing")
+                logcat(WARN) { "WebView url has changed since autofill request; bailing" }
                 return@withContext
             }
 
@@ -321,6 +325,10 @@ class ImportGooglePasswordsWebFlowFragment :
             )
             dialog.show(childFragmentManager, SELECT_CREDENTIALS_FRAGMENT_TAG)
         }
+    }
+
+    override suspend fun promptUserToImportPassword(originalUrl: String) {
+        // no-op, we don't prompt the user for anything in this flow
     }
 
     override suspend fun onCsvAvailable(csv: String) {
@@ -336,7 +344,7 @@ class ImportGooglePasswordsWebFlowFragment :
         selectedCredentials: LoginCredentials,
     ) {
         if (binding?.webView?.url != originalUrl) {
-            Timber.w("WebView url has changed since autofill request; bailing")
+            logcat(WARN) { "WebView url has changed since autofill request; bailing" }
             return
         }
         browserAutofill.injectCredentials(selectedCredentials)
@@ -344,7 +352,7 @@ class ImportGooglePasswordsWebFlowFragment :
 
     override fun onNoCredentialsChosenForAutofill(originalUrl: String) {
         if (binding?.webView?.url != originalUrl) {
-            Timber.w("WebView url has changed since autofill request; bailing")
+            logcat(WARN) { "WebView url has changed since autofill request; bailing" }
             return
         }
         browserAutofill.injectCredentials(null)

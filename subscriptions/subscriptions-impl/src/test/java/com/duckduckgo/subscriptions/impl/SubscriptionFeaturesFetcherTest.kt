@@ -12,6 +12,7 @@ import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.DUCK_AI
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.NETP
@@ -19,6 +20,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.services.FeaturesResponse
+import com.duckduckgo.subscriptions.impl.services.SubscriptionsCachedService
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -42,6 +44,7 @@ class SubscriptionFeaturesFetcherTest {
     private val processLifecycleOwner = TestLifecycleOwner(initialState = INITIALIZED)
     private val playBillingManager: PlayBillingManager = mock()
     private val subscriptionsService: SubscriptionsService = mock()
+    private val subscriptionsCachedService: SubscriptionsCachedService = mock()
     private val authRepository: AuthRepository = mock()
     private val privacyProFeature: PrivacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java)
 
@@ -49,6 +52,7 @@ class SubscriptionFeaturesFetcherTest {
         appCoroutineScope = coroutineRule.testScope,
         playBillingManager = playBillingManager,
         subscriptionsService = subscriptionsService,
+        subscriptionsCachedService = subscriptionsCachedService,
         authRepository = authRepository,
         privacyProFeature = privacyProFeature,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -71,20 +75,40 @@ class SubscriptionFeaturesFetcherTest {
     }
 
     @Test
-    fun `when products loaded then fetches and stores features`() = runTest {
+    fun `when products loaded And Use Client with Cache Enabled then fetches and stores features from Cached Service`() = runTest {
         givenIsFeaturesApiEnabled(true)
+        givenUseClientWithCacheForFeaturesEnabled(true)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
         whenever(authRepository.getFeatures(any())).thenReturn(emptySet())
-        whenever(subscriptionsService.features(any())).thenReturn(FeaturesResponse(listOf(NETP, ITR)))
+        whenever(subscriptionsCachedService.features(any())).thenReturn(FeaturesResponse(listOf(NETP, ITR, DUCK_AI)))
 
         processLifecycleOwner.currentState = CREATED
 
         verify(playBillingManager).productsFlow
-        verify(authRepository).getFeatures(MONTHLY_PLAN_US)
-        verify(authRepository).getFeatures(YEARLY_PLAN_US)
-        verify(authRepository).setFeatures(MONTHLY_PLAN_US, setOf(NETP, ITR))
-        verify(authRepository).setFeatures(YEARLY_PLAN_US, setOf(NETP, ITR))
+        verifyNoInteractions(subscriptionsService)
+        verify(subscriptionsCachedService).features(MONTHLY_PLAN_US)
+        verify(subscriptionsCachedService).features(YEARLY_PLAN_US)
+        verify(authRepository).setFeatures(MONTHLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+        verify(authRepository).setFeatures(YEARLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+    }
+
+    @Test
+    fun `when products loaded then fetches and stores features`() = runTest {
+        givenIsFeaturesApiEnabled(true)
+        givenUseClientWithCacheForFeaturesEnabled(false)
+        val productDetails = mockProductDetails()
+        whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
+        whenever(authRepository.getFeatures(any())).thenReturn(emptySet())
+        whenever(subscriptionsService.features(any())).thenReturn(FeaturesResponse(listOf(NETP, ITR, DUCK_AI)))
+
+        processLifecycleOwner.currentState = CREATED
+
+        verify(playBillingManager).productsFlow
+        verify(subscriptionsService).features(MONTHLY_PLAN_US)
+        verify(subscriptionsService).features(YEARLY_PLAN_US)
+        verify(authRepository).setFeatures(MONTHLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+        verify(authRepository).setFeatures(YEARLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
     }
 
     @Test
@@ -100,11 +124,13 @@ class SubscriptionFeaturesFetcherTest {
     }
 
     @Test
-    fun `when features already stored then does not fetch again`() = runTest {
+    fun `when features already stored and refresh features FF Disabled then does not fetch again`() = runTest {
+        givenRefreshSubscriptionPlanFeaturesEnabled(false)
         givenIsFeaturesApiEnabled(true)
         val productDetails = mockProductDetails()
         whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
         whenever(authRepository.getFeatures(any())).thenReturn(setOf(NETP, ITR))
+        whenever(subscriptionsService.features(any())).thenReturn(FeaturesResponse(listOf(NETP, ITR)))
 
         processLifecycleOwner.currentState = CREATED
 
@@ -115,9 +141,38 @@ class SubscriptionFeaturesFetcherTest {
         verifyNoInteractions(subscriptionsService)
     }
 
+    @Test
+    fun `when features already stored and refresh features FF enabled then does fetch again`() = runTest {
+        givenRefreshSubscriptionPlanFeaturesEnabled(true)
+        givenUseClientWithCacheForFeaturesEnabled(false)
+        givenIsFeaturesApiEnabled(true)
+        val productDetails = mockProductDetails()
+        whenever(playBillingManager.productsFlow).thenReturn(flowOf(productDetails))
+        whenever(authRepository.getFeatures(any())).thenReturn(setOf(NETP, ITR))
+        whenever(subscriptionsService.features(any())).thenReturn(FeaturesResponse(listOf(NETP, ITR, DUCK_AI)))
+
+        processLifecycleOwner.currentState = CREATED
+
+        verify(playBillingManager).productsFlow
+        verify(subscriptionsService).features(MONTHLY_PLAN_US)
+        verify(subscriptionsService).features(YEARLY_PLAN_US)
+        verify(authRepository).setFeatures(MONTHLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+        verify(authRepository).setFeatures(YEARLY_PLAN_US, setOf(NETP, ITR, DUCK_AI))
+    }
+
     @SuppressLint("DenyListedApi")
     private fun givenIsFeaturesApiEnabled(value: Boolean) {
         privacyProFeature.featuresApi().setRawStoredState(State(value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenRefreshSubscriptionPlanFeaturesEnabled(value: Boolean) {
+        privacyProFeature.refreshSubscriptionPlanFeatures().setRawStoredState(State(value))
+    }
+
+    @SuppressLint("DenyListedApi")
+    private fun givenUseClientWithCacheForFeaturesEnabled(value: Boolean) {
+        privacyProFeature.useClientWithCacheForFeatures().setRawStoredState(State(value))
     }
 
     private fun mockProductDetails(): List<ProductDetails> {

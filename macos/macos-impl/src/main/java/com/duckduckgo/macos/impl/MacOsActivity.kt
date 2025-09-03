@@ -40,7 +40,9 @@ import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(MacOsScreenWithEmptyParams::class)
@@ -106,7 +108,7 @@ class MacOsActivity : DuckDuckGoActivity() {
         try {
             startActivity(Intent.createChooser(share, getString(string.macos_share_title), pi.intentSender))
         } catch (e: ActivityNotFoundException) {
-            Timber.w(e, "Activity not found")
+            logcat(WARN) { "Activity not found: ${e.asLog()}" }
         }
     }
 

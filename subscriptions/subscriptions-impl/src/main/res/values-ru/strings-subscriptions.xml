@@ -61,13 +61,20 @@
     <string name="privacyProFaqSecondary">На страницах справки вы найдете ответы на распространенные вопросы, а также контакты поддержки Privacy Pro. Доступность функций зависит от страны.</string>
     <string name="subscriptionStatusSubscribed">Подписка оформлена</string>
     <string name="privacyPolicyAndTermsOfService">Политика конфиденциальности и условия обслуживания</string>
+    <string name="subscriptionStatusFreeTrial">Бесплатный пробный доступ активирован</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s. В тот же день вы автоматически перейдете на платную ежемесячную подписку.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s. В тот же день вы автоматически перейдете на платную годовую подписку.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ваш бесплатный пробный период завершится %1$s без перехода на платную подписку.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Настройки подписки</string>
     <string name="subscriptionSettingSubscribe">Тариф Privacy Pro для защиты соединения и личных данных</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Включает услуги: VPN, Personal Information Removal (удаление личной информации) и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Включает услуги: VPN и и Identity Theft Restoration (восстановление данных после «кражи личности»).</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Подписка открывает доступ к VPN, а также функциям удаления личной информации и восстановления после кражи данных.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Подписка открывает доступ к VPN и функции восстановления после кражи данных.</string>
+
     <string name="subscriptionSettingGet">Перейти на Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Попробуйте Privacy Pro бесплатно</string>
     <string name="subscriptionSettingRestore">У меня уже есть подписка</string>
     <string name="subscriptionSettingExpired">Срок действия вашей подписки Privacy Pro истек</string>
     <string name="subscriptionSettingExpiredViewPlans">Просмотреть тарифы</string>
@@ -161,4 +168,34 @@
     <string name="activityActivateSubscription">У меня уже есть подписка</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Отправить отзыв</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Подписка DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Срок действия вашей подписки DuckDuckGo истек.</string>
+    <string name="privacyProFaqRebranding">Нужна помощь с подпиской?</string>
+    <string name="privacyProFaqSecondaryRebranding">На страницах справочного раздела вы найдете ответы на распространенные вопросы, а также контактную информацию по тарифам. Доступность функций зависит от страны.</string>
+    <string name="restoreSubscriptionTitleRebranding">Добавьте подписку на это устройство</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Чтобы добавить подписку на это устройство, привяжите к ней адрес электронной почты.</string>
+    <string name="activateOnOtherDevicesRebranding">Добавление подписки на другие устройства</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Подписку можно добавить на другие устройства через магазин приложений Google Play или путем привязки адреса электронной почты.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Чтобы добавить подписку на другие устройства, введите указанный выше адрес электронной почты в приложении DuckDuckGo. Для этого посетите раздел «Настройки &gt; Настройки подписки &gt; У меня уже есть подписка».</string>
+    <string name="subscriptionSettingRebrandingMessage">Пакет Privacy Pro теперь называется просто подпиской DuckDuckGo.</string>
+    <string name="subscriptionSettingSubscribeRebranding">Защита соединения и личных данных по одной подписке</string>
+    <string name="removeFromDeviceDescriptionRebranding">Вы утратите доступ к преимуществам подписки на этом устройстве. Сама же подписка не отменяется и по-прежнему будет работать на других устройствах.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai, а также функциям удаления личной информации и восстановления после кражи данных.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Подписка открывает доступ к VPN, продвинутым моделям ИИ в Duck.ai и функции восстановления после кражи данных.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Нет доступа к моделям Duck.ai, предоставляемым только по подписке</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Не могу воспользоваться Duck.ai по подписке в других браузерах</string>
+    <string name="feedbackSubCategoryDuckAiOther">Другие отзывы о Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Безопасный Wi-Fi и приватные чаты с продвинутыми моделями ИИ</string>
+
+    <string name="subscriptionSettingGetRebranding">Подписаться на DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Попробуйте бесплатно</string>
+    <string name="feedbackGeneralSubscription">По подписке</string>
+
 </resources>

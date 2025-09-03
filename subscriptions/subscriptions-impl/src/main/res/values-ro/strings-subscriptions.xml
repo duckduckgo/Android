@@ -61,13 +61,20 @@
     <string name="privacyProFaqSecondary">Primește răspunsuri la întrebările frecvente sau contactează asistența Privacy Pro din paginile noastre de ajutor. Disponibilitatea funcțiilor variază în funcție de țară.</string>
     <string name="subscriptionStatusSubscribed">Abonat</string>
     <string name="privacyPolicyAndTermsOfService">Politica de confidențialitate și Condițiile de prestare a serviciului</string>
+    <string name="subscriptionStatusFreeTrial">Perioada de încercare gratuită este activă</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și se transformă automat într-un abonament lunar cu plată, începând din ziua respectivă.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și se transformă automat într-un abonament anual cu plată, începând din ziua respectivă.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Perioada de încercare gratuită se încheie pe %1$s și nu se va transforma într-un abonament cu plată.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Setări pentru abonament</string>
     <string name="subscriptionSettingSubscribe">Protejează-ți conexiunea și identitatea cu Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Include VPN, Personal Information Removal și Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Include VPN-ul nostru și Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Abonații beneficiază de VPN, Personal Information Removal și Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Abonații beneficiază de VPN și Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Obține Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Încearcă Privacy Pro gratuit</string>
     <string name="subscriptionSettingRestore">Am un abonament</string>
     <string name="subscriptionSettingExpired">Abonamentul tău Privacy Pro a expirat</string>
     <string name="subscriptionSettingExpiredViewPlans">Vezi planurile</string>
@@ -161,4 +168,34 @@
     <string name="activityActivateSubscription">Am un abonament</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Trimite feedback</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Abonament DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Abonamentul tău DuckDuckGo a expirat</string>
+    <string name="privacyProFaqRebranding">Ai nevoie de ajutor cu privire la abonamentul tău?</string>
+    <string name="privacyProFaqSecondaryRebranding">Primește răspunsuri la întrebările frecvente sau contactează serviciul de asistență pentru abonamente din paginile noastre de asistență. Disponibilitatea funcțiilor variază în funcție de țară.</string>
+    <string name="restoreSubscriptionTitleRebranding">Adaugă abonamentul tău pe acest dispozitiv</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Asociază o adresă de e-mail la abonamentul tău pentru a-l adăuga pe acest dispozitiv.</string>
+    <string name="activateOnOtherDevicesRebranding">Adaugă abonamentul tău pe alte dispozitive</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Adaugă abonamentul pe celelalte dispozitive ale tale prin Google Play sau prin asocierea unei adrese de e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Folosește adresa de e-mail de mai sus pentru a-ți adăuga abonamentul pe celelalte dispozitive în aplicația DuckDuckGo. Accesează Setări &gt; Setări abonament &gt; Am un abonament.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro se numește acum doar abonament DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Protejează-ți conexiunea și identitatea cu un singur abonament.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Nu vei mai putea accesa abonamentul tău pe acest dispozitiv. Acest lucru nu îți va anula abonamentul, care va rămâne activ pe celelalte dispozitive.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Abonații beneficiază de VPN, modele avansate de IA în Duck.ai, Personal Information Removal și Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Abonații beneficiază de VPN, modele avansate de inteligență artificială în Duck.ai și Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Nu se pot accesa modelele Duck.ai disponibile doar pentru abonați</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Nu pot accesa Duck.ai cu abonamentul meu în alte browsere</string>
+    <string name="feedbackSubCategoryDuckAiOther">Alt feedback privind Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Asigură-ți rețeaua Wi-Fi și discută în privat cu modele avansate de IA</string>
+
+    <string name="subscriptionSettingGetRebranding">Abonează-te la DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Încearcă gratuit</string>
+    <string name="feedbackGeneralSubscription">Abonament</string>
+
 </resources>

@@ -31,6 +31,8 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_ADDED
+import com.duckduckgo.app.pixels.AppPixelName.SEARCH_AND_FAVORITES_WIDGET_DELETED
 import com.duckduckgo.app.systemsearch.SystemSearchActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -39,7 +41,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 enum class WidgetTheme {
     LIGHT,
@@ -76,6 +79,9 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var searchWidgetLifecycleDelegate: SearchWidgetLifecycleDelegate
+
     private var layoutId: Int = R.layout.search_favorites_widget_daynight_auto
 
     override fun onReceive(
@@ -86,12 +92,19 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
     }
 
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        appCoroutineScope.launch {
+            searchWidgetLifecycleDelegate.handleOnWidgetEnabled(SEARCH_AND_FAVORITES_WIDGET_ADDED)
+        }
+    }
+
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        Timber.i("SearchAndFavoritesWidget - onUpdate")
+        logcat(INFO) { "SearchAndFavoritesWidget - onUpdate" }
         appCoroutineScope.launch(dispatchers.io()) {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
@@ -106,7 +119,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetId: Int,
         newOptions: Bundle,
     ) {
-        Timber.i("SearchAndFavoritesWidget - onAppWidgetOptionsChanged")
+        logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
         appCoroutineScope.launch(dispatchers.io()) {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
@@ -125,6 +138,11 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         super.onDeleted(context, appWidgetIds)
     }
 
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        searchWidgetLifecycleDelegate.handleOnWidgetDisabled(SEARCH_AND_FAVORITES_WIDGET_DELETED)
+    }
+
     private suspend fun updateWidget(
         context: Context,
         appWidgetManager: AppWidgetManager,
@@ -134,7 +152,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         val widgetTheme = withContext(dispatchers.io()) {
             widgetPrefs.widgetTheme(appWidgetId)
         }
-        Timber.i("SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme")
+        logcat(INFO) { "SearchAndFavoritesWidget theme for $appWidgetId is $widgetTheme" }
 
         val (columns, rows) = getCurrentWidgetSize(context, appWidgetManager.getAppWidgetOptions(appWidgetId), newOptions)
         layoutId = getLayoutThemed(columns, widgetTheme)
@@ -230,7 +248,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         var columns = gridCalculator.calculateColumns(context, width)
         var rows = gridCalculator.calculateRows(context, height)
 
-        Timber.i("SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows")
+        logcat(INFO) { "SearchAndFavoritesWidget $portraitWidth x $portraitHeight -> $columns x $rows" }
         return Pair(columns, rows)
     }
 
@@ -274,11 +292,20 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
 
     private fun buildPendingIntent(context: Context): PendingIntent {
         val intent = SystemSearchActivity.fromFavWidget(context)
-        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        return PendingIntent.getActivity(
+            context,
+            SEARCH_AND_FAVORITES_WIDGET_REQUEST_CODE,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
     }
 
     private fun inject(context: Context) {
         val application = context.applicationContext as DuckDuckGoApplication
         application.daggerAppComponent.inject(this)
+    }
+
+    companion object {
+        private const val SEARCH_AND_FAVORITES_WIDGET_REQUEST_CODE = 1540
     }
 }

@@ -20,6 +20,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
@@ -30,6 +31,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.daxprompts.api.DaxPromptDuckPlayerNoParams
+import com.duckduckgo.daxprompts.impl.R
 import com.duckduckgo.daxprompts.impl.databinding.ActivityDaxPromptDuckPlayerBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
@@ -45,6 +47,11 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+        if (isDarkThemeEnabled()) {
+            renderDarkUi()
+        } else {
+            renderLightUi()
+        }
         setupListeners()
         setupObservers()
     }
@@ -55,15 +62,26 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
         markAsShown()
     }
 
+    private fun renderDarkUi() {
+        binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape_dark))
+        binding.daxPromptDuckPlayerContainer.setBackgroundColor(getColor(R.color.daxPromptBackgroundDark))
+        binding.daxPromptDuckPlayerMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message_dark)
+        binding.daxPromptDuckPlayerPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_dark_with_ripple)
+    }
+
+    private fun renderLightUi() {
+        binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape))
+        binding.daxPromptDuckPlayerContainer.setBackgroundColor(getColor(R.color.daxPromptBackground))
+        binding.daxPromptDuckPlayerMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message)
+        binding.daxPromptDuckPlayerPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_with_ripple)
+    }
+
     private fun setupListeners() {
         binding.daxPromptDuckPlayerCloseButton.setOnClickListener {
             viewModel.onCloseButtonClicked()
         }
         binding.daxPromptDuckPlayerPrimaryButton.setOnClickListener {
             viewModel.onPrimaryButtonClicked()
-        }
-        binding.daxPromptDuckPlayerSecondaryButton.setOnClickListener {
-            viewModel.onSecondaryButtonClicked()
         }
     }
 
@@ -86,12 +104,6 @@ class DaxPromptDuckPlayerActivity : DuckDuckGoActivity() {
                     putExtra(DAX_PROMPT_DUCK_PLAYER_ACTIVITY_URL_EXTRA, command.url)
                 }
                 setResult(RESULT_OK, resultIntent)
-                finish()
-            }
-
-            is DaxPromptDuckPlayerViewModel.Command.Dismiss -> {
-                viewModel.updateDuckPlayerSettings()
-                setResult(RESULT_OK)
                 finish()
             }
         }

@@ -29,7 +29,9 @@ import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesBinding(FragmentScope::class)
 class RealDuckAddressLoginCreator @Inject constructor(
@@ -57,7 +59,7 @@ class RealDuckAddressLoginCreator @Inject constructor(
             } else {
                 val existingAutoSavedLogin = autofillStore.getCredentialsWithId(autologinId)
                 if (existingAutoSavedLogin == null) {
-                    Timber.w("Can't find saved login with autosavedLoginId: $autologinId")
+                    logcat(WARN) { "Can't find saved login with autosavedLoginId: $autologinId" }
                     saveDuckAddressForCurrentSite(duckAddress = duckAddress, tabId = tabId, url = originalUrl)
                 } else {
                     updateUsernameIfDifferent(existingAutoSavedLogin, duckAddress)
@@ -85,9 +87,9 @@ class RealDuckAddressLoginCreator @Inject constructor(
         username: String,
     ) {
         if (username == autosavedLogin.username) {
-            Timber.i("Generated username matches existing login; nothing to do here")
+            logcat(INFO) { "Generated username matches existing login; nothing to do here" }
         } else {
-            Timber.i("Updating existing login with new username. Login id is: %s", autosavedLogin.id)
+            logcat(INFO) { "Updating existing login with new username. Login id is: ${autosavedLogin.id}" }
             autofillStore.updateCredentials(autosavedLogin.copy(username = username))
         }
     }
@@ -99,12 +101,7 @@ class RealDuckAddressLoginCreator @Inject constructor(
     ) {
         val credentials = LoginCredentials(domain = url, username = duckAddress, password = null)
         autofillStore.saveCredentials(rawUrl = url, credentials = credentials)?.id?.let { savedId ->
-            Timber.i(
-                "New login saved for duck address %s on site %s because no exact matches were found, with ID: %s",
-                duckAddress,
-                url,
-                savedId,
-            )
+            logcat(INFO) { "New login saved for duck address $duckAddress on site $url because no exact matches were found with ID: $savedId" }
             autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
         }
     }

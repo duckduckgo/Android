@@ -1,0 +1,18 @@
+appId: com.duckduckgo.mobile.android
+name: "DuckPlayer: Ask > Direct YouTube > Duck Player"
+tags:
+  - duckplayerlocal
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+
+      - runFlow: ../shared/skip_all_onboarding.yaml
+      - runFlow: common/load_youtube_video.yaml
+
+      - tapOn:
+          text: "Turn On Duck Player"
+
+      - runFlow: common/assert_duckplayer_visible.yaml

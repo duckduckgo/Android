@@ -38,6 +38,8 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
 
     override suspend fun isEligible(): Boolean = false
 
+    override fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus> = flowOf(UNKNOWN)
+
     override suspend fun getSubscriptionStatus(): SubscriptionStatus = UNKNOWN
 
     override suspend fun getAvailableProducts(): Set<Product> = emptySet()
@@ -52,4 +54,6 @@ class SubscriptionsDummy @Inject constructor() : Subscriptions {
     }
 
     override fun isPrivacyProUrl(uri: Uri): Boolean = false
+
+    override suspend fun isFreeTrialEligible(): Boolean = false
 }

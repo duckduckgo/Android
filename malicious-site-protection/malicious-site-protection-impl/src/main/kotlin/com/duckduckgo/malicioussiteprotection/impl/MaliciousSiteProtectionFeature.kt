@@ -47,4 +47,11 @@ interface MaliciousSiteProtectionFeature {
     @Toggle.InternalAlwaysEnabled
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun scamProtection(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripWWWPrefix(): Toggle
+
+    @Toggle.InternalAlwaysEnabled
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun enableCaching(): Toggle
 }

@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation Square.okio
     implementation project(':library-loader-api')
     implementation "com.duckduckgo.synccrypto:sync-crypto-android:_"

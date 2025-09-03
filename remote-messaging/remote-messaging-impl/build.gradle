@@ -53,7 +53,7 @@ dependencies {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.work.runtimeKtx
     implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
@@ -69,6 +69,7 @@ dependencies {
     implementation AndroidX.lifecycle.viewModelKtx
 
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation CashApp.turbine

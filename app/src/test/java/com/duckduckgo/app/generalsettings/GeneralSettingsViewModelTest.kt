@@ -361,6 +361,32 @@ internal class GeneralSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenScamBlockerAvailableThenScamBlockerSettingIsShown() = runTest {
+        fakeBrowserConfigFeature.newThreatProtectionSettings().setRawStoredState(Toggle.State(false))
+        fakeBrowserConfigFeature.enableMaliciousSiteProtection().setRawStoredState(Toggle.State(true))
+        whenever(mockMaliciousSiteProtection.isFeatureEnabled()).thenReturn(true)
+
+        initTestee()
+
+        testee.viewState.test {
+            assertTrue(awaitItem()?.maliciousSiteProtectionFeatureAvailable!!)
+        }
+    }
+
+    @Test
+    fun whenScamBlockerAvailableButNewThreatProtectionSettingsThenScamBlockerSettingIsNotShown() = runTest {
+        fakeBrowserConfigFeature.newThreatProtectionSettings().setRawStoredState(Toggle.State(true))
+        fakeBrowserConfigFeature.enableMaliciousSiteProtection().setRawStoredState(Toggle.State(true))
+        whenever(mockMaliciousSiteProtection.isFeatureEnabled()).thenReturn(true)
+
+        initTestee()
+
+        testee.viewState.test {
+            assertFalse(awaitItem()?.maliciousSiteProtectionFeatureAvailable!!)
+        }
+    }
+
     private fun defaultViewState() = GeneralSettingsViewModel.ViewState(
         autoCompleteSuggestionsEnabled = true,
         autoCompleteRecentlyVisitedSitesSuggestionsUserEnabled = true,
@@ -375,6 +401,7 @@ internal class GeneralSettingsViewModelTest {
 
     private fun initTestee() {
         testee = GeneralSettingsViewModel(
+            fakeAppSettingsDataStore,
             fakeAppSettingsDataStore,
             mockPixel,
             mockHistory,

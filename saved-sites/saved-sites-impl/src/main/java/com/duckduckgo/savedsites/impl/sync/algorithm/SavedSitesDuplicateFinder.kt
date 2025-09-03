@@ -24,7 +24,6 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.D
 import com.duckduckgo.savedsites.impl.sync.algorithm.SavedSitesDuplicateResult.NotDuplicate
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.*
 
 interface SavedSitesDuplicateFinder {
 
@@ -36,7 +35,7 @@ interface SavedSitesDuplicateFinder {
 }
 
 sealed class SavedSitesDuplicateResult {
-    object NotDuplicate : SavedSitesDuplicateResult()
+    data object NotDuplicate : SavedSitesDuplicateResult()
     data class Duplicate(val id: String) : SavedSitesDuplicateResult()
 }
 

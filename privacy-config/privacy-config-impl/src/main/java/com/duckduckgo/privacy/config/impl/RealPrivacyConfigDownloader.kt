@@ -30,7 +30,9 @@ import com.duckduckgo.privacy.config.impl.RealPrivacyConfigDownloader.DownloadEr
 import com.duckduckgo.privacy.config.impl.network.PrivacyConfigService
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
+import retrofit2.HttpException
 
 /** Public interface for download remote privacy config */
 interface PrivacyConfigDownloader {
@@ -57,7 +59,7 @@ class RealPrivacyConfigDownloader @Inject constructor(
 ) : PrivacyConfigDownloader {
 
     override suspend fun download(): PrivacyConfigDownloader.ConfigDownloadResult {
-        Timber.d("Downloading privacy config")
+        logcat { "Downloading privacy config" }
 
         val response = runCatching {
             privacyConfigService.privacyConfig()
@@ -79,8 +81,17 @@ class RealPrivacyConfigDownloader @Inject constructor(
             }
         }.onFailure {
             // error downloading remote config
-            Timber.w(it.localizedMessage)
-            notifyErrorToCallbacks(DOWNLOAD_ERROR)
+            val code = if (it is HttpException) {
+                it.code().toString()
+            } else {
+                null
+            }
+            val params = mapOf(
+                "code" to (code ?: "unknown"),
+                "message" to (it.localizedMessage ?: "unknown"),
+            )
+            logcat(WARN) { it.localizedMessage ?: "unknown" }
+            notifyErrorToCallbacks(DOWNLOAD_ERROR, params)
         }
 
         return if (response.isFailure) {
@@ -91,8 +102,8 @@ class RealPrivacyConfigDownloader @Inject constructor(
         }
     }
 
-    private fun notifyErrorToCallbacks(reason: DownloadError) {
-        pixel.fire(reason.pixelName)
+    private fun notifyErrorToCallbacks(reason: DownloadError, params: Map<String, String> = emptyMap()) {
+        pixel.fire(reason.pixelName, params)
     }
 
     private enum class DownloadError(val pixelName: String) {

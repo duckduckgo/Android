@@ -31,6 +31,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
@@ -77,6 +78,11 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(binding.root)
+        if (isDarkThemeEnabled()) {
+            renderDarkUi()
+        } else {
+            renderLightUi()
+        }
         configureClickableLinks()
         setupListeners()
         setupObservers()
@@ -86,6 +92,29 @@ class DaxPromptBrowserComparisonActivity : DuckDuckGoActivity() {
         super.onResume()
         applyFullScreenFlags()
         markAsShown()
+    }
+
+    private fun renderDarkUi() {
+        binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape_dark))
+        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.daxPromptBackgroundDark))
+        binding.daxPromptBrowserComparisonMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message_dark)
+        binding.daxPromptBrowserComparisonPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_dark_with_ripple)
+        binding.daxPromptBrowserComparisonPrimaryButton.setTextColor(getColor(com.duckduckgo.mobile.android.R.color.black))
+        binding.daxPromptBrowserComparisonChart.featureIcon1.setImageDrawable(
+            ContextCompat.getDrawable(
+                this,
+                R.drawable.ic_comparison_chart_search_dark,
+            ),
+        )
+    }
+
+    private fun renderLightUi() {
+        binding.orangeShape.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.background_shape))
+        binding.daxPromptBrowserComparisonContainer.setBackgroundColor(getColor(R.color.daxPromptBackground))
+        binding.daxPromptBrowserComparisonMessageContainer.background = ContextCompat.getDrawable(this, R.drawable.background_dax_message)
+        binding.daxPromptBrowserComparisonPrimaryButton.background = ContextCompat.getDrawable(this, R.drawable.background_button_with_ripple)
+        binding.daxPromptBrowserComparisonPrimaryButton.setTextColor(getColor(com.duckduckgo.mobile.android.R.color.white))
+        binding.daxPromptBrowserComparisonChart.featureIcon1.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_comparison_chart_search))
     }
 
     private fun configureClickableLinks() {

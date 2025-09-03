@@ -62,7 +62,7 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Sync Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
@@ -79,7 +79,7 @@ jobs:
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
@@ -90,7 +90,7 @@ jobs:
 
       - name: Add Asana task to Browser Sync & Backup project
         if: ${{ failure() }}
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_BROWSER_SYNC_BACKUP_PROJECT_ID }}

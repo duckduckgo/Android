@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncInternalSettingsViewModel
@@ -78,10 +78,10 @@ constructor(
 
     sealed class Command {
         data class ShowMessage(val message: String) : Command()
-        object ReadQR : Command()
-        object ReadConnectQR : Command()
+        data object ReadQR : Command()
+        data object ReadConnectQR : Command()
         data class ShowQR(val string: String) : Command()
-        object LoginSuccess : Command()
+        data object LoginSuccess : Command()
     }
 
     init {
@@ -283,7 +283,7 @@ constructor(
     }
 
     fun resetFaviconsPrompt() {
-        Timber.d("Sync-Internal: Reset Favicons Prompt")
+        logcat { "Sync-Internal: Reset Favicons Prompt" }
         syncFaviconFetchingStore.isFaviconsFetchingEnabled = false
         syncFaviconFetchingStore.promptShown = false
     }

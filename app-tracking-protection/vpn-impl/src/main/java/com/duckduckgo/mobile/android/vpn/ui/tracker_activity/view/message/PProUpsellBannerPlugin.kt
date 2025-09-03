@@ -47,6 +47,7 @@ class PProUpsellBannerPlugin @Inject constructor(
     private val browserNav: BrowserNav,
     private val vpnStore: VpnStore,
     private val deviceShieldPixels: DeviceShieldPixels,
+    private val appTPStateMessageToggle: AppTPStateMessageToggle,
 ) : AppTPStateMessagePlugin {
     override fun getView(
         context: Context,
@@ -55,14 +56,22 @@ class PProUpsellBannerPlugin @Inject constructor(
     ): View? {
         val isEligible = runBlocking { subscriptions.isUpsellEligible() && !vpnStore.isPproUpsellBannerDismised() }
         return if (isEligible) {
+            val actionText: String
+            runBlocking {
+                actionText = if (subscriptions.isFreeTrialEligible() && appTPStateMessageToggle.freeTrialCopy().isEnabled()) {
+                    context.getString(R.string.apptp_PproUpsellBannerAction_freeTrial)
+                } else {
+                    context.getString(R.string.apptp_PproUpsellBannerAction)
+                }
+            }
             MessageCta(context)
                 .apply {
                     this.setMessage(
                         Message(
                             topIllustration = com.duckduckgo.mobile.android.R.drawable.ic_privacy_pro,
                             title = context.getString(R.string.apptp_PproUpsellBannerTitle),
-                            subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage),
-                            action = context.getString(R.string.apptp_PproUpsellBannerAction),
+                            subtitle = context.getString(R.string.apptp_PproUpsellBannerMessage_freeTrial),
+                            action = actionText,
                             messageType = REMOTE_MESSAGE,
                         ),
                     )

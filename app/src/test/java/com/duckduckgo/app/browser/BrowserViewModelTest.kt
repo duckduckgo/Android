@@ -23,8 +23,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment
-import com.duckduckgo.app.browser.defaultbrowsing.prompts.DefaultBrowserPromptsExperiment.SetAsDefaultActionTrigger
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.generalsettings.showonapplaunch.ShowOnAppLaunchFeature
@@ -42,6 +42,7 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.channels.Channel
@@ -92,9 +93,11 @@ class BrowserViewModelTest {
 
     @Mock private lateinit var showOnAppLaunchOptionHandler: ShowOnAppLaunchOptionHandler
 
-    private val defaultBrowserPromptsExperimentCommandsFlow = Channel<DefaultBrowserPromptsExperiment.Command>(capacity = Channel.CONFLATED)
+    private val additionalDefaultBrowserPromptsCommandsFlow = Channel<AdditionalDefaultBrowserPrompts.Command>(capacity = Channel.CONFLATED)
 
-    @Mock private lateinit var mockDefaultBrowserPromptsExperiment: DefaultBrowserPromptsExperiment
+    @Mock private lateinit var mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts
+
+    @Mock private lateinit var mockDuckChat: DuckChat
 
     private val fakeShowOnAppLaunchFeatureToggle = FakeFeatureToggleFactory.create(ShowOnAppLaunchFeature::class.java)
 
@@ -116,7 +119,7 @@ class BrowserViewModelTest {
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
-        whenever(mockDefaultBrowserPromptsExperiment.commands).thenReturn(defaultBrowserPromptsExperimentCommandsFlow.receiveAsFlow())
+        whenever(mockAdditionalDefaultBrowserPrompts.commands).thenReturn(additionalDefaultBrowserPromptsCommandsFlow.receiveAsFlow())
 
         initTestee()
 
@@ -124,7 +127,7 @@ class BrowserViewModelTest {
 
         runTest {
             whenever(mockTabRepository.add()).thenReturn(TAB_ID)
-            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any())).then { it.arguments.first() }
+            whenever(mockOmnibarEntryConverter.convertQueryToUrl(any(), any(), any(), any())).then { it.arguments.first() }
         }
     }
 
@@ -292,7 +295,7 @@ class BrowserViewModelTest {
         testee.onBookmarksActivityResult(bookmarkUrl)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.OpenInNewTab(bookmarkUrl), commandCaptor.lastValue)
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
     }
 
     @Test
@@ -337,103 +340,103 @@ class BrowserViewModelTest {
     }
 
     @Test
-    fun `when default browser prompts experiment OpenMessageDialog command, then propagate it to consumers`() = runTest {
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenMessageDialog)
+    fun `when default browser prompts OpenMessageDialog command, then propagate it to consumers`() = runTest {
+        additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenMessageDialog)
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowSetAsDefaultBrowserDialog, commandCaptor.lastValue)
     }
 
     @Test
-    fun `when default browser prompts experiment OpenSystemDefaultBrowserDialog command, then propagate it to consumers`() = runTest {
+    fun `when default browser prompts OpenSystemDefaultBrowserDialog command, then propagate it to consumers`() = runTest {
         val intent: Intent = mock()
         val trigger: SetAsDefaultActionTrigger = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
+        additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowSystemDefaultBrowserDialog(intent), commandCaptor.lastValue)
     }
 
     @Test
-    fun `when default browser prompts experiment OpenSystemDefaultAppsActivity command, then propagate it to consumers`() = runTest {
+    fun `when default browser prompts OpenSystemDefaultAppsActivity command, then propagate it to consumers`() = runTest {
         val intent: Intent = mock()
         val trigger: SetAsDefaultActionTrigger = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity(intent, trigger))
+        additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultAppsActivity(intent, trigger))
 
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.ShowSystemDefaultAppsActivity(intent), commandCaptor.lastValue)
     }
 
     @Test
-    fun `when onSetDefaultBrowserDialogShown called, then pass that information to the experiment`() {
+    fun `when onSetDefaultBrowserDialogShown called, then pass that information`() {
         testee.onSetDefaultBrowserDialogShown()
 
-        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogShown()
+        verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogShown()
     }
 
     @Test
-    fun `when onSetDefaultBrowserDialogCanceled called, then pass that information to the experiment`() {
+    fun `when onSetDefaultBrowserDialogCanceled called, then pass that information`() {
         testee.onSetDefaultBrowserDialogCanceled()
 
-        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogCanceled()
+        verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogCanceled()
     }
 
     @Test
-    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information to the experiment and dismiss dialog`() {
+    fun `when onSetDefaultBrowserConfirmationButtonClicked called, then pass that information and dismiss dialog`() {
         testee.onSetDefaultBrowserConfirmationButtonClicked()
 
-        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogConfirmationButtonClicked()
+        verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogConfirmationButtonClicked()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
         assertEquals(Command.DismissSetAsDefaultBrowserDialog, commandCaptor.lastValue)
     }
 
     @Test
-    fun `when onSetDefaultBrowserNotNowButtonClicked called, then pass that information to the experiment and dismiss dialog`() {
-        testee.onSetDefaultBrowserNotNowButtonClicked()
+    fun `when onSetDefaultBrowserDoNotAskAgainButtonClicked called, then pass that information and dismiss dialog`() {
+        testee.onSetDefaultBrowserDoNotAskAgainButtonClicked()
 
-        verify(mockDefaultBrowserPromptsExperiment).onMessageDialogNotNowButtonClicked()
+        verify(mockAdditionalDefaultBrowserPrompts).onMessageDialogDoNotAskAgainButtonClicked()
         verify(mockCommandObserver).onChanged(commandCaptor.capture())
-        assertEquals(Command.DismissSetAsDefaultBrowserDialog, commandCaptor.lastValue)
+        assertEquals(Command.DoNotAskAgainSetAsDefaultBrowserDialog, commandCaptor.lastValue)
     }
 
     @Test
-    fun `when onSystemDefaultBrowserDialogShown called, then pass that information to the experiment`() {
+    fun `when onSystemDefaultBrowserDialogShown called, then pass that information`() {
         testee.onSystemDefaultBrowserDialogShown()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogShown()
+        verify(mockAdditionalDefaultBrowserPrompts).onSystemDefaultBrowserDialogShown()
     }
 
     @Test
-    fun `when onSystemDefaultBrowserDialogSuccess called, then pass that information to the experiment`() = runTest {
+    fun `when onSystemDefaultBrowserDialogSuccess called, then pass that information`() = runTest {
         val intent: Intent = mock()
         val trigger: SetAsDefaultActionTrigger = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
+        additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
 
         testee.onSystemDefaultBrowserDialogSuccess()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogSuccess(trigger)
+        verify(mockAdditionalDefaultBrowserPrompts).onSystemDefaultBrowserDialogSuccess(trigger)
     }
 
     @Test
-    fun `when onSystemDefaultBrowserDialogCanceled called, then pass that information to the experiment`() = runTest {
+    fun `when onSystemDefaultBrowserDialogCanceled called, then pass that information`() = runTest {
         val intent: Intent = mock()
         val trigger: SetAsDefaultActionTrigger = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
+        additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog(intent, trigger))
 
         testee.onSystemDefaultBrowserDialogCanceled()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultBrowserDialogCanceled(trigger)
+        verify(mockAdditionalDefaultBrowserPrompts).onSystemDefaultBrowserDialogCanceled(trigger)
     }
 
     @Test
-    fun `when onSystemDefaultAppsActivityClosed called, then pass that information to the experiment`() = runTest {
+    fun `when onSystemDefaultAppsActivityClosed called, then pass that information`() = runTest {
         val intent: Intent = mock()
         val trigger: SetAsDefaultActionTrigger = mock()
-        defaultBrowserPromptsExperimentCommandsFlow.send(DefaultBrowserPromptsExperiment.Command.OpenSystemDefaultAppsActivity(intent, trigger))
+        additionalDefaultBrowserPromptsCommandsFlow.send(AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultAppsActivity(intent, trigger))
 
         testee.onSystemDefaultAppsActivityClosed()
 
-        verify(mockDefaultBrowserPromptsExperiment).onSystemDefaultAppsActivityClosed(trigger)
+        verify(mockAdditionalDefaultBrowserPrompts).onSystemDefaultAppsActivityClosed(trigger)
     }
 
     @Test
@@ -506,6 +509,17 @@ class BrowserViewModelTest {
         assertEquals(false, testee.viewState.value!!.isTabSwipingEnabled)
     }
 
+    @Test
+    fun whenOnBookmarksActivityResultCalledThenOpenSavedSiteCommandTriggered() = runTest {
+        swipingTabsFeature.self().setRawStoredState(State(enable = false))
+        val bookmarkUrl = "https://www.example.com"
+
+        testee.onBookmarksActivityResult(bookmarkUrl)
+
+        verify(mockCommandObserver).onChanged(commandCaptor.capture())
+        assertEquals(Command.OpenSavedSite(bookmarkUrl), commandCaptor.lastValue)
+    }
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -519,8 +533,9 @@ class BrowserViewModelTest {
             skipUrlConversionOnNewTabFeature = skipUrlConversionOnNewTabFeature,
             showOnAppLaunchFeature = fakeShowOnAppLaunchFeatureToggle,
             showOnAppLaunchOptionHandler = showOnAppLaunchOptionHandler,
-            defaultBrowserPromptsExperiment = mockDefaultBrowserPromptsExperiment,
+            additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
+            duckChat = mockDuckChat,
         )
     }
 

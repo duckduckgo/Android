@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">DNS-server</string>
     <string name="netpPrivateDns">Privé-DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (risicovolle domeinen blokkeren)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Blokkering van scam)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (aanbevolen)</string>
     <string name="netpCustomDnsCustom">Pas Aan</string>
     <string name="netpCustomDnsInputAddressHint">IPv4-adres</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo routeert DNS-zoekopdrachten via onze DNS-servers zodat je internetprovider niet kan zien welke websites je bezoekt.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blokkeren en filteren van inhoud</string>
-    <string name="netpDnsBlockMalwarePrimary">Risicovolle domeinen blokkeren</string>
+    <string name="netpDnsBlockMalwareHeader">Blokkeren van schadelijke inhoud</string>
+    <string name="netpDnsBlockMalwarePrimary">Scamblocker</string>
     <string name="netpDnsBlockMalwareByline">Blokkeer meer dan 150.000 domeinen die zijn aangeduid als hosts van malware, phishing-aanvallen en online oplichting met een blokkeringslijst op DNS-niveau. <annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS-blokkeringslijsten</string>
 
@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Apps die niet compatibel zijn met VPN\'s automatisch uitsluiten</string>
     <string name="netpExclusionListLabelAutoExclude">Niet compatibel met VPN\'s</string>
     <string name="netpExclusionListAutoExcludeDescription">Sommige apps, zoals bank- of streamingapps, werken niet goed met VPN\'s. Als je deze instelling inschakelt, sluiten we die apps automatisch uit.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">De VPN-verbinding is verbroken omdat het abonnement is verlopen. Abonneer je op DuckDuckGo om opnieuw verbinding te maken met de VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonneer je op DuckDuckGo om opnieuw verbinding te maken met de VPN.</string>
 </resources>

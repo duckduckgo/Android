@@ -423,9 +423,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Vous ne pouvez pas l\'utiliser App Tracking Protection à cause de votre VPN ? Passez à DuckDuckGo VPN, le seul VPN compatible. <annotation type="ppro_upsell_link">En savoir plus</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Vous ne pouvez pas utiliser App Tracking Protection à cause de votre VPN ? Passez à DuckDuckGo VPN, le seul VPN compatible. <annotation type="ppro_upsell_link">Essayez gratuitement !</annotation></string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection désactivée</b>\nVotre VPN a désactivé App Tracking Protection ? Faites basculer le bouton ci-dessus pour la réactiver.\n\nProcurez-vous DuckDuckGo VPN, le seul VPN qui fonctionne avec App Tracking Protection. <annotation type="ppro_upsell_link">En savoir plus</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>App Tracking Protection désactivée</b>\nVotre VPN a désactivé App Tracking Protection ? Faites basculer le bouton ci-dessus pour la réactiver.\n\nPassez à DuckDuckGo VPN, le seul VPN qui fonctionne avec App Tracking Protection. <annotation type="ppro_upsell_link">Essayez gratuitement !</annotation></string>
     <string name="apptp_PproUpsellBannerTitle">Renforcez votre confidentialité</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo dispose du seul VPN compatible avec App Tracking Protection. Activez-le grâce à un abonnement Privacy Pro payant.</string>
     <string name="apptp_PproUpsellBannerAction">En savoir plus</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Abonnez-vous à DuckDuckGo et obtenez le seul VPN compatible avec App Tracking Protection.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Essayez gratuitement !</string>
 
 </resources>

@@ -23,6 +23,7 @@ import androidx.core.content.edit
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
+import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.VariantManagerPlugin.Companion.VARIANT_MANAGER_FEATURE_NAME
 import com.duckduckgo.privacy.config.impl.di.ConfigPersisterPreferences
@@ -42,7 +43,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Qualifier
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface PrivacyConfigPersister {
     suspend fun persistPrivacyConfig(
@@ -64,6 +66,7 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val privacyConfigRepository: PrivacyConfigRepository,
     private val database: PrivacyConfigDatabase,
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
+    private val privacyConfigCallbackPlugin: PluginPoint<PrivacyConfigCallbackPlugin>,
 ) : PrivacyConfigPersister {
 
     override suspend fun persistPrivacyConfig(
@@ -78,14 +81,14 @@ class RealPrivacyConfigPersister @Inject constructor(
 
         val shouldPersist = newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
 
-        Timber.v(
-            "Should persist privacy config: %s. version=(existing: %s, new: %s), hash=(existing: %s, new: %s)",
-            shouldPersist,
-            previousVersion,
-            newVersion,
-            previousPluginHashCode,
-            currentPluginHashCode,
-        )
+        logcat(VERBOSE) {
+            """
+                Should persist privacy config: $shouldPersist. 
+                version=(existing: $previousVersion, 
+                new: $newVersion), 
+                hash=(existing: $previousPluginHashCode, new: $currentPluginHashCode)
+            """.trimIndent()
+        }
 
         if (shouldPersist) {
             database.runInTransaction {
@@ -120,6 +123,9 @@ class RealPrivacyConfigPersister @Inject constructor(
                     }
                 }
             }
+        }
+        privacyConfigCallbackPlugin.getPlugins().forEach {
+            it.onPrivacyConfigPersisted()
         }
     }
 

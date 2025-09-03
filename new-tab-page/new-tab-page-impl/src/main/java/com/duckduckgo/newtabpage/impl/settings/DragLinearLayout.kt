@@ -34,7 +34,8 @@ import android.widget.LinearLayout
 import androidx.core.view.MotionEventCompat
 import kotlin.math.abs
 import kotlin.math.roundToInt
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.logcat
 
 class DragLinearLayout @JvmOverloads constructor(
     context: Context?,
@@ -97,7 +98,7 @@ class DragLinearLayout @JvmOverloads constructor(
             dragHandle!!.setOnLongClickListener(mLongClickDragListener)
             mDraggableChildren.put(indexOfChild(child), DraggableChild())
         } else {
-            Timber.e(TAG, "$child is not a child, cannot make draggable.")
+            logcat(tag = TAG, priority = ERROR) { "$child is not a child, cannot make draggable" }
         }
     }
 
@@ -256,7 +257,7 @@ class DragLinearLayout @JvmOverloads constructor(
                             observer.removeOnPreDrawListener(this)
                             mDragItem.updateTargetLocation()
                             if (mDragItem.settling()) {
-                                Timber.d(TAG, "Updating settle animation")
+                                logcat(tag = TAG) { "Updating settle animation" }
                                 mDragItem.mSettleAnimation!!.removeAllListeners()
                                 mDragItem.mSettleAnimation!!.cancel()
                                 onDragStop()

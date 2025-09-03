@@ -30,7 +30,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
@@ -57,7 +57,7 @@ class VpnReminderReceiver : BroadcastReceiver() {
                 vpnFeaturesRegistry.registerFeature(AppTpVpnFeature.APPTP_VPN)
             }
         } else {
-            logcat(LogPriority.WARN) { "VpnReminderReceiver: unknown action" }
+            logcat(WARN) { "VpnReminderReceiver: unknown action: ${intent.action}" }
             pendingResult?.finish()
         }
     }

@@ -32,8 +32,10 @@ import com.duckduckgo.mobile.android.R as CommonR
 import java.io.File
 import java.util.*
 import kotlin.math.absoluteValue
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import okio.ByteString.Companion.encodeUtf8
-import timber.log.Timber
 
 fun ImageView.loadFavicon(
     file: File,
@@ -52,7 +54,7 @@ fun ImageView.loadFavicon(
             .error(defaultDrawable)
             .into(this)
     }.onFailure {
-        Timber.e(it, "Error loading favicon")
+        logcat(ERROR) { "Error loading favicon: ${it.asLog()}" }
     }
 }
 
@@ -73,7 +75,7 @@ fun ImageView.loadFavicon(
             .error(defaultDrawable)
             .into(this)
     }.onFailure {
-        Timber.e(it, "Error loading favicon")
+        logcat(ERROR) { "Error loading favicon: ${it.asLog()}" }
     }
 }
 
@@ -81,7 +83,7 @@ fun ImageView.loadDefaultFavicon(domain: String) {
     runCatching {
         this.setImageDrawable(generateDefaultDrawable(this.context, domain))
     }.onFailure {
-        Timber.e(it, "Error loading default favicon")
+        logcat(ERROR) { "Error loading default favicon: ${it.asLog()}" }
     }
 }
 

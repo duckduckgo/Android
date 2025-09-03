@@ -16,7 +16,9 @@
 
 package com.duckduckgo.malicioussiteprotection.impl.domain
 
+import android.R.attr.priority
 import android.net.Uri
+import android.util.LruCache
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -35,16 +37,27 @@ import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Result
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
 import com.squareup.anvil.annotations.ContributesBinding
+import dagger.SingleInstanceIn
 import java.security.MessageDigest
 import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 class WriteInProgressException : Exception("Write in progress")
 
 @ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
+interface InternalMaliciousSiteProtection : MaliciousSiteProtection {
+    suspend fun loadFilters(vararg feeds: Feed): kotlin.Result<Unit>
+    suspend fun loadHashPrefixes(vararg feeds: Feed): kotlin.Result<Unit>
+}
+
+@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, InternalMaliciousSiteProtection::class)
 class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -53,9 +66,11 @@ class RealMaliciousSiteProtection @Inject constructor(
     private val messageDigest: MessageDigest,
     private val maliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature,
     private val urlCanonicalization: UrlCanonicalization,
-) : MaliciousSiteProtection {
+) : InternalMaliciousSiteProtection {
 
-    private val timber = Timber.tag("MaliciousSiteProtection")
+    private inline fun logcat(logPriority: LogPriority = LogPriority.DEBUG, message: () -> String) =
+        logcat(tag = "MaliciousSiteProtection", priority = logPriority, message = message)
+    private val lruCache = LruCache<String, MaliciousStatus>(10)
 
     override fun isFeatureEnabled(): Boolean {
         return maliciousSiteProtectionRCFeature.isFeatureEnabled()
@@ -65,10 +80,10 @@ class RealMaliciousSiteProtection @Inject constructor(
         url: Uri,
         confirmationCallback: (confirmedResult: MaliciousStatus) -> Unit,
     ): IsMaliciousResult {
-        timber.d("isMalicious $url")
+        logcat { "isMalicious $url" }
 
         if (!maliciousSiteProtectionRCFeature.isFeatureEnabled()) {
-            timber.d("should not block (feature disabled) $url")
+            logcat { "should not block (feature disabled) $url" }
             return ConfirmedResult(Ignored)
         }
 
@@ -77,8 +92,16 @@ class RealMaliciousSiteProtection @Inject constructor(
 
         val hostname = canonicalUri.host ?: return ConfirmedResult(Safe)
 
+        if (maliciousSiteProtectionRCFeature.isCachingEnabled()) {
+            lruCache.get(canonicalUriString)?.let {
+                logcat { "Cached result for $canonicalUriString" }
+                return ConfirmedResult(it)
+            }
+        }
+
         if (maliciousSiteProtectionRCRepository.isExempted(hostname)) {
-            timber.d("should not block (exempted) $hostname")
+            logcat { "should not block (exempted) $hostname" }
+            cacheResult(canonicalUriString, Safe)
             return ConfirmedResult(Safe)
         }
 
@@ -88,52 +111,92 @@ class RealMaliciousSiteProtection @Inject constructor(
         try {
             maliciousSiteRepository.getFeedForHashPrefix(hashPrefix).let {
                 if (it == null) {
-                    timber.d("should not block (no hash) $hashPrefix,  $canonicalUri")
+                    logcat { "should not block (no hash) $hashPrefix,  $canonicalUri" }
+                    cacheResult(canonicalUriString, Safe)
                     return ConfirmedResult(Safe)
                 } else if (it == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) {
-                    timber.d("should not block (scam protection disabled) $canonicalUri")
+                    logcat { "should not block (scam protection disabled) $canonicalUri" }
+                    cacheResult(canonicalUriString, Ignored)
                     return ConfirmedResult(Ignored)
                 }
             }
             maliciousSiteRepository.getFilters(hash)?.let { filterSet ->
                 filterSet.filters.let {
                     if (Pattern.compile(it.regex).matcher(canonicalUriString).find()) {
-                        timber.d("should block $canonicalUriString")
+                        logcat { "should block $canonicalUriString" }
+                        cacheResult(canonicalUriString, Malicious(filterSet.feed))
                         return ConfirmedResult(Malicious(filterSet.feed))
                     }
                 }
             }
         } catch (e: WriteInProgressException) {
-            timber.d("Write in progress, ignoring")
+            logcat { "Write in progress, ignoring" }
+            // We don't want to cache these
             return ConfirmedResult(Ignored)
         }
         appCoroutineScope.launch(dispatchers.io()) {
             try {
                 val result = when (val matches = maliciousSiteRepository.matches(hashPrefix.substring(0, 4))) {
-                    is Result -> matches.matches.firstOrNull { match ->
-                        Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
-                            (hostname == match.hostname) &&
-                            (hash == match.hash)
-                    }?.feed?.let { feed: Feed ->
-                        if (feed == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) return@let Ignored
-                        return@let Malicious(feed)
-                    } ?: Safe
+                    is Result -> extractMaliciousStatus(matches, canonicalUriString, hostname, hash).also { result ->
+                        cacheResult(canonicalUriString, result)
+                    }
                     is MatchesResult.Ignored -> Ignored
                 }
 
                 when (result) {
-                    is Malicious -> timber.d("should block (matches) $canonicalUriString, result: ${result.feed}")
-                    is Safe -> timber.d("should not block (no match) $canonicalUriString")
-                    is Ignored -> timber.d("should not block (ignored) $canonicalUriString")
+                    is Malicious -> {
+                        logcat { "should block (matches) $canonicalUriString, result: ${result.feed}" }
+                    }
+                    is Safe -> {
+                        logcat { "should not block (no match) $canonicalUriString" }
+                    }
+                    is Ignored -> logcat { "should not block (ignored) $canonicalUriString" }
                 }
                 confirmationCallback(result)
             } catch (e: Exception) {
-                timber.e(e, "shouldBlock $canonicalUriString")
+                logcat(logPriority = ERROR) { "shouldBlock $canonicalUriString: ${e.asLog()}" }
                 confirmationCallback(Safe)
             }
         }
-        timber.d("wait for confirmation $canonicalUriString")
+        logcat { "wait for confirmation $canonicalUriString" }
         return IsMaliciousResult.WaitForConfirmation
+    }
+
+    private fun extractMaliciousStatus(
+        matches: Result,
+        canonicalUriString: String,
+        hostname: String,
+        hash: String,
+    ): MaliciousStatus = (
+        matches.matches.firstOrNull { match ->
+            Pattern.compile(match.regex).matcher(canonicalUriString).find() &&
+                (hostname == match.hostname) &&
+                (hash == match.hash)
+        }?.feed?.let { feed: Feed ->
+            if (feed == SCAM && !maliciousSiteProtectionRCFeature.scamProtectionEnabled()) return@let Ignored
+            return@let Malicious(feed)
+        } ?: Safe
+        )
+
+    override suspend fun loadFilters(vararg feeds: Feed): kotlin.Result<Unit> {
+        return maliciousSiteRepository.loadFilters(*feeds).also {
+            lruCache.evictAll()
+        }
+    }
+
+    override suspend fun loadHashPrefixes(vararg feeds: Feed): kotlin.Result<Unit> {
+        return maliciousSiteRepository.loadHashPrefixes(*feeds).also {
+            lruCache.evictAll()
+        }
+    }
+
+    private fun cacheResult(
+        canonicalUriString: String,
+        result: MaliciousStatus,
+    ) {
+        if (maliciousSiteProtectionRCFeature.isCachingEnabled()) {
+            lruCache.put(canonicalUriString, result)
+        }
     }
 
     private fun generateHash(hostname: String): String {

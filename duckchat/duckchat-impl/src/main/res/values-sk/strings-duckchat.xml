@@ -21,10 +21,52 @@
     <string name="duck_chat_download_finished_action_name">Otvorené</string>
     <string name="duck_chat_cannot_open_file_error_message">Súbor sa nedá otvoriť. Vyhľadajte kompatibilnú aplikáciu.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Nepodarilo sa získať prístup k fotoaparátu</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Nahrať obrázok</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Vyberte si súbor</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Urobiť fotografiu</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k fotoaparátu v tomto zariadení</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Lokality môžu používať váš fotoaparát len vtedy, ak povolíte aplikácii DuckDuckGo žiadať o prístup.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Otvoriť nastavenia</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Zrušiť</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Nepodarilo sa získať prístup k zvukovému záznamníku</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Povoliť aplikácii DuckDuckGo žiadať o prístup k záznamníku zvuku v tomto zariadení</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Lokality môžu používať záznamník zvuku len vtedy, ak povolíš aplikácii DuckDuckGo žiadať o prístup.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai je voliteľná funkcia, ktorá ti umožňuje anonymne chatovať s obľúbenými modelmi chatu s umelou inteligenciou tretích strán. Tvoje chaty sa nepoužívajú na trénovanie AI.\n<annotation type="learn_more_link">Viac informácií</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Povoliť Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Skratky</string>
     <string name="duck_chat_visibility_setting">Ponuka prehliadača</string>
     <string name="duck_chat_address_bar_visibility_setting">Riadok adresy</string>
+    <string name="duck_chat_assist_settings_title">Nastavenia Assist</string>
+    <string name="duck_chat_assist_settings_description">Vyber, ako často chceš, aby sa vo vyhľadávaní zobrazovali odpovede podporované AI</string>
+    <string name="duck_ai_shortcut_settings_title">Skratky Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Vyber, ktoré skratky Duck.ai sa majú zobraziť</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Vyhľadávať</string>
+    <string name="input_screen_search_hint">Vyhľadajte alebo zadajte adresu</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Spýtaj sa súkromne</string>
+    <string name="input_screen_user_pref_without_ai">Iba vyhľadať\n(predvolené)</string>
+    <string name="input_screen_user_pref_with_ai">Vyhľadať a Duck.ai\n(experimentálne)</string>
+    <string name="input_screen_user_pref_description">Vyskúšaj našu experimentálnu možnosť pýtať sa Duck.ai priamo z panela s adresou. <annotation type="share_feedback">Zdieľaj spätnú väzbu</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chatuj súkromne s modelmi umelej inteligencie exkluzívne pre predplatiteľov.\n<a href=\"\">Zisti viac</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Otvoriť Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Zistite viac</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Funkcie AI</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Funkcie DuckDuckGo AI sú súkromné a voliteľné.\nTvoje údaje sa nepoužívajú na trénovanie umelej inteligencie.\n<annotation type="learn_more_link">Viac informácií</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatuj súkromne s populárnymi AI modelmi tretích strán</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Nastavenia Assist vyhľadávania</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Vyber, ako často chceš, aby sa vo vyhľadávaní zobrazovali odpovede podporované AI</string>
 </resources>

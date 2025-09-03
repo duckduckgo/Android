@@ -25,7 +25,8 @@ import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.flow.firstOrNull
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface AutofillServiceStore {
     suspend fun isDefaultAutofillProvider(): Boolean
@@ -43,7 +44,7 @@ class RealAutofillServiceStore @Inject constructor(
     }
 
     override suspend fun updateDefaultAutofillProvider(isDefault: Boolean) {
-        Timber.i("DDGAutofillService updating default autofill provider to $isDefault")
+        logcat(INFO) { "DDGAutofillService updating default autofill provider to $isDefault" }
         store.edit {
             it[enabledByUserKey] = isDefault
         }

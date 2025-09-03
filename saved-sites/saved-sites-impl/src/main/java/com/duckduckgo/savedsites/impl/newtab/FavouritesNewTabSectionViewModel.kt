@@ -32,6 +32,7 @@ import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
+import com.duckduckgo.savedsites.api.views.FavoritesPlacement
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName.*
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Command.DeleteFavoriteConfirmation
@@ -40,6 +41,7 @@ import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionViewModel.Co
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import javax.inject.Inject
+import kotlin.math.abs
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -71,23 +73,6 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         val bookmarkFolder: BookmarkFolder?,
     )
 
-    enum class Placement {
-        FOCUSED_STATE,
-        NEW_TAB_PAGE,
-        ;
-
-        companion object {
-            fun from(type: Int): Placement {
-                // same order as attrs-saved-sites.xml
-                return when (type) {
-                    0 -> Placement.FOCUSED_STATE
-                    1 -> Placement.NEW_TAB_PAGE
-                    else -> Placement.FOCUSED_STATE
-                }
-            }
-        }
-    }
-
     sealed class Command {
         class ShowEditSavedSiteDialog(val savedSiteChangedViewState: SavedSiteChangedViewState) : Command()
         class DeleteFavoriteConfirmation(val savedSite: SavedSite) : Command()
@@ -104,6 +89,12 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
     val viewState = _viewState.asStateFlow()
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)
     internal fun commands(): Flow<Command> = command.receiveAsFlow()
+
+    enum class SwipeDecision { HORIZONTAL, VERTICAL, CANCEL_LONG_PRESS }
+
+    private var initialTouchX = 0f
+    private var initialTouchY = 0f
+    private var longPressActivated = false
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
@@ -135,7 +126,11 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
             if (favourites.size == newList.size) {
                 savedSitesRepository.updateWithPosition(newList.map { it })
             } else {
-                val updatedList = newList.plus(favourites.takeLast(favourites.size - newList.size))
+                val updatedList = if (favourites.size > newList.size) {
+                    newList.plus(favourites.takeLast(favourites.size - newList.size))
+                } else {
+                    newList
+                }
                 savedSitesRepository.updateWithPosition(updatedList.map { it })
             }
         }
@@ -288,15 +283,43 @@ class FavouritesNewTabSectionViewModel @Inject constructor(
         pixel.fire(EDIT_BOOKMARK_REMOVE_FAVORITE_TOGGLED)
     }
 
-    fun onFavoriteClicked(placement: Placement) {
+    fun onFavoriteClicked(placement: FavoritesPlacement) {
         pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED, placement))
         pixel.fire(formatPixelWithPlacement(FAVOURITE_CLICKED_DAILY, placement), type = Daily())
     }
 
     private fun formatPixelWithPlacement(
         pixelName: SavedSitesPixelName,
-        placement: Placement,
+        placement: FavoritesPlacement,
     ): String {
         return pixelName.pixelName + "_" + placement.name.lowercase()
     }
+
+    fun onTouchDown(x: Float, y: Float) {
+        initialTouchX = x
+        initialTouchY = y
+        longPressActivated = false
+    }
+
+    fun onTouchUp() {
+        longPressActivated = false
+    }
+
+    fun onTouchMove(x: Float, y: Float, touchSlop: Int): SwipeDecision? {
+        val dx = abs(x - initialTouchX)
+        val dy = abs(y - initialTouchY)
+
+        return when {
+            dx > dy && dx > touchSlop -> SwipeDecision.HORIZONTAL
+            dy > dx && dy > touchSlop -> SwipeDecision.VERTICAL
+            dx > touchSlop || dy > touchSlop -> SwipeDecision.CANCEL_LONG_PRESS
+            else -> null
+        }
+    }
+
+    fun onLongPressTriggered() {
+        longPressActivated = true
+    }
+
+    fun isLongPressActive(): Boolean = longPressActivated
 }

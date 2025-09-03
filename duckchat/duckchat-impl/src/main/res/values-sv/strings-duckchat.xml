@@ -21,10 +21,52 @@
     <string name="duck_chat_download_finished_action_name">Öppna</string>
     <string name="duck_chat_cannot_open_file_error_message">Det går inte att öppna filen. Sök efter en kompatibel app.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Det gick inte att komma åt kameran</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Ladda upp en bild</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Välj fil</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ta foto</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Tillåt DuckDuckGo att be om kameraåtkomst på den här enheten</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Webbplatser kan endast använda din kamera om du tillåter DuckDuckGo att be om åtkomst.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Öppna inställningar</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Avbryt</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Det gick inte att komma åt ljudinspelaren</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Tillåt DuckDuckGo att be om åtkomst till ljudinspelaren på den här enheten</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Webbplatser kan endast använda ljudinspelaren om du tillåter DuckDuckGo att be om åtkomst.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai är en valfri funktion som låter dig chatta anonymt med populära AI-chattmodeller från tredje part. Dina chattar används inte för att träna AI.\n<annotation type="learn_more_link">Läs mer</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Aktivera Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Genvägar</string>
     <string name="duck_chat_visibility_setting">Webbläsarmeny</string>
     <string name="duck_chat_address_bar_visibility_setting">Adressfält</string>
+    <string name="duck_chat_assist_settings_title">Assist-inställningar</string>
+    <string name="duck_chat_assist_settings_description">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
+    <string name="duck_ai_shortcut_settings_title">Duck.ai-genvägar</string>
+    <string name="duck_ai_shortcut_settings_description">Välj vilka Duck.ai-genvägar du vill visa</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Sökning</string>
+    <string name="input_screen_search_hint">Sök eller ange adress</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Fråga privat</string>
+    <string name="input_screen_user_pref_without_ai">Endast sök\n(som standard)</string>
+    <string name="input_screen_user_pref_with_ai">Sök och Duck.ai\n(experimentell)</string>
+    <string name="input_screen_user_pref_description">Prova vår experimentella funktion och fråga Duck.ai direkt från adressfältet. <annotation type="share_feedback">Berätta vad du tycker</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Chatta privat med AI-modeller för prenumeranter.\n<a href=\"\">Läs mer</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Öppna Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Läs mer</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">AI-funktioner</string>
+    <string name="duck_chat_settings_activity_description_rebranding">DuckDuckGos AI-funktioner är privata och valfria.\nDina data används inte för att träna AI.\n<annotation type="learn_more_link">Läs mer</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Chatta privat med populära AI-modeller från tredje part</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Inställningar för Search Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Välj hur ofta du vill att AI-assisterade svar ska visas i dina sökningar</string>
 </resources>

@@ -32,6 +32,42 @@
     "title" : "<b>HATA:</b> Geçersiz video kimliği",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player bu videoyu yükleyemiyor",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Bu video YouTube dışında izlenemez.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Bu videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izleyebilirsiniz.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Üzgünüz, bu videoda yaş sınırlaması var",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Yaş sınırlaması olan videoları izlemek için yaşınızı doğrulamak üzere YouTube'da oturum açmanız gerekir.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Bu videoyu yine izleyebilirsiniz. Ancak Duck Player'ın ek gizliliği olmadan YouTube'da oturum açmanız ve izlemeniz gerekir.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Üzgünüz, bu video yalnızca YouTube'da oynatılabilir",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Bu videoyu oluşturan kişi, videonun başka sitelerde izlenmesine izin vermemeyi seçti.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Bu videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izleyebilirsiniz.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube, Duck Player'ın bu videoyu yüklemesine izin vermiyor",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Bu videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izleyebilirsiniz.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "Üzgünüz, YouTube sizin bir bot olduğunuzu sanıyor",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube bu videonun yüklenmesini engelliyor. VPN kullanıyorsanız, VPN'i kapatıp bu sayfayı yeniden yüklemeyi deneyin.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Bu işe yaramazsa, videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izleyebilirsiniz.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "VPN kullanıyorsanız bu durum meydana gelebilir. VPN'i kapatmayı veya sunucu konumlarını değiştirmeyi ve bu sayfayı yeniden yüklemeyi deneyin.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Bu işe yaramazsa, oturum açmanız ve bu videoyu Duck Player'ın sunduğu ek gizlilik olmadan YouTube'da izlemeniz gerekir.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

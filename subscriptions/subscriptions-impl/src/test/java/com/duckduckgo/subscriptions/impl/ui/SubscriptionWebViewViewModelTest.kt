@@ -1,5 +1,6 @@
 package com.duckduckgo.subscriptions.impl.ui
 
+import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -8,6 +9,7 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -20,13 +22,13 @@ import com.duckduckgo.subscriptions.impl.PrivacyProFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionOffer
 import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_FREE_TRIAL_OFFER_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialExperimentDataStore
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -51,6 +53,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
+@SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
 class SubscriptionWebViewViewModelTest {
     @get:Rule
@@ -62,8 +65,8 @@ class SubscriptionWebViewViewModelTest {
     private val networkProtectionAccessState: NetworkProtectionAccessState = mock()
     private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val mockSubscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle = mock()
     private val privacyProFeature = FakeFeatureToggleFactory.create(PrivacyProFeature::class.java, FakeToggleStore())
-    private val freeTrialExperimentDataStore: FreeTrialExperimentDataStore = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -77,7 +80,7 @@ class SubscriptionWebViewViewModelTest {
             networkProtectionAccessState,
             pixelSender,
             privacyProFeature,
-            freeTrialExperimentDataStore,
+            mockSubscriptionRebrandingFeatureToggle,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -99,7 +102,7 @@ class SubscriptionWebViewViewModelTest {
             assertEquals(Companion.PURCHASE_COMPLETED_FEATURE_NAME, (success as Success).subscriptionEventData.featureName)
             assertEquals(Companion.PURCHASE_COMPLETED_SUBSCRIPTION_NAME, success.subscriptionEventData.subscriptionName)
             assertNotNull(success.subscriptionEventData.params)
-            assertEquals("completed", success.subscriptionEventData.params!!.getString("type"))
+            assertEquals("completed", success.subscriptionEventData.params.getString("type"))
 
             flowTest.emit(CurrentPurchase.InProgress)
             assertTrue(awaitItem().purchaseState is PurchaseStateView.InProgress)
@@ -295,6 +298,112 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun givenFreeTrialAvailableWhenGetSubscriptionOptionsThenSendCommandWithFreeTrialOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$1", billingPeriod = "P1M"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(true)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = jsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+            assertEquals(MONTHLY_FREE_TRIAL_OFFER_US, params?.options?.last()?.offer?.id)
+            assertEquals(YEARLY_FREE_TRIAL_OFFER_US, params?.options?.first()?.offer?.id)
+        }
+    }
+
+    @Test
+    fun givenFreeTrialAvailableWhenGetSubscriptionOptionsAndUserIsNotFreeTrialEligibleThenSendCommandWithoutFreeTrialOffers() = runTest {
+        val testSubscriptionOfferList = listOf(
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$1", billingPeriod = "P1M")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = null,
+                pricingPhases = listOf(PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y")),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = MONTHLY_PLAN_US,
+                offerId = MONTHLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$1", billingPeriod = "P1M"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+            SubscriptionOffer(
+                planId = YEARLY_PLAN_US,
+                offerId = YEARLY_FREE_TRIAL_OFFER_US,
+                pricingPhases = listOf(
+                    PricingPhase(formattedPrice = "$10", billingPeriod = "P1Y"),
+                    PricingPhase(formattedPrice = "Free", billingPeriod = "P1W"),
+                ),
+                features = setOf(SubscriptionsConstants.NETP),
+            ),
+        )
+        whenever(subscriptionsManager.getSubscriptionOffer()).thenReturn(testSubscriptionOfferList)
+        whenever(subscriptionsManager.isFreeTrialEligible()).thenReturn(false)
+        privacyProFeature.allowPurchase().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionOptions", "id", JSONObject("{}"))
+            val result = awaitItem()
+            assertTrue(result is Command.SendResponseToJs)
+            val response = (result as Command.SendResponseToJs).data
+
+            val params = jsonAdapter.fromJson(response.params.toString())
+            assertEquals("id", response.id)
+            assertEquals("test", response.featureName)
+            assertEquals("getSubscriptionOptions", response.method)
+            assertEquals(null, params?.options?.last()?.offer)
+            assertEquals(null, params?.options?.first()?.offer)
+        }
+    }
+
+    @Test
     fun whenActivateSubscriptionAndSubscriptionActiveThenNoCommandSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
         viewModel.commands().test {
@@ -377,6 +486,20 @@ class SubscriptionWebViewViewModelTest {
                 JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
             )
             assertTrue(awaitItem() is Command.GoToPIR)
+        }
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiThenCommandSent() = runTest {
+        givenSubscriptionStatus(EXPIRED)
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "test",
+                "featureSelected",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+            )
+            assertTrue(awaitItem() is Command.GoToDuckAI)
         }
     }
 
@@ -516,6 +639,34 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiAndInPurchaseFlowThenPixelIsSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
+        viewModel.start()
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+        )
+        verify(pixelSender).reportOnboardingDuckAiClick()
+    }
+
+    @Test
+    fun whenFeatureSelectedAndFeatureIsDuckAiAndNotInPurchaseFlowThenPixelIsNotSent() = runTest {
+        givenSubscriptionStatus(AUTO_RENEWABLE)
+
+        viewModel.processJsCallbackMessage(
+            featureName = "test",
+            method = "featureSelected",
+            id = null,
+            data = JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+        )
+        verifyNoInteractions(pixelSender)
+    }
+
+    @Test
     fun whenSubscriptionsWelcomeFaqClickedAndInPurchaseFlowThenPixelIsSent() = runTest {
         givenSubscriptionStatus(AUTO_RENEWABLE)
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowOf(CurrentPurchase.Success))
@@ -552,7 +703,7 @@ class SubscriptionWebViewViewModelTest {
         viewModel.commands().test {
             viewModel.onSubscriptionRestored()
             val result = awaitItem()
-            assertTrue(result is BackToSettings)
+            assertTrue(result is Command.BackToSettings)
         }
     }
 

@@ -69,7 +69,7 @@ class RealPrivacyConfigDownloaderTest {
                 pixel,
             )
         assertTrue(testee.download() is Error)
-        verify(pixel).fire("m_privacy_config_download_error")
+        verify(pixel).fire("m_privacy_config_download_error", mapOf("code" to "unknown", "message" to "unknown"))
     }
 
     @Test

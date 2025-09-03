@@ -51,8 +51,7 @@ tags:
           id: daxDialogDismissButton
       - assertNotVisible:
           text: ".*Remember: every time you browse with me a creepy ad loses its wings..*"
-      - tapOn:
-          id: "com.duckduckgo.mobile.android:id/tabCount"
+      - runFlow: ../shared/browser_screen/click_on_tabs_button.yaml
       - tapOn: "New Tab"
       - assertVisible:
-          text: ".*Try our search widget!.*"
+          text: ".*Try our Home screen widget!.*"

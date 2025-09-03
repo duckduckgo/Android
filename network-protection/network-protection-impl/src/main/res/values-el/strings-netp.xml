@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">Διακομιστής DNS</string>
     <string name="netpPrivateDns">Ιδιωτικό DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Αποκλεισμός επικίνδυνων τομέων)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Πρόγραμμα αποκλεισμού απάτης)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Συνιστάται)</string>
     <string name="netpCustomDnsCustom">Προσαρμογή</string>
     <string name="netpCustomDnsInputAddressHint">Διεύθυνση IPv4</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">Το DuckDuckGo δρομολογεί τα ερωτήματα DNS μέσω των διακομιστών DNS μας, ώστε ο πάροχος διαδικτύου σας να μην μπορεί να δει ποιους ιστότοπους επισκέπτεστε.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Αποκλεισμός και φιλτράρισμα περιεχομένου</string>
-    <string name="netpDnsBlockMalwarePrimary">Αποκλεισμός επικίνδυνων τομέων</string>
+    <string name="netpDnsBlockMalwareHeader">Αποκλεισμός κακόβουλου περιεχομένου</string>
+    <string name="netpDnsBlockMalwarePrimary">Πρόγραμμα αποκλεισμού απάτης</string>
     <string name="netpDnsBlockMalwareByline">Αποκλείστε περισσότερους από 150.000 τομείς που έχουν επισημανθεί για φιλοξενία κακόβουλου λογισμικού, επιθέσεις ηλεκτρονικού ψαρέματος και διαδικτυακές απάτες, με μια λίστα αποκλεισμού σε επίπεδο DNS. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Λίστες αποκλεισμού DNS</string>
 
@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Εξαιρέστε αυτόματα εφαρμογές που δεν είναι συμβατές με VPN</string>
     <string name="netpExclusionListLabelAutoExclude">Μη συμβατό με VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Κάποιες εφαρμογές, όπως οι τραπεζικές ή οι εφαρμογές streaming, δεν λειτουργούν καλά με VPN. Όταν έχει ενεργοποιηθεί η ρύθμιση αυτή, θα εξαιρούμε αυτόματα τις εφαρμογές αυτές.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">Το VPN αποσυνδέθηκε λόγω λήξης της συνδρομής. Εγγραφείτε στο DuckDuckGo για να συνδέσετε εκ νέου το VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Εγγραφείτε στο DuckDuckGo για να συνδέσετε εκ νέου το VPN.</string>
 </resources>

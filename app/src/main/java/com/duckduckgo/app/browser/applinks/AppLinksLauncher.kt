@@ -28,7 +28,9 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.AppLink
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 interface AppLinksLauncher {
     fun openAppLink(context: Context?, appLink: AppLink, viewModel: BrowserTabViewModel)
@@ -65,7 +67,7 @@ class DuckDuckGoAppLinksLauncher @Inject constructor() : AppLinksLauncher {
         try {
             context.startActivity(intent)
         } catch (exception: ActivityNotFoundException) {
-            Timber.e(exception, "Activity not found")
+            logcat(ERROR) { "Activity not found: ${exception.asLog()}" }
         } catch (exception: SecurityException) {
             showToast(context, R.string.unableToOpenLink)
         }

@@ -22,10 +22,10 @@ import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_DEV_ENVIRONMENT_URL
 import com.duckduckgo.sync.impl.SyncService.Companion.SYNC_PROD_ENVIRONMENT_URL
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
+import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
-import timber.log.Timber
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -42,7 +42,7 @@ class SyncInternalEnvInterceptor @Inject constructor(
             val newRequest = chain.request().newBuilder()
 
             val changedUrl = chain.request().url.toString().replace(SYNC_PROD_ENVIRONMENT_URL, SYNC_DEV_ENVIRONMENT_URL)
-            Timber.d("Sync-Engine: environment changed to $changedUrl")
+            logcat { "Sync-Engine: environment changed to $changedUrl" }
             newRequest.url(changedUrl)
             return chain.proceed(newRequest.build())
         }

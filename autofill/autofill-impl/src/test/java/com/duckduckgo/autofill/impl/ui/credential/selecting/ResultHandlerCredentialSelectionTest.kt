@@ -17,6 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.selecting
 
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -52,6 +53,7 @@ class ResultHandlerCredentialSelectionTest {
     private lateinit var deviceAuthenticator: FakeAuthenticator
     private lateinit var testee: ResultHandlerCredentialSelection
     private val autofillStore: InternalAutofillStore = mock()
+    private val webView: WebView = mock()
 
     @Before
     fun setup() = runTest {
@@ -68,7 +70,7 @@ class ResultHandlerCredentialSelectionTest {
     fun whenUserRejectedToUseCredentialThenCorrectCallbackInvoked() = runTest {
         configureSuccessfulAuth()
         val bundle = bundleForUserCancelling("example.com")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback).onNoCredentialsChosenForAutofill("example.com")
     }
 
@@ -76,7 +78,7 @@ class ResultHandlerCredentialSelectionTest {
     fun whenUserAcceptedToUseCredentialsAndSuccessfullyAuthenticatedThenCorrectCallbackInvoked() = runTest {
         configureSuccessfulAuth()
         val bundle = bundleForUserAcceptingToAutofill("example.com")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback).onShareCredentialsForAutofill("example.com", aLogin())
     }
 
@@ -84,7 +86,7 @@ class ResultHandlerCredentialSelectionTest {
     fun whenUserAcceptedToUseCredentialsAndCancelsAuthenticationThenCorrectCallbackInvoked() = runTest {
         configureCancelledAuth()
         val bundle = bundleForUserAcceptingToAutofill("example.com")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback).onNoCredentialsChosenForAutofill("example.com")
     }
 
@@ -92,7 +94,7 @@ class ResultHandlerCredentialSelectionTest {
     fun whenUserAcceptedToUseCredentialsAndAuthenticationFailsThenCorrectCallbackInvoked() = runTest {
         configureFailedAuth()
         val bundle = bundleForUserAcceptingToAutofill("example.com")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verify(callback).onNoCredentialsChosenForAutofill("example.com")
     }
 
@@ -100,7 +102,7 @@ class ResultHandlerCredentialSelectionTest {
     fun whenUserAcceptedToUseCredentialsButMissingInBundleThenNoCallbackInvoked() = runTest {
         configureSuccessfulAuth()
         val bundle = bundleMissingCredentials("example.com")
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verifyNoInteractions(callback)
     }
 
@@ -108,7 +110,7 @@ class ResultHandlerCredentialSelectionTest {
     fun whenMissingUrlThenNoCallbackInvoked() = runTest {
         configureSuccessfulAuth()
         val bundle = bundleMissingUrl()
-        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback)
+        testee.processResult(bundle, context, "tab-id-123", Fragment(), callback, webView)
         verifyNoInteractions(callback)
     }
 

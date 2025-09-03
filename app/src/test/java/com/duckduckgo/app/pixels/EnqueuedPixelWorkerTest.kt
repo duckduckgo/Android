@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.fire.UnsentForgetAllPixelStore
 import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.customtabs.api.CustomTabDetector
@@ -49,6 +50,7 @@ class EnqueuedPixelWorkerTest {
     private val androidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
+    private val appBuildConfig: AppBuildConfig = mock()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
 
@@ -64,6 +66,7 @@ class EnqueuedPixelWorkerTest {
             androidBrowserConfigFeature,
             privacyProtectionsPopupExperimentExternalPixels,
             isVerifiedPlayStoreInstall,
+            appBuildConfig,
             coroutineRule.testScope,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
@@ -114,7 +117,65 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
             ),
+        )
+    }
+
+    @Test
+    fun whenAppLaunchWithOurProductionAppPackageThenIsFlaggedAsOurApp() {
+        whenever(appBuildConfig.applicationId).thenReturn("com.duckduckgo.mobile.android")
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        val expectedParameters = mapOf(
+            Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "true",
+        )
+
+        verify(pixel).fire(
+            eq(AppPixelName.APP_LAUNCH),
+            argThat { this.entries.containsAll(expectedParameters.entries) },
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenAppLaunchWithOurDebugAppPackageThenIsFlaggedAsOurApp() {
+        whenever(appBuildConfig.applicationId).thenReturn("com.duckduckgo.mobile.android.debug")
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        val expectedParameters = mapOf(
+            Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "true",
+        )
+
+        verify(pixel).fire(
+            eq(AppPixelName.APP_LAUNCH),
+            argThat { this.entries.containsAll(expectedParameters.entries) },
+            any(),
+            any(),
+        )
+    }
+
+    @Test
+    fun whenAppLaunchWithADifferentAppPackageThenIsFlaggedAsNotOurApp() {
+        whenever(appBuildConfig.applicationId).thenReturn("not.our.app.package")
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        val expectedParameters = mapOf(
+            Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
+        )
+
+        verify(pixel).fire(
+            eq(AppPixelName.APP_LAUNCH),
+            argThat { this.entries.containsAll(expectedParameters.entries) },
+            any(),
+            any(),
         )
     }
 
@@ -133,6 +194,7 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "true",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
             ),
         )
     }
@@ -153,6 +215,7 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
                 Pixel.PixelParameter.WEBVIEW_FULL_VERSION to "91.0.4472.101",
             ),
         )
@@ -174,6 +237,7 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
             ),
         )
         verify(webViewVersionProvider, never()).getFullVersion()
@@ -195,6 +259,7 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
             ),
         )
     }
@@ -214,6 +279,7 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+                Pixel.PixelParameter.IS_DUCKDUCKGO_PACKAGE to "false",
                 "test_key" to "test_value",
             ),
         )

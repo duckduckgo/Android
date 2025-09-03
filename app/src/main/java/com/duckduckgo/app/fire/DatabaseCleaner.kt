@@ -20,7 +20,9 @@ import android.database.sqlite.SQLiteDatabase
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 interface DatabaseCleaner {
     suspend fun cleanDatabase(databasePath: String): Boolean
@@ -49,7 +51,7 @@ class DatabaseCleanerHelper(private val dispatcherProvider: DispatcherProvider =
                         db.rawQuery(command, null).use { cursor -> cursor.moveToFirst() }
                         commandExecuted = true
                     } catch (exception: Exception) {
-                        Timber.e(exception)
+                        logcat(ERROR) { exception.asLog() }
                     }
                 }
                 return@withContext commandExecuted

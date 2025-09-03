@@ -21,7 +21,6 @@ import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarViewMo
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -36,9 +35,6 @@ class BrowserNavigationBarViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     @Mock
-    private lateinit var visualDesignExperimentDataStoreMock: VisualDesignExperimentDataStore
-
-    @Mock
     private lateinit var tabRepositoryMock: TabRepository
 
     @Mock
@@ -51,7 +47,6 @@ class BrowserNavigationBarViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         testee = BrowserNavigationBarViewModel(
-            visualDesignExperimentDataStore = visualDesignExperimentDataStoreMock,
             tabRepository = tabRepositoryMock,
             pixel = pixelMock,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,

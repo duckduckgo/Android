@@ -59,4 +59,7 @@
     <string name="searchbar_searchhint_default" translatable="false">Search</string>
     <string name="searchbar_upaction_content_description_default" translatable="false">Navigate up</string>
 
+    <!-- Duck.ai updates - O-A -->
+    <string name="duckAIUpdateTitle">Duck.ai PoC</string>
+    <string name="duckAIUpdateMessage">This feature is in active development, intended for feedback purposes.</string>
 </resources>

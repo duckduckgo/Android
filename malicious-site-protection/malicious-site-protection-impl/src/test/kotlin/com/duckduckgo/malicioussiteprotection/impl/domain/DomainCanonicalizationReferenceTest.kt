@@ -19,12 +19,16 @@ package com.duckduckgo.malicioussiteprotection.impl.domain
 import androidx.core.net.toUri
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.utils.domain
+import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionRCFeature
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -49,8 +53,15 @@ class DomainCanonicalizationReferenceTest(private val testCase: TestCase) {
 
     @get:org.junit.Rule
     var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
+    private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
 
-    private val testee = RealUrlCanonicalization()
+    private lateinit var testee: RealUrlCanonicalization
+
+    @Before
+    fun setup() {
+        whenever(mockMaliciousSiteProtectionRCFeature.stripWWWPrefix()).thenReturn(true)
+        testee = RealUrlCanonicalization(mockMaliciousSiteProtectionRCFeature)
+    }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {

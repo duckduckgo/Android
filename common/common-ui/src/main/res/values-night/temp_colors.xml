@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <color name="buckColorPrimaryText">@color/white</color>
+
+    <color name="buckColorButtonPrimaryContainer">#FFDF80</color>
+    <color name="buckColorButtonPrimaryContainerPressed">#CCAA00</color>
+    <color name="buckColorButtonPrimaryText">@color/black</color>
+
+    <color name="buckColorButtonSecondaryBorder">#074C89</color>
+    <color name="buckColorButtonSecondaryText">@color/white</color>
+    <color name="buckColorButtonSecondaryContainerPressed">#0267C1</color>
+
+    <color name="buckColorButtonFAB">#042E50</color>
+    <color name="buckColorComparisonChartItemBackground">#1AFFFFFF</color>
+
+    <color name="buckColorComparisonChartCheckIcon">#00DE4E</color>
+    <color name="buckColorComparisonChartCrossIcon">#888888</color>
+    <color name="buckColorComparisonChartSearchIcon">#68C5FF</color>
+    <color name="buckColorComparisonChartShieldIcon">#FFFFFF</color>
+    <color name="buckColorComparisonChartCookieIcon">#68C5FF</color>
+    <color name="buckColorComparisonChartBlockIcon">#FFFFFF</color>
+    <color name="buckColorComparisonChartFireIcon">#68C5FF</color>
+
+    <color name="buckColorPreonboardingOptionBackground">#260D7BDE</color>
+    <color name="buckColorPreonboardingOptionBackgroundSelected">#B2FFFFFF</color>
+    <color name="buckColorPreonboardingOptionIcon">@color/white18</color>
+    <color name="buckColorPreonboardingOptionIconSelected">#252A38</color>
+
+    <color name="buckColorCheckBoxCheckedBackground">#0D7BDE</color>
+    <color name="buckColorCheckBoxCheckedIcon">@color/white</color>
+    <color name="buckColorCheckBoxUncheckedBackground">@color/white3</color>
+    <color name="buckColorCheckBoxUncheckedOutline">@color/white18</color>
+
+    <color name="bbSurfaceColor">#161615</color>
+
+    <color name="bbColorPrimaryText">#EDEDEC</color>
+    <color name="bbColorSecondaryText">#A1A09A</color>
+
+    <color name="bbColorButtonSecondaryText">#EDEDEC</color>
+    <color name="bbColorButtonOptionPressed">@color/white12</color>
+
+    <color name="bbColorButtonOptionContainer">#232320</color>
+    <color name="bbColorButtonOptionText">#EDEDEC</color>
+
+    <color name="bbColorButtonFAB">#272727</color>
+
+    <color name="bbFeatherOutline">#EDEDEC</color>
+    <color name="bbFeatherFill">#5D6167</color>
+    <color name="bbFeatherWhisps">#656871</color>
+
+    <color name="bbColorComparisonChartItemBackground">#242423</color>
+    <color name="bbColorComparisonChartDivider">#2E2E2B</color>
+    <color name="bbColorComparisonChartCrossIcon">#7B7B7B</color>
+
+    <color name="bbColorPreonboardingOptionOutline">#2E2E2B</color>
+    <color name="bbColorPreonboardingOptionOutlineSelected">#802373D5</color>
+    <color name="bbColorPreonboardingOptionBackground">#00000000</color>
+    <color name="bbColorPreonboardingOptionBackgroundSelected">#3B6FA3E6</color>
+    <color name="bbColorPreonboardingOptionIconSelected">#4E9EFF</color>
+    <color name="bbColorPreonboardingOptionIcon">#EDEDEC</color>
+
+</resources>

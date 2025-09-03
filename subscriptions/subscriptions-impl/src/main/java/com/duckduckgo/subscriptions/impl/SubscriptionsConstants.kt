@@ -31,6 +31,10 @@ object SubscriptionsConstants {
     // List of offers
     const val MONTHLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-monthly-renews-us"
     const val YEARLY_FREE_TRIAL_OFFER_US = "ddg-privacy-pro-freetrial-yearly-renews-us"
+    const val MONTHLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-monthly-renews-row"
+    const val YEARLY_FREE_TRIAL_OFFER_ROW = "ddg-privacy-pro-freetrial-yearly-renews-row"
+    val LIST_OF_FREE_TRIAL_OFFERS =
+        listOf(MONTHLY_FREE_TRIAL_OFFER_US, YEARLY_FREE_TRIAL_OFFER_US, MONTHLY_FREE_TRIAL_OFFER_ROW, YEARLY_FREE_TRIAL_OFFER_ROW)
 
     // List of features
     const val LEGACY_FE_NETP = "vpn"
@@ -41,6 +45,7 @@ object SubscriptionsConstants {
     const val ITR = "Identity Theft Restoration"
     const val ROW_ITR = "Global Identity Theft Restoration"
     const val PIR = "Data Broker Protection"
+    const val DUCK_AI = "Duck.ai"
 
     // Platform
     const val PLATFORM = "android"
@@ -50,10 +55,10 @@ object SubscriptionsConstants {
     const val YEARLY = "Yearly"
 
     // URLs
-    const val BUY_URL = "https://duckduckgo.com/subscriptions"
-    const val ACTIVATE_URL = "https://duckduckgo.com/subscriptions/activation-flow"
     const val ITR_URL = "https://duckduckgo.com/identity-theft-restoration"
     const val FAQS_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/"
     const val PRIVACY_PRO_ETLD = "duckduckgo.com"
+    const val FEATURE_PAGE_QUERY_PARAM_KEY = "featurePage"
     const val PRIVACY_PRO_PATH = "pro"
+    const val PRIVACY_SUBSCRIPTIONS_PATH = "subscriptions"
 }

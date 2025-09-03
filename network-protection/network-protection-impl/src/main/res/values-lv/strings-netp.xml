@@ -223,7 +223,7 @@
     <string name="netpCustomDnsSettingText">DNS serveris</string>
     <string name="netpPrivateDns">Privātais DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (bloķēt riskantus domēnus)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Krāpniecības bloķētājs)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (ieteicams)</string>
     <string name="netpCustomDnsCustom">Paraža</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 adrese</string>
@@ -234,8 +234,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo maršrutē DNS vaicājumus caur mūsu DNS serveriem, lai tavs interneta pakalpojumu sniedzējs neredzētu, kādas vietnes tu apmeklē.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Satura bloķēšana un filtrēšana</string>
-    <string name="netpDnsBlockMalwarePrimary">Bloķēt riskantos domēnus</string>
+    <string name="netpDnsBlockMalwareHeader">Ļaunprātīga satura bloķēšana</string>
+    <string name="netpDnsBlockMalwarePrimary">Krāpniecības bloķētājs</string>
     <string name="netpDnsBlockMalwareByline">Bloķē vairāk nekā 150 000 domēnu, kas atzīmēti kā ļaunprātīgas programmatūras, pikšķerēšanas uzbrukumu un tiešsaistes krāpšanas vietnes, izmantojot DNS līmeņa bloķēšanas sarakstu. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS bloķēšanas saraksti</string>
 
@@ -260,4 +260,8 @@
     <string name="netpAutoExcludeToggleName">Automātiski izslēdz lietotnes, kas nav saderīgas ar VPN.</string>
     <string name="netpExclusionListLabelAutoExclude">Nesaderīgs ar VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Dažas lietotnes, piemēram, banku vai straumēšanas lietotnes, nedarbojas labi ar VPN. Kad šis iestatījums ir ieslēgts, mēs automātiski izslēgsim šādas lietotnes.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN atvienots, jo ir beidzies abonements. Abonē DuckDuckGo, lai atkārtoti izveidotu savienojumu ar VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonē DuckDuckGo, lai atkārtoti izveidotu savienojumu ar VPN.</string>
 </resources>

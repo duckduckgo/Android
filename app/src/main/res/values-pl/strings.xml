@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Wygląd</string>
+    <string name="settingsShowFullUrlTitle">Pokaż pełny adres witryny internetowej</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Zapisz</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Domyślnie szukaj prywatnie</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj mechanizmy śledzące innych firm</string>
     <string name="preOnboardingComparisonChartItem3">Blokuj wyskakujące okienka z informacją o plikach cookie</string>
-    <string name="preOnboardingComparisonChartItem4">Blokowanie śledzących reklam</string>
+    <string name="preOnboardingComparisonChartItem4">Blokowanie ukierunkowanych reklam</string>
     <string name="preOnboardingComparisonChartItem5">Usuwanie danych przeglądania za pomocą jednego przycisku</string>
     <string name="preOnboardingDaxDialog3Title">Fantastycznie! Witaj po Kaczej Stronie Mocy!</string>
     <string name="preOnboardingDaxDialog3Button">Rozpocznij przeglądanie</string>
@@ -828,8 +829,9 @@
     <string name="onboardingEndDaxDialogDescription">Pamiętaj: za każdym razem, gdy przeglądasz ze mną Internet, jakaś wstrętna reklama przestaje działać. 👌</string>
     <string name="onboardingEndDaxDialogButton">Wszystko gotowe!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Jeszcze jedno.</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ma także wbudowaną <b>sieć VPN</b>!<br/><br/>Aktywuj ją w <b>płatnej subskrypcji Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo obejmuje również bezpieczną <b>sieć VPN + 2 dodatkowe zabezpieczenia premium</b>, dostępne z <b>opcjonalną płatną subskrypcją</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Dowiedz się więcej</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Wypróbuj za darmo!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Pomiń</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,21 +876,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Dziękujemy! Twoje zgłoszenie pomoże ulepszyć DuckDuckGo u wszystkich użytkowników!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nowy AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Skorzystaj z DuckDuckGo, aby chronić swoją aktywność w Internecie</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Ustaw naszą przeglądarkę jako domyślną, aby wszystkie linki były otwierane w DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Nie teraz</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Zmień domyślną przeglądarkę, aby linki były otwierane w DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Nie teraz</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nie jest domyślną przeglądarką. Zapewnij sobie lepszą ochronę.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Ustaw jako domyślną</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Nie pytaj ponownie</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokuje skrypty śledzące, aby chronić Twoje przeglądanie</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Wyczyszczenie kart i danych spowoduje usunięcie historii blokowania mechanizmów śledzących i zresetowanie tej liczby do zera.\n\nUkryj ten baner, jeśli wolisz go nie widzieć w widoku kart.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ukryj baner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Ostrzeżenie: ta witryna może stanowić zagrożenie dla bezpieczeństwa</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Ta strona została zablokowana przez DuckDuckGo, ponieważ może rozpowszechniać złośliwe oprogramowanie, którego celem jest naruszenie bezpieczeństwa urządzenia lub kradzież danych osobowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Ta witryna może podszywać się pod legalną witrynę w celu nakłonienia użytkownika do podania danych osobowych, takich jak hasła lub numery kart kredytowych.\n<a href=\"\">Dowiedz się więcej</a>]]></string>
@@ -903,5 +906,57 @@
     <string name="maliciousSiteToggleHint">Ostrzegaj mnie przed witrynami oznaczonymi jako wyłudzanie informacji lub złośliwe oprogramowanie</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Dowiedz się więcej</annotation></string>
     <string name="maliciousSiteSettingDisabled">Wyłączenie tej funkcji może narazić Twoje dane na ryzyko.</string>
+    <string name="threatProtectionTitle">Ochrona przed zagrożeniami</string>
+    <string name="threatProtectionDescription">Ulepszone mechanizmy ochrony dostępne w DuckDuckGo blokują typowe zagrożenia, a jednocześnie zapewniają bezpieczeństwo połączenia.</string>
+    <string name="smarterEncryptionTitle">Inteligentniejsze szyfrowanie</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatycznie aktualizuje łącza do protokołu HTTPS, jeśli to możliwe.<br><a href=\"\">Dowiedz się więcej</a>]]></string>
+    <string name="scamBlockerTitle">Blokowanie oszustw</string>
+    <string name="scamBlockerDescription">Ostrzegaj przed witrynami oznaczonymi z powodu oszustw, wyłudzania informacji i złośliwego oprogramowania.</string>
+    <string name="threatProtectionLearnMoreTitle">Dowiedz się więcej</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Wypróbuj nasz widżet ekranu głównego!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Dodaj widżet naszej wyszukiwarki do ekranu głównego, aby mieć do niej szybki i łatwy dostęp.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Dodaj widżet</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Nie teraz</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Szukaj w DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widżet ekranu głównego</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Dokończ swoją konfigurację</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Cześć!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ochrona</b> <i>aktywowana!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Cześć.<br/>Chcesz skorzystać z szybszej przeglądarki, która zapewni Ci ochronę?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Natychmiast wyczyść swoją aktywność związaną z przeglądaniem za pomocą przycisku <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Spróbuj!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ i %1$d inny element próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="few"><![CDATA[ i %1$d inne elementy próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="many"><![CDATA[ i %1$d innych elementów próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="other"><![CDATA[ i %1$d innego elementu próbowało Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ element próbował Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem go!</font>]]></item>
+        <item quantity="few"><![CDATA[ elementy próbowały Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="many"><![CDATA[ elementów próbowało Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+        <item quantity="other"><![CDATA[ elementu próbowało Cię tu śledzić. <font color=\"#F05C2B\">Zablokowałem je!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Dotknij tarczy, aby uzyskać więcej informacji.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Dziękujemy za przejście na stronę Duck!\n\nDuckDuckGo to niezależna firma oferująca ochronę w Internecie użytkownikom, którzy chcą odzyskać kontrolę nad swoimi danymi osobowymi.\n\nWierzymy, że najlepszym sposobem ochrony Twoich danych osobowych przed hakerami, oszustami i firmami naruszającymi prywatność jest zapobieganie ich gromadzeniu. Dlatego miliony ludzi <annotation type="chart_comparison">wybierają DuckDuckGo zamiast Chrome i innych przeglądarek</annotation> do wyszukiwania i przeglądania w Internecie. Nasza wbudowana wyszukiwarka jest jak Google, ale nigdy nie śledzi Twoich wyszukiwań. Nasze zabezpieczenia przeglądania, takie jak blokowanie mechanizmów śledzących reklam i blokowanie plików cookie, pomagają powstrzymać inne firmy przed gromadzeniem Twoich danych. Nasza przeglądarka jest bezpłatna — zarabiamy na <annotation type="privacy_respecting_ads">reklamach szanujących prywatność</annotation>, a nie na wykorzystywaniu danych użytkowników.\n\nDodatkowo oferujemy również <annotation type="ppro_help_page">subskrypcję DuckDuckGo</annotation> zintegrowaną z naszą przeglądarką. Subskrybenci otrzymują jeszcze większą ochronę prywatności dzięki szybkiej i prostej w obsłudze sieci <annotation type="vpn_help_page">VPN,</annotation> która pomaga zabezpieczyć aktywność w Internecie, dostępowi do zaawansowanych modeli sztucznej inteligencji w prywatnej usłudze czatu AI Duck.ai, usłudze, która wyszukuje i usuwa dane osobowe użytkownika z witryn wyszukiwania osób oraz usłudze, która przywraca tożsamość w przypadku jej kradzieży.\n\nOdzyskaj kontrolę nad swoimi danymi osobowymi dzięki przeglądarce zaprojektowanej do ochrony danych, a nie ich gromadzenia.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo oferuje również <b>opcjonalną płatną subskrypcję</b> z bezpieczną <b>siecią VPN</b> i <b>zaawansowaną, prywatną sztuczną inteligencją</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Funkcje AI</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

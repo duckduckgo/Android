@@ -22,6 +22,7 @@ import com.duckduckgo.downloads.api.DownloadFailReason.ConnectionRefused
 import com.duckduckgo.downloads.api.DownloadFailReason.Other
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
+import com.duckduckgo.downloads.impl.feature.FileDownloadFeature
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
 import java.io.File
 import javax.inject.Inject
@@ -38,6 +39,7 @@ class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
     private val cookieManagerWrapper: CookieManagerWrapper,
+    private val fileDownloadFeature: FileDownloadFeature,
 ) {
 
     @WorkerThread
@@ -50,7 +52,7 @@ class UrlFileDownloader @Inject constructor(
         val directory = pendingFileDownload.directory
         val call = downloadFileService.downloadFile(
             urlString = url,
-            cookie = cookieManagerWrapper.getCookie(url).orEmpty(),
+            cookie = cookieManagerWrapper.getCookie(url).handleNull(),
         )
         val downloadId = Random.nextLong()
         urlFileDownloadCallManager.add(downloadId, call)
@@ -155,6 +157,17 @@ class UrlFileDownloader @Inject constructor(
         if (!this.exists()) this.mkdirs()
         if (!file.exists()) file.createNewFile()
         return file
+    }
+
+    private fun String?.handleNull(): String? {
+        if (this != null) return this
+
+        // if there are no cookies, we omit sending the cookie header when ff is enabled
+        return if (fileDownloadFeature.omitEmptyCookieHeader().isEnabled()) {
+            null
+        } else {
+            "" // legacy behavior, we send an empty cookie header
+        }
     }
 
     /**

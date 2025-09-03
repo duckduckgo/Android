@@ -28,7 +28,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class EngagementPasswordAddedListener @Inject constructor(
@@ -42,14 +43,14 @@ class EngagementPasswordAddedListener @Inject constructor(
     private var credentialAdded = false
 
     @Synchronized
-    override fun onCredentialAdded(id: Long) {
+    override fun onCredentialAdded(newCredentialIds: List<Long>) {
         if (credentialAdded) return
 
         credentialAdded = true
 
         appCoroutineScope.launch(dispatchers.io()) {
             val daysInstalled = userBrowserProperties.daysSinceInstalled()
-            Timber.v("onCredentialAdded. daysInstalled: $daysInstalled")
+            logcat(VERBOSE) { "onCredentialAdded. daysInstalled: $daysInstalled" }
             if (daysInstalled < 7) {
                 pixel.fire(AutofillPixelNames.AUTOFILL_ENGAGEMENT_ONBOARDED_USER, type = Unique())
             }

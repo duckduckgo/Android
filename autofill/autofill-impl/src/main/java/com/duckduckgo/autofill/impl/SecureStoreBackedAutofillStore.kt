@@ -46,7 +46,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @SingleInstanceIn(AppScope::class)
 @ContributesBinding(AppScope::class, AutofillDeclineStore::class)
@@ -81,24 +84,58 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             autofillPrefsStore.hasEverBeenPromptedToSaveLogin = value
         }
 
+    override var hasEverImportedPasswords: Boolean
+        get() = autofillPrefsStore.hasEverImportedPasswords
+        set(value) {
+            autofillPrefsStore.hasEverImportedPasswords = value
+        }
+
+    override fun hasEverImportedPasswordsFlow(): Flow<Boolean> {
+        return autofillPrefsStore.hasEverImportedPasswordsFlow()
+    }
+
+    override var hasDismissedMainAppSettingsPromo: Boolean
+        get() = autofillPrefsStore.hasDismissedMainAppSettingsPromo
+        set(value) {
+            autofillPrefsStore.hasDismissedMainAppSettingsPromo = value
+        }
+
+    override var hasDeclinedPasswordManagementImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedPasswordManagementImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedPasswordManagementImportPromo = value
+        }
+
+    override var hasDeclinedInBrowserPasswordImportPromo: Boolean
+        get() = autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo
+        set(value) {
+            autofillPrefsStore.hasDeclinedInBrowserPasswordImportPromo = value
+        }
+
+    override var inBrowserImportPromoShownCount: Int
+        get() = autofillPrefsStore.inBrowserImportPromoShownCount
+        set(value) {
+            autofillPrefsStore.inBrowserImportPromoShownCount = value
+        }
+
     override var autofillDeclineCount: Int
         get() = autofillPrefsStore.autofillDeclineCount
         set(value) {
-            Timber.i("Autofill: Setting autofillDeclineCount to %d", value)
+            logcat(INFO) { "Autofill: Setting autofillDeclineCount to $value" }
             autofillPrefsStore.autofillDeclineCount = value
         }
 
     override var monitorDeclineCounts: Boolean
         get() = autofillPrefsStore.monitorDeclineCounts
         set(value) {
-            Timber.i("Autofill: Setting monitorDeclineCounts to %b", value)
+            logcat(INFO) { "Autofill: Setting monitorDeclineCounts to $value" }
             autofillPrefsStore.monitorDeclineCounts = value
         }
 
     override suspend fun getCredentials(rawUrl: String): List<LoginCredentials> {
         return withContext(dispatcherProvider.io()) {
             return@withContext if (autofillEnabled && autofillAvailable()) {
-                Timber.i("Querying secure store for stored credentials. rawUrl: %s", rawUrl)
+                logcat(INFO) { "Querying secure store for stored credentials. rawUrl: $rawUrl" }
 
                 val visitedSite = autofillUrlMatcher.extractUrlPartsForAutofill(rawUrl)
                 if (visitedSite.eTldPlus1 == null) return@withContext emptyList()
@@ -128,7 +165,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     ): LoginCredentials? {
         val url = autofillUrlMatcher.cleanRawUrl(rawUrl)
 
-        Timber.i("Saving login credentials for %s. username=%s", url, credentials.username)
+        logcat(INFO) { "Saving login credentials for $url. username=${credentials.username}" }
 
         val loginDetails = WebsiteLoginDetails(
             domain = url,
@@ -146,7 +183,8 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             secureStorage.addWebsiteLoginDetailsWithCredentials(webSiteLoginCredentials)?.toLoginCredentials().also {
                 syncCredentialsListener.onCredentialAdded(it?.id!!)
                 it.id?.let { newCredentialId ->
-                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(newCredentialId) }
+                    val credentialList = listOf(newCredentialId)
+                    passwordStoreEventListeners.forEach { listener -> listener.onCredentialAdded(credentialList) }
                 }
             }
         }
@@ -157,11 +195,11 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         credentials: LoginCredentials,
         updateType: CredentialUpdateType,
     ): LoginCredentials? {
-        Timber.v("Updating credentials. Update type: %s. for %s", updateType, rawUrl)
+        logcat(VERBOSE) { "Updating credentials. Update type: $updateType. for $rawUrl" }
 
         val url = getUrlToCompare(rawUrl)
         if (url == null) {
-            Timber.w("Cannot update credentials as URL to lookup is null")
+            logcat(WARN) { "Cannot update credentials as URL to lookup is null" }
             return null
         }
 
@@ -176,11 +214,11 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             ?.filter { filter(it) }
 
         if (matchingCredentials.isNullOrEmpty()) {
-            Timber.w("Cannot update credentials as no credentials were found for %s", url)
+            logcat(WARN) { "Cannot update credentials as no credentials were found for $url" }
             return null
         }
 
-        Timber.i("Updating %d saved login credentials for %s. username=%s", matchingCredentials.size, url, credentials.username)
+        logcat(INFO) { "Updating ${matchingCredentials.size} saved login credentials for $url. username=${credentials.username}" }
 
         var updatedCredentials: WebsiteLoginDetailsWithCredentials? = null
 
@@ -237,7 +275,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
         val savedCredentials = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull() ?: emptyList()
         val idsToDelete = savedCredentials.mapNotNull { it.details.id }
         secureStorage.deleteWebSiteLoginDetailsWithCredentials(idsToDelete)
-        Timber.i("Deleted %d credentials", idsToDelete.size)
+        logcat(INFO) { "Deleted ${idsToDelete.size} credentials" }
         syncCredentialsListener.onCredentialRemoved(idsToDelete)
         return savedCredentials.map { it.toLoginCredentials() }
     }
@@ -301,7 +339,7 @@ class SecureStoreBackedAutofillStore @Inject constructor(
             NoMatch
         }
 
-        Timber.v("Determined match type is %s", matchType.javaClass.simpleName)
+        logcat(VERBOSE) { "Determined match type is ${matchType.javaClass.simpleName}" }
         return matchType
     }
 
@@ -349,8 +387,9 @@ class SecureStoreBackedAutofillStore @Inject constructor(
     override suspend fun bulkInsert(credentials: List<LoginCredentials>): List<Long> {
         return withContext(dispatcherProvider.io()) {
             val mappedCredentials = credentials.map { it.prepareForBulkInsertion() }
-            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also {
-                syncCredentialsListener.onCredentialsAdded(it)
+            return@withContext secureStorage.addWebsiteLoginDetailsWithCredentials(mappedCredentials).also { credentialsAdded ->
+                syncCredentialsListener.onCredentialsAdded(credentialsAdded)
+                passwordStoreEventListeners.forEach { it.onCredentialAdded(credentialsAdded) }
             }
         }
     }

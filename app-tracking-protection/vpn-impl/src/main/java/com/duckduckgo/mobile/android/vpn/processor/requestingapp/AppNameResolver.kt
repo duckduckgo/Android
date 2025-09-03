@@ -17,7 +17,8 @@
 package com.duckduckgo.mobile.android.vpn.processor.requestingapp
 
 import android.content.pm.PackageManager
-import logcat.LogPriority
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 
@@ -60,7 +61,7 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
             val appName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(stripped, PackageManager.GET_META_DATA)) as String
             AppNameResolver.OriginatingApp(packageId, appName)
         } catch (e: PackageManager.NameNotFoundException) {
-            logcat(LogPriority.ERROR) { "Failed to find app name for: $stripped. ${e.message}" }
+            logcat(ERROR) { "Failed to find app name for: $stripped. ${e.asLog()}" }
             AppNameResolver.OriginatingApp(packageId, UNKNOWN)
         }
     }
@@ -71,12 +72,12 @@ internal class RealAppNameResolver(private val packageManager: PackageManager) :
         try {
             packages = packageManager.getPackagesForUid(uid)
         } catch (e: SecurityException) {
-            logcat(LogPriority.ERROR) { e.asLog() }
+            logcat(ERROR) { e.asLog() }
             return null
         }
 
         if (packages.isNullOrEmpty()) {
-            logcat(LogPriority.WARN) { "Failed to get package ID for UID: $uid" }
+            logcat(WARN) { "Failed to get package ID for UID: $uid" }
             return null
         }
 

@@ -23,6 +23,7 @@ import android.webkit.WebView
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
+import com.duckduckgo.app.browser.indexeddb.IndexedDBManager
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.weblocalstorage.WebLocalStorageManager
 import com.duckduckgo.app.global.file.FileDeleter
@@ -57,6 +58,7 @@ class WebViewDataManagerTest {
     private val mockFileDeleter: FileDeleter = mock()
     private val mockWebViewHttpAuthStore: WebViewHttpAuthStore = mock()
     private val mockWebLocalStorageManager: WebLocalStorageManager = mock()
+    private val mockIndexedDBManager: IndexedDBManager = mock()
     private val mockCrashLogger: CrashLogger = mock()
     private val mockAppBuildConfig: AppBuildConfig = mock()
     private val feature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
@@ -69,6 +71,7 @@ class WebViewDataManagerTest {
         mockWebViewHttpAuthStore,
         feature,
         mockWebLocalStorageManager,
+        mockIndexedDBManager,
         mockCrashLogger,
         TestScope(),
         CoroutineTestRule().testDispatcherProvider,
@@ -218,6 +221,57 @@ class WebViewDataManagerTest {
                 listOf("Cookies", "Local Storage"),
             )
             verify(mockWebLocalStorageManager).clearWebLocalStorage()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataAndIndexedDBFeatureDisabledThenDefaultContentsDeletedExceptCookies() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = false))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockFileDeleter).deleteContents(
+                File(context.applicationInfo.dataDir, "app_webview/Default"),
+                listOf("Cookies"),
+            )
+            verifyNoInteractions(mockIndexedDBManager)
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataAndIndexedDBFeatureEnabledThenDefaultContentsDeletedExceptCookiesAndIndexedDB() = runTest {
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockFileDeleter).deleteContents(
+                File(context.applicationInfo.dataDir, "app_webview/Default"),
+                listOf("Cookies", "IndexedDB"),
+            )
+            verify(mockIndexedDBManager).clearIndexedDB()
+        }
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenClearDataAndIndexedDBThrowsExceptionThenDefaultContentsDeletedExceptCookies() = runTest {
+        whenever(mockIndexedDBManager.clearIndexedDB()).thenThrow(RuntimeException())
+        withContext(Dispatchers.Main) {
+            feature.indexedDB().setRawStoredState(State(enable = true))
+            val webView = TestWebView(context)
+
+            testee.clearData(webView, mockStorage)
+
+            verify(mockFileDeleter).deleteContents(
+                File(context.applicationInfo.dataDir, "app_webview/Default"),
+                listOf("Cookies"),
+            )
         }
     }
 

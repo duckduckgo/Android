@@ -204,6 +204,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Vzhled</string>
+    <string name="settingsShowFullUrlTitle">Zobrazovat celou adresu webu</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Uložit</string>
@@ -785,7 +786,7 @@
     <string name="preOnboardingComparisonChartItem1">Soukromé vyhledávání ve výchozím nastavení</string>
     <string name="preOnboardingComparisonChartItem2">Blokuj trackery třetích stran</string>
     <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
-    <string name="preOnboardingComparisonChartItem4">Blokuj reklamy, které tě sledují</string>
+    <string name="preOnboardingComparisonChartItem4">Blokování cílených reklam</string>
     <string name="preOnboardingComparisonChartItem5">Vymaž údaje o prohlížení jedním tlačítkem</string>
     <string name="preOnboardingDaxDialog3Title">Bezva! Vítej v Kačerově.</string>
     <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
@@ -828,8 +829,9 @@
     <string name="onboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
     <string name="onboardingEndDaxDialogButton">Všechno je hotové!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Než to zapomenu...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má také integrovanou <b>VPN</b>!<br/><br/>Můžete ji aktivovat pomocí <b>placeného předplatného Privacy Pro.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo má taky bezpečnou <b>VPN a dvě další prémiové ochranné funkce</b>, které jsou dostupné v rámci <b>volitelného předplatného</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Více informací</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Vyzkoušej to zdarma!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Přeskočit</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -874,21 +876,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Děkujeme! Podrobnosti od tebe pomůžou zlepšit DuckDuckGo pro všechny!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nový AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Používej DuckDuckGo a získej větší ochranu při prohlížení internetu</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Nastav si nás jako výchozí prohlížeč, aby se všechny odkazy na stránky otevíraly v DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Teď ne</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Změň svůj výchozí prohlížeč, aby se odkazy otevíraly v DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Teď ne</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo není tvůj výchozí prohlížeč. Získej větší ochranu.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nastavit jako výchozí</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Už se znovu neptat</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">Služba DuckDuckGo blokuje trackery, aby tě chránila při prohlížení</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Vymazáním panelů a dat smažeš historii blokování trackerů a resetuješ údaj o nich na nulu.\n\nPokud tenhle banner v zobrazení panelů už nechceš vidět, můžeš ho skrýt.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Skrýt banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Pozor: Tahle stránka může představovat bezpečnostní riziko</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Služba DuckDuckGo tuhle stránku zablokovala, protože může šířit malware, jehož cílem je narušit zabezpečení zařízení nebo odcizit osobní údaje.\n<a href=\"\">Přečti si víc</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tahle webová stránka se může vydávat za legitimní web, aby tě přiměla k poskytnutí osobních údajů, jako jsou hesla nebo čísla kreditních karet.\n<a href=\"\">Přečti si víc</a>]]></string>
@@ -903,5 +906,57 @@
     <string name="maliciousSiteToggleHint">Chci upozornit na weby nahlášené kvůli phishingu nebo malwaru</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Další informace</annotation></string>
     <string name="maliciousSiteSettingDisabled">Vypnutím téhle funkce můžeš svoje údaje vystavit riziku.</string>
+    <string name="threatProtectionTitle">Ochrana proti hrozbám</string>
+    <string name="threatProtectionDescription">Vylepšená ochrana DuckDuckGo zastavuje běžné hrozby a zároveň chrání tvoje připojení.</string>
+    <string name="smarterEncryptionTitle">Chytřejší šifrování</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automaticky převede odkazy na HTTPS, pokud to jde.<br><a href=\"\">Další informace</a>]]></string>
+    <string name="scamBlockerTitle">Blokování podvodů</string>
+    <string name="scamBlockerDescription">Upozorní na weby nahlášené kvůli podvodům, phishingu a malwaru.</string>
+    <string name="threatProtectionLearnMoreTitle">Více informací</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Vyzkoušej náš widget na domovskou obrazovku!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Přidejte náš vyhledávací widget na domovskou obrazovku a získejte rychlý a snadný přístup.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Přidat widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Teď ne</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hledat DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Widget na plochu</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Dokonči své nastavení</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Zdravíme tě.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Jsi připravený na rychlejší prohlížeč, který tě ochrání?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Ochrana</b> <i>je aktivní!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Zdravíme tě!<br/>Už se těšíš na rychlejší prohlížeč, který tě ochrání?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Zkus ji!</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[a %1$d další tracker se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="few"><![CDATA[a %1$d další trackery se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="many"><![CDATA[a %1$d dalšího trackeru se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="other"><![CDATA[a %1$d dalších trackerů se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">Tenhle tracker jsem ale zablokoval!</font>]]></item>
+        <item quantity="few"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="many"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+        <item quantity="other"><![CDATA[ se tě tady snaží sledovat. <font color=\"#F05C2B\">A tak jsem je zablokoval!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️ Klepnutím na štít si zobrazíš další informace.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo je nezávislá společnost zaměřená na ochranu soukromí na internetu pro každého, kdo chce mít své osobní údaje zase pod kontrolou.\n\nVěříme, že nejlepší způsob, jak ochránit tvoje osobní údaje před hackery, podvodníky a společnostmi, co jim soukromí moc neříká, je vůbec jim přístup k tvým údajům neumožnit. Proto milióny lidí při prohlížení webu <annotation type="chart_comparison">dávají přednost DuckDuckGo před Chromem a dalšími prohlížeči</annotation>. Náš vyhledávač integrovaný v prohlížeči je jako Google, ale nikdy nesleduje, co hledáš. A naše sada funkcí na ochranu soukromí, která zahrnuje blokování reklamních trackerů a cookies, brání firmám ve sběru tvých dat. Náš prohlížeč je navíc zdarma – vyděláváme na <annotation type="privacy_respecting_ads">reklamách ve vyhledávání, které respektují soukromí</annotation> a nezneužívají tvé údaje.\n\nKromě toho nabízíme také <annotation type="ppro_help_page">předplatné DuckDuckGo</annotation>, které je integrované v našem prohlížeči. Předplatitelé získají ještě větší ochranu soukromí díky rychlé a jednoduché <annotation type="vpn_help_page">VPN</annotation>, která pomáhá zabezpečit tvoje online aktivity, přístup k pokročilým modelům umělé inteligence v naší soukromé chatovací službě Duck.ai, službu, která vyhledává a odstraňuje tvoje osobní údaje ze stránek pro vyhledávání lidí, a službě, která obnoví tvoji identitu, pokud by byla odcizena.\n\nPřevezmi kontrolu nad svými osobními údaji a pořiď si prohlížeč navržený tak, aby tvoje data neshromažďoval, ale chránil.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo má také <b>volitelné předplatné</b> s bezpečnou <b>VPN</b> a <b>špičkovou soukromou umělou inteligencí</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Funkce AI</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

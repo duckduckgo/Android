@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">DNS-server</string>
     <string name="netpPrivateDns">Privat DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blockera riskabla domäner)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (bedrägeriblockerare)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (rekommenderas)</string>
     <string name="netpCustomDnsCustom">Anpassat</string>
     <string name="netpCustomDnsInputAddressHint">IPv4-adress</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo dirigerar DNS-förfrågningar via våra DNS-servrar så att din internetleverantör inte kan se vilka webbplatser du besöker.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Innehållsblockering och filtrering</string>
-    <string name="netpDnsBlockMalwarePrimary">Blockera riskabla domäner</string>
+    <string name="netpDnsBlockMalwareHeader">Blockering av skadligt innehåll</string>
+    <string name="netpDnsBlockMalwarePrimary">Bedrägeriblockerare</string>
     <string name="netpDnsBlockMalwareByline">Blockera över 150 000 domäner som har flaggats för att innehålla skadlig kod, nätfiskeattacker och onlinebedrägerier med en blockeringslista på DNS-nivå. <annotation type="learn_more_link">Läs mer</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS-blockeringslistor</string>
 
@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Exkludera automatiskt appar som inte är kompatibla med VPN-tjänster</string>
     <string name="netpExclusionListLabelAutoExclude">Inkompatibel med VPN-tjänster</string>
     <string name="netpExclusionListAutoExcludeDescription">Vissa appar, som bank- eller streamingappar, fungerar inte så bra med VPN-tjänster. När den här inställningen är aktiverad kommer vi automatiskt att exkludera sådana appar.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN har kopplats från på grund av att abonnemanget har gått ut. Prenumerera på DuckDuckGo för att återansluta VPN-tjänsten.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonnera på DuckDuckGo för att återansluta VPN-tjänsten.</string>
 </resources>

@@ -27,7 +27,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class InlineBrowserAutofillConfigurator @Inject constructor(
@@ -43,7 +44,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
     ) {
         coroutineScope.launch(dispatchers.io()) {
             if (canJsBeInjected(url)) {
-                Timber.v("Injecting autofill JS into WebView for %s", url)
+                logcat(VERBOSE) { "Injecting autofill JS into WebView for $url" }
 
                 val rawJs = autofillJavascriptLoader.getAutofillJavascript()
                 val formatted = autofillRuntimeConfigProvider.getRuntimeConfiguration(rawJs, url)
@@ -52,7 +53,7 @@ class InlineBrowserAutofillConfigurator @Inject constructor(
                     webView.evaluateJavascript("javascript:$formatted", null)
                 }
             } else {
-                Timber.v("Won't inject autofill JS into WebView for: %s", url)
+                logcat(VERBOSE) { "Won't inject autofill JS into WebView for: $url" }
             }
         }
     }

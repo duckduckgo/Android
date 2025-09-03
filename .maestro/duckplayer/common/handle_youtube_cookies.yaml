@@ -1,0 +1,21 @@
+appId: com.duckduckgo.mobile.android
+---
+- extendedWaitUntil:
+    notVisible:
+      id: pageLoadingIndicator
+    timeout: 5000
+    optional: true
+# Handle YouTube cookies consent dialog if visible
+- runFlow:
+    when:
+      visible: "Before you continue to YouTube"
+    commands:
+      - scrollUntilVisible:
+          element:
+            text: "More options"
+            optional: true
+          direction: DOWN
+
+      - tapOn:
+          text: "Reject.*"
+          optional: true

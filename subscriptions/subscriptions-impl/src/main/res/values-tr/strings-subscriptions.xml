@@ -61,13 +61,20 @@
     <string name="privacyProFaqSecondary">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya Privacy Pro destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
     <string name="subscriptionStatusSubscribed">Abone olundu</string>
     <string name="privacyPolicyAndTermsOfService">Gizlilik Politikası ve Hizmet Koşulları</string>
+    <string name="subscriptionStatusFreeTrial">Ücretsiz Deneme Süresi Aktif</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz denemeniz %1$s tarihinde sona erecek ve aynı gün otomatik olarak aylık ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz denemeniz %1$s tarihinde sona erecek ve aynı gün otomatik olarak yıllık ücretli aboneliğe dönüşecektir.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Ücretsiz deneme sürümünüz %1$s tarihinde sona erecek ve ücretli aboneliğe dönüşmeyecektir.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Abonelik Ayarları</string>
     <string name="subscriptionSettingSubscribe">Privacy Pro ile bağlantınızı ve kimliğinizi koruyun</string>
-    <string name="subscriptionSettingSubscribeSubtitle">VPN, Personal Information Removal ve Identity Theft Restoration\'ı içerir.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">VPN ve Identity Theft Restoration hizmetlerimizi içerir.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Aboneler VPN, Personal Information Removal ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Aboneler VPN ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+
     <string name="subscriptionSettingGet">Privacy Pro\'yu Al</string>
+    <string name="subscriptionSettingTryFreeTrial">Privacy Pro\'yu Ücretsiz Deneyin</string>
     <string name="subscriptionSettingRestore">Aboneliğim Var</string>
     <string name="subscriptionSettingExpired">Privacy Pro aboneliğiniz sona erdi</string>
     <string name="subscriptionSettingExpiredViewPlans">Planları Görüntüle</string>
@@ -161,4 +168,34 @@
     <string name="activityActivateSubscription">Aboneliğim Var</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Geri Bildirim gönder</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo Aboneliği</string>
+    <string name="subscriptionSettingExpiredRebranding">DuckDuckGo aboneliğinizin süresi doldu</string>
+    <string name="privacyProFaqRebranding">Aboneliğinizle ilgili yardıma mı ihtiyacınız var?</string>
+    <string name="privacyProFaqSecondaryRebranding">Yardım sayfalarımızdan sıkça sorulan soruların yanıtlarını alabilir veya abonelik destek ekibiyle iletişime geçebilirsiniz. Özelliklerin kullanılabilirliği ülkeye göre değişiklik gösterir.</string>
+    <string name="restoreSubscriptionTitleRebranding">Aboneliğinizi bu cihaza ekleyin</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Bu cihaza eklemek için aboneliğinize bir e-posta adresi bağlayın.</string>
+    <string name="activateOnOtherDevicesRebranding">Aboneliğinizi diğer cihazlara ekleyin</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Aboneliğinizi Google Play üzerinden veya bir e-posta adresi bağlayarak diğer cihazlarınıza ekleyebilirsiniz.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Aboneliğinizi DuckDuckGo uygulamasındaki diğer cihazlarınıza eklemek için yukarıdaki e-postayı kullanın. Ayarlar &gt; Abonelik Ayarları &gt; Aboneliğim Var\'a gidin.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro artık sadece DuckDuckGo aboneliği olarak adlandırılıyor</string>
+    <string name="subscriptionSettingSubscribeRebranding">Tek bir abonelikle bağlantınızı ve kimliğinizi koruyun.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Aboneliğinize artık bu cihaz üzerinden erişemeyeceksiniz. Bu işlem aboneliğinizi iptal etmez ve abonelik diğer cihazlarınızda aktif kalır.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Aboneler VPN ve Duck.ai\'dski gelişmiş yapay zeka modellerinden yararlanır. Personal Information Removal ve Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Aboneler VPN, Duck.ai\'daki gelişmiş yapay zeka modelleri ve Identity Theft Restoration hizmetlerimizden yararlanır.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Abonelere özel Duck.ai modellerine erişilemiyor.</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Aboneliğimle diğer tarayıcılarda Duck.ai\'a erişemiyorum.</string>
+    <string name="feedbackSubCategoryDuckAiOther">Diğer Duck.ai geri bildirimleri</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Wi-Fi bağlantınızı güvence altına alın ve gelişmiş yapay zeka modelleriyle gizlice sohbet edin</string>
+
+    <string name="subscriptionSettingGetRebranding">DuckDuckGo\'ya abone olun</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Ücretsiz Deneyin</string>
+    <string name="feedbackGeneralSubscription">Abonelik</string>
+
 </resources>

@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.omnibar.ChangeOmnibarPositionFeature
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.icon.api.AppIcon
 import com.duckduckgo.app.pixels.AppPixelName
@@ -31,14 +30,13 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoTheme
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
+import kotlin.to
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -48,7 +46,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AppearanceViewModel @Inject constructor(
@@ -56,7 +54,6 @@ class AppearanceViewModel @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
-    private val changeOmnibarPositionFeature: ChangeOmnibarPositionFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -66,7 +63,7 @@ class AppearanceViewModel @Inject constructor(
         val canForceDarkMode: Boolean = false,
         val supportsForceDarkMode: Boolean = true,
         val omnibarPosition: OmnibarPosition = OmnibarPosition.TOP,
-        val isOmnibarPositionFeatureEnabled: Boolean = true,
+        val isFullUrlEnabled: Boolean = true,
     )
 
     sealed class Command {
@@ -89,7 +86,7 @@ class AppearanceViewModel @Inject constructor(
                     canForceDarkMode = canForceDarkMode(),
                     supportsForceDarkMode = WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING),
                     omnibarPosition = settingsDataStore.omnibarPosition,
-                    isOmnibarPositionFeatureEnabled = changeOmnibarPositionFeature.self().isEnabled(),
+                    isFullUrlEnabled = settingsDataStore.isFullUrlEnabled,
                 )
             }
         }
@@ -119,9 +116,9 @@ class AppearanceViewModel @Inject constructor(
     }
 
     fun onThemeSelected(selectedTheme: DuckDuckGoTheme) {
-        Timber.d("User toggled theme, theme to set: $selectedTheme")
+        logcat { "User toggled theme, theme to set: $selectedTheme" }
         if (themingDataStore.isCurrentlySelected(selectedTheme)) {
-            Timber.d("User selected same theme they've already set: $selectedTheme; no need to do anything else")
+            logcat { "User selected same theme they've already set: $selectedTheme; no need to do anything else" }
             return
         }
         viewModelScope.launch(dispatcherProvider.io()) {
@@ -136,8 +133,6 @@ class AppearanceViewModel @Inject constructor(
             when (selectedTheme) {
                 LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 DARK -> SETTINGS_THEME_TOGGLED_DARK
-                EXPERIMENT_DARK -> SETTINGS_THEME_TOGGLED_DARK
-                EXPERIMENT_LIGHT -> SETTINGS_THEME_TOGGLED_LIGHT
                 SYSTEM_DEFAULT -> SETTINGS_THEME_TOGGLED_SYSTEM_DEFAULT
             }
         pixel.fire(pixelName)
@@ -167,6 +162,16 @@ class AppearanceViewModel @Inject constructor(
                 pixel.fire(AppPixelName.FORCE_DARK_MODE_DISABLED)
             }
             settingsDataStore.experimentalWebsiteDarkMode = checked
+        }
+    }
+
+    fun onFullUrlSettingChanged(checked: Boolean) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            settingsDataStore.isFullUrlEnabled = checked
+            viewState.update { it.copy(isFullUrlEnabled = checked) }
+
+            val params = mapOf(Pixel.PixelParameter.IS_ENABLED to checked.toString())
+            pixel.fire(AppPixelName.SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED, params)
         }
     }
 }

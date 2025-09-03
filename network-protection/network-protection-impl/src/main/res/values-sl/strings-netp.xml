@@ -224,7 +224,7 @@
     <string name="netpCustomDnsSettingText">Strežnik DNS</string>
     <string name="netpPrivateDns">Zasebni DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blokiranje tveganih domen)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Preprečevanje prevar)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (priporočeno)</string>
     <string name="netpCustomDnsCustom">Druga</string>
     <string name="netpCustomDnsInputAddressHint">Naslov IPv4</string>
@@ -235,8 +235,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo usmerja poizvedbe DNS prek naših strežnikov DNS, da vaš ponudnik interneta ne more videti, katere spletne strani obiskujete.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blokiranje in filtriranje vsebine</string>
-    <string name="netpDnsBlockMalwarePrimary">Blokiranje tveganih domen</string>
+    <string name="netpDnsBlockMalwareHeader">Blokiranje zlonamerne vsebine</string>
+    <string name="netpDnsBlockMalwarePrimary">Preprečevanje prevar</string>
     <string name="netpDnsBlockMalwareByline">Z blokirnim seznamom na ravni DNS blokirajte več kot 150.000 domen, ki so označene kot gostiteljice zlonamerne programske opreme, napadov z lažnim predstavljanjem in spletnih prevar. <annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Seznami blokad DNS</string>
 
@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Samodejno izključi aplikacije, ki niso združljive z VPN-ji.</string>
     <string name="netpExclusionListLabelAutoExclude">Nezdružljivo z VPN-ji</string>
     <string name="netpExclusionListAutoExcludeDescription">Nekatere aplikacije, kot so bančne ali pretočne aplikacije, ne delujejo dobro z VPN-ji. Ko je ta nastavitev omogočena, bomo te aplikacije samodejno izključili.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN je prekinjen zaradi potekle naročnine. Naročite se na DuckDuckGo, da znova povežete VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Naročite se na DuckDuckGo, da znova povežete VPN.</string>
 </resources>

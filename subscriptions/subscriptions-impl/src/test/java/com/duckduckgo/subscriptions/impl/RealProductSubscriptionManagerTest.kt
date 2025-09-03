@@ -263,6 +263,8 @@ private class FakeSubscriptions(
 
     override suspend fun isEligible(): Boolean = true
 
+    override fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus> = flowOf(subscriptionStatus)
+
     override suspend fun getSubscriptionStatus(): SubscriptionStatus = subscriptionStatus
 
     override suspend fun getAvailableProducts(): Set<Product> = emptySet()
@@ -277,4 +279,6 @@ private class FakeSubscriptions(
     }
 
     override fun isPrivacyProUrl(uri: Uri): Boolean = false
+
+    override suspend fun isFreeTrialEligible(): Boolean = false
 }

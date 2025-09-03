@@ -36,7 +36,9 @@ import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.DDG
 import com.duckduckgo.user.agent.impl.remoteconfig.ClientBrandsHints.WEBVIEW
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesBinding(AppScope::class)
 class RealClientBrandHintProvider @Inject constructor(
@@ -48,21 +50,19 @@ class RealClientBrandHintProvider @Inject constructor(
     private var currentBranding: ClientBrandsHints = DDG
 
     override fun setDefault(settings: WebSettings) {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
-            if (clientBrandHintFeature.self().isEnabled()) {
-                Timber.v("ClientBrandHintProvider: branding enabled, initialising metadata with DuckDuckGo branding")
-                setUserAgentMetadata(settings, DEFAULT_ENABLED_BRANDING)
-            } else {
-                Timber.v("ClientBrandHintProvider: branding disabled, initialising metadata with Google Chrome branding")
-                setUserAgentMetadata(settings, DEFAULT_DISABLED_BRANDING)
-            }
+        if (clientBrandHintFeature.self().isEnabled()) {
+            logcat(VERBOSE) { "ClientBrandHintProvider: branding enabled, initialising metadata with DuckDuckGo branding" }
+            setUserAgentMetadata(settings, DEFAULT_ENABLED_BRANDING)
+        } else {
+            logcat(VERBOSE) { "ClientBrandHintProvider: branding disabled, initialising metadata with Google Chrome branding" }
+            setUserAgentMetadata(settings, DEFAULT_DISABLED_BRANDING)
         }
     }
 
     override fun shouldChangeBranding(
         documentUrl: String,
     ): Boolean {
-        Timber.v("ClientBrandHintProvider: should branding change for $documentUrl?")
+        logcat(VERBOSE) { "ClientBrandHintProvider: should branding change for $documentUrl?" }
         val brandingChange = calculateBrandingChange(documentUrl) is Change
         return brandingChange
     }
@@ -73,39 +73,39 @@ class RealClientBrandHintProvider @Inject constructor(
 
             if (!clientBrandHintFeature.self().isEnabled()) {
                 return if (currentBranding != DEFAULT_DISABLED_BRANDING) {
-                    Timber.v("ClientBrandHintProvider: branding is disabled but current branding is not default")
+                    logcat(VERBOSE) { "ClientBrandHintProvider: branding is disabled but current branding is not default" }
                     Change(DEFAULT_DISABLED_BRANDING)
                 } else {
-                    Timber.v("ClientBrandHintProvider: branding for is disabled, default branding already applied")
+                    logcat(VERBOSE) { "ClientBrandHintProvider: branding for is disabled, default branding already applied" }
                     None
                 }
             }
 
-            Timber.v("ClientBrandHintProvider: check brand for request url $documentUrl with domain $documentDomain")
-            Timber.v("ClientBrandHintProvider: currentDomain is $currentDomain currentBranding is $currentBranding")
+            logcat(VERBOSE) { "ClientBrandHintProvider: check brand for request url $documentUrl with domain $documentDomain" }
+            logcat(VERBOSE) { "ClientBrandHintProvider: currentDomain is $currentDomain currentBranding is $currentBranding" }
 
             if (currentDomain == documentDomain) {
-                Timber.d("ClientBrandHintProvider: Branding already applied for $currentDomain, skipping")
+                logcat { "ClientBrandHintProvider: Branding already applied for $currentDomain, skipping" }
                 return None
             }
 
             val customBranding = repository.clientBrandHints.filter { it.domain == documentDomain }
             if (customBranding.isEmpty()) {
-                Timber.i("ClientBrandHintProvider: $documentDomain doesn't have custom branding")
+                logcat(INFO) { "ClientBrandHintProvider: $documentDomain doesn't have custom branding" }
                 return if (currentBranding == DEFAULT_ENABLED_BRANDING) {
-                    Timber.i("ClientBrandHintProvider: branding already active, skipping")
+                    logcat(INFO) { "ClientBrandHintProvider: branding already active, skipping" }
                     None
                 } else {
-                    Timber.i("ClientBrandHintProvider: $documentUrl is not an exception, change to default braning")
+                    logcat(INFO) { "ClientBrandHintProvider: $documentUrl is not an exception, change to default braning" }
                     Change(DEFAULT_ENABLED_BRANDING)
                 }
             } else {
                 val branding = customBranding.first().brand
                 return if (branding == currentBranding) {
-                    Timber.i("ClientBrandHintProvider: branding already active, skipping")
+                    logcat(INFO) { "ClientBrandHintProvider: branding already active, skipping" }
                     None
                 } else {
-                    Timber.i("ClientBrandHintProvider: $documentUrl has custom branding, change branding to $branding")
+                    logcat(INFO) { "ClientBrandHintProvider: $documentUrl has custom branding, change branding to $branding" }
                     Change(branding)
                 }
             }
@@ -134,6 +134,12 @@ class RealClientBrandHintProvider @Inject constructor(
         settings: WebSettings,
         branding: ClientBrandsHints,
     ) {
+        // Check if WebView supports user agent metadata
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) {
+            logcat(VERBOSE) { "ClientBrandHintProvider: USER_AGENT_METADATA not supported by WebView, skipping" }
+            return
+        }
+
         currentBranding = branding
         val metadata = WebSettingsCompat.getUserAgentMetadata(settings)
         val finalBrandList = metadata.brandVersionList.map {
@@ -175,8 +181,8 @@ class RealClientBrandHintProvider @Inject constructor(
                 }
             }
         }
-        Timber.i("ClientBrandHintProvider: original Brand List ${metadata.brandVersionList}")
-        Timber.i("ClientBrandHintProvider: updated Brand List $finalBrandList")
+        logcat(INFO) { "ClientBrandHintProvider: original Brand List ${metadata.brandVersionList}" }
+        logcat(INFO) { "ClientBrandHintProvider: updated Brand List $finalBrandList" }
 
         val ua = UserAgentMetadata.Builder()
             .setPlatform(metadata.platform)

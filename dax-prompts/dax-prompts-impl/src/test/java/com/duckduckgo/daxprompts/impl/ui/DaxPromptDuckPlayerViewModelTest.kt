@@ -18,9 +18,8 @@ package com.duckduckgo.daxprompts.impl.ui
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.daxprompts.impl.ReactivateUsersExperiment
 import com.duckduckgo.daxprompts.impl.repository.DaxPromptsRepository
-import com.duckduckgo.duckplayer.api.DuckPlayer
-import com.duckduckgo.duckplayer.api.PrivatePlayerMode
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -37,12 +36,12 @@ class DaxPromptDuckPlayerViewModelTest {
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
     private lateinit var testee: DaxPromptDuckPlayerViewModel
-    private val mockDuckPlayer: DuckPlayer = mock()
     private val mockDaxPromptsRepository: DaxPromptsRepository = mock()
+    private val mockReactivationExperiment: ReactivateUsersExperiment = mock()
 
     @Before
     fun setup() {
-        testee = DaxPromptDuckPlayerViewModel(mockDuckPlayer, mockDaxPromptsRepository)
+        testee = DaxPromptDuckPlayerViewModel(mockDaxPromptsRepository, mockReactivationExperiment)
     }
 
     @Test
@@ -53,6 +52,7 @@ class DaxPromptDuckPlayerViewModelTest {
             assertEquals(DaxPromptDuckPlayerViewModel.Command.CloseScreen, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+        verify(mockReactivationExperiment).fireCloseScreen()
     }
 
     @Test
@@ -64,25 +64,6 @@ class DaxPromptDuckPlayerViewModelTest {
             assertEquals(DaxPromptDuckPlayerViewModel.DUCK_PLAYER_DEMO_URL, command.url)
             cancelAndIgnoreRemainingEvents()
         }
-    }
-
-    @Test
-    fun whenSecondaryButtonClickedThenEmitsDismissCommand() = runTest {
-        testee.onSecondaryButtonClicked()
-
-        testee.commands().test {
-            assertEquals(DaxPromptDuckPlayerViewModel.Command.Dismiss, awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenUpdateDuckPlayerSettingsCalledThenSetUserPreferencesWithCorrectParameters() = runTest {
-        testee.updateDuckPlayerSettings()
-
-        verify(mockDuckPlayer).setUserPreferences(
-            overlayInteracted = false,
-            privatePlayerMode = PrivatePlayerMode.AlwaysAsk.value,
-        )
+        verify(mockReactivationExperiment).fireDuckPlayerClick()
     }
 }

@@ -36,12 +36,11 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.Transformation
 import com.bumptech.glide.load.engine.Resource
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ItemTabGridBinding
-import com.duckduckgo.app.browser.databinding.ItemTabGridNewBinding
 import com.duckduckgo.app.browser.databinding.ItemTabListBinding
-import com.duckduckgo.app.browser.databinding.ItemTabListNewBinding
 import com.duckduckgo.app.browser.databinding.ItemTabSwitcherAnimationInfoPanelBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -74,10 +73,11 @@ import java.io.File
 import java.security.MessageDigest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class TabSwitcherAdapter(
-    private val isVisualExperimentEnabled: Boolean,
     private val itemClickListener: TabSwitcherListener,
     private val webViewPreviewPersister: WebViewPreviewPersister,
     private val lifecycleOwner: LifecycleOwner,
@@ -103,22 +103,12 @@ class TabSwitcherAdapter(
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             GRID_TAB -> {
-                if (isVisualExperimentEnabled) {
-                    val binding = ItemTabGridNewBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.GridTabViewHolder(binding)
-                } else {
-                    val binding = ItemTabGridBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.GridTabViewHolder(binding)
-                }
+                val binding = ItemTabGridBinding.inflate(inflater, parent, false)
+                TabSwitcherViewHolder.GridTabViewHolder(binding)
             }
             LIST_TAB -> {
-                if (isVisualExperimentEnabled) {
-                    val binding = ItemTabListNewBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.ListTabViewHolder(binding)
-                } else {
-                    val binding = ItemTabListBinding.inflate(inflater, parent, false)
-                    TabSwitcherViewHolder.ListTabViewHolder(binding)
-                }
+                val binding = ItemTabListBinding.inflate(inflater, parent, false)
+                TabSwitcherViewHolder.ListTabViewHolder(binding)
             }
             TRACKER_ANIMATION_TILE_INFO_PANEL -> {
                 val binding = ItemTabSwitcherAnimationInfoPanelBinding.inflate(inflater, parent, false)
@@ -294,7 +284,7 @@ class TabSwitcherAdapter(
         for (payload in payloads) {
             val bundle = payload as Bundle
             for (key in bundle.keySet()) {
-                Timber.v("$key changed - Need an update for ${tab.tabEntity}")
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
             if (bundle.containsKey(DIFF_KEY_PREVIEW)) {
@@ -327,7 +317,7 @@ class TabSwitcherAdapter(
         for (payload in payloads) {
             val bundle = payload as Bundle
             for (key in bundle.keySet()) {
-                Timber.v("$key changed - Need an update for ${tab.tabEntity}")
+                logcat(VERBOSE) { "$key changed - Need an update for ${tab.tabEntity}" }
             }
 
             bundle.getString(DIFF_KEY_URL)?.let {
@@ -370,11 +360,7 @@ class TabSwitcherAdapter(
                 outWidth: Int,
                 outHeight: Int,
             ): Resource<Bitmap> {
-                resource.get().height = if (isVisualExperimentEnabled) {
-                    context.resources.getDimension(CommonR.dimen.gridItemPreviewHeightNew)
-                } else {
-                    context.resources.getDimension(CommonR.dimen.gridItemPreviewHeight)
-                }.toInt()
+                resource.get().height = context.resources.getDimension(CommonR.dimen.gridItemPreviewHeight).toInt()
                 return resource
             }
 
@@ -397,10 +383,17 @@ class TabSwitcherAdapter(
                     return@launch
                 }
 
-                glide.load(cachedWebViewPreview)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .optionalTransform(fitAndClipBottom())
-                    .into(tabPreview)
+                try {
+                    glide.load(cachedWebViewPreview)
+                        .transition(DrawableTransitionOptions.withCrossFade()).transform(
+                            fitAndClipBottom(),
+                            RoundedCorners(tabPreview.context.resources.getDimensionPixelSize(CommonR.dimen.smallShapeCornerRadius)),
+                        )
+                        .into(tabPreview)
+                } catch (e: Exception) {
+                    logcat(ERROR) { "Error loading tab preview for ${tab.tabId}: ${e.message}" }
+                    glide.load(AndroidR.drawable.ic_dax_icon_72).into(tabPreview)
+                }
             }
         } else {
             glide.clear(tabPreview)
@@ -497,16 +490,6 @@ class TabSwitcherAdapter(
                 selectionIndicator = binding.selectionIndicator,
                 tabPreview = binding.tabPreview,
             )
-
-            constructor(binding: ItemTabGridNewBinding) : this(
-                rootView = binding.root,
-                favicon = binding.favicon,
-                title = binding.title,
-                close = binding.close,
-                tabUnread = binding.tabUnread,
-                selectionIndicator = binding.selectionIndicator,
-                tabPreview = binding.tabPreview,
-            )
         }
 
         data class ListTabViewHolder(
@@ -520,16 +503,6 @@ class TabSwitcherAdapter(
         ) : TabSwitcherViewHolder(rootView), TabViewHolder {
 
             constructor(binding: ItemTabListBinding) : this(
-                rootView = binding.root,
-                favicon = binding.favicon,
-                title = binding.title,
-                close = binding.close,
-                tabUnread = binding.tabUnread,
-                selectionIndicator = binding.selectionIndicator,
-                url = binding.url,
-            )
-
-            constructor(binding: ItemTabListNewBinding) : this(
                 rootView = binding.root,
                 favicon = binding.favicon,
                 title = binding.title,

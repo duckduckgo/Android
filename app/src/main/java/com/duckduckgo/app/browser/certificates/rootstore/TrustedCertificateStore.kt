@@ -22,17 +22,17 @@ import com.duckduckgo.app.browser.certificates.CertificateTypes
 import com.duckduckgo.app.browser.certificates.LetsEncryptCertificateProvider
 import com.duckduckgo.app.browser.certificates.toX509Certificate
 import java.security.cert.*
-import timber.log.Timber
+import logcat.logcat
 
 interface TrustedCertificateStore {
     fun validateSslCertificateChain(sslCertificate: SslCertificate): CertificateValidationState
 }
 
 sealed class CertificateValidationState {
-    object IssuerExpired : CertificateValidationState()
-    object IssuerNotYetValid : CertificateValidationState()
-    object UntrustedChain : CertificateValidationState()
-    object TrustedChain : CertificateValidationState()
+    data object IssuerExpired : CertificateValidationState()
+    data object IssuerNotYetValid : CertificateValidationState()
+    data object UntrustedChain : CertificateValidationState()
+    data object TrustedChain : CertificateValidationState()
 }
 
 class TrustedCertificateStoreImpl(
@@ -69,10 +69,10 @@ class TrustedCertificateStoreImpl(
             validate(sslCertificate.toX509Certificate(), it.certificate())
             // then check if root
             if (it.type() == CertificateType.Root) {
-                Timber.d("SSLShield: Certificate Trusted anchor validated!")
+                logcat { "SSLShield: Certificate Trusted anchor validated!" }
                 return
             }
-            Timber.d("SSLShield: Intermediate certificate validated!")
+            logcat { "SSLShield: Intermediate certificate validated!" }
             validateSslCertificateChainInternal(SslCertificate(it.certificate() as X509Certificate))
 
             // certificate chain validated

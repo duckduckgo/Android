@@ -106,6 +106,21 @@
         </activity-alias>
 
         <activity-alias
+            android:name="com.duckduckgo.app.launch.LauncherPink"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_pink"
+            android:roundIcon="@mipmap/ic_launcher_pink_round"
+            android:targetActivity="com.duckduckgo.app.launch.LaunchBridgeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.APP_BROWSER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
             android:name="com.duckduckgo.app.launch.LauncherBlue"
             android:enabled="false"
             android:exported="true"
@@ -298,6 +313,7 @@
         <activity
             android:name="com.duckduckgo.app.SelectedTextSearchActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:label="@string/systemTextSearchMessage">
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
@@ -448,6 +464,12 @@
             android:exported="false"
             android:label="@string/downloadsActivityTitle"
             android:parentActivityName=".BrowserActivity" />
+        <activity
+            android:name=".threatprotection.ThreatProtectionSettingsActivity"
+            android:exported="false"
+            android:label="Threat protection"
+            android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity"
+            />
 
         <service
             android:name="com.duckduckgo.widget.FavoritesWidgetService"

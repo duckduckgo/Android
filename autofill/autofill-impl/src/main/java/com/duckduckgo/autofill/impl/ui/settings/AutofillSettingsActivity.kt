@@ -27,6 +27,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.AutofillSettings
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
@@ -114,7 +115,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
 
     private fun observeViewModel() {
         lifecycleScope.launch {
-            viewModel.viewState
+            viewModel.viewState(extractLaunchSource())
                 .flowWithLifecycle(lifecycle, STARTED)
                 .collectLatest { state ->
                     val isAutofillAvailable = state.autofillUnsupported.not() && state.autofillDisabled.not()
@@ -174,7 +175,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
             viewModel.onPasswordListClicked()
         }
         binding.autofillAvailable.importPasswordsOption.setOnClickListener {
-            viewModel.onImportPasswordsClicked(getAutofillSettingsLaunchSource())
+            viewModel.onImportPasswordsClicked(AutofillImportLaunchSource.AutofillSettings)
         }
         binding.autofillAvailable.syncDesktopPasswordsOption.setOnClickListener {
             viewModel.onImportFromDesktopWithSyncClicked(getAutofillSettingsLaunchSource())
@@ -223,7 +224,7 @@ class AutofillSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchImportPasswordsScreen() {
-        val dialog = ImportFromGooglePasswordsDialog.instance()
+        val dialog = ImportFromGooglePasswordsDialog.instance(AutofillImportLaunchSource.AutofillSettings)
         dialog.show(supportFragmentManager, IMPORT_FROM_GPM_DIALOG_TAG)
     }
 

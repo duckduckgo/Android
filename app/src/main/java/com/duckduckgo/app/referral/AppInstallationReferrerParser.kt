@@ -23,7 +23,10 @@ import com.duckduckgo.app.referral.ParsedReferrerResult.ReferrerNotFound
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface AppInstallationReferrerParser {
 
@@ -37,7 +40,7 @@ class QueryParamReferrerParser @Inject constructor(
 ) : AppInstallationReferrerParser {
 
     override fun parse(referrer: String): ParsedReferrerResult {
-        Timber.v("Full referrer string: %s", referrer)
+        logcat(VERBOSE) { "Full referrer string: $referrer" }
 
         val referrerParts = splitIntoConstituentParts(referrer)
         if (referrerParts.isEmpty()) return ReferrerNotFound(fromCache = false)
@@ -54,33 +57,33 @@ class QueryParamReferrerParser @Inject constructor(
     }
 
     private fun extractEuAuctionReferrer(referrerParts: List<String>): ParsedReferrerResult {
-        Timber.d("Looking for Google EU Auction referrer data")
+        logcat { "Looking for Google EU Auction referrer data" }
         for (part in referrerParts) {
-            Timber.v("Analysing query param part: $part")
+            logcat(VERBOSE) { "Analysing query param part: $part" }
             if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_SEARCH_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
-                Timber.i("App installed as a result of the EU auction - Search Choice")
+                logcat(INFO) { "App installed as a result of the EU auction - Search Choice" }
                 return EuAuctionSearchChoiceReferrerFound()
             }
             if (part.startsWith(INSTALLATION_SOURCE_KEY) && part.endsWith(INSTALLATION_BROWSER_CHOICE_SOURCE_EU_AUCTION_VALUE)) {
-                Timber.i("App installed as a result of the EU auction - Browser Choice")
+                logcat(INFO) { "App installed as a result of the EU auction - Browser Choice" }
                 return EuAuctionBrowserChoiceReferrerFound()
             }
         }
 
-        Timber.d("No EU referrer data found; app not installed as a result of EU auction or choice screen")
+        logcat { "No EU referrer data found; app not installed as a result of EU auction or choice screen" }
         return ReferrerNotFound()
     }
 
     private fun extractCampaignReferrer(referrerParts: List<String>): ParsedReferrerResult {
-        Timber.d("Looking for regular referrer data")
+        logcat { "Looking for regular referrer data" }
         for (part in referrerParts) {
-            Timber.v("Analysing query param part: $part")
+            logcat(VERBOSE) { "Analysing query param part: $part" }
             if (part.contains(CAMPAIGN_NAME_PREFIX)) {
                 return extractCampaignNameSuffix(part, CAMPAIGN_NAME_PREFIX)
             }
         }
 
-        Timber.d("Referrer information does not contain inspected campaign names")
+        logcat { "Referrer information does not contain inspected campaign names" }
         return ReferrerNotFound()
     }
 
@@ -88,16 +91,16 @@ class QueryParamReferrerParser @Inject constructor(
         part: String,
         prefix: String,
     ): ParsedReferrerResult {
-        Timber.i("Found target campaign name prefix $prefix in $part")
+        logcat(INFO) { "Found target campaign name prefix $prefix in $part" }
         val suffix = stripCampaignName(part, prefix)
 
         if (suffix.length < 2) {
-            Timber.w("Unexpected suffix length for campaign")
+            logcat(WARN) { "Unexpected suffix length for campaign" }
             return ReferrerNotFound(fromCache = false)
         }
 
         val condensedSuffix = suffix.take(2)
-        Timber.i("Found suffix $condensedSuffix (looking for $prefix, found in $part)")
+        logcat(INFO) { "Found suffix $condensedSuffix (looking for $prefix, found in $part)" }
         return CampaignReferrerFound(condensedSuffix)
     }
 
@@ -135,10 +138,10 @@ sealed class ParsedReferrerResult(open val fromCache: Boolean = false) {
 }
 
 sealed class ParseFailureReason {
-    object FeatureNotSupported : ParseFailureReason()
-    object ServiceUnavailable : ParseFailureReason()
-    object DeveloperError : ParseFailureReason()
-    object ServiceDisconnected : ParseFailureReason()
-    object UnknownError : ParseFailureReason()
-    object ReferralServiceUnavailable : ParseFailureReason()
+    data object FeatureNotSupported : ParseFailureReason()
+    data object ServiceUnavailable : ParseFailureReason()
+    data object DeveloperError : ParseFailureReason()
+    data object ServiceDisconnected : ParseFailureReason()
+    data object UnknownError : ParseFailureReason()
+    data object ReferralServiceUnavailable : ParseFailureReason()
 }

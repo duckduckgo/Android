@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Ulkoasu</string>
+    <string name="settingsShowFullUrlTitle">Näytä sivuston osoite kokonaan</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Tallenna</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Yksityinen selaus oletuksena</string>
     <string name="preOnboardingComparisonChartItem2">Estä kolmannen osapuolen seuraimet</string>
     <string name="preOnboardingComparisonChartItem3">Estä evästeponnahdusikkunat</string>
-    <string name="preOnboardingComparisonChartItem4">Estä seurantamainokset</string>
+    <string name="preOnboardingComparisonChartItem4">Estä kohdennetut mainokset</string>
     <string name="preOnboardingComparisonChartItem5">Poista selaustiedot yhdellä painikkeella</string>
     <string name="preOnboardingDaxDialog3Title">Mahtavaa! Tervetuloa käyttämään Duckia.</string>
     <string name="preOnboardingDaxDialog3Button">Aloita selailu</string>
@@ -796,8 +797,9 @@
     <string name="onboardingEndDaxDialogDescription">Muista, että joka kerta kun käytät minua selaamiseen, rasittavat mainokset katoavat. 👌</string>
     <string name="onboardingEndDaxDialogButton">Valmista!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ai niin...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös sisäänrakennettu <b>VPN</b>!<br/><br/>Aktivoi se <b>maksullisella Privacy Pro -tilauksella.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGossa on myös turvallinen <b>VPN + 2 muuta premium-suojausta</b>, jotka ovat saatavilla <b>valinnaisen maksullisen tilauksen</b> kautta.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Lue lisää</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Kokeile ilmaiseksi!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Ohita</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,21 +844,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Kiitos! Ilmoituksesi auttaa tekemään DuckDuckGosta paremman kaikille!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Uusi AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Anna DuckDuckGon suojata enemmän tekemisiäsi verkossa.</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Tee meistä oletusselaimesi, niin kaikki sivustolinkit avautuvat DuckDuckGo-selaimessa.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Vaihda oletusselain niin, että linkit avautuvat DuckDuckGo:ssa.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ei nyt</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo ei ole oletusselaimesi. Hanki lisää suojausta.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Aseta oletukseksi</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Älä kysy uudelleen</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo suojaa selaamistasi estämällä seurantatoiminnot</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Välilehtiesi ja tietojesi tyhjentäminen poistaa seurantatoimintojen estohistorian ja palauttaa tämän luvun nollaan.\n\nJos et halua nähdä tätä banneria välilehtinäkymässä, piilota se.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Piilota banneri</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varoitus: Tämä sivusto saattaa olla tietoturvariski</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo esti tämän sivun, koska se saattaa levittää haittaohjelmia, jotka voivat vaarantaa laitteesi tai varastaa henkilökohtaisia tietojasi.\n<a href=\"\">Lue lisää</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Tämä verkkosivusto saattaa esiintyä laillisena sivustona huijatakseen sinua antamaan henkilötietoja, kuten salasanan tai luottokortin numeron.\n<a href=\"\">Lue lisää</a>]]></string>
@@ -871,5 +874,53 @@
     <string name="maliciousSiteToggleHint">Varoita sivustoista, jotka on merkitty tietojenkalastelun tai haittaohjelmien johdosta</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Lue lisää</annotation></string>
     <string name="maliciousSiteSettingDisabled">Tämän ominaisuuden käytöstä poistaminen voi vaarantaa tietosi.</string>
+    <string name="threatProtectionTitle">Uhkien torjunta</string>
+    <string name="threatProtectionDescription">DuckDuckGon parannetut suojaukset pysäyttävät yleisimmät uhat ja pitävät yhteytesi suojattuna.</string>
+    <string name="smarterEncryptionTitle">Älykkäämpi salaus</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Päivittää linkit automaattisesti HTTPS-yhteyteen aina kun mahdollista.<a href=\"\">Lue lisää</a>]]></string>
+    <string name="scamBlockerTitle">Huijausten esto</string>
+    <string name="scamBlockerDescription">Varoita sivustoista, jotka on merkitty huijausten, tietojenkalastelun ja haittaohjelmien johdosta.</string>
+    <string name="threatProtectionLearnMoreTitle">Lue lisää</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Kokeile aloitusnäytön widgetiä!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Lisää haku-widgetimme aloitusnäytöllesi, josta löydät sen nopeasti ja helposti.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Lisää widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Ei nyt</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Hae DuckDuckGosta</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Aloitusnäytön widget</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Viimeistele asennuksesi</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hei!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Suojaukset</b> <i>aktivoitu!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hei!<br/>Oletko valmis käyttämään nopeampaa selainta, joka pitää sinut suojattuna?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Tyhjennä selaustoimintasi välittömästi <font color=\"#F05C2B\">Fire Buttonilla</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Kokeile nyt!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ja %1$d muu yritti seurata sinua täällä. <font color=\"#F05C2B\">Estin sen!</font>]]></item>
+        <item quantity="other"><![CDATA[ ja %1$d muuta yritti seurata sinua täällä. <font color=\"#F05C2B\">Estin ne!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ yritti seurata sinua täällä. <font color=\"#F05C2B\">Estin sen!</font>]]></item>
+        <item quantity="other"><![CDATA[ yrittivät seurata sinua täällä. <font color=\"#F05C2B\">Estin ne!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Napauta kilpeä saadaksesi lisätietoja.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo on riippumaton verkkosuojausta tarjoava yritys kaikille, jotka haluavat saada henkilökohtaiset tietonsa takaisin hallintaansa.\n\nUskomme, että paras tapa suojata henkilötietojasi hakkereilta, huijareilta ja tietosuojaa loukkaavilta yrityksiltä on estää niiden kerääminen kokonaan. Siksi miljoonat ihmiset <annotation type="chart_comparison">valitsevat DuckDuckGon hakeakseen ja selatakseen verkossa Chromen ja muiden selainten sijaan</annotation>. Selaimeemme sisältyvä hakukoneemme on kuin Google, mutta se ei koskaan seuraa hakujasi. Selaussuojauksemme, kuten mainosten seurannan esto ja evästeiden esto, auttavat estämään muita yrityksiä keräämästä tietojasi. Lisäksi selaimemme on ilmainen – ansaitsemme <annotation type="privacy_respecting_ads">tietosuojaa kunnioittavilla hakumainoksilla</annotation>, emme hyödyntämällä tietojasi.Lisäksi tarjoamme myös <annotation type="ppro_help_page">DuckDuckGo-tilauksen</annotation>, joka on integroitu selaimeemme. Tilaajat saavat entistä paremman tietosuojan nopealla ja yksinkertaisella <annotation type="vpn_help_page">VPN</annotation>:llä, joka auttaa suojaamaan verkkotoimintaasi, pääsyn edistyneisiin tekoälymalleihin yksityisessä Duck.ai-tekoälychat-palvelussamme, joka etsii ja poistaa henkilökohtaiset tietosi käyttäjiä etsiviltä sivustoilta sekä palauttaa henkilöllisyytesi, jos se varastetaan.\n\nOta henkilökohtaiset tietosi takaisin hallintaasi selaimella, joka on suunniteltu tietojen suojaamiseen, ei tietojen keräämiseen.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGolla on myös <b>valinnainen maksullinen</b> tilaus, johon sisältyy turvallinen <b>VPN</b> ja <b>edistynyt, yksityinen tekoäly</b>.]]></string>
+    <string name="settingsDuckAiRebranding">Tekoälyominaisuudet</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

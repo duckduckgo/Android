@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Пароли</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Импортиране на пароли от Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Импортиране на пароли</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d пароли са импортирани от Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d пароли са импортирани от CSV</string>
 
@@ -250,9 +250,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Синхронизиране на паролите от работния плот</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Синхронизиране на паролите от работния плот</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Импортиране на вашите пароли от Google</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Импортиране на пароли от Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google може да ви помоли да влезете или да въведете паролата си, за да потвърдите.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Отваряне на паролите от Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Импортиране от Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Избор на CSV файл</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Импортиране от браузър на работния плот</string>
 
@@ -280,5 +280,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Импортиране на пароли от Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Синхронизиране на паролите от работния плот</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Нулиране на изключените сайтове</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Пренесете паролите си от&lt;br /&gt;Google в DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Можете бързо и сигурно да импортирате паролите си в DuckDuckGo. Google може да поиска да въведете парола.</string>
+    <string name="passwords_import_promo_action">Импортиране от Google</string>
+    <string name="passwords_import_promo_in_browser_title">Прехвърли паролите си от Google в DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Не ме питай повече</string>
+    <string name="passwords_import_promo_in_settings_title">Импортиране на пароли от Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Скрий</string>
 
 </resources>

@@ -41,7 +41,7 @@ import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePerm
 import com.duckduckgo.site.permissions.impl.ui.permissionsperwebsite.WebsitePermissionSettingOption.DENY
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
@@ -136,8 +136,8 @@ class PermissionsPerWebsiteActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val permissionSettingSelected = selectedItem.getPermissionSettingOptionFromPosition()
                         val newPermissionSetting = WebsitePermissionSetting(currentOption.icon, currentOption.title, permissionSettingSelected)
-                        Timber.d("Permissions: permissionSettingSelected $permissionSettingSelected")
-                        Timber.d("Permissions: newPermissionSetting $newPermissionSetting")
+                        logcat { "Permissions: permissionSettingSelected $permissionSettingSelected" }
+                        logcat { "Permissions: newPermissionSetting $newPermissionSetting" }
                         viewModel.onPermissionSettingSelected(newPermissionSetting, url)
                     }
                 },

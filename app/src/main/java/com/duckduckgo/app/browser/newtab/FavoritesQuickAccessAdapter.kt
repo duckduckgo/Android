@@ -37,7 +37,8 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -72,9 +73,9 @@ class FavoritesQuickAccessAdapter(
         private var popupMenu: PopupMenu? = null
 
         sealed class ItemState {
-            object Stale : ItemState()
-            object LongPress : ItemState()
-            object Drag : ItemState()
+            data object Stale : ItemState()
+            data object LongPress : ItemState()
+            data object Drag : ItemState()
         }
 
         private val scaleDown = ObjectAnimator.ofPropertyValuesHolder(
@@ -126,7 +127,7 @@ class FavoritesQuickAccessAdapter(
                 val bundle = payload as Bundle
 
                 for (key: String in bundle.keySet()) {
-                    Timber.v("$key changed - Need an update for $item")
+                    logcat(VERBOSE) { "$key changed - Need an update for $item" }
                 }
 
                 bundle[DIFF_KEY_TITLE]?.let {

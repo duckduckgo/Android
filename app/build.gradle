@@ -72,6 +72,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     compileOptions {
         coreLibraryDesugaringEnabled = true
@@ -249,7 +250,6 @@ dependencies {
 
     implementation project(':autofill-api')
     implementation project(':autofill-impl')
-    implementation project(':autofill-store')
     internalImplementation project(':autofill-internal')
     testImplementation project(':autofill-test')
 
@@ -290,6 +290,8 @@ dependencies {
     implementation project(':macos-api')
     implementation project(':macos-impl')
 
+    implementation project(":pir-api")
+    implementation project(":pir-impl")
     internalImplementation project(':pir-internal')
 
     implementation project(':privacy-dashboard-api')
@@ -404,6 +406,9 @@ dependencies {
     implementation project(':dax-prompts-api')
     implementation project(':dax-prompts-impl')
 
+    implementation project(':serp-logos-api')
+    implementation project(':serp-logos-impl')
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -434,7 +439,7 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation "io.reactivex.rxjava2:rxandroid:_"
-    implementation JakeWharton.timber
+    implementation "com.squareup.logcat:logcat:_"
     implementation 'nl.dionsegijn:konfetti:1.2.5'
     implementation("io.github.pcmind:leveldb:_") {
         exclude group: 'com.google.guava', module: 'guava'

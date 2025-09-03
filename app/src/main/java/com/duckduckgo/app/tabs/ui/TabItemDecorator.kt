@@ -27,22 +27,13 @@ import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.mobile.android.R as CommonR
 
-class TabItemDecorator(context: Context, experimentStore: VisualDesignExperimentDataStore) : RecyclerView.ItemDecoration() {
-    private val borderPadding = if (experimentStore.isExperimentEnabled.value) BORDER_PADDING_NEW else BORDER_PADDING
-    private val activeTabBorderColor = if (experimentStore.isExperimentEnabled.value) {
-        CommonR.attr.daxColorTabHighlight
-    } else {
-        CommonR.attr.daxColorBackgroundInverted
-    }
-    private val selectionBorderWidth = if (experimentStore.isExperimentEnabled.value) {
-        ACTIVE_TAB_BORDER_WIDTH
-    } else {
-        SELECTION_BORDER_WIDTH
-    }
+class TabItemDecorator(context: Context) : RecyclerView.ItemDecoration() {
+    private val borderPadding = BORDER_PADDING_NEW
+    private val activeTabBorderColor = CommonR.attr.daxColorTabHighlight
+    private val selectionBorderWidth = ACTIVE_TAB_BORDER_WIDTH
 
     private val activeTabBorderStroke: Paint = Paint().apply {
         isAntiAlias = true
@@ -106,8 +97,6 @@ class TabItemDecorator(context: Context, experimentStore: VisualDesignExperiment
     companion object {
         private val BORDER_RADIUS = 12.toPx().toFloat()
         private val ACTIVE_TAB_BORDER_WIDTH = 2.toPx().toFloat()
-        private val SELECTION_BORDER_WIDTH = 4.toPx().toFloat()
-        private val BORDER_PADDING = 3.toPx().toFloat()
         private val BORDER_PADDING_NEW = 1.toPx().toFloat()
     }
 }

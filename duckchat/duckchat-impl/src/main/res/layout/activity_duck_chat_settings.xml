@@ -19,7 +19,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.DuckChatSettingsActivity">
+    tools:context=".ui.settings.DuckChatSettingsActivity">
 
     <include
         android:id="@+id/includeToolbar"
@@ -64,6 +64,7 @@
                 android:layout_marginBottom="@dimen/keyline_6"
                 android:text="@string/duck_chat_settings_activity_description"
                 android:gravity="center"
+                app:textType="secondary"
                 app:typography="body2"/>
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
@@ -78,25 +79,138 @@
                 app:primaryText="@string/duck_chat_enable_duck_ai_setting"
                 app:showSwitch="true"/>
 
-            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
-                android:id="@+id/duckChatToggleSettingsTitle"
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/userEnabledDuckChatToggleRebranding"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_show_in_heading" />
+                android:visibility="gone"
+                app:leadingIcon="@drawable/ic_ai_chat_24"
+                app:leadingIconBackground="circular"
+                app:primaryText="@string/duck_chat_enable_duck_ai_setting_rebranding"
+                app:secondaryText="@string/duck_chat_enable_duck_ai_setting_description_rebranding"
+                app:showSwitch="true" />
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showDuckChatInMenuToggle"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/duckAiInputScreenToggleContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_visibility_setting"
-                app:showSwitch="true"/>
+                android:layout_marginTop="@dimen/keyline_4"
+                android:layout_marginHorizontal="@dimen/keyline_4">
 
-            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
-                android:id="@+id/showDuckChatInAddressBarToggle"
+                <LinearLayout
+                    android:id="@+id/duckAiInputScreenWithoutAiContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="@dimen/keyline_2"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintWidth_max="160dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/duckAiInputScreenWithAiContainer"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/duckAiInputScreenToggleWithoutAiImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/searchbox_withoutai_active" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:text="@string/input_screen_user_pref_without_ai"
+                        app:textType="primary"
+                        app:typography="caption" />
+
+                    <ImageView
+                        android:id="@+id/duckAiInputScreenToggleWithoutAiCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:src="@drawable/ic_check_accent_24" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/duckAiInputScreenWithAiContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/inputScreenUserPrefToggleSpacing"
+                    android:paddingBottom="@dimen/keyline_2"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintWidth_max="160dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/duckAiInputScreenWithoutAiContainer"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageView
+                        android:id="@+id/duckAiInputScreenToggleWithAiImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/searchbox_withai_inactive" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:text="@string/input_screen_user_pref_with_ai"
+                        app:textType="primary"
+                        app:typography="caption" />
+
+                    <ImageView
+                        android:id="@+id/duckAiInputScreenToggleWithAiCheck"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:src="@drawable/ic_shape_circle_24" />
+
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/duckAiInputScreenDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:primaryText="@string/duck_chat_address_bar_visibility_setting"
-                app:showSwitch="true"/>
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:layout_marginBottom="@dimen/keyline_4"
+                android:text="@string/input_screen_user_pref_description"
+                app:textType="secondary"
+                app:typography="body2" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/duckAiShortcuts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:primaryText="@string/duck_ai_shortcut_settings_title"
+                app:secondaryText="@string/duck_ai_shortcut_settings_description" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/divider2"/>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/showDuckChatSearchSettingsLink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/duck_chat_assist_settings_title"
+                app:secondaryText="@string/duck_chat_assist_settings_description"
+                app:leadingIcon="@drawable/ic_assist_24"
+                app:leadingIconBackground="circular"
+                app:showSwitch="false"/>
+
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

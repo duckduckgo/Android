@@ -70,6 +70,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckplayer.api.DuckPlayer
@@ -85,7 +86,10 @@ import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import java.net.URI
 import javax.inject.Inject
 import kotlinx.coroutines.*
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -121,6 +125,7 @@ class BrowserWebViewClient @Inject constructor(
     private val uriLoadedManager: UriLoadedManager,
     private val androidFeaturesHeaderPlugin: AndroidFeaturesHeaderPlugin,
     private val duckChat: DuckChat,
+    private val contentScopeExperiments: ContentScopeExperiments,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -160,7 +165,7 @@ class BrowserWebViewClient @Inject constructor(
         isRedirect: Boolean,
     ): Boolean {
         try {
-            Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
+            logcat(VERBOSE) { "shouldOverride webViewUrl: ${webView.url} URL: $url" }
             webViewClientListener?.onShouldOverride()
             if (requestInterceptor.shouldOverrideUrlLoading(webViewClientListener, url, webView.url?.toUri(), isForMainFrame)) {
                 return true
@@ -193,7 +198,7 @@ class BrowserWebViewClient @Inject constructor(
                 }
 
                 is SpecialUrlDetector.UrlType.AppLink -> {
-                    Timber.i("Found app link for ${urlType.uriString}")
+                    logcat(INFO) { "Found app link for ${urlType.uriString}" }
                     webViewClientListener?.let { listener ->
                         return listener.handleAppLink(urlType, isForMainFrame)
                     }
@@ -201,7 +206,12 @@ class BrowserWebViewClient @Inject constructor(
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink -> {
                     runCatching {
-                        duckChat.openDuckChat(url.getQueryParameter(QUERY))
+                        val query = url.getQueryParameter(QUERY)
+                        if (query != null) {
+                            duckChat.openDuckChatWithPrefill(query)
+                        } else {
+                            duckChat.openDuckChat()
+                        }
                     }.isSuccess
                 }
                 is SpecialUrlDetector.UrlType.ShouldLaunchDuckPlayerLink -> {
@@ -225,7 +235,7 @@ class BrowserWebViewClient @Inject constructor(
                     }
                 }
                 is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
-                    Timber.i("Found non-http app link for ${urlType.uriString}")
+                    logcat(INFO) { "Found non-http app link for ${urlType.uriString}" }
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             return listener.handleNonHttpAppLink(urlType)
@@ -235,7 +245,7 @@ class BrowserWebViewClient @Inject constructor(
                 }
 
                 is SpecialUrlDetector.UrlType.Unknown -> {
-                    Timber.w("Unable to process link type for ${urlType.uriString}")
+                    logcat(WARN) { "Unable to process link type for ${urlType.uriString}" }
                     webView.originalUrl?.let {
                         webView.loadUrl(it)
                     }
@@ -251,7 +261,7 @@ class BrowserWebViewClient @Inject constructor(
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.startProcessingTrackingLink()
-                            Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
+                            logcat { "AMP link detection: Loading extracted URL: ${urlType.extractedUrl}" }
                             loadUrl(listener, webView, urlType.extractedUrl)
                             return true
                         }
@@ -274,7 +284,7 @@ class BrowserWebViewClient @Inject constructor(
                     if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
                             listener.startProcessingTrackingLink()
-                            Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+                            logcat { "Loading parameter cleaned URL: ${urlType.cleanedUrl}" }
 
                             return when (
                                 val parameterStrippedType =
@@ -286,7 +296,7 @@ class BrowserWebViewClient @Inject constructor(
                                 }
 
                                 is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
-                                    Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
+                                    logcat { "AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}" }
                                     loadUrl(listener, webView, parameterStrippedType.extractedUrl)
                                     true
                                 }
@@ -379,7 +389,7 @@ class BrowserWebViewClient @Inject constructor(
 
     @UiThread
     override fun onPageCommitVisible(webView: WebView, url: String) {
-        Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+        logcat(VERBOSE) { "onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
         // Show only when the commit matches the tab state
         if (webView.url == url) {
             val navigationList = webView.safeCopyBackForwardList() ?: return
@@ -429,15 +439,19 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
         val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.pageStarted(WebViewNavigationState(navigationList))
+
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            val activeExperiments = contentScopeExperiments.getActiveExperiments()
+            webViewClientListener?.pageStarted(WebViewNavigationState(navigationList), activeExperiments)
+            jsPlugins.getPlugins().forEach {
+                it.onPageStarted(webView, url, webViewClientListener?.getSite()?.isDesktopMode, activeExperiments)
+            }
+        }
         if (url != null && url == lastPageStarted) {
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
-        jsPlugins.getPlugins().forEach {
-            it.onPageStarted(webView, url, webViewClientListener?.getSite())
-        }
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
@@ -451,9 +465,7 @@ class BrowserWebViewClient @Inject constructor(
 
     @UiThread
     override fun onPageFinished(webView: WebView, url: String?) {
-        Timber.v(
-            "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}",
-        )
+        logcat(VERBOSE) { "onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}" }
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
@@ -478,7 +490,13 @@ class BrowserWebViewClient @Inject constructor(
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
+                        pageLoadedHandler.onPageLoaded(
+                            url = it,
+                            title = navigationList.currentItem?.title,
+                            start = safeStart,
+                            end = currentTimeProvider.elapsedRealtime(),
+                            isTabInForeground = webViewClientListener?.isTabInForeground() ?: true,
+                        )
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
                             if (duckPlayer.getDuckPlayerState() == ENABLED && duckPlayer.isSimulatedYoutubeNoCookie(uri)) {
@@ -519,7 +537,7 @@ class BrowserWebViewClient @Inject constructor(
             withContext(dispatcherProvider.main()) {
                 loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
             }
-            Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+            logcat(VERBOSE) { "Intercepting resource ${request.url} type:${request.method} on page $documentUrl" }
             requestInterceptor.shouldIntercept(
                 request,
                 webView,
@@ -533,7 +551,7 @@ class BrowserWebViewClient @Inject constructor(
         view: WebView?,
         detail: RenderProcessGoneDetail?,
     ): Boolean {
-        Timber.w("onRenderProcessGone. Did it crash? ${detail?.didCrash()}")
+        logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
         if (detail?.didCrash() == true) {
             pixel.fire(WEB_RENDERER_GONE_CRASH)
         } else {
@@ -550,9 +568,9 @@ class BrowserWebViewClient @Inject constructor(
         host: String?,
         realm: String?,
     ) {
-        Timber.v("onReceivedHttpAuthRequest ${view?.url} $realm, $host")
+        logcat(VERBOSE) { "onReceivedHttpAuthRequest ${view?.url} $realm, $host" }
         if (handler != null) {
-            Timber.v("onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]")
+            logcat(VERBOSE) { "onReceivedHttpAuthRequest - useHttpAuthUsernamePassword [${handler.useHttpAuthUsernamePassword()}]" }
             if (handler.useHttpAuthUsernamePassword()) {
                 val credentials = view?.let {
                     webViewHttpAuthStore.getHttpAuthUsernamePassword(it, host.orEmpty(), realm.orEmpty())
@@ -580,14 +598,14 @@ class BrowserWebViewClient @Inject constructor(
 
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
-                Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
+                logcat { "The certificate authority ${error.certificate.issuedBy.dName} is not trusted" }
                 trusted = trustedCertificateStore.validateSslCertificateChain(error.certificate)
             }
 
-            else -> Timber.d("SSL error ${error.primaryError}")
+            else -> logcat { "SSL error ${error.primaryError}" }
         }
 
-        Timber.d("The certificate authority validation result is $trusted")
+        logcat { "The certificate authority validation result is $trusted" }
         if (trusted is CertificateValidationState.TrustedChain) {
             handler.proceed()
         } else {
@@ -596,7 +614,7 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun parseSSlErrorResponse(sslError: SslError): SslErrorResponse {
-        Timber.d("SSL Certificate: parseSSlErrorResponse ${sslError.primaryError}")
+        logcat { "SSL Certificate: parseSSlErrorResponse ${sslError.primaryError}" }
         val sslErrorType = when (sslError.primaryError) {
             SSL_UNTRUSTED -> UNTRUSTED_HOST
             SSL_EXPIRED -> EXPIRED
@@ -614,7 +632,7 @@ class BrowserWebViewClient @Inject constructor(
         realm: String?,
     ) {
         webViewClientListener?.let {
-            Timber.v("showAuthenticationDialog - $host, $realm")
+            logcat(VERBOSE) { "showAuthenticationDialog - $host, $realm" }
 
             val siteURL = if (view?.url != null) "${URI(view.url).scheme}://$host" else host.orEmpty()
 
@@ -641,7 +659,7 @@ class BrowserWebViewClient @Inject constructor(
                 webViewClientListener?.onReceivedError(parsedError, request.url.toString())
             }
             if (request?.isForMainFrame == true) {
-                Timber.d("recordErrorCode for ${request.url}")
+                logcat { "recordErrorCode for ${request.url}" }
                 webViewClientListener?.recordErrorCode(
                     "${it.errorCode.asStringErrorCode()} - ${it.description}",
                     request.url.toString(),
@@ -677,7 +695,7 @@ class BrowserWebViewClient @Inject constructor(
         }
         if (request?.isForMainFrame == true) {
             errorResponse?.let {
-                Timber.d("recordHttpErrorCode for ${request.url}")
+                logcat { "recordHttpErrorCode for ${request.url}" }
                 webViewClientListener?.recordHttpErrorCode(it.statusCode, request.url.toString())
             }
         }

@@ -28,7 +28,8 @@ import com.duckduckgo.app.pixels.AppPixelName.*
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface LongPressHandler {
     fun handleLongPress(
@@ -44,7 +45,7 @@ interface LongPressHandler {
     ): RequiredAction
 
     sealed class RequiredAction {
-        object None : RequiredAction()
+        data object None : RequiredAction()
         class OpenInNewTab(val url: String) : RequiredAction()
         class OpenInNewBackgroundTab(val url: String) : RequiredAction()
         class DownloadFile(val url: String) : RequiredAction()
@@ -103,7 +104,7 @@ class WebViewLongPressHandler @Inject constructor(
                 }
             }
             else -> {
-                Timber.v("App does not yet handle target type: $longPressTargetType")
+                logcat(VERBOSE) { "App does not yet handle target type: $longPressTargetType" }
                 menuShown = false
             }
         }

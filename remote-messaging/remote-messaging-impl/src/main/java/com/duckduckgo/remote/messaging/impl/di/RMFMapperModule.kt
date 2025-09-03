@@ -34,6 +34,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -45,7 +46,7 @@ object RMFMapperModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providesMessageMapper(
-        messageAdapter: JsonAdapter<RemoteMessage>,
+        messageAdapter: Lazy<JsonAdapter<RemoteMessage>>,
     ): MessageMapper {
         return MessageMapper(messageAdapter)
     }

@@ -24,6 +24,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.services.SubscriptionsCachedService
 import com.duckduckgo.subscriptions.impl.services.SubscriptionsService
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -41,6 +42,7 @@ class SubscriptionFeaturesFetcher @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val playBillingManager: PlayBillingManager,
     private val subscriptionsService: SubscriptionsService,
+    private val subscriptionsCachedService: SubscriptionsCachedService,
     private val authRepository: AuthRepository,
     private val privacyProFeature: PrivacyProFeature,
     private val dispatcherProvider: DispatcherProvider,
@@ -69,9 +71,22 @@ class SubscriptionFeaturesFetcher @Inject constructor(
             ?.find { it.productId == BASIC_SUBSCRIPTION }
             ?.subscriptionOfferDetails
             ?.map { it.basePlanId }
-            ?.filter { authRepository.getFeatures(it).isEmpty() }
+            ?.distinct()
+            ?.let { basePlanIds ->
+                if (privacyProFeature.refreshSubscriptionPlanFeatures().isEnabled()) {
+                    basePlanIds
+                } else {
+                    basePlanIds.filter {
+                        authRepository.getFeatures(it).isEmpty()
+                    }
+                }
+            }
             ?.forEach { basePlanId ->
-                val features = subscriptionsService.features(basePlanId).features
+                val features = if (privacyProFeature.useClientWithCacheForFeatures().isEnabled()) {
+                    subscriptionsCachedService.features(basePlanId).features
+                } else {
+                    subscriptionsService.features(basePlanId).features
+                }
                 logcat { "Subscription features for base plan $basePlanId fetched: $features" }
                 if (features.isNotEmpty()) {
                     authRepository.setFeatures(basePlanId, features.toSet())

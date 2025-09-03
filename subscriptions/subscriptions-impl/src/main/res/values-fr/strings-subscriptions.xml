@@ -61,13 +61,20 @@
     <string name="privacyProFaqSecondary">Trouvez les réponses aux questions fréquemment posées ou contactez l\'assistance de Privacy Pro sur nos pages d\'aide. La disponibilité des fonctionnalités varie selon les pays.</string>
     <string name="subscriptionStatusSubscribed">Abonné(e)</string>
     <string name="privacyPolicyAndTermsOfService">Politique de confidentialité et conditions d\'utilisation</string>
+    <string name="subscriptionStatusFreeTrial">Essai gratuit actif</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Votre essai gratuit se termine le %1$s ; il sera automatiquement converti en abonnement mensuel payant ce jour-là.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Votre essai gratuit se termine le %1$s ; il sera automatiquement converti en abonnement annuel payant ce jour-là.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Votre essai gratuit se termine le %1$s ; il ne sera pas converti en abonnement payant.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Paramètres d\'abonnement</string>
     <string name="subscriptionSettingSubscribe">Protégez votre connexion et votre identité avec Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Comprend notre VPN, Personal Information Removal et Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Comprend notre VPN et Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Les abonnés bénéficient de notre VPN, de Personal Information Removal et d\'Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Les abonnés bénéficient de notre VPN et d\'Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Obtenir Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Essayer Privacy Pro gratuitement</string>
     <string name="subscriptionSettingRestore">J\'ai un abonnement</string>
     <string name="subscriptionSettingExpired">Votre abonnement Privacy Pro a expiré</string>
     <string name="subscriptionSettingExpiredViewPlans">Voir les forfaits</string>
@@ -161,4 +168,34 @@
     <string name="activityActivateSubscription">J\'ai un abonnement</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Envoyer vos remarques</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Abonnement DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">Votre abonnement DuckDuckGo a expiré</string>
+    <string name="privacyProFaqRebranding">Besoin d\'aide pour votre abonnement ?</string>
+    <string name="privacyProFaqSecondaryRebranding">Trouvez les réponses aux questions fréquemment posées ou contactez l\'assistance abonnement sur nos pages d\'aide. La disponibilité des fonctionnalités varie selon les pays.</string>
+    <string name="restoreSubscriptionTitleRebranding">Ajoutez votre abonnement à cet appareil</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Associez une adresse e-mail à votre abonnement pour l\'ajouter à cet appareil.</string>
+    <string name="activateOnOtherDevicesRebranding">Ajoutez votre abonnement à d\'autres appareils</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Ajoutez votre abonnement à vos autres appareils via Google Play ou en associant une adresse e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Servez-vous de l\'e-mail ci-dessus pour ajouter votre abonnement à vos autres appareils dans l\'application DuckDuckGo. Accédez à Paramètres &gt; Paramètres d\'abonnement &gt; J\'ai un abonnement.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro s\'appelle désormais simplement l\'abonnement DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Protégez votre connexion et votre identité avec un seul abonnement.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Vous ne pourrez plus accéder à votre abonnement sur cet appareil. Cela n\'annulera pas votre abonnement et il restera actif sur vos autres appareils.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai, de Personal Information Removal et d\'Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Les abonnés bénéficient de notre VPN, de modèles d\'IA avancés dans Duck.ai et d\'Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Impossible d\'accéder aux modèles Duck.ai réservés aux abonnés</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Je n\'arrive pas à accéder à Duck.ai dans d\'autres navigateurs avec mon abonnement</string>
+    <string name="feedbackSubCategoryDuckAiOther">Autres commentaires sur Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Sécurisez votre Wi-Fi et discutez en toute confidentialité grâce à des modèles d\'IA avancés</string>
+
+    <string name="subscriptionSettingGetRebranding">S\'abonner à DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Essayer gratuitement</string>
+    <string name="feedbackGeneralSubscription">Abonnement</string>
+
 </resources>

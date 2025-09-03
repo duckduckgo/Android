@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Contraseñas</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importar contraseñas de Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importar contraseñas</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d contraseñas importadas de Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d contraseñas importadas de CSV</string>
 
@@ -250,9 +250,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizar contraseñas de escritorio</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizar contraseñas de escritorio</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importa tus contraseñas de Google</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Importar contraseñas de Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google puede pedirte que inicies sesión o introduzcas tu contraseña para confirmar.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Abre tus contraseñas de Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importar desde Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Elige un archivo CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importar desde el navegador del escritorio</string>
 
@@ -280,5 +280,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importar contraseñas de Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Sincronizar contraseñas de escritorio</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Restablecer sitios excluidos</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Trae tus contraseñas de&lt;br /&gt;Google a DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importa tus contraseñas a DuckDuckGo de forma rápida y segura. Google puede pedirte que introduzcas tu contraseña.</string>
+    <string name="passwords_import_promo_action">Importar desde Google</string>
+    <string name="passwords_import_promo_in_browser_title">Trae tus contraseñas de Google a DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">No volver a preguntar</string>
+    <string name="passwords_import_promo_in_settings_title">Importar contraseñas de Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Ocultar</string>
 
 </resources>

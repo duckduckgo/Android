@@ -60,6 +60,7 @@
     <attr name="daxColorLines" format="color"/>
     <attr name="daxColorAccentBlue" format="color"/>
     <attr name="daxColorAccentYellow" format="color"/>
+    <attr name="daxColorAccentContentPrimary" format="color"/>
     <attr name="daxColorContainerDisabled" format="color"/>
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
@@ -74,6 +75,7 @@
     <attr name="daxColorControlFillPrimary" format="color"/>
     <attr name="daxColorControlFillSecondary" format="color"/>
     <attr name="daxColorControlFillTertiary" format="color"/>
+    <attr name="daxColorControlDecorationTertiary" format="color"/>
 
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
     <attr name="daxColorButtonPrimaryContainerPressed" format="color"/>
@@ -121,6 +123,10 @@
     <attr name="daxColorTextInputEnabledOutline" format="color"/>
 
     <attr name="daxColorWebViewScrollbarTrack" format="color"/>
+
+    <attr name="daxColorInputModeIndicator" format="color"/>
+    <attr name="daxColorInputModeIndicatorShadow" format="color"/>
+    <attr name="daxColorBackdrop" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>
@@ -187,6 +193,7 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
+    <color name="blue80">#14307E</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
@@ -213,6 +220,7 @@
     <color name="white12">#1FFFFFFF</color>
     <color name="white9">#17FFFFFF</color>
     <color name="white6">#0FFFFFFF</color>
+    <color name="white3">#08FFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="white_60">#F2F5F9</color>
 
@@ -225,6 +233,8 @@
     <color name="yellow">#FFB652</color>
     <color name="blue">#1A73E9</color>
     <color name="grey">#F3F5F9</color>
+
+    <color name="transparent">#00000000</color>
 
     <!-- Legacy colors -->
     <!-- WebView -->
@@ -242,6 +252,78 @@
     <color name="ic_launcher_purple_background">#7A4BDC</color>
     <color name="ic_launcher_blue_background">#4179ED</color>
     <color name="ic_launcher_black_background">#262626</color>
+    <color name="ic_launcher_pink_background">#E37089</color>
+
+    <!-- The new color system is defined by categories and sub-categories-->
+    <!-- Backgrounds / Text / Icons / Lines / Controls / Tone -->
+    <!-- Inside each category there are different colors, which define where are applied -->
+
+    <!-- Dark Palette -->
+    <!-- Accents -->
+    <color name="accent_content_primary_dark">@color/blue80</color>
+
+    <!-- Backgrounds -->
+    <color name="background_background_dark">#27282A</color>
+    <color name="background_surface_dark">#333538</color>
+    <color name="background_window_dark">#404145</color>
+    <color name="background_container_dark">#404145</color>
+
+    <!-- Text -->
+    <color name="text_primary_dark">#E6FFFFFF</color>
+    <color name="text_secondary_dark">#99FFFFFF</color>
+    <color name="text_tertiary_dark">#66FFFFFF</color>
+
+    <!-- Icons -->
+    <color name="icon_primary_dark">#C7FFFFFF</color>
+    <color name="icon_secondary_dark">#7AFFFFFF</color>
+    <color name="icon_tertiary_dark">#3DFFFFFF</color>
+
+    <!-- Lines-->
+    <color name="lines_dark">#1FF9F9F9</color>
+
+    <!-- Controls -->
+    <color name="controls_fill_primary_dark">#1FF9F9F9</color>
+    <color name="controls_fill_secondary_dark">#2EF9F9F9</color>
+    <color name="controls_fill_tertiary_dark">#3DF9F9F9</color>
+    <color name="controls_decoration_tertiary_dark">#B8F9F9F9</color>
+
+    <!-- Light Palette -->
+    <!-- Accents -->
+    <color name="accent_content_primary_light">@color/white</color>
+
+    <!-- Backgrounds -->
+    <color name="background_background_light">#F2F2F2</color>
+    <color name="background_surface_light">#F9F9F9</color>
+    <color name="background_window_light">#FFFFFF</color>
+    <color name="background_container_light">#FFFFFF</color>
+
+    <!-- Text -->
+    <color name="text_primary_light">#1F1F1F</color>
+    <color name="text_secondary_light">#B81C1F21</color>
+    <color name="text_tertiary_light">#661F1F1F</color>
+
+    <!-- Icons -->
+    <color name="icon_primary_light">#D61F1F1F</color>
+    <color name="icon_secondary_light">#991F1F1F</color>
+    <color name="icon_tertiary_light">#661F1F1F</color>
+
+    <!-- Lines-->
+    <color name="lines_light">#171F1F1F</color>
+
+    <!-- Controls -->
+    <color name="controls_fill_primary_light">#171F1F1F</color>
+    <color name="controls_fill_secondary_light">#1F1F1F1F</color>
+    <color name="controls_fill_tertiary_light">#2E1F1F1F</color>
+    <color name="controls_decoration_tertiary_light">#991F1F1F</color>
+
+    <!-- Fire Button -->
+    <attr name="daxColorFireButtonOne" format="color"/>
+    <attr name="daxColorFireButtonTwo" format="color"/>
+    <attr name="daxColorFireButtonThree" format="color"/>
+
+    <!-- Shadows -->
+    <color name="background_omnibar_shadow">#FF000000</color>
+
 </resources>
 
     <!-- Opacity Prefixes

@@ -55,26 +55,39 @@ jobs:
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Autofill Critical Path E2E Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.9.7
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
         timeout-minutes: 120
         with:
           api-key: ${{ secrets.ROBIN_API_KEY }}
           project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
-          name: autofill_${{ github.sha }}
+          name: autofill_critical_path_${{ github.sha }}
           timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
           app-file: apk/release.apk
           android-api-level: 30
           workspace: .maestro
           include-tags: autofillNoAuthTests
 
+      - name: Autofill web flows
+        uses: mobile-dev-inc/action-maestro-cloud@v1.9.8
+        timeout-minutes: 120
+        with:
+          api-key: ${{ secrets.ROBIN_API_KEY }}
+          project-id: ${{ vars.ROBIN_ANDROID_PROJECT_ID }}
+          name: autofill_secondary_functionality_${{ github.sha }}
+          timeout: ${{ vars.ROBIN_TIMEOUT_MINUTES }}
+          app-file: apk/release.apk
+          android-api-level: 30
+          workspace: .maestro
+          include-tags: autofillBackfillingUsername,autofillPasswordGeneration
+
       - name: Create Asana task when workflow failed
         if: ${{ failure() }}
         id: create-failure-task
-        uses: duckduckgo/native-github-asana-sync@v1.8
+        uses: duckduckgo/native-github-asana-sync@v2.0
         with:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: GH Workflow Failure - Autofill Critical Path E2E Flows (Robin)
-          asana-task-description: Autofill critical path tests have failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
+          asana-task-name: GH Workflow Failure - Autofill E2E Flows (Robin)
+          asana-task-description: Autofill tests have failed. See https://github.com/duckduckgo/Android/actions/runs/${{ github.run_id }}
           action: 'create-asana-task'

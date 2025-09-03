@@ -1,0 +1,88 @@
+appId: com.duckduckgo.mobile.android
+tags:
+    - privacyTest
+---
+# This test verifies that no session data is retained after clearing the browser data.
+# It's verified by revisiting the product page after using the fire button and asserting that the conversion request is now blocked.
+- retry:
+      maxRetries: 3
+      commands:
+            - launchApp:
+                clearState: true
+            - runFlow: ../shared/skip_all_onboarding.yaml
+            - inputText: "https://www.search-company.site/#ad-id-5"
+            - pressKey: Enter
+            - assertVisible:
+                id: "ad-id-5"
+            - tapOn:
+                id: "ad-id-5"
+            - assertVisible:
+                text: "Publisher site"
+            - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
+            - assertVisible:
+                text: "View Tracker Companies"
+            - tapOn:
+                text: "View Tracker Companies"
+            - assertVisible:
+                text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
+            - assertVisible:
+                text: "About our Web Tracking Protections"
+            - assertVisible:
+                text: ".*Ad Company"
+            - assertVisible:
+                text: "ad-company.site"
+            - action: back
+            - assertVisible:
+                text: "View Non-Tracker Companies"
+            - tapOn:
+                text: "View Non-Tracker Companies"
+            - assertVisible:
+                text: "The following third-party domains’ requests were loaded. If a company's requests are loaded, it can allow them to profile you, though our other web tracking protections still apply."
+            - assertVisible:
+                text: "About our Web Tracking Protections"
+            - assertVisible:
+                text: "The following domain’s requests were loaded because a publisher-company.site ad on DuckDuckGo was recently clicked. These requests help evaluate ad effectiveness. All ads on DuckDuckGo are non-profiling."
+            - assertVisible:
+                text: "How our search ads impact our protections"
+            - assertVisible:
+                text: ".*Ad Company"
+            - assertVisible:
+                text: "convert.ad-company.site"
+            - action: back
+            - action: back
+            - longPressOn:
+                id: "omnibarTextInput"
+            - tapOn: "Copy"
+            - action: back
+            - runFlow: ../shared/browser_screen/click_on_fire_button.yaml
+            - tapOn: "Clear All Tabs And Data"
+            - longPressOn:
+                id: "omnibarTextInput"
+            - tapOn: "Paste"
+            - pressKey: Enter
+            - assertVisible:
+                text: "Publisher site"
+            - runFlow: ../shared/browser_screen/click_on_privacy_shield.yaml
+            - assertVisible:
+                text: "View Tracker Companies"
+            - tapOn:
+                text: "View Tracker Companies"
+            - assertVisible:
+                text: "The following third-party domains’ requests were blocked from loading because they were identified as tracking requests. If a company's requests are loaded, it can allow them to profile you."
+            - assertVisible:
+                text: "About our Web Tracking Protections"
+            - assertVisible:
+                text: ".*Ad Company"
+            - assertVisible:
+                text: "ad-company.site"
+            - assertVisible:
+                text: "convert.ad-company.site"
+            - action: back
+            - assertVisible:
+                text: "View Non-Tracker Companies"
+            - tapOn:
+                text: "View Non-Tracker Companies"
+            - assertVisible:
+                text: "We did not identify any requests from third-party domains."
+            - assertVisible:
+                text: "About our Web Tracking Protections"

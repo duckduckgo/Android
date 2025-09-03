@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Password</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Importa le password di Google</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Importa password</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d password importate da Google</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d password importate da file CSV</string>
 
@@ -250,9 +250,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Sincronizza le password del desktop</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Sincronizza le password del desktop</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Importa le password di Google</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Importa le password da Google</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">Google potrebbe chiederti di effettuare l\'accesso o di inserire la tua password per confermare.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Apri le password di Google</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importa da Google</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Scegli un file CSV</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importa dal browser desktop</string>
 
@@ -280,5 +280,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Importa le password da Google</string>
     <string name="autofillSettingsImportFromDesktopSync">Sincronizza le password del desktop</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Ripristina siti esclusi</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Porta le password da&lt;br /&gt;Google a DuckDuckGo</string>
+    <string name="passwords_import_promo_subtitle">Importa rapidamente e in modo sicuro le password su DuckDuckGo. Google potrebbe chiederti di inserire la tua password.</string>
+    <string name="passwords_import_promo_action">Importa da Google</string>
+    <string name="passwords_import_promo_in_browser_title">Porta le password da Google a DuckDuckGo</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Non chiedere più</string>
+    <string name="passwords_import_promo_in_settings_title">Importa le password da Google</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Nascondi</string>
 
 </resources>

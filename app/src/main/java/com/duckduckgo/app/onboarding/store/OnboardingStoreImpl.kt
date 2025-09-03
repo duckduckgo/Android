@@ -35,10 +35,6 @@ class OnboardingStoreImpl @Inject constructor(
         get() = preferences.getString(ONBOARDING_JOURNEY, null)
         set(dialogJourney) = preferences.edit { putString(ONBOARDING_JOURNEY, dialogJourney) }
 
-    override var visitSiteCtaDisplayCount: Int
-        get() = preferences.getInt(VISIT_SITE_CTA_DISPLAY_COUNT, 0)
-        set(count) = preferences.edit { putInt(VISIT_SITE_CTA_DISPLAY_COUNT, count) }
-
     override fun getSearchOptions(): List<DaxDialogIntroOption> {
         val country = Locale.getDefault().country
         val language = Locale.getDefault().language
@@ -67,18 +63,9 @@ class OnboardingStoreImpl @Inject constructor(
                 },
             ),
             DaxDialogIntroOption(
-                optionText = context.getString(R.string.onboardingSearchDaxDialogOption3),
-                iconRes = drawable.ic_find_search_16,
-                link = context.getString(R.string.onboardingSearchDaxDialogOption3),
-            ),
-            DaxDialogIntroOption(
                 optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
                 iconRes = drawable.ic_wand_16,
-                link = if (country == "US") {
-                    context.getString(R.string.onboardingSearchQueryOption4US)
-                } else {
-                    context.getString(R.string.onboardingSearchQueryOption4)
-                },
+                link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
             ),
         )
     }
@@ -176,48 +163,8 @@ class OnboardingStoreImpl @Inject constructor(
         )
     }
 
-    override fun getExperimentSearchOptions(): List<DaxDialogIntroOption> {
-        val country = Locale.getDefault().country
-        val language = Locale.getDefault().language
-
-        return listOf(
-            DaxDialogIntroOption(
-                optionText = if (language == "en") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption1English)
-                } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption1)
-                },
-                iconRes = drawable.ic_find_search_16,
-                link = if (language == "en") "how to say duck in spanish" else context.getString(R.string.onboardingSearchQueryOption1),
-            ),
-            DaxDialogIntroOption(
-                optionText = if (country == "US") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
-                } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2)
-                },
-                iconRes = drawable.ic_find_search_16,
-                link = if (country == "US") {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2US)
-                } else {
-                    context.getString(R.string.onboardingSearchDaxDialogOption2)
-                },
-            ),
-            DaxDialogIntroOption(
-                optionText = context.getString(R.string.onboardingSearchDaxDialogOption4),
-                iconRes = drawable.ic_wand_16,
-                link = "!image ${context.getString(R.string.highlightsOnboardingSearchQueryOption4)}",
-            ),
-        )
-    }
-
-    override fun clearVisitSiteCtaDisplayCount() {
-        preferences.edit { remove(VISIT_SITE_CTA_DISPLAY_COUNT) }
-    }
-
     companion object {
         const val FILENAME = "com.duckduckgo.app.onboarding.settings"
         const val ONBOARDING_JOURNEY = "onboardingJourney"
-        const val VISIT_SITE_CTA_DISPLAY_COUNT = "visitSiteCtaDisplayCount"
     }
 }

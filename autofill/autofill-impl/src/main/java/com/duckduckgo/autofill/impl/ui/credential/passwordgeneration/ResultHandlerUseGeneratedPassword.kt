@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.impl.ui.credential.passwordgeneration
 
 import android.content.Context
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillEventListener
@@ -41,7 +42,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerUseGeneratedPassword @Inject constructor(
@@ -54,14 +58,15 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
     private val usernameBackFiller: UsernameBackFiller,
 ) : AutofillFragmentResultsPlugin {
 
-    override fun processResult(
+    override suspend fun processResult(
         result: Bundle,
         context: Context,
         tabId: String,
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
+        webView: WebView?,
     ) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         val originalUrl = result.getString(UseGeneratedPasswordDialog.KEY_URL) ?: return
         if (result.getBoolean(UseGeneratedPasswordDialog.KEY_ACCEPTED)) {
@@ -90,18 +95,14 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         val password = result.getString(UseGeneratedPasswordDialog.KEY_PASSWORD) ?: return
         val autologinId = autoSavedLoginsMonitor.getAutoSavedLoginId(tabId)
         val matchType = existingCredentialMatchDetector.determine(originalUrl, username, password)
-        Timber.v(
-            "autoSavedLoginId: %s. Match type against existing entries: %s",
-            autologinId,
-            matchType.javaClass.simpleName,
-        )
+        logcat(VERBOSE) { "autoSavedLoginId: $autologinId. Match type against existing entries: ${matchType.javaClass.simpleName}" }
 
         if (autologinId == null) {
             saveLoginIfNotAlreadySaved(matchType, originalUrl, username, password, tabId)
         } else {
             val existingAutoSavedLogin = autofillStore.getCredentialsWithId(autologinId)
             if (existingAutoSavedLogin == null) {
-                Timber.w("Can't find saved login with autosavedLoginId: $autologinId")
+                logcat(WARN) { "Can't find saved login with autosavedLoginId: $autologinId" }
                 saveLoginIfNotAlreadySaved(matchType, originalUrl, username, password, tabId)
             } else {
                 updateLoginIfDifferent(existingAutoSavedLogin, username, password)
@@ -124,20 +125,20 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         tabId: String,
     ) {
         when (matchType) {
-            ContainsCredentialsResult.ExactMatch -> Timber.v("Already got an exact match; nothing to do here")
+            ContainsCredentialsResult.ExactMatch -> logcat(VERBOSE) { "Already got an exact match; nothing to do here" }
             ContainsCredentialsResult.UsernameMatchMissingPassword -> {
-                Timber.v("Will update existing password(s) which are username matches but missing a password")
+                logcat(VERBOSE) { "Will update existing password(s) which are username matches but missing a password" }
                 updateCredentialsIfPasswordMissing(originalUrl, username, password)
             }
             ContainsCredentialsResult.UsernameMatchDifferentPassword -> {
-                Timber.v("There's a matching username already with a different password saved. No automatic action taken.")
+                logcat(VERBOSE) { "There's a matching username already with a different password saved. No automatic action taken." }
             }
             else -> {
                 autofillStore.saveCredentials(
                     originalUrl,
                     LoginCredentials(domain = originalUrl, username = username, password = password),
                 )?.id?.let { savedId ->
-                    Timber.i("New login saved because no exact matches were found, with ID: $savedId")
+                    logcat(INFO) { "New login saved because no exact matches were found, with ID: $savedId" }
                     autoSavedLoginsMonitor.setAutoSavedLoginId(savedId, tabId)
                 }
             }
@@ -153,7 +154,11 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
             autofillStore.getCredentials(originalUrl)
                 .filter { it.username == username }
                 .filter { it.password.isNullOrEmpty() }
-                .also { list -> Timber.v("Found %d credentials with missing password for username=%s and url=%s", list.size, username, originalUrl) }
+                .also { list ->
+                    logcat(VERBOSE) {
+                        "Found ${list.size} credentials with missing password for username=$username and url=$originalUrl"
+                    }
+                }
                 .map { it.copy(password = password) }
                 .forEach { autofillStore.updateCredentials(originalUrl, it, CredentialUpdateType.Password) }
         }
@@ -165,9 +170,9 @@ class ResultHandlerUseGeneratedPassword @Inject constructor(
         password: String,
     ) {
         if (username == autosavedLogin.username && password == autosavedLogin.password) {
-            Timber.i("Generated password (and username) matches existing login; nothing to do here")
+            logcat(INFO) { "Generated password (and username) matches existing login; nothing to do here" }
         } else {
-            Timber.i("Updating existing login with new username and/or password. Login id is: %s", autosavedLogin.id)
+            logcat(INFO) { "Updating existing login with new username and/or password. Login id is: ${autosavedLogin.id}" }
             autofillStore.updateCredentials(autosavedLogin.copy(username = username, password = password))
         }
     }

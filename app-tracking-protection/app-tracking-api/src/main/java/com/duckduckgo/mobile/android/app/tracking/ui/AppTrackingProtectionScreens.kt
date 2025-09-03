@@ -25,7 +25,7 @@ sealed class AppTrackingProtectionScreens {
      * globalActivityStarter.start(context, DeviceShieldTrackerActivityWithEmptyParams)
      * ```
      */
-    object AppTrackerActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
+    data object AppTrackerActivityWithEmptyParams : GlobalActivityStarter.ActivityParams
 
     /**
      * Use this class to launch the AppTP onboarding screen
@@ -33,5 +33,5 @@ sealed class AppTrackingProtectionScreens {
      * globalActivityStarter.start(context, AppTrackerOnboardingActivityWithEmptyParamsParams)
      * ```
      */
-    object AppTrackerOnboardingActivityWithEmptyParamsParams : GlobalActivityStarter.ActivityParams
+    data object AppTrackerOnboardingActivityWithEmptyParamsParams : GlobalActivityStarter.ActivityParams
 }

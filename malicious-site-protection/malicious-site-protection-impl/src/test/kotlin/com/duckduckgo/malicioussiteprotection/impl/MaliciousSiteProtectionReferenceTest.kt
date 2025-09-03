@@ -90,9 +90,11 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
     private val mockPixel: Pixel = mock()
     private val moshi = Moshi.Builder().build()
     private val mockMaliciousSiteProtectionRCRepository: MaliciousSiteProtectionRCRepository = mock()
-    private val urlCanonicalization: UrlCanonicalization = RealUrlCanonicalization()
-    private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
+    private val urlCanonicalization: UrlCanonicalization = RealUrlCanonicalization(
+        mockMaliciousSiteProtectionRCFeature,
+    )
+    private val messageDigest: MessageDigest = MessageDigest.getInstance("SHA-256")
     private val repository = RealMaliciousSiteRepository(
         maliciousSiteDao,
         maliciousSiteService,
@@ -147,6 +149,7 @@ class MaliciousSiteProtectionReferenceTest(private val testCase: TestCase) {
             ),
         )
         whenever(mockMaliciousSiteProtectionRCFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(mockMaliciousSiteProtectionRCFeature.stripWWWPrefix()).thenReturn(true)
         repository.loadFilters(*enumValues<Feed>())
         repository.loadHashPrefixes(*enumValues<Feed>())
 

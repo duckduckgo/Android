@@ -30,7 +30,10 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface StatisticsUpdater {
     fun initializeAtb()
@@ -55,16 +58,16 @@ class StatisticsRequester @Inject constructor(
      */
     @SuppressLint("CheckResult")
     override fun initializeAtb() {
-        Timber.i("Initializing ATB")
+        logcat(INFO) { "Initializing ATB" }
 
         if (store.hasInstallationStatistics) {
-            Timber.v("Atb already initialized")
+            logcat(VERBOSE) { "Atb already initialized" }
 
             val storedAtb = store.atb
             if (storedAtb != null && storedAtbFormatNeedsCorrecting(storedAtb)) {
-                Timber.d(
-                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour",
-                )
+                logcat {
+                    "Previous app version stored hardcoded `ma` variant in ATB param; we want to correct this behaviour"
+                }
                 store.atb = Atb(storedAtb.version.removeSuffix(LEGACY_ATB_FORMAT_SUFFIX))
                 store.variant = variantManager.defaultVariantKey()
             }
@@ -78,21 +81,21 @@ class StatisticsRequester @Inject constructor(
             .subscribeOn(Schedulers.io())
             .flatMap {
                 val atb = Atb(it.version)
-                Timber.i("$atb")
+                logcat(INFO) { "$atb" }
                 store.saveAtb(atb)
                 val atbWithVariant = atb.formatWithVariant(variantManager.getVariantKey())
 
-                Timber.i("Initialized ATB: $atbWithVariant")
+                logcat(INFO) { "Initialized ATB: $atbWithVariant" }
                 service.exti(atbWithVariant)
             }
             .subscribe(
                 {
-                    Timber.d("Atb initialization succeeded")
+                    logcat { "Atb initialization succeeded" }
                     plugins.getPlugins().forEach { it.onAppAtbInitialized() }
                 },
                 {
                     store.clearAtb()
-                    Timber.w("Atb initialization failed ${it.localizedMessage}")
+                    logcat(WARN) { "Atb initialization failed ${it.localizedMessage}" }
                 },
             )
     }
@@ -122,12 +125,12 @@ class StatisticsRequester @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                     {
-                        Timber.v("Search atb refresh succeeded, latest atb is ${it.version}")
+                        logcat(VERBOSE) { "Search atb refresh succeeded, latest atb is ${it.version}" }
                         store.searchRetentionAtb = it.version
                         storeUpdateVersionIfPresent(it)
                         plugins.getPlugins().forEach { plugin -> plugin.onSearchRetentionAtbRefreshed(oldSearchAtb, it.version) }
                     },
-                    { Timber.v("Search atb refresh failed with error ${it.localizedMessage}") },
+                    { logcat(VERBOSE) { "Search atb refresh failed with error ${it.localizedMessage}" } },
                 )
         }
     }
@@ -153,12 +156,12 @@ class StatisticsRequester @Inject constructor(
             .subscribeOn(Schedulers.io())
             .subscribe(
                 {
-                    Timber.v("App atb refresh succeeded, latest atb is ${it.version}")
+                    logcat(VERBOSE) { "App atb refresh succeeded, latest atb is ${it.version}" }
                     store.appRetentionAtb = it.version
                     storeUpdateVersionIfPresent(it)
                     plugins.getPlugins().forEach { plugin -> plugin.onAppRetentionAtbRefreshed(oldAppAtb, it.version) }
                 },
-                { Timber.v("App atb refresh failed with error ${it.localizedMessage}") },
+                { logcat(VERBOSE) { "App atb refresh failed with error ${it.localizedMessage}" } },
             )
     }
 

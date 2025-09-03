@@ -197,7 +197,7 @@ sealed class SyncDeviceListItem {
         val loading: Boolean = false,
     ) : SyncDeviceListItem()
 
-    object LoadingItem : SyncDeviceListItem()
+    data object LoadingItem : SyncDeviceListItem()
 }
 
 interface ConnectedDeviceClickListener {

@@ -16,8 +16,10 @@ android {
         generateDaggerFactories = true // default is false
     }
     namespace 'com.duckduckgo.pir.internal'
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -28,15 +30,10 @@ dependencies {
     implementation project(':common-ui')
     implementation project(':common-utils')
     implementation project(':di')
-    implementation project(':data-store-api')
     implementation project(':internal-features-api')
-    implementation project(':js-messaging-api')
     implementation project(':navigation-api')
-    implementation project(':subscriptions-api')
-    implementation project(':statistics-api')
+    implementation project(':pir-impl')
     implementation "com.squareup.logcat:logcat:_"
-    implementation "com.squareup.moshi:moshi-adapters:_"
-    implementation "com.squareup.moshi:moshi-kotlin:_"
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -44,16 +41,4 @@ dependencies {
     implementation AndroidX.webkit
     implementation Google.android.material
     implementation Google.dagger
-
-    // Room
-    implementation AndroidX.room.runtime
-    implementation AndroidX.room.ktx
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.moshi
-    ksp AndroidX.room.compiler
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:_"
-
 }

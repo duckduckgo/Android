@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Görünüm</string>
+    <string name="settingsShowFullUrlTitle">Tam Site Adresini Göster</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Kaydet</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
     <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
     <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
-    <string name="preOnboardingComparisonChartItem4">İzleme reklamlarını engelleyin</string>
+    <string name="preOnboardingComparisonChartItem4">Hedefli reklamları engelleyin</string>
     <string name="preOnboardingComparisonChartItem5">Tarama verilerini tek bir düğmeyle silin</string>
     <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
     <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
@@ -796,8 +797,9 @@
     <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
     <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ah, unutmadan...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo\'nun ayrıca yerleşik bir <b>VPN\'i</b> var!<br/><br/> <b>Ücretli bir Privacy Pro</b> aboneliğiyle etkinleştirebilirsiniz.]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo ayrıca <b>isteğe bağlı ücretli abonelikle</b> kullanılabilen güvenli bir <b>VPN + 2 premium koruma daha</b> sunuyor.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Daha Fazla Bilgi</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Ücretsiz deneyin!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Atla</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,21 +844,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Teşekkür ederiz! Raporunuz DuckDuckGo\'yu herkes için daha iyi hale getirmeye yardımcı oluyor!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Yeni Yapay Zeka Sohbeti</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">DuckDuckGo\'nun internette yaptıklarınızın daha fazlasını korumasına izin verin</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Tüm site bağlantılarının DuckDuckGo\'da açılması için bizi varsayılan tarayıcınız yapın.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Şimdi Değil</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Bağlantıların DuckDuckGo\'da açılması için varsayılan tarayıcınızı değiştirin.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Şimdi Değil</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo varsayılan tarayıcınız değil. Daha fazla koruma elde edin.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Varsayılan Olarak Ayarla</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Bir Daha Sorma</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo, gezinmenizi korumak için izleyicileri engeller</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Sekmelerinizi ve verilerinizi temizlemek, izleyici engelleme geçmişinizi silecek ve bu sayıyı sıfırlayacaktır.\n\nSekmeler görünümünde görmemeyi tercih ediyorsanız bu başlığı gizleyin.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner\'ı Gizle</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Uyarı: Bu site bir güvenlik riski oluşturabilir</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[Cihazınızı tehlikeye atmak veya kişisel bilgilerinizi çalmak için tasarlanmış kötü amaçlı yazılım dağıtıyor olabileceğinden, DuckDuckGo bu sayfayı engelledi. <a href=\"\">Daha fazla bilgi</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Bu web sitesi, şifre veya kredi kartı numarası gibi kişisel bilgilerinizi vermeniz için sizi kandırmak amacıyla meşru bir siteyi taklit ediyor olabilir.\n<a href=\"\">Daha fazla bilgi</a>]]></string>
@@ -871,5 +874,53 @@
     <string name="maliciousSiteToggleHint">Kimlik avı veya kötü amaçlı yazılım için işaretlenen siteler olduğunda beni uyar</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Daha Fazla Bilgi</annotation></string>
     <string name="maliciousSiteSettingDisabled">Bu özelliği devre dışı bırakmak bilgilerinizi riske atabilir.</string>
+    <string name="threatProtectionTitle">Tehdit Koruması</string>
+    <string name="threatProtectionDescription">DuckDuckGo\'nun gelişmiş korumaları, bağlantıyı güvende tutarken yaygın tehditleri durdurur.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Mümkün olduğunda bağlantıları otomatik olarak HTTPS\'ye yükseltir.<a href=\"\">Daha Fazla Bilgi</a>]]></string>
+    <string name="scamBlockerTitle">Dolandırıcılık Engelleyici</string>
+    <string name="scamBlockerDescription">Dolandırıcılık, kimlik avı ve kötü amaçlı yazılım için işaretlenen siteler olduğunda uyarı göster.</string>
+    <string name="threatProtectionLearnMoreTitle">Daha fazla bilgi</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Ana ekran widget\'ımızı deneyin!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Hızlı ve kolay erişim için arama widget\'ımızı ana ekranınıza ekleyin.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget Ekle</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Şimdi Değil</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">DuckDuckGo\'da Ara</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Ana Ekran Widget\'ı</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Kurulumu Tamamlayın</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Merhaba.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Korumalar</b> <i>etkinleştirildi!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Merhaba.<br/>Sizi koruyan daha hızlı bir tarayıcıya hazır mısınız?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[<font color=\"#F05C2B\">Fire Button</font> ile göz atma etkinliğinizi anında temizleyin]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Hemen deneyin!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ ve %1$d site daha sizi burada takip etmeye çalışıyordu. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+        <item quantity="other"><![CDATA[ ve %1$d site daha sizi burada takip etmeye çalışıyordu. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyorlardı. <font color=\"#F05C2B\">Onları engelledim!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Daha fazla bilgi için kalkana dokunun.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo, kişisel bilgilerinin kontrolünü geri almak isteyen herkes için bağımsız bir online koruma şirketidir.\n\nKişisel bilgilerinizi bilgisayar korsanlarından, dolandırıcılardan ve gizliliğinizi ihlal eden şirketlerden korumanın en iyi yolunun, bu bilgilerin toplanmasını tamamen durdurmak olduğuna inanıyoruz. Bu yüzden milyonlarca insan internette arama yapmak ve gezinmek için <annotation type="chart_comparison">Chrome ve diğer tarayıcılar yerine DuckDuckGo\'yu tercih ediyor</annotation>. Yerleşik arama motorumuz Google gibidir ancak aramalarınızı asla izlemez. Reklam izleyici ve çerezleri engelleme gibi tarama korumalarımız, diğer şirketlerin verilerinizi toplamasını önlemeye de yardımcı olur. Ayrıca, tarayıcımız ücretsizdir. Verilerinizi kullanarak değil, <annotation type="privacy_respecting_ads">gizliliğe saygılı arama reklamlarından</annotation> para kazanıyoruz.\n\nBuna ek olarak, tarayıcımıza entegre edilmiş <annotation type="ppro_help_page">DuckDuckGo aboneliği</annotation> sunuyoruz. Aboneler, internetteki etkinliklerinizi güvence altına alan hızlı ve basit bir <annotation type="vpn_help_page">VPN</annotation>, özel yapay zeka sohbet hizmetimiz Duck.ai\'daki gelişmiş yapay zeka modellerine erişim, kişisel bilgilerinizi kişi bulma sitelerinden bulan ve kaldıran ve çalınması durumunda kimliğinizi geri yükleyen bir hizmet ile daha fazla gizlilik koruması elde eder.\n\nVeri koruma için tasarlanmış, veri toplama amacı gütmeyen tarayıcıyla kişisel bilgilerinizin kontrolünü geri alın.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo\'nun ayrıca güvenli bir <b>VPN</b> ve <b>gelişmiş, gizli yapay zeka</b> içeren <b>isteğe bağlı ücretli bir aboneliği</b> var.]]></string>
+    <string name="settingsDuckAiRebranding">AI Özellikleri</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

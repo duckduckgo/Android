@@ -17,8 +17,9 @@
 package com.duckduckgo.subscriptions.impl.feedback
 
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FAQS_URL
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackVpnSubCategory.OTHER
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
 
@@ -27,14 +28,17 @@ interface FeedbackHelpUrlProvider {
 }
 
 @ContributesBinding(ActivityScope::class)
-class RealFeedbackHelpUrlProvider @Inject constructor() : FeedbackHelpUrlProvider {
+class RealFeedbackHelpUrlProvider @Inject constructor(
+    private val subscriptionsUrlProvider: SubscriptionsUrlProvider,
+) : FeedbackHelpUrlProvider {
     override fun getUrl(subCategory: SubscriptionFeedbackSubCategory): String {
         return when (subCategory) {
             is SubscriptionFeedbackVpnSubCategory -> getVPNUrl(subCategory)
             is SubscriptionFeedbackSubsSubCategory -> getSubsUrl()
             is SubscriptionFeedbackPirSubCategory -> getPirUrl(subCategory)
             is SubscriptionFeedbackItrSubCategory -> getItrUrl(subCategory)
-            else -> SubscriptionsConstants.FAQS_URL
+            is SubscriptionFeedbackDuckAiSubCategory -> getDuckAiSubCategoryUrl(subCategory)
+            else -> FAQS_URL
         }
     }
 
@@ -61,6 +65,14 @@ class RealFeedbackHelpUrlProvider @Inject constructor() : FeedbackHelpUrlProvide
         }
     }
 
+    private fun getDuckAiSubCategoryUrl(subCategory: SubscriptionFeedbackDuckAiSubCategory): String {
+        return when (subCategory) {
+            SubscriptionFeedbackDuckAiSubCategory.ACCESS_SUBSCRIPTION_MODELS -> HELP_PAGE_DUCK_AI_ACCESS_SUBSCRIPTION_MODELS
+            SubscriptionFeedbackDuckAiSubCategory.LOGIN_THIRD_PARTY_BROWSER -> HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER
+            SubscriptionFeedbackDuckAiSubCategory.OTHER -> HELP_PAGE_DUCK_AI_OTHER
+        }
+    }
+
     companion object {
         private const val HELP_PAGE_PPRO_PAYMENT = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/payments/"
         private const val HELP_PAGE_PPRO_VPN_TROUBLESHOOTING = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/troubleshooting/"
@@ -70,5 +82,9 @@ class RealFeedbackHelpUrlProvider @Inject constructor() : FeedbackHelpUrlProvide
         private const val HELP_PAGE_PPRO_PIR = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/personal-information-removal/"
         private const val HELP_PAGE_PPRO_ITR = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/identity-theft-restoration/"
         private const val HELP_PAGE_PPRO_ITR_IRIS = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/identity-theft-restoration/iris/"
+        private const val HELP_PAGE_DUCK_AI_ACCESS_SUBSCRIPTION_MODELS =
+            "https://duckduckgo.com/duckduckgo-help-pages/duckai/access-subscriber-AI-models"
+        private const val HELP_PAGE_DUCK_AI_LOGIN_THIRD_PARTY_BROWSER = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/activating"
+        private const val HELP_PAGE_DUCK_AI_OTHER = "https://duckduckgo.com/duckduckgo-help-pages/duckai"
     }
 }

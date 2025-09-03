@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.viewstate
 import com.duckduckgo.app.browser.SSLErrorType
 import com.duckduckgo.app.browser.SpecialUrlDetector
 import com.duckduckgo.app.browser.WebViewErrorResponse
+import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.global.model.MaliciousSiteStatus
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupViewState
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -58,6 +59,7 @@ data class BrowserViewState(
     val maliciousSiteStatus: MaliciousSiteStatus? = null,
     val privacyProtectionsPopupViewState: PrivacyProtectionsPopupViewState = PrivacyProtectionsPopupViewState.Gone,
     val showDuckChatOption: Boolean = false,
+    val lastQueryOrigin: QueryOrigin = QueryOrigin.FromUser,
 )
 
 sealed class HighlightableButton {
@@ -66,7 +68,7 @@ sealed class HighlightableButton {
         val highlighted: Boolean = false,
     ) : HighlightableButton()
 
-    object Gone : HighlightableButton()
+    data object Gone : HighlightableButton()
 
     fun isHighlighted(): Boolean {
         return when (this) {

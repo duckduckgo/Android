@@ -48,7 +48,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
+
+const val SCAM_PROTECTION_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/threat-protection/scam-blocker"
 
 interface MaliciousSiteBlockerWebViewIntegration {
 
@@ -200,13 +202,13 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         val exemptedUrl = mainframeUrl?.let { getExemptedUrl(it) }
 
         if (exemptedUrl != null) {
-            Timber.d("Previously exempted, skipping $requestUrl as ${exemptedUrl.feed}")
+            logcat { "Previously exempted, skipping $requestUrl as ${exemptedUrl.feed}" }
             return IsMaliciousViewData.MaliciousSite(requestUrl, exemptedUrl.feed, true, clientSideHit = true)
         }
 
         processedUrls[requestUrl]?.let {
             processedUrls.remove(requestUrl)
-            Timber.d("Already intercepted, skipping $requestUrl, status: $it")
+            logcat { "Already intercepted, skipping $requestUrl, status: $it" }
             return when (it.status) {
                 is Safe -> IsMaliciousViewData.Safe(isForMainFrame)
                 is Malicious -> IsMaliciousViewData.MaliciousSite(requestUrl, it.status.feed, false, it.clientSideHit)
@@ -303,6 +305,6 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
         feed: Feed,
     ) {
         exemptedUrlsHolder.addExemptedMaliciousUrl(ExemptedUrl(url, feed))
-        Timber.d("Added $url to exemptedUrls")
+        logcat { "Added $url to exemptedUrls" }
     }
 }

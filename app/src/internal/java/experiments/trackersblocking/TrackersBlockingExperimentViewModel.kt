@@ -58,7 +58,7 @@ class TrackersBlockingExperimentViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
             if (checked) {
-                senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+                senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
                     State(
                         remoteEnableState = true,
                         enable = true,
@@ -71,7 +71,7 @@ class TrackersBlockingExperimentViewModel @Inject constructor(
                     ),
                 )
             } else {
-                senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+                senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
                     State(
                         remoteEnableState = false,
                         enable = false,
@@ -93,7 +93,7 @@ class TrackersBlockingExperimentViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
             if (checked) {
-                senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+                senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
                     State(
                         remoteEnableState = true,
                         enable = true,
@@ -106,7 +106,7 @@ class TrackersBlockingExperimentViewModel @Inject constructor(
                     ),
                 )
             } else {
-                senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+                senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
                     State(
                         remoteEnableState = false,
                         enable = false,
@@ -128,7 +128,7 @@ class TrackersBlockingExperimentViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             val enrollmentDateET = ZonedDateTime.now(ZoneId.of("America/New_York")).toString()
             if (checked) {
-                senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+                senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
                     State(
                         remoteEnableState = true,
                         enable = true,
@@ -141,7 +141,7 @@ class TrackersBlockingExperimentViewModel @Inject constructor(
                     ),
                 )
             } else {
-                senseOfProtectionToggles.senseOfProtectionExistingUserExperimentMay25().setRawStoredState(
+                senseOfProtectionToggles.senseOfProtectionExistingUserExperiment27May25().setRawStoredState(
                     State(
                         remoteEnableState = false,
                         enable = false,

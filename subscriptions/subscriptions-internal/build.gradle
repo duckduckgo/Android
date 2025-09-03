@@ -32,6 +32,7 @@ android {
 dependencies {
     anvil project(':anvil-compiler')
     implementation project(':anvil-annotations')
+    implementation project(':subscriptions-api')
     implementation project(':subscriptions-impl')
     implementation project(':di')
     implementation project(':common-utils')
@@ -39,6 +40,7 @@ dependencies {
     implementation project(':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(':navigation-api')
+    implementation project(':data-store-api')
 
     implementation Square.moshi
     implementation Square.okHttp3.okHttp

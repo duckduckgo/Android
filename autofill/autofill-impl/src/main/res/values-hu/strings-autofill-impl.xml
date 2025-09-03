@@ -240,7 +240,7 @@
 
     <string name="newTabPageShortcutPasswords">Jelszavak</string>
 
-    <string name="autofillImportGooglePasswordsWebFlowTitle">Google-jelszavak importálása</string>
+    <string name="autofillImportGooglePasswordsWebFlowTitle">Jelszavak importálása</string>
     <string name="autofillImportGooglePasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d jelszó importálva a Google-ból</string>
     <string name="autofillImportCsvPasswordsSuccessMessage" instruction="Placeholder is the number of passwords imported">%1$d jelszó importálva CSV-fájlból</string>
 
@@ -250,9 +250,9 @@
     <string name="autofillSyncDesktopPasswordEmptyStateButtonTitle">Asztali jelszavak szinkronizálása</string>
     <string name="autofillSyncDesktopPasswordsMenuTitle">Asztali jelszavak szinkronizálása</string>
 
-    <string name="importPasswordsChooseMethodDialogTitle">Google-jelszavaid importálása</string>
+    <string name="importPasswordsChooseMethodDialogTitle">Jelszavak importálása a Google-ból</string>
     <string name="importPasswordsChooseMethodDialogSubtitle">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
-    <string name="importPasswordsChooseMethodDialogGpmButton">Nyisd meg a Google Jelszókezelőt</string>
+    <string name="importPasswordsChooseMethodDialogGpmButton">Importálás a Google-ból</string>
     <string name="importPasswordsChooseMethodDialogCsvButton">Válassz egy CSV-fájlt</string>
     <string name="importPasswordsChooseMethodDialogDesktopSyncButton">Importálás asztali böngészőből</string>
 
@@ -280,5 +280,13 @@
     <string name="autofillSettingsImportFromGoogleLabel">Jelszavak importálása a Google-ból</string>
     <string name="autofillSettingsImportFromDesktopSync">Asztali jelszavak szinkronizálása</string>
     <string name="autofillSettingsResetExcludedSitesTitle">Kizárt webhelyek visszaállítása</string>
+
+    <string name="passwords_import_promo_title" instruction="The &apos;br&apos; is a forced line break for English. It does not need to be included in translations.">Hozd át a jelszavaidat a&lt;br /&gt;Google-ból a DuckDuckGóba</string>
+    <string name="passwords_import_promo_subtitle">Gyorsan és biztonságosan importáld jelszavaidat a DuckDuckGóba. A Google megkérhet, hogy add meg a jelszavad.</string>
+    <string name="passwords_import_promo_action">Importálás a Google-ból</string>
+    <string name="passwords_import_promo_in_browser_title">Hozd át a jelszavaidat a&lt;br /&gt;Google-ból a DuckDuckGóba</string>
+    <string name="passwords_import_promo_in_browser_secondary_action_button">Ne kérdezzen rá újra</string>
+    <string name="passwords_import_promo_in_settings_title">Jelszavak importálása a Google-ból</string>
+    <string name="passwords_import_promo_in_settings_dismiss_text">Elrejtés</string>
 
 </resources>

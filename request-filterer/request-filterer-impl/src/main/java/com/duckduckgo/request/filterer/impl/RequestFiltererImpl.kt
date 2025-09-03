@@ -32,8 +32,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import timber.log.Timber
 
 @ContributesBinding(AppScope::class)
 class RequestFiltererImpl @Inject constructor(
@@ -96,7 +96,7 @@ class RequestFiltererImpl @Inject constructor(
             }
             return url == previousPage
         } catch (e: Exception) {
-            Timber.d(e.localizedMessage)
+            logcat { e.localizedMessage }
             false
         }
     }

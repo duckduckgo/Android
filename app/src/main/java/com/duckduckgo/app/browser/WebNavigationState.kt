@@ -41,10 +41,10 @@ sealed class WebNavigationStateChange {
     ) : WebNavigationStateChange()
 
     data class UrlUpdated(val url: String) : WebNavigationStateChange()
-    object PageCleared : WebNavigationStateChange()
-    object Unchanged : WebNavigationStateChange()
-    object PageNavigationCleared : WebNavigationStateChange()
-    object Other : WebNavigationStateChange()
+    data object PageCleared : WebNavigationStateChange()
+    data object Unchanged : WebNavigationStateChange()
+    data object PageNavigationCleared : WebNavigationStateChange()
+    data object Other : WebNavigationStateChange()
 }
 
 fun WebNavigationState.compare(previous: WebNavigationState?): WebNavigationStateChange {

@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -40,7 +41,9 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerCredentialSelection @Inject constructor(
@@ -53,19 +56,20 @@ class ResultHandlerCredentialSelection @Inject constructor(
     private val autofilledListeners: PluginPoint<DataAutofilledListener>,
 ) : AutofillFragmentResultsPlugin {
 
-    override fun processResult(
+    override suspend fun processResult(
         result: Bundle,
         context: Context,
         tabId: String,
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
+        webView: WebView?,
     ) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         val originalUrl = result.getString(CredentialAutofillPickerDialog.KEY_URL) ?: return
 
         if (result.getBoolean(CredentialAutofillPickerDialog.KEY_CANCELLED)) {
-            Timber.v("Autofill: User cancelled credential selection")
+            logcat(VERBOSE) { "Autofill: User cancelled credential selection" }
             autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
             return
         }
@@ -99,20 +103,20 @@ class ResultHandlerCredentialSelection @Inject constructor(
             ) {
                 when (it) {
                     DeviceAuthenticator.AuthResult.Success -> {
-                        Timber.v("Autofill: user selected credential to use, and successfully authenticated")
+                        logcat(VERBOSE) { "Autofill: user selected credential to use, and successfully authenticated" }
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_SUCCESSFUL)
                         notifyAutofilledListeners()
                         autofillCallback.onShareCredentialsForAutofill(originalUrl, selectedCredentials)
                     }
 
                     DeviceAuthenticator.AuthResult.UserCancelled -> {
-                        Timber.d("Autofill: user selected credential to use, but cancelled without authenticating")
+                        logcat { "Autofill: user selected credential to use, but cancelled without authenticating" }
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_CANCELLED)
                         autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
                     }
 
                     is DeviceAuthenticator.AuthResult.Error -> {
-                        Timber.w("Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}")
+                        logcat(WARN) { "Autofill: user selected credential to use, but there was an error when authenticating: ${it.reason}" }
                         pixel.fire(AutofillPixelNames.AUTOFILL_AUTHENTICATION_TO_AUTOFILL_AUTH_FAILURE)
                         autofillCallback.onNoCredentialsChosenForAutofill(originalUrl)
                     }

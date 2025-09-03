@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Uiterlijk</string>
+    <string name="settingsShowFullUrlTitle">Volledig siteadres weergeven</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Opslaan</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Standaard privé zoeken</string>
     <string name="preOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
     <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
-    <string name="preOnboardingComparisonChartItem4">Blokkeer trackingadvertenties</string>
+    <string name="preOnboardingComparisonChartItem4">Blokkeer gerichte advertenties</string>
     <string name="preOnboardingComparisonChartItem5">Verwijder browsegegevens met één knop</string>
     <string name="preOnboardingDaxDialog3Title">Geweldig! Welkom aan de Duck-kant.</string>
     <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
@@ -796,8 +797,9 @@
     <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
     <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, voordat ik het vergeet...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo heeft ook een ingebouwde <b>VPN</b>!<br/><br/>Activeer deze met een <b>betaald Privacy Pro-abonnement.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo biedt ook beveiligde <b>VPN + nog 2 premiumbeveiligingen</b>, beschikbaar met een <b>optioneel betaald abonnement</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Meer informatie</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Probeer het gratis!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Overslaan</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,21 +844,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Bedankt! Jouw melding helpt DuckDuckGo beter te maken voor iedereen!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Nieuwe AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Laat DuckDuckGo meer beschermen van wat je online doet</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Maak ons je standaardbrowser zodat alle sitelinks in DuckDuckGo worden geopend.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Niet nu</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Stel je standaardbrowser in, zodat links in DuckDuckGo worden geopend.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Niet nu</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo is niet je standaardbrowser. Krijg meer bescherming.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Als standaard instellen</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Niet opnieuw vragen</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokkeert trackers om je te beschermen tijdens het browsen  </string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Als je je tabbladen en gegevens wist, wordt je geschiedenis met geblokkeerde trackers verwijderd. Dit getal wordt dan weer op nul gezet.\n\nVerberg deze banner als je deze liever niet in de tabbladweergave wilt zien.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Banner verbergen</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Waarschuwing: Deze website vormt mogelijk een veiligheidsrisico</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo heeft deze pagina geblokkeerd omdat deze mogelijk malware verspreidt om je apparaat te beschadigen of je persoonlijke gegevens te stelen.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Deze website kan zich voordoen als een legitieme site om je te verleiden tot het verstrekken van persoonlijke informatie, zoals wachtwoorden of creditcardnummers.\n<a href=\"\">Meer informatie</a>]]></string>
@@ -871,5 +874,53 @@
     <string name="maliciousSiteToggleHint">Waarschuw me op websites die zijn aangeduid als phishing of malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="maliciousSiteSettingDisabled">Als je deze functie uitschakelt, kunnen je gegevens in gevaar komen.</string>
+    <string name="threatProtectionTitle">Bescherming tegen bedreigingen</string>
+    <string name="threatProtectionDescription">De verbeterde beveiligingen van DuckDuckGo stoppen veelvoorkomende bedreigingen en houden je verbinding veilig.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Links worden waar mogelijk automatisch naar HTTPS geüpgraded.<br><a href=\"\">Meer informatie</a>]]></string>
+    <string name="scamBlockerTitle">Scamblocker</string>
+    <string name="scamBlockerDescription">Waarschuwing geven over sites die zijn aangeduid als oplichting, phishing en malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Meer informatie</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Probeer onze widget op het startscherm!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Voeg onze zoekwidget toe aan je startscherm voor snelle en gemakkelijke toegang.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Widget toevoegen</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Niet nu</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Zoek in DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Startschermwidget</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Je instelling voltooien</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hoi.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Klaar voor een snellere browser die je beschermt?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Bescherming</b> <i>geactiveerd!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hoi.<br />Klaar voor een snellere browser die je beschermt?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Wis je browse-activiteit direct met de <font color=\"#F05C2B\">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Probeer het maar eens!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ en %1$d ander probeerde je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+        <item quantity="other"><![CDATA[ en %1$d anderen probeerden je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ probeerde je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+        <item quantity="other"><![CDATA[ probeerden je hier te volgen. <font color=\"#F05C2B\">Ik heb ze geblokkeerd!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tik op het pictogram voor meer informatie.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo is het onafhankelijke online beveiligingsbedrijf voor iedereen die weer controle wil krijgen over zijn of haar persoonlijke gegevens.\n\nWij zijn ervan overtuigd dat de beste manier om je persoonlijke gegevens te beschermen tegen hackers, oplichters en bedrijven die je privacy schenden is om te voorkomen dat ze worden verzameld. Daarom kiezen miljoenen mensen <annotation type="chart_comparison">voor DuckDuckGo boven Chrome en andere browsers</annotation> om online te zoeken en te surfen. Onze ingebouwde zoekmachine is zoals Google, maar volgt je zoekopdrachten nooit. En met onze browsebescherming, zoals blokkering van advertentietrackers en cookieblokkering, voorkom je dat andere bedrijven je gegevens verzamelen. Bovendien is onze browser gratis - we verdienen geld met <annotation type="privacy_respecting_ads"> zoekadvertenties die de privacy respecteren</annotation>, niet door je gegevens uit te buiten.\n\nDaarnaast bieden we ook een <annotation type="ppro_help_page">DuckDuckGo-abonnement</annotation> aan dat geïntegreerd is in onze browser. Abonnees krijgen nog meer privacybescherming met een snel en eenvoudig <annotation type="vpn_help_page">VPN</annotation> die je online activiteiten helpt beveiligen, toegang tot geavanceerde AI-modellen in onze privé AI-chatservice Duck.ai, een dienst die je persoonlijke gegevens opspoort en verwijdert van zoeksites om mensen op internet te vinden, en een dienst die je identiteit herstelt als deze wordt gestolen.\n\nKrijg weer de controle over je persoonlijke gegevens met de browser die is ontworpen voor gegevensbescherming, niet voor gegevensverzameling.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo heeft ook een <b>optioneel betaald abonnement</b>, met een veilig <b>VPN</b> en <b>geavanceerde, privé-AI</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI-functies</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

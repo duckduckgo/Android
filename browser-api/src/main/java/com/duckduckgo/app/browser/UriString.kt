@@ -23,8 +23,9 @@ import com.duckduckgo.common.utils.UrlScheme
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.withScheme
 import java.lang.IllegalArgumentException
+import logcat.LogPriority.INFO
+import logcat.logcat
 import okhttp3.HttpUrl.Companion.toHttpUrl
-import timber.log.Timber
 
 class UriString {
 
@@ -34,6 +35,15 @@ class UriString {
         private val webUrlRegex by lazy { PatternsCompat.WEB_URL.toRegex() }
         private val domainRegex by lazy { PatternsCompat.DOMAIN_NAME.toRegex() }
         private val cache = LruCache<Int, Boolean>(250_000)
+
+        fun extractUrl(inputQuery: String): String? {
+            val urls = webUrlRegex.findAll(inputQuery).map { it.value }.toList()
+            return if (urls.size == 1) {
+                urls.first()
+            } else {
+                null
+            }
+        }
 
         fun host(uriString: String): String? {
             return Uri.parse(uriString).baseHost
@@ -95,10 +105,18 @@ class UriString {
             return parentHost == childHost || (childHost.endsWith(".$parentHost") || parentHost.endsWith(".$childHost"))
         }
 
-        fun isWebUrl(inputQuery: String): Boolean {
+        fun isWebUrl(inputQuery: String, extractUrlQuery: Boolean = false): Boolean {
             if (inputQuery.contains("\"") || inputQuery.contains("'")) {
                 return false
             }
+
+            if (extractUrlQuery) {
+                val extractedUrl = extractUrl(inputQuery)
+                if (extractedUrl != null) {
+                    return isWebUrl(extractedUrl)
+                }
+            }
+
             if (inputQuery.contains(space)) return false
             val rawUri = Uri.parse(inputQuery)
 
@@ -121,7 +139,7 @@ class UriString {
                 // e.g., this means "http://raspberrypi" will be considered a webUrl, but "raspberrypi" will not
                 rawUri.hasWebScheme()
             } catch (e: IllegalArgumentException) {
-                Timber.i("Failed to parse %s as a web url; assuming it isn't", inputQuery)
+                logcat(INFO) { "Failed to parse $inputQuery as a web url; assuming it isn't" }
                 false
             }
         }

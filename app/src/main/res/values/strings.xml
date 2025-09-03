@@ -115,8 +115,8 @@
     <string name="tabClosed">Tab closed</string>
     <string name="tabClosedUndo">Undo</string>
     <string name="downloadsMenuItemTitle">Downloads</string>
-    <string name="tabSwitcherListViewMenu">List view</string>
-    <string name="tabSwitcherGridViewMenu">Grid view</string>
+    <string name="tabSwitcherListViewMenu">List View</string>
+    <string name="tabSwitcherGridViewMenu">Grid View</string>
 
     <!--Tab Switcher Animation-->
     <string name="trackersBlockedInTheLast7days" instruction="Placeholder is the number of trackers blocked > 1">&lt;b&gt;%1$s trackers blocked &lt;/b&gt; in the last 7 days</string>
@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Appearance</string>
+    <string name="settingsShowFullUrlTitle">Show Full Site Address</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Save</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Search privately by default</string>
     <string name="preOnboardingComparisonChartItem2">Block 3rd-party trackers</string>
     <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
-    <string name="preOnboardingComparisonChartItem4">Block tracking ads</string>
+    <string name="preOnboardingComparisonChartItem4">Block targeted ads</string>
     <string name="preOnboardingComparisonChartItem5">Delete browsing data with one button</string>
     <string name="preOnboardingDaxDialog3Title">Awesome! Welcome to the duck side.</string>
     <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
@@ -796,8 +797,9 @@
     <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
     <string name="onboardingEndDaxDialogButton">All done!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Oh, before I forget…</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has a built-in <b>VPN</b>!<br/><br/>Activate it with a <b>paid Privacy Pro subscription.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[DuckDuckGo also has a secure <b>VPN + 2 more premium protections</b>, available with an <b>optional paid subscription</b>.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">Learn More</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Try for free!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Skip</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,21 +844,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Thank you! Your report helps make DuckDuckGo better for everyone!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">New AI Chat</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Not Now</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Switch your default browser so links open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Not Now</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo isn\'t your default browser. Get more protection.</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Set As Default</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Don\'t Ask Again</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocks trackers to protect your browsing</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[DuckDuckGo blocked this page because it may be distributing malware designed to compromise your device or steal your personal information.\n<a href="">Learn more</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[This website may be impersonating a legitimate site in order to trick you into providing personal information, such as passwords or credit card numbers.\n<a href="">Learn more</a>]]></string>
@@ -871,5 +874,53 @@
     <string name="maliciousSiteToggleHint">Warn me on sites flagged for phishing or malware</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">Learn More</annotation></string>
     <string name="maliciousSiteSettingDisabled">Disabling this feature can put your information at risk.</string>
+    <string name="threatProtectionTitle">Threat Protection</string>
+    <string name="threatProtectionDescription">DuckDuckGo\'s enhanced protections stop common threats while keeping your connection secure.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Automatically upgrades links to HTTPS whenever possible.<br><a href="">Learn More</a>]]></string>
+    <string name="scamBlockerTitle">Scam Blocker</string>
+    <string name="scamBlockerDescription">Warn on sites flagged for scams, phishing and malware.</string>
+    <string name="threatProtectionLearnMoreTitle">Learn more</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Try our Home screen widget!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">Add our search widget to your Home screen for quick and easy access.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Add Widget</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Not Now</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Search DuckDuckGo</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Home Screen Widget</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Complete Your Setup</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Hi there.</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Ready for a faster browser that keeps you protected?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Protections</b> <i>activated!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Hi there.<br/>Ready for a faster browser that keeps you protected?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Instantly clear your browsing activity with the <font color="#F05C2B">Fire Button</font>]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Give it a try!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and %1$d other were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and %1$d others were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <font color="#F05C2B">I blocked them!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝️Tap the shield for more info.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nDuckDuckGo is the independent online protection company for anyone who wants to take back control of their personal information.\n\nWe believe the best way to protect your personal information from hackers, scammers, and privacy-invasive companies is to stop it from being collected at all. That\'s why millions of people <annotation type="chart_comparison">choose DuckDuckGo over Chrome and other browsers</annotation> to search and browse online. Our built-in search engine is like Google but never tracks your searches. And our browsing protections, such as ad tracker blocking and cookie blocking, help stop other companies from collecting your data. Oh, and our browser is free — we make money from <annotation type="privacy_respecting_ads">privacy-respecting search ads</annotation>, not by exploiting your data.\n\nIn addition, we also offer <annotation type="ppro_help_page">DuckDuckGo subscription</annotation> integrated into our browser. Subscribers get even more privacy protection with a fast and simple <annotation type="vpn_help_page">VPN</annotation> that helps secure your online activity, access to advanced AI models in our private AI chat service Duck.ai, a service that finds and removes your personal information from people-finder sites, and a service that restores your identity should it be stolen.\n\nTake back control of your personal information with the browser designed for data protection, not data collection.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
+    <string name="settingsDuckAiRebranding">AI Features</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

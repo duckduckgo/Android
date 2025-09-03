@@ -52,7 +52,8 @@ import java.lang.IllegalStateException
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
@@ -90,7 +91,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
         request: PermissionRequest,
         permissionsGrantedListener: SitePermissionsGrantedListener,
     ) {
-        Timber.d("Permissions: permission askForSitePermission $permissionsRequested")
+        logcat { "Permissions: permission askForSitePermission $permissionsRequested" }
         sitePermissionRequest = request
         siteURL = url
         this.tabId = tabId
@@ -230,7 +231,6 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
                     override fun onCheckedChanged(checked: Boolean) {
                         rememberChoice = checked
-                        super.onCheckedChanged(checked)
                     }
                 },
             )
@@ -461,14 +461,14 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             sitePermissionRequest.grant(permissions)
         } catch (e: IllegalStateException) {
             // IllegalStateException is thrown when grant() or deny() have been called already.
-            Timber.w("IllegalStateException when calling grant() site permissions")
+            logcat(WARN) { "IllegalStateException when calling grant() site permissions" }
         }
     }
 
     private fun systemPermissionGranted() {
         grantPermissions()
         permissionsHandledByUser.forEach {
-            Timber.w("Permissions: sitePermission $it granted for $siteURL rememberChoice $permissionPermanent")
+            logcat(WARN) { "Permissions: sitePermission $it granted for $siteURL rememberChoice $permissionPermanent" }
             if (permissionPermanent) {
                 sitePermissionsRepository.sitePermissionPermanentlySaved(siteURL, it, ALLOW_ALWAYS)
             } else {
@@ -553,7 +553,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun denyPermissions(rememberChoice: Boolean = false) {
-        Timber.w("Permissions: sitePermission ${sitePermissionRequest.resources.asList()} denied for $siteURL rememberChoice $rememberChoice")
+        logcat(WARN) { "Permissions: sitePermission ${sitePermissionRequest.resources.asList()} denied for $siteURL rememberChoice $rememberChoice" }
         try {
             if (permissionsHandledAutomatically.isNotEmpty()) {
                 sitePermissionRequest.grant(permissionsHandledAutomatically.toTypedArray())
@@ -572,7 +572,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
         } catch (e: IllegalStateException) {
             // IllegalStateException is thrown when grant() or deny() have been called already.
-            Timber.w("IllegalStateException when calling grant() or deny() site permissions")
+            logcat(WARN) { "IllegalStateException when calling grant() or deny() site permissions" }
         }
     }
 

@@ -20,7 +20,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 interface ReferrerOriginAttributeHandler {
     fun process(referrerParts: List<String>)
@@ -34,11 +36,11 @@ class ReferrerOriginAttributeHandlerImpl @Inject constructor(
 
     override fun process(referrerParts: List<String>) {
         runCatching {
-            Timber.v("Looking for origin attribute referrer data")
+            logcat(VERBOSE) { "Looking for origin attribute referrer data" }
             var originAttributePart = extractOriginAttribute(referrerParts)
 
             if (originAttributePart == null && playStoreInstallChecker.installedFromPlayStore()) {
-                Timber.v("No origin attribute referrer data available; assigning one")
+                logcat(VERBOSE) { "No origin attribute referrer data available; assigning one" }
                 originAttributePart = DEFAULT_ATTRIBUTION_FOR_PLAY_STORE_INSTALLS
             }
 
@@ -49,14 +51,14 @@ class ReferrerOriginAttributeHandlerImpl @Inject constructor(
     private fun extractOriginAttribute(referrerParts: List<String>): String? {
         val originAttributePart = referrerParts.find { it.startsWith("$ORIGIN_ATTRIBUTE_KEY=") }
         if (originAttributePart == null) {
-            Timber.v("Did not find referrer origin attribute key")
+            logcat(VERBOSE) { "Did not find referrer origin attribute key" }
             return null
         }
 
-        Timber.v("Found referrer origin attribute: %s", originAttributePart)
+        logcat(VERBOSE) { "Found referrer origin attribute: $originAttributePart" }
 
         return originAttributePart.removePrefix("$ORIGIN_ATTRIBUTE_KEY=").also {
-            Timber.i("Found referrer origin attribute value: %s", it)
+            logcat(INFO) { "Found referrer origin attribute value: $it" }
         }
     }
 

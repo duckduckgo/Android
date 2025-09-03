@@ -1,0 +1,9 @@
+appId: com.duckduckgo.mobile.android
+---
+# Assert YouTube video overlay is not shown
+- assertNotVisible:
+    text: "Turn on Duck Player to watch without targeted ads"
+- assertNotVisible:
+    text: "Turn On Duck Player"
+- assertNotVisible:
+    text: "No Thanks"

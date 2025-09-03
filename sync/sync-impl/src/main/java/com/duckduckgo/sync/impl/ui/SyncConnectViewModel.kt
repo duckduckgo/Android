@@ -38,11 +38,14 @@ import com.duckduckgo.sync.impl.R.dimen
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
+import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.onFailure
 import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.FinishWithError
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.LoginSuccess
 import com.duckduckgo.sync.impl.ui.SyncConnectViewModel.Command.ReadTextCode
@@ -58,7 +61,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class SyncConnectViewModel @Inject constructor(
@@ -86,6 +89,7 @@ class SyncConnectViewModel @Inject constructor(
                     .onSuccess { success ->
                         if (!success) return@onSuccess // continue polling
                         syncPixels.fireSignupConnectPixel(source)
+                        syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
                         command.send(LoginSuccess)
                         polling = false
                     }.onFailure {
@@ -114,7 +118,7 @@ class SyncConnectViewModel @Inject constructor(
                         }
                         is LoggedIn -> {
                             polling = false
-                            syncPixels.fireLoginPixel()
+                            fireLoginPixels()
                             command.send(LoginSuccess)
                         }
                     }
@@ -146,9 +150,10 @@ class SyncConnectViewModel @Inject constructor(
     fun onCopyCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
             syncAccountRepository.getConnectQR().getOrNull()?.let { code ->
-                Timber.d("Sync: code available for sharing manually: $code")
+                logcat { "Sync: code available for sharing manually: $code" }
                 clipboard.copyToClipboard(code.rawCode)
                 command.send(ShowMessage(R.string.sync_code_copied_message))
+                syncPixels.fireSyncSetupCodeCopiedToClipboard(SYNC_CONNECT)
             } ?: command.send(FinishWithError)
         }
     }
@@ -158,10 +163,10 @@ class SyncConnectViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object ReadTextCode : Command()
-        object LoginSuccess : Command()
+        data object ReadTextCode : Command()
+        data object LoginSuccess : Command()
         data class ShowMessage(val messageId: Int) : Command()
-        object FinishWithError : Command()
+        data object FinishWithError : Command()
         data class ShowError(@StringRes val message: Int, val reason: String = "") : Command()
     }
 
@@ -173,7 +178,7 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onQRCodeScanned(qrCode: String) {
         viewModelScope.launch(dispatchers.io()) {
-            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode)
+            val codeType = syncAccountRepository.parseSyncAuthCode(qrCode).also { it.onCodeScanned() }
             when (val result = syncAccountRepository.processCode(codeType)) {
                 is Error -> {
                     processError(result)
@@ -183,12 +188,20 @@ class SyncConnectViewModel @Inject constructor(
                     if (codeType is Exchange) {
                         pollForRecoveryKey()
                     } else {
-                        syncPixels.fireLoginPixel()
+                        fireLoginPixels()
                         command.send(LoginSuccess)
                     }
                 }
             }
         }
+    }
+
+    fun onBarcodeScreenShown() {
+        syncPixels.fireSyncBarcodeScreenShown(SYNC_CONNECT)
+    }
+
+    fun onUserCancelledWithoutSyncSetup() {
+        syncPixels.fireSyncSetupAbandoned(SYNC_CONNECT)
     }
 
     private suspend fun processError(result: Error) {
@@ -206,8 +219,20 @@ class SyncConnectViewModel @Inject constructor(
 
     fun onLoginSuccess() {
         viewModelScope.launch {
-            syncPixels.fireLoginPixel()
+            fireLoginPixels()
             command.send(LoginSuccess)
+        }
+    }
+
+    private fun fireLoginPixels() {
+        syncPixels.fireLoginPixel()
+        syncPixels.fireSyncSetupFinishedSuccessfully(SYNC_CONNECT)
+    }
+
+    private fun SyncAuthCode.onCodeScanned() {
+        when (this) {
+            is Unknown -> syncPixels.fireBarcodeScannerParseError(SYNC_CONNECT)
+            else -> syncPixels.fireBarcodeScannerParseSuccess(SYNC_CONNECT)
         }
     }
 

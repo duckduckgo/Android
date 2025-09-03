@@ -21,10 +21,52 @@
     <string name="duck_chat_download_finished_action_name">Odpri</string>
     <string name="duck_chat_cannot_open_file_error_message">Datoteke ni mogoče odpreti. Poiščite združljivo aplikacijo.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Ni bilo mogoče dostopati do kamere</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Naložite sliko</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Izberite datoteko</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Posnemite fotografijo</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Dovolite, da lahko spletno mesto DuckDuckGo zahteva dostop do kamere v tej napravi</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Spletna mesta lahko uporabljajo vašo kamero le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Odpri nastavitve</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Prekliči</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Ni bilo mogoče dostopati do snemalnika zvoka</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Dovolite, da lahko DuckDuckGo zahteva dostop do snemalnika zvoka v tej napravi</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Spletna mesta lahko uporabljajo snemalnik zvoka le, če dovolite, da DuckDuckGo zaprosi za dostop.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai je izbirna funkcija, ki vam omogoča anonimen klepet s priljubljenimi modeli za klepet z umetno inteligenco drugih ponudnikov. Vaši klepeti se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Omogoči Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Bližnjice</string>
     <string name="duck_chat_visibility_setting">Meni brskalnika</string>
     <string name="duck_chat_address_bar_visibility_setting">Naslovna vrstica</string>
+    <string name="duck_chat_assist_settings_title">Nastavitve modula Assist</string>
+    <string name="duck_chat_assist_settings_description">Izberite, kako pogosto želite, da se odgovori s pomočjo umetne inteligence prikazujejo v vaših iskanjih</string>
+    <string name="duck_ai_shortcut_settings_title">Bližnjice do Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Izberite, katere bližnjice do Duck.ai naj bodo prikazane</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Iskanje</string>
+    <string name="input_screen_search_hint">Poišči ali vnesi naslov</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Vprašaj zasebno</string>
+    <string name="input_screen_user_pref_without_ai">Samo iskanje\n(privzeto)</string>
+    <string name="input_screen_user_pref_with_ai">Iskanje in Duck.ai\n(poskusno)</string>
+    <string name="input_screen_user_pref_description">Preizkusite našo poskusno možnost, da vprašate Duck.ai neposredno iz naslovne vrstice. <annotation type="share_feedback">Podajte povratne informacije</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Zasebno klepetajte z modeli umetne inteligence, na voljo ekskluzivno za naročnike.\n<a href=\"\">Več o tem</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Odprite Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Več</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Lastnosti UI</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Funkcije umetne inteligence DuckDuckGo so zasebne in izbirne.\nVaši podatki se ne uporabljajo za usposabljanje umetne inteligence.\n<annotation type="learn_more_link">Več o tem</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Klepetajte zasebno s priljubljenimi modeli umetne inteligence tretjih oseb</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Nastavitve modula Search Assist</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Izberite, kako pogosto želite, da se odgovori s pomočjo umetne inteligence prikazujejo v vaših iskanjih</string>
 </resources>

@@ -423,9 +423,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Kan du ikke bruge App Tracking Protection på grund af din VPN? Skift til DuckDuckGo VPN – den eneste VPN, der er kompatibel. <annotation type="ppro_upsell_link">Læs mere</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Kan du ikke bruge App Tracking Protection på grund af din VPN? Skift til DuckDuckGo VPN – den eneste VPN, der er kompatibel. <annotation type="ppro_upsell_link">Prøv gratis!</annotation>.</string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection er deaktiveret</b>\nHar din VPN deaktiveret App Tracking Protection? Brug til/fra-knappen ovenfor til at genaktivere.\n\nFå DuckDuckGo VPN – den eneste VPN, der fungerer med App Tracking Protection. <annotation type="ppro_upsell_link">Læs mere</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>App Tracking Protection er deaktiveret</b>\nHar din VPN deaktiveret App Tracking Protection? Brug til/fra-knappen ovenfor til at genaktivere.\n\nSkift til DuckDuckGo VPN – den eneste VPN, der fungerer med App Tracking Protection. <annotation type="ppro_upsell_link">Prøv gratis!</annotation>.</string>
     <string name="apptp_PproUpsellBannerTitle">Tag dit privatliv til det næste niveau</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGo har den eneste VPN, der er kompatibel med App Tracking Protection. Aktivér med et betalt Privacy Pro-abonnement.</string>
     <string name="apptp_PproUpsellBannerAction">Mere info</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Abonner på DuckDuckGo, og få den eneste VPN, der er kompatibel med App Tracking Protection.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Prøv gratis!</string>
 
 </resources>

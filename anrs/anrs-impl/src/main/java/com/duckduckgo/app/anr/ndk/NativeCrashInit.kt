@@ -95,7 +95,7 @@ class NativeCrashInit @Inject constructor(
         }
     }
 
-    override fun failure(t: Throwable?) {
+    override fun failure(t: Throwable) {
         logcat(ERROR) { "ndk-crash: error loading library in process $processName: ${t?.asLog()}" }
     }
 

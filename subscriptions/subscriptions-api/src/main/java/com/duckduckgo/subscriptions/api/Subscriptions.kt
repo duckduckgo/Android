@@ -49,6 +49,8 @@ interface Subscriptions {
      */
     suspend fun isEligible(): Boolean
 
+    fun getSubscriptionStatusFlow(): Flow<SubscriptionStatus>
+
     /**
      * @return `SubscriptionStatus` with the current subscription status
      */
@@ -76,6 +78,11 @@ interface Subscriptions {
      * @return `true` if the given Uri leads to the Privacy Pro page, or `false` otherwise
      */
     fun isPrivacyProUrl(uri: Uri): Boolean
+
+    /**
+     * @return `true` if a Free Trial offer is available for the user, `false` otherwise
+     */
+    suspend fun isFreeTrialEligible(): Boolean
 }
 
 enum class Product(val value: String) {
@@ -83,6 +90,7 @@ enum class Product(val value: String) {
     ITR("Identity Theft Restoration"),
     ROW_ITR("Global Identity Theft Restoration"),
     PIR("Data Broker Protection"),
+    DuckAiPlus("Duck.ai"),
 }
 
 enum class SubscriptionStatus(val statusName: String) {

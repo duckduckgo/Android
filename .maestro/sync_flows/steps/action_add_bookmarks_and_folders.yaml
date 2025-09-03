@@ -23,16 +23,14 @@ appId: com.duckduckgo.mobile.android
     commands:
       - tapOn:
           id: "com.duckduckgo.mobile.android:id/primaryCta"
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
 - tapOn: "Add Bookmark"
 - tapOn:
     id: "omnibarTextInput"
 # Now, we add a favourite
 - inputText: "${output.bookmarks.domains[1]}"
 - pressKey: Enter
-- tapOn:
-    id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
 - tapOn: "Add Bookmark"
 - tapOn:
     id: "com.duckduckgo.mobile.android:id/bookmarksBottomSheetSwitch"

@@ -61,13 +61,20 @@
     <string name="privacyProFaqSecondary">Obtém respostas a perguntas frequentes ou contacta o apoio técnico do Privacy Pro a partir das nossas páginas de ajuda. A disponibilidade das funcionalidades varia consoante o país.</string>
     <string name="subscriptionStatusSubscribed">Subscrito</string>
     <string name="privacyPolicyAndTermsOfService">Política de Privacidade e Termos de Serviço</string>
+    <string name="subscriptionStatusFreeTrial">Período de teste gratuito ativo</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">O teu período de teste gratuito termina em %1$s e converte-se automaticamente numa subscrição mensal paga nesse dia.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">O teu período de teste gratuito termina em %1$s e converte-se automaticamente numa subscrição anual paga nesse dia.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">O teu período de teste gratuito termina a %1$s e não será convertido numa subscrição paga.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Definições de Subscrição</string>
     <string name="subscriptionSettingSubscribe">Protege a tua ligação e identidade com o Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Inclui a nossa VPN, a Personal Information Removal e a Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Inclui a nossa VPN e a Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Os subscritores obtêm a nossa VPN, a Personal Information Removal e a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Os subscritores obtêm a nossa VPN e a Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Obter Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Experimentar o Privacy Pro gratuitamente</string>
     <string name="subscriptionSettingRestore">Tenho uma Subscrição</string>
     <string name="subscriptionSettingExpired">A tua subscrição Privacy Pro expirou</string>
     <string name="subscriptionSettingExpiredViewPlans">Ver Planos</string>
@@ -161,4 +168,34 @@
     <string name="activityActivateSubscription">Tenho uma Subscrição</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Enviar comentário</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">Subscrição DuckDuckGo</string>
+    <string name="subscriptionSettingExpiredRebranding">A tua subscrição da DuckDuckGo expirou</string>
+    <string name="privacyProFaqRebranding">Precisas de ajuda com a tua subscrição?</string>
+    <string name="privacyProFaqSecondaryRebranding">Obtém respostas a perguntas frequentes ou contacta o apoio técnico da subscrição a partir das nossas páginas de ajuda. A disponibilidade das funcionalidades varia consoante o país.</string>
+    <string name="restoreSubscriptionTitleRebranding">Adiciona a tua subscrição a este dispositivo</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Associa um endereço de e-mail à tua subscrição para a adicionares a este dispositivo.</string>
+    <string name="activateOnOtherDevicesRebranding">Adiciona a tua subscrição a outros dispositivos</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Adiciona a tua subscrição aos teus outros dispositivos através da Google Play ou ao associar um endereço de e-mail.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Utiliza o e-mail acima para adicionar a tua subscrição aos teus outros dispositivos na aplicação DuckDuckGo. Acede a Definições &gt; Definições de subscrição &gt; Tenho uma subscrição.</string>
+    <string name="subscriptionSettingRebrandingMessage">O Privacy Pro chama-se agora subscrição da DuckDuckGo</string>
+    <string name="subscriptionSettingSubscribeRebranding">Protege a tua ligação e identidade com uma subscrição.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Perderás acesso à tua subscrição neste dispositivo. Isto não cancela a tua subscrição, e vai permanecer ativa nos teus outros dispositivos.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Os subscritores obtêm a nossa VPN e os modelos avançados de IA no Duck.ai, a Personal Information Removal e a Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Os subscritores obtêm a nossa VPN, a modelos de IA avançados no Duck.ai e à Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Não é possível aceder aos modelos Duck.ai só para subscritores</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Não consigo aceder ao Duck.ai com a minha subscrição noutros navegadores</string>
+    <string name="feedbackSubCategoryDuckAiOther">Outros comentários sobre o Duck.ai</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Protege a tua rede Wi-Fi e conversa em privado com modelos de IA avançados</string>
+
+    <string name="subscriptionSettingGetRebranding">Subscrever o DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Experimentar gratuitamente</string>
+    <string name="feedbackGeneralSubscription">Subscrição</string>
+
 </resources>

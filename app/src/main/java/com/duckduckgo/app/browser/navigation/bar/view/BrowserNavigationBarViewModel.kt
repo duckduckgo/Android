@@ -35,7 +35,6 @@ import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.FIRE_BUTTON_STATE
 import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.common.ui.experiments.visual.store.VisualDesignExperimentDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import javax.inject.Inject
@@ -53,7 +52,6 @@ import kotlinx.coroutines.flow.update
 @SuppressLint("NoLifecycleObserver")
 @ContributesViewModel(ViewScope::class)
 class BrowserNavigationBarViewModel @Inject constructor(
-    private val visualDesignExperimentDataStore: VisualDesignExperimentDataStore,
     private val tabRepository: TabRepository,
     private val pixel: Pixel,
     private val dispatcherProvider: DispatcherProvider,
@@ -67,10 +65,9 @@ class BrowserNavigationBarViewModel @Inject constructor(
         _viewState.asStateFlow(),
         isCustomTab,
         tabRepository.flowTabs,
-        visualDesignExperimentDataStore.isExperimentEnabled,
-    ) { state, isCustomTab, tabs, isExperimentEnabled ->
+    ) { state, isCustomTab, tabs ->
         state.copy(
-            isVisible = isExperimentEnabled && !isCustomTab,
+            isVisible = !isCustomTab,
             tabsCount = tabs.size,
             hasUnreadTabs = tabs.firstOrNull { !it.viewed } != null,
         )

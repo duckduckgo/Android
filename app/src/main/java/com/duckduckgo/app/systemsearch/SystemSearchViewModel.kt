@@ -21,13 +21,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.autocomplete.api.AutoComplete
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.app.browser.defaultbrowsing.prompts.ui.experiment.OnboardingHomeScreenWidgetExperiment
 import com.duckduckgo.app.browser.newtab.FavoritesQuickAccessAdapter
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -38,6 +32,15 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.systemsearch.SystemSearchViewModel.Command.UpdateVoiceSearch
+import com.duckduckgo.app.widget.experiment.PostCtaExperienceExperiment
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -67,7 +70,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 data class SystemSearchResult(
     val autocomplete: AutoCompleteResult,
@@ -82,9 +87,12 @@ class SystemSearchViewModel @Inject constructor(
     private val pixel: Pixel,
     private val savedSitesRepository: SavedSitesRepository,
     private val appSettingsPreferencesStore: SettingsDataStore,
+    private val autoCompleteSettings: AutoCompleteSettings,
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val postCtaExperienceExperiment: PostCtaExperienceExperiment,
+    private val onboardingHomeScreenWidgetExperiment: OnboardingHomeScreenWidgetExperiment,
 ) : ViewModel(), EditSavedSiteDialogFragment.EditSavedSiteListener {
 
     data class OnboardingViewState(
@@ -102,8 +110,8 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     sealed class Command {
-        object ClearInputText : Command()
-        object LaunchDuckDuckGo : Command()
+        data object ClearInputText : Command()
+        data object LaunchDuckDuckGo : Command()
         data class LaunchBrowser(val query: String) : Command()
         data class LaunchBrowserAndSwitchToTab(val query: String, val tabId: String) : Command()
         data class LaunchEditDialog(val savedSite: SavedSite) : Command()
@@ -111,9 +119,9 @@ class SystemSearchViewModel @Inject constructor(
         data class DeleteSavedSiteConfirmation(val savedSite: SavedSite) : Command()
         data class LaunchDeviceApplication(val deviceApp: DeviceApp) : Command()
         data class ShowAppNotFoundMessage(val appName: String) : Command()
-        object DismissKeyboard : Command()
+        data object DismissKeyboard : Command()
         data class EditQuery(val query: String) : Command()
-        object UpdateVoiceSearch : Command()
+        data object UpdateVoiceSearch : Command()
         data class ShowRemoveSearchSuggestionDialog(val suggestion: AutoCompleteSuggestion) : Command()
         data object AutocompleteItemRemoved : Command()
     }
@@ -191,7 +199,7 @@ class SystemSearchViewModel @Inject constructor(
                 updateResults(result)
             }
             .flowOn(dispatchers.main())
-            .catch { t: Throwable? -> Timber.w(t, "Failed to get search results") }
+            .catch { t: Throwable? -> logcat(WARN) { "Failed to get search results: ${t?.asLog()}" } }
             .launchIn(viewModelScope)
     }
 
@@ -237,7 +245,7 @@ class SystemSearchViewModel @Inject constructor(
             return
         }
 
-        if (appSettingsPreferencesStore.autoCompleteSuggestionsEnabled) {
+        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
             val trimmedQuery = query.trim()
             resultsStateFlow.value = trimmedQuery
         }
@@ -272,7 +280,7 @@ class SystemSearchViewModel @Inject constructor(
     }
 
     private fun inputCleared() {
-        if (appSettingsPreferencesStore.autoCompleteSuggestionsEnabled) {
+        if (autoCompleteSettings.autoCompleteSuggestionsEnabled) {
             resultsStateFlow.value = ""
         }
         resetResultsState()
@@ -300,6 +308,10 @@ class SystemSearchViewModel @Inject constructor(
             userStageStore.stageCompleted(AppStage.NEW)
             command.value = Command.LaunchBrowser(query.trim())
             pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+            postCtaExperienceExperiment.fireWidgetSearch()
+            postCtaExperienceExperiment.fireWidgetSearchXCount()
+            onboardingHomeScreenWidgetExperiment.fireWidgetSearch()
+            onboardingHomeScreenWidgetExperiment.fireWidgetSearchXCount()
         }
     }
 
@@ -313,6 +325,12 @@ class SystemSearchViewModel @Inject constructor(
             }
         }
         pixel.fire(INTERSTITIAL_LAUNCH_BROWSER_QUERY)
+        viewModelScope.launch {
+            postCtaExperienceExperiment.fireWidgetSearch()
+            postCtaExperienceExperiment.fireWidgetSearchXCount()
+            onboardingHomeScreenWidgetExperiment.fireWidgetSearch()
+            onboardingHomeScreenWidgetExperiment.fireWidgetSearchXCount()
+        }
     }
 
     fun userLongPressedAutocomplete(suggestion: AutoCompleteSuggestion) {

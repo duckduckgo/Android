@@ -28,30 +28,39 @@ import com.duckduckgo.app.dispatchers.IntentDispatcherViewModel.ViewState
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.di.scopes.ActivityScope
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import javax.inject.Inject
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 class IntentDispatcherActivity : DuckDuckGoActivity() {
 
     private val viewModel: IntentDispatcherViewModel by bindViewModel()
 
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Timber.d("onCreate called with intent $intent")
+        logcat { "onCreate called with intent $intent" }
 
-        viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).onEach {
-            dispatch(it)
-        }.launchIn(lifecycleScope)
+        lifecycleScope.launch {
+            viewModel.viewState.flowWithLifecycle(lifecycle, Lifecycle.State.CREATED).collectLatest {
+                dispatch(it)
+            }
+        }
 
         val surfaceColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.daxColorToolbar)
         viewModel.onIntentReceived(intent, surfaceColor, isExternal = true)
     }
 
     private fun dispatch(viewState: ViewState) {
-        if (viewState.customTabRequested) {
+        if (viewState.activityParams != null) {
+            globalActivityStarter.start(this, viewState.activityParams)
+        } else if (viewState.customTabRequested) {
             showCustomTab(viewState.intentText, viewState.toolbarColor, viewState.isExternal)
         } else {
             showBrowserActivity(viewState.intentText, viewState.isExternal)

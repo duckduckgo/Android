@@ -36,7 +36,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class PermissionsViewModel @Inject constructor(
@@ -64,8 +65,8 @@ class PermissionsViewModel @Inject constructor(
     )
 
     sealed class Command {
-        object LaunchLocation : Command()
-        object LaunchNotificationsSettings : Command()
+        data object LaunchLocation : Command()
+        data object LaunchNotificationsSettings : Command()
         data class LaunchAppLinkSettings(val appLinksSettingType: AppLinkSettingType) : Command()
     }
 
@@ -107,7 +108,7 @@ class PermissionsViewModel @Inject constructor(
     }
 
     fun onAppLinksSettingChanged(appLinkSettingType: AppLinkSettingType) {
-        Timber.i("User changed app links setting, is now: ${appLinkSettingType.name}")
+        logcat(INFO) { "User changed app links setting, is now: ${appLinkSettingType.name}" }
 
         val pixelName =
             when (appLinkSettingType) {

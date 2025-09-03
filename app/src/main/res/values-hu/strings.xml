@@ -202,6 +202,7 @@
 
     <!-- Appearance -->
     <string name="appearanceActivityTitle">Megjelenés</string>
+    <string name="settingsShowFullUrlTitle">Teljes webhelycím megjelenítése</string>
 
     <!-- Settings - Automatically clearing data -->
     <string name="settingsAutomaticallyClearingDialogSave">Mentés</string>
@@ -757,7 +758,7 @@
     <string name="preOnboardingComparisonChartItem1">Privát keresés alapértelmezés szerint</string>
     <string name="preOnboardingComparisonChartItem2">Harmadik féltől származó nyomkövetők blokkolása</string>
     <string name="preOnboardingComparisonChartItem3">Felugró sütiablakok blokkolása</string>
-    <string name="preOnboardingComparisonChartItem4">Nyomon követő hirdetések blokkolása</string>
+    <string name="preOnboardingComparisonChartItem4">Célzott hirdetések blokkolása</string>
     <string name="preOnboardingComparisonChartItem5">Böngészési adatok törlése gombnyomásra</string>
     <string name="preOnboardingDaxDialog3Title">Nagyszerű! Üdvözlünk a kacsa világában!</string>
     <string name="preOnboardingDaxDialog3Button">Böngészés indítása</string>
@@ -796,8 +797,9 @@
     <string name="onboardingEndDaxDialogDescription">Ne feledd: minden alkalommal, amikor velem böngészel, egy undok hirdetés elveszíti az erejét. 👌</string>
     <string name="onboardingEndDaxDialogButton">Minden kész!</string>
     <string name="onboardingPrivacyProDaxDialogTitle">Ó, mielőtt elfelejtem...</string>
-    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo beépített <b>VPN</b>-nel is rendelkezik!<br/><br/>Az aktiválásához <b>fizess elő a Privacy Pro csomagra.</b>]]></string>
+    <string name="onboardingPrivacyProDaxDialogDescription"><![CDATA[A DuckDuckGo funkciói között <b>opcionális előfizetés</b> mellett igénybe vehető biztonságos <b>VPN és további két prémium védelem</b> is szerepel.]]></string>
     <string name="onboardingPrivacyProDaxDialogOkButton">További részletek</string>
+    <string name="onboardingPrivacyProDaxDialogFreeTrialOkButton">Próbáld ki ingyen!</string>
     <string name="onboardingPrivacyProDaxDialogCancelButton">Kihagyás</string>
 
     <!-- Highlight Onboarding Experiment-->
@@ -842,21 +844,22 @@
     <!-- Privacy Dashboard -->
     <string name="brokenSiteSubmittedReportMessage">Köszönjük! A jelentésed segít nekünk abban, hogy a DuckDuckGo mindenki számára jobb élményt nyújthasson!</string>
 
-    <!-- DuckChat -->
-    <string name="duckChatTitle">Duck.ai</string>
-    <string name="duckChatMenuItem">Új AI-csevegés</string>
-
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton">Most nem</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Állítsd be a DuckDuckGót alapértelmezett böngészőként, hogy a linkek a DuckDuckGóban nyíljanak meg</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Most nem</string>
+
+    <!-- Default Browser message -->
+    <string name="newTabPageDefaultBrowserMessageHeading">Nem a DuckDuckGo az alapértelmezett böngésződ. Erősítsd a védelmed!</string>
+    <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Beállítás alapértelmezettként</string>
+    <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne kérdezzen rá újra</string>
 
     <!--TabSwitcher Animation Tile Dialog-->
     <string name="tabSwitcherAnimationTileRemovalDialogTitle">A DuckDuckGo a böngészésed védelme érdekében blokkolja a nyomkövetőket</string>
     <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
     <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
 
-    <!-- Malicious Site -->
+    <!-- Threat protection -->
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
     <string name="maliciousSiteMalwareHeadline"><![CDATA[A DuckDuckGo blokkolta ezt az oldalt, mert lehetséges, hogy olyan rosszindulatú programokat terjeszt, amelyek veszélyeztethetik az eszközöd biztonságát vagy ellophatják a személyes adataidat.\n<a href=\"\">További részletek</a>]]></string>
     <string name="maliciousSitePhishingHeadline"><![CDATA[Előfordulhat, hogy ez a webhely legitim webhelynek adja ki magát, hogy személyes adatok, például jelszavak vagy hitelkártyaszámok megadására vegyen rá.\n<a href=\"\">További részletek</a>]]></string>
@@ -871,5 +874,53 @@
     <string name="maliciousSiteToggleHint">Figyelmeztetés az adathalászat vagy rosszindulatú programok miatt megjelölt webhelyekre</string>
     <string name="maliciousSiteSettingLearnMore"><annotation type="learn_more_link">További tudnivalók</annotation></string>
     <string name="maliciousSiteSettingDisabled">Ennek a funkciónak a letiltása veszélyt jelenthet az adataidra.</string>
+    <string name="threatProtectionTitle">Fenyegetések elleni védelem</string>
+    <string name="threatProtectionDescription">A DuckDuckGo továbbfejlesztett védelmi megoldásai megállítják a gyakori fenyegetéseket, miközben megőrzik a kapcsolat biztonságát.</string>
+    <string name="smarterEncryptionTitle">Smarter Encryption</string>
+    <string name="smarterEncryptionDescription"><![CDATA[Linkek automatikus frissítése HTTPS-re, amikor csak lehetséges.<a href=\"\">További részletek</a>]]></string>
+    <string name="scamBlockerTitle">Csalásblokkoló</string>
+    <string name="scamBlockerDescription">Figyelmeztetés azokra az oldalakra, amelyeket csalás, adathalászat vagy rosszindulatú programok miatt jelöltek meg.</string>
+    <string name="threatProtectionLearnMoreTitle">További részletek</string>
+
+    <!-- Experiment: Improve prompts for "homescreen widget" -->
+    <string name="experimentHomeScreenWidgetBottomSheetDialogTitle">Próbáld ki kezdőképernyő-minialkalmazásunkat!</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSubTitle">A gyors és könnyű hozzáférés érdekében add hozzá kereső minialkalmazásunkat a kezdőképernyődhöz.</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogPrimaryButton">Minialkalmazás hozzáadása</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogGhostButton">Most nem</string>
+    <string name="experimentHomeScreenWidgetBottomSheetDialogSearchText">Keresés a DuckDuckGo alkalmazásban</string>
+
+    <!-- Change under remote feature flag: Widget as a Protection -->
+    <string name="settingsAddHomeWidgetTitle">Kezdőképernyő-minialkalmazás</string>
+
+    <!-- Section in main app settings -->
+    <string name="settingsHeadingCompleteSetup">Beállítás végrehajtása</string>
+
+    <!-- Buck Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBuck">Szia!</string>
+    <string name="highlightsPreOnboardingDaxDialog1DescriptionBuck">Felkészültél egy gyorsabb böngészőre, amely védelmet nyújt neked?</string>
+    <string name="highlightsPreOnboardingDaxDialog2TitleBuck"><![CDATA[<b>Védelem</b> <i>aktiválva!</i>]]></string>
+
+    <!-- BB Onboarding Experiment -->
+    <string name="highlightsPreOnboardingDaxDialog1TitleBb"><![CDATA[Szia!<br/>Felkészültél egy gyorsabb böngészőre, amely védelmet is nyújt számodra?]]></string>
+
+    <string name="bbOnboardingFireButtonDaxDialogTitle"><![CDATA[Töröld azonnal a böngészési adataidat a <font color=\"#F05C2B\">Fire Button</font> használatával]]></string>
+    <string name="bbOnboardingFireButtonDaxDialogDescription">Próbáld ki!️</string>
+
+    <plurals name="bbOnboardingTrackersBlockedDialogTitle">
+        <item quantity="one"><![CDATA[ és %1$d másik webhely próbált téged követni itt. <font color=\"#F05C2B\">Blokkoltam őket!</font>]]></item>
+        <item quantity="other"><![CDATA[ és %1$d másik webhely próbált téged követni itt. <font color=\"#F05C2B\">Blokkoltam őket!</font>]]></item>
+    </plurals>
+    <plurals name="bbOnboardingTrackersBlockedZeroDialogTitle" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ követni próbált téged itt. <font color=\"#F05C2B\">Blokkoltam!</font>]]></item>
+        <item quantity="other"><![CDATA[ követni próbált téged itt. <font color=\"#F05C2B\">Blokkoltam őket!</font>]]></item>
+    </plurals>
+
+    <string name="bbOnboardingTrackersBlockedDialogDescription">☝További információkért koppints a pajzsra.️</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="aboutDescriptionBrandUpdate2025Rebranding">Welcome to the Duck Side!\n\nA DuckDuckGo egy független online adatvédelmi cég, amely azoknak kínál megoldást, akik vissza kívánják venni az irányítást a személyes adataik felett.\n\nÚgy gondoljuk, hogy a legjobb módja annak, hogy megvédjük a személyes adataidat a hekkerektől, a csalóktól és az adatvédelmet sértő cégektől az, ha egyáltalán nem gyűjtjük őket. Ezért <annotation type="chart_comparison">választják emberek milliói a DuckDuckGót a Chrome és más böngészők helyett</annotation> az online kereséshez és böngészéshez. Beépített keresőmotorunk olyan, mint a Google, de sosem követi a kereséseidet. Böngészési védelmeink, mint például a hirdetéskövetők és a sütik blokkolása, segítenek megakadályozni, hogy más cégek összegyűjtsék az adataidat. Ja, és a böngészőnk ingyenes – a bevételünket az <annotation type="privacy_respecting_ads">adatvédelmet tiszteletben tartó keresési hirdetésekből</annotation> szerezzük, nem az adataid kihasználásából.\n\nEzenkívül <annotation type="ppro_help_page">DuckDuckGo-előfizetést</annotation> is kínálunk, a böngészőnkbe integrálva. Az előfizetők még nagyobb adatvédelmet élvezhetnek a következőknek köszönhetően: gyors és egyszerű <annotation type="vpn_help_page">VPN</annotation>, melynek segítségével biztonságossá tehető az online tevékenység; hozzáférés a fejlett MI-modellekhez (a privát MI alapú csevegőszolgáltatásunkban, a Duck.ai-ban); egy szolgáltatás, amely felkutatja és eltávolítja a személyes adatokat a kereshető személyadatbázis-oldalakról; illetve egy másik szolgáltatás, amely segít helyreállítani a személyazonosságot annak ellopása esetén.\n\nVedd vissza az irányítást a személyes adataid felett az adatgyűjtés helyett adatvédelemre tervezett böngészővel.</string>
+    <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[A DuckDuckGo emellett <b>opcionális előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és <b>fejlett, privát AI-szolgáltatás</b> tartozik.]]></string>
+    <string name="settingsDuckAiRebranding">AI funkciók</string>
+    <string name="settingsDuckAi">Duck.ai</string>
 
 </resources>

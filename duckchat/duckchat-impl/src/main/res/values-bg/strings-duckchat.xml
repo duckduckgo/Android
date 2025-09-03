@@ -21,10 +21,52 @@
     <string name="duck_chat_download_finished_action_name">Отваряне</string>
     <string name="duck_chat_cannot_open_file_error_message">Файлът не може да се отвори. Проверете за съвместимо приложение.</string>
 
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Няма достъп до камерата</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Качване на изображение</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Изберете файл</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Направете снимка</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Разрешаване на DuckDuckGo да иска достъп до камерата на това устройство</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Сайтовете могат да използват камерата, само ако разрешите на DuckDuckGo да поиска достъп.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Отвори Настройки</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Отмени</string>
+
+    <!-- Content capture for upload -->
+    <string name="audioCaptureSoundRecorderUnavailable">Няма достъп до звукозаписно устройство</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedTitle">Разрешаване на DuckDuckGo да иска достъп за звукозапис на това устройство</string>
+    <string name="audioCaptureSoundRecorderPermissionDeniedMessage">Сайтовете могат да използват звукозаписното устройство, само ако разрешите на DuckDuckGo да поиска достъп.</string>
+
     <!-- Settings -->
     <string name="duck_chat_settings_activity_description">Duck.ai е незадължителна функция, чрез която можете да разговаряте анонимно с популярни AI чат модели от трети страни. Чатовете Ви не се използват за обучение на AI.\n<annotation type="learn_more_link">Научете повече</annotation></string>
     <string name="duck_chat_enable_duck_ai_setting">Активиране на Duck.ai</string>
-    <string name="duck_chat_show_in_heading">Бързи Връзки</string>
     <string name="duck_chat_visibility_setting">Меню на браузъра</string>
     <string name="duck_chat_address_bar_visibility_setting">Адресна лента</string>
+    <string name="duck_chat_assist_settings_title">Настройки на Assist</string>
+    <string name="duck_chat_assist_settings_description">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
+    <string name="duck_ai_shortcut_settings_title">Преки пътища за Duck.ai</string>
+    <string name="duck_ai_shortcut_settings_description">Изберете кои преки пътища на Duck.ai да се показват</string>
+
+    <!-- Input Screen  -->
+    <string name="input_screen_search_tab">Търсене</string>
+    <string name="input_screen_search_hint">Търсене или въвеждане на адрес</string>
+    <string name="input_screen_chat_tab">Duck.ai</string>
+    <string name="input_screen_chat_hint">Задавайте въпроси поверително</string>
+    <string name="input_screen_user_pref_without_ai">Само търсене\n(По подразбиране)</string>
+    <string name="input_screen_user_pref_with_ai">Търсене и Duck.ai\n(Експериментално)</string>
+    <string name="input_screen_user_pref_description">Изпробвайте нашата експериментална опция за задаване на въпроси към Duck.ai директно от адресната лента. <annotation type="share_feedback">Споделяне на отзив</annotation></string>
+
+    <!-- Duck.ai Pro settings -->
+    <string name="duck_ai_paid_settings_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_title">Duck.ai</string>
+    <string name="duck_ai_paid_settings_page_description"><![CDATA[Поверителен чат с AI модели, достъпни само за абонати.\n<a href=\"\">Научете повече</a>]]></string>
+    <string name="duck_ai_paid_settings_open_duck_ai">Отваряне на Duck.ai</string>
+    <string name="duck_ai_paid_settings_learn_more_title">Научете повече</string>
+
+    <!-- Rebranding-->
+    <string name="duck_chat_title_rebranding">Функции с изкуствен интелект</string>
+    <string name="duck_chat_settings_activity_description_rebranding">Функциите на DuckDuckGo AI са поверителни и незадължителни.Вашите данни не се използват за обучение на AI.\n<annotation type="learn_more_link">Научете повече</annotation></string>
+    <string name="duck_chat_enable_duck_ai_setting_rebranding">Duck.ai</string>
+    <string name="duck_chat_enable_duck_ai_setting_description_rebranding">Поверителен чат с популярни AI модели на трети страни</string>
+    <string name="duck_chat_assist_settings_title_rebranding">Настройки за Assist при търсене</string>
+    <string name="duck_chat_assist_settings_description_rebranding">Изберете колко често искате да се появяват отговори, подпомагани от изкуствен интелект, в търсенето</string>
 </resources>

@@ -61,13 +61,20 @@
     <string name="privacyProFaqSecondary">Saa vastused korduma kippuvatele küsimustele või võta ühendust Privacy Pro klienditoega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
     <string name="subscriptionStatusSubscribed">Tellitud</string>
     <string name="privacyPolicyAndTermsOfService">Privaatsuspoliitika ja teenusetingimused</string>
+    <string name="subscriptionStatusFreeTrial">Tasuta prooviperiood aktiveeritud</string>
+    <string name="freeTrialMonthlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt tasuliseks kuutellimuseks.</string>
+    <string name="freeTrialYearlyActiveSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ja muutub sel päeval automaatselt tasuliseks aastatellimuseks.</string>
+    <string name="freeTrialCancelledSubscriptionsData" instruction="Placeholder is a date in format MMMM dd, yyyy">Teie tasuta prooviperiood lõpeb %1$s ega muutu tasuliseks tellimuseks.</string>
 
     <!--Settings Subscriptions-->
     <string name="subscriptionSetting">Tellimuse seaded</string>
     <string name="subscriptionSettingSubscribe">Kaitse oma ühendust ja identiteeti rakendusega Privacy Pro</string>
-    <string name="subscriptionSettingSubscribeSubtitle">Sisaldab meie VPN-i, rakendusi Personal Information Removal ja Identity Theft Restoration.</string>
-    <string name="subscriptionSettingSubscribeSubtitleRow">Sisaldab meie VPN-i ja teenust Identity Theft Restoration.</string>
+
+    <string name="subscriptionSettingSubscribeSubtitle">Tellijad saavad meie VPN-i ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeSubtitleRow">Tellijad saavad meie VPN-i ja teenuse Identity Theft Restoration.</string>
+
     <string name="subscriptionSettingGet">Hangi Privacy Pro</string>
+    <string name="subscriptionSettingTryFreeTrial">Proovi Privacy Pro\'d tasuta</string>
     <string name="subscriptionSettingRestore">Mul on tellimus</string>
     <string name="subscriptionSettingExpired">Sinu Privacy Pro tellimus on aegunud</string>
     <string name="subscriptionSettingExpiredViewPlans">Kuva plaane</string>
@@ -161,4 +168,34 @@
     <string name="activityActivateSubscription">Mul on tellimus</string>
     <string name="activityPir" translatable="false">Privacy Pro</string>
     <string name="activitySendFeedback">Saada tagasisidet</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="privacyProRebranding">DuckDuckGo tellimus</string>
+    <string name="subscriptionSettingExpiredRebranding">Sinu DuckDuckGo tellimus aegus</string>
+    <string name="privacyProFaqRebranding">Kas vajad abi oma tellimusega?</string>
+    <string name="privacyProFaqSecondaryRebranding">Saa vastused korduma kippuvatele küsimustele või võta ühendust tellimuse toega meie abilehtedelt. Funktsioonide kättesaadavus varieerub riigiti.</string>
+    <string name="restoreSubscriptionTitleRebranding">Lisa oma tellimus sellele seadmele</string>
+    <string name="restoreSubscriptionEmailDescriptionRebranding">Seo e-posti aadress oma tellimusega, et lisada see sellesse seadmesse.</string>
+    <string name="activateOnOtherDevicesRebranding">Lisage oma tellimus teistele seadmetele</string>
+    <string name="addToDeviceSecondaryTextWithoutEmailRebranding">Lisa oma tellimus oma teistesse seadmetesse Google Play kaudu või e-posti aadressi sidumisega.</string>
+    <string name="addToDeviceSecondaryTextWithEmailRebranding">Kasuta ülaltoodud e-posti aadressi, et lisada oma tellimus teistesse seadmetesse DuckDuckGo rakenduses. Mine jaotisse Seaded &gt; Tellimisseaded &gt; Mul on tellimus.</string>
+    <string name="subscriptionSettingRebrandingMessage">Privacy Pro kannab nüüd lihtsalt nime DuckDuckGo tellimus</string>
+    <string name="subscriptionSettingSubscribeRebranding">Kaitse oma ühendust ja identiteeti ühe tellimusega.</string>
+    <string name="removeFromDeviceDescriptionRebranding">Sa ei pääse enam selles seadmes oma tellimusele ligi. See ei tühista sinu tellimust ja see jääb teistel seadmetel aktiivseks.</string>
+
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitle">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenused Personal Information Removal ning Identity Theft Restoration.</string>
+    <string name="subscriptionSettingSubscribeWithDuckAiSubtitleRow">Tellijad saavad meie VPN-i, täiustatud tehisintellekti mudelid Duck.ai-s ja teenuse Identity Theft Restoration.</string>
+
+    <string name="feedbackCategoryDuckAi">Duck.ai</string>
+    <string name="feedbackSubCategoryDuckAiSubscriberModels">Ei pääse ainult tellijatele mõeldud Duck.ai mudelitele ligi</string>
+    <string name="feedbackSubCategoryDuckAiLoginThirdPartyBrowser">Ei pääse Duck.ai-le teistes brauserites oma tellimusega ligi</string>
+    <string name="feedbackSubCategoryDuckAiOther">Muu Duck.ai tagasiside</string>
+
+    <string name="subscriptionSettingSectionTitle" translatable="false">DuckDuckGo Subscription</string>
+    <string name="subscriptionSettingSubscribeSecure">Muuda oma Wi-Fi turvaliseks ja vestle privaatselt täiustatud tehisintellekti mudelitega</string>
+
+    <string name="subscriptionSettingGetRebranding">Telli DuckDuckGo</string>
+    <string name="subscriptionSettingTryFreeTrialRebranding">Proovi tasuta</string>
+    <string name="feedbackGeneralSubscription">Püsitellimus</string>
+
 </resources>

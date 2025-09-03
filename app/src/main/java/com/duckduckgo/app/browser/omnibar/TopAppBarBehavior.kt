@@ -40,14 +40,19 @@ class TopAppBarBehavior(
         private val viewsExemptedFromOffset = setOf(
             R.id.browserLayout,
             R.id.webViewFullScreenContainer,
-            R.id.navigationBar,
         )
     }
 
     @SuppressLint("RestrictedApi")
-    override fun layoutDependsOn(parent: CoordinatorLayout, child: AppBarLayout, dependency: View): Boolean {
+    override fun layoutDependsOn(
+        parent: CoordinatorLayout,
+        child: AppBarLayout,
+        dependency: View,
+    ): Boolean {
         if (dependency is Snackbar.SnackbarLayout) {
-            updateSnackbar(child, dependency)
+            if (omnibar.isBottomNavEnabled()) {
+                updateSnackbar(child, dependency)
+            }
         } else if (!viewsExemptedFromOffset.contains(dependency.id)) {
             offsetBottomByToolbar(dependency)
         }
@@ -72,11 +77,14 @@ class TopAppBarBehavior(
     }
 
     @SuppressLint("RestrictedApi")
-    private fun updateSnackbar(child: View, snackbarLayout: Snackbar.SnackbarLayout) {
+    private fun updateSnackbar(
+        child: View,
+        snackbarLayout: Snackbar.SnackbarLayout,
+    ) {
         if (snackbarLayout.layoutParams is CoordinatorLayout.LayoutParams) {
             val params = snackbarLayout.layoutParams as CoordinatorLayout.LayoutParams
 
-            params.anchorId = R.id.navigationBar
+            params.anchorId = child.id
             params.anchorGravity = Gravity.TOP
             params.gravity = Gravity.TOP
             snackbarLayout.layoutParams = params

@@ -59,6 +59,9 @@ dependencies {
     implementation project(':remote-messaging-api') // remote feature flag
     implementation project(':survey-api')
     implementation project(':vpn-api')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':duckchat-api')
+    implementation project(':pir-api')
 
     implementation AndroidX.appCompat
     implementation KotlinX.coroutines.core

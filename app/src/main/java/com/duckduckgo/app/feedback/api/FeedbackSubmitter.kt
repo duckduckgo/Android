@@ -25,6 +25,7 @@ import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.OTHER
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.SEARCH_NOT_GOOD_ENOUGH
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.MainReason.WEBSITES_NOT_LOADING
 import com.duckduckgo.app.feedback.ui.negative.FeedbackType.SubReason
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FEEDBACK_NEGATIVE_SUBMISSION
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -35,7 +36,9 @@ import com.duckduckgo.experiments.api.VariantManager
 import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 interface FeedbackSubmitter {
 
@@ -63,13 +66,14 @@ class FireAndForgetFeedbackSubmitter(
     private val appCoroutineScope: CoroutineScope,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
+    private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
 ) : FeedbackSubmitter {
     override suspend fun sendNegativeFeedback(
         mainReason: MainReason,
         subReason: SubReason?,
         openEnded: String,
     ) {
-        Timber.i("User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason")
+        logcat(INFO) { "User provided negative feedback: {$openEnded}. mainReason = $mainReason, subReason = $subReason" }
 
         val category = categoryFromMainReason(mainReason)
         val subcategory = apiKeyMapper.apiKeyFromSubReason(subReason)
@@ -85,21 +89,21 @@ class FireAndForgetFeedbackSubmitter(
                     subcategory = subcategory,
                 )
             }
-                .onSuccess { Timber.i("Successfully submitted feedback") }
-                .onFailure { Timber.w(it, "Failed to send feedback") }
+                .onSuccess { logcat(INFO) { "Successfully submitted feedback" } }
+                .onFailure { logcat(WARN) { "Failed to send feedback" } }
         }
     }
 
     override suspend fun sendPositiveFeedback(openEnded: String?) {
-        Timber.i("User provided positive feedback: {$openEnded}")
+        logcat(INFO) { "User provided positive feedback: {$openEnded}" }
 
         sendPixel(pixelForPositiveFeedback())
 
         if (openEnded != null) {
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 runCatching { submitFeedback(openEnded = openEnded, rating = POSITIVE_FEEDBACK) }
-                    .onSuccess { Timber.i("Successfully submitted feedback") }
-                    .onFailure { Timber.w(it, "Failed to send feedback") }
+                    .onSuccess { logcat(INFO) { "Successfully submitted feedback" } }
+                    .onFailure { logcat(WARN) { "Failed to send feedback" } }
             }
         }
     }
@@ -108,7 +112,7 @@ class FireAndForgetFeedbackSubmitter(
         openEnded: String,
         brokenSite: String?,
     ) {
-        Timber.i("User provided broken site report through feedback, url:{$brokenSite}, comment:{$openEnded}")
+        logcat(INFO) { "User provided broken site report through feedback, url:{$brokenSite}, comment:{$openEnded}" }
 
         val category = categoryFromMainReason(WEBSITES_NOT_LOADING)
         val subcategory = apiKeyMapper.apiKeyFromSubReason(null)
@@ -123,18 +127,18 @@ class FireAndForgetFeedbackSubmitter(
                     category = category,
                 )
             }
-                .onSuccess { Timber.i("Successfully submitted broken site feedback") }
-                .onFailure { Timber.w(it, "Failed to send broken site feedback") }
+                .onSuccess { logcat(INFO) { "Successfully submitted broken site feedback" } }
+                .onFailure { logcat(WARN) { "Failed to send broken site feedback" } }
         }
     }
 
     override suspend fun sendUserRated() {
-        Timber.i("User indicated they'd rate the app")
+        logcat(INFO) { "User indicated they'd rate the app" }
         sendPixel(pixelForPositiveFeedback())
     }
 
     private fun sendPixel(pixelName: String) {
-        Timber.d("Firing feedback pixel: $pixelName")
+        logcat { "Firing feedback pixel: $pixelName" }
         pixel.fire(pixelName)
     }
 
@@ -146,6 +150,13 @@ class FireAndForgetFeedbackSubmitter(
         url: String? = null,
         reason: String = FeedbackService.REASON_GENERAL,
     ) {
+        // Delete after the experiment has finished and go back to always return atbWithVariant()
+        val atb = if (onboardingDesignExperimentManager.isAnyExperimentEnrolledAndEnabled()) {
+            atbWithVariant() + "_${onboardingDesignExperimentManager.getCohort()}"
+        } else {
+            atbWithVariant()
+        }
+
         feedbackService.submitFeedback(
             reason = reason,
             category = category,
@@ -157,7 +168,7 @@ class FireAndForgetFeedbackSubmitter(
             manufacturer = Build.MANUFACTURER,
             model = Build.MODEL,
             api = appBuildConfig.sdkInt,
-            atb = atbWithVariant(),
+            atb = atb,
         )
     }
 

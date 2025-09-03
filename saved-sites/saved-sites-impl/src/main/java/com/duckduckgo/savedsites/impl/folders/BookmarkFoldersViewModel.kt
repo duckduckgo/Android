@@ -31,7 +31,7 @@ import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel.Command.N
 import com.duckduckgo.savedsites.impl.folders.BookmarkFoldersViewModel.Command.SelectFolder
 import javax.inject.Inject
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class BookmarkFoldersViewModel @Inject constructor(
@@ -45,7 +45,7 @@ class BookmarkFoldersViewModel @Inject constructor(
 
     sealed class Command {
         class SelectFolder(val selectedBookmarkFolder: BookmarkFolder) : Command()
-        object NewFolderCreatedUpdateTheStructure : Command()
+        data object NewFolderCreatedUpdateTheStructure : Command()
     }
 
     val viewState: MutableLiveData<ViewState> = MutableLiveData()
@@ -59,8 +59,8 @@ class BookmarkFoldersViewModel @Inject constructor(
         selectedFolderId: String,
         currentFolder: BookmarkFolder?,
     ) {
-        Timber.d("Saved sites: selectedFolderId $selectedFolderId")
-        Timber.d("Saved sites: currentFolder $currentFolder")
+        logcat { "Saved sites: selectedFolderId $selectedFolderId" }
+        logcat { "Saved sites: currentFolder $currentFolder" }
         viewModelScope.launch(dispatcherProvider.io()) {
             val folderStructure = savedSitesRepository.getFolderTree(selectedFolderId, currentFolder)
             onFolderStructureCreated(folderStructure)

@@ -26,6 +26,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback
 import com.duckduckgo.subscriptions.api.PrivacyProUnifiedFeedback.PrivacyProFeedbackSource.DDG_SETTINGS
+import com.duckduckgo.subscriptions.api.SubscriptionRebrandingFeatureToggle
 import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -34,17 +35,20 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AboutDuckDuckGoViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val pixel: Pixel,
     private val privacyProUnifiedFeedback: PrivacyProUnifiedFeedback,
+    private val subscriptionRebrandingFeatureToggle: SubscriptionRebrandingFeatureToggle,
 ) : ViewModel() {
 
     data class ViewState(
         val version: String = "",
+        val rebrandingEnabled: Boolean = false,
     )
 
     sealed class Command {
@@ -68,6 +72,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
             viewState.emit(
                 currentViewState().copy(
                     version = obtainVersion(),
+                    rebrandingEnabled = subscriptionRebrandingFeatureToggle.isSubscriptionRebrandingEnabled(),
                 ),
             )
         }
@@ -106,7 +111,7 @@ class AboutDuckDuckGoViewModel @Inject constructor(
     fun onVersionClicked() {
         easterEggCounter++
         if (easterEggCounter >= MAX_EASTER_EGG_COUNT) {
-            Timber.v("Easter egg triggered")
+            logcat(VERBOSE) { "Easter egg triggered" }
             resetEasterEggCounter()
             pixel.fire(SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED)
         }

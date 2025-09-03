@@ -18,15 +18,8 @@ package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.extensions.toSanitizedLanguageTag
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.freetrial.FreeTrialPrivacyProPixelsPlugin
-import com.duckduckgo.subscriptions.impl.freetrial.onPaywallImpression
-import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedMonthly
-import com.duckduckgo.subscriptions.impl.freetrial.onStartClickedYearly
-import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedMonthly
-import com.duckduckgo.subscriptions.impl.freetrial.onSubscriptionStartedYearly
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_ENTER_EMAIL_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ACTIVATE_SUBSCRIPTION_RESTORE_PURCHASE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.APP_SETTINGS_GET_SUBSCRIPTION_CLICK
@@ -46,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_RESTORE_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SCREEN_SHOWN
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.OFFER_SUBSCRIBE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_ADD_DEVICE_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_DUCK_AI_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_IDTR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_PIR_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.ONBOARDING_VPN_CLICK
@@ -67,7 +61,6 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_O
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_MONTHLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRICE_YEARLY_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PRIVACY_PRO_REDIRECT
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_PURCHASE_WITH_RESTORED_ACCOUNT
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_REMOVE_FROM_DEVICE_CLICK
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_SETTINGS_SHOWN
@@ -78,7 +71,7 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionActive()
     fun reportOfferScreenShown()
     fun reportOfferSubscribeClick()
-    fun reportPurchaseFailureOther()
+    fun reportPurchaseFailureOther(errorType: String, reason: String? = null)
     fun reportPurchaseFailureStore(errorType: String)
     fun reportPurchaseFailureBackend()
     fun reportPurchaseFailureAccountCreation()
@@ -97,6 +90,7 @@ interface SubscriptionPixelSender {
     fun reportOnboardingVpnClick()
     fun reportOnboardingPirClick()
     fun reportOnboardingIdtrClick()
+    fun reportOnboardingDuckAiClick()
     fun reportSubscriptionSettingsShown()
     fun reportAppSettingsPirClick()
     fun reportAppSettingsIdtrClick()
@@ -109,7 +103,6 @@ interface SubscriptionPixelSender {
     fun reportOnboardingFaqClick()
     fun reportAddEmailSuccess()
     fun reportPrivacyProRedirect()
-    fun reportPurchaseWithRestoredAccount(hasEmail: Boolean)
     fun reportAuthV2InvalidRefreshTokenDetected()
     fun reportAuthV2InvalidRefreshTokenSignedOut()
     fun reportAuthV2InvalidRefreshTokenRecovered()
@@ -119,18 +112,12 @@ interface SubscriptionPixelSender {
     fun reportAuthV2MigrationFailureOther()
     fun reportAuthV2TokenValidationError()
     fun reportAuthV2TokenStoreError()
-    suspend fun reportFreeTrialExperimentOnPaywallImpression()
-    suspend fun reportFreeTrialOnStartClickedMonthly()
-    suspend fun reportFreeTrialOnStartClickedYearly()
-    suspend fun reportFreeTrialOnSubscriptionStartedMonthly()
-    suspend fun reportFreeTrialOnSubscriptionStartedYearly()
 }
 
 @ContributesBinding(AppScope::class)
 class SubscriptionPixelSenderImpl @Inject constructor(
     private val pixelSender: Pixel,
     private val appBuildConfig: AppBuildConfig,
-    private val freeTrialPrivacyProPixelsPlugin: FreeTrialPrivacyProPixelsPlugin,
 ) : SubscriptionPixelSender {
 
     override fun reportSubscriptionActive() =
@@ -142,11 +129,17 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportOfferSubscribeClick() =
         fire(OFFER_SUBSCRIBE_CLICK)
 
-    override fun reportPurchaseFailureOther() =
-        fire(PURCHASE_FAILURE_OTHER)
+    override fun reportPurchaseFailureOther(errorType: String, reason: String?) =
+        fire(
+            PURCHASE_FAILURE_OTHER,
+            mapOf(
+                SubscriptionPixelParameter.ERROR_TYPE to errorType,
+                SubscriptionPixelParameter.REASON to reason.orEmpty(),
+            ),
+        )
 
     override fun reportPurchaseFailureStore(errorType: String) =
-        fire(PURCHASE_FAILURE_STORE, mapOf("errorType" to errorType))
+        fire(PURCHASE_FAILURE_STORE, mapOf(SubscriptionPixelParameter.ERROR_TYPE to errorType))
 
     override fun reportPurchaseFailureBackend() =
         fire(PURCHASE_FAILURE_BACKEND)
@@ -206,6 +199,9 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportOnboardingIdtrClick() =
         fire(ONBOARDING_IDTR_CLICK)
 
+    override fun reportOnboardingDuckAiClick() =
+        fire(ONBOARDING_DUCK_AI_CLICK)
+
     override fun reportSubscriptionSettingsShown() =
         fire(SUBSCRIPTION_SETTINGS_SHOWN)
 
@@ -242,9 +238,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
     override fun reportPrivacyProRedirect() =
         fire(SUBSCRIPTION_PRIVACY_PRO_REDIRECT)
 
-    override fun reportPurchaseWithRestoredAccount(hasEmail: Boolean) =
-        fire(SUBSCRIPTION_PURCHASE_WITH_RESTORED_ACCOUNT, mapOf("hasEmail" to hasEmail.toBinaryString()))
-
     override fun reportAuthV2InvalidRefreshTokenDetected() {
         fire(AUTH_V2_INVALID_REFRESH_TOKEN_DETECTED)
     }
@@ -279,26 +272,6 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportAuthV2TokenStoreError() {
         fire(AUTH_V2_TOKEN_STORE_ERROR)
-    }
-
-    override suspend fun reportFreeTrialExperimentOnPaywallImpression() {
-        freeTrialPrivacyProPixelsPlugin.onPaywallImpression()
-    }
-
-    override suspend fun reportFreeTrialOnStartClickedMonthly() {
-        freeTrialPrivacyProPixelsPlugin.onStartClickedMonthly()
-    }
-
-    override suspend fun reportFreeTrialOnStartClickedYearly() {
-        freeTrialPrivacyProPixelsPlugin.onStartClickedYearly()
-    }
-
-    override suspend fun reportFreeTrialOnSubscriptionStartedMonthly() {
-        freeTrialPrivacyProPixelsPlugin.onSubscriptionStartedMonthly()
-    }
-
-    override suspend fun reportFreeTrialOnSubscriptionStartedYearly() {
-        freeTrialPrivacyProPixelsPlugin.onSubscriptionStartedYearly()
     }
 
     private fun fire(pixel: SubscriptionPixel, params: Map<String, String> = emptyMap()) {

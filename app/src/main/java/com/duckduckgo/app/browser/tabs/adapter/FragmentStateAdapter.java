@@ -49,7 +49,6 @@ import androidx.viewpager2.adapter.StatefulAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.duckduckgo.app.browser.tabs.TabManager;
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -59,7 +58,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import timber.log.Timber;
+import logcat.LogPriority;
+import logcat.LogcatKt;
 
 /**
  * Similar in behavior to {@link androidx.fragment.app.FragmentStatePagerAdapter
@@ -101,9 +101,6 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final FragmentManager mFragmentManager;
 
-    @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
-    final SwipingTabsFeatureProvider mSwipingTabsFeature;
-
     // Fragment bookkeeping
     @SuppressWarnings("WeakerAccess") // to avoid creation of a synthetic accessor
     final LongSparseArray<Fragment> mFragments = new LongSparseArray<>();
@@ -130,28 +127,22 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
     /**
      * @param fragmentActivity if the {@link ViewPager2} lives directly in a {@link
      *     FragmentActivity} subclass.
-     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
      */
     public FragmentStateAdapter(
-            @NonNull FragmentActivity fragmentActivity,
-            SwipingTabsFeatureProvider swipingTabsFeature) {
+            @NonNull FragmentActivity fragmentActivity) {
         this(fragmentActivity.getSupportFragmentManager(),
-                fragmentActivity.getLifecycle(),
-                swipingTabsFeature);
+                fragmentActivity.getLifecycle());
     }
 
     /**
      * @param fragmentManager of {@link ViewPager2}'s host
      * @param lifecycle of {@link ViewPager2}'s host
-     * @param swipingTabsFeature Feature flag to enable swiping tabs fixes
      */
     public FragmentStateAdapter(
             @NonNull FragmentManager fragmentManager,
-            @NonNull Lifecycle lifecycle,
-            SwipingTabsFeatureProvider swipingTabsFeature) {
+            @NonNull Lifecycle lifecycle) {
         mFragmentManager = fragmentManager;
         mLifecycle = lifecycle;
-        mSwipingTabsFeature = swipingTabsFeature;
         super.setHasStableIds(true);
     }
 
@@ -184,6 +175,8 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
      * @see ViewPager2#setOffscreenPageLimit
      */
     public abstract @NonNull Fragment createFragment(int position);
+
+    public abstract @NonNull Boolean shouldPlaceFragmentInViewHolder(int position);
 
     @NonNull
     @Override
@@ -230,13 +223,16 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
         }
 
-        // Remove Fragments that are not bound anywhere -- pending a grace period
+        // Remove Fragments that are not bound anywhere and are not hidden -- pending a grace period
         if (!mIsInGracePeriod) {
             mHasStaleFragments = false; // we've executed all GC checks
 
             for (int ix = 0; ix < mFragments.size(); ix++) {
                 long itemId = mFragments.keyAt(ix);
-                if (!isFragmentViewBound(itemId)) {
+                // Exclude items in itemIdQueue from garbage collection. itemIdQueue is a FIFO queue
+                // that tracks fragments which are hidden but not yet eligible for removal. This ensures
+                // that fragments are only removed when the maximum active tab limit is reached.
+                if (!isFragmentViewBound(itemId) && !itemIdQueue.contains(itemId)) {
                     toRemove.add(itemId);
                 }
             }
@@ -291,8 +287,10 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
 
     @Override
     public final void onViewAttachedToWindow(@NonNull final FragmentViewHolder holder) {
-        placeFragmentInViewHolder(holder);
-        gcFragments();
+        if (shouldPlaceFragmentInViewHolder(holder.getBindingAdapterPosition())) {
+            placeFragmentInViewHolder(holder);
+            gcFragments();
+        }
     }
 
     /**
@@ -462,6 +460,11 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
             }
             mItemIdToViewHolder.remove(boundItemId);
         }
+    }
+
+    public void cleanupRemovedItems() {
+        mHasStaleFragments = true;
+        gcFragments();
     }
 
     @Override
@@ -641,8 +644,9 @@ public abstract class FragmentStateAdapter extends RecyclerView.Adapter<Fragment
                     Fragment fragment = mFragmentManager.getFragment(bundle, key);
                     mFragments.put(itemId, fragment);
                 } catch (IllegalStateException e) {
-                    Timber.w("FragmentManager is in a bad state, unable to restore fragment %d",
-                            itemId);
+                    LogcatKt.logcat(FragmentStateAdapter.class.getSimpleName(), LogPriority.WARN, () ->
+                            String.format("FragmentManager is in a bad state, unable to restore fragment %d", itemId)
+                    );
                 }
             }
         }

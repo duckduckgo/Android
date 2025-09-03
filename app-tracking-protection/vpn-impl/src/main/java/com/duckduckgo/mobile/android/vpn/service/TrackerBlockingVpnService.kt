@@ -45,6 +45,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
+import com.duckduckgo.mobile.android.vpn.integration.NgVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -83,8 +84,6 @@ import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
-
-private const val DDG_VPN_SESSION = "DuckDuckGo"
 
 @InjectWith(
     scope = VpnScope::class,
@@ -242,7 +241,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                         launch(serviceDispatcher) {
                             // Give Android a moment to complete foreground transition
                             // You might think this is a hack (and it kind of is)
-                            // but it’s a workaround to avoid early establish() binding failures
+                            // but it's a workaround to avoid early establish() binding failures
                             delay(100)
                             async {
                                 startVpn(intent.alwaysOnTriggered())
@@ -406,9 +405,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
         tunnelConfig?.let { config ->
             // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
-            if (config.dns.map { it.hostAddress }.contains("10.11.12.1")) {
-                // noop whenever NetP is enabled
-            } else if (config.dns.isNotEmpty()) {
+            if (vpnNetworkStack is NgVpnNetworkStack && config.dns.isNotEmpty()) {
+                // This solution is only relevant for AppTP
                 // just temporary pixel to know quantify how many users would be impacted
                 deviceShieldPixels.reportMotoGFix()
                 dnsChangeCallback.register()
@@ -449,7 +447,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 // TODO should we protect all comms with our controller BE? other VPNs do that
                 safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
                 setBlocking(true)
-                setSession(DDG_VPN_SESSION)
                 setMtu(1280)
                 try {
                     prepare(this@TrackerBlockingVpnService)
@@ -530,9 +527,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
 
             setBlocking(true)
-            // optional in docs but apparently some OEMs may expect to have a session
-            setSession(DDG_VPN_SESSION)
-
             // Cap the max MTU value to avoid backpressure issues in the socket
             // This is effectively capping the max segment size too
             setMtu(tunnelConfig.mtu)
@@ -837,7 +831,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 //                }
 //            }.onFailure {
 //                // fallback for when both browser and vpn processes are not up, as we can't start a non-foreground service in the background
-//                Timber.w(it, "VPN log: Failed to start trampoline service")
+//                logcat(WARN) { "VPN log: Failed to start trampoline service: ${it.asLog()} }
 //                startVpnService(applicationContext)
 //            }
 //        }

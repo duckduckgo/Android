@@ -61,7 +61,8 @@ import com.duckduckgo.common.ui.view.addClickableLink
 import com.duckduckgo.common.ui.view.prependIconToText
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class AutofillManagementRecyclerAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -311,11 +312,13 @@ class AutofillManagementRecyclerAdapter(
         promotionView: View?,
         credentialsLoadedState: CredentialsLoadedState,
     ) {
-        Timber.v(
-            "Updating logins" +
-                ", credentialsLoadedState=$credentialsLoadedState" +
-                ", promo view: ${promotionView?.javaClass?.simpleName}",
-        )
+        logcat(VERBOSE) {
+            """
+                Updating logins, 
+                credentialsLoadedState=$credentialsLoadedState, 
+                promo view: ${promotionView?.javaClass?.simpleName}
+            """.trimIndent()
+        }
 
         val newList = mutableListOf<ListItem>()
 

@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.impl.configuration
 
+import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesProvider.AvailableInputTypes
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputSuccessResponse
-import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -40,14 +40,14 @@ class RealRuntimeConfigurationWriterTest {
                 "password": false,
                 "username": false
               },
-              "email": true
+              "email": true,
+              "credentialsImport": true
             }
         """,
         )
 
         val actualInputTypes = testee.generateResponseGetAvailableInputTypes(
-            credentialsAvailable = AvailableInputTypeCredentials(username = false, password = false),
-            emailAvailable = true,
+            availableInputTypes = AvailableInputTypes(username = false, password = false, email = true, credentialsImport = true),
         )
 
         assertAvailableInputTypesJsonCorrect(expectedAvailableInputTypes, actualInputTypes)
@@ -139,7 +139,8 @@ class RealRuntimeConfigurationWriterTest {
                       "inlineIcon_credentials": true,
                       "emailProtection_incontext_signup": true,
                       "unknown_username_categorization": false,
-                      "partial_form_saves": false
+                      "partial_form_saves": false,
+                      "password_variant_categorization" : false
                     }
                   }
                 }
@@ -155,6 +156,7 @@ class RealRuntimeConfigurationWriterTest {
                 showInlineKeyIcon = true,
                 showInContextEmailProtectionSignup = true,
                 unknownUsernameCategorization = false,
+                canCategorizePasswordVariant = false,
                 partialFormSaves = false,
             ),
         )

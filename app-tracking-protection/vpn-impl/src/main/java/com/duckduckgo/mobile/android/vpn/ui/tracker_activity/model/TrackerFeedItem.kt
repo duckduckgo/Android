@@ -30,9 +30,9 @@ sealed class TrackerFeedItem(open val id: Int) {
         val displayTimestamp: String,
     ) : TrackerFeedItem(id)
 
-    object TrackerLoadingSkeleton : TrackerFeedItem(0)
+    data object TrackerLoadingSkeleton : TrackerFeedItem(0)
 
-    object TrackerDescriptionFeed : TrackerFeedItem(0)
+    data object TrackerDescriptionFeed : TrackerFeedItem(0)
 
     data class TrackerTrackerAppsProtection(
         val appsData: AppsProtectionData,

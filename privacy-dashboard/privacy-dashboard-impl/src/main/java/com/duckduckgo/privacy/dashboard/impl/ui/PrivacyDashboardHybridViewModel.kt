@@ -77,7 +77,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @ContributesViewModel(ActivityScope::class)
@@ -307,7 +308,7 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
         payload: String,
         dashboardOpenedFromCustomTab: Boolean = false,
     ) {
-        Timber.i("PrivacyDashboard: onPrivacyProtectionsClicked $payload")
+        logcat(INFO) { "PrivacyDashboard: onPrivacyProtectionsClicked $payload" }
 
         viewModelScope.launch(dispatcher.io()) {
             val event = privacyDashboardPayloadAdapter.onPrivacyProtectionsClicked(payload) ?: return@launch
@@ -446,6 +447,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                contentScopeExperiments = site.activeContentScopeExperiments,
+                debugFlags = site.debugFlags,
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = false)
@@ -541,6 +544,8 @@ class PrivacyDashboardHybridViewModel @Inject constructor(
                 userRefreshCount = site.realBrokenSiteContext.userRefreshCount,
                 openerContext = site.realBrokenSiteContext.openerContext?.context,
                 jsPerformance = site.realBrokenSiteContext.jsPerformance?.toList(),
+                contentScopeExperiments = site.activeContentScopeExperiments,
+                debugFlags = site.debugFlags,
             )
 
             brokenSiteSender.submitBrokenSiteFeedback(brokenSite, toggle = true)

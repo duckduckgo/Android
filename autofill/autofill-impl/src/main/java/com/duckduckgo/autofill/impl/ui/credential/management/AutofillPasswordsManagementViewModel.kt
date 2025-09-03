@@ -20,12 +20,11 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.DocumentStartJavaScript
-import com.duckduckgo.app.browser.api.WebViewCapabilityChecker.WebViewCapability.WebMessageListener
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementPromo
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -33,6 +32,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.asString
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
+import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_DELETE_LOGIN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_ENABLE_AUTOFILL_TOGGLE_MANUALLY_DISABLED
@@ -50,6 +50,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SITE_BREAK
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportCanShowRules
 import com.duckduckgo.autofill.impl.reporting.AutofillBreakageReportSender
 import com.duckduckgo.autofill.impl.reporting.AutofillSiteBreakageReportingDataStore
+import com.duckduckgo.autofill.impl.store.AutofillEffect.LaunchImportPasswords
+import com.duckduckgo.autofill.impl.store.AutofillEffectDispatcher
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ExitCredentialMode
@@ -64,7 +66,6 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDeviceUnsupportedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListMode
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowListModeLegacy
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowLockedMode
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserPasswordCopied
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.Command.ShowUserUsernameCopied
@@ -84,7 +85,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsMa
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.NotManageable
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.DuckAddressStatus.SettingActivationStatus
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportPasswordsFromGooglePasswordManager
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchImportGooglePasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchReportAutofillBreakageConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillPasswordsManagementViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
@@ -101,7 +102,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.squareup.anvil.annotations.ContributesBinding
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -113,7 +114,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class AutofillPasswordsManagementViewModel @Inject constructor(
@@ -135,7 +138,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     private val autofillBreakageReportDataStore: AutofillSiteBreakageReportingDataStore,
     private val autofillBreakageReportCanShowRules: AutofillBreakageReportCanShowRules,
     private val autofillFeature: AutofillFeature,
-    private val webViewCapabilityChecker: WebViewCapabilityChecker,
+    private val importGooglePasswordsCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val autofillEffectDispatcher: AutofillEffectDispatcher,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -193,12 +197,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                 showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
             )
 
-            val command = if (autofillFeature.newScrollBehaviourInPasswordManagementScreen().isEnabled()) {
-                ShowListMode
-            } else {
-                ShowListModeLegacy
-            }
-            addCommand(command)
+            addCommand(ShowListMode)
         }
     }
 
@@ -314,13 +313,13 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
     suspend fun launchDeviceAuth() {
         if (!autofillStore.autofillAvailable()) {
-            Timber.d("Can't access secure storage so can't offer autofill functionality")
+            logcat(VERBOSE) { "Can't access secure storage so can't offer autofill functionality" }
             deviceUnsupported()
             return
         }
 
         if (deviceAuthenticator.isAuthenticationRequiredForAutofill() && !deviceAuthenticator.hasValidDeviceAuthentication()) {
-            Timber.d("Can't show device auth as there is no valid device authentication")
+            logcat(VERBOSE) { "Can't show device auth as there is no valid device authentication" }
             disabled()
             return
         }
@@ -328,7 +327,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         val credentialCount = autofillStore.getCredentialCount().firstOrNull()
         val shouldAskAuth = credentialCount == null || credentialCount == 0
         if (shouldAskAuth) {
-            Timber.d("No credentials; can skip showing device auth")
+            logcat(VERBOSE) { "No credentials; can skip showing device auth" }
             unlock()
         } else {
             addCommand(LaunchDeviceAuth)
@@ -336,14 +335,14 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     fun lock() {
-        Timber.v("Locking autofill settings")
+        logcat(VERBOSE) { "Locking autofill settings" }
         trackCurrentModeBeforeLocking()
         addCommand(ShowLockedMode)
         _viewState.value = _viewState.value.copy(credentialMode = Locked)
     }
 
     fun unlock() {
-        Timber.v("Unlocking autofill settings")
+        logcat(VERBOSE) { "Unlocking autofill settings" }
         addCommand(ExitDisabledMode)
         addCommand(ExitLockedMode)
 
@@ -353,7 +352,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
 
         credentialModeBeforeLocking?.let { mode ->
-            Timber.v("Will return view state to ${mode.javaClass.name}")
+            logcat(VERBOSE) { "Will return view state to ${mode.javaClass.name}" }
             _viewState.value = _viewState.value.copy(credentialMode = mode)
         }
     }
@@ -384,7 +383,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     private fun addCommand(command: Command) {
-        Timber.v("Adding command %s", command::class.simpleName)
+        logcat(VERBOSE) { "Adding command ${command::class.simpleName}" }
         commands.value.let { commands ->
             val updatedList = commands + command
             _commands.value = updatedList
@@ -446,6 +445,14 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatchers.io()) {
+            autofillEffectDispatcher.effects.collect { effect ->
+                when {
+                    effect is LaunchImportPasswords -> addCommand(LaunchImportGooglePasswords(PasswordManagementPromo))
+                }
+            }
+        }
+
+        viewModelScope.launch(dispatchers.io()) {
             neverSavedSiteRepository.neverSaveListCount().collect { count ->
                 _neverSavedSitesViewState.value = NeverSavedSitesViewState(showOptionToReset = count > 0)
             }
@@ -453,10 +460,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
 
         viewModelScope.launch(dispatchers.io()) {
             val gpmImport = autofillFeature.self().isEnabled() && autofillFeature.canImportFromGooglePasswordManager().isEnabled()
-            val webViewWebMessageSupport = webViewCapabilityChecker.isSupported(WebMessageListener)
-            val webViewDocumentStartJavascript = webViewCapabilityChecker.isSupported(DocumentStartJavaScript)
-            val canImport = gpmImport && webViewWebMessageSupport && webViewDocumentStartJavascript
-            Timber.v("Can import from Google Password Manager: $canImport")
+            val webViewSupportsImportingPasswords = importGooglePasswordsCapabilityChecker.webViewCapableOfImporting()
+            val canImport = gpmImport && webViewSupportsImportingPasswords
+            logcat(VERBOSE) { "Can import from Google Password Manager: $canImport" }
             _viewState.value = _viewState.value.copy(
                 canImportFromGooglePasswords = canImport,
                 showAutofillEnabledToggle = autofillFeature.settingsScreen().isEnabled().not(),
@@ -487,7 +493,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             val existingCredentials = autofillStore.deleteCredentials(credentialsId)
             addCommand(OfferUserUndoDeletion(existingCredentials))
 
-            Timber.i("Deleted $existingCredentials")
+            logcat(INFO) { "Deleted $existingCredentials" }
         }
     }
 
@@ -569,7 +575,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     fun onSearchQueryChanged(searchText: String) {
-        Timber.v("Search query changed: %s", searchText)
+        logcat(VERBOSE) { "Search query changed: $searchText" }
         searchQueryFilter.value = searchText
         val showAutofillEnabledToggle = searchText.isEmpty() && autofillFeature.settingsScreen().isEnabled().not()
         _viewState.value = _viewState.value.copy(credentialSearchQuery = searchText, showAutofillEnabledToggle = showAutofillEnabledToggle)
@@ -591,16 +597,16 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     }
 
     private fun updateDuckAddressStatus(username: String?) {
-        Timber.d("Determining duck address status for %s", username)
+        logcat { "Determining duck address status for $username" }
 
         viewModelScope.launch(dispatchers.io()) {
             val mainAddress = emailManager.getEmailAddress()
             if (!isPrivateDuckAddress(username, mainAddress)) {
-                Timber.d("Not a private duck address: %s", username)
+                logcat { "Not a private duck address: $username" }
             } else {
                 val credMode = viewState.value.credentialMode
                 if (credMode is Viewing) {
-                    Timber.d("Fetching duck address status from the network for %s", username)
+                    logcat { "Fetching duck address status from the network for $username" }
                     retrieveStatusFromNetwork(credMode, username)
                 }
             }
@@ -624,17 +630,17 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
                 }
 
                 ActivationStatusResult.NotSignedIn -> {
-                    Timber.d("Not signed into email protection; can't manage %s", duckAddress)
+                    logcat { "Not signed into email protection; can't manage $duckAddress" }
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = DuckAddressStatus.NotSignedIn))
                 }
 
                 ActivationStatusResult.Unmanageable -> {
-                    Timber.w("Can't manage %s from this account", duckAddress)
+                    logcat(VERBOSE) { "Can't manage $duckAddress from this account" }
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = NotManageable))
                 }
 
                 ActivationStatusResult.GeneralError -> {
-                    Timber.w("General error when querying status for %s", duckAddress)
+                    logcat(VERBOSE) { "General error when querying status for $duckAddress" }
                     _viewState.value = viewState.value.copy(credentialMode = credMode.copy(duckAddressStatus = FailedToObtainStatus))
                 }
             }
@@ -669,7 +675,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
      */
     fun sendLaunchPixel(launchSource: AutofillScreenLaunchSource) {
         viewModelScope.launch {
-            Timber.v("Opened autofill management screen from from %s", launchSource)
+            logcat(VERBOSE) { "Opened autofill management screen from from $launchSource" }
 
             val source = launchSource.asString()
             val hasCredentialsSaved = (autofillStore.getCredentialCount().firstOrNull() ?: 0) > 0
@@ -714,7 +720,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun onAuthenticatedToDeleteAllPasswords() {
         viewModelScope.launch(dispatchers.io()) {
             val removedCredentials = autofillStore.deleteAllCredentials()
-            Timber.i("Removed %d credentials", removedCredentials.size)
+            logcat(INFO) { "Removed ${removedCredentials.size} credentials" }
 
             if (removedCredentials.isNotEmpty()) {
                 addCommand(OfferUserUndoMassDeletion(removedCredentials))
@@ -724,9 +730,9 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         }
     }
 
-    fun onImportPasswordsFromGooglePasswordManager() {
+    fun onImportPasswordsFromGooglePasswordManager(importSource: AutofillImportLaunchSource) {
         viewModelScope.launch(dispatchers.io()) {
-            addCommand(LaunchImportPasswordsFromGooglePasswordManager)
+            addCommand(LaunchImportGooglePasswords(importSource))
         }
     }
 
@@ -800,7 +806,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
     fun recordImportGooglePasswordButtonShown() {
         if (!importGooglePasswordButtonShownPixelSent) {
             importGooglePasswordButtonShownPixelSent = true
-            pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN)
+            val params = mapOf("source" to AutofillImportLaunchSource.PasswordManagementEmptyState.value)
+            pixel.fire(AUTOFILL_IMPORT_GOOGLE_PASSWORDS_EMPTY_STATE_CTA_BUTTON_SHOWN, params)
         }
     }
 
@@ -832,7 +839,7 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
      *     EditingExisting is used when the user is editing an existing credential.
      */
     sealed class CredentialMode {
-        object ListMode : CredentialMode()
+        data object ListMode : CredentialMode()
 
         data class Viewing(
             val credentialsViewed: LoginCredentials,
@@ -855,8 +862,8 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
             override val saveable: Boolean = true,
         ) : Editing(saveable)
 
-        object Disabled : CredentialMode()
-        object Locked : CredentialMode()
+        data object Disabled : CredentialMode()
+        data object Locked : CredentialMode()
     }
 
     sealed class Command(val id: String = UUID.randomUUID().toString()) {
@@ -866,44 +873,43 @@ class AutofillPasswordsManagementViewModel @Inject constructor(
         class OfferUserUndoDeletion(val credentials: LoginCredentials?) : Command()
         class OfferUserUndoMassDeletion(val credentials: List<LoginCredentials>) : Command()
 
-        object ShowListModeLegacy : Command()
-        object ShowListMode : Command()
-        object ShowCredentialMode : Command()
-        object ShowDisabledMode : Command()
-        object ShowDeviceUnsupportedMode : Command()
-        object ShowLockedMode : Command()
-        object LaunchDeviceAuth : Command()
-        object ExitCredentialMode : Command()
-        object ExitListMode : Command()
-        object ExitLockedMode : Command()
-        object InitialiseViewAfterUnlock : Command()
-        object ExitDisabledMode : Command()
+        data object ShowListMode : Command()
+        data object ShowCredentialMode : Command()
+        data object ShowDisabledMode : Command()
+        data object ShowDeviceUnsupportedMode : Command()
+        data object ShowLockedMode : Command()
+        data object LaunchDeviceAuth : Command()
+        data object ExitCredentialMode : Command()
+        data object ExitListMode : Command()
+        data object ExitLockedMode : Command()
+        data object InitialiseViewAfterUnlock : Command()
+        data object ExitDisabledMode : Command()
     }
 
     sealed class CredentialModeCommand(val id: String = UUID.randomUUID().toString()) {
         data class ShowEditCredentialMode(val credentials: LoginCredentials) : CredentialModeCommand()
-        object ShowManualCredentialMode : CredentialModeCommand()
+        data object ShowManualCredentialMode : CredentialModeCommand()
     }
 
     sealed class ListModeCommand(val id: String = UUID.randomUUID().toString()) {
         data object LaunchResetNeverSaveListConfirmation : ListModeCommand()
         data class LaunchDeleteAllPasswordsConfirmation(val numberToDelete: Int) : ListModeCommand()
         data class PromptUserToAuthenticateMassDeletion(val authConfiguration: AuthConfiguration) : ListModeCommand()
-        data object LaunchImportPasswordsFromGooglePasswordManager : ListModeCommand()
+        data class LaunchImportGooglePasswords(val importSource: AutofillImportLaunchSource) : ListModeCommand()
         data class LaunchReportAutofillBreakageConfirmation(val eTldPlusOne: String) : ListModeCommand()
         data object ShowUserReportSentMessage : ListModeCommand()
         data object ReevalutePromotions : ListModeCommand()
     }
 
     sealed class DuckAddressStatus {
-        object NotADuckAddress : DuckAddressStatus()
+        data object NotADuckAddress : DuckAddressStatus()
         data class FetchingActivationStatus(val address: String) : DuckAddressStatus()
         data class SettingActivationStatus(val activating: Boolean) : DuckAddressStatus()
         data class Activated(val address: String) : DuckAddressStatus()
         data class Deactivated(val address: String) : DuckAddressStatus()
-        object NotManageable : DuckAddressStatus()
-        object FailedToObtainStatus : DuckAddressStatus()
-        object NotSignedIn : DuckAddressStatus()
+        data object NotManageable : DuckAddressStatus()
+        data object FailedToObtainStatus : DuckAddressStatus()
+        data object NotSignedIn : DuckAddressStatus()
     }
 }
 

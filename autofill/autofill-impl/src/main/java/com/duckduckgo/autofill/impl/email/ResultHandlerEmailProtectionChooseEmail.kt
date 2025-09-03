@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.webkit.WebView
 import androidx.fragment.app.Fragment
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -45,7 +46,7 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
 class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
@@ -58,14 +59,15 @@ class ResultHandlerEmailProtectionChooseEmail @Inject constructor(
     private val partialCredentialSaveStore: PartialCredentialSaveStore,
 ) : AutofillFragmentResultsPlugin {
 
-    override fun processResult(
+    override suspend fun processResult(
         result: Bundle,
         context: Context,
         tabId: String,
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
+        webView: WebView?,
     ) {
-        Timber.d("${this::class.java.simpleName}: processing result")
+        logcat { "${this::class.java.simpleName}: processing result" }
 
         val userSelection: EmailProtectionChooseEmailDialog.UseEmailResultType =
             result.safeGetParcelable(EmailProtectionChooseEmailDialog.KEY_RESULT) ?: return

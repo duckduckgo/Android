@@ -21,6 +21,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_CODE
 import com.duckduckgo.sync.impl.ui.setup.SetupAccountActivity.Companion.Screen.RECOVERY_INTRO
@@ -73,19 +75,19 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
     )
 
     sealed class ViewMode {
-        object CreateAccount : ViewMode()
-        object AskSaveRecoveryCode : ViewMode()
-        object SyncSetupCompleted : ViewMode()
+        data object CreateAccount : ViewMode()
+        data object AskSaveRecoveryCode : ViewMode()
+        data object SyncSetupCompleted : ViewMode()
 
-        object IntroCreateAccount : ViewMode()
-        object IntroRecoveryCode : ViewMode()
+        data object IntroCreateAccount : ViewMode()
+        data object IntroRecoveryCode : ViewMode()
     }
 
     sealed class Command {
         data object RecoverAccount : Command()
         data object Finish : Command()
         data object Close : Command()
-        data class LaunchSyncGetOnOtherPlatforms(val source: String) : Command()
+        data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
     }
 
     fun onBackPressed() {
@@ -126,11 +128,7 @@ class SetupAccountViewModel @Inject constructor(private val dispatchers: Dispatc
 
     fun onGetAppOnOtherDevicesClicked() {
         viewModelScope.launch {
-            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_SYNC_ACTIVATING))
+            command.send(LaunchSyncGetOnOtherPlatforms(source = SOURCE_ACTIVATING))
         }
-    }
-
-    companion object {
-        private const val SOURCE_SYNC_ACTIVATING = "activating"
     }
 }

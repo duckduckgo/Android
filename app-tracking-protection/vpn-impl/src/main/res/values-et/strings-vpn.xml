@@ -423,9 +423,13 @@
 
     <!-- Privacy pro upsell -->
     <string name="apptp_PproUpsellInfoDisabled">Kas te ei saa oma VPN-i tõttu kasutada App Tracking Protectionit? Kasutage DuckDuckGo VPN-i — see on ainus VPN, mis ühildub. <annotation type="ppro_upsell_link">Lisateave</annotation>.</string>
+    <string name="apptp_PproUpsellInfoDisabled_freeTrial">Kas sa ei saa oma VPN-i tõttu kasutada App Tracking Protectionit? Kasutage DuckDuckGo VPN-i — see on ainus VPN, mis ühildub. <annotation type="ppro_upsell_link">Proovi tasuta!</annotation></string>
     <string name="apptp_PproUpsellInfoRevoked"><b>App Tracking Protection on inaktiveeritud</b>\nKas teie VPN keelas App Tracking Protectioni? Taasaktiveerimiseks kasutage ülaltoodud lülitit.\n\nHankige DuckDuckGo VPN — ainus VPN, mis töötab koos App Tracking Protectioniga. <annotation type="ppro_upsell_link">Lisateave</annotation>.</string>
+    <string name="apptp_PproUpsellInfoRevoked_freeTrial"><b>App Tracking Protection on inaktiveeritud</b>\nKas sinu VPN keelas App Tracking Protectioni? Taasaktiveerimiseks kasuta ülaltoodud lülitit.\n\nMine üle DuckDuckGo VPN-ile — ainus VPN, mis töötab koos App Tracking Protectioniga. <annotation type="ppro_upsell_link">Proovi tasuta!</annotation></string>
     <string name="apptp_PproUpsellBannerTitle">Viige oma privaatsus järgmisele tasemele</string>
     <string name="apptp_PproUpsellBannerMessage">DuckDuckGol on ainus VPN, mis ühildub App Tracking Protectioniga. Aktiveerige tasulise Privacy Pro tellimusega.</string>
     <string name="apptp_PproUpsellBannerAction">Loe edasi</string>
+    <string name="apptp_PproUpsellBannerMessage_freeTrial">Telli DuckDuckGo ja saa ainus VPN, mis ühildub App Tracking Protectioniga.</string>
+    <string name="apptp_PproUpsellBannerAction_freeTrial">Proovi tasuta!</string>
 
 </resources>

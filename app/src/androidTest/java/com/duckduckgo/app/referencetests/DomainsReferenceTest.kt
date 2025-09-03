@@ -34,6 +34,7 @@ import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.privacy.db.UserAllowListDao
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -57,6 +58,7 @@ import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.duckplayer.api.DuckPlayer
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -122,6 +124,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
     private val mockMaliciousSiteProtection: MaliciousSiteBlockerWebViewIntegration = FakeMaliciousSiteBlockerWebViewIntegration()
+    private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -179,6 +182,10 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             requestFilterer = mockRequestFilterer,
             maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteProtection,
             duckPlayer = mockDuckPlayer,
+            dispatchers = coroutinesTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutinesTestRule.testScope,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            isMainProcess = true,
         )
     }
 

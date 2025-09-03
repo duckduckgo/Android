@@ -32,6 +32,42 @@
     "title" : "<b>NAPAKA:</b> Neveljaven ID videoposnetka",
     "note" : "Shown when the page URL doesn't match a known video ID. Note for translators: The <b> tag makes the word 'ERROR:' bold. Depending on the grammar of the target language, you might need to move it so that the correct word is emphasized."
   },
+  "unknownErrorHeading2" : {
+    "title" : "Duck Player ne more naložiti tega videa",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "unknownErrorMessage2a" : {
+    "title" : "Tega videoposnetka si ni mogoče ogledati zunaj YouTuba.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "unknownErrorMessage2b" : {
+    "title" : "Ta videoposnetek si lahko še vedno ogledate na YouTubu, vendar brez dodane zasebnosti predvajalnika Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "ageRestrictedErrorHeading2" : {
+    "title" : "Žal je ta videoposnetek starostno omejen",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "ageRestrictedErrorMessage2a" : {
+    "title" : "Če si želite ogledati starostno omejene videoposnetke, se morate prijaviti v YouTube in potrditi svojo starost.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "ageRestrictedErrorMessage2b" : {
+    "title" : "Ta videoposnetek si lahko še vedno ogledate, vendar se boste morali prijaviti in si ga ogledati v YouTubu brez dodane zasebnosti predvajalnika Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
+  "noEmbedErrorHeading2" : {
+    "title" : "Žal je ta videoposnetek mogoče predvajati samo na YouTubu",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
+  "noEmbedErrorMessage2a" : {
+    "title" : "Ustvarjalec tega videoposnetka se je odločil, da ne dovoli njegovega ogleda na drugih spletnih mestih.",
+    "note" : "Explanation on why the error is happening."
+  },
+  "noEmbedErrorMessage2b" : {
+    "title" : "Še vedno si ga lahko ogledate na YouTubu, vendar brez dodane zasebnosti predvajalnika Duck Player.",
+    "note" : "A message explaining that the blocked video can be watched directly on YouTube."
+  },
   "blockedVideoErrorHeading" : {
     "title" : "YouTube ne dovoli predvajalniku Duck Player naložiti tega videa",
     "note" : "Message shown when YouTube has blocked playback of a video"
@@ -44,12 +80,24 @@
     "title" : "Ta videoposnetek si lahko še vedno ogledate na YouTubu, vendar brez dodane zasebnosti predvajalnika Duck Player.",
     "note" : "A message explaining that the blocked video can be watched directly on YouTube."
   },
+  "signInRequiredErrorHeading2" : {
+    "title" : "YouTube misli, da ste bot",
+    "note" : "Message shown when YouTube has blocked playback of a video"
+  },
   "signInRequiredErrorMessage1" : {
     "title" : "YouTube preprečuje nalaganje tega videoposnetka. Če uporabljate omrežje VPN, ga poskusite izklopiti in znova naložite to stran.",
     "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
   },
   "signInRequiredErrorMessage2" : {
     "title" : "Če to ne deluje, si lahko ta videoposnetek še vedno ogledate na YouTubu, vendar brez dodane zasebnosti predvajalnika Duck Player.",
+    "note" : "More troubleshooting tips for this specific error"
+  },
+  "signInRequiredErrorMessage2a" : {
+    "title" : "To se lahko zgodi, če uporabljate omrežje VPN. Poskusite izklopiti omrežje VPN ali zamenjati lokacijo strežnika in znova naložite to stran.",
+    "note" : "Explanation on why the error is happening and a suggestions on how to solve it."
+  },
+  "signInRequiredErrorMessage2b" : {
+    "title" : "Če to ne deluje, se boste morali prijaviti in si ogledati ta videoposnetek na YouTubu brez dodane zasebnosti predvajalnika Duck Player.",
     "note" : "More troubleshooting tips for this specific error"
   },
   "tooltipInfo" : {

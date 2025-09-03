@@ -25,7 +25,8 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 interface AppInstallStore : MainProcessLifecycleObserver {
     var installTimestamp: Long
@@ -66,7 +67,7 @@ class AppInstallSharedPreferences @Inject constructor(private val context: Conte
 
     @UiThread
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.i("recording installation timestamp")
+        logcat(INFO) { "recording installation timestamp" }
         if (!hasInstallTimestampRecorded()) {
             installTimestamp = System.currentTimeMillis()
         }

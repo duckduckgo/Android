@@ -1,7 +1,7 @@
 appId: com.duckduckgo.mobile.android
 ---
-- tapOn:
-      id: "com.duckduckgo.mobile.android:id/browserMenuImageView"
+- hideKeyboard
+- runFlow: ../shared/browser_screen/click_on_menu_button.yaml
 - tapOn: "Bookmarks"
 - runFlow:
     when:

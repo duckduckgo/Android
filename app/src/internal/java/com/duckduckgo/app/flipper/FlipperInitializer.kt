@@ -31,7 +31,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 @ContributesMultibinding(
     scope = AppScope::class,
@@ -45,7 +46,7 @@ class FlipperInitializer @Inject constructor(
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
-        Timber.v("Flipper: setup flipper")
+        logcat(VERBOSE) { "Flipper: setup flipper" }
         SoLoader.init(context, false)
 
         coroutineScope.launch(dispatcherProvider.io()) {

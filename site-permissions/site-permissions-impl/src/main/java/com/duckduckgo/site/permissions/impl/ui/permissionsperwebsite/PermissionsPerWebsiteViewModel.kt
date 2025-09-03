@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class PermissionsPerWebsiteViewModel @Inject constructor(
@@ -53,15 +53,15 @@ class PermissionsPerWebsiteViewModel @Inject constructor(
 
     sealed class Command {
         class ShowPermissionSettingSelectionDialog(val setting: WebsitePermissionSetting) : Command()
-        object GoBackToSitePermissions : Command()
+        data object GoBackToSitePermissions : Command()
     }
 
     fun websitePermissionSettings(url: String) {
         viewModelScope.launch {
             val websitePermissionsSettings = sitePermissionsRepository.getSitePermissionsForWebsite(url)
             val websitePermissions = convertToWebsitePermissionSettings(websitePermissionsSettings)
-            Timber.d("Permissions: websitePermissionsSettings for $url $websitePermissionsSettings")
-            Timber.d("Permissions: websitePermissions for $url $websitePermissions")
+            logcat { "Permissions: websitePermissionsSettings for $url $websitePermissionsSettings" }
+            logcat { "Permissions: websitePermissions for $url $websitePermissions" }
 
             _viewState.value = _viewState.value.copy(websitePermissions = websitePermissions)
         }

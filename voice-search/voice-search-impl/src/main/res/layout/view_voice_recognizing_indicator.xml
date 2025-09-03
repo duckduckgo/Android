@@ -40,7 +40,6 @@
         android:background="@drawable/background_voice_search_indicator"
         android:clickable="false"
         android:focusable="false"
-        android:padding="16dp"
         tools:ignore="ContentDescription">
 
             <ImageView

@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.ui
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -33,6 +34,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.annotation.AnyThread
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -58,6 +60,7 @@ import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -66,18 +69,20 @@ import com.duckduckgo.mobile.android.R
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionScreenNoParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.R.string
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ACTIVATE_URL
-import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BUY_URL
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.FEATURE_PAGE_QUERY_PARAM_KEY
+import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ITR_URL
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
+import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettingsActivateSuccess
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToDuckAI
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToITR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
@@ -87,6 +92,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.ViewState
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.CustomTitle
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams.ToolbarConfig.DaxPrivacyPro
@@ -101,6 +107,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import logcat.logcat
 import org.json.JSONObject
 
 data class SubscriptionsWebViewActivityWithParams(
@@ -122,7 +129,7 @@ data class SubscriptionsWebViewActivityWithParams(
     scope = ActivityScope::class,
     delayGeneration = true, // Delayed because it has a dependency on DownloadConfirmationFragment from another module
 )
-@ContributeToActivityStarter(SubscriptionScreenNoParams::class)
+@ContributeToActivityStarter(SubscriptionPurchase::class)
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
@@ -161,6 +168,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     @Inject
     lateinit var pixelSender: SubscriptionPixelSender
 
+    @Inject
+    lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var subscriptions: Subscriptions
+
+    @Inject
+    lateinit var subscriptionsUrlProvider: SubscriptionsUrlProvider
+
     private val viewModel: SubscriptionWebViewViewModel by bindViewModel()
 
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
@@ -177,11 +193,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        params = intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
-            ?: SubscriptionsWebViewActivityWithParams(BUY_URL)
+        params = convertIntoSubscriptionWebViewActivityParams(intent).also {
+            logcat { "Subscription Flow: entering with params $it" }
+        }
 
         setContentView(binding.root)
-        setupInternalToolbar(toolbar)
+
+        viewModel.viewState
+            .onEach { setupInternalToolbar(toolbar, it) }
+            .launchIn(lifecycleScope)
 
         binding.webview.let {
             subscriptionJsMessaging.register(
@@ -237,7 +257,6 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 displayZoomControls = false
                 mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
                 setSupportMultipleWindows(false)
-                databaseEnabled = false
                 setSupportZoom(true)
             }
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
@@ -258,7 +277,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             renderPurchaseState(it.purchaseState)
         }.launchIn(lifecycleScope)
 
-        if (savedInstanceState == null && params.url == BUY_URL) {
+        val isPrivacyProUrl by lazy {
+            runCatching { subscriptions.isPrivacyProUrl(params.url.toUri()) }.getOrDefault(false)
+        }
+        if (savedInstanceState == null && isPrivacyProUrl) {
             viewModel.paywallShown()
         }
     }
@@ -269,6 +291,33 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     override fun cancelDownload() {
         // NOOP
+    }
+
+    private fun convertIntoSubscriptionWebViewActivityParams(intent: Intent): SubscriptionsWebViewActivityWithParams {
+        intent.getActivityParams(SubscriptionPurchase::class.java)?.let { subscriptionPurchaseActivityParams ->
+            return SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.buyUrl,
+                origin = subscriptionPurchaseActivityParams.origin,
+            ).let { webViewActivityWithParams ->
+                if (subscriptionPurchaseActivityParams.featurePage.isNullOrBlank().not()) {
+                    val urlWithParams = kotlin.runCatching {
+                        subscriptionsUrlProvider.buyUrl.toUri()
+                            .buildUpon()
+                            .appendQueryParameter(FEATURE_PAGE_QUERY_PARAM_KEY, subscriptionPurchaseActivityParams.featurePage)
+                            .build()
+                            .toString()
+                    }.getOrDefault(subscriptionsUrlProvider.buyUrl)
+                    webViewActivityWithParams.copy(
+                        url = urlWithParams,
+                    )
+                } else {
+                    webViewActivityWithParams
+                }
+            }
+        }
+
+        return intent.getActivityParams(SubscriptionsWebViewActivityWithParams::class.java)
+            ?: SubscriptionsWebViewActivityWithParams(subscriptionsUrlProvider.buyUrl)
     }
 
     private fun launchDownloadMessagesJob() {
@@ -380,7 +429,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE)
     }
 
-    private fun setupInternalToolbar(toolbar: Toolbar) {
+    private fun setupInternalToolbar(toolbar: Toolbar, viewState: ViewState) {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
@@ -391,10 +440,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             },
         )
 
-        updateToolbarTitle(params.toolbarConfig)
+        updateToolbarTitle(params.toolbarConfig, viewState)
     }
 
-    private fun updateToolbarTitle(config: ToolbarConfig) {
+    private fun updateToolbarTitle(config: ToolbarConfig, viewState: ViewState) {
         when (config) {
             is CustomTitle -> {
                 supportActionBar?.setDisplayShowTitleEnabled(true)
@@ -407,6 +456,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 binding.includeToolbar.logoToolbar.show()
                 binding.includeToolbar.titleToolbar.show()
                 title = null
+                binding.includeToolbar.titleToolbar.text = if (viewState.rebrandingEnabled) {
+                    getString(string.privacyProRebranding)
+                } else {
+                    getString(string.privacyPro)
+                }
                 toolbar.setNavigationOnClickListener { onBackPressed() }
             }
         }
@@ -422,6 +476,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is GoToITR -> goToITR()
             is GoToPIR -> goToPIR()
             is GoToNetP -> goToNetP(command.activityParams)
+            is GoToDuckAI -> goToDuckAI()
             Reload -> binding.webview.reload()
         }
     }
@@ -434,7 +489,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         globalActivityStarter.start(
             this,
             SubscriptionsWebViewActivityWithParams(
-                url = SubscriptionsConstants.ITR_URL,
+                url = ITR_URL,
             ),
         )
     }
@@ -445,6 +500,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun goToNetP(params: ActivityParams) {
         globalActivityStarter.start(this, params)
+    }
+
+    private fun goToDuckAI() {
+        duckChat.openDuckChat()
     }
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
@@ -531,7 +590,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     }
 
     private fun backToSettings() {
-        if (params.url == ACTIVATE_URL) {
+        if (params.url == subscriptionsUrlProvider.activateUrl) {
             setResult(RESULT_OK)
         }
         finish()

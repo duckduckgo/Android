@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.api
 
 import android.content.Context
 import android.os.Bundle
+import android.webkit.WebView
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 
@@ -34,12 +35,13 @@ interface AutofillFragmentResultsPlugin {
      * Will be invoked on the main thread.
      */
     @MainThread
-    fun processResult(
+    suspend fun processResult(
         result: Bundle,
         context: Context,
         tabId: String,
         fragment: Fragment,
         autofillCallback: AutofillEventListener,
+        webView: WebView?,
     )
 
     /**

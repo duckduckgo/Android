@@ -3,210 +3,210 @@
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"
+        message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="32"
             column="5"
-            message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"/>
+            message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="22"
             column="5"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="22"
             column="5"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="22"
             column="5"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"
+        message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="32"
             column="5"
-            message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"/>
+            message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="29"
             column="9"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="29"
             column="9"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="29"
             column="9"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"
+        message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="32"
             column="5"
-            message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"/>
+            message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="51"
             column="13"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="54"
             column="13"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="53"
             column="13"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"
+        message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="32"
             column="5"
-            message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"/>
+            message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="41"
             column="13"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="44"
             column="13"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="43"
             column="13"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"
+        message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="64"
             column="5"
-            message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"/>
+            message="Duplicate id @+id/appBarLayoutMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="22"
             column="5"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="22"
             column="5"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/appBarLayoutMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="22"
             column="5"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/appBarLayoutMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"
+        message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="64"
             column="5"
-            message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"/>
+            message="Duplicate id @+id/omniBarContainerMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="29"
             column="9"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="29"
             column="9"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omniBarContainerMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="29"
             column="9"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omniBarContainerMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"
+        message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="64"
             column="5"
-            message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"/>
+            message="Duplicate id @+id/omnibarTextInputMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="51"
             column="13"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="54"
             column="13"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/omnibarTextInputMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup_bottom.xml"
+            file="src/main/res/layout/include_omnibar_toolbar_mockup_bottom.xml"
             line="53"
             column="13"
-            message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup"/>
+            message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/omnibarTextInputMockup"/>
     </issue>
 
     <issue
         id="DuplicateIncludedIds"
-        message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"
+        message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"
         errorLine1="    &lt;include"
         errorLine2="    ^">
         <location
             file="src/main/res/layout/activity_browser.xml"
             line="64"
             column="5"
-            message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"/>
+            message="Duplicate id @+id/searchIconMockup, defined or included multiple times in layout/activity_browser.xml: [layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup, layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup_bottom.xml defines @+id/searchIconMockup]"/>
         <location
             file="src/main/res/layout/include_omnibar_toolbar_mockup.xml"
             line="41"
             column="13"
             message="Defined here, included via layout/activity_browser.xml => layout/include_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup"/>
         <location
-            file="src/main/res/layout/include_experimental_omnibar_toolbar_mockup.xml"
+            file="src/main/res/layout/include__omnibar_toolbar_mockup.xml"
             line="44"
             column="13"
             message="Defined here, included via layout/activity_browser.xml => layout/include_experimental_omnibar_toolbar_mockup.xml defines @+id/searchIconMockup"/>
@@ -8114,19 +8114,8 @@
         errorLine1="    &lt;EditText"
         errorLine2="     ~~~~~~~~">
         <location
-            file="src/main/res/layout/include_fade_omnibar_find_in_page.xml"
-            line="41"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="Autofill"
-        message="Missing `autofillHints` attribute"
-        errorLine1="    &lt;EditText"
-        errorLine2="     ~~~~~~~~">
-        <location
             file="src/main/res/layout/include_find_in_page.xml"
-            line="38"
+            line="41"
             column="6"/>
     </issue>
 
@@ -8810,28 +8799,6 @@
             file="src/main/res/layout/view_experimental_tab_switcher_button.xml"
             line="34"
             column="9"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                            android:paddingStart=&quot;@dimen/keyline_4&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_fade_omnibar.xml"
-            line="87"
-            column="29"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
-        errorLine1="                            android:paddingStart=&quot;5dp&quot;"
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/view_fade_omnibar.xml"
-            line="231"
-            column="29"/>
     </issue>
 
     <issue

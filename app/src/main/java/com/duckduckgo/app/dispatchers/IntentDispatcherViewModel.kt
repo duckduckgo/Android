@@ -23,15 +23,21 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.global.intentText
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.duckplayer.api.DuckPlayerSettingsNoParams
+import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.WARN
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class IntentDispatcherViewModel @Inject constructor(
@@ -39,6 +45,8 @@ class IntentDispatcherViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val emailProtectionLinkVerifier: EmailProtectionLinkVerifier,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
+    private val syncUrlIdentifier: SyncUrlIdentifier,
+    private val appBuildConfig: AppBuildConfig,
 ) : ViewModel() {
 
     private val _viewState = MutableStateFlow(ViewState())
@@ -47,6 +55,7 @@ class IntentDispatcherViewModel @Inject constructor(
     data class ViewState(
         val customTabRequested: Boolean = false,
         val intentText: String? = null,
+        val activityParams: ActivityParams? = null,
         val toolbarColor: Int = 0,
         val isExternal: Boolean = false,
     )
@@ -56,24 +65,36 @@ class IntentDispatcherViewModel @Inject constructor(
             runCatching {
                 val hasSession = intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true
                 val intentText = intent?.intentText
+                val activityParams = if (appBuildConfig.isInternalBuild()) {
+                    if (intent?.data?.toString() == "duck://settings.player") {
+                        DuckPlayerSettingsNoParams
+                    } else {
+                        null
+                    }
+                } else {
+                    null
+                }
                 val toolbarColor = intent?.getIntExtra(CustomTabsIntent.EXTRA_TOOLBAR_COLOR, defaultColor) ?: defaultColor
                 val isEmailProtectionLink = emailProtectionLinkVerifier.shouldDelegateToInContextView(intentText, true)
                 val isDuckDuckGoUrl = intentText?.let { duckDuckGoUrlDetector.isDuckDuckGoUrl(it) } ?: false
-                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl
 
-                Timber.d("Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor")
+                val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
+                val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl
+
+                logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
 
                 customTabDetector.setCustomTab(false)
                 _viewState.emit(
                     viewState.value.copy(
                         customTabRequested = customTabRequested,
                         intentText = if (customTabRequested) intentText?.sanitize() else intentText,
+                        activityParams = activityParams,
                         toolbarColor = toolbarColor,
                         isExternal = isExternal,
                     ),
                 )
             }.onFailure {
-                Timber.w("Error handling custom tab intent %s", it.message)
+                logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
             }
         }
     }

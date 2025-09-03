@@ -32,7 +32,7 @@ class VpnFirstUsedSurveyParameterPluginTest {
         whenever(netpCohortStore.cohortLocalDate).thenReturn(LocalDate.of(2024, 6, 8))
         whenever(currentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.of(2024, 6, 18, 0, 0))
 
-        assertEquals("10", plugin.evaluate())
+        assertEquals("10", plugin.evaluate("vpn_first_used"))
     }
 
     @Test
@@ -40,6 +40,6 @@ class VpnFirstUsedSurveyParameterPluginTest {
         whenever(netpCohortStore.cohortLocalDate).thenReturn(null)
         whenever(currentTimeProvider.localDateTimeNow()).thenReturn(LocalDateTime.of(2024, 6, 18, 0, 0))
 
-        assertEquals("0", plugin.evaluate())
+        assertEquals("0", plugin.evaluate("vpn_first_used"))
     }
 }

@@ -224,7 +224,7 @@
     <string name="netpCustomDnsSettingText">DNS serveris</string>
     <string name="netpPrivateDns">Privatus DNS</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">„DuckDuckGo“ (rizikingų domenų blokavimas)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">„DuckDuckGo“ (sukčiavimo blokatorius)</string>
     <string name="netpCustomDnsDefaultOption">„DuckDuckGo“ (rekomenduojama)</string>
     <string name="netpCustomDnsCustom">Pasirinkti kitą</string>
     <string name="netpCustomDnsInputAddressHint">IPv4 adresas</string>
@@ -235,8 +235,8 @@
     <string name="netpDdgDnsByLine">„DuckDuckGo“ nukreipia DNS užklausas per mūsų DNS serverius, kad tavo interneto tiekėjas negalėtų matyti, kokiose svetainėse lankaisi.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Turinio blokavimas ir filtravimas</string>
-    <string name="netpDnsBlockMalwarePrimary">Blokuoti rizikingus domenus</string>
+    <string name="netpDnsBlockMalwareHeader">Kenksmingo turinio blokavimas</string>
+    <string name="netpDnsBlockMalwarePrimary">Sukčiavimo blokavimo įrankis</string>
     <string name="netpDnsBlockMalwareByline">Blokuoti daugiau nei 150 000 domenų, pažymėtų kaip talpinančių kenkėjiškas programas, sukčiavimo atakas ir internetinius sukčius, naudodamas DNS lygmens blokavimo sąrašą. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">DNS blokavimo sąrašai</string>
 
@@ -263,4 +263,8 @@
     <string name="netpAutoExcludeToggleName">Automatiškai išskirk programas, nesuderinamas su VPN.</string>
     <string name="netpExclusionListLabelAutoExclude">Nesuderinama su VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Kai kurios programėlės, pavyzdžiui, bankininkystės ar transliacijos programėlės, neveikia gerai su VPN. Įjungus šį nustatymą, mes automatiškai pašalinsime tas programas.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN atjungtas dėl pasibaigusios prenumeratos. Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Prenumeruokite „DuckDuckGo“, kad iš naujo prisijungtumėte prie VPN.</string>
 </resources>

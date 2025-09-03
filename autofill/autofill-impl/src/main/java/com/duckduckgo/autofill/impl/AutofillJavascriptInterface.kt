@@ -33,6 +33,7 @@ import com.duckduckgo.autofill.impl.deduper.AutofillLoginDeduplicator
 import com.duckduckgo.autofill.impl.domain.javascript.JavascriptCredentials
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextRecentInstallChecker
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.jsbridge.AutofillMessagePoster
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillDataRequest
 import com.duckduckgo.autofill.impl.jsbridge.request.AutofillRequestParser
@@ -46,6 +47,7 @@ import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubTy
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillInputSubType.USERNAME
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.AUTOPROMPT
+import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.CREDENTIALS_IMPORT
 import com.duckduckgo.autofill.impl.jsbridge.request.SupportedAutofillTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.jsbridge.response.AutofillResponseWriter
 import com.duckduckgo.autofill.impl.partialsave.PartialCredentialSaveStore
@@ -72,7 +74,12 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.LogPriority.WARN
+import logcat.asLog
+import logcat.logcat
 
 interface AutofillJavascriptInterface {
 
@@ -128,6 +135,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     private val partialCredentialSaveStore: PartialCredentialSaveStore,
     private val usernameBackFiller: UsernameBackFiller,
     private val existingCredentialMatchDetector: ExistingCredentialMatchDetector,
+    private val inBrowserImportPromo: InBrowserImportPromo,
 ) : AutofillJavascriptInterface {
 
     override var callback: Callback? = null
@@ -145,22 +153,22 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
 
     @JavascriptInterface
     override fun getAutofillData(requestString: String) {
-        Timber.v("BrowserAutofill: getAutofillData called:\n%s", requestString)
+        logcat(VERBOSE) { "BrowserAutofill: getAutofillData called:\n$requestString" }
         getAutofillDataJob += coroutineScope.launch(dispatcherProvider.io()) {
             val url = currentUrlProvider.currentUrl(webView)
             if (url == null) {
-                Timber.w("Can't autofill as can't retrieve current URL")
+                logcat(WARN) { "Can't autofill as can't retrieve current URL" }
                 return@launch
             }
 
             if (!autofillCapabilityChecker.canInjectCredentialsToWebView(url)) {
-                Timber.v("BrowserAutofill: getAutofillData called but feature is disabled")
+                logcat(VERBOSE) { "BrowserAutofill: getAutofillData called but feature is disabled" }
                 return@launch
             }
 
             val parseResult = requestParser.parseAutofillDataRequest(requestString)
             val request = parseResult.getOrElse {
-                Timber.w(it, "Unable to parse getAutofillData request")
+                logcat(WARN) { "Unable to parse getAutofillData request: ${it.asLog()}" }
                 return@launch
             }
 
@@ -176,8 +184,14 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             } else if (request.isAutofillCredentialsRequest()) {
                 handleRequestForAutofillingCredentials(url, request, triggerType)
             } else {
-                Timber.w("Unable to process request; don't know how to handle request %s", requestString)
+                logcat(WARN) { "Unable to process request; don't know how to handle request $requestString" }
             }
+        }
+    }
+
+    private fun handlePromoteImport(url: String) {
+        coroutineScope.launch(dispatcherProvider.io()) {
+            callback?.promptUserToImportPassword(url)
         }
     }
 
@@ -229,19 +243,24 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         val matches = mutableListOf<LoginCredentials>()
         val directMatches = autofillStore.getCredentials(url)
         val shareableMatches = shareableCredentials.shareableCredentials(url)
-        Timber.v("Direct matches: %d, shareable matches: %d for %s", directMatches.size, shareableMatches.size, url)
+        logcat(VERBOSE) { "Direct matches: ${directMatches.size}, shareable matches: ${shareableMatches.size} for $url" }
         matches.addAll(directMatches)
         matches.addAll(shareableMatches)
 
         val credentials = filterRequestedSubtypes(request, matches)
 
         val dedupedCredentials = loginDeduplicator.deduplicate(url, credentials)
-        Timber.v("Original autofill credentials list size: %d, after de-duping: %d", credentials.size, dedupedCredentials.size)
+        logcat(VERBOSE) { "Original autofill credentials list size: ${credentials.size}, after de-duping: ${dedupedCredentials.size}" }
 
         val finalCredentialList = ensureUsernamesNotNull(dedupedCredentials)
 
         if (finalCredentialList.isEmpty()) {
-            callback?.noCredentialsAvailable(url)
+            val canShowImport = inBrowserImportPromo.canShowPromo(credentialsAvailableForCurrentPage = false, url = url)
+            if (canShowImport) {
+                handlePromoteImport(url)
+            } else {
+                callback?.noCredentialsAvailable(url)
+            }
         } else {
             callback?.onCredentialsAvailableToInject(url, finalCredentialList, triggerType)
         }
@@ -260,6 +279,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         return when (trigger) {
             USER_INITIATED -> LoginTriggerType.USER_INITIATED
             AUTOPROMPT -> LoginTriggerType.AUTOPROMPT
+            CREDENTIALS_IMPORT -> LoginTriggerType.AUTOPROMPT
         }
     }
 
@@ -277,7 +297,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         request: AutofillDataRequest,
         url: String,
     ) {
-        Timber.w("Autofill type %s unsupported", request.mainType)
+        logcat(WARN) { "Autofill type ${request.mainType} unsupported" }
         callback?.noCredentialsAvailable(url)
     }
 
@@ -286,29 +306,29 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         // important to call suppressor as soon as possible
         systemAutofillServiceSuppressor.suppressAutofill(webView)
 
-        Timber.i("storeFormData called, credentials provided to be persisted")
+        logcat(INFO) { "storeFormData called, credentials provided to be persisted" }
 
         storeFormDataJob += coroutineScope.launch(dispatcherProvider.io()) {
             val currentUrl = currentUrlProvider.currentUrl(webView) ?: return@launch
 
             if (!autofillCapabilityChecker.canSaveCredentialsFromWebView(currentUrl)) {
-                Timber.v("BrowserAutofill: storeFormData called but feature is disabled")
+                logcat(VERBOSE) { "BrowserAutofill: storeFormData called but feature is disabled" }
                 return@launch
             }
 
             if (neverSavedSiteRepository.isInNeverSaveList(currentUrl)) {
-                Timber.v("BrowserAutofill: storeFormData called but site is in never save list")
+                logcat(VERBOSE) { "BrowserAutofill: storeFormData called but site is in never save list" }
                 return@launch
             }
 
             val parseResult = requestParser.parseStoreFormDataRequest(data)
             val request = parseResult.getOrElse {
-                Timber.w(it, "Unable to parse storeFormData request")
+                logcat(WARN) { "Unable to parse storeFormData request: ${it.asLog()}" }
                 return@launch
             }
 
             if (!request.isValid()) {
-                Timber.w("Invalid data from storeFormData")
+                logcat(WARN) { "Invalid data from storeFormData" }
                 return@launch
             }
 
@@ -317,7 +337,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
             when (request.trigger) {
                 FORM_SUBMISSION -> handleRequestForFormSubmission(requestCredentials, currentUrl)
                 PARTIAL_SAVE -> handleRequestForPartialSave(requestCredentials, currentUrl)
-                UNKNOWN -> Timber.e("Unknown trigger type %s", request.trigger)
+                UNKNOWN -> logcat(ERROR) { "Unknown trigger type ${request.trigger}" }
             }
         }
     }
@@ -368,7 +388,7 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
         currentUrl: String,
         credentials: LoginCredentials,
     ) {
-        Timber.d("%d actions to take: %s", actions.size, actions.joinToString { it.javaClass.simpleName })
+        logcat { "${actions.size} actions to take: ${actions.joinToString { it.javaClass.simpleName }}" }
         actions.forEach {
             when (it) {
                 is DeleteAutoLogin -> {
@@ -386,13 +406,13 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 is UpdateSavedAutoLogin -> {
                     autofillStore.getCredentialsWithId(it.autologinId)?.let { existingCredentials ->
                         if (isUpdateRequired(existingCredentials, credentials)) {
-                            Timber.v("Updating without prompting: autologin not identical to what is already stored. id=%s", it.autologinId)
+                            logcat(VERBOSE) { "Updating without prompting: autologin not identical to what is already stored. id=${it.autologinId}" }
                             val toSave = existingCredentials.copy(username = credentials.username, password = credentials.password)
                             autofillStore.updateCredentials(toSave)?.let { savedCredentials ->
                                 callback?.onCredentialsSaved(savedCredentials)
                             }
                         } else {
-                            Timber.v("Update not required as identical to what is already stored. id=%s", it.autologinId)
+                            logcat(VERBOSE) { "Update not required as identical to what is already stored. id=${it.autologinId}" }
                             callback?.onCredentialsSaved(existingCredentials)
                         }
                     }
@@ -428,7 +448,11 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
                 .filter { it.username != null }
                 .filter { it.username == username }
                 .filter { it.password.isNullOrEmpty() }
-                .also { list -> Timber.v("Found %d credentials with missing password for username=%s and url=%s", list.size, username, originalUrl) }
+                .also { list ->
+                    logcat(VERBOSE) {
+                        "Found ${list.size} credentials with missing password for username=$username and url=$originalUrl"
+                    }
+                }
                 .map { it.copy(password = password) }
                 .forEach {
                     if (autofillStore.updateCredentials(originalUrl, it, CredentialUpdateType.Password) != null) {
@@ -446,17 +470,17 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     override fun injectCredentials(credentials: LoginCredentials) {
-        Timber.v("Informing JS layer with credentials selected")
+        logcat(VERBOSE) { "Informing JS layer with credentials selected" }
         injectCredentialsJob += coroutineScope.launch(dispatcherProvider.io()) {
             val jsCredentials = credentials.asJsCredentials()
             val jsonResponse = autofillResponseWriter.generateResponseGetAutofillData(jsCredentials)
-            Timber.i("Injecting credentials: %s", jsonResponse)
+            logcat(INFO) { "Injecting credentials: $jsonResponse" }
             autofillMessagePoster.postMessage(webView, jsonResponse)
         }
     }
 
     override fun injectNoCredentials() {
-        Timber.v("No credentials selected; informing JS layer")
+        logcat(VERBOSE) { "No credentials selected; informing JS layer" }
         injectCredentialsJob += coroutineScope.launch(dispatcherProvider.io()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateEmptyResponseGetAutofillData())
         }
@@ -474,14 +498,14 @@ class AutofillStoredBackJavascriptInterface @Inject constructor(
     }
 
     override fun acceptGeneratedPassword() {
-        Timber.v("Accepting generated password")
+        logcat(VERBOSE) { "Accepting generated password" }
         injectCredentialsJob += coroutineScope.launch(dispatcherProvider.io()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseForAcceptingGeneratedPassword())
         }
     }
 
     override fun rejectGeneratedPassword() {
-        Timber.v("Rejecting generated password")
+        logcat(VERBOSE) { "Rejecting generated password" }
         injectCredentialsJob += coroutineScope.launch(dispatcherProvider.io()) {
             autofillMessagePoster.postMessage(webView, autofillResponseWriter.generateResponseForRejectingGeneratedPassword())
         }

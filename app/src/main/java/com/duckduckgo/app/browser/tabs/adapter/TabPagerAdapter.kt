@@ -21,18 +21,28 @@ import android.os.Bundle
 import android.os.Message
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.BrowserTabFragment
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
-import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 
 class TabPagerAdapter(
     private val activity: BrowserActivity,
-    swipingTabsFeature: SwipingTabsFeatureProvider,
-) : FragmentStateAdapter(activity, swipingTabsFeature) {
+) : FragmentStateAdapter(activity) {
     private val tabs = mutableListOf<TabModel>()
     private var messageForNewFragment: Message? = null
+
+    var currentTabIndex = -1
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            // if the current tab index is -1 and the set value 0, it means the first tab is really selected
+            // and we need to notify the adapter to create the first fragment
+            if (field == -1 && value == 0) {
+                notifyItemChanged(0)
+            }
+            field = value
+        }
 
     override fun getItemCount() = tabs.size
 
@@ -61,6 +71,11 @@ class TabPagerAdapter(
         }
     }
 
+    // This method prevents the creation of a tab fragment for the first tab when we don't know the current tab index yet
+    override fun shouldPlaceFragmentInViewHolder(position: Int): Boolean {
+        return currentTabIndex != -1 || position != 0
+    }
+
     fun restore(state: Bundle) {
         // state is only useful when there are fragments to restore (also avoids a crash)
         if (activity.supportFragmentManager.fragments.isNotEmpty()) {
@@ -77,9 +92,34 @@ class TabPagerAdapter(
         if (tabs.map { it.tabId } != newTabs.map { it.tabId }) {
             // we only want to notify the adapter if the tab IDs change
             val diff = DiffUtil.calculateDiff(PagerDiffUtil(tabs, newTabs))
+
             tabs.clear()
             tabs.addAll(newTabs)
-            diff.dispatchUpdatesTo(this)
+
+            var wereTabsRemoved = false
+            val updateCallback = object : ListUpdateCallback {
+                override fun onInserted(position: Int, count: Int) {
+                    this@TabPagerAdapter.notifyItemRangeInserted(position, count)
+                }
+
+                override fun onRemoved(position: Int, count: Int) {
+                    this@TabPagerAdapter.notifyItemRangeRemoved(position, count)
+                    wereTabsRemoved = true
+                }
+
+                override fun onMoved(fromPosition: Int, toPosition: Int) {
+                    this@TabPagerAdapter.notifyItemMoved(fromPosition, toPosition)
+                }
+
+                override fun onChanged(position: Int, count: Int, payload: Any?) {
+                    this@TabPagerAdapter.notifyItemRangeChanged(position, count, payload)
+                }
+            }
+            diff.dispatchUpdatesTo(updateCallback)
+
+            if (wereTabsRemoved) {
+                cleanupRemovedItems()
+            }
         } else {
             // the state of tabs is managed separately, so we don't need to notify the adapter, but we need URL and skipHome to create new fragments
             tabs.clear()

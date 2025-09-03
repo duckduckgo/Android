@@ -18,14 +18,26 @@
 
     <application>
         <activity
-            android:name="com.duckduckgo.duckchat.impl.ui.DuckChatSettingsActivity"
+            android:name="com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsActivity"
             android:exported="false"
             android:label="@string/duck_chat_title"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
+        <activity
+            android:name="com.duckduckgo.duckchat.impl.ui.settings.DuckAiShortcutSettingsActivity"
+            android:exported="false"
+            android:label="@string/duck_ai_shortcut_settings_title"
+            android:parentActivityName="com.duckduckgo.duckchat.impl.ui.settings.DuckChatSettingsActivity" />
         <activity
             android:name="com.duckduckgo.duckchat.impl.ui.DuckChatWebViewActivity"
             android:exported="false"
             android:label="@string/duck_chat_title"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"/>
+        <activity
+            android:name="com.duckduckgo.duckchat.impl.inputscreen.ui.InputScreenActivity"
+            android:exported="false" />
+        <activity
+            android:name=".subscription.DuckAiPaidSettingsActivity"
+            android:exported="false"
+            android:label="@string/duck_ai_paid_settings_title"/>
     </application>
 </manifest>

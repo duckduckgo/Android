@@ -22,7 +22,9 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.AppProperties
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.experiments.api.VariantManager
-import timber.log.Timber
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 
 class AndroidAppProperties(
     private val appContext: Context,
@@ -55,7 +57,7 @@ class AndroidAppProperties(
         return kotlin.runCatching {
             WebViewCompat.getCurrentWebViewPackage(appContext)?.versionName ?: WEBVIEW_UNKNOWN_VERSION
         }.getOrElse {
-            Timber.e(it, "Error getting current WebView package")
+            logcat(ERROR) { "Error getting current WebView package: ${it.asLog()}" }
             WEBVIEW_UNKNOWN_VERSION
         }
     }

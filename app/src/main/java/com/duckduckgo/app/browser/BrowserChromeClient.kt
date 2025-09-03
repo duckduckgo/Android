@@ -39,7 +39,9 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermis
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.LogPriority.VERBOSE
+import logcat.logcat
 
 class BrowserChromeClient @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
@@ -56,7 +58,7 @@ class BrowserChromeClient @Inject constructor(
         view: View,
         callback: CustomViewCallback?,
     ) {
-        Timber.d("on show custom view")
+        logcat { "on show custom view" }
         if (customView != null) {
             callback?.onCustomViewHidden()
             return
@@ -67,7 +69,7 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onHideCustomView() {
-        Timber.d("on hide custom view")
+        logcat { "on hide custom view" }
         webViewClientListener?.exitFullScreen()
         customView = null
     }
@@ -78,7 +80,7 @@ class BrowserChromeClient @Inject constructor(
     ) {
         // We want to use webView.progress rather than newProgress because the former gives you the overall progress of the new site
         // and the latter gives you the progress of the current main request being loaded and one site could have several redirects.
-        Timber.d("onProgressChanged ${webView.url}, ${webView.progress}")
+        logcat { "onProgressChanged ${webView.url}, ${webView.progress}" }
         if (webView.progress == 0) return
         val navigationList = webView.safeCopyBackForwardList() ?: return
         webViewClientListener?.progressChanged(webView.progress, WebViewNavigationState(navigationList, webView.progress))
@@ -90,7 +92,7 @@ class BrowserChromeClient @Inject constructor(
         icon: Bitmap,
     ) {
         webView.url?.let {
-            Timber.i("Favicon bitmap received: ${webView.url}")
+            logcat(INFO) { "Favicon bitmap received: ${webView.url}" }
             webViewClientListener?.iconReceived(it, icon)
         }
     }
@@ -100,7 +102,7 @@ class BrowserChromeClient @Inject constructor(
         url: String?,
         precomposed: Boolean,
     ) {
-        Timber.i("Favicon touch received: ${view?.url}, $url")
+        logcat(INFO) { "Favicon touch received: ${view?.url}, $url" }
         val visitedUrl = view?.url ?: return
         val iconUrl = url ?: return
         webViewClientListener?.iconReceived(visitedUrl, iconUrl)
@@ -144,12 +146,12 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        Timber.d("Permissions: permission requested ${request.resources.asList()}")
+        logcat { "Permissions: permission requested ${request.resources.asList()}" }
         webViewClientListener?.getCurrentTabId()?.let { tabId ->
             appCoroutineScope.launch(coroutineDispatcher.io()) {
                 val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
                 if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
-                    Timber.d("Permissions: permission requested not user handled")
+                    logcat { "Permissions: permission requested not user handled" }
                     webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
                 }
             }
@@ -160,7 +162,7 @@ class BrowserChromeClient @Inject constructor(
         origin: String,
         callback: GeolocationPermissions.Callback,
     ) {
-        Timber.d("Permissions: location permission requested $origin")
+        logcat { "Permissions: location permission requested $origin" }
         onPermissionRequest(LocationPermissionRequest(origin, callback))
     }
 
@@ -213,7 +215,7 @@ class BrowserChromeClient @Inject constructor(
             return false
         }
 
-        Timber.v("javascript dialog attempting to show but is not the active tab; suppressing dialog")
+        logcat(VERBOSE) { "javascript dialog attempting to show but is not the active tab; suppressing dialog" }
         result.cancel()
         return true
     }

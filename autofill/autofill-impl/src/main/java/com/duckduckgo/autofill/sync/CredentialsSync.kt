@@ -31,7 +31,7 @@ import com.duckduckgo.sync.api.SyncCrypto
 import dagger.SingleInstanceIn
 import javax.inject.*
 import kotlinx.coroutines.flow.firstOrNull
-import timber.log.Timber
+import logcat.logcat
 
 typealias Iso8601String = String
 
@@ -55,7 +55,7 @@ class CredentialsSync @Inject constructor(
                 credentialsSyncMetadata.initializeDatabase(autofillIds)
             }
 
-        Timber.i("CredentialsSync: initMetadata ${credentialsSyncMetadata.getAllObservable().firstOrNull()}")
+        logcat { "CredentialsSync: initMetadata ${credentialsSyncMetadata.getAllObservable().firstOrNull()}" }
     }
 
     suspend fun getUpdatesSince(since: Iso8601String): List<LoginCredentialEntry> {
@@ -80,7 +80,7 @@ class CredentialsSync @Inject constructor(
     suspend fun getCredentialWithSyncId(syncId: String): LoginCredentials? {
         val localId = credentialsSyncMetadata.getLocalId(syncId)
         val localCredential = localId?.let { secureStorage.getWebsiteLoginDetailsWithCredentials(localId)?.toLoginCredentials() }
-        Timber.d("CredentialsSync: >>> getCredentialWithSyncId $syncId - credential $localCredential found")
+        logcat { "CredentialsSync: >>> getCredentialWithSyncId $syncId - credential $localCredential found" }
         return localCredential
     }
 
@@ -115,7 +115,8 @@ class CredentialsSync @Inject constructor(
             credentialsSyncMetadata.addOrUpdate(
                 CredentialsSyncMetadataEntity(syncId = remoteId, localId = autofillId, deleted_at = null, modified_at = null),
             )
-            passwordStoreEventPlugins.getPlugins().forEach { it.onCredentialAdded(autofillId) }
+            val credentialList = listOf(autofillId)
+            passwordStoreEventPlugins.getPlugins().forEach { it.onCredentialAdded(credentialList) }
         }
     }
 
@@ -152,16 +153,16 @@ class CredentialsSync @Inject constructor(
     }
 
     private fun markSavedSitesAsInvalid(ids: List<String>) {
-        Timber.i("CredentialsSync: Storing invalid items: $ids")
+        logcat { "CredentialsSync: Storing invalid items: $ids" }
         credentialsSyncStore.invalidEntitiesIds = ids
     }
 
     private suspend fun allContentAsUpdates() = secureStorage.websiteLoginDetailsWithCredentials().firstOrNull().mapToLoginCredentialEntry()
 
     private suspend fun changesSince(since: Iso8601String): List<LoginCredentialEntry> {
-        Timber.d("CredentialsSync: generating changes since $since")
+        logcat { "CredentialsSync: generating changes since $since" }
         credentialsSyncMetadata.getAllCredentials().forEach {
-            Timber.i("CredentialsSync: syncMetadata $it")
+            logcat { "CredentialsSync: syncMetadata $it" }
         }
 
         val changes = credentialsSyncMetadata.getChangesSince(since).map {
@@ -172,8 +173,8 @@ class CredentialsSync @Inject constructor(
             LoginCredentialEntry(id = it.syncId, deleted = "1", client_last_modified = it.deleted_at)
         }
 
-        Timber.d("CredentialsSync: modifiedSince changes: $changes")
-        Timber.d("CredentialsSync: modifiedSince removed: $removedItems")
+        logcat { "CredentialsSync: modifiedSince changes: $changes" }
+        logcat { "CredentialsSync: modifiedSince removed: $removedItems" }
 
         val changesEntries = changes.mapToLoginCredentialEntry()
 
@@ -223,7 +224,6 @@ class CredentialsSync @Inject constructor(
 
     private fun List<LoginCredentialEntry>.validItems(): List<LoginCredentialEntry> {
         if (credentialsSyncLocalValidationFeature.self().isEnabled().not()) return this // Skip validation if feature is disabled
-
         return this.filter {
             (it.title?.length ?: 0) < MAX_ENCRYPTED_TITLE_LENGTH &&
                 (it.domain?.length ?: 0) < MAX_ENCRYPTED_DOMAIN_LENGTH &&

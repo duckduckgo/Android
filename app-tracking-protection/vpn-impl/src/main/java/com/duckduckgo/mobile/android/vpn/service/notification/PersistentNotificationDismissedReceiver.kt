@@ -23,7 +23,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.di.scopes.ReceiverScope
 import dagger.android.AndroidInjection
 import javax.inject.Inject
-import logcat.LogPriority
+import logcat.LogPriority.WARN
 import logcat.logcat
 
 @InjectWith(ReceiverScope::class)
@@ -47,7 +47,7 @@ class PersistentNotificationDismissedReceiver : BroadcastReceiver() {
                 vpnNotificationStore.persistentNotifDimissedTimestamp = System.currentTimeMillis()
             }
         } else {
-            logcat(LogPriority.WARN) { "PersistentNotificationDismissedReceiver: unknown action ${intent.action}" }
+            logcat(WARN) { "PersistentNotificationDismissedReceiver: unknown action ${intent.action}" }
             pendingResult?.finish()
         }
     }

@@ -223,7 +223,7 @@
     <string name="netpCustomDnsSettingText">Server DNS</string>
     <string name="netpPrivateDns">DNS privat</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (blochează domeniile riscante)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (instrument de blocare a escrocheriilor)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (Recomandat)</string>
     <string name="netpCustomDnsCustom">Personalizat</string>
     <string name="netpCustomDnsInputAddressHint">Adresa IPv4</string>
@@ -234,8 +234,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo direcționează interogările DNS prin serverele noastre DNS, astfel încât furnizorul tău de internet să nu poată vedea ce site-uri web vizitezi.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blocarea și filtrarea conținutului</string>
-    <string name="netpDnsBlockMalwarePrimary">Blochează domeniile riscante</string>
+    <string name="netpDnsBlockMalwareHeader">Blocare a conținutului rău intenționat</string>
+    <string name="netpDnsBlockMalwarePrimary">Instrument de blocare a înșelătoriilor</string>
     <string name="netpDnsBlockMalwareByline">Blochează peste 150.000 de domenii marcate pentru găzduirea de programe rău intenționate (malware), atacuri de phishing și escrocherii online cu o listă de blocare la nivel de DNS. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Liste de blocare DNS</string>
 
@@ -260,4 +260,8 @@
     <string name="netpAutoExcludeToggleName">Exclude automat aplicațiile care nu sunt compatibile cu VPN-urile</string>
     <string name="netpExclusionListLabelAutoExclude">Incompatibilă cu VPN-urile</string>
     <string name="netpExclusionListAutoExcludeDescription">Unele aplicații, cum ar fi cele bancare sau de streaming, nu funcționează bine cu VPN-urile. Când această setare este activată, vom exclude automat acele aplicații.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN deconectat din cauza expirării abonamentului. Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonează-te la DuckDuckGo pentru a reconecta VPN-ul.</string>
 </resources>

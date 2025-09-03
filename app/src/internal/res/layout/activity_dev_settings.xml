@@ -74,13 +74,6 @@
                 app:secondaryText="@string/devSettingsTriggerAnrSubtitle" />
 
             <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
-                android:id="@+id/clearSavedSites"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:primaryText="@string/devSettingsClearSavedSites"
-                app:secondaryText="@string/devSettingsClearSavedSitesSubtitle" />
-
-            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                 android:id="@+id/customTabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

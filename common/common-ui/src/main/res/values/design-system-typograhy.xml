@@ -105,4 +105,28 @@
         <item name="android:textAllCaps">true</item>
     </style>
 
+    <style name="Typography.Buck"/>
+
+    <style name="Typography.Buck.H1">
+        <item name="android:textSize">24sp</item>
+        <item name="fontFamily">@font/pangea_semibold</item>
+    </style>
+
+    <style name="Typography.Buck.Body1">
+        <item name="android:textSize">18sp</item>
+        <item name="fontFamily">@font/pangea_regular</item>
+    </style>
+
+    <style name="Typography.BB"/>
+
+    <style name="Typography.BB.H1">
+        <item name="android:textSize">23sp</item>
+        <item name="fontFamily">@font/pangea_medium</item>
+    </style>
+
+    <style name="Typography.BB.Body1">
+        <item name="android:textSize">16sp</item>
+        <item name="fontFamily">@font/pangea_regular</item>
+    </style>
+
 </resources>

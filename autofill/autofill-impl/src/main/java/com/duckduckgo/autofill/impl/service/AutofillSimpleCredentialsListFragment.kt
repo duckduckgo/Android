@@ -38,7 +38,9 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillProviderListBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_SERVICE_PASSWORDS_SEARCH
-import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapterLegacy
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.AutofillToggleState
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.CredentialsLoadedState.Loaded
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
@@ -55,7 +57,8 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @InjectWith(FragmentScope::class)
 class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragment_autofill_provider_list) {
@@ -95,7 +98,7 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
     }
 
     private val binding: FragmentAutofillProviderListBinding by viewBinding()
-    private lateinit var adapter: AutofillManagementRecyclerAdapterLegacy
+    private lateinit var adapter: AutofillManagementRecyclerAdapter
 
     private var searchMenuItem: MenuItem? = null
 
@@ -225,24 +228,38 @@ class AutofillSimpleCredentialsListFragment : DuckDuckGoFragment(R.layout.fragme
 
         withContext(dispatchers.io()) {
             val showSuggestionsFor = getRequestedUrl().takeUnless { it.isNullOrBlank() } ?: getRequestedPackage()
-            Timber.i("DDGAutofillService showSuggestionsFor: $showSuggestionsFor")
+            logcat(INFO) { "DDGAutofillService showSuggestionsFor: $showSuggestionsFor" }
             val directSuggestions = suggestionMatcher.getDirectSuggestions(showSuggestionsFor, credentials)
             val shareableCredentials = suggestionMatcher.getShareableSuggestions(showSuggestionsFor)
-            adapter.updateLogins(credentials, directSuggestions, shareableCredentials, false)
+            val directSuggestionsListItems = suggestionListBuilder.build(directSuggestions, shareableCredentials, allowBreakageReporting = false)
+            val groupedCredentials = credentialGrouper.group(credentials)
+
+            withContext(dispatchers.main()) {
+                adapter.showLogins(
+                    credentialsLoadedState = Loaded(
+                        directSuggestionsListItems = directSuggestionsListItems,
+                        groupedCredentials = groupedCredentials,
+                        showGoogleImportPasswordsButton = false,
+                    ),
+                    autofillToggleState = AutofillToggleState(enabled = true, visible = false),
+                    promotionView = null,
+                )
+            }
         }
     }
 
     private fun configureRecyclerView() {
-        adapter = AutofillManagementRecyclerAdapterLegacy(
+        adapter = AutofillManagementRecyclerAdapter(
             this,
-            dispatchers = dispatchers,
             faviconManager = faviconManager,
-            grouper = credentialGrouper,
             initialExtractor = initialExtractor,
-            suggestionListBuilder = suggestionListBuilder,
             onCredentialSelected = this::onCredentialsSelected,
             onContextMenuItemClicked = { },
             onReportBreakageClicked = { },
+            onImportFromGoogleClicked = { },
+            onAutofillToggleClicked = { },
+            onImportViaDesktopSyncClicked = { },
+            launchHelpPageClicked = { },
         ).also { binding.logins.adapter = it }
     }
 

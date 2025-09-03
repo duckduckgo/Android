@@ -222,7 +222,7 @@
     <string name="netpCustomDnsSettingText">Serveur DNS</string>
     <string name="netpPrivateDns">DNS privé</string>
     <string name="netpCustomDnsDefault" translatable="false">DuckDuckGo</string>
-    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Bloquer les domaines à risque)</string>
+    <string name="netpCustomDnsDefaultBlockMalware">DuckDuckGo (Bloqueur d\'escroqueries)</string>
     <string name="netpCustomDnsDefaultOption">DuckDuckGo (recommandé)</string>
     <string name="netpCustomDnsCustom">Personnalisé</string>
     <string name="netpCustomDnsInputAddressHint">Adresse IPv4</string>
@@ -233,8 +233,8 @@
     <string name="netpDdgDnsByLine">DuckDuckGo achemine les requêtes DNS via nos serveurs DNS afin que votre fournisseur d\'accès à Internet ne puisse pas voir les sites Web que vous visitez.</string>
 
     <!-- Block malware DNS -->
-    <string name="netpDnsBlockMalwareHeader">Blocage et filtrage de contenu</string>
-    <string name="netpDnsBlockMalwarePrimary">Bloquer les domaines à risque</string>
+    <string name="netpDnsBlockMalwareHeader">Blocage de contenu malveillant</string>
+    <string name="netpDnsBlockMalwarePrimary">Bloqueur d\'escroqueries</string>
     <string name="netpDnsBlockMalwareByline">Bloquez plus de 150 000 domaines signalés comme hébergeant des logiciels malveillants, des attaques de phishing et des escroqueries en ligne grâce à une liste de blocage au niveau du DNS. <annotation type="learn_more_link">En savoir plus</annotation></string>
     <string name="netpDnsBlockMalwareFaqsTitle">Listes de blocage DNS</string>
 
@@ -257,4 +257,8 @@
     <string name="netpAutoExcludeToggleName">Exclure automatiquement les applications non compatibles avec les VPN</string>
     <string name="netpExclusionListLabelAutoExclude">Incompatible avec les VPN</string>
     <string name="netpExclusionListAutoExcludeDescription">Certaines applications, comme les applications bancaires ou de streaming, ne fonctionnent pas bien avec les VPN. Quand ce paramètre sera activé, nous exclurons automatiquement ces applications.</string>
+
+    <!-- Privacy Pro Rebranding-->
+    <string name="netpNotificationVpnAccessRevokedRebranding">VPN déconnecté en raison de l\'expiration de l\'abonnement. Abonnez-vous à DuckDuckGo pour reconnecter le VPN.</string>
+    <string name="netpDialogVpnAccessRevokedBodyRebranding">Abonnez-vous à DuckDuckGo pour reconnecter le VPN.</string>
 </resources>

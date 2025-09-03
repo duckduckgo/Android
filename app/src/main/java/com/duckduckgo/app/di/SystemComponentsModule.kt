@@ -25,6 +25,8 @@ import com.duckduckgo.app.global.shortcut.AppShortcutCreator
 import com.duckduckgo.app.icon.api.AppIconModifier
 import com.duckduckgo.app.icon.api.IconModifier
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentManager
+import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.systemsearch.DeviceAppListProvider
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
@@ -74,8 +76,17 @@ object SystemComponentsModule {
         settingsDataStore: SettingsDataStore,
         dispatcherProvider: DispatcherProvider,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
+        onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
+        onboardingExperimentFireAnimationHelper: OnboardingExperimentFireAnimationHelper,
     ): FireAnimationLoader {
-        return LottieFireAnimationLoader(context, settingsDataStore, dispatcherProvider, appCoroutineScope)
+        return LottieFireAnimationLoader(
+            context = context,
+            settingsDataStore = settingsDataStore,
+            dispatchers = dispatcherProvider,
+            appCoroutineScope = appCoroutineScope,
+            onboardingDesignExperimentManager = onboardingDesignExperimentManager,
+            onboardingExperimentFireAnimationHelper = onboardingExperimentFireAnimationHelper,
+        )
     }
 }
 

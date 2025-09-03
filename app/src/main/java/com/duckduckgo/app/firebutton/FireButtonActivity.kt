@@ -17,6 +17,8 @@
 package com.duckduckgo.app.firebutton
 
 import android.app.ActivityOptions
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.lifecycle.Lifecycle
@@ -46,7 +48,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import logcat.logcat
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(FireButtonScreenNoParams::class)
@@ -70,6 +72,10 @@ class FireButtonActivity : DuckDuckGoActivity() {
 
         configureUiEventHandlers()
         observeViewModel()
+
+        intent?.getStringExtra(LAUNCH_FROM_NOTIFICATION_PIXEL_NAME)?.let {
+            viewModel.onLaunchedFromNotification(it)
+        }
     }
 
     private fun configureUiEventHandlers() {
@@ -196,7 +202,7 @@ class FireButtonActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val clearWhenSelected = selectedItem.getClearWhenForIndex()
                         viewModel.onAutomaticallyWhenOptionSelected(clearWhenSelected)
-                        Timber.d("Option selected: $clearWhenSelected")
+                        logcat { "Option selected: $clearWhenSelected" }
                     }
                 },
             )
@@ -237,5 +243,13 @@ class FireButtonActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    companion object {
+        const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+
+        fun intent(context: Context): Intent {
+            return Intent(context, FireButtonActivity::class.java)
+        }
     }
 }

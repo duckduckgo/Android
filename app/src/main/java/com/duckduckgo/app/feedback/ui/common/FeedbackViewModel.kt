@@ -40,7 +40,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 @ContributesViewModel(ActivityScope::class)
 class FeedbackViewModel @Inject constructor(
@@ -145,7 +146,7 @@ class FeedbackViewModel @Inject constructor(
         val playStoreInstalled = playStoreUtils.isPlayStoreInstalled()
 
         if (!playStoreInstalled) {
-            Timber.i("Play Store not installed")
+            logcat(INFO) { "Play Store not installed" }
             return false
         }
 
@@ -154,7 +155,7 @@ class FeedbackViewModel @Inject constructor(
         }
 
         if (appBuildConfig.isDebug) {
-            Timber.i("Not installed from the Play Store but it is DEBUG; will treat as if installed from Play Store")
+            logcat(INFO) { "Not installed from the Play Store but it is DEBUG; will treat as if installed from Play Store" }
             return true
         }
         return false
@@ -327,7 +328,7 @@ sealed class FragmentState(open val forwardDirection: Boolean) {
 
 sealed class Command {
     data class Exit(val feedbackSubmitted: Boolean) : Command()
-    object HideKeyboard : Command()
+    data object HideKeyboard : Command()
 }
 
 data class UpdateViewCommand(

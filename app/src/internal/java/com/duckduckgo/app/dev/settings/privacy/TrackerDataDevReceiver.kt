@@ -32,7 +32,8 @@ import com.squareup.anvil.annotations.ContributesMultibinding
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
-import timber.log.Timber
+import logcat.LogPriority.INFO
+import logcat.logcat
 
 class TrackerDataDevReceiver(
     context: Context,
@@ -68,11 +69,11 @@ class TrackerDataDevReceiverRegister @Inject constructor(
     @SuppressLint("CheckResult")
     override fun onCreate(owner: LifecycleOwner) {
         if (!appBuildConfig.isDebug) {
-            Timber.i("Will not register TrackerDataDevReceiverRegister, not in DEBUG mode")
+            logcat(INFO) { "Will not register TrackerDataDevReceiverRegister, not in DEBUG mode" }
             return
         }
 
-        Timber.i("Debug receiver TrackerDataDevReceiverRegister registered")
+        logcat(INFO) { "Debug receiver TrackerDataDevReceiverRegister registered" }
 
         TrackerDataDevReceiver(context) { _ ->
             trackderDataDownloader.downloadTds()

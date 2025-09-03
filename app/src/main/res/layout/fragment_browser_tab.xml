@@ -20,14 +20,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
-        android:id="@+id/newOmnibar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:omnibarPosition="top" />
-
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-        android:id="@+id/fadeOmnibar"
+    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
+        android:id="@+id/singleOmnibar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:omnibarPosition="top" />
@@ -91,12 +85,21 @@
             android:id="@+id/daxDialogOnboardingCtaContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
             android:elevation="@dimen/keyline_4">
 
             <include
                 android:id="@+id/includeOnboardingInContextDaxDialog"
                 layout="@layout/include_onboarding_in_context_dax_dialog"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/includeOnboardingInContextBuckDialog"
+                layout="@layout/include_onboarding_in_context_buck_dialog"
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/includeOnboardingInContextBBDialog"
+                layout="@layout/include_onboarding_in_context_bb_dialog"
                 android:visibility="gone" />
 
             <include
@@ -139,25 +142,11 @@
 
     </RelativeLayout>
 
-    <com.duckduckgo.app.browser.omnibar.experiments.ScrollingOmnibarLayout
-        android:id="@+id/newOmnibarBottom"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom"
-        app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.omnibar.experiments.FadeOmnibarLayout
-        android:id="@+id/fadeOmnibarBottom"
+    <com.duckduckgo.app.browser.omnibar.SingleOmnibarLayout
+        android:id="@+id/singleOmnibarBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         app:omnibarPosition="bottom" />
-
-    <com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarView
-        android:id="@+id/navigationBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:showShadows="true"
-        android:layout_gravity="bottom" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -23,8 +23,11 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.test.runTest
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.ParameterizedRobolectricTestRunner
 
 @RunWith(ParameterizedRobolectricTestRunner::class)
@@ -33,6 +36,7 @@ class URLCanonicalizationReferenceTest(private val testCase: TestCase) {
     companion object {
         private val moshi = Moshi.Builder().build()
         private val adapter: JsonAdapter<ReferenceTest> = moshi.adapter(ReferenceTest::class.java)
+        private val mockMaliciousSiteProtectionRCFeature: MaliciousSiteProtectionRCFeature = mock()
 
         @JvmStatic
         @ParameterizedRobolectricTestRunner.Parameters(name = "Test case: {index} - {0}")
@@ -47,10 +51,16 @@ class URLCanonicalizationReferenceTest(private val testCase: TestCase) {
         }
     }
 
-    private val testee = RealUrlCanonicalization()
+    private lateinit var testee: RealUrlCanonicalization
 
     @get:org.junit.Rule
     var coroutineRule = com.duckduckgo.common.test.CoroutineTestRule()
+
+    @Before
+    fun setup() {
+        whenever(mockMaliciousSiteProtectionRCFeature.stripWWWPrefix()).thenReturn(true)
+        testee = RealUrlCanonicalization(mockMaliciousSiteProtectionRCFeature)
+    }
 
     @Test
     fun whenReferenceTestRunsItReturnsTheExpectedResult() = runTest {

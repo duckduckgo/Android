@@ -20,23 +20,24 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
-import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.browser.api.autocomplete.AutoComplete
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
+import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.UrlScheme
@@ -64,66 +65,6 @@ import kotlinx.coroutines.flow.map
 const val maximumNumberOfSuggestions = 12
 const val maximumNumberOfTopHits = 2
 const val minimumNumberInSuggestionGroup = 5
-
-interface AutoComplete {
-    fun autoComplete(query: String): Flow<AutoCompleteResult>
-    suspend fun userDismissedHistoryInAutoCompleteIAM()
-    suspend fun submitUserSeenHistoryIAM()
-
-    data class AutoCompleteResult(
-        val query: String,
-        val suggestions: List<AutoCompleteSuggestion>,
-    )
-
-    sealed class AutoCompleteSuggestion(open val phrase: String) {
-        data class AutoCompleteSearchSuggestion(
-            override val phrase: String,
-            val isUrl: Boolean,
-            val isAllowedInTopHits: Boolean,
-        ) : AutoCompleteSuggestion(phrase)
-
-        data class AutoCompleteDefaultSuggestion(
-            override val phrase: String,
-        ) : AutoCompleteSuggestion(phrase)
-
-        sealed class AutoCompleteUrlSuggestion(
-            phrase: String,
-            open val title: String,
-            open val url: String,
-        ) : AutoCompleteSuggestion(phrase) {
-
-            data class AutoCompleteBookmarkSuggestion(
-                override val phrase: String,
-                override val title: String,
-                override val url: String,
-                val isFavorite: Boolean = false,
-            ) : AutoCompleteUrlSuggestion(phrase, title, url)
-
-            data class AutoCompleteSwitchToTabSuggestion(
-                override val phrase: String,
-                override val title: String,
-                override val url: String,
-                val tabId: String,
-            ) : AutoCompleteUrlSuggestion(phrase, title, url)
-        }
-
-        sealed class AutoCompleteHistoryRelatedSuggestion(phrase: String) : AutoCompleteSuggestion(phrase) {
-            data class AutoCompleteHistorySuggestion(
-                override val phrase: String,
-                val title: String,
-                val url: String,
-                val isAllowedInTopHits: Boolean,
-            ) : AutoCompleteHistoryRelatedSuggestion(phrase)
-
-            data class AutoCompleteHistorySearchSuggestion(
-                override val phrase: String,
-                val isAllowedInTopHits: Boolean,
-            ) : AutoCompleteHistoryRelatedSuggestion(phrase)
-
-            data object AutoCompleteInAppMessageSuggestion : AutoCompleteHistoryRelatedSuggestion("")
-        }
-    }
-}
 
 @ContributesBinding(AppScope::class)
 class AutoCompleteApi @Inject constructor(
