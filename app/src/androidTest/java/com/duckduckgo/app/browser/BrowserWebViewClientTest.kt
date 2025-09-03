@@ -1342,7 +1342,7 @@ class BrowserWebViewClientTest {
         }
 
         override fun register(
-            jsMessageCallback: JsMessageCallback?,
+            jsMessageCallback: JsMessageCallback,
             webView: WebView,
         ) {
             registered = true

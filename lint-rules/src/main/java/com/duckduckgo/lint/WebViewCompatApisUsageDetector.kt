@@ -34,8 +34,8 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
     companion object {
         val ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE: Issue = Issue.create(
             id = "AddWebMessageListenerUsage",
-            briefDescription = "Use safe WebMessageListener methods",
-            explanation = "Use `safeAddWebMessageListener` instead of `WebViewCompat.addWebMessageListener`",
+            briefDescription = "Use safe WebViewCompatWrapper methods",
+            explanation = "Use `WebViewCompatWrapper#addWebMessageListener` instead",
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
@@ -46,8 +46,8 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
 
         val ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE: Issue = Issue.create(
             id = "RemoveWebMessageListenerUsage",
-            briefDescription = "Use safe WebMessageListener methods",
-            explanation = "Use `safeRemoveWebMessageListener` instead of `WebViewCompat.removeWebMessageListener`",
+            briefDescription = "Use safe WebViewCompatWrapper methods",
+            explanation = "Use `WebViewCompatWrapper#removeWebMessageListener` instead",
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
@@ -59,7 +59,7 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
         val ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE: Issue = Issue.create(
             id = "AddDocumentStartJavaScriptUsage",
             briefDescription = "Use safe WebViewCompatWrapper methods",
-            explanation = "Use `WebViewCompatWrapper#addDocumentStartJavaScript` instead of `WebViewCompat.addDocumentStartJavaScript`",
+            explanation = "Use `WebViewCompatWrapper#addDocumentStartJavaScript` instead",
             category = Category.CORRECTNESS,
             severity = Severity.ERROR,
             implementation = Implementation(
