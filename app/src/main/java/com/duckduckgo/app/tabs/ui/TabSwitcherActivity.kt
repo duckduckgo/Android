@@ -58,7 +58,6 @@ import com.duckduckgo.app.settings.clear.OnboardingExperimentFireAnimationHelper
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
-import com.duckduckgo.app.tabs.TabSwitcherAnimationFeature
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
@@ -156,9 +155,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var duckChat: DuckChat
 
     @Inject
-    lateinit var tabSwitcherAnimationFeature: TabSwitcherAnimationFeature
-
-    @Inject
     lateinit var trackerCountAnimator: TrackerCountAnimator
 
     @Inject
@@ -232,10 +228,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         firstTimeLoadingTabsList = savedInstanceState?.getBoolean(KEY_FIRST_TIME_LOADING) ?: true
 
-        if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            tabsAdapter.setAnimationTileCloseClickListener {
-                viewModel.onTrackerAnimationInfoPanelClicked()
-            }
+        tabsAdapter.setAnimationTileCloseClickListener {
+            viewModel.onTrackerAnimationInfoPanelClicked()
         }
 
         extractIntentExtras()
@@ -404,10 +398,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun checkTrackerAnimationPanelVisibility() {
-        if (!tabSwitcherAnimationFeature.self().isEnabled()) {
-            return
-        }
-
         val layoutManager = tabsRecycler.layoutManager as? LinearLayoutManager ?: return
         val firstVisible = layoutManager.findFirstVisibleItemPosition()
         val isPanelCurrentlyVisible = firstVisible == 0 && tabsAdapter.getTabSwitcherItem(0) is TrackersAnimationInfoPanel
@@ -775,24 +765,15 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onTabMoved(from: Int, to: Int) {
-        if (tabSwitcherAnimationFeature.self().isEnabled()) {
-            val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.firstOrNull() is TrackersAnimationInfoPanel
-            val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
-            val tabSwitcherItemCount = viewModel.tabSwitcherItems.size
+        val isTrackerAnimationInfoPanelVisible = viewModel.tabSwitcherItems.firstOrNull() is TrackersAnimationInfoPanel
+        val canSwapFromIndex = if (isTrackerAnimationInfoPanelVisible) 1 else 0
+        val tabSwitcherItemCount = viewModel.tabSwitcherItems.size
 
-            val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
-            if (canSwap) {
-                tabsAdapter.onTabMoved(from, to)
-                // Adjust indices if animation feature is enabled to account for the TrackerAnimationTile at index 0
-                viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
-            }
-        } else {
-            val tabCount = viewModel.tabSwitcherItems.size
-            val canSwap = from in 0..< tabCount && to in 0..< tabCount
-            if (canSwap) {
-                tabsAdapter.onTabMoved(from, to)
-                viewModel.onTabMoved(from, to)
-            }
+        val canSwap = from in canSwapFromIndex..<tabSwitcherItemCount && to in canSwapFromIndex..<tabSwitcherItemCount
+        if (canSwap) {
+            tabsAdapter.onTabMoved(from, to)
+            // Adjust indices if animation feature is enabled to account for the TrackerAnimationTile at index 0
+            viewModel.onTabMoved(from - canSwapFromIndex, to - canSwapFromIndex)
         }
     }
 
