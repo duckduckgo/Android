@@ -6190,9 +6190,51 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnDuckChatOmnibarButtonClickedThenOpenDuckChat() {
-        testee.onDuckChatOmnibarButtonClicked("example")
-        verify(mockDuckChat).openDuckChatWithAutoPrompt("example")
+    fun whenOnDuckChatOmnibarButtonClickedWithFocusThenOpenDuckChatWithAutoPrompt() {
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = false)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithoutFocusThenOpenDuckChat() {
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = false)
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryAndFocusThenOpenDuckChatWithAutoPrompt() {
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = false)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "")
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWithNullQueryWithoutFocusThenOpenDuckChat() {
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = false, isNtp = false)
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithNullQueryAndWithFocusThenOpenDuckChat() {
+        testee.onDuckChatOmnibarButtonClicked(query = null, hasFocus = true, isNtp = true)
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithBlankQueryAndWithFocusThenOpenDuckChat() {
+        testee.onDuckChatOmnibarButtonClicked(query = " ", hasFocus = true, isNtp = true)
+        verify(mockDuckChat).openDuckChat()
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithFocusThenOpenDuckChatWithAutoPrompt() {
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = true, isNtp = true)
+        verify(mockDuckChat).openDuckChatWithAutoPrompt(query = "example")
+    }
+
+    @Test
+    fun whenOnDuckChatOmnibarButtonClickedWhenOnNtpWithQueryAndWithoutFocusThenOpenDuckChat() {
+        testee.onDuckChatOmnibarButtonClicked(query = "example", hasFocus = false, isNtp = true)
+        verify(mockDuckChat).openDuckChat()
     }
 
     @Test
@@ -6457,91 +6499,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOpenDuckChatWithNonEmptyQueryThenOpenWithAutoPrompt() = runTest {
-        val query = "example"
-
-        testee.openDuckChat("example")
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChat()
-    }
-
-    @Test
-    fun whenOpenDuckChatWithEmptyStringQueryThenOpenDuckChat() = runTest {
-        testee.openDuckChat("")
-
-        verify(mockDuckChat).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-    }
-
-    @Test
-    fun whenOpenDuckChatWithNullQueryThenOpenDuckChat() = runTest {
-        testee.openDuckChat(null)
-
-        verify(mockDuckChat).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-    }
-
-    @Test
-    fun whenOpenDuckChatWithQueryEqualToUrlThenOpenDuckChat() = runTest {
-        val url = "https://example.com"
-        loadUrl(url)
-
-        testee.openDuckChat(url)
-
-        verify(mockDuckChat).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-    }
-
-    @Test
-    fun whenOpenDuckChatWithLastSubmittedUserQueryThenOpenDuckChatWithQuery() = runTest {
-        val query = "example"
-        testee.setLastSubmittedUserQuery(query)
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithPrefill(query)
-        verify(mockDuckChat, never()).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-    }
-
-    @Test
-    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasSameTextThenOpenDuckChatWithAutoPrompt() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithPrefill(query)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-    }
-
-    @Test
-    fun whenLastSubmittedUserQueryIsNullAndOmnibarHasNewTextThenOpenDuckChatWithAutoPrompt() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "foo", queryOrFullUrl = "foo")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChat()
-    }
-
-    @Test
-    fun whenLastSubmittedUserQueryDiffersFromNewQueryThenOpenWithAutoPrompt() = runTest {
-        val query = "example"
-        testee.setLastSubmittedUserQuery("foo")
-        testee.setLastSubmittedUserChatQuery("foo")
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(query)
-    }
-
-    @Test
     fun whenProcessJsCallbackMessageForSubscriptionsThenSendCommand() = runTest {
         val jsCallbackData = JsCallbackData(JSONObject(), "", "", "")
         whenever(mockSubscriptionsJSHelper.processJsCallbackMessage(anyString(), anyString(), anyOrNull(), anyOrNull())).thenReturn(jsCallbackData)
@@ -6741,85 +6698,6 @@ class BrowserTabViewModelTest {
 
         // Verify loading state reflects the completed navigation
         assertFalse(loadingViewState().isLoading)
-    }
-
-    @Test
-    fun whenOpeningDuckChatWithMatchingQueryOrFullUrlValueThenOpenDuckChat() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = query, queryOrFullUrl = query)
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithPrefill(query)
-        verify(mockDuckChat, never()).openDuckChat()
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-    }
-
-    @Test
-    fun whenOpeningDuckChatWithDifferentQueryOrFullUrlValueThenOpenDuckChatWithAutoPrompt() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
-        testee.setLastSubmittedUserQuery("test")
-        testee.setLastSubmittedUserChatQuery("test")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
-        verify(mockDuckChat, never()).openDuckChat()
-    }
-
-    @Test
-    fun whenOpeningDuckChatWithoutSubmittingAPreviousSearchThenOpenDuckChatWithPrefill() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithPrefill(query)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-        verify(mockDuckChat, never()).openDuckChat()
-    }
-
-    @Test
-    fun whenOpeningDuckChatChangingOmnibarThenOpenDuckChatWithAutoPrompt() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "something else", queryOrFullUrl = "something else")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
-        verify(mockDuckChat, never()).openDuckChat()
-    }
-
-    @Test
-    fun whenOpeningDuckChatAfterSubmittingASearchThenOpenDuckChatWithPrefill() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
-
-        testee.setLastSubmittedUserQuery("test")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithPrefill(query)
-        verify(mockDuckChat, never()).openDuckChatWithAutoPrompt(any())
-        verify(mockDuckChat, never()).openDuckChat()
-    }
-
-    @Test
-    fun whenOpeningDuckChatAfterSubmittingASearchAndChatThenOpenDuckChatWithAutoPrompt() = runTest {
-        val query = "example"
-        testee.omnibarViewState.value = omnibarViewState().copy(omnibarText = "example", queryOrFullUrl = "example")
-
-        testee.setLastSubmittedUserQuery("test")
-        testee.setLastSubmittedUserChatQuery("test")
-
-        testee.openDuckChat(query)
-
-        verify(mockDuckChat).openDuckChatWithAutoPrompt(query)
-        verify(mockDuckChat, never()).openDuckChatWithPrefill(any())
-        verify(mockDuckChat, never()).openDuckChat()
     }
 
     @Test
