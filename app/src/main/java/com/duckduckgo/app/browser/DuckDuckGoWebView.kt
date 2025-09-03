@@ -451,7 +451,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         false
     }
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
     suspend fun safeAddDocumentStartJavaScript(
         script: String,
         allowedOriginRules: Set<String>,

@@ -31,6 +31,7 @@ import com.duckduckgo.lint.NoRetrofitCreateMethodCallDetector.Companion.NO_RETRO
 import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECTRIC_TEST_RUNNER_ISSUE
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
+import com.duckduckgo.lint.WebViewCompatApisUsageDetector
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector.Companion.ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector.Companion.ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector.Companion.ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE
@@ -67,9 +68,6 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_ROBOLECTRIC_TEST_RUNNER_ISSUE,
             ISSUE_NON_CANCELLABLE,
             ISSUE_AVOID_COMPUTATION,
-            ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE,
-            ISSUE_ADD_WEB_MESSAGE_LISTENER_USAGE,
-            ISSUE_REMOVE_WEB_MESSAGE_LISTENER_USAGE,
             DenyListedApiDetector.ISSUE,
 
             // Android Design System
@@ -86,7 +84,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             WRONG_STYLE_NAME,
             INVALID_COLOR_ATTRIBUTE
 
-        )
+        ).plus(WebViewCompatApisUsageDetector.issues)
 
     override val api: Int
         get() = CURRENT_API

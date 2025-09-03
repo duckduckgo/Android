@@ -67,7 +67,7 @@ class WebViewBlobDownloaderModernImpl @Inject constructor(
 
     private val fixedReplyProxyMap = mutableMapOf<String, Map<String, JavaScriptReplyProxy>>()
 
-    @SuppressLint("RequiresFeature")
+    @SuppressLint("RequiresFeature", "AddDocumentStartJavaScriptUsage")
     override suspend fun addBlobDownloadSupport(webView: WebView) {
         withContext(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled()) {
