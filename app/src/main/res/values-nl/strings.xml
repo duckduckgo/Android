@@ -189,6 +189,7 @@
     <string name="webTrackingProtectionLearnMoreTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionTitle">Bescherming tegen webtracking</string>
     <string name="webTrackingProtectionExplanationDescription"><![CDATA[De DuckDuckGo-browser biedt bescherming tegen tracking die altijd actief is.\n<a href=\"\">Meer informatie</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[De DuckDuckGo-browser biedt bescherming tegen tracking, zodat je gegevens veilig blijven terwijl je surft.\n<a href=\"\">Meer informatie</a>]]></string>
     <string name="webTrackingProtectionExplanationTitle">Hoe wij je beschermen</string>
     <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkeert trackers van derden</string>
     <string name="webTrackingProtectionThirdPartyTrackersDescription">Helpt bij het blokkeren van cookies van derden die je op elke website volgen door te voorkomen dat trackers van derden überhaupt worden geladen.</string>
