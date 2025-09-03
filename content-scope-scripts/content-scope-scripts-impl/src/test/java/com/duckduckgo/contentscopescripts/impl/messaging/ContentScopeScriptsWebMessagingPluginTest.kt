@@ -41,7 +41,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class WebViewCompatWebCompatMessagingPluginTest {
+class ContentScopeScriptsWebMessagingPluginTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
@@ -51,7 +51,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin> = FakeGlobalHandlersPluginPoint()
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
     private val mockWebView: WebView = mock()
-    private lateinit var testee: WebViewCompatWebCompatMessagingPlugin
+    private lateinit var testee: ContentScopeScriptsWebMessagingPlugin
 
     private class FakePluginPoint : PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin> {
         override fun getPlugins(): Collection<WebViewCompatContentScopeJsMessageHandlersPlugin> {
@@ -101,7 +101,7 @@ class WebViewCompatWebCompatMessagingPluginTest {
     @Before
     fun setUp() = runTest {
         whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        testee = WebViewCompatWebCompatMessagingPlugin(
+        testee = ContentScopeScriptsWebMessagingPlugin(
             handlers = handlers,
             globalHandlers = globalHandlers,
             webViewCompatContentScopeScripts = webViewCompatContentScopeScripts,

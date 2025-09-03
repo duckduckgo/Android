@@ -39,7 +39,7 @@ import logcat.logcat
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
 @ContributesMultibinding(ActivityScope::class)
-class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
+class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
