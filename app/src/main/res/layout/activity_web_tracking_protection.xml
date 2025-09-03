@@ -25,7 +25,7 @@
         android:id="@+id/includeToolbar"
         layout="@layout/include_default_toolbar" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -94,6 +94,29 @@
                 android:layout_height="wrap_content"
                 app:primaryText="@string/settingsPrivacyProtectionAllowlist" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/protectionsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginTop="@dimen/keyline_3"
+                android:layout_marginBottom="6dp"
+                android:gravity="start"
+                android:text="@string/webTrackingProtectionExplanationTitle"
+                android:textColor="?daxColorTertiaryText"
+                app:typography="h4" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/protectionsList"
+                android:layout_width="match_parent"
+                android:overScrollMode="never"
+                android:paddingHorizontal="10dp"
+                android:layout_height="match_parent" />
+
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
