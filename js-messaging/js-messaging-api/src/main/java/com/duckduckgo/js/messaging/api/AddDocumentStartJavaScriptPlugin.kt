@@ -17,7 +17,6 @@
 package com.duckduckgo.js.messaging.api
 
 import android.webkit.WebView
-import com.duckduckgo.feature.toggles.api.Toggle
 
 /**
  * Plugin interface for injecting JavaScript code that executes at document start.
@@ -27,7 +26,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 interface AddDocumentStartJavaScriptPlugin {
 
     fun addDocumentStartJavaScript(
-        activeExperiments: List<Toggle>,
         webView: WebView,
     )
 }

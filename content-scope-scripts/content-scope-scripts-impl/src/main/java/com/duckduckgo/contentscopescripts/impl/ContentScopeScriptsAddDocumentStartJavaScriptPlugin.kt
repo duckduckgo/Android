@@ -23,8 +23,8 @@ import com.duckduckgo.app.browser.api.WebViewCapabilityChecker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
@@ -38,6 +38,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val webViewCapabilityChecker: WebViewCapabilityChecker,
     private val webViewCompatWrapper: WebViewCompatWrapper,
+    private val contentScopeExperiments: ContentScopeExperiments,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : AddDocumentStartJavaScriptPlugin {
     private var script: ScriptHandler? = null
@@ -45,7 +46,6 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
 
     @SuppressLint("RequiresFeature")
     override fun addDocumentStartJavaScript(
-        activeExperiments: List<Toggle>,
         webView: WebView,
     ) {
         appCoroutineScope.launch {
@@ -56,6 +56,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
                 return@launch
             }
 
+            val activeExperiments = contentScopeExperiments.getActiveExperiments()
             val scriptString = webViewCompatContentScopeScripts.getScript(activeExperiments)
             if (scriptString == currentScriptString) {
                 return@launch
