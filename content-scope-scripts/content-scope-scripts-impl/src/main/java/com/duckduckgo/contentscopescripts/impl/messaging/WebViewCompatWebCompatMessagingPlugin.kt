@@ -83,12 +83,11 @@ class WebViewCompatWebCompatMessagingPlugin @Inject constructor(
     }
 
     override fun register(
-        jsMessageCallback: JsMessageCallback?,
+        jsMessageCallback: JsMessageCallback,
         webView: WebView,
     ) {
         coroutineScope.launch {
             if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
-            if (jsMessageCallback == null) throw Exception("Callback cannot be null")
 
             runCatching {
                 return@runCatching webViewCompatWrapper.addWebMessageListener(
