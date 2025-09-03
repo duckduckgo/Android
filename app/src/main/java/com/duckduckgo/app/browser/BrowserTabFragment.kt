@@ -3466,8 +3466,11 @@ class BrowserTabFragment :
         view: View,
         menuInfo: ContextMenu.ContextMenuInfo?,
     ) {
-        webView?.safeHitTestResult?.let {
-            val target = getLongPressTarget(it) ?: return
+        webView?.safeHitTestResult?.let { safeHitTestResult ->
+            val handler = Handler(Looper.myLooper() ?: Looper.getMainLooper())
+            val nodeHref = handler.obtainMessage()
+            webView?.requestFocusNodeHref(nodeHref)
+            val target = getLongPressTarget(safeHitTestResult, nodeHref) ?: return
             viewModel.userLongPressedInWebView(target, menu)
         }
     }
@@ -3484,7 +3487,8 @@ class BrowserTabFragment :
         return message.data.getString(URL_BUNDLE_KEY)
     }
 
-    private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? {
+    private fun getLongPressTarget(hitTestResult: HitTestResult, nodeHref: Message): LongPressTarget? {
+        val nodeText = nodeHref.data.getString("title")
         return when {
             hitTestResult.extra == null -> null
             hitTestResult.type == UNKNOWN_TYPE -> null
@@ -3492,17 +3496,20 @@ class BrowserTabFragment :
                 url = hitTestResult.extra,
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type,
+                text = nodeText,
             )
 
             hitTestResult.type == SRC_IMAGE_ANCHOR_TYPE -> LongPressTarget(
                 url = getTargetUrlForImageSource(),
                 imageUrl = hitTestResult.extra,
                 type = hitTestResult.type,
+                text = nodeText,
             )
 
             else -> LongPressTarget(
                 url = hitTestResult.extra,
                 type = hitTestResult.type,
+                text = nodeText,
             )
         }
     }
@@ -3510,8 +3517,10 @@ class BrowserTabFragment :
     override fun onContextItemSelected(item: MenuItem): Boolean {
         if (this.isResumed) {
             runCatching {
-                webView?.safeHitTestResult?.let {
-                    val target = getLongPressTarget(it)
+                webView?.safeHitTestResult?.let { safeHitTestResult ->
+                    val nodeHref = Message()
+                    webView?.requestFocusNodeHref(nodeHref)
+                    val target = getLongPressTarget(safeHitTestResult, nodeHref)
                     if (target != null && viewModel.userSelectedItemFromLongPressMenu(target, item)) {
                         return true
                     }

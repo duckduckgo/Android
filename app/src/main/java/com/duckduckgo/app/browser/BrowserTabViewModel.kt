@@ -2576,7 +2576,7 @@ class BrowserTabViewModel @Inject constructor(
         target: LongPressTarget,
         menu: ContextMenu,
     ) {
-        logcat(INFO) { "Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})" }
+        logcat(INFO) { "Long pressed on $target" }
         longPressHandler.handleLongPress(target.type, target.url, menu)
     }
 
