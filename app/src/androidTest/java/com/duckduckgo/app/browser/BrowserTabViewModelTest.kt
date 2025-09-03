@@ -6033,6 +6033,9 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenUserSelectedAutocompleteDuckAiPromptThenCommandSent() = runTest {
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+
         val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
 
         testee.userSelectedAutocomplete(duckPrompt)
