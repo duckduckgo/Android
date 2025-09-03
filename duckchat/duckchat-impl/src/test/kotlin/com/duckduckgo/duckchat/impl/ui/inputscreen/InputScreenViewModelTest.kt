@@ -12,6 +12,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -58,6 +59,7 @@ class InputScreenViewModelTest {
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val pixel: Pixel = mock()
     private val inputScreenSessionStore: InputScreenSessionStore = mock()
+    private val duckChat: DuckChat = mock()
 
     @Before
     fun setup() {
@@ -78,6 +80,7 @@ class InputScreenViewModelTest {
             autoCompleteSettings = autoCompleteSettings,
             pixel = pixel,
             sessionStore = inputScreenSessionStore,
+            duckChat = duckChat,
         )
     }
 
