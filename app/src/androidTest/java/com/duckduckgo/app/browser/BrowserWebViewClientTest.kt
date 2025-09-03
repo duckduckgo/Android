@@ -1295,7 +1295,6 @@ class BrowserWebViewClientTest {
             private set
 
         override fun addDocumentStartJavaScript(
-            activeExperiments: List<Toggle>,
             webView: WebView,
         ) {
             countInitted++

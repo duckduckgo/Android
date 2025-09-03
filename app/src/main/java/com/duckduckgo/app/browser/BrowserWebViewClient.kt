@@ -466,11 +466,8 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     fun configureWebView(webView: DuckDuckGoWebView) {
-        appCoroutineScope.launch {
-            val activeExperiments = contentScopeExperiments.getActiveExperiments()
-            addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
-                plugin.addDocumentStartJavaScript(activeExperiments, webView)
-            }
+        addDocumentStartJavascriptPlugins.getPlugins().forEach { plugin ->
+            plugin.addDocumentStartJavaScript(webView)
         }
     }
 
@@ -487,16 +484,10 @@ class BrowserWebViewClient @Inject constructor(
                     webViewClientListener?.getSite(),
                 )
             }
-            appCoroutineScope.launch {
-                (webView as? DuckDuckGoWebView)?.let { duckDuckGoWebView ->
-                    val activeExperiments = webViewClientListener?.getSite()?.activeContentScopeExperiments ?: listOf()
-                    addDocumentStartJavascriptPlugins.getPlugins().forEach {
-                        it.addDocumentStartJavaScript(
-                            activeExperiments,
-                            webView,
-                        )
-                    }
-                }
+            addDocumentStartJavascriptPlugins.getPlugins().forEach {
+                it.addDocumentStartJavaScript(
+                    webView,
+                )
             }
 
             url?.let {
