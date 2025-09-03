@@ -443,8 +443,6 @@ class BrowserTabViewModelTest {
 
     private val mockDuckPlayer: DuckPlayer = mock()
 
-    private val mockDuckChat: DuckChat = mock()
-
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
@@ -553,6 +551,7 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -614,6 +613,7 @@ class BrowserTabViewModelTest {
             mockTabRepository,
             mockUserStageStore,
             mockAutocompleteTabsFeature,
+            mockDuckChat,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
