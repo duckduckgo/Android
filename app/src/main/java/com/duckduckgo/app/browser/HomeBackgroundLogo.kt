@@ -26,7 +26,6 @@ import logcat.logcat
 
 class HomeBackgroundLogo(
     private val ddgLogoView: View,
-    private val container: View,
 ) {
 
     private var readyToShowLogo = false
@@ -53,7 +52,6 @@ class HomeBackgroundLogo(
     private fun fadeLogoIn() {
         logcat(VERBOSE) { "showLogo" }
         // To avoid glitches when calling show/hide logo within a small amount of time we keep this 50ms animation
-        container.show()
         ddgLogoView.animate().apply {
             duration = FADE_IN_DURATION
             interpolator = AccelerateInterpolator()
@@ -65,7 +63,6 @@ class HomeBackgroundLogo(
     private fun fadeLogoOut() {
         logcat(VERBOSE) { "hideLogo" }
         ddgLogoView.gone()
-        container.gone()
     }
 
     private fun updateLogoConstraint(omnibarPosition: OmnibarPosition) {
