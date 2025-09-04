@@ -23,6 +23,7 @@ import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback
@@ -126,7 +127,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         binding.actionSend.setOnClickListener {
             binding.inputModeWidget.submitMessage()
         }
-        binding.inputModeWidget.inputField.post {
+        binding.inputModeWidget.inputField.postDelayed(300) {
             showKeyboard(binding.inputModeWidget.inputField)
         }
         binding.actionNewLine.setOnClickListener {

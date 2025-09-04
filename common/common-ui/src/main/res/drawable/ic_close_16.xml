@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
   ~ limitations under the License.
   -->
 
-<ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="?attr/daxColorRipple">
-    <item>
-        <shape android:shape="rectangle">
-            <stroke
-                android:width="1dp"
-                android:color="?attr/daxColorPreonboardingOptionBackgroundStroke" />
-            <corners android:radius="@dimen/mediumShapeCornerRadius" />
-        </shape>
-    </item>
-</ripple>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="16dp"
+    android:height="16dp"
+    android:viewportWidth="16"
+    android:viewportHeight="16">
+  <path
+      android:pathData="M13.817,3.067a0.625,0.625 0,1 0,-0.884 -0.884L8,7.116 3.067,2.183a0.625,0.625 0,1 0,-0.884 0.884L7.116,8l-4.933,4.933a0.625,0.625 0,1 0,0.884 0.884L8,8.884l4.933,4.933a0.625,0.625 0,1 0,0.884 -0.884L8.884,8l4.933,-4.933Z"
+      android:fillColor="?attr/daxColorPrimaryIcon" />
+</vector>
