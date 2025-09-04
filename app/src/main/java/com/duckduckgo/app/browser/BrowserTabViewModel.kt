@@ -193,6 +193,7 @@ import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
+import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -479,6 +480,7 @@ class BrowserTabViewModel @Inject constructor(
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val onboardingDesignExperimentManager: OnboardingDesignExperimentManager,
     private val serpEasterEggLogosToggles: SerpEasterEggLogosToggles,
+    private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -3051,7 +3053,9 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun nonHttpAppLinkClicked(appLink: NonHttpAppLink) {
-        command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+        if (nonHttpAppLinkChecker.isPermitted(appLink.intent)) {
+            command.value = HandleNonHttpAppLink(appLink, getUrlHeaders(appLink.fallbackUrl))
+        }
     }
 
     fun onPrintSelected() {

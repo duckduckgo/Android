@@ -118,6 +118,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -584,6 +585,8 @@ class BrowserTabViewModelTest {
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
     private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
 
+    private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
+
     private val EXAMPLE_URL = "http://example.com"
     private val SHORT_EXAMPLE_URL = "example.com"
 
@@ -652,7 +655,7 @@ class BrowserTabViewModelTest {
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
         whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
-
+        whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
         ctaViewModel = CtaViewModel(
@@ -798,6 +801,7 @@ class BrowserTabViewModelTest {
             addressDisplayFormatter = mockAddressDisplayFormatter,
             autoCompleteSettings = mockAutoCompleteSettings,
             serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
+            nonHttpAppLinkChecker = nonHttpAppLinkChecker,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3765,6 +3769,14 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), EXAMPLE_URL)
         assertTrue(testee.handleNonHttpAppLink(urlType))
         assertCommandIssued<Command.HandleNonHttpAppLink>()
+    }
+
+    @Test
+    fun whenHandleNonHttpAppLinkCalledWithUnpermittedIntentThenDoNotHandleNonHttpAppLink() {
+        whenever(nonHttpAppLinkChecker.isPermitted(any())).thenReturn(false)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), EXAMPLE_URL)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandNotIssued<Command.HandleNonHttpAppLink>()
     }
 
     @Test
