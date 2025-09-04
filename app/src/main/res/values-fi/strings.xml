@@ -188,7 +188,29 @@
     <string name="webTrackingProtectionActivityTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionLearnMoreTitle">Verkkoseurannan suojaus</string>
     <string name="webTrackingProtectionTitle">Verkkoseurannan suojaus</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo estää automaattisesti piilotetut jäljittäjät, kun selaat verkkoa.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-selain tarjoaa aina käytössä olevan seurantasuojauksen.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo-selain tarjoaa seurantasuojausta, joka auttaa pitämään tietosi turvassa selaillessasi.\n<a href=\"\">Lue lisää</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Näin suojaamme sinua</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Estää kolmannen osapuolen seuraimet</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Auttaa estämään kolmannen osapuolen evästeitä, jotka seuraavat sinua sivustolta toiselle, estämällä kolmannen osapuolen seurantatoimintoja latautumasta.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Estää kohdennetut mainokset</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Estää tunkeilevat seurantatoiminnot ennen niiden latautumista, mikä eliminoi tehokkaasti seurantaa käyttävät mainokset.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Estää sormenjälkien seurannan</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Auttaa estämään seurantayrityksiä hankkimasta selaimestasi ja laitteestasi yksilöllisiä tunnisteita, joiden avulla ne seuraavat sinua verkossa.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Estää linkkien seurannan</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Poistaa seurantaparametrit linkeistä estääkseen kolmansia osapuolia seuraamasta toimintaasi eri sivustoilla.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Suojaa viittausseurannalta</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Auttaa estämään yrityksiä tunnistamasta verkkosivustoa, jossa viimeksi vierailit.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Vanhentaa ensimmäisen osapuolen evästeet</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Vanhentaa automaattisesti ensimmäisen osapuolen evästeet 30 päivän kuluttua, jotta sivustot eivät voi seurata sinua loputtomiin, kun olet kirjautunut ulos.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Suojaa DNS CNAME -naamioitumiselta</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Auttaa estämään kolmannen osapuolen seurantalaitteet, jotka yrittävät naamioida itsensä verkkosivustolla DNS:n avulla.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Estää Googlen AMP-seurannan</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Korvaa Googlen AMP-linkit alkuperäisen julkaisijan sivuston linkeillä.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Estää Googlen kirjautumisponnahdusikkunat</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Estää Googlen kirjautumisponnahdusikkunat sivustoissa, joita Google ei omista.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Ilmaisee kieltäytymisoikeudet puolestasi kertomalla sivustoille, etteivät ne saa myydä tai jakaa henkilötietojasi.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Evästeiden ponnahdusikkuna -suojaus</string>

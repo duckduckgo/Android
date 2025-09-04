@@ -189,7 +189,29 @@
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionLearnMoreTitle">Protecție împotriva urmăririi pe web</string>
     <string name="webTrackingProtectionTitle">Protecție împotriva urmăririi pe web</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blochează automat tehnologiile de urmărire ascunse în timp ce navighezi pe web.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[Browserul DuckDuckGo oferă instrumente de protecție împotriva urmăririi, care sunt mereu active.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[Browserul DuckDuckGo oferă protecții împotriva urmăririi care te ajută să-ți păstrezi datele în siguranță în timp ce navighezi.\n<a href=\"\">Află mai multe</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Cum te protejăm</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blochează tehnologiile de urmărire terță parte</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Ajută la blocarea modulelor cookie terțe care te urmăresc de la un site la altul, împiedicând încărcarea instrumentelor de urmărire terțe de la bun început.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blochează reclamele direcționate</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blochează tehnologiile de urmărire invazive înainte de a se încărca, eliminând eficient reclamele care se bazează pe urmărire.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Împiedică urmărirea amprentelor digitale</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Ajută la împiedicarea companiilor de urmărire să obțină identificatori unici despre browserul și dispozitivul tău, pe care să îl folosească pentru a te urmări pe web.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blochează urmărirea linkurilor</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Elimină parametrii de urmărire din linkuri pentru a împiedica terții să-ți urmărească comportamentul pe site-uri.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Protejează împotriva urmăririi numelui de gazdă de referință</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Ajută la blocarea identificării de către companii a ultimului site pe care l-ai vizitat.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Expiră modulele cookie originale</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Expiră automat modulele cookie originale după 30 de zile, asigurând faptul că site-urile nu te pot urmări la nesfârșit atunci când ești deconectat.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Protejează împotriva disimulării DNS CNAME</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Ajută la blocarea tehnologiilor de urmărire externe care încearcă să se deghizeze pe un site web folosind DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blochează urmărirea AMP de la Google</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Înlocuiește linkurile Google AMP cu site-ul editorului original.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blochează ferestrele pop-up de conectare la Google</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blochează ferestrele pop-up de conectare Google pe site-urile pe care nu le deține Google.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Controlul global al confidențialității</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Exprimă drepturile de retragere în numele tău, comunicând site-urilor să nu vândă sau să nu partajeze informațiile tale personale.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Protecție pentru ferestre pop-up aferente modulelor cookie</string>

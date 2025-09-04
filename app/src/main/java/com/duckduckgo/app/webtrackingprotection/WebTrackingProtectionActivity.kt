@@ -88,7 +88,7 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
 
     private fun configureClickableLink() {
         val htmlGPCText = getString(
-            R.string.webTrackingProtectionDescriptionNew,
+            R.string.webTrackingProtectionExplanationDescription,
         ).html(this)
         val gpcSpannableString = SpannableStringBuilder(htmlGPCText)
         val urlSpans = htmlGPCText.getSpans(0, htmlGPCText.length, URLSpan::class.java)

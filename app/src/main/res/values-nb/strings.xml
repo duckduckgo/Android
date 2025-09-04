@@ -188,7 +188,29 @@
     <string name="webTrackingProtectionActivityTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionLearnMoreTitle">Beskyttelse mot nettsporing</string>
     <string name="webTrackingProtectionTitle">Beskyttelse mot nettsporing</string>
-    <string name="webTrackingProtectionDescriptionNew"><![CDATA[DuckDuckGo blokkerer automatisk skjulte sporere når du surfer på nettet.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="webTrackingProtectionExplanationDescription"><![CDATA[DuckDuckGo-nettleseren gir deg sporingsbeskyttelser, som alltid er aktive.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="webTrackingProtectionExplanationAlternativeDescription"><![CDATA[DuckDuckGo-nettleseren har sporingsbeskyttelser som holder dataene dine trygge mens du surfer.\n<a href=\"\">Finn ut mer</a>]]></string>
+    <string name="webTrackingProtectionExplanationTitle">Slik beskytter vi deg</string>
+    <string name="webTrackingProtectionThirdPartyTrackersTitle">Blokkerer tredjepartssporere</string>
+    <string name="webTrackingProtectionThirdPartyTrackersDescription">Bidrar til å blokkere tredjeparts informasjonskapsler som sporer deg fra nettsted til nettsted ved å forhindre at tredjepartssporere lastes i det hele tatt.</string>
+    <string name="webTrackingProtectionTargetedAdsTitle">Blokkerer målrettede annonser</string>
+    <string name="webTrackingProtectionTargetedAdsDescription">Blokkerer invaderende sporere før de blir lastet inn, og dette eliminerer også annonser som er basert på sporing.</string>
+    <string name="webTrackingProtectionFingerprintTrackingTitle">Forhindrer sporing av fingeravtrykk</string>
+    <string name="webTrackingProtectionFingerprintTrackingDescription">Bidrar til å hindre at selskaper henter inn unike identifikatorer om nettleseren og enheten din, som de bruker til å følge deg rundt på nettet med.</string>
+    <string name="webTrackingProtectionLinkTrackingTitle">Blokkerer sporing av koblinger</string>
+    <string name="webTrackingProtectionLinkTrackingDescription">Fjerner sporingsparametere i lenker for å forhindre at tredjeparter sporer atferden din fra nettsted til nettsted.</string>
+    <string name="webTrackingProtectionReferrerTrackingTitle">Beskytter mot sporing av henvisninger</string>
+    <string name="webTrackingProtectionReferrerTrackingDescription">Hjelper med å blokkere selskaper fra å identifisere det siste nettstedet du besøkte.</string>
+    <string name="webTrackingProtectionFirstPartyCookiesTitle">Avslutter førsteparts informasjonskapsler</string>
+    <string name="webTrackingProtectionFirstPartyCookiesDescription">Gjør at førsteparts informasjonskapsler utløper automatisk etter 30 dager, slik at nettsteder ikke kan spore deg på ubestemt tid når du er logget ut.</string>
+    <string name="webTrackingProtectionDnsCnameCloakingTitle">Beskytter mot DNS CNAME-maskering</string>
+    <string name="webTrackingProtectionDnsCnameCloakingDescription">Hjelper med å blokkere tredjepartssporere som prøver å skjule seg på et nettsted ved hjelp av DNS.</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingTitle">Blokkerer Googles AMP-sporing</string>
+    <string name="webTrackingProtectionGoogleAmpTrackingDescription">Erstatter Googles AMP-lenker med den opprinnelige utgiverens nettsted.</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsTitle">Blokkerer Googles popup-vinduer for pålogging</string>
+    <string name="webTrackingProtectionGoogleSigninPopupsDescription">Blokkerer popup-vinduer for Google-pålogging på nettsteder Google ikke eier.</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlTitle">Global Privacy Control (GPC)</string>
+    <string name="webTrackingProtectionGlobalPrivacyControlDescription">Uttrykker på dine vegne retten til å reservere seg, ved å be nettsteder om ikke å selge eller dele personopplysningene dine.</string>
 
     <!-- Cookie Pop-Up Protection -->
     <string name="cookiePopupProtectionTitle">Beskyttelse mot popup-vinduer om informasjonskapsler</string>

@@ -72,7 +72,7 @@
                 android:layout_marginTop="@dimen/keyline_2"
                 android:layout_marginBottom="@dimen/keyline_6"
                 android:gravity="center"
-                android:text="@string/webTrackingProtectionDescriptionNew"
+                android:text="@string/webTrackingProtectionExplanationDescription"
                 app:textType="secondary"
                 app:typography="body2" />
 
