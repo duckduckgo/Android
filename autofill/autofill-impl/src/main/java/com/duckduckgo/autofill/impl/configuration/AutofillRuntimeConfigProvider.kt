@@ -20,6 +20,7 @@ import com.duckduckgo.autofill.api.AutofillCapabilityChecker
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.impl.email.incontext.availability.EmailProtectionInContextAvailabilityRules
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
 import javax.inject.Inject
@@ -30,6 +31,7 @@ interface AutofillRuntimeConfigProvider {
     suspend fun getRuntimeConfiguration(
         rawJs: String,
         url: String?,
+        reAuthenticationDetails: ReAuthenticationDetails,
     ): String
 }
 
@@ -46,6 +48,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
     override suspend fun getRuntimeConfiguration(
         rawJs: String,
         url: String?,
+        reAuthenticationDetails: ReAuthenticationDetails,
     ): String {
         logcat(VERBOSE) { "BrowserAutofill: getRuntimeConfiguration called" }
 
@@ -63,7 +66,7 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         ).also {
             logcat(VERBOSE) { "autofill-config: userPreferences for $url: \n$it" }
         }
-        val availableInputTypes = generateAvailableInputTypes(url)
+        val availableInputTypes = generateAvailableInputTypes(url, reAuthenticationDetails)
 
         return StringBuilder(rawJs).apply {
             replacePlaceholder(this, TAG_INJECT_CONTENT_SCOPE, contentScope)
@@ -80,8 +83,8 @@ class RealAutofillRuntimeConfigProvider @Inject constructor(
         }
     }
 
-    private suspend fun generateAvailableInputTypes(url: String?): String {
-        val inputTypes = autofillAvailableInputTypesProvider.getTypes(url)
+    private suspend fun generateAvailableInputTypes(url: String?, reAuthenticationDetails: ReAuthenticationDetails): String {
+        val inputTypes = autofillAvailableInputTypesProvider.getTypes(url, reAuthenticationDetails)
 
         val json = runtimeConfigurationWriter.generateResponseGetAvailableInputTypes(inputTypes).also {
             logcat(VERBOSE) { "autofill-config: availableInputTypes for $url: \n$it" }
