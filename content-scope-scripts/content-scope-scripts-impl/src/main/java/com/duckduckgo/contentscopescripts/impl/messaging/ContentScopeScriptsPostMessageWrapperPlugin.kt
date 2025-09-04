@@ -23,14 +23,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
-import com.squareup.anvil.annotations.ContributesBinding
+import com.squareup.anvil.annotations.ContributesMultibinding
+import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@ContributesBinding(AppScope::class)
-class ContentScopeScriptsPostMessageWrapperPlugin(
-    @Named("contentScopeScrips") private val webMessagingPlugin: WebMessagingPlugin,
+@ContributesMultibinding(AppScope::class)
+class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
+    @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,
     private val contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
