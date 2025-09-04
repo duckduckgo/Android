@@ -85,8 +85,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailab
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
-import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
@@ -351,7 +351,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenConfigureWebViewThenInjectJsCode() {
         assertEquals(0, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
-        val mockCallback = mock<JsMessageCallback>()
+        val mockCallback = mock<WebViewCompatMessageCallback>()
         testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
         assertEquals(1, fakeAddDocumentStartJavaScriptPlugins.plugin.countInitted)
     }
@@ -360,7 +360,7 @@ class BrowserWebViewClientTest {
     @Test
     fun whenConfigureWebViewThenAddWebMessageListener() {
         assertFalse(fakeMessagingPlugins.plugin.registered)
-        val mockCallback = mock<JsMessageCallback>()
+        val mockCallback = mock<WebViewCompatMessageCallback>()
         testee.configureWebView(DuckDuckGoWebView(context), mockCallback)
         assertTrue(fakeMessagingPlugins.plugin.registered)
     }
@@ -368,7 +368,7 @@ class BrowserWebViewClientTest {
     @UiThreadTest
     @Test
     fun whenDestroyThenRemoveWebMessageListener() = runTest {
-        val mockCallback = mock<JsMessageCallback>()
+        val mockCallback = mock<WebViewCompatMessageCallback>()
         val webView = DuckDuckGoWebView(context)
         testee.configureWebView(webView, mockCallback)
         assertTrue(fakeMessagingPlugins.plugin.registered)
@@ -1342,7 +1342,7 @@ class BrowserWebViewClientTest {
         }
 
         override fun register(
-            jsMessageCallback: JsMessageCallback,
+            jsMessageCallback: WebViewCompatMessageCallback,
             webView: WebView,
         ) {
             registered = true

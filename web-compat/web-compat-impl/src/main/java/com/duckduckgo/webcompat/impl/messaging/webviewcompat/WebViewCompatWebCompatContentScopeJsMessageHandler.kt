@@ -14,32 +14,29 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.contentscopescripts.impl.messaging
+package com.duckduckgo.webcompat.impl.messaging.webviewcompat
 
+import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult
-import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import com.squareup.anvil.annotations.ContributesMultibinding
 import javax.inject.Inject
-import logcat.logcat
 
 @ContributesMultibinding(AppScope::class)
-class DebugFlagGlobalHandler @Inject constructor() : GlobalContentScopeJsMessageHandlersPlugin {
+class WebViewCompatWebCompatContentScopeJsMessageHandler @Inject constructor() : WebViewCompatContentScopeJsMessageHandlersPlugin {
 
-    override fun getGlobalJsMessageHandler(): GlobalJsMessageHandler = object :
-        GlobalJsMessageHandler {
+    override fun getJsMessageHandler(): WebViewCompatMessageHandler = object : WebViewCompatMessageHandler {
 
         override fun process(
             jsMessage: JsMessage,
         ): ProcessResult? {
-            if (jsMessage.method == method) {
-                logcat { "DebugFlagGlobalHandler addDebugFlag: ${jsMessage.featureName}" }
-                return SendToConsumer
-            }
-            return null
+            if (jsMessage.id == null) return null
+            return ProcessResult.SendToConsumer
         }
 
-        override val method: String = "addDebugFlag"
+        override val featureName: String = "webCompat"
+        override val methods: List<String> = listOf("webShare", "permissionsQuery", "screenLock", "screenUnlock")
     }
 }

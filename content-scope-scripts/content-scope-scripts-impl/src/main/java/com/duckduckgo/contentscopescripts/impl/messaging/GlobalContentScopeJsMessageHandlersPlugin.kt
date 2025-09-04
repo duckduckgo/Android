@@ -17,7 +17,7 @@
 package com.duckduckgo.contentscopescripts.impl.messaging
 
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.ProcessResult
 
 /**
  * Plugin interface for global message handlers that should always be processed
@@ -44,12 +44,10 @@ interface GlobalJsMessageHandler {
      * invoking a callback so consumers can also process the message if needed.
      *
      * @param jsMessage The JavaScript message to be processed.
-     * @param jsMessageCallback An optional callback to handle the result of the message processing.
      */
     fun process(
         jsMessage: JsMessage,
-        jsMessageCallback: JsMessageCallback,
-    )
+    ): ProcessResult?
 
     /**
      * Method this handler can process.

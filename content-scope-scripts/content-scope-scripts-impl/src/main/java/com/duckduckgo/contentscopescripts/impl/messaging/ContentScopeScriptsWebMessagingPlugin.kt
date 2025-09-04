@@ -16,17 +16,23 @@
 
 package com.duckduckgo.contentscopescripts.impl.messaging
 
+import android.annotation.SuppressLint
 import android.webkit.WebView
 import androidx.annotation.VisibleForTesting
+import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
-import com.duckduckgo.js.messaging.api.JsMessageCallback
+import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
+import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
+import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
@@ -35,6 +41,7 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import org.json.JSONObject
 
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
@@ -44,7 +51,8 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val webViewCompatWrapper: WebViewCompatWrapper,
-    @AppCoroutineScope private val coroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : WebMessagingPlugin {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -55,7 +63,8 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun process(
         message: String,
-        jsMessageCallback: JsMessageCallback,
+        jsMessageCallback: WebViewCompatMessageCallback,
+        replyProxy: JavaScriptReplyProxy,
     ) {
         try {
             val adapter = moshi.adapter(JsMessage::class.java)
@@ -68,13 +77,31 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                         .map { it.getGlobalJsMessageHandler() }
                         .filter { it.method == jsMessage.method }
                         .forEach { handler ->
-                            handler.process(jsMessage, jsMessageCallback)
+                            handler.process(jsMessage)?.let { processResult ->
+                                when (processResult) {
+                                    is SendToConsumer -> {
+                                        sendToConsumer(jsMessageCallback, jsMessage, replyProxy)
+                                    }
+                                    is SendResponse -> {
+                                        onResponse(jsMessage, replyProxy)
+                                    }
+                                }
+                            }
                         }
 
                     // Process with feature handlers
                     handlers.getPlugins().map { it.getJsMessageHandler() }.firstOrNull {
                         it.methods.contains(jsMessage.method) && it.featureName == jsMessage.featureName
-                    }?.process(jsMessage, jsMessageCallback)
+                    }?.process(jsMessage)?.let { processResult ->
+                        when (processResult) {
+                            is SendToConsumer -> {
+                                sendToConsumer(jsMessageCallback, jsMessage, replyProxy)
+                            }
+                            is SendResponse -> {
+                                onResponse(jsMessage, replyProxy)
+                            }
+                        }
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -82,11 +109,46 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         }
     }
 
+    private fun onResponse(
+        jsMessage: JsMessage,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
+        val callbackData = JsCallbackData(
+            id = jsMessage.id ?: "",
+            params = jsMessage.params,
+            featureName = jsMessage.featureName,
+            method = jsMessage.method,
+        )
+        onResponse(callbackData, replyProxy)
+    }
+
+    private fun sendToConsumer(
+        jsMessageCallback: WebViewCompatMessageCallback,
+        jsMessage: JsMessage,
+        replyProxy: JavaScriptReplyProxy,
+    ) {
+        jsMessageCallback.process(
+            jsMessage.featureName,
+            jsMessage.method,
+            jsMessage.id ?: "",
+            jsMessage.params,
+            { response: JSONObject ->
+                val callbackData = JsCallbackData(
+                    id = jsMessage.id ?: "",
+                    params = response,
+                    featureName = jsMessage.featureName,
+                    method = jsMessage.method,
+                )
+                onResponse(callbackData, replyProxy)
+            },
+        )
+    }
+
     override fun register(
-        jsMessageCallback: JsMessageCallback,
+        jsMessageCallback: WebViewCompatMessageCallback,
         webView: WebView,
     ) {
-        coroutineScope.launch {
+        appCoroutineScope.launch {
             if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
 
             runCatching {
@@ -94,10 +156,11 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                     webView,
                     JS_OBJECT_NAME,
                     allowedDomains,
-                ) { _, message, _, _, _ ->
+                ) { _, message, _, _, replyProxy ->
                     process(
                         message.data ?: "",
                         jsMessageCallback,
+                        replyProxy,
                     )
                 }
             }.getOrElse { exception ->
@@ -109,7 +172,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     override fun unregister(
         webView: WebView,
     ) {
-        coroutineScope.launch {
+        appCoroutineScope.launch {
             if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
             runCatching {
                 return@runCatching webViewCompatWrapper.removeWebMessageListener(webView, JS_OBJECT_NAME)
@@ -117,6 +180,21 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
                 logcat(ERROR) {
                     "Error removing WebMessageListener for contentScopeAdsjs: ${exception.asLog()}"
                 }
+            }
+        }
+    }
+
+    @SuppressLint("RequiresFeature")
+    private fun onResponse(response: JsCallbackData, replyProxy: JavaScriptReplyProxy) {
+        runCatching {
+            val responseWithId = JSONObject().apply {
+                put("id", response.id)
+                put("result", response.params)
+                put("featureName", response.featureName)
+                put("context", context)
+            }
+            appCoroutineScope.launch(dispatcherProvider.main()) {
+                replyProxy.postMessage(responseWithId.toString())
             }
         }
     }
