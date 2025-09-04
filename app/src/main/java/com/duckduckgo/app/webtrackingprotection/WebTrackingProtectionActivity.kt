@@ -115,7 +115,8 @@ class WebTrackingProtectionActivity : DuckDuckGoActivity() {
     }
 
     private fun configureGridList() {
-        val layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        val columnCount = resources.getInteger(R.integer.web_tracking_protection_grid_column_count)
+        val layoutManager = StaggeredGridLayoutManager(columnCount, StaggeredGridLayoutManager.VERTICAL)
         binding.protectionsList.layoutManager = layoutManager
         gridAdapter = FeatureGridAdapter()
         binding.protectionsList.adapter = gridAdapter
