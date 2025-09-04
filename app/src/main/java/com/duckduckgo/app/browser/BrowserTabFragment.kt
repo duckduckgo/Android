@@ -3040,23 +3040,6 @@ class BrowserTabFragment :
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
-            lifecycleScope.launch(dispatchers.main()) {
-                webViewClient.configureWebView(
-                    it,
-                    object : WebViewCompatMessageCallback {
-                        override fun process(
-                            featureName: String,
-                            method: String,
-                            id: String?,
-                            data: JSONObject?,
-                            onResponse: (JSONObject) -> Unit,
-                        ) {
-                            viewModel.webViewCompatProcessJsCallbackMessage(featureName, method, id, data, onResponse)
-                        }
-                    },
-                )
-            }
-
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
 
@@ -3141,6 +3124,20 @@ class BrowserTabFragment :
                         viewModel.processJsCallbackMessage(featureName, method, id, data, isActiveCustomTab()) {
                             it.url
                         }
+                    }
+                },
+            )
+            webViewClient.configureWebView(
+                it,
+                object : WebViewCompatMessageCallback {
+                    override fun process(
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                        onResponse: (JSONObject) -> Unit,
+                    ) {
+                        viewModel.webViewCompatProcessJsCallbackMessage(featureName, method, id, data, onResponse)
                     }
                 },
             )
