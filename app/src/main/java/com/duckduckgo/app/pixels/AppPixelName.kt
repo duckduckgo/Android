@@ -240,7 +240,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     AUTOCOMPLETE_RESULT_DELETED_DAILY("m_autocomplete_result_deleted_daily"),
 
     AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION("m_autocomplete_click_duckai_legacy"),
-    AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION("m_autocomplete_click_duckai_experimental"),
 
     SERP_REQUERY("rq_%s"),
 

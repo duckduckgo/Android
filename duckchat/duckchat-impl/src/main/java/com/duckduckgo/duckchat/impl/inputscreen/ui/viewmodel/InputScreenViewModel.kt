@@ -287,6 +287,7 @@ class InputScreenViewModel @AssistedInject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
+            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION, parameters = params)
         }
         duckChat.openDuckChatWithAutoPrompt(prompt)
     }
@@ -369,6 +370,7 @@ class InputScreenViewModel @AssistedInject constructor(
             command.value = Command.SubmitSearch(query)
         } else {
             command.value = Command.SubmitChat(query)
+            duckChat.openDuckChatWithAutoPrompt(query)
         }
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
@@ -377,8 +379,6 @@ class InputScreenViewModel @AssistedInject constructor(
             sessionStore.setHasUsedChatMode(true)
             checkAndFireBothModesPixel()
         }
-
-        duckChat.openDuckChatWithAutoPrompt(query)
     }
 
     fun onUserDismissedAutoCompleteInAppMessage() {
