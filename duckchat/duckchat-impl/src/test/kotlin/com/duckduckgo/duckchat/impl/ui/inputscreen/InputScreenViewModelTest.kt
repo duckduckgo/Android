@@ -17,6 +17,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.usage.InputScreenSessionUsageMetric
 import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
@@ -58,6 +59,7 @@ class InputScreenViewModelTest {
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val pixel: Pixel = mock()
     private val inputScreenSessionStore: InputScreenSessionStore = mock()
+    private val inputScreenSessionUsageMetric: InputScreenSessionUsageMetric = mock()
 
     @Before
     fun setup() {
@@ -78,6 +80,7 @@ class InputScreenViewModelTest {
             autoCompleteSettings = autoCompleteSettings,
             pixel = pixel,
             sessionStore = inputScreenSessionStore,
+            inputScreenSessionUsageMetric = inputScreenSessionUsageMetric,
         )
     }
 
@@ -828,6 +831,18 @@ class InputScreenViewModelTest {
     }
 
     @Test
+    fun `when onSearchSubmitted then inputScreenSessionUsage onSearchSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(inputScreenSessionUsageMetric).onSearchSubmitted()
+    }
+
+    @Test
     fun `when onChatSubmitted then prompt submitted pixels are fired`() = runTest {
         val viewModel = createViewModel()
 
@@ -838,6 +853,18 @@ class InputScreenViewModelTest {
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when onChatSubmitted then inputScreenSessionUsage onPromptSubmitted is called`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(inputScreenSessionUsageMetric).onPromptSubmitted()
     }
 
     @Test
