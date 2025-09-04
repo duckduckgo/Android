@@ -18,20 +18,16 @@ package com.duckduckgo.app.browser
 
 import android.view.View
 import android.view.animation.AccelerateInterpolator
-import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 
-class HomeBackgroundLogo(
-    private val ddgLogoView: View,
-) {
+class HomeBackgroundLogo(private var ddgLogoView: View) {
 
     private var readyToShowLogo = false
 
-    fun showLogo(omnibarPosition: OmnibarPosition) {
-        updateLogoConstraint(omnibarPosition)
+    fun showLogo() {
         this.readyToShowLogo = true
         update()
     }
@@ -63,21 +59,6 @@ class HomeBackgroundLogo(
     private fun fadeLogoOut() {
         logcat(VERBOSE) { "hideLogo" }
         ddgLogoView.gone()
-    }
-
-    private fun updateLogoConstraint(omnibarPosition: OmnibarPosition) {
-        val params = ddgLogoView.layoutParams as? androidx.constraintlayout.widget.ConstraintLayout.LayoutParams ?: return
-        when (omnibarPosition) {
-            OmnibarPosition.TOP -> {
-                params.topToTop = R.id.guidelineTop
-                params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-            }
-            OmnibarPosition.BOTTOM -> {
-                params.topToTop = R.id.guidelineBottom
-                params.topToBottom = androidx.constraintlayout.widget.ConstraintLayout.LayoutParams.UNSET
-            }
-        }
-        ddgLogoView.layoutParams = params
     }
 
     companion object {
