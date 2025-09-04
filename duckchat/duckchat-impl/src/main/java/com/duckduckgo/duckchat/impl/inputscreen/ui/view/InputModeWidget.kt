@@ -36,6 +36,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.widget.doOnTextChanged
@@ -43,6 +44,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 
@@ -111,6 +113,11 @@ class InputModeWidget @JvmOverloads constructor(
         configureTabBehavior()
         applyModeSpecificInputBehaviour(isSearchTab = true)
         configureShadow()
+
+        context.withStyledAttributes(0, intArrayOf(CommonR.attr.daxColorBackground)) {
+            setBackgroundColor(getColor(0, 0))
+        }
+        outlineProvider = null
     }
 
     fun provideInitialText(text: String) {
