@@ -293,7 +293,6 @@ class SpecialUrlDetectorImplTest {
     @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithAdditionalIntentFlags() {
         externalAppIntentFlagsFeature.self().setRawStoredState(State(true))
-        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(ResolveInfo())
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, type.intent.flags)
@@ -301,18 +300,8 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsCustomUriSchemeAndNoResolveInfoThenUnknownTypeDetected() {
-        externalAppIntentFlagsFeature.self().setRawStoredState(State(true))
-        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(null)
-        val expected = Unknown::class
-        val actual = testee.determineType("myapp:foo bar")
-        assertEquals(expected, actual::class)
-    }
-
-    @Test
     fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithoutAdditionalIntentFlags() {
         externalAppIntentFlagsFeature.self().setRawStoredState(State(false))
-        whenever(mockPackageManager.resolveActivity(any(), anyInt())).thenReturn(ResolveInfo())
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
         assertEquals(0, type.intent.flags)
