@@ -3676,6 +3676,33 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun webViewCompatProcessJsCallbackMessage(
+        context: String,
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        processGlobalMessages(
+            featureName = featureName,
+            method = method,
+            id = id,
+            data = data,
+            onResponse = onResponse,
+        )
+
+        when (context) {
+            "contentScopeScripts" -> processContentScopeMessages(
+                featureName = featureName,
+                method = method,
+                id = id,
+                data = data,
+                onResponse = onResponse,
+            )
+        }
+    }
+
+    private fun processGlobalMessages(
         featureName: String,
         method: String,
         id: String?,
@@ -3683,11 +3710,30 @@ class BrowserTabViewModel @Inject constructor(
         onResponse: (JSONObject) -> Unit,
     ) {
         when (method) {
-            "webShare" -> if (id != null && data != null) {
-                webViewCompatWebShare(featureName, method, id, data, onResponse)
-            }
             "addDebugFlag" -> {
-                site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
+                site?.debugFlags =
+                    (site?.debugFlags ?: listOf())
+                        .toMutableList()
+                        .plus(featureName)
+                        .distinct()
+            }
+        }
+    }
+
+    private fun processContentScopeMessages(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        when (featureName) {
+            "webCompat" -> {
+                when (method) {
+                    "webShare" -> if (id != null && data != null) {
+                        webViewCompatWebShare(featureName, method, id, data, onResponse)
+                    }
+                }
             }
             "breakageReportResult" -> if (data != null) {
                 breakageReportResult(data)

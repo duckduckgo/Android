@@ -3131,13 +3131,21 @@ class BrowserTabFragment :
                 it,
                 object : WebViewCompatMessageCallback {
                     override fun process(
+                        context: String,
                         featureName: String,
                         method: String,
                         id: String?,
                         data: JSONObject?,
                         onResponse: (JSONObject) -> Unit,
                     ) {
-                        viewModel.webViewCompatProcessJsCallbackMessage(featureName, method, id, data, onResponse)
+                        viewModel.webViewCompatProcessJsCallbackMessage(
+                            context = context,
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                            data = data,
+                            onResponse = onResponse,
+                        )
                     }
                 },
             )

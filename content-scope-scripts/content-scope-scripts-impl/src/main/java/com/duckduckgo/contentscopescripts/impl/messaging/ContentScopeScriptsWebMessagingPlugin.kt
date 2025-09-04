@@ -140,11 +140,12 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         replyProxy: JavaScriptReplyProxy,
     ) {
         jsMessageCallback.process(
-            jsMessage.featureName,
-            jsMessage.method,
-            jsMessage.id ?: "",
-            jsMessage.params,
-            { response: JSONObject ->
+            context = context,
+            featureName = jsMessage.featureName,
+            method = jsMessage.method,
+            id = jsMessage.id ?: "",
+            data = jsMessage.params,
+            onResponse = { response: JSONObject ->
                 val callbackData = JsCallbackData(
                     id = jsMessage.id ?: "",
                     params = response,

@@ -269,6 +269,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
     private val callback = object : WebViewCompatMessageCallback {
         var counter = 0
         override fun process(
+            context: String,
             featureName: String,
             method: String,
             id: String?,
