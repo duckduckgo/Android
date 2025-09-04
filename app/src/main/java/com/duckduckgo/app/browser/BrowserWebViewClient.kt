@@ -80,6 +80,7 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.On
 import com.duckduckgo.duckplayer.impl.DUCK_PLAYER_OPEN_IN_YOUTUBE_PATH
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
@@ -132,6 +133,7 @@ class BrowserWebViewClient @Inject constructor(
     private val contentScopeExperiments: ContentScopeExperiments,
     private val addDocumentStartJavascriptPlugins: PluginPoint<AddDocumentStartJavaScriptPlugin>,
     private val webMessagingPlugins: PluginPoint<WebMessagingPlugin>,
+    private val postMessageWrapperPlugins: PluginPoint<PostMessageWrapperPlugin>,
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -765,12 +767,12 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    fun postMessage(
+    fun postContentScopeMessage(
         eventData: SubscriptionEventData,
     ) {
-        webMessagingPlugins.getPlugins().forEach {
-            it.postMessage(eventData)
-        }
+        postMessageWrapperPlugins.getPlugins()
+            .firstOrNull { it.context == "contentScopeScripts" }
+            ?.postMessage(eventData)
     }
 }
 

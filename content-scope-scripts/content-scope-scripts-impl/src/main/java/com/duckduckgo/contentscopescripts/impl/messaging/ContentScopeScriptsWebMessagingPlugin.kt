@@ -35,9 +35,11 @@ import com.duckduckgo.js.messaging.api.SubscriptionEvent
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -48,6 +50,8 @@ import org.json.JSONObject
 
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
+@Named("contentScopeScripts")
+@ContributesBinding(ActivityScope::class)
 @ContributesMultibinding(ActivityScope::class)
 class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
@@ -61,7 +65,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private val context: String = "contentScopeScripts"
+    override val context: String = "contentScopeScripts"
     private val allowedDomains: Set<String> = setOf("*")
 
     private var globalReplyProxy: JavaScriptReplyProxy? = null
@@ -79,8 +83,7 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
             jsMessage?.let {
                 if (context == jsMessage.context) {
                     // Setup reply proxy so we can send subscription events
-                    if (jsMessage.featureName == "messaging" || jsMessage.method == "initialPing") {
-                        logcat("Cris") { "initialPing" }
+                    if (jsMessage.featureName == "messaging" && jsMessage.method == "initialPing") {
                         globalReplyProxy = replyProxy
                     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.js.messaging.api
+package com.duckduckgo.contentscopescripts.impl
 
-import android.webkit.WebView
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 
-interface WebMessagingPlugin {
-    fun register(
-        jsMessageCallback: WebViewCompatMessageCallback,
-        webView: WebView,
-    )
-
-    fun unregister(
-        webView: WebView,
-    )
-
-    fun postMessage(subscriptionEventData: SubscriptionEventData)
-
-    val context: String
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = PostMessageWrapperPlugin::class,
+)
+@Suppress("unused")
+interface UnusedPostMessageWrapperPluginPoint
