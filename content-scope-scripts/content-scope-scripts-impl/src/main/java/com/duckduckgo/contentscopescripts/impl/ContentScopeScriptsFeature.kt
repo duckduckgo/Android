@@ -30,6 +30,6 @@ interface ContentScopeScriptsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun useNewWebCompatApis(): Toggle
 }
