@@ -169,6 +169,7 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
             } else {
                 it.showChatLogo
             }
+            binding.actionNewLine.isVisible = it.newLineButtonVisible
         }.launchIn(lifecycleScope)
     }
 

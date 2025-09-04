@@ -17,6 +17,7 @@
 package com.duckduckgo.mobile.android.vpn.ui.newtab
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
@@ -24,6 +25,7 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.*
 import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -90,6 +92,10 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
         deviceShieldPixels.didShowNewTabSummary()
 
         configureViewReferences()
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            binding.root.addBottomShadow()
+        }
     }
 
     override fun onDetachedFromWindow() {

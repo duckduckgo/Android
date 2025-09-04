@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
@@ -80,7 +81,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
@@ -166,9 +166,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var tabManagerFeatureFlags: TabManagerFeatureFlags
 
     @Inject
-    lateinit var experimentalThemingDataStore: ExperimentalThemingDataStore
-
-    @Inject
     lateinit var onboardingDesignExperimentManager: OnboardingDesignExperimentManager
 
     @Inject
@@ -178,7 +175,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val tabsAdapter: TabSwitcherAdapter by lazy {
         TabSwitcherAdapter(
-            isVisualExperimentEnabled = experimentalThemingDataStore.isSingleOmnibarEnabled.value,
             itemClickListener = this,
             webViewPreviewPersister = webViewPreviewPersister,
             lifecycleOwner = this,
@@ -207,6 +203,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private lateinit var tabTouchHelper: TabTouchHelper
     private lateinit var tabsRecycler: RecyclerView
+    private lateinit var tabsContainer: FrameLayout
     private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
 
@@ -216,7 +213,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private val binding: ActivityTabSwitcherBinding by viewBinding()
     private val popupMenu by lazy {
-        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM && viewModel.isNewDesignEnabled) {
+        if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM && viewModel.isNewToolbarEnabled) {
             PopupMenu(layoutInflater, R.layout.popup_tabs_menu_bottom)
         } else {
             PopupMenu(layoutInflater, R.layout.popup_tabs_menu)
@@ -248,7 +245,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         setupToolbar(toolbar)
         configureRecycler()
 
-        if (!viewModel.isNewDesignEnabled) {
+        if (!viewModel.isNewToolbarEnabled) {
             configureFabs()
         }
 
@@ -285,7 +282,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
 
-        if (viewModel.isNewDesignEnabled) {
+        if (viewModel.isNewToolbarEnabled) {
             if (settingsDataStore.omnibarPosition == OmnibarPosition.BOTTOM) {
                 binding.root.removeView(binding.tabSwitcherExperimentToolbarTop.root)
             } else {
@@ -298,6 +295,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         toolbar = findViewById(R.id.toolbar)
+
+        tabsContainer = findViewById(R.id.tabsContainer)
     }
 
     private fun configureRecycler() {
@@ -318,22 +317,22 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         val swipeListener = ItemTouchHelper(tabTouchHelper)
         swipeListener.attachToRecyclerView(tabsRecycler)
 
-        tabItemDecorator = TabItemDecorator(this, experimentalThemingDataStore)
+        tabItemDecorator = TabItemDecorator(context = this)
         tabsRecycler.addItemDecoration(tabItemDecorator)
 
         tabsRecycler.setHasFixedSize(true)
 
         if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            if (viewModel.isNewDesignEnabled) {
+            if (viewModel.isNewToolbarEnabled) {
                 handleFabStateUpdates()
             }
 
             handleSelectionModeCancellation()
         }
 
-        if (viewModel.isNewDesignEnabled) {
+        if (viewModel.isNewToolbarEnabled) {
             // Set the layout params for the tabs recycler view based on omnibar position
-            tabsRecycler.updateLayoutParams {
+            tabsContainer.updateLayoutParams {
                 this as CoordinatorLayout.LayoutParams
                 this.behavior = null
                 if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {

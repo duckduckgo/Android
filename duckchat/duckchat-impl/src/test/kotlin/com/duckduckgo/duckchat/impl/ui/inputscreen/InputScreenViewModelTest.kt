@@ -913,4 +913,32 @@ class InputScreenViewModelTest {
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
         verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
     }
+
+    @Test
+    fun `when onChatSelected then new line button is visible`() {
+        val viewModel = createViewModel()
+        viewModel.onChatSelected()
+        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
+    }
+
+    @Test
+    fun `when onSearchSelected then new line button is not visible`() {
+        val viewModel = createViewModel()
+        viewModel.onSearchSelected()
+        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
+    }
+
+    @Test
+    fun `when onSearchSubmitted with newlines then they are replaced with spaces`() = runTest {
+        val viewModel = createViewModel()
+        val queryWithNewlines = "first line\nsecond line\nthird line"
+        val expected = "first line second line third line"
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted(queryWithNewlines)
+
+        assertEquals(SubmitSearch(expected), viewModel.command.value)
+    }
 }

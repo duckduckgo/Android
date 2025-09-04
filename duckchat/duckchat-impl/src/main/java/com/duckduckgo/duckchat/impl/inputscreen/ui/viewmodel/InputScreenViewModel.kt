@@ -124,6 +124,7 @@ class InputScreenViewModel @AssistedInject constructor(
             autoCompleteSuggestionsVisible = false,
             showChatLogo = true,
             showSearchLogo = true,
+            newLineButtonVisible = false,
         ),
     )
     val visibilityState: StateFlow<InputScreenVisibilityState> = _visibilityState.asStateFlow()
@@ -175,7 +176,7 @@ class InputScreenViewModel @AssistedInject constructor(
         .flatMapLatest { shouldShow ->
             if (shouldShow) {
                 merge(
-                    searchInputTextState.debounceExceptFirst(300),
+                    searchInputTextState.debounceExceptFirst(timeoutMillis = 100),
                     refreshSuggestions.map { searchInputTextState.value },
                 ).flatMapLatest { autoComplete.autoComplete(it) }
             } else {
@@ -337,7 +338,8 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSubmitted(query: String) {
-        command.value = Command.SubmitSearch(query)
+        val sanitizedQuery = query.replace(oldValue = "\n", newValue = " ")
+        command.value = Command.SubmitSearch(sanitizedQuery)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
 
@@ -382,6 +384,9 @@ class InputScreenViewModel @AssistedInject constructor(
             _submitButtonIconState.update {
                 it.copy(icon = SubmitButtonIcon.SEND)
             }
+            _visibilityState.update {
+                it.copy(newLineButtonVisible = true)
+            }
         }
         if (userSelectedMode == SEARCH) {
             fireModeSwitchedPixel()
@@ -390,6 +395,11 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onSearchSelected() {
+        viewModelScope.launch {
+            _visibilityState.update {
+                it.copy(newLineButtonVisible = false)
+            }
+        }
         if (userSelectedMode == CHAT) {
             fireModeSwitchedPixel()
         }

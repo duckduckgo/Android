@@ -37,6 +37,7 @@ import com.duckduckgo.remote.messaging.api.RemoteMessageModel
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.sync.api.engine.SyncEngine
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -109,7 +110,7 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
-                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertFalse(it.onboardingComplete)
             }
@@ -127,7 +128,7 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
-                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertFalse(it.onboardingComplete)
             }
@@ -145,7 +146,7 @@ class NewTabLegacyPageViewModelTest {
         testee.viewState.test {
             expectMostRecentItem().also {
                 assertEquals(it.message, remoteMessage)
-                assertTrue(it.favourites.isEmpty())
+                assertTrue(it.favourites?.isEmpty() == true)
                 assertTrue(it.newMessage)
                 assertTrue(it.onboardingComplete)
             }
@@ -400,6 +401,25 @@ class NewTabLegacyPageViewModelTest {
             expectMostRecentItem().also {
                 assertFalse(it.shouldShowLogo)
                 assertTrue(it.hasContent)
+            }
+        }
+    }
+
+    @Test
+    fun `when favourites loading, then hide logo but still report content`() = runTest {
+        val favouritesFlow = MutableSharedFlow<List<SavedSite.Favorite>>(replay = 0)
+        val remoteMessageFlow = MutableSharedFlow<RemoteMessage?>(replay = 0)
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(favouritesFlow)
+        whenever(mockRemoteMessageModel.getActiveMessages()).thenReturn(remoteMessageFlow)
+
+        testee = createTestee()
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            expectMostRecentItem().also {
+                assertFalse(it.shouldShowLogo)
+                assertTrue(it.hasContent)
+                assertNull(it.favourites)
             }
         }
     }

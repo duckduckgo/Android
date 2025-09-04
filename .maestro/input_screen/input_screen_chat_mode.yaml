@@ -26,7 +26,7 @@ tags:
       - tapOn:
           text: "Duck.ai"
       - assertVisible:
-          text: "Ask Duck.ai"
+          text: "Ask privately"
       - inputText: "hey"
       - tapOn:
           id: "actionSend"

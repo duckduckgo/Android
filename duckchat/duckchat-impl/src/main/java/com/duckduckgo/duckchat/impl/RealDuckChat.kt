@@ -28,7 +28,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.BrowserNav
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -55,8 +54,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -214,7 +211,6 @@ data class DuckChatSettingJson(
 class RealDuckChat @Inject constructor(
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
     private val duckChatFeature: DuckChatFeature,
-    private val experimentalThemingDataStore: ExperimentalThemingDataStore,
     private val moshi: Moshi,
     private val dispatchers: DispatcherProvider,
     private val globalActivityStarter: GlobalActivityStarter,
@@ -254,12 +250,6 @@ class RealDuckChat @Inject constructor(
     init {
         if (isMainProcess) {
             cacheConfig()
-            experimentalThemingDataStore.isSingleOmnibarEnabled.onEach { isExperimentEnabled ->
-                if (!isExperimentEnabled) {
-                    // the new input screen feature is only available when the visual design experiment is enabled
-                    setInputScreenUserSetting(false)
-                }
-            }.launchIn(appCoroutineScope)
         }
     }
 
@@ -570,7 +560,7 @@ class RealDuckChat @Inject constructor(
         isDuckChatUserEnabled = duckChatFeatureRepository.isDuckChatUserEnabled()
 
         val showInputScreen = isInputScreenFeatureAvailable() && isDuckChatFeatureEnabled && isDuckChatUserEnabled &&
-            experimentalThemingDataStore.isSingleOmnibarEnabled.value && duckChatFeatureRepository.isInputScreenUserSettingEnabled()
+            duckChatFeatureRepository.isInputScreenUserSettingEnabled()
         _showInputScreen.emit(showInputScreen)
 
         _showInputScreenAutomaticallyOnNewTab.value = showInputScreen && duckAiInputScreenOpenAutomaticallyEnabled

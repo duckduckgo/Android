@@ -73,6 +73,7 @@ class RealPirScanScheduler @Inject constructor(
             )
                 .boundToPirProcess(appBuildConfig.applicationId)
                 .setConstraints(constraints)
+                .setInitialDelay(SCHEDULED_SCAN_INTERVAL_HOURS, TimeUnit.HOURS)
                 .build()
 
         pirPixelSender.reportScheduledScanScheduled()

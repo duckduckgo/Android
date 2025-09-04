@@ -118,6 +118,7 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.BOTTOM
 import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
+import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
 import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
@@ -220,7 +221,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -280,6 +280,8 @@ import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.SavedSite.Bookmark
 import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
+import com.duckduckgo.serp.logos.api.SerpEasterEggLogosToggles
+import com.duckduckgo.serp.logos.api.SerpLogo
 import com.duckduckgo.site.permissions.api.SitePermissionsManager
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.LocationPermissionRequest
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissionQueryResponse
@@ -557,8 +559,6 @@ class BrowserTabViewModelTest {
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
     val mockStack: WebBackForwardList = mock()
 
-    private val mockExperimentalThemingDataStore: ExperimentalThemingDataStore = mock()
-
     private val mockSiteErrorHandlerKillSwitch: SiteErrorHandlerKillSwitch = mock()
     private val mockSiteErrorHandlerKillSwitchToggle: Toggle = mock { on { it.isEnabled() } doReturn true }
     private val mockSiteErrorHandler: StringSiteErrorHandler = mock()
@@ -583,6 +583,9 @@ class BrowserTabViewModelTest {
     }
 
     private val mockOnboardingDesignExperimentManager: OnboardingDesignExperimentManager = mock()
+    private val mockSerpEasterEggLogoToggles: SerpEasterEggLogosToggles = mock()
+
+    private val nonHttpAppLinkChecker: NonHttpAppLinkChecker = mock()
 
     private val EXAMPLE_URL = "http://example.com"
     private val SHORT_EXAMPLE_URL = "example.com"
@@ -651,7 +654,8 @@ class BrowserTabViewModelTest {
         whenever(mockOnboardingDesignExperimentManager.isModifiedControlEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBuckEnrolledAndEnabled()).thenReturn(false)
         whenever(mockOnboardingDesignExperimentManager.isBbEnrolledAndEnabled()).thenReturn(false)
-
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
+        whenever(nonHttpAppLinkChecker.isPermitted(anyOrNull())).thenReturn(true)
         remoteMessagingModel = givenRemoteMessagingModel(mockRemoteMessagingRepository, mockPixel, coroutineRule.testDispatcherProvider)
 
         ctaViewModel = CtaViewModel(
@@ -787,7 +791,6 @@ class BrowserTabViewModelTest {
             tabStatsBucketing = mockTabStatsBucketing,
             additionalDefaultBrowserPrompts = mockAdditionalDefaultBrowserPrompts,
             swipingTabsFeature = swipingTabsFeatureProvider,
-            experimentalThemingDataStore = mockExperimentalThemingDataStore,
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
@@ -797,6 +800,8 @@ class BrowserTabViewModelTest {
             tabManager = tabManager,
             addressDisplayFormatter = mockAddressDisplayFormatter,
             autoCompleteSettings = mockAutoCompleteSettings,
+            serpEasterEggLogosToggles = mockSerpEasterEggLogoToggles,
+            nonHttpAppLinkChecker = nonHttpAppLinkChecker,
         )
 
         testee.loadData("abc", null, false, false)
@@ -3767,6 +3772,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenHandleNonHttpAppLinkCalledWithUnpermittedIntentThenDoNotHandleNonHttpAppLink() {
+        whenever(nonHttpAppLinkChecker.isPermitted(any())).thenReturn(false)
+        val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("market://details?id=com.example", Intent(), EXAMPLE_URL)
+        assertTrue(testee.handleNonHttpAppLink(urlType))
+        assertCommandNotIssued<Command.HandleNonHttpAppLink>()
+    }
+
+    @Test
     fun whenUserSubmittedQueryIsAppLinkAndShouldShowPromptThenOpenAppLinkInBrowserAndSetPreviousUrlToNull() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.AppLink(uriString = "http://foo.com"))
@@ -6456,15 +6469,6 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenOnAnimationFinishedAndSelfAndVariant2EnabledThenStartTrackersExperimentShieldPopAnimation() = runTest {
-        whenever(mockSenseOfProtectionExperiment.isUserEnrolledInAVariantAndExperimentEnabled()).thenReturn(true)
-
-        testee.onAnimationFinished()
-
-        assertCommandIssued<Command.StartTrackersExperimentShieldPopAnimation>()
-    }
-
-    @Test
     fun whenOpenDuckChatWithNonEmptyQueryThenOpenWithAutoPrompt() = runTest {
         val query = "example"
 
@@ -7145,6 +7149,64 @@ class BrowserTabViewModelTest {
             "LaunchInputScreen command should be triggered when switching to new tab that was NOT opened from another tab",
             commands.any { it is Command.LaunchInputScreen },
         )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandIssued() {
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(webViewNavState, ddgUrl)
+
+        verify(mockCommandObserver, atLeastOnce()).onChanged(commandCaptor.capture())
+        val commands = commandCaptor.allValues
+        assertTrue(
+            "ExtractSerpLogo command should be issued when SERP logos feature is enabled and URL is DuckDuckGo query",
+            commands.any { it is Command.ExtractSerpLogo && it.currentUrl == ddgUrl },
+        )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithDuckDuckGoUrlAndFeatureDisabledThenExtractSerpLogoCommandNotIssued() {
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockDisabledToggle)
+        val ddgUrl = "https://duckduckgo.com/?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(webViewNavState, ddgUrl)
+
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued when SERP logos feature is disabled",
+            commands.any { it is Command.ExtractSerpLogo },
+        )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenExtractSerpLogoCommandNotIssued() {
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.pageFinished(webViewNavState, nonDdgUrl)
+
+        val commands = commandCaptor.allValues
+        assertFalse(
+            "ExtractSerpLogo command should NOT be issued for non-DuckDuckGo URLs even when feature is enabled",
+            commands.any { it is Command.ExtractSerpLogo },
+        )
+    }
+
+    @Test
+    fun whenEvaluateSerpLogoStateCalledWithNonDuckDuckGoUrlAndFeatureEnabledThenSerpLogoIsCleared() {
+        whenever(mockSerpEasterEggLogoToggles.feature()).thenReturn(mockEnabledToggle)
+        val nonDdgUrl = "https://example.com/search?q=test"
+        val webViewNavState = WebViewNavigationState(mockStack, 100)
+
+        testee.omnibarViewState.value = omnibarViewState().copy(serpLogo = SerpLogo.EasterEgg("some-logo-url"))
+        testee.pageFinished(webViewNavState, nonDdgUrl)
+
+        assertNull("SERP logo should be cleared when navigating to non-DuckDuckGo URL", omnibarViewState().serpLogo)
     }
 
     private fun aCredential(): LoginCredentials {
