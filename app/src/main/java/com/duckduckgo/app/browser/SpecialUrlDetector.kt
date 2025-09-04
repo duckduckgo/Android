@@ -195,10 +195,6 @@ class SpecialUrlDetectorImpl(
     private fun buildIntent(uriString: String, intentFlags: Int): UrlType {
         return try {
             val intent = Intent.parseUri(uriString, intentFlags)
-            // only proceed if something can handle it
-            if (intent == null || packageManager.resolveActivity(intent, 0) == null) {
-                return UrlType.Unknown(uriString)
-            }
 
             if (externalAppIntentFlagsFeature.self().isEnabled()) {
                 intent.addCategory(Intent.CATEGORY_BROWSABLE)
