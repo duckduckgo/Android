@@ -25,6 +25,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.inputscreen.ui.metrics.discovery.InputScreenDiscoveryFunnel
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -34,9 +35,13 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
+    @Inject
+    lateinit var inputScreenDiscoveryFunnel: InputScreenDiscoveryFunnel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
+        inputScreenDiscoveryFunnel.onInputScreenOpened()
     }
 
     override fun finish() {
