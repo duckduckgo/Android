@@ -300,4 +300,5 @@ fun View.addBottomShadow(
 
     clipToOutline = false
     elevation = shadowSize
+    setAllParentsClip(false)
 }

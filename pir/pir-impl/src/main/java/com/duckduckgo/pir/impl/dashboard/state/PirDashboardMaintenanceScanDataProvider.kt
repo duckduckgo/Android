@@ -25,6 +25,8 @@ import com.duckduckgo.pir.impl.dashboard.state.PirDashboardMaintenanceScanDataPr
 import com.duckduckgo.pir.impl.models.Broker
 import com.duckduckgo.pir.impl.models.isExtant
 import com.duckduckgo.pir.impl.models.scheduling.BrokerSchedulingConfig
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REMOVED
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus.REQUESTED
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.ScanJobRecord
 import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
@@ -92,13 +94,13 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
     private val pirSchedulingRepository: PirSchedulingRepository,
 ) : PirDashboardStateProvider(currentTimeProvider, pirRepository, pirSchedulingRepository), PirDashboardMaintenanceScanDataProvider {
     override suspend fun getInProgressOptOuts(): List<DashboardExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        return@withContext getExtractedProfileResults().filter {
+        return@withContext getAllExtractedProfileResults().filter {
             it.optOutRemovedDateInMillis == null || it.optOutRemovedDateInMillis == 0L
         }
     }
 
     override suspend fun getRemovedOptOuts(): List<DashboardRemovedExtractedProfileResult> = withContext(dispatcherProvider.io()) {
-        val allRemovedExtractedProfiles = getExtractedProfileResults().filter {
+        val allRemovedExtractedProfiles = getAllExtractedProfileResults().filter {
             it.optOutRemovedDateInMillis != null && it.optOutRemovedDateInMillis != 0L
         }
 
@@ -133,15 +135,16 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         val startDate = currentTimeProvider.currentTimeMillis()
         val endDate = startDate + SCAN_DETAILS_RANGE
         val schedulingConfigMap = pirRepository.getAllBrokerSchedulingConfigs().associateBy { it.brokerName }
+        val nextRunFromOptOutDataMap = getNextRunFromOptOutRecords(schedulingConfigMap, startDate, endDate)
 
         val allValidBrokerMatches = getBrokerMatches(
             scanFilter = {
                 val schedulingConfig = schedulingConfigMap[it.brokerName] ?: return@getBrokerMatches false
-                it.getNextRunMillis(schedulingConfig) in startDate..endDate
+                it.getNextRunMillis(schedulingConfig, nextRunFromOptOutDataMap[it.brokerName], startDate, endDate) in startDate..endDate
             },
             getDateMillis = {
                 val schedulingConfig = schedulingConfigMap[it.brokerName] ?: return@getBrokerMatches 0L
-                it.getNextRunMillis(schedulingConfig)
+                it.getNextRunMillis(schedulingConfig, nextRunFromOptOutDataMap[it.brokerName], startDate, endDate)
             },
         )
 
@@ -151,11 +154,42 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         )
     }
 
+    private suspend fun getNextRunFromOptOutRecords(
+        schedulingConfigMap: Map<String, BrokerSchedulingConfig>,
+        startDate: Long,
+        endDate: Long,
+    ): Map<String, Long?> {
+        // This is a map for broker to the next potential run from the opt-out records that are either in REQUESTED or REMOVED
+        return pirSchedulingRepository.getAllValidOptOutJobRecords()
+            .filter {
+                it.status == REQUESTED || it.status == REMOVED
+            }
+            .groupBy { it.brokerName }
+            .mapValues { (_, optOutJobRecords) ->
+                // From the opt out jobs for the broker, we take the earliest next run that is within the range
+                optOutJobRecords.mapNotNull { optOutJob ->
+                    val schedulingConfig = schedulingConfigMap[optOutJob.brokerName] ?: return@mapNotNull null
+                    when (optOutJob.status) {
+                        REQUESTED -> optOutJob.optOutRequestedDateInMillis + schedulingConfig.confirmOptOutScanInMillis
+                        REMOVED -> optOutJob.optOutRemovedDateInMillis + schedulingConfig.maintenanceScanInMillis
+                        else -> null
+                    }
+                }.filter {
+                    it in startDate..endDate
+                }.minOrNull()
+            }
+    }
+
     override suspend fun getScannedBrokerCount(): Int {
         return getBrokersAndMirrorSitesWithProgressStatus().size
     }
 
-    private fun ScanJobRecord.getNextRunMillis(schedulingConfig: BrokerSchedulingConfig): Long {
+    private fun ScanJobRecord.getNextRunMillis(
+        schedulingConfig: BrokerSchedulingConfig,
+        nextRunFromOptOutData: Long?,
+        startDate: Long,
+        endDate: Long,
+    ): Long {
         return when (this.status) {
             ScanJobRecord.ScanJobStatus.NOT_EXECUTED -> {
                 // Should be executed immediately
@@ -163,14 +197,26 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
             }
 
             ScanJobRecord.ScanJobStatus.MATCHES_FOUND -> {
-                lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis
+                // If a match is found, the next run could be a maintenance scan for the broker or confirmation/maintenance scan from an opt-out
+                // We will take the earliest within the range
+                val nextMaintenanceScan = lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis
+
+                if (nextRunFromOptOutData != null) {
+                    listOf(nextMaintenanceScan, nextRunFromOptOutData).filter {
+                        it in startDate..endDate
+                    }.minOrNull() ?: 0L
+                } else {
+                    nextMaintenanceScan
+                }
             }
 
             ScanJobRecord.ScanJobStatus.NO_MATCH_FOUND -> {
+                // Next run would be a maintenance scan
                 lastScanDateInMillis + schedulingConfig.maintenanceScanInMillis
             }
 
             ScanJobRecord.ScanJobStatus.ERROR -> {
+                // Next run would be an error retry
                 lastScanDateInMillis + schedulingConfig.retryErrorInMillis
             }
 
@@ -181,7 +227,7 @@ class RealPirDashboardMaintenanceScanDataProvider @Inject constructor(
         }
     }
 
-    private suspend fun getBrokerMatches(
+    suspend fun getBrokerMatches(
         scanFilter: (ScanJobRecord) -> Boolean,
         getDateMillis: (ScanJobRecord) -> Long,
     ): List<DashboardBrokerMatch> {

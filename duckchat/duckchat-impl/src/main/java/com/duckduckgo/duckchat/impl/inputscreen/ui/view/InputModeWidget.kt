@@ -235,6 +235,9 @@ class InputModeWidget @JvmOverloads constructor(
                 root,
                 ChangeBounds().apply {
                     duration = EXPAND_COLLAPSE_TRANSITION_DURATION
+                    excludeTarget(R.id.actionSend, true)
+                    excludeTarget(R.id.actionNewLine, true)
+                    excludeTarget(R.id.actionVoice, true)
                 },
             )
         }
