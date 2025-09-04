@@ -671,7 +671,6 @@ class TabSwitcherViewModel @Inject constructor(
 
         val dynamicInterface = when (mode) {
             is Normal -> {
-                val isThereOnlyNewTabPage = tabs.size == 1 && tabs.first().isNewTabPage
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabButtonVisible = isNewToolbarEnabled,
@@ -688,7 +687,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isCloseOtherTabsVisible = false,
                     isCloseAllTabsDividerVisible = true,
                     isCloseAllTabsVisible = true,
-                    isMenuButtonEnabled = !isThereOnlyNewTabPage,
+                    isMenuButtonEnabled = true,
                     isMainFabVisible = !isNewToolbarEnabled,
                     isAIFabVisible = isDuckAIButtonVisible && !isNewToolbarEnabled,
                     mainFabType = FabType.NEW_TAB,
