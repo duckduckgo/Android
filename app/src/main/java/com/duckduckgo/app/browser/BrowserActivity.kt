@@ -34,7 +34,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -212,6 +211,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var duckAiFragment: DuckChatWebViewFragment? = null
 
+    /**
+     * Whether [duckAiFragment] should animate in.
+     *
+     * True only if [BrowserActivity] has been visible (`STARTED`) for at least [DUCK_AI_ANIM_READY_DELAY_MS].
+     * Otherwise, the fragment is shown immediately (e.g., when the activity was just launched from elsewhere) to avoid janky transitions.
+     *
+     * Delay is required because [onNewIntent] (which shows Duck.ai) always runs after [onStart].
+     * We must ensure the animation is executed only if the activity was already visible before the intent was delivered.
+     */
+    private var duckAiShouldAnimate: Boolean = false
+    private var duckAiAnimDelayJob: Job? = null
+
     private var _currentTab: BrowserTabFragment? = null
     private var currentTab: BrowserTabFragment?
         get() {
@@ -382,10 +393,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        duckAiAnimDelayJob = lifecycleScope.launch {
+            delay(DUCK_AI_ANIM_READY_DELAY_MS)
+            duckAiShouldAnimate = true
+        }
+    }
+
     override fun onStop() {
         openMessageInNewTabJob?.cancel()
 
         super.onStop()
+
+        duckAiAnimDelayJob?.cancel()
+        duckAiShouldAnimate = false
     }
 
     override fun onDestroy() {
@@ -564,7 +586,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         if (intent.getBooleanExtra(OPEN_DUCK_CHAT, false)) {
             isDuckChatVisible = true
             val duckChatSessionActive = intent.getBooleanExtra(DUCK_CHAT_SESSION_ACTIVE, false)
-            viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive)
+            viewModel.openDuckChat(intent.getStringExtra(DUCK_CHAT_URL), duckChatSessionActive, withTransition = duckAiShouldAnimate)
             return
         }
 
@@ -705,7 +727,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             is Command.ShowSystemDefaultAppsActivity -> showSystemDefaultAppsActivity(command.intent)
             is Command.ShowSystemDefaultBrowserDialog -> showSystemDefaultBrowserDialog(command.intent)
             is Command.ShowUndoDeleteTabsMessage -> showTabsDeletedSnackbar(command.tabIds)
-            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.duckChatSessionActive)
+            is Command.OpenDuckChat -> openDuckChat(command.duckChatUrl, command.duckChatSessionActive, command.withTransition)
             Command.LaunchTabSwitcher -> currentTab?.launchTabSwitcherAfterTabsUndeleted()
         }
     }
@@ -804,15 +826,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun openDuckChat(
         url: String?,
         duckChatSessionActive: Boolean,
+        withTransition: Boolean,
     ) {
         duckAiFragment?.let { fragment ->
             if (duckChatSessionActive) {
-                restoreDuckChat(fragment)
+                restoreDuckChat(fragment, withTransition)
             } else {
-                launchNewDuckChat(url)
+                launchNewDuckChat(url, withTransition)
             }
         } ?: run {
-            launchNewDuckChat(url)
+            launchNewDuckChat(url, withTransition)
         }
 
         currentTab?.omnibar?.newOmnibar?.omnibarTextInput?.let {
@@ -820,7 +843,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun launchNewDuckChat(duckChatUrl: String?) {
+    private fun launchNewDuckChat(duckChatUrl: String?, withTransition: Boolean) {
         val wasFragmentVisible = duckAiFragment?.isVisible ?: false
         val fragment = DuckChatWebViewFragment().apply {
             duckChatUrl?.let {
@@ -835,13 +858,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.replace(binding.duckAiFragmentContainer.id, fragment)
         transaction.commit()
 
+        // If the fragment was already visible but needs to be force-reloaded, we don't want to animate it in again.
         if (!wasFragmentVisible) {
-            // If the fragment was already visible but needs to be force-reloaded, we don't want to animate it in again.
-            animateDuckAiFragmentIn()
+            if (withTransition) {
+                animateDuckAiFragmentIn()
+            } else {
+                showDuckAiFragmentImmediately()
+            }
         }
     }
 
-    private fun restoreDuckChat(fragment: DuckChatWebViewFragment) {
+    private fun restoreDuckChat(fragment: DuckChatWebViewFragment, withTransition: Boolean) {
         if (fragment.isVisible) {
             return
         }
@@ -850,7 +877,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
         transaction.show(fragment)
         transaction.commit()
 
-        animateDuckAiFragmentIn()
+        if (withTransition) {
+            animateDuckAiFragmentIn()
+        } else {
+            showDuckAiFragmentImmediately()
+        }
+    }
+
+    private fun showDuckAiFragmentImmediately() {
+        val duckAiContainer = binding.duckAiFragmentContainer
+        duckAiContainer.isVisible = true
+        duckAiContainer.alpha = 1f
+        duckAiContainer.translationX = 0f
+
+        val browserContainer = if (swipingTabsFeature.isEnabled) binding.tabPager else binding.fragmentContainer
+        browserContainer.alpha = 0f
     }
 
     private fun animateDuckAiFragmentIn() {
@@ -979,6 +1020,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"
 
         private const val DISABLE_SWIPING_DELAY = 1000L
+
+        private const val DUCK_AI_ANIM_READY_DELAY_MS = 300L
     }
 
     inner class BrowserStateRenderer {
@@ -1288,12 +1331,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 if (Build.VERSION.SDK_INT >= 28) {
-                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow(
-                        shadowSizeDp = 12f,
-                        offsetYDp = 3f,
-                        insetDp = 3f,
-                        shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-                    )
+                    omnibarToolbarMockupBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
             }
 
@@ -1310,12 +1348,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
 
                 if (Build.VERSION.SDK_INT >= 28) {
-                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow(
-                        shadowSizeDp = 12f,
-                        offsetYDp = 3f,
-                        insetDp = 3f,
-                        shadowColor = ContextCompat.getColor(this, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
-                    )
+                    omnibarToolbarMockupBottomBinding.mockOmniBarContainerShadow.addBottomShadow()
                 }
             }
         }
