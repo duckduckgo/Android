@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.duckduckgo.autofill.impl.configuration
 
-import com.duckduckgo.autofill.api.BrowserAutofill.Configurator
-import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import javax.inject.Inject
+package com.duckduckgo.autofill.impl.store
 
-@ContributesBinding(AppScope::class)
-class InlineBrowserAutofillConfigurator @Inject constructor(
-    private val configurator: InternalBrowserAutofillConfigurator,
-) : Configurator by configurator
+data class ReAuthenticationDetails(
+    val password: String? = null,
+) {
+    override fun toString(): String {
+        return "ReAuthenticationDetails(password available: ${password != null})"
+    }
+}
+
+fun emptyReAuthenticationDetails() = ReAuthenticationDetails()

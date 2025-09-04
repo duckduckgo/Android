@@ -23,6 +23,7 @@ import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.importing.InBrowserImportPromo
 import com.duckduckgo.autofill.impl.sharedcreds.ShareableCredentials
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -244,6 +245,56 @@ class RealAutofillAvailableInputTypesProviderTest {
 
         assertFalse(result.username)
         assertFalse(result.password)
+    }
+
+    @Test
+    fun whenNoSavedPasswordButReAuthPasswordAvailableThenPasswordIsTrue() = runTest {
+        configureAutofillCapabilities(enabled = true)
+        whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+        whenever(shareableCredentials.shareableCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+
+        val result = testee.getTypes(EXAMPLE_URL, reAuthenticationDetails = ReAuthenticationDetails(password = "password"))
+
+        assertFalse(result.username)
+        assertTrue(result.password)
+    }
+
+    @Test
+    fun whenSavedPasswordAndReAuthPasswordBothAvailableThenPasswordIsTrue() = runTest {
+        configureAutofillCapabilities(enabled = true)
+        whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = "example.com",
+                    username = "username",
+                    password = "password",
+                ),
+            ),
+        )
+        whenever(shareableCredentials.shareableCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+
+        val result = testee.getTypes(EXAMPLE_URL, reAuthenticationDetails = ReAuthenticationDetails(password = "password"))
+        assertTrue(result.password)
+    }
+
+    @Test
+    fun whenSharablePasswordAndReAuthPasswordBothAvailableThenPasswordIsTrue() = runTest {
+        configureAutofillCapabilities(enabled = true)
+        whenever(autofillStore.getCredentials(EXAMPLE_URL)).thenReturn(emptyList())
+        whenever(shareableCredentials.shareableCredentials(EXAMPLE_URL)).thenReturn(
+            listOf(
+                LoginCredentials(
+                    id = 1,
+                    domain = "example.com",
+                    username = "username",
+                    password = "password",
+                ),
+            ),
+        )
+
+        val result = testee.getTypes(EXAMPLE_URL, reAuthenticationDetails = ReAuthenticationDetails(password = "password"))
+        assertTrue(result.password)
     }
 
     @Test
