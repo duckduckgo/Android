@@ -29,6 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@android:color/transparent"
         app:layout_scrollFlags="scroll|enterAlways|snap">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -271,7 +272,7 @@
                                     android:scaleType="center"
                                     android:visibility="gone"
                                     app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@+id/verticalDivider"
+                                    app:layout_constraintEnd_toStartOf="@id/verticalDivider"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:srcCompat="@drawable/ic_microphone_24"
                                     tools:visibility="visible" />

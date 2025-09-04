@@ -24,7 +24,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -99,12 +98,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
 
         if (Build.VERSION.SDK_INT >= 28) {
-            omnibarCardShadow.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = ContextCompat.getColor(context, CommonR.color.background_omnibar_shadow),
-            )
+            omnibarCardShadow.addBottomShadow()
         }
 
         when (omnibarPosition) {
