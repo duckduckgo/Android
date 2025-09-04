@@ -47,7 +47,7 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
     private val autofillFeature: AutofillFeature,
-) : SecureStorageDatabaseFactory {
+) : SecureStorageDatabaseFactory, LibraryLoader.LibraryLoaderListener {
     private var _database: SecureStorageDatabase? = null
 
     private val mutex = Mutex()
@@ -55,20 +55,31 @@ class RealSecureStorageDatabaseFactory @Inject constructor(
     init {
         logcat { "Loading the sqlcipher native library" }
         try {
-            LibraryLoader.loadLibrary(context, "sqlcipher")
-            logcat { "sqlcipher native library loaded ok" }
+            LibraryLoader.loadLibrary(context, "sqlcipher", this)
         } catch (t: Throwable) {
-            // error loading the library
-            logcat(ERROR) { "Error loading sqlcipher library: ${t.asLog()}" }
+            logcat(ERROR) { "Error when calling LibraryLoader.loadLibrary for sqlcipher: ${t.asLog()}" }
         }
     }
 
     override suspend fun getDatabase(): SecureStorageDatabase? {
-        return if (autofillFeature.createAsyncPreferences().isEnabled()) {
-            getAsyncDatabase()
-        } else {
-            getDatabaseSynchronized()
+        return try {
+            if (autofillFeature.createAsyncPreferences().isEnabled()) {
+                getAsyncDatabase()
+            } else {
+                getDatabaseSynchronized()
+            }
+        } catch (e: Exception) {
+            logcat(ERROR) { "Error getting secure storage database instance: ${e.asLog()}" }
+            null
         }
+    }
+
+    override fun success() {
+        logcat { "sqlcipher native library loaded ok" }
+    }
+
+    override fun failure(throwable: Throwable) {
+        logcat(ERROR) { "Error loading sqlcipher library: ${throwable.asLog()}" }
     }
 
     @Synchronized
