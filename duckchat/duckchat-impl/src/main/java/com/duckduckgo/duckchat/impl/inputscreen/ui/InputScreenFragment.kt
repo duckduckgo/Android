@@ -18,9 +18,11 @@ package com.duckduckgo.duckchat.impl.inputscreen.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -193,6 +195,21 @@ class InputScreenFragment : DuckDuckGoFragment(R.layout.fragment_input_screen) {
         pagerAdapter = InputScreenPagerAdapter(this)
         binding.viewPager.adapter = pagerAdapter
         binding.viewPager.registerOnPageChangeCallback(pageChangeCallback)
+        configureViewPagerWidth()
+    }
+
+    private fun configureViewPagerWidth() {
+        val horizontalMargin = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            resources.getDimensionPixelSize(R.dimen.inputScreenMarginHorizontalLandscape)
+        } else {
+            0
+        }
+        (binding.viewPager.layoutParams as LayoutParams).apply {
+            width = 0
+            matchConstraintPercentWidth = -1f
+            leftMargin = horizontalMargin
+            rightMargin = horizontalMargin
+        }
     }
 
     private fun configureOmnibar() = with(binding.inputModeWidget) {
