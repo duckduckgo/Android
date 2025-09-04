@@ -988,6 +988,7 @@ class BrowserTabViewModel @Inject constructor(
             is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
             is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
             is AutoCompleteSwitchToTabSuggestion -> AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
+            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> AppPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION
             else -> return
         }
 
@@ -1007,7 +1008,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteSwitchToTabSuggestion -> onUserSwitchedToTab(suggestion.tabId)
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
-                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserDuckAiPrompt(suggestion.phrase)
+                    is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                 }
             }
         }
@@ -4201,8 +4202,13 @@ class BrowserTabViewModel @Inject constructor(
         command.value = Command.SwitchToTab(tabId)
     }
 
-    private fun onUserDuckAiPrompt(prompt: String) {
+    private fun onUserTappedDuckAiPromptAutocomplete(prompt: String) {
         command.value = Command.SubmitChat(prompt)
+
+        viewModelScope.launch {
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_LEGACY, parameters = params)
+        }
     }
 
     fun onDuckChatMenuClicked() {
