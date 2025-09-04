@@ -36,6 +36,7 @@
         android:layout_width="@dimen/ntpDaxLogoIconWidth"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
+        android:paddingTop="@dimen/inputScreenContentTopOffset"
         android:adjustViewBounds="true"
         android:maxWidth="180dp"
         android:maxHeight="180dp"
