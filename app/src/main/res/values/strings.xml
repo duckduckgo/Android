@@ -272,7 +272,7 @@
     <string name="addWidgetCtaAutoLaunchButton">Add Widget</string>
     <string name="addWidgetCtaInstructionsLaunchButton">Show Me</string>
     <string name="addWidgetCtaDismissButton">Dismiss</string>
-    <string name="addWidgetInstructionsActivityTitle">Add Widget</string>
+    <string name="addWidgetInstructionsActivityTitle">Add widget</string>
     <string name="addWidgetInstruction1Label">1</string>
     <string name="addWidgetInstruction1">Long-press your home screen, then open the widgets menu.</string>
     <string name="addWidgetInstruction2Label">2</string>
