@@ -278,7 +278,12 @@ class AutoCompleteApi @Inject constructor(
                 }
             }
 
-            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) {
+                AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
+            } else {
+                AutoCompletePixelNames.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
+            }
+
             is AutoCompleteHistorySuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SITE_SELECTION
             is AutoCompleteHistorySearchSuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
             is AutoCompleteSwitchToTabSuggestion -> AutoCompletePixelNames.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
