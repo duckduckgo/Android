@@ -581,8 +581,6 @@ class BrowserTabViewModel @Inject constructor(
     private var isProcessingTrackingLink = false
     private var isLinkOpenedInNewTab = false
     private var allowlistRefreshTriggerJob: Job? = null
-    private var lastSubmittedUserQuery: String? = null
-    private var lastSubmittedChatQuery: String? = null
 
     private val fireproofWebsitesObserver = Observer<List<FireproofWebsiteEntity>> {
         browserViewState.value = currentBrowserViewState().copy(isFireproofWebsite = isFireproofWebsite())
@@ -4218,34 +4216,20 @@ class BrowserTabViewModel @Inject constructor(
     fun onDuckChatMenuClicked() {
         viewModelScope.launch {
             command.value = HideKeyboardForChat
+            val params = duckChat.createWasUsedBeforePixelParams()
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU, parameters = params)
         }
-        openDuckChat(pixelName = DuckChatPixelName.DUCK_CHAT_OPEN_BROWSER_MENU)
+        duckChat.openDuckChat()
     }
 
-    fun onDuckChatOmnibarButtonClicked(query: String?) {
+    fun onDuckChatOmnibarButtonClicked(query: String?, hasFocus: Boolean, isNtp: Boolean) {
         viewModelScope.launch {
             command.value = HideKeyboardForChat
         }
-        query?.let {
-            openDuckChat(query = query)
-        } ?: openDuckChat()
-    }
-
-    private fun openDuckChat(
-        pixelName: Pixel.PixelName? = null,
-        query: String? = null,
-    ) {
-        viewModelScope.launch {
-            if (pixelName != null) {
-                val params = duckChat.createWasUsedBeforePixelParams()
-                pixel.fire(pixelName, parameters = params)
-            }
-
-            if (query?.isNotEmpty() == true) {
-                duckChat.openDuckChatWithAutoPrompt(query)
-            } else {
-                duckChat.openDuckChat()
-            }
+        when {
+            hasFocus && isNtp && query.isNullOrBlank() -> duckChat.openDuckChat()
+            hasFocus -> duckChat.openDuckChatWithAutoPrompt(query ?: "")
+            else -> duckChat.openDuckChat()
         }
     }
 
@@ -4285,30 +4269,6 @@ class BrowserTabViewModel @Inject constructor(
                 onboardingDesignExperimentManager.firePrivacyDashClickedFromOnboardingPixel()
             }
         }
-    }
-
-    fun openDuckChat(query: String?) {
-        when {
-            query.isNullOrBlank() || query == url -> duckChat.openDuckChat()
-            lastSubmittedUserQuery == null && (query != omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithAutoPrompt(query)
-            lastSubmittedUserQuery == null && (query == omnibarViewState.value?.queryOrFullUrl) -> duckChat.openDuckChatWithPrefill(query)
-            lastSubmittedChatQuery == null -> duckChat.openDuckChatWithPrefill(query)
-            lastSubmittedChatQuery != lastSubmittedUserQuery -> duckChat.openDuckChatWithPrefill(query)
-            query == lastSubmittedUserQuery -> duckChat.openDuckChatWithPrefill(query)
-
-            else -> duckChat.openDuckChatWithAutoPrompt(query)
-        }
-        if (query != null) {
-            setLastSubmittedUserChatQuery(query)
-        }
-    }
-
-    fun setLastSubmittedUserQuery(query: String) {
-        lastSubmittedUserQuery = query
-    }
-
-    fun setLastSubmittedUserChatQuery(query: String) {
-        lastSubmittedChatQuery = query
     }
 
     fun onUserSelectedOnboardingDialogOption(

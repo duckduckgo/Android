@@ -1208,8 +1208,8 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
-    private fun onOmnibarDuckChatPressed(query: String) {
-        viewModel.onDuckChatOmnibarButtonClicked(query)
+    private fun onOmnibarDuckChatPressed(query: String, hasFocus: Boolean, isNtp: Boolean) {
+        viewModel.onDuckChatOmnibarButtonClicked(query = query, hasFocus = hasFocus, isNtp = isNtp)
     }
 
     private fun configureCustomTab() {
@@ -2897,7 +2897,9 @@ class BrowserTabFragment :
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
                     }
-                    onOmnibarDuckChatPressed(omnibar.getText())
+                    val hasFocus = omnibar.omnibarTextInput.hasFocus()
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
                 }
             },
         )
@@ -2990,7 +2992,6 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 
