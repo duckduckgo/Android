@@ -87,18 +87,19 @@ class AutofillImportPasswordConfigStoreImplTest {
     @Test
     fun whenUrlMappingsNotSpecifiedInConfigThenDefaultsUsed() = runTest {
         configureFeature(config = Config(urlMappings = null))
-        assertEquals(5, testee.getConfig().urlMappings.size)
+        assertEquals(6, testee.getConfig().urlMappings.size)
     }
 
     @Test
     fun whenUrlMappingsNotSpecifiedInConfigThenCorrectOrderOfDefaultsReturned() = runTest {
         configureFeature(config = Config(urlMappings = null))
         testee.getConfig().urlMappings.apply {
-            assertEquals("webflow-passphrase-encryption", get(0).key)
-            assertEquals("webflow-pre-login", get(1).key)
-            assertEquals("webflow-export", get(2).key)
-            assertEquals("webflow-authenticate", get(3).key)
-            assertEquals("webflow-post-login-landing", get(4).key)
+            assertEquals("webflow-signin-rejected", get(0).key)
+            assertEquals("webflow-passphrase-encryption", get(1).key)
+            assertEquals("webflow-pre-login", get(2).key)
+            assertEquals("webflow-export", get(3).key)
+            assertEquals("webflow-authenticate", get(4).key)
+            assertEquals("webflow-post-login-landing", get(5).key)
         }
     }
 

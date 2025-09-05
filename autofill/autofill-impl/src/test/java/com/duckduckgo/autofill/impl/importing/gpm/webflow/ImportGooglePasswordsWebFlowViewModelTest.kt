@@ -2,21 +2,31 @@ package com.duckduckgo.autofill.impl.importing.gpm.webflow
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.api.domain.app.LoginTriggerType
+import com.duckduckgo.autofill.api.domain.app.LoginTriggerType.USER_INITIATED
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult.Error
 import com.duckduckgo.autofill.impl.importing.CsvCredentialConverter.CsvCredentialImportResult.Success
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
 import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordSettings
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.InjectCredentialsFromReauth
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.Command.PromptUserToSelectFromStoredCredentials
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.LoadStartPage
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.NavigatingBack
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserCancelledImportFlow
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedCannotImport
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.ViewState.UserFinishedImportFlow
+import com.duckduckgo.autofill.impl.store.ReAuthenticationDetails
+import com.duckduckgo.autofill.impl.store.ReauthenticationHandler
+import com.duckduckgo.autofill.impl.urlmatcher.AutofillUrlMatcher
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,6 +44,9 @@ class ImportGooglePasswordsWebFlowViewModelTest {
     private val csvCredentialConverter: CsvCredentialConverter = mock()
     private val autofillImportConfigStore: AutofillImportPasswordConfigStore = mock()
     private val urlToStageMapper: ImportGooglePasswordUrlToStageMapper = mock()
+    private val reauthenticationHandler: ReauthenticationHandler = mock()
+    private val autofillFeature: AutofillFeature = mock()
+    private val autofillUrlMatcher: AutofillUrlMatcher = mock()
 
     private val testee = ImportGooglePasswordsWebFlowViewModel(
         dispatchers = coroutineTestRule.testDispatcherProvider,
@@ -41,6 +54,8 @@ class ImportGooglePasswordsWebFlowViewModelTest {
         csvCredentialConverter = csvCredentialConverter,
         autofillImportConfigStore = autofillImportConfigStore,
         urlToStageMapper = urlToStageMapper,
+        reauthenticationHandler = reauthenticationHandler,
+        autofillFeature = autofillFeature,
     )
 
     @Test
@@ -100,6 +115,48 @@ class ImportGooglePasswordsWebFlowViewModelTest {
         testee.onCloseButtonPressed("https://example.com")
         testee.viewState.test {
             assertEquals(expectedStage, (awaitItem() as UserCancelledImportFlow).stage)
+        }
+    }
+
+    @Test
+    fun whenStoredCredentialsAvailableWithReauthAllowedAndPasswordThenInjectCredentialsFromReauth() = runTest {
+        val url = "https://example.com"
+        val password = "test-password"
+        val credentials = listOf(creds())
+        val mockToggle: Toggle = mock()
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(autofillFeature.canReAuthenticateGoogleLoginsAutomatically()).thenReturn(mockToggle)
+        whenever(reauthenticationHandler.retrieveReauthData(url)).thenReturn(ReAuthenticationDetails(password = password))
+
+        testee.commands.test {
+            testee.onStoredCredentialsAvailable(url, credentials, USER_INITIATED, scenarioAllowsReAuthentication = true)
+            assertTrue(awaitItem() is InjectCredentialsFromReauth)
+        }
+    }
+
+    @Test
+    fun whenStoredCredentialsAvailableWithReauthAllowedButNoPasswordThenPromptUser() = runTest {
+        val url = "https://example.com"
+        val credentials = listOf(creds())
+        val mockToggle: Toggle = mock()
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(autofillFeature.canReAuthenticateGoogleLoginsAutomatically()).thenReturn(mockToggle)
+        whenever(reauthenticationHandler.retrieveReauthData(url)).thenReturn(ReAuthenticationDetails(password = null))
+
+        testee.commands.test {
+            testee.onStoredCredentialsAvailable(url, credentials, USER_INITIATED, scenarioAllowsReAuthentication = true)
+            assertTrue(awaitItem() is PromptUserToSelectFromStoredCredentials)
+        }
+    }
+
+    @Test
+    fun whenStoredCredentialsAvailableWithReauthNotAllowedThenPromptUser() = runTest {
+        val url = "https://example.com"
+        val credentials = listOf(creds())
+
+        testee.commands.test {
+            testee.onStoredCredentialsAvailable(url, credentials, LoginTriggerType.AUTOPROMPT, scenarioAllowsReAuthentication = false)
+            assertTrue(awaitItem() is PromptUserToSelectFromStoredCredentials)
         }
     }
 

@@ -44,15 +44,16 @@ class InlineBrowserAutofillConfiguratorTest {
     @Before
     fun before() = runTest {
         whenever(autofillJavascriptLoader.getAutofillJavascript()).thenReturn("")
-        whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any())).thenReturn("")
+        whenever(autofillRuntimeConfigProvider.getRuntimeConfiguration(any(), any(), any())).thenReturn("")
 
-        inlineBrowserAutofillConfigurator = InlineBrowserAutofillConfigurator(
+        val internalConfigurator = RealInlineBrowserAutofillConfigurator(
             autofillRuntimeConfigProvider,
             TestScope(),
             coroutineRule.testDispatcherProvider,
             autofillCapabilityChecker,
             autofillJavascriptLoader,
         )
+        inlineBrowserAutofillConfigurator = InlineBrowserAutofillConfigurator(internalConfigurator)
     }
 
     @Test

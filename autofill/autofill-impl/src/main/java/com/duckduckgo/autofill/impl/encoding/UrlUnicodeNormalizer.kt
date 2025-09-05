@@ -36,14 +36,19 @@ class UrlUnicodeNormalizerImpl @Inject constructor() : UrlUnicodeNormalizer {
         val originalScheme = url.scheme() ?: ""
         val noScheme = url.removePrefix(originalScheme)
 
+        // Extract just the hostname/domain part for IDNA processing
+        val hostEndIndex = noScheme.indexOfFirst { it == '/' || it == '?' || it == '#' }
+        val hostname = if (hostEndIndex == -1) noScheme else noScheme.substring(0, hostEndIndex)
+        val pathAndQuery = if (hostEndIndex == -1) "" else noScheme.substring(hostEndIndex)
+
         val sb = StringBuilder()
         val info = IDNA.Info()
-        IDNA.getUTS46Instance(IDNA.DEFAULT).nameToASCII(noScheme, sb, info)
+        IDNA.getUTS46Instance(IDNA.DEFAULT).nameToASCII(hostname, sb, info)
         if (info.hasErrors()) {
-            logcat { "Unable to convert to ASCII: $url" }
+            logcat { "Unable to convert hostname to ASCII: $hostname" }
             return url
         }
-        return "${originalScheme}$sb"
+        return "${originalScheme}$sb$pathAndQuery"
     }
 
     override fun normalizeUnicode(url: String?): String? {
