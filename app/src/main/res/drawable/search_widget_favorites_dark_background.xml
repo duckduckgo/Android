@@ -16,5 +16,5 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/searchWidgetBackgroundColorDark" />
-    <corners android:radius="@dimen/largeShapeCornerRadius" />
+    <corners android:radius="@dimen/extraLargeShapeCornerRadius" />
 </shape>

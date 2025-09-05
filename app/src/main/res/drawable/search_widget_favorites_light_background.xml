@@ -16,5 +16,5 @@
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
     <solid android:color="@color/background_background_light" />
-    <corners android:radius="@dimen/largeShapeCornerRadius" />
+    <corners android:radius="@dimen/extraLargeShapeCornerRadius" />
 </shape>
