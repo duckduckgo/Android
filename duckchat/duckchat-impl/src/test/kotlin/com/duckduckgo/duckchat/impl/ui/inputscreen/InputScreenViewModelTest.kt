@@ -12,6 +12,8 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
@@ -21,6 +23,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionSto
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import java.io.IOException
@@ -58,6 +61,7 @@ class InputScreenViewModelTest {
     private val autoCompleteSettings: AutoCompleteSettings = mock()
     private val pixel: Pixel = mock()
     private val inputScreenSessionStore: InputScreenSessionStore = mock()
+    private val duckChat: DuckChat = mock()
 
     @Before
     fun setup() {
@@ -78,6 +82,7 @@ class InputScreenViewModelTest {
             autoCompleteSettings = autoCompleteSettings,
             pixel = pixel,
             sessionStore = inputScreenSessionStore,
+            duckChat = duckChat,
         )
     }
 
@@ -940,5 +945,25 @@ class InputScreenViewModelTest {
         viewModel.onSearchSubmitted(queryWithNewlines)
 
         assertEquals(SubmitSearch(expected), viewModel.command.value)
+    }
+
+    @Test
+    fun `when userSelectedAutocomplete with chat then command and pixel sent`() = runTest {
+        val viewModel = createViewModel()
+        val query = "example"
+
+        val duckAIPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query)
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+        val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString())
+
+        viewModel.userSelectedAutocomplete(duckAIPrompt)
+
+        assertEquals(SubmitChat(query), viewModel.command.value)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
+        verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION, params)
     }
 }

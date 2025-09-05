@@ -444,8 +444,6 @@ class BrowserTabViewModelTest {
 
     private val mockDuckPlayer: DuckPlayer = mock()
 
-    private val mockDuckChat: DuckChat = mock()
-
     private val mockDuckAiFeatureState: DuckAiFeatureState = mock()
 
     private val mockDuckAiFeatureStateInputScreenFlow = MutableStateFlow(false)
@@ -554,6 +552,7 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -617,6 +616,7 @@ class BrowserTabViewModelTest {
             mockTabRepository,
             mockUserStageStore,
             mockAutocompleteTabsFeature,
+            mockDuckChat,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
@@ -6040,6 +6040,21 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.SwitchToTab> {
             assertEquals(tabId, this.tabId)
+        }
+    }
+
+    @Test
+    fun whenUserSelectedAutocompleteDuckAiPromptThenCommandSent() = runTest {
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
+        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
+        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
+
+        val duckPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("title")
+
+        testee.userSelectedAutocomplete(duckPrompt)
+        assertCommandIssued<Command.SubmitChat> {
+            assertEquals(query, "title")
         }
     }
 
