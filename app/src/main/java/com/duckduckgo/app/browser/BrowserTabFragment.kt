@@ -2153,6 +2153,7 @@ class BrowserTabFragment :
                 webViewCompatWebShareLauncher.launch(it.data)
             }
             is Command.ScreenLock -> screenLock(it.data)
+            is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url, it.showDuckPlayerIcon)
@@ -3176,6 +3177,14 @@ class BrowserTabFragment :
     private fun screenLock(data: JsCallbackData) {
         val returnData = jsOrientationHandler.updateOrientation(data, this)
         contentScopeScripts.onResponse(returnData)
+    }
+
+    private fun webViewCompatScreenLock(
+        data: JsCallbackData,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        val returnData = jsOrientationHandler.updateOrientation(data, this)
+        onResponse(returnData.params)
     }
 
     private fun screenUnlock() {

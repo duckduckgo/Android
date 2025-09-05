@@ -253,6 +253,7 @@ sealed class Command {
     data class WebShareRequest(val data: JsCallbackData) : Command()
     data class WebViewCompatWebShareRequest(val data: JsCallbackData, val onResponse: (JSONObject) -> Unit) : Command()
     data class ScreenLock(val data: JsCallbackData) : Command()
+    data class WebViewCompatScreenLock(val data: JsCallbackData, val onResponse: (JSONObject) -> Unit) : Command()
     data object ScreenUnlock : Command()
     data object ShowFaviconsPrompt : Command()
     data class ShowSSLError(val handler: SslErrorHandler, val error: SslErrorResponse) : Command()
