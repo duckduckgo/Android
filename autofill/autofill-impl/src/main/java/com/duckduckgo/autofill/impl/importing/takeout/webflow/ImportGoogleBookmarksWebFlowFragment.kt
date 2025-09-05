@@ -27,6 +27,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.widget.Toolbar
+import androidx.webkit.WebViewCompat
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -36,6 +37,8 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentImportGoogleBookmarksWebflowBinding
+import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPasswordConfigStore
+import com.duckduckgo.autofill.impl.importing.gpm.webflow.PasswordImporterScriptLoader
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtractor
 import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutZipDownloader
 import com.duckduckgo.common.ui.DuckDuckGoFragment
@@ -67,6 +70,12 @@ class ImportGoogleBookmarksWebFlowFragment :
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var bookmarkImporterScriptLoader: PasswordImporterScriptLoader
+
+    @Inject
+    lateinit var importBookmarkConfig: AutofillImportPasswordConfigStore
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -302,10 +311,10 @@ class ImportGoogleBookmarksWebFlowFragment :
     @SuppressLint("RequiresFeature")
     private suspend fun configureBookmarkImportJavascript(webView: WebView) {
         // TODO: Add bookmark import config check when available
-        // if (importBookmarkConfig.getConfig().canInjectJavascript) {
-        //     val script = bookmarkImporterScriptLoader.getScript()
-        //     WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
-        // }
+        if (importBookmarkConfig.getConfig().canInjectJavascript) {
+            val script = bookmarkImporterScriptLoader.getScript()
+            WebViewCompat.addDocumentStartJavaScript(webView, script, setOf("*"))
+        }
     }
 
     private fun initialiseToolbar() {
