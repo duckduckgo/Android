@@ -1906,4 +1906,10 @@ class OmnibarLayoutViewModelTest {
             expectNoEvents()
         }
     }
+
+    @Test
+    fun whenBackButtonPressedThenDuckChatLegacyOmnibarBackButtonPixelSent() = runTest {
+        testee.onBackButtonPressed()
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_BACK_BUTTON_PRESSED)
+    }
 }
