@@ -31,6 +31,7 @@
     <dimen name="smallShapeCornerRadius">8dp</dimen>
     <dimen name="mediumShapeCornerRadius">12dp</dimen>
     <dimen name="largeShapeCornerRadius">16dp</dimen>
+    <dimen name="extraLargeShapeCornerRadius">24dp</dimen>
 
     <!-- App Components -->
     <dimen name="changeAppIconSize">75dp</dimen>
@@ -166,6 +167,6 @@
     <dimen name="searchWidgetFavoritesTopMargin">10dp</dimen>
     <dimen name="searchWidgetFavoritesVerticalSpacing">20dp</dimen>
     <dimen name="searchWidgetFavoritesHorizontalSpacing">4dp</dimen>
-    <dimen name="searchWidgetFavoritesCornerRadius">10dp</dimen>
+    <dimen name="searchWidgetFavoritesCornerRadius">12dp</dimen>
 
 </resources>
