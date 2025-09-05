@@ -42,6 +42,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -828,7 +829,8 @@ class InputScreenViewModelTest {
 
         viewModel.onSearchSubmitted("query")
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
+        val expectedParams = mapOf("text_length_bucket" to "short")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED, parameters = expectedParams)
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
     }
 
@@ -841,7 +843,8 @@ class InputScreenViewModelTest {
 
         viewModel.onChatSubmitted("prompt")
 
-        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
+        val expectedParams = mapOf("text_length_bucket" to "short")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED, parameters = expectedParams)
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
     }
 
@@ -965,5 +968,91 @@ class InputScreenViewModelTest {
 
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
         verify(pixel).fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION, params)
+    }
+
+    @Test
+    fun `when onSearchSubmitted then correct text_length_bucket parameters are sent`() = runTest {
+        data class TestCase(
+            val query: String,
+            val expectedBucket: String,
+        )
+
+        val testCases = listOf(
+            // 5 characters
+            TestCase("short", "short"),
+            // 33 characters
+            TestCase("this is a medium length query text", "medium"),
+            // 85 characters
+            TestCase("this is a very long query that should be categorized as long text length bucket", "long"),
+            // 15 characters - boundary
+            TestCase("exactly15chars!", "short"),
+            // 16 characters - boundary
+            TestCase("exactly16chars!!", "medium"),
+            // 40 characters - boundary
+            TestCase("this text has exactly forty characters!", "medium"),
+            // 41 characters - boundary
+            TestCase("this text has exactly forty-one characters", "long"),
+            // 100 characters - boundary
+            TestCase("this text has exactly one hundred characters to test the boundary between long and very long", "long"),
+            // 101 characters - boundary
+            TestCase("this text has exactly one hundred and one characters to test the boundary between long and very long!", "very_long"),
+        )
+
+        testCases.forEach { testCase ->
+            val viewModel = createViewModel()
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onSearchSubmitted(testCase.query)
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED,
+                parameters = mapOf("text_length_bucket" to testCase.expectedBucket),
+            )
+            clearInvocations(pixel) // Reset mock for next iteration
+        }
+    }
+
+    @Test
+    fun `when onChatSubmitted then correct text_length_bucket parameters are sent`() = runTest {
+        data class TestCase(
+            val prompt: String,
+            val expectedBucket: String,
+        )
+
+        val testCases = listOf(
+            // 5 characters
+            TestCase("short", "short"),
+            // 33 characters
+            TestCase("this is a medium length query text", "medium"),
+            // 85 characters
+            TestCase("this is a very long query that should be categorized as long text length bucket", "long"),
+            // 15 characters - boundary
+            TestCase("exactly15chars!", "short"),
+            // 16 characters - boundary
+            TestCase("exactly16chars!!", "medium"),
+            // 40 characters - boundary
+            TestCase("this text has exactly forty characters!", "medium"),
+            // 41 characters - boundary
+            TestCase("this text has exactly forty-one characters", "long"),
+            // 100 characters - boundary
+            TestCase("this text has exactly one hundred characters to test the boundary between long and very long", "long"),
+            // 101 characters - boundary
+            TestCase("this text has exactly one hundred and one characters to test the boundary between long and very long!", "very_long"),
+        )
+
+        testCases.forEach { testCase ->
+            val viewModel = createViewModel()
+            whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+            whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+            viewModel.onChatSubmitted(testCase.prompt)
+
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED,
+                parameters = mapOf("text_length_bucket" to testCase.expectedBucket),
+            )
+            clearInvocations(pixel) // Reset mock for next iteration
+        }
     }
 }
