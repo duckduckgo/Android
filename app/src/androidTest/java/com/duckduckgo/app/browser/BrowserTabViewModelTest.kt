@@ -119,7 +119,6 @@ import com.duckduckgo.app.browser.omnibar.model.OmnibarPosition.TOP
 import com.duckduckgo.app.browser.refreshpixels.RefreshPixelSender
 import com.duckduckgo.app.browser.remotemessage.RemoteMessagingModel
 import com.duckduckgo.app.browser.santize.NonHttpAppLinkChecker
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin.Companion.X_DUCKDUCKGO_ANDROID_HEADER
@@ -551,7 +550,6 @@ class BrowserTabViewModelTest {
     private val mockDuckChatJSHelper: DuckChatJSHelper = mock()
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
-    private val mockSenseOfProtectionExperiment: SenseOfProtectionExperiment = mock()
     private val mockDuckChat: DuckChat = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
@@ -674,7 +672,6 @@ class BrowserTabViewModelTest {
             subscriptions = subscriptions,
             duckPlayer = mockDuckPlayer,
             brokenSitePrompt = mockBrokenSitePrompt,
-            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             onboardingHomeScreenWidgetExperiment = mockOnboardingHomeScreenWidgetExperiment,
             onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             rebrandingFeatureToggle = mockRebrandingFeatureToggle,
@@ -794,7 +791,6 @@ class BrowserTabViewModelTest {
             siteErrorHandlerKillSwitch = mockSiteErrorHandlerKillSwitch,
             siteErrorHandler = mockSiteErrorHandler,
             siteHttpErrorHandler = mockSiteHttpErrorHandler,
-            senseOfProtectionExperiment = mockSenseOfProtectionExperiment,
             subscriptionsJSHelper = mockSubscriptionsJSHelper,
             onboardingDesignExperimentManager = mockOnboardingDesignExperimentManager,
             tabManager = tabManager,
