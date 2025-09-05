@@ -19,7 +19,20 @@ package com.duckduckgo.js.messaging.api
 import org.json.JSONObject
 
 interface WebViewCompatMessageCallback {
+    /**
+     * Processes a JavaScript message received by the WebView.
+     *
+     * This method is responsible for handling a message with the given parameters
+     * and invoking a callback to send a response back to the JavaScript code.
+     *
+     * @param featureName The name of the feature associated with the message.
+     * @param method The method name of the message.
+     * @param id An optional identifier for the message.
+     * @param data An optional JSON object containing additional data for the message.
+     * @param onResponse A callback function to send a response back to the JavaScript code.
+     */
     fun process(
+        context: String,
         featureName: String,
         method: String,
         id: String?,

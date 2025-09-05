@@ -85,6 +85,8 @@ import com.duckduckgo.duckplayer.api.DuckPlayer.OpenDuckPlayerInNewTab.Unavailab
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.privacy.config.api.AmpLinks
@@ -100,6 +102,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -166,6 +169,7 @@ class BrowserWebViewClientTest {
     private val mockContentScopeExperiments: ContentScopeExperiments = mock()
     private val fakeAddDocumentStartJavaScriptPlugins = FakeAddDocumentStartJavaScriptPluginPoint()
     private val fakeMessagingPlugins = FakeWebMessagingPluginPoint()
+    private val fakePostMessageWrapperPlugins = FakePostMessageWrapperPluginPoint()
     private val mockAndroidFeaturesHeaderPlugin = AndroidFeaturesHeaderPlugin(
         mockDuckDuckGoUrlDetector,
         mockCustomHeaderGracePeriodChecker,
@@ -216,6 +220,7 @@ class BrowserWebViewClientTest {
             mockContentScopeExperiments,
             fakeAddDocumentStartJavaScriptPlugins,
             fakeMessagingPlugins,
+            fakePostMessageWrapperPlugins,
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -374,6 +379,17 @@ class BrowserWebViewClientTest {
         assertTrue(fakeMessagingPlugins.plugin.registered)
         testee.destroy(webView)
         assertFalse(fakeMessagingPlugins.plugin.registered)
+    }
+
+    @Test
+    fun whenPostMessageThenCallPostContentScopeMessage() = runTest {
+        val data = SubscriptionEventData("feature", "method", JSONObject())
+
+        assertFalse(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
+
+        testee.postContentScopeMessage(data)
+
+        assertTrue(fakePostMessageWrapperPlugins.plugin.postMessageCalled)
     }
 
     @UiThreadTest
@@ -1347,12 +1363,38 @@ class BrowserWebViewClientTest {
         ) {
             registered = true
         }
+
+        override fun postMessage(subscriptionEventData: SubscriptionEventData) {
+        }
+
+        override val context: String
+            get() = "test"
     }
 
     class FakeWebMessagingPluginPoint : PluginPoint<WebMessagingPlugin> {
         val plugin = FakeWebMessagingPlugin()
 
         override fun getPlugins(): Collection<WebMessagingPlugin> {
+            return listOf(plugin)
+        }
+    }
+
+    class FakePostMessageWrapperPlugin : PostMessageWrapperPlugin {
+        var postMessageCalled = false
+            private set
+
+        override fun postMessage(message: SubscriptionEventData) {
+            postMessageCalled = true
+        }
+
+        override val context: String
+            get() = "contentScopeScripts"
+    }
+
+    class FakePostMessageWrapperPluginPoint : PluginPoint<PostMessageWrapperPlugin> {
+        val plugin = FakePostMessageWrapperPlugin()
+
+        override fun getPlugins(): Collection<PostMessageWrapperPlugin> {
             return listOf(plugin)
         }
     }

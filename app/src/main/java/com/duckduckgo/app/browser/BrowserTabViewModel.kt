@@ -162,6 +162,7 @@ import com.duckduckgo.app.browser.commands.Command.ShowWebContent
 import com.duckduckgo.app.browser.commands.Command.ShowWebPageTitle
 import com.duckduckgo.app.browser.commands.Command.ToggleReportFeedback
 import com.duckduckgo.app.browser.commands.Command.WebShareRequest
+import com.duckduckgo.app.browser.commands.Command.WebViewCompatScreenLock
 import com.duckduckgo.app.browser.commands.Command.WebViewCompatWebShareRequest
 import com.duckduckgo.app.browser.commands.Command.WebViewError
 import com.duckduckgo.app.browser.commands.NavigationCommand
@@ -3676,6 +3677,33 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun webViewCompatProcessJsCallbackMessage(
+        context: String,
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        processGlobalMessages(
+            featureName = featureName,
+            method = method,
+            id = id,
+            data = data,
+            onResponse = onResponse,
+        )
+
+        when (context) {
+            "contentScopeScripts" -> processContentScopeMessages(
+                featureName = featureName,
+                method = method,
+                id = id,
+                data = data,
+                onResponse = onResponse,
+            )
+        }
+    }
+
+    private fun processGlobalMessages(
         featureName: String,
         method: String,
         id: String?,
@@ -3683,11 +3711,52 @@ class BrowserTabViewModel @Inject constructor(
         onResponse: (JSONObject) -> Unit,
     ) {
         when (method) {
-            "webShare" -> if (id != null && data != null) {
-                webViewCompatWebShare(featureName, method, id, data, onResponse)
-            }
             "addDebugFlag" -> {
-                site?.debugFlags = (site?.debugFlags ?: listOf()).toMutableList().plus(featureName)?.toList()
+                site?.debugFlags =
+                    (site?.debugFlags ?: listOf())
+                        .toMutableList()
+                        .plus(featureName)
+                        .distinct()
+            }
+        }
+    }
+
+    private fun processContentScopeMessages(
+        featureName: String,
+        method: String,
+        id: String?,
+        data: JSONObject?,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        when (featureName) {
+            "webCompat" -> {
+                when (method) {
+                    "webShare" -> if (id != null && data != null) {
+                        webViewCompatWebShare(featureName, method, id, data, onResponse)
+                    }
+                    "permissionsQuery" -> if (id != null && data != null) {
+                        webViewCompatPermissionsQuery(featureName, method, id, data, onResponse)
+                    }
+
+                    "screenLock" -> if (id != null && data != null) {
+                        webViewCompatScreenLock(featureName, method, id, data, onResponse)
+                    }
+
+                    "screenUnlock" -> screenUnlock()
+                }
+            }
+            "breakageReportResult" -> if (data != null) {
+                breakageReportResult(data)
+            }
+            "initialPing" -> {
+                // TODO: Eventually, we might want plugins here
+                val response = JSONObject(
+                    mapOf(
+                        "desktopModeEnabled" to (getSite()?.isDesktopMode ?: false),
+                        "forcedZoomEnabled" to (accessibilityViewState.value?.forceZoom ?: false),
+                    ),
+                )
+                onResponse(response)
             }
         }
     }
@@ -3810,6 +3879,27 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    private fun webViewCompatPermissionsQuery(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.io()) {
+            val response = if (url == null) {
+                getDataForPermissionState(featureName, method, id, SitePermissionQueryResponse.Denied)
+            } else {
+                val permissionState = sitePermissionsManager.getPermissionsQueryResponse(url!!, tabId, data.optString("name"))
+                getDataForPermissionState(featureName, method, id, permissionState)
+            }
+
+            withContext(dispatchers.main()) {
+                onResponse(response.params)
+            }
+        }
+    }
+
     private fun screenLock(
         featureName: String,
         method: String,
@@ -3820,6 +3910,22 @@ class BrowserTabViewModel @Inject constructor(
             if (androidBrowserConfig.screenLock().isEnabled()) {
                 withContext(dispatchers.main()) {
                     command.value = ScreenLock(JsCallbackData(data, featureName, method, id))
+                }
+            }
+        }
+    }
+
+    private fun webViewCompatScreenLock(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        viewModelScope.launch(dispatchers.main()) {
+            if (androidBrowserConfig.screenLock().isEnabled()) {
+                withContext(dispatchers.main()) {
+                    command.value = WebViewCompatScreenLock(JsCallbackData(data, featureName, method, id), onResponse)
                 }
             }
         }

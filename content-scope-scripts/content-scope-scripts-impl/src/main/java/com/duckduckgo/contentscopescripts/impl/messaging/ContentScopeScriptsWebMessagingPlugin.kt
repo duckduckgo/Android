@@ -26,18 +26,24 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
+import com.duckduckgo.js.messaging.api.SubscriptionEvent
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
+import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import dagger.SingleInstanceIn
 import javax.inject.Inject
+import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -45,7 +51,10 @@ import org.json.JSONObject
 
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
-@ContributesMultibinding(ActivityScope::class)
+@Named("contentScopeScripts")
+@SingleInstanceIn(FragmentScope::class)
+@ContributesBinding(FragmentScope::class)
+@ContributesMultibinding(scope = FragmentScope::class, ignoreQualifier = true)
 class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
@@ -57,8 +66,10 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
-    private val context: String = "contentScopeScripts"
+    override val context: String = "contentScopeScripts"
     private val allowedDomains: Set<String> = setOf("*")
+
+    private var globalReplyProxy: JavaScriptReplyProxy? = null
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     internal fun process(
@@ -72,6 +83,11 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
 
             jsMessage?.let {
                 if (context == jsMessage.context) {
+                    // Setup reply proxy so we can send subscription events
+                    if (jsMessage.featureName == "messaging" && jsMessage.method == "initialPing") {
+                        globalReplyProxy = replyProxy
+                    }
+
                     // Process global handlers first (always processed regardless of feature handlers)
                     globalHandlers.getPlugins()
                         .map { it.getGlobalJsMessageHandler() }
@@ -128,11 +144,12 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         replyProxy: JavaScriptReplyProxy,
     ) {
         jsMessageCallback.process(
-            jsMessage.featureName,
-            jsMessage.method,
-            jsMessage.id ?: "",
-            jsMessage.params,
-            { response: JSONObject ->
+            context = context,
+            featureName = jsMessage.featureName,
+            method = jsMessage.method,
+            id = jsMessage.id ?: "",
+            data = jsMessage.params,
+            onResponse = { response: JSONObject ->
                 val callbackData = JsCallbackData(
                     id = jsMessage.id ?: "",
                     params = response,
@@ -149,7 +166,9 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         webView: WebView,
     ) {
         appCoroutineScope.launch {
-            if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
+            if (!webViewCompatContentScopeScripts.isEnabled()) {
+                return@launch
+            }
 
             runCatching {
                 return@runCatching webViewCompatWrapper.addWebMessageListener(
@@ -195,6 +214,30 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
             }
             appCoroutineScope.launch(dispatcherProvider.main()) {
                 replyProxy.postMessage(responseWithId.toString())
+            }
+        }
+    }
+
+    @SuppressLint("RequiresFeature")
+    override fun postMessage(subscriptionEventData: SubscriptionEventData) {
+        runCatching {
+            appCoroutineScope.launch {
+                if (!webViewCompatContentScopeScripts.isEnabled()) {
+                    return@launch
+                }
+
+                val subscriptionEvent = SubscriptionEvent(
+                    context = context,
+                    featureName = subscriptionEventData.featureName,
+                    subscriptionName = subscriptionEventData.subscriptionName,
+                    params = subscriptionEventData.params,
+                ).let {
+                    moshi.adapter(SubscriptionEvent::class.java).toJson(it)
+                }
+
+                withContext(dispatcherProvider.main()) {
+                    globalReplyProxy?.postMessage(subscriptionEvent)
+                }
             }
         }
     }

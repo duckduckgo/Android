@@ -68,6 +68,18 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
             )
         )
 
+        val ISSUE_POST_MESSAGE_USAGE: Issue = Issue.create(
+            id = "PostMessageUsage",
+            briefDescription = "Use PostMessageWrapperPlugin to post messages",
+            explanation = "Use `PluginPoint<PostMessageWrapperPlugin>` instead for backwards compatibility",
+            category = Category.CORRECTNESS,
+            severity = Severity.ERROR,
+            implementation = Implementation(
+                WebViewCompatApisUsageDetector::class.java,
+                Scope.JAVA_FILE_SCOPE
+            )
+        )
+
         private val webViewCompatApiUsages = listOf(
             WebViewCompatApiUsage(
                 methodName = "addWebMessageListener",
@@ -99,6 +111,11 @@ class WebViewCompatApisUsageDetector : Detector(), SourceCodeScanner {
                 containingClass = "com.duckduckgo.app.browser.DuckDuckGoWebView",
                 issue = ISSUE_ADD_DOCUMENT_START_JAVASCRIPT_USAGE
             ),
+            WebViewCompatApiUsage(
+                methodName = "postMessage",
+                containingClass = "com.duckduckgo.js.messaging.api.WebMessagingPlugin",
+                issue = ISSUE_POST_MESSAGE_USAGE
+            )
         )
 
         val issues = webViewCompatApiUsages.mapToSetOrEmpty { it.issue }

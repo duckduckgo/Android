@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 DuckDuckGo
+ * Copyright (c) 2022 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,13 @@
 
 package com.duckduckgo.contentscopescripts.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 
-@ContributesRemoteFeature(
+@ContributesPluginPoint(
     scope = AppScope::class,
-    featureName = "clientContentFeatures",
+    boundType = PostMessageWrapperPlugin::class,
 )
-
-interface ContentScopeScriptsFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun useNewWebCompatApis(): Toggle
-}
+@Suppress("unused")
+interface UnusedPostMessageWrapperPluginPoint

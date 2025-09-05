@@ -27,6 +27,7 @@ import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult
 import com.duckduckgo.js.messaging.api.ProcessResult.SendToConsumer
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
 import junit.framework.TestCase.assertEquals
@@ -36,6 +37,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
@@ -217,9 +219,56 @@ class ContentScopeScriptsWebMessagingPluginTest {
         verify(mockWebViewCompatWrapper).removeWebMessageListener(mockWebView, "contentScopeAdsjs")
     }
 
+    @Test
+    fun `when posting message and adsjs is disabled then do not post message`() = runTest {
+        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
+        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+        givenInterfaceIsRegistered()
+
+        testee.postMessage(eventData)
+
+        verify(mockReplyProxy, never()).postMessage(anyString())
+    }
+
+    @Test
+    fun `when posting message and adsjs is enabled but webView not registered then do not post message`() = runTest {
+        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+
+        testee.postMessage(eventData)
+
+        verify(mockReplyProxy, never()).postMessage(anyString())
+    }
+
+    @Test
+    fun `when posting message and adsjs is enabled but initialPing not processes then do not post message`() = runTest {
+        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+
+        testee.postMessage(eventData)
+
+        verify(mockReplyProxy, never()).postMessage(anyString())
+    }
+
+    @Test
+    fun `when posting message after getting initialPing and adsjs is enabled then post message`() = runTest {
+        whenever(webViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
+        val eventData = SubscriptionEventData("feature", "subscription", JSONObject())
+        givenInterfaceIsRegistered()
+        val expectedMessage = """
+            {"context":"contentScopeScripts","featureName":"feature","params":{},"subscriptionName":"subscription"}
+        """.trimIndent()
+
+        verify(mockWebView, never()).postWebMessage(any(), any())
+
+        testee.postMessage(eventData)
+        verify(mockReplyProxy).postMessage(expectedMessage)
+    }
+
     private val callback = object : WebViewCompatMessageCallback {
         var counter = 0
         override fun process(
+            context: String,
             featureName: String,
             method: String,
             id: String?,
@@ -232,5 +281,10 @@ class ContentScopeScriptsWebMessagingPluginTest {
 
     private fun givenInterfaceIsRegistered() = runTest {
         testee.register(callback, mockWebView)
+        val initialPingMessage =
+            """
+                {"context":"contentScopeScripts","featureName":"messaging","id":"debugId","method":"initialPing","params":{}}
+            """.trimIndent()
+        testee.process(initialPingMessage, callback, mockReplyProxy)
     }
 }

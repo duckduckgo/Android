@@ -1190,9 +1190,14 @@ class BrowserTabFragment :
     private fun onOmnibarCustomTabPrivacyDashboardPressed() {
         val params = PrivacyDashboardPrimaryScreen(tabId)
         val intent = globalActivityStarter.startIntent(requireContext(), params)
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         intent?.let { activityResultPrivacyDashboard.launch(intent) }
         pixel.fire(CustomTabPixelNames.CUSTOM_TABS_PRIVACY_DASHBOARD_OPENED)
+    }
+
+    private fun postBreakageReportingEvent() {
+        val eventData = createBreakageReportingEventData()
+        webViewClient.postContentScopeMessage(eventData)
     }
 
     private fun onFireButtonPressed() {
@@ -1202,12 +1207,12 @@ class BrowserTabFragment :
     }
 
     private fun onBrowserMenuButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         viewModel.onBrowserMenuClicked(isCustomTab = isActiveCustomTab())
     }
 
     private fun onOmnibarPrivacyShieldButtonPressed() {
-        contentScopeScripts.sendSubscriptionEvent(createBreakageReportingEventData())
+        postBreakageReportingEvent()
         launchPrivacyDashboard(toggle = false)
     }
 
@@ -1934,11 +1939,17 @@ class BrowserTabFragment :
             is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.RefreshAndShowPrivacyProtectionEnabledConfirmation -> {
+                webView?.let {
+                    webViewClient.configureWebView(it, null)
+                }
                 refresh()
                 privacyProtectionEnabledConfirmation(it.domain)
             }
 
             is Command.RefreshAndShowPrivacyProtectionDisabledConfirmation -> {
+                webView?.let {
+                    webViewClient.configureWebView(it, null)
+                }
                 refresh()
                 privacyProtectionDisabledConfirmation(it.domain)
             }
@@ -2142,6 +2153,7 @@ class BrowserTabFragment :
                 webViewCompatWebShareLauncher.launch(it.data)
             }
             is Command.ScreenLock -> screenLock(it.data)
+            is Command.WebViewCompatScreenLock -> webViewCompatScreenLock(it.data, it.onResponse)
             is Command.ScreenUnlock -> screenUnlock()
             is Command.ShowFaviconsPrompt -> showFaviconsPrompt()
             is Command.ShowWebPageTitle -> showWebPageTitleInCustomTab(it.title, it.url, it.showDuckPlayerIcon)
@@ -3029,23 +3041,6 @@ class BrowserTabFragment :
         webView?.let {
             it.isSafeWebViewEnabled = safeWebViewFeature.self().isEnabled()
             it.webViewClient = webViewClient
-            lifecycleScope.launch(dispatchers.main()) {
-                webViewClient.configureWebView(
-                    it,
-                    object : WebViewCompatMessageCallback {
-                        override fun process(
-                            featureName: String,
-                            method: String,
-                            id: String?,
-                            data: JSONObject?,
-                            onResponse: (JSONObject) -> Unit,
-                        ) {
-                            viewModel.webViewCompatProcessJsCallbackMessage(featureName, method, id, data, onResponse)
-                        }
-                    },
-                )
-            }
-
             it.webChromeClient = webChromeClient
             it.clearSslPreferences()
 
@@ -3133,6 +3128,28 @@ class BrowserTabFragment :
                     }
                 },
             )
+            webViewClient.configureWebView(
+                it,
+                object : WebViewCompatMessageCallback {
+                    override fun process(
+                        context: String,
+                        featureName: String,
+                        method: String,
+                        id: String?,
+                        data: JSONObject?,
+                        onResponse: (JSONObject) -> Unit,
+                    ) {
+                        viewModel.webViewCompatProcessJsCallbackMessage(
+                            context = context,
+                            featureName = featureName,
+                            method = method,
+                            id = id,
+                            data = data,
+                            onResponse = onResponse,
+                        )
+                    }
+                },
+            )
             duckPlayerScripts.register(
                 it,
                 object : JsMessageCallback() {
@@ -3160,6 +3177,14 @@ class BrowserTabFragment :
     private fun screenLock(data: JsCallbackData) {
         val returnData = jsOrientationHandler.updateOrientation(data, this)
         contentScopeScripts.onResponse(returnData)
+    }
+
+    private fun webViewCompatScreenLock(
+        data: JsCallbackData,
+        onResponse: (JSONObject) -> Unit,
+    ) {
+        val returnData = jsOrientationHandler.updateOrientation(data, this)
+        onResponse(returnData.params)
     }
 
     private fun screenUnlock() {

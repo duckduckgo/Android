@@ -16,19 +16,8 @@
 
 package com.duckduckgo.js.messaging.api
 
-import android.webkit.WebView
-
-interface WebMessagingPlugin {
-    fun register(
-        jsMessageCallback: WebViewCompatMessageCallback,
-        webView: WebView,
-    )
-
-    fun unregister(
-        webView: WebView,
-    )
-
-    fun postMessage(subscriptionEventData: SubscriptionEventData)
+interface PostMessageWrapperPlugin {
+    fun postMessage(message: SubscriptionEventData)
 
     val context: String
 }
