@@ -29,7 +29,9 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.widget.DuckAiOnlyWidget
 import com.duckduckgo.widget.SearchAndFavoritesWidget
+import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
 import com.duckduckgo.widget.SearchWidgetLight
 import com.squareup.anvil.annotations.ContributesBinding
@@ -37,7 +39,12 @@ import javax.inject.Inject
 import javax.inject.Named
 
 interface AddWidgetLauncher {
-    fun launchAddWidget(activity: Activity?, simpleWidgetPrompt: Boolean = false)
+    fun launchAddWidget(
+        activity: Activity?,
+        simpleWidgetPrompt: Boolean = false,
+        searchOnlyWidgetPrompt: Boolean = false,
+        duckAiOnlyWidgetPrompt: Boolean = false,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -47,11 +54,16 @@ class AddWidgetCompatLauncher @Inject constructor(
     private val widgetCapabilities: WidgetCapabilities,
 ) : AddWidgetLauncher {
 
-    override fun launchAddWidget(activity: Activity?, simpleWidgetPrompt: Boolean) {
+    override fun launchAddWidget(
+        activity: Activity?,
+        simpleWidgetPrompt: Boolean,
+        searchOnlyWidgetPrompt: Boolean,
+        duckAiOnlyWidgetPrompt: Boolean,
+    ) {
         if (widgetCapabilities.supportsAutomaticWidgetAdd) {
-            defaultAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt)
+            defaultAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt)
         } else {
-            legacyAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt)
+            legacyAddWidgetLauncher.launchAddWidget(activity, simpleWidgetPrompt, searchOnlyWidgetPrompt, duckAiOnlyWidgetPrompt)
         }
     }
 }
@@ -71,6 +83,8 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
     override fun launchAddWidget(
         activity: Activity?,
         simpleWidgetPrompt: Boolean,
+        searchOnlyWidgetPrompt: Boolean,
+        duckAiOnlyWidgetPrompt: Boolean,
     ) {
         activity?.let {
             val widgetLabel: String
@@ -82,6 +96,14 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
                 simpleWidgetPrompt -> {
                     widgetLabel = it.getString(R.string.searchWidgetLabel)
                     ComponentName(it, SearchWidget::class.java)
+                }
+                searchOnlyWidgetPrompt -> {
+                    widgetLabel = it.getString(R.string.searchOnlyWidgetLabel)
+                    ComponentName(it, SearchOnlyWidget::class.java)
+                }
+                duckAiOnlyWidgetPrompt -> {
+                    widgetLabel = it.getString(R.string.duckAiOnlyWidgetLabel)
+                    ComponentName(it, DuckAiOnlyWidget::class.java)
                 }
                 else -> {
                     widgetLabel = it.getString(R.string.favoritesWidgetLabel)
@@ -109,7 +131,7 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
 @ContributesBinding(AppScope::class)
 @Named("legacyAddWidgetLauncher")
 class LegacyAddWidgetLauncher @Inject constructor() : AddWidgetLauncher {
-    override fun launchAddWidget(activity: Activity?, simpleWidgetPrompt: Boolean) {
+    override fun launchAddWidget(activity: Activity?, simpleWidgetPrompt: Boolean, searchOnlyWidgetPrompt: Boolean, duckAiOnlyWidgetPrompt: Boolean) {
         activity?.let {
             val options = ActivityOptions.makeSceneTransitionAnimation(it).toBundle()
             it.startActivity(AddWidgetInstructionsActivity.intent(it), options)

@@ -25,7 +25,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
 import android.widget.RemoteViews
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -67,7 +66,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
     lateinit var gridCalculator: SearchAndFavoritesGridCalculator
 
     @Inject
-    lateinit var voiceSearchWidgetConfigurator: VoiceSearchWidgetConfigurator
+    lateinit var searchWidgetConfigurator: SearchWidgetConfigurator
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
@@ -105,7 +104,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onUpdate" }
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             appWidgetIds.forEach { id ->
                 updateWidget(context, appWidgetManager, id, null)
             }
@@ -120,7 +119,7 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         newOptions: Bundle,
     ) {
         logcat(INFO) { "SearchAndFavoritesWidget - onAppWidgetOptionsChanged" }
-        appCoroutineScope.launch(dispatchers.io()) {
+        appCoroutineScope.launch {
             updateWidget(context, appWidgetManager, appWidgetId, newOptions)
         }
         super.onAppWidgetOptionsChanged(context, appWidgetManager, appWidgetId, newOptions)
@@ -164,13 +163,16 @@ class SearchAndFavoritesWidget : AppWidgetProvider() {
         withContext(dispatchers.main()) {
             val remoteViews = RemoteViews(context.packageName, layoutId)
 
-            remoteViews.setViewVisibility(R.id.searchInputBox, if (columns == 2) View.INVISIBLE else View.VISIBLE)
             remoteViews.setOnClickPendingIntent(R.id.widgetSearchBarContainer, buildPendingIntent(context))
 
-            voiceSearchWidgetConfigurator.configureVoiceSearch(context, remoteViews, true)
+            searchWidgetConfigurator.populateRemoteViews(
+                context = context,
+                remoteViews = remoteViews,
+                fromFavWidget = true,
+            )
             configureFavoritesGridView(context, appWidgetId, remoteViews, widgetTheme)
             configureEmptyWidgetCta(context, appWidgetId, remoteViews, widgetTheme)
-// TODO: can this be moved to io?
+
             appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.favoritesGrid)
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.emptyfavoritesGrid)

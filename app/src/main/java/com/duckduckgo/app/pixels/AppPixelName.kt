@@ -79,6 +79,10 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SEARCH_AND_FAVORITES_WIDGET_DELETED(pixelName = "m_search_and_favorites_widget_deleted"),
     SEARCH_WIDGET_ADDED(pixelName = "m_search_widget_added"),
     SEARCH_WIDGET_DELETED(pixelName = "m_search_widget_deleted"),
+    SEARCH_ONLY_WIDGET_ADDED(pixelName = "m_search_only_widget_added"),
+    SEARCH_ONLY_WIDGET_DELETED(pixelName = "m_search_only_widget_deleted"),
+    DUCKAI_ONLY_WIDGET_ADDED(pixelName = "m_duckai_only_widget_added"),
+    DUCKAI_ONLY_WIDGET_DELETED(pixelName = "m_duckai_only_widget_deleted"),
 
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
