@@ -16,15 +16,18 @@
 
 package com.duckduckgo.duckchat.impl.inputscreen.ui
 
+import android.content.res.Configuration
 import android.os.Build.VERSION
 import android.os.Bundle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.inputscreen.BrowserAndInputScreenTransitionProvider
 import com.duckduckgo.duckchat.api.inputscreen.InputScreenActivityParams
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -34,9 +37,20 @@ class InputScreenActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var browserAndInputScreenTransitionProvider: BrowserAndInputScreenTransitionProvider
 
+    @Inject
+    lateinit var pixel: Pixel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_input_screen)
+        val params = mapOf(
+            "orientation" to if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                "landscape"
+            } else {
+                "portrait"
+            },
+        )
+        pixel.fire(pixel = DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_TEXT_AREA_FOCUSED, parameters = params)
     }
 
     override fun finish() {

@@ -64,6 +64,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
+import com.duckduckgo.duckchat.impl.pixel.inputScreenPixelsModeParam
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import dagger.assisted.Assisted
@@ -136,6 +137,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     private val initialSearchInputText = currentOmnibarText.trim()
     private val searchInputTextState = MutableStateFlow(initialSearchInputText)
+    private val chatInputTextState = MutableStateFlow("")
 
     private val _submitButtonIconState = MutableStateFlow(SubmitButtonIconState(SubmitButtonIcon.SEARCH))
     val submitButtonIconState: StateFlow<SubmitButtonIconState> = _submitButtonIconState.asStateFlow()
@@ -348,6 +350,7 @@ class InputScreenViewModel @AssistedInject constructor(
     }
 
     fun onChatInputTextChanged(query: String) {
+        chatInputTextState.value = query.trim()
         _visibilityState.update {
             it.copy(showChatLogo = (query == initialSearchInputText && !it.autoCompleteSuggestionsVisible) || query.isEmpty())
         }
@@ -406,7 +409,7 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }
         if (userSelectedMode == SEARCH) {
-            fireModeSwitchedPixel()
+            fireModeSwitchedPixel(directionToSearch = false)
         }
         userSelectedMode = CHAT
     }
@@ -418,9 +421,14 @@ class InputScreenViewModel @AssistedInject constructor(
             }
         }
         if (userSelectedMode == CHAT) {
-            fireModeSwitchedPixel()
+            fireModeSwitchedPixel(directionToSearch = true)
         }
         userSelectedMode = SEARCH
+    }
+
+    fun onSendButtonClicked() {
+        val pixelParams = inputScreenPixelsModeParam(isSearchMode = userSelectedMode == SEARCH)
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED, parameters = pixelParams)
     }
 
     fun onVoiceSearchDisabled() {
@@ -476,8 +484,21 @@ class InputScreenViewModel @AssistedInject constructor(
         pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN, type = Daily())
     }
 
-    private fun fireModeSwitchedPixel() {
-        pixel.fire(DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+    private fun fireModeSwitchedPixel(directionToSearch: Boolean) {
+        val hadText = if (directionToSearch) {
+            chatInputTextState.value.isNotBlank()
+        } else {
+            searchInputTextState.value.isNotBlank()
+        }
+        val params = mapOf(
+            "direction" to if (directionToSearch) {
+                "to_search"
+            } else {
+                "to_duckai"
+            },
+            "had_text" to hadText.toString(),
+        )
+        pixel.fire(pixel = DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED, parameters = params)
     }
 
     private suspend fun checkAndFireBothModesPixel() {
