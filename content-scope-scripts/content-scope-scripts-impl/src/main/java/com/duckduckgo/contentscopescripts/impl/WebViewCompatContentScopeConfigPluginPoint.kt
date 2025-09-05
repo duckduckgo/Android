@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.contentscopescripts.impl
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
+import com.duckduckgo.di.scopes.AppScope
 
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation AndroidX.webkit
-    implementation project(':feature-toggles-api')
-    implementation project(':js-messaging-api')
-}
-
-android {
-    namespace 'com.duckduckgo.contentscopescripts.api'
-}
+@ContributesPluginPoint(
+    scope = AppScope::class,
+    boundType = WebViewCompatContentScopeJsMessageHandlersPlugin::class,
+)
+@Suppress("unused")
+interface UnusedWebViewCompatContentScopeJsMessageHandlersPluginPoint

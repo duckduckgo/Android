@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
-}
+package com.duckduckgo.js.messaging.api
 
-apply from: "$rootProject.projectDir/gradle/android-library.gradle"
+import android.webkit.WebView
 
-dependencies {
-    implementation AndroidX.core.ktx
-    implementation AndroidX.webkit
-    implementation project(':feature-toggles-api')
-    implementation project(':js-messaging-api')
-}
+/**
+ * Plugin interface for injecting JavaScript code that executes at document start.
+ * * Allows plugins to inject JavaScript that will be executed before any other scripts on the page.
+ * Useful for privacy protections and that need to run as early as possible and/or on iframes.
+ */
+interface AddDocumentStartJavaScriptPlugin {
 
-android {
-    namespace 'com.duckduckgo.contentscopescripts.api'
+    fun addDocumentStartJavaScript(
+        webView: WebView,
+    )
 }

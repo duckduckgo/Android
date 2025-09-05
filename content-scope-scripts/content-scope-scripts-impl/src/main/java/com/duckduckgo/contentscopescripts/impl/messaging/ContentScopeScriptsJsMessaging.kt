@@ -104,7 +104,9 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             subscriptionEventData.subscriptionName,
             subscriptionEventData.params,
         )
-        jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        if (::webView.isInitialized) {
+            jsMessageHelper.sendSubscriptionEvent(subscriptionEvent, callbackName, secret, webView)
+        }
     }
 
     override fun onResponse(response: JsCallbackData) {
