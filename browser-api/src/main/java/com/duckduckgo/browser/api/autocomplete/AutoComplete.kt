@@ -22,6 +22,11 @@ interface AutoComplete {
     fun autoComplete(query: String): Flow<AutoCompleteResult>
     suspend fun userDismissedHistoryInAutoCompleteIAM()
     suspend fun submitUserSeenHistoryIAM()
+    suspend fun fireAutocompletePixel(
+        suggestions: List<AutoCompleteSuggestion>,
+        suggestion: AutoCompleteSuggestion,
+        experimentalInputScreen: Boolean = false,
+    )
 
     data class AutoCompleteResult(
         val query: String,
