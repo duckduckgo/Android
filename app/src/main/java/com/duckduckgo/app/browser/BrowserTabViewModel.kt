@@ -243,12 +243,8 @@ import com.duckduckgo.app.onboardingdesignexperiment.OnboardingDesignExperimentM
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_DISMISSED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_BANNER_SHOWN
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_SITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_RESULT_DELETED_DAILY
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
-import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_SEARCH_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.ONBOARDING_VISIT_SITE_CUSTOM
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_CLICKED_DAILY
@@ -947,60 +943,11 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    suspend fun fireAutocompletePixel(suggestion: AutoCompleteSuggestion) {
-        val currentViewState = currentAutoCompleteViewState()
-
-        val hasBookmarks = withContext(dispatchers.io()) {
-            savedSitesRepository.hasBookmarks()
-        }
-        val hasFavorites = withContext(dispatchers.io()) {
-            savedSitesRepository.hasFavorites()
-        }
-        val hasHistory = withContext(dispatchers.io()) {
-            history.hasHistory()
-        }
-        val hasTabs = withContext(dispatchers.io()) {
-            (tabRepository.liveTabs.value?.size ?: 0) > 1
-        }
-        val hasBookmarkResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && !it.isFavorite }
-        val hasFavoriteResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteBookmarkSuggestion && it.isFavorite }
-        val hasHistoryResults =
-            currentViewState.searchResults.suggestions.any { it is AutoCompleteHistorySuggestion || it is AutoCompleteHistorySearchSuggestion }
-        val hasSwitchToTabResults = currentViewState.searchResults.suggestions.any { it is AutoCompleteSwitchToTabSuggestion }
-        val params = mapOf(
-            PixelParameter.SHOWED_BOOKMARKS to hasBookmarkResults.toString(),
-            PixelParameter.SHOWED_FAVORITES to hasFavoriteResults.toString(),
-            PixelParameter.BOOKMARK_CAPABLE to hasBookmarks.toString(),
-            PixelParameter.FAVORITE_CAPABLE to hasFavorites.toString(),
-            PixelParameter.HISTORY_CAPABLE to hasHistory.toString(),
-            PixelParameter.SHOWED_HISTORY to hasHistoryResults.toString(),
-            PixelParameter.SWITCH_TO_TAB_CAPABLE to hasTabs.toString(),
-            PixelParameter.SHOWED_SWITCH_TO_TAB to hasSwitchToTabResults.toString(),
-        )
-        val pixelName = when (suggestion) {
-            is AutoCompleteBookmarkSuggestion -> {
-                if (suggestion.isFavorite) {
-                    AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION
-                } else {
-                    AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION
-                }
-            }
-
-            is AutoCompleteSearchSuggestion -> if (suggestion.isUrl) AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION else AUTOCOMPLETE_SEARCH_PHRASE_SELECTION
-            is AutoCompleteHistorySuggestion -> AUTOCOMPLETE_HISTORY_SITE_SELECTION
-            is AutoCompleteHistorySearchSuggestion -> AUTOCOMPLETE_HISTORY_SEARCH_SELECTION
-            is AutoCompleteSwitchToTabSuggestion -> AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION
-            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> AppPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_LEGACY_SELECTION
-            else -> return
-        }
-
-        pixel.fire(pixelName, params)
-    }
-
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         appCoroutineScope.launch(dispatchers.io()) {
-            fireAutocompletePixel(suggestion)
+            val autoCompleteViewState = currentAutoCompleteViewState()
+            autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
