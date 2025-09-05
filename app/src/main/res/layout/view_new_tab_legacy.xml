@@ -14,61 +14,77 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:parentTag="android.widget.LinearLayout"
+    android:id="@+id/ddgLogoContainer"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <com.duckduckgo.app.browser.indonesiamessage.IndonesiaNewTabSectionView
         android:id="@+id/indonesiaNewTabSectionView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.duckduckgo.mobile.android.vpn.ui.newtab.AppTrackingProtectionStateView
         android:id="@+id/appTrackingProtectionStateView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/indonesiaNewTabSectionView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.365" />
 
-        <ImageView
-            android:id="@+id/ddgLogo"
-            android:layout_height="wrap_content"
-            android:layout_width="@dimen/ntpDaxLogoIconWidth"
-            android:layout_marginTop="@dimen/homeTabDdgLogoTopMargin"
-            android:adjustViewBounds="true"
-            android:alpha="0"
-            android:contentDescription="@string/duckDuckGoLogoDescription"
-            android:maxWidth="180dp"
-            android:maxHeight="180dp"
-            app:srcCompat="@drawable/logo_full"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineBottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.44" />
 
-        <com.duckduckgo.common.ui.view.MessageCta
-            android:id="@+id/messageCta"
-            android:layout_width="0dp"
-            android:visibility="gone"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintWidth_max="600dp" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    <ImageView
+        android:id="@+id/ddgLogo"
+        android:layout_height="wrap_content"
+        android:layout_width="@dimen/ntpDaxLogoIconWidth"
+        android:adjustViewBounds="true"
+        android:alpha="0"
+        android:contentDescription="@string/duckDuckGoLogoDescription"
+        android:maxWidth="180dp"
+        android:maxHeight="180dp"
+        app:srcCompat="@drawable/logo_full"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/guidelineTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.duckduckgo.common.ui.view.MessageCta
+        android:id="@+id/messageCta"
+        android:layout_width="0dp"
+        android:visibility="gone"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_max="600dp" />
 
     <com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView
         android:id="@+id/focusedFavourites"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:isExpandable="false"
         app:showPlaceholders="false"
-        app:favoritesPlacement="new_tab_page"/>
+        app:favoritesPlacement="new_tab_page"
+        app:layout_constraintTop_toBottomOf="@id/messageCta"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
