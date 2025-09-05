@@ -237,7 +237,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     newProgress: Int,
                 ) {
                     if (newProgress == 100) {
-                        if (binding.webview.canGoBack()) {
+                        if (canGoBack()) {
                             toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
                         } else {
                             toolbar.setNavigationIcon(R.drawable.ic_close_24)
@@ -616,8 +616,20 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onBackPressed() {
+    private fun canGoBack(): Boolean {
         if (binding.webview.canGoBack()) {
+            binding.webview.url?.let { url ->
+                val uri = url.toUri()
+                return uri.getQueryParameter("preventBackNavigation") != "true"
+            }
+            return false
+        } else {
+            return false
+        }
+    }
+
+    override fun onBackPressed() {
+        if (canGoBack()) {
             binding.webview.goBack()
         } else {
             super.onBackPressed()
