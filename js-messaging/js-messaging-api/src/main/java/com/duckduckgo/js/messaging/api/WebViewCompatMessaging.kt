@@ -32,6 +32,7 @@ interface WebViewCompatMessageCallback {
      * @param onResponse A callback function to send a response back to the JavaScript code.
      */
     fun process(
+        context: String,
         featureName: String,
         method: String,
         id: String?,

@@ -112,7 +112,6 @@ class ContentScopeScriptsWebMessagingPluginTest {
             webViewCompatWrapper = mockWebViewCompatWrapper,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
-            contentScopeScriptsJsMessaging = mock(),
         )
     }
 
@@ -269,6 +268,7 @@ class ContentScopeScriptsWebMessagingPluginTest {
     private val callback = object : WebViewCompatMessageCallback {
         var counter = 0
         override fun process(
+            context: String,
             featureName: String,
             method: String,
             id: String?,

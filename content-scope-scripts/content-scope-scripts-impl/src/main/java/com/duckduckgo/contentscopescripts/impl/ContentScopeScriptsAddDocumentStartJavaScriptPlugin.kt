@@ -24,15 +24,17 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.api.contentscopeExperiments.ContentScopeExperiments
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.AddDocumentStartJavaScriptPlugin
 import com.squareup.anvil.annotations.ContributesMultibinding
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-@ContributesMultibinding(AppScope::class)
+@SingleInstanceIn(FragmentScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsAddDocumentStartJavaScriptPlugin @Inject constructor(
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
     private val dispatcherProvider: DispatcherProvider,
