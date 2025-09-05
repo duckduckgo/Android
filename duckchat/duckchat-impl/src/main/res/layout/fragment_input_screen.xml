@@ -106,4 +106,12 @@
         app:srcCompat="@drawable/ic_microphone_24"
         app:tint="?attr/daxColorPrimaryIcon" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/fabsTopBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="top"
+        app:constraint_referenced_ids="actionSend,actionNewLine,actionVoice"
+        app:barrierAllowsGoneWidgets="true" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
