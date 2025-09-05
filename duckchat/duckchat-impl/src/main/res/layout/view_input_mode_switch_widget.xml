@@ -55,7 +55,7 @@
         style="@style/Widget.DuckDuckGo.OmnibarCardView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/omnibarCardMarginHorizontal"
+        android:layout_marginHorizontal="@dimen/inputScreenOmnibarCardMarginHorizontal"
         android:layout_marginTop="@dimen/omnibarCardMarginTop"
         android:layout_marginBottom="@dimen/omnibarCardMarginBottom"
         app:strokeColor="?attr/daxColorAccentBlue"

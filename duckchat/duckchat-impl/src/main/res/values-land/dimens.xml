@@ -15,12 +15,6 @@
   -->
 
 <resources>
-    <dimen name="inputModeSwitchHeight">38dp</dimen>
-    <dimen name="inputModeTabIndicatorHeight">34dp</dimen>
-    <dimen name="inputModeTabIndicatorHorizontalInset">2dp</dimen>
-    <dimen name="inputModeTabIndicatorElevation">5dp</dimen>
-    <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
-    <dimen name="inputScreenContentTopOffset">12dp</dimen>
-    <dimen name="inputScreenOmnibarCardMarginHorizontal">@dimen/omnibarCardMarginHorizontal</dimen>
-    <dimen name="inputScreenMarginHorizontal">0dp</dimen>
+    <dimen name="inputScreenOmnibarCardMarginHorizontal">170dp</dimen>
+    <dimen name="inputScreenMarginHorizontal">154dp</dimen>
 </resources>
