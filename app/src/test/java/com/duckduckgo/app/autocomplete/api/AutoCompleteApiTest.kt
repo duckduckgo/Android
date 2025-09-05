@@ -23,6 +23,7 @@ import com.duckduckgo.app.autocomplete.impl.AutoCompleteRepository
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.AppStage.NEW
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
@@ -34,6 +35,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -89,6 +91,12 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockDuckChat: DuckChat
 
+    @Mock
+    private lateinit var mockHistory: NavigationHistory
+
+    @Mock
+    private lateinit var mockPixel: Pixel
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -116,6 +124,10 @@ class AutoCompleteApiTest {
             mockUserStageStore,
             mockAutocompleteTabsFeature,
             mockDuckChat,
+            mockHistory,
+            DefaultDispatcherProvider(),
+            mockPixel,
+
         )
     }
 
