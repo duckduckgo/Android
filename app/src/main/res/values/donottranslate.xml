@@ -65,9 +65,9 @@
 
     <!-- Widgets -->
     <string name="searchOnlyWidgetLabel">Search Only</string>
-    <string name="searchOnlyWidgetDescription">Quickly launch a private search with DuckDuckGo</string>
+    <string name="searchOnlyWidgetDescription">Quickly launch a private search with DuckDuckGo.</string>
     <string name="duckAiOnlyWidgetText">Duck.ai</string>
     <string name="duckAiOnlyWidgetLabel">Duck.ai</string>
-    <string name="searchAndFavoritesWidgetDescription">Search or visit your favorite sites privately with one tap. Voice and Duck.ai available if enabled.</string>
-    <string name="searchWidgetDescription">Search privately with DuckDuckGo or ask Duck.ai. Voice and Duck.ai available if enabled.</string>
+    <string name="searchAndFavoritesWidgetDescription">Search or visit your favorite sites privately with one tap. Voice Search and Duck.ai available if enabled.</string>
+    <string name="searchWidgetDescription">Search privately with DuckDuckGo or ask Duck.ai. Voice Search and Duck.ai available if enabled.</string>
 </resources>

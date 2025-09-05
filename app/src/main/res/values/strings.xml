@@ -244,7 +244,7 @@
     <string name="widgetConfigurationSystemThemeOption">System default</string>
     <string name="widgetConfigurationLightThemeOption">Light</string>
     <string name="widgetConfigurationDarkThemeOption">Dark</string>
-    <string name="widgetConfigurationAddWidgetOption">Add widget</string>
+    <string name="widgetConfigurationAddWidgetOption">Add Widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
     <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
