@@ -49,6 +49,8 @@ import com.duckduckgo.lint.ui.NoStyleAppliedToDesignSystemComponentDetector.Comp
 import com.duckduckgo.lint.ui.SkeletonViewBackgroundDetector.Companion.INVALID_SKELETON_VIEW_BACKGROUND
 import com.duckduckgo.lint.ui.WrongStyleDetector.Companion.WRONG_STYLE_NAME
 import com.duckduckgo.lint.ui.WrongStyleDetector.Companion.WRONG_STYLE_PARAMETER
+import com.duckduckgo.lint.ui.NoComposeViewUsageDetector.Companion.NO_COMPOSE_VIEW_USAGE
+import com.duckduckgo.lint.ui.NoSetContentDetector.Companion.NO_SET_CONTENT_USAGE
 
 @Suppress("UnstableApiUsage")
 class DuckDuckGoIssueRegistry : IssueRegistry() {
@@ -83,7 +85,9 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             INVALID_SKELETON_VIEW_BACKGROUND,
             WRONG_STYLE_PARAMETER,
             WRONG_STYLE_NAME,
-            INVALID_COLOR_ATTRIBUTE
+            INVALID_COLOR_ATTRIBUTE,
+            NO_COMPOSE_VIEW_USAGE,
+            NO_SET_CONTENT_USAGE
 
         )
 
