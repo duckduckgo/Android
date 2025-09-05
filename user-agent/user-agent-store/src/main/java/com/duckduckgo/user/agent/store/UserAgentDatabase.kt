@@ -31,4 +31,4 @@ abstract class UserAgentDatabase : RoomDatabase() {
     abstract fun userAgentExceptionsDao(): UserAgentExceptionsDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

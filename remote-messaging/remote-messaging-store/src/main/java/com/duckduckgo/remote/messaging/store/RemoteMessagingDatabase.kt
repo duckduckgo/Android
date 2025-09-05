@@ -48,7 +48,7 @@ abstract class RemoteMessagingDatabase : RoomDatabase() {
                 }
             }
         }
-        val ALL_MIGRATIONS: Array<Migration>
-            get() = arrayOf(MIGRATION_1_2)
+        val ALL_MIGRATIONS: List<Migration>
+            get() = listOf(MIGRATION_1_2)
     }
 }
