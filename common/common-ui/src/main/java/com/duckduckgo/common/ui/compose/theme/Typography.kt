@@ -24,82 +24,99 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 @Immutable
-data class DuckDuckGoTypography (
+data class DuckDuckGoTextStyle internal constructor(
+    internal val textStyle: TextStyle
+)
 
-    val title: TextStyle =
+// Internal extension to extract TextStyle - only accessible within the design system
+internal val DuckDuckGoTextStyle.asTextStyle: TextStyle
+    get() = textStyle
+
+@Immutable
+data class DuckDuckGoTypography(
+
+    val title: DuckDuckGoTextStyle =
+        DuckDuckGoTextStyle(
+            TextStyle(
+                fontSize = 32.sp,
+                lineHeight = 36.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+        ),
+
+    val h1: DuckDuckGoTextStyle =
+        DuckDuckGoTextStyle(
+            TextStyle(
+                fontSize = 24.sp,
+                lineHeight = 30.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+        ),
+
+    val h2: DuckDuckGoTextStyle =
+        DuckDuckGoTextStyle(
+            TextStyle(
+                fontSize = 20.sp,
+                lineHeight = 24.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        ),
+
+    val h3: DuckDuckGoTextStyle =
+        DuckDuckGoTextStyle(
+            TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 21.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        ),
+
+    val h4: DuckDuckGoTextStyle =
+        DuckDuckGoTextStyle(
+            TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        ),
+
+    val h5: DuckDuckGoTextStyle =
+        DuckDuckGoTextStyle(
+            TextStyle(
+                fontSize = 13.sp,
+                lineHeight = 16.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        ),
+
+    val body1: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
         TextStyle(
-            fontSize = 32.sp,
-            lineHeight = 36.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            lineHeight = 20.sp,
+        ),
     ),
 
-    val h1: TextStyle =
-        TextStyle(
-            fontSize = 24.sp,
-            lineHeight = 30.sp,
-            fontWeight = FontWeight.Bold,
-        )
-    ,
-
-    val h2: TextStyle =
-        TextStyle(
-            fontSize = 20.sp,
-            lineHeight = 24.sp,
-            fontWeight = FontWeight.Medium,
-        )
-    ,
-
-    val h3: TextStyle=
-        TextStyle(
-            fontSize = 16.sp,
-            lineHeight = 21.sp,
-            fontWeight = FontWeight.Medium,
-        )
-    ,
-
-    val h4: TextStyle =
-        TextStyle(
-            fontSize = 14.sp,
-            lineHeight = 20.sp,
-            fontWeight = FontWeight.Medium,
-        )
-    ,
-
-    val h5: TextStyle =
-        TextStyle(
-            fontSize = 13.sp,
-            lineHeight = 16.sp,
-            fontWeight = FontWeight.Medium,
-        )
-    ,
-
-    val body1: TextStyle =
-        TextStyle(
-            fontSize = 16.sp,
-            lineHeight = 20.sp,
-        )
-    ,
-
-    val body2: TextStyle =
+    val body2: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
         TextStyle(
             fontSize = 14.sp,
             lineHeight = 18.sp,
-        )
-    ,
+        ),
+    ),
 
-    val button: TextStyle =
+    val button: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
         TextStyle(
             fontSize = 15.sp,
             lineHeight = 20.sp,
             fontWeight = FontWeight.Bold,
-        )
-    ,
+        ),
+    ),
 
-    val caption: TextStyle =
+    val caption: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
         TextStyle(
             fontSize = 12.sp,
             lineHeight = 16.sp,
         ),
+    ),
 )
 
 @SuppressLint("ComposeCompositionLocalUsage")
