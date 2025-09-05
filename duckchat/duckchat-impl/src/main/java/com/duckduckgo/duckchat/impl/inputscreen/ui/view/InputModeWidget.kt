@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.inputscreen.ui.view
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.text.Editable
 import android.text.InputType
@@ -43,6 +44,7 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.tabs.TabLayout
 
@@ -170,6 +172,8 @@ class InputModeWidget @JvmOverloads constructor(
                 removeFormatting(text)
             }
         }
+
+        configureInputFieldWidth()
     }
 
     private fun removeFormatting(text: Editable) {
@@ -298,6 +302,20 @@ class InputModeWidget @JvmOverloads constructor(
     private fun configureShadow() {
         if (Build.VERSION.SDK_INT >= 28) {
             inputModeWidgetCard.addBottomShadow()
+        }
+    }
+
+    private fun configureInputFieldWidth() {
+        val horizontalMargin = if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            resources.getDimensionPixelSize(R.dimen.omnibarCardMarginHorizontalLandscape)
+        } else {
+            resources.getDimensionPixelSize(CommonR.dimen.omnibarCardMarginHorizontal)
+        }
+        (inputModeWidgetCard.layoutParams as LayoutParams).apply {
+            width = 0
+            matchConstraintPercentWidth = -1f
+            leftMargin = horizontalMargin
+            rightMargin = horizontalMargin
         }
     }
 
