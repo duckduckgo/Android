@@ -148,6 +148,7 @@ sealed class Command {
     ) : Command()
 
     class SubmitUrl(val url: String) : Command()
+    class SubmitChat(val query: String) : Command()
     class LaunchPlayStore(val appPackage: String) : Command()
     data object LaunchDefaultBrowser : Command()
     data object LaunchAppTPOnboarding : Command()

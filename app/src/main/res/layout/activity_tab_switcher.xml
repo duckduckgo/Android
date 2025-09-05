@@ -33,18 +33,39 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/tabsRecycler"
+    <FrameLayout
+        android:id="@+id/tabsContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:padding="@dimen/keyline_2"
-        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:itemCount="3"
-        tools:listitem="@layout/item_tab_grid"
-        tools:showIn="@layout/activity_tab_switcher"
-        tools:spanCount="2" />
+        android:elevation="10dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShade"
+            android:layout_gravity="top"
+            android:elevation="20dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/tabsRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:padding="@dimen/keyline_2"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_tab_grid"
+            tools:showIn="@layout/activity_tab_switcher"
+            tools:spanCount="2" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="?attr/daxColorShadeSolid"
+            android:layout_gravity="bottom" />
+
+    </FrameLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/aiChatFab"

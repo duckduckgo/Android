@@ -24,6 +24,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
@@ -198,6 +199,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private lateinit var tabTouchHelper: TabTouchHelper
     private lateinit var tabsRecycler: RecyclerView
+    private lateinit var tabsContainer: FrameLayout
     private lateinit var tabItemDecorator: TabItemDecorator
     private lateinit var toolbar: Toolbar
 
@@ -287,6 +289,8 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
 
         toolbar = findViewById(R.id.toolbar)
+
+        tabsContainer = findViewById(R.id.tabsContainer)
     }
 
     private fun configureRecycler() {
@@ -322,7 +326,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         if (viewModel.isNewToolbarEnabled) {
             // Set the layout params for the tabs recycler view based on omnibar position
-            tabsRecycler.updateLayoutParams {
+            tabsContainer.updateLayoutParams {
                 this as CoordinatorLayout.LayoutParams
                 this.behavior = null
                 if (settingsDataStore.omnibarPosition == OmnibarPosition.TOP) {

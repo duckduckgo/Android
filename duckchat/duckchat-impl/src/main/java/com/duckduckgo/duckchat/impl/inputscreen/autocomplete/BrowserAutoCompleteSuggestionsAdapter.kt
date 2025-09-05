@@ -37,6 +37,7 @@ import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.AutoCompleteViewHol
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DIVIDER_TYPE
+import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DUCK_AI_PROMPT_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.EMPTY_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
 import com.duckduckgo.duckchat.impl.inputscreen.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
@@ -98,6 +99,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(omnibarPosition),
         SWITCH_TO_TAB_TYPE to SwitchToTabSuggestionViewHolderFactory(),
         DIVIDER_TYPE to DividerViewHolderFactory(),
+        DUCK_AI_PROMPT_TYPE to DuckAIPromptSuggestionViewHolderFactory(),
     )
 
     private var phrase = ""
@@ -119,6 +121,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
             is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
             is AutoCompleteSwitchToTabSuggestion -> SWITCH_TO_TAB_TYPE
             is AutoCompleteUrlSuggestion -> SWITCH_TO_TAB_TYPE
+            is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> DUCK_AI_PROMPT_TYPE
             else -> SUGGESTION_TYPE
         }
     }
@@ -187,5 +190,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val DEFAULT_TYPE = 7
         const val SWITCH_TO_TAB_TYPE = 8
         const val DIVIDER_TYPE = 9
+        const val DUCK_AI_PROMPT_TYPE = 10
     }
 }

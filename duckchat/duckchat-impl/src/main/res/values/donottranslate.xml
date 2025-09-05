@@ -15,4 +15,8 @@
   -->
 
 <resources>
+
+    <!-- AutoComplete -->
+    <string name="autocompleteDuckAiPrompt">Ask Duck.ai</string>
+
 </resources>

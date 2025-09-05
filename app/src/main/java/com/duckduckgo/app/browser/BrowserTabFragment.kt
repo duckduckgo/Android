@@ -50,7 +50,6 @@ import android.view.ContextMenu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
@@ -1205,8 +1204,8 @@ class BrowserTabFragment :
         voiceSearchLauncher.launch(requireActivity())
     }
 
-    private fun onOmnibarDuckChatPressed(query: String) {
-        viewModel.onDuckChatOmnibarButtonClicked(query)
+    private fun onOmnibarDuckChatPressed(query: String, hasFocus: Boolean, isNtp: Boolean) {
+        viewModel.onDuckChatOmnibarButtonClicked(query = query, hasFocus = hasFocus, isNtp = isNtp)
     }
 
     private fun configureCustomTab() {
@@ -1531,6 +1530,15 @@ class BrowserTabFragment :
                 it.let { renderer.renderPrivacyShield(it) }
             },
         )
+
+        lifecycleScope.launch {
+            viewModel.areFavoritesDisplayed
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .collectLatest { hasFavorites ->
+                    binding.includeNewBrowserTab.topNtpOutlineStroke.isVisible = hasFavorites
+                    binding.includeNewBrowserTab.bottomNtpOutlineStroke.isVisible = hasFavorites
+                }
+        }
 
         addTabsObserver()
     }
@@ -1995,9 +2003,9 @@ class BrowserTabFragment :
             is Command.ShowFullScreen -> {
                 binding.webViewFullScreenContainer.addView(
                     it.view,
-                    ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT,
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
                     ),
                 )
             }
@@ -2189,6 +2197,8 @@ class BrowserTabFragment :
             null -> {
                 // NO OP
             }
+
+            is Command.SubmitChat -> duckChat.openDuckChatWithAutoPrompt(it.query)
         }
     }
 
@@ -2883,7 +2893,9 @@ class BrowserTabFragment :
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED)
                         pixel.fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_LEGACY_OMNIBAR_AICHAT_BUTTON_PRESSED_DAILY, type = Daily())
                     }
-                    onOmnibarDuckChatPressed(omnibar.getText())
+                    val hasFocus = omnibar.omnibarTextInput.hasFocus()
+                    val isNtp = omnibar.viewMode == ViewMode.NewTab
+                    onOmnibarDuckChatPressed(query = omnibar.getText(), hasFocus = hasFocus, isNtp = isNtp)
                 }
             },
         )
@@ -2976,7 +2988,6 @@ class BrowserTabFragment :
     }
 
     private fun userEnteredQuery(query: String) {
-        viewModel.setLastSubmittedUserQuery(query)
         viewModel.onUserSubmittedQuery(query)
     }
 

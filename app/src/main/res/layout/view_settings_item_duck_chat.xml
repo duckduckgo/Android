@@ -13,46 +13,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/duckChatSetting"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/selectableItemBackground"
-    android:paddingHorizontal="16dp">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/oneLineItemHeight">
-
-        <ImageView
-            android:id="@+id/leadingIcon"
-            android:layout_width="@dimen/listItemImageMediumSize"
-            android:layout_height="@dimen/listItemImageMediumSize"
-            android:layout_gravity="center"
-            android:importantForAccessibility="no"
-            android:src="@drawable/ic_ai_chat_color_24"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/primaryText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:breakStrategy="balanced"
-            android:text="@string/duck_chat_title"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@id/leadingIcon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constrainedWidth="true"
-            app:typography="body1" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</FrameLayout>
+    app:primaryText="@string/duck_chat_title"
+    app:leadingIcon="@drawable/ic_ai_chat_color_24"/>

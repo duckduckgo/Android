@@ -35,6 +35,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
@@ -85,6 +86,9 @@ class AutoCompleteApiTest {
     @Mock
     private lateinit var mockToggle: Toggle
 
+    @Mock
+    private lateinit var mockDuckChat: DuckChat
+
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
@@ -101,6 +105,7 @@ class AutoCompleteApiTest {
         }
         whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(mockDuckChat.isEnabled()).thenReturn(false)
         testee = AutoCompleteApi(
             mockAutoCompleteService,
             mockSavedSitesRepository,
@@ -110,6 +115,7 @@ class AutoCompleteApiTest {
             mockTabRepository,
             mockUserStageStore,
             mockAutocompleteTabsFeature,
+            mockDuckChat,
         )
     }
 
@@ -1660,6 +1666,70 @@ class AutoCompleteApiTest {
                 AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
                 AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenDuckAIDisabledAndSomeResultsAvailableThenDuckAIPromptIsnotShown() = runTest {
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+
+            ),
+            value.suggestions,
+        )
+    }
+
+    @Test
+    fun whenDuckAIEnabledAndSomeResultsAvailableThenDuckAIPromptIsShown() = runTest {
+        whenever(mockDuckChat.isEnabled()).thenReturn(true)
+
+        val searchTerm = "espn"
+        whenever(mockAutoCompleteService.autoComplete(searchTerm)).thenReturn(
+            listOf(
+                AutoCompleteServiceRawResult("espn", isNav = false),
+                AutoCompleteServiceRawResult("espn.com", isNav = true),
+                AutoCompleteServiceRawResult("espn fantasy football", isNav = false),
+                AutoCompleteServiceRawResult("espn sports", isNav = false),
+                AutoCompleteServiceRawResult("espn nba", isNav = false),
+            ),
+        )
+        whenever(mockSavedSitesRepository.getFavorites()).thenReturn(flowOf(emptyList()))
+        whenever(mockSavedSitesRepository.getBookmarks()).thenReturn(flowOf(emptyList()))
+
+        val result = testee.autoComplete(searchTerm)
+        val value = result.first()
+
+        assertEquals(
+            listOf(
+                AutoCompleteSearchSuggestion(phrase = "espn.com", isUrl = true, isAllowedInTopHits = true),
+                AutoCompleteSearchSuggestion(phrase = "espn", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn fantasy football", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn sports", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSearchSuggestion(phrase = "espn nba", isUrl = false, isAllowedInTopHits = false),
+                AutoCompleteSuggestion.AutoCompleteDuckAIPrompt("espn"),
             ),
             value.suggestions,
         )

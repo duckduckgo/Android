@@ -184,6 +184,8 @@
         <item name="daxColorContainerDisabled">@color/white18</item>
         <item name="daxColorTextDisabled">@color/white36</item>
         <item name="daxColorLines">@color/lines_dark</item>
+        <item name="daxColorShade">@color/shade_dark</item>
+        <item name="daxColorShadeSolid">@color/shade_dark_solid</item>
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorAccentContentPrimary">@color/accent_content_primary_dark</item>
@@ -321,6 +323,8 @@
         <item name="daxColorContainerDisabled">@color/black6</item>
         <item name="daxColorTextDisabled">@color/black36</item>
         <item name="daxColorLines">@color/lines_light</item>
+        <item name="daxColorShade">@color/shade_light</item>
+        <item name="daxColorShadeSolid">@color/shade_light_solid</item>
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorAccentContentPrimary">@color/accent_content_primary_light</item>

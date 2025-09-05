@@ -23,9 +23,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.view.animation.DecelerateInterpolator
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -43,6 +41,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.card.MaterialCardView
+import com.google.android.material.color.MaterialColors.*
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
@@ -55,7 +54,6 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val omnibarCard: MaterialCardView by lazy { findViewById(R.id.omniBarContainer) }
     private val omnibarCardShadow: MaterialCardView by lazy { findViewById(R.id.omniBarContainerShadow) }
     private val iconsContainer: View by lazy { findViewById(R.id.iconsContainer) }
     private val shieldIconPulseAnimationContainer: View by lazy { findViewById(R.id.shieldIconPulseAnimationContainer) }
@@ -100,12 +98,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
 
         if (Build.VERSION.SDK_INT >= 28) {
-            omnibarCardShadow.addBottomShadow(
-                shadowSizeDp = 12f,
-                offsetYDp = 3f,
-                insetDp = 3f,
-                shadowColor = ContextCompat.getColor(context, CommonR.color.background_omnibar_shadow),
-            )
+            omnibarCardShadow.addBottomShadow()
         }
 
         when (omnibarPosition) {
@@ -185,28 +178,7 @@ class SingleOmnibarLayout @JvmOverloads constructor(
     }
 
     private fun animateOmnibarFocusedState(focused: Boolean) {
-        focusAnimator?.cancel()
-
-        val startCardStrokeWidth = omnibarCard.strokeWidth
-        val endCardStrokeWidth: Int = if (focused) {
-            omnibarOutlineFocusedWidth
-        } else {
-            omnibarOutlineWidth
-        }
-
-        val animator = ValueAnimator.ofFloat(0f, 1f)
-        animator.duration = DEFAULT_ANIMATION_DURATION
-        animator.interpolator = DecelerateInterpolator()
-        animator.addUpdateListener { valueAnimator ->
-            val fraction = valueAnimator.animatedValue as Float
-
-            val animatedCardStrokeWidth = (startCardStrokeWidth + (endCardStrokeWidth - startCardStrokeWidth) * fraction).toInt()
-
-            omnibarCard.strokeWidth = animatedCardStrokeWidth
-        }
-
-        animator.start()
-        focusAnimator = animator
+        // temporarily disable focus animation
     }
 
     private fun onFindInPageShown() {

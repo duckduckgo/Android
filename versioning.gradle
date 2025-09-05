@@ -48,11 +48,11 @@ ext {
         def suffix = getVersionNameSuffix()
         if (suffix?.trim()) {
             def tag = getStoredTag()
-            if (tag.contains('nightly')) {
-                def (major, minor, patch, nightly) = tag.toLowerCase().tokenize('.')
-                (major, minor, patch, nightly) = [major, minor, patch, nightly].collect { it.toString() }
+            if (tag.contains('nightly') || tag.contains('internal')) {
+                def (major, minor, patch, internal) = tag.toLowerCase().tokenize('.')
+                (major, minor, patch, internal) = [major, minor, patch, internal].collect { it.toString() }
 
-                def (code, sufix) = nightly.toLowerCase().tokenize('-')
+                def (code, sufix) = internal.toLowerCase().tokenize('-')
                 (code, sufix) = [code, sufix].collect { it.toString() }
 
                 def newCode = Integer.parseInt(code) + 1
