@@ -26,7 +26,7 @@ interface WebViewCapabilityChecker {
     /**
      * Check if a particular capability is currently supported by the WebView
      */
-    suspend fun isSupported(capability: WebViewCapability): Boolean
+    suspend fun isSupported(capability: WebViewCapability, additionalCompatibilityChecks: Boolean = true): Boolean
 
     /**
      * WebView capabilities, which can be provided to [isSupported]
