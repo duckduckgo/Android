@@ -19,7 +19,7 @@ package com.duckduckgo.contentscopescripts.impl.messaging
 import android.annotation.SuppressLint
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
-import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.PostMessageWrapperPlugin
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.js.messaging.api.WebMessagingPlugin
@@ -29,7 +29,7 @@ import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@ContributesMultibinding(AppScope::class)
+@ContributesMultibinding(FragmentScope::class)
 class ContentScopeScriptsPostMessageWrapperPlugin @Inject constructor(
     @Named("contentScopeScripts") private val webMessagingPlugin: WebMessagingPlugin,
     private val contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging,

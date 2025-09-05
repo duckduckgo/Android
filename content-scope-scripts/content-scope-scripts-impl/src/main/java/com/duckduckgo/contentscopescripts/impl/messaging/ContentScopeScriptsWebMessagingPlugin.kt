@@ -26,7 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.WebViewCompatContentScopeJsMessageHandlersPlugin
 import com.duckduckgo.contentscopescripts.impl.WebViewCompatContentScopeScripts
-import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult.SendResponse
@@ -38,6 +38,7 @@ import com.duckduckgo.js.messaging.api.WebViewCompatMessageCallback
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
+import dagger.SingleInstanceIn
 import javax.inject.Inject
 import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
@@ -51,13 +52,13 @@ import org.json.JSONObject
 private const val JS_OBJECT_NAME = "contentScopeAdsjs"
 
 @Named("contentScopeScripts")
-@ContributesBinding(ActivityScope::class)
-@ContributesMultibinding(ActivityScope::class)
+@SingleInstanceIn(FragmentScope::class)
+@ContributesBinding(FragmentScope::class)
+@ContributesMultibinding(scope = FragmentScope::class, ignoreQualifier = true)
 class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
     private val handlers: PluginPoint<WebViewCompatContentScopeJsMessageHandlersPlugin>,
     private val globalHandlers: PluginPoint<GlobalContentScopeJsMessageHandlersPlugin>,
     private val webViewCompatContentScopeScripts: WebViewCompatContentScopeScripts,
-    private val contentScopeScriptsJsMessaging: ContentScopeScriptsJsMessaging,
     private val webViewCompatWrapper: WebViewCompatWrapper,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -165,7 +166,9 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         webView: WebView,
     ) {
         appCoroutineScope.launch {
-            if (!webViewCompatContentScopeScripts.isEnabled()) return@launch
+            if (!webViewCompatContentScopeScripts.isEnabled()) {
+                return@launch
+            }
 
             runCatching {
                 return@runCatching webViewCompatWrapper.addWebMessageListener(
@@ -220,7 +223,6 @@ class ContentScopeScriptsWebMessagingPlugin @Inject constructor(
         runCatching {
             appCoroutineScope.launch {
                 if (!webViewCompatContentScopeScripts.isEnabled()) {
-                    contentScopeScriptsJsMessaging.sendSubscriptionEvent(subscriptionEventData)
                     return@launch
                 }
 
