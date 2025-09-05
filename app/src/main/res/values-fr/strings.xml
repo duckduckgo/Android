@@ -918,4 +918,11 @@
     <string name="settingsDuckAiRebranding">Fonctionnalités de l\'IA</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Afficher le nombre de traqueurs dans l\'outil de changement d\'onglet</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Masquer le nombre de traqueurs ?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vous pouvez réactiver cette option dans Paramètres &gt; Apparence.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Masquer</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Conserver</string>
+
 </resources>

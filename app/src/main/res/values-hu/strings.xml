@@ -918,4 +918,11 @@
     <string name="settingsDuckAiRebranding">AI funkciók</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Nyomkövető-számláló megjelenítése a lapváltóban</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Elrejted a nyomkövető-számlálót?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bármikor visszakapcsolhatod a Beállítások &gt; Megjelenés menüben.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Elrejtés</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Megtartás.</string>
+
 </resources>

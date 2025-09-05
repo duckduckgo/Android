@@ -954,4 +954,11 @@
     <string name="settingsDuckAiRebranding">Funkcie AI</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Zobraziť počet sledovačov v prepínači kariet</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Skryť počet sledovaných položiek?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Túto funkciu môžeš znova zapnúť v časti Nastavenia &gt; Vzhľad.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Skryť</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ponechať</string>
+
 </resources>

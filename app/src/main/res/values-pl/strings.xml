@@ -954,4 +954,11 @@
     <string name="settingsDuckAiRebranding">Funkcje AI</string>
     <string name="settingsDuckAi">Duck.ai</string>
 
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Pokaż liczbę mechanizmów śledzących w przełączniku kart</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ukryć liczbę mechanizmów śledzących?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Możesz to włączyć ponownie, wybierając kolejno Ustawienia &gt; Wygląd.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ukryj</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zachowaj</string>
+
 </resources>
