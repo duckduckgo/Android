@@ -35,15 +35,19 @@ class RealWebViewCapabilityChecker @Inject constructor(
     private val webViewVersionProvider: WebViewVersionProvider,
 ) : WebViewCapabilityChecker {
 
-    override suspend fun isSupported(capability: WebViewCapability): Boolean {
+    override suspend fun isSupported(capability: WebViewCapability, additionalCompatibilityChecks: Boolean): Boolean {
         return when (capability) {
             DocumentStartJavaScript -> isDocumentStartJavaScriptSupported()
-            WebMessageListener -> isWebMessageListenerSupported()
+            WebMessageListener -> isWebMessageListenerSupported(additionalCompatibilityChecks)
         }
     }
 
-    private suspend fun isWebMessageListenerSupported(): Boolean {
+    private suspend fun isWebMessageListenerSupported(additionalCompatibilityChecks: Boolean): Boolean {
         return withContext(dispatchers.io()) {
+            if (!additionalCompatibilityChecks) {
+                return@withContext WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
+            }
+
             webViewVersionProvider.getFullVersion()
                 .compareSemanticVersion(WEB_MESSAGE_LISTENER_WEBVIEW_VERSION)?.let { it >= 0 } ?: false
         } && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)
