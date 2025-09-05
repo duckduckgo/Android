@@ -49,7 +49,7 @@ class RealWebViewCompatWrapper @Inject constructor(
         allowedOriginRules: Set<String>,
     ): ScriptHandler? {
         return runCatching {
-            if (!webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript)) {
+            if (!webViewCapabilityChecker.isSupported(WebViewCapability.DocumentStartJavaScript, false)) {
                 return null
             }
 
@@ -66,7 +66,7 @@ class RealWebViewCompatWrapper @Inject constructor(
     }
 
     override suspend fun removeWebMessageListener(webView: WebView, jsObjectName: String) {
-        if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+        if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener, false)) {
             return
         }
 
@@ -85,7 +85,7 @@ class RealWebViewCompatWrapper @Inject constructor(
         allowedOriginRules: Set<String>,
         listener: WebViewCompat.WebMessageListener,
     ) {
-        if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener)) {
+        if (!webViewCapabilityChecker.isSupported(WebViewCapability.WebMessageListener, false)) {
             return
         }
 
