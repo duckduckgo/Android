@@ -6817,28 +6817,42 @@
       if (window.Notification) {
         return;
       }
+      const NotificationConstructor = function Notification() {
+        throw new TypeError("Failed to construct 'Notification': Illegal constructor");
+      };
+      const wrappedNotification = wrapToString(
+        NotificationConstructor,
+        NotificationConstructor,
+        "function Notification() { [native code] }"
+      );
       this.defineProperty(window, "Notification", {
-        value: () => {
-        },
+        value: wrappedNotification,
         writable: true,
         configurable: true,
         enumerable: false
       });
-      this.defineProperty(window.Notification, "requestPermission", {
-        value: () => {
-          return Promise.resolve("denied");
-        },
-        writable: true,
+      this.defineProperty(window.Notification, "permission", {
+        value: "denied",
+        writable: false,
         configurable: true,
         enumerable: true
       });
-      this.defineProperty(window.Notification, "permission", {
-        get: () => "denied",
-        configurable: true,
-        enumerable: false
-      });
       this.defineProperty(window.Notification, "maxActions", {
         get: () => 2,
+        configurable: true,
+        enumerable: true
+      });
+      const requestPermissionFunc = function requestPermission() {
+        return Promise.resolve("denied");
+      };
+      const wrappedRequestPermission = wrapToString(
+        requestPermissionFunc,
+        requestPermissionFunc,
+        "function requestPermission() { [native code] }"
+      );
+      this.defineProperty(window.Notification, "requestPermission", {
+        value: wrappedRequestPermission,
+        writable: true,
         configurable: true,
         enumerable: true
       });
