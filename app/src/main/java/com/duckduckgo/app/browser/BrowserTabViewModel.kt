@@ -2585,7 +2585,7 @@ class BrowserTabViewModel @Inject constructor(
         menu: ContextMenu,
     ) {
         logcat(INFO) { "Long pressed on ${target.type}, (url=${target.url}), (image url = ${target.imageUrl})" }
-        longPressHandler.handleLongPress(target.type, target.url, menu)
+        longPressHandler.handleLongPress(target.type, target.url, target.text, menu)
     }
 
     fun userSelectedItemFromLongPressMenu(
@@ -2628,6 +2628,11 @@ class BrowserTabViewModel @Inject constructor(
 
             is RequiredAction.CopyLink -> {
                 command.value = CopyLink(requiredAction.url)
+                true
+            }
+
+            is RequiredAction.CopyLinkText -> {
+                command.value = CopyLink(requiredAction.text)
                 true
             }
 

@@ -3490,6 +3490,18 @@ class BrowserTabFragment :
         return message.data.getString(URL_BUNDLE_KEY)
     }
 
+    /**
+     * Use requestFocusNodeHref to get the a tag title for the touched link.
+     */
+    private fun getTargetTitleForLinkSource(): String? {
+        val handler = Handler()
+        val message = handler.obtainMessage()
+
+        webView?.requestFocusNodeHref(message)
+
+        return message.data.getString(TITLE_BUNDLE_KEY)?.trim()
+    }
+
     private fun getLongPressTarget(hitTestResult: HitTestResult): LongPressTarget? {
         return when {
             hitTestResult.extra == null -> null
@@ -3509,6 +3521,7 @@ class BrowserTabFragment :
             else -> LongPressTarget(
                 url = hitTestResult.extra,
                 type = hitTestResult.type,
+                text = getTargetTitleForLinkSource(),
             )
         }
     }
@@ -4107,6 +4120,7 @@ class BrowserTabFragment :
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
 
         private const val URL_BUNDLE_KEY = "url"
+        private const val TITLE_BUNDLE_KEY = "title"
 
         private const val DOWNLOAD_CONFIRMATION_TAG = "DOWNLOAD_CONFIRMATION_TAG"
         private const val DAX_DIALOG_DIALOG_TAG = "DAX_DIALOG_TAG"
