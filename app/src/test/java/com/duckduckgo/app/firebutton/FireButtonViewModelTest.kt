@@ -27,6 +27,8 @@ import com.duckduckgo.app.settings.clear.FireAnimation
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -59,6 +61,9 @@ internal class FireButtonViewModelTest {
     @Mock
     private lateinit var mockPixel: Pixel
 
+    @Mock
+    private lateinit var mockDuckChat: DuckChat
+
     @Before
     fun before() {
         MockitoAnnotations.openMocks(this)
@@ -66,11 +71,15 @@ internal class FireButtonViewModelTest {
         whenever(mockAppSettingsDataStore.automaticallyClearWhenOption).thenReturn(ClearWhenOption.APP_EXIT_ONLY)
         whenever(mockAppSettingsDataStore.automaticallyClearWhatOption).thenReturn(ClearWhatOption.CLEAR_NONE)
         whenever(mockAppSettingsDataStore.selectedFireAnimation).thenReturn(FireAnimation.HeroFire)
+        runBlocking {
+            whenever(mockDuckChat.wasOpenedBefore()).thenReturn(false)
+        }
 
         testee = FireButtonViewModel(
             mockAppSettingsDataStore,
             mockFireAnimationLoader,
             mockPixel,
+            mockDuckChat,
         )
     }
 

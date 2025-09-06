@@ -134,6 +134,10 @@ class FakeSettingsDataStore : SettingsDataStore, AutoCompleteSettings {
         get() = store["isFullUrlEnabled"] as Boolean? ?: false
         set(value) { store["isFullUrlEnabled"] = value }
 
+    override var clearDuckAiData: Boolean
+        get() = store["clearDuckAiData"] as Boolean? ?: false
+        set(value) { store["clearDuckAiData"] = value }
+
     override fun isCurrentlySelected(clearWhatOption: ClearWhatOption): Boolean {
         val currentlySelected = store["automaticallyClearWhatOption"] as ClearWhatOption?
         return currentlySelected == clearWhatOption
