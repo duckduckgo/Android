@@ -19,7 +19,6 @@ package com.duckduckgo.app.widget.ui
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
-import com.duckduckgo.widget.DuckAiOnlyWidget
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
@@ -48,7 +47,6 @@ val Context.hasInstalledWidgets: Boolean
         val hasDarkWidget = manager.getAppWidgetIds(ComponentName(this, SearchWidget::class.java)).any()
         val hasLightWidget = manager.getAppWidgetIds(ComponentName(this, SearchWidgetLight::class.java)).any()
         val hasSearchOnlyWidget = manager.getAppWidgetIds(ComponentName(this, SearchOnlyWidget::class.java)).any()
-        val hasDuckAiOnlyWidget = manager.getAppWidgetIds(ComponentName(this, DuckAiOnlyWidget::class.java)).any()
         val hasSearchAndFavoritesWidget = manager.getAppWidgetIds(ComponentName(this, SearchAndFavoritesWidget::class.java)).any()
-        return hasDarkWidget || hasLightWidget || hasSearchOnlyWidget || hasDuckAiOnlyWidget || hasSearchAndFavoritesWidget
+        return hasDarkWidget || hasLightWidget || hasSearchOnlyWidget || hasSearchAndFavoritesWidget
     }
