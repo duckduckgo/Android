@@ -209,12 +209,9 @@ import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
-import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteUrlSuggestion.AutoCompleteSwitchToTabSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browser.api.brokensite.BrokenSiteContext
@@ -222,6 +219,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
@@ -551,6 +549,7 @@ class BrowserTabViewModelTest {
     private val swipingTabsFeature = FakeFeatureToggleFactory.create(SwipingTabsFeature::class.java)
     private val swipingTabsFeatureProvider = SwipingTabsFeatureProvider(swipingTabsFeature)
     private val mockDuckChat: DuckChat = mock()
+    private val mockHistory: NavigationHistory = mock()
 
     private val defaultBrowserPromptsExperimentShowPopupMenuItemFlow = MutableStateFlow(false)
     private val mockAdditionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts = mock()
@@ -615,6 +614,9 @@ class BrowserTabViewModelTest {
             mockUserStageStore,
             mockAutocompleteTabsFeature,
             mockDuckChat,
+            mockHistory,
+            DefaultDispatcherProvider(),
+            mockPixel,
         )
         val fireproofWebsiteRepositoryImpl = FireproofWebsiteRepositoryImpl(
             fireproofWebsiteDao,
@@ -2452,115 +2454,6 @@ class BrowserTabViewModelTest {
         testee.cancelAuthentication(request = authenticationRequest)
 
         assertCommandIssued<Command.ShowWebContent>()
-    }
-
-    @Test
-    fun whenBookmarkSuggestionSubmittedThenAutoCompleteBookmarkSelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com")
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
-        testee.fireAutocompletePixel(suggestion)
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_BOOKMARK_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
-    }
-
-    @Test
-    fun whenBookmarkFavoriteSubmittedThenAutoCompleteFavoriteSelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
-        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(true)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        val suggestion = AutoCompleteBookmarkSuggestion("example", "Example", "https://example.com", isFavorite = true)
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
-        testee.fireAutocompletePixel(suggestion)
-
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_FAVORITE_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_FAVORITES])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.FAVORITE_CAPABLE])
-    }
-
-    @Test
-    fun whenHistorySubmittedThenAutoCompleteHistorySelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(true)
-        val suggestion = AutoCompleteHistorySearchSuggestion("example", true)
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", listOf(suggestion)))
-        testee.fireAutocompletePixel(suggestion)
-
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_HISTORY_SEARCH_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_HISTORY])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.HISTORY_CAPABLE])
-    }
-
-    @Test
-    fun whenSearchSuggestionSubmittedWithBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(true)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        val suggestions = listOf(AutoCompleteSearchSuggestion("", false, false), AutoCompleteBookmarkSuggestion("", "", ""))
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
-        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false, false))
-
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
-    }
-
-    @Test
-    fun whenSearchSuggestionSubmittedWithoutBookmarksThenAutoCompleteSearchSelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
-        testee.fireAutocompletePixel(AutoCompleteSearchSuggestion("example", false, false))
-
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SEARCH_PHRASE_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_BOOKMARKS])
-        assertEquals("false", argumentCaptor.firstValue[PixelParameter.BOOKMARK_CAPABLE])
-    }
-
-    @Test
-    fun whenSearchSuggestionSubmittedWithTabsThenAutoCompleteSearchSelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0), TabEntity("2", "https://example.com", position = 1))
-        val suggestions = listOf(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", suggestions))
-        testee.fireAutocompletePixel(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
-
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
-        assertEquals("true", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
-    }
-
-    @Test
-    fun whenSearchSuggestionSubmittedWithoutTabsThenAutoCompleteSearchSelectionPixelSent() = runTest {
-        whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
-        whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
-        tabsLiveData.value = listOf(TabEntity("1", "https://example.com", position = 0))
-        testee.autoCompleteViewState.value = autoCompleteViewState().copy(searchResults = AutoCompleteResult("", emptyList()))
-        testee.fireAutocompletePixel(AutoCompleteSwitchToTabSuggestion("example", "", "", ""))
-
-        val argumentCaptor = argumentCaptor<Map<String, String>>()
-        verify(mockPixel).fire(eq(AppPixelName.AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION), argumentCaptor.capture(), any(), any())
-
-        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SHOWED_SWITCH_TO_TAB])
-        assertEquals("false", argumentCaptor.firstValue[PixelParameter.SWITCH_TO_TAB_CAPABLE])
     }
 
     @Test
@@ -6029,7 +5922,10 @@ class BrowserTabViewModelTest {
     fun whenUserSelectedAutocompleteWithAutoCompleteSwitchToTabSuggestionThenSwitchToTabCommandSentWithTabId() = runTest {
         val tabId = "tabId"
         val suggestion = AutoCompleteSwitchToTabSuggestion(phrase = "phrase", title = "title", url = "https://www.example.com", tabId = tabId)
+
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
         whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
 
         testee.userSelectedAutocomplete(suggestion)

@@ -263,6 +263,7 @@ class InputScreenViewModel @AssistedInject constructor(
 
     fun userSelectedAutocomplete(suggestion: AutoCompleteSuggestion) {
         appCoroutineScope.launch(dispatchers.io()) {
+            autoComplete.fireAutocompletePixel(autoCompleteSuggestionResults.value.suggestions, suggestion, true)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase)
@@ -287,7 +288,6 @@ class InputScreenViewModel @AssistedInject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to duckChat.wasOpenedBefore().toBinaryString())
             pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, parameters = params)
-            pixel.fire(DuckChatPixelName.AUTOCOMPLETE_DUCKAI_PROMPT_EXPERIMENTAL_SELECTION, parameters = params)
         }
         duckChat.openDuckChatWithAutoPrompt(prompt)
     }
