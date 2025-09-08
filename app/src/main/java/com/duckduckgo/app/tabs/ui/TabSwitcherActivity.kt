@@ -246,9 +246,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureObservers()
         configureOnBackPressedListener()
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            initMenuClickListeners()
-        }
+        initMenuClickListeners()
     }
 
     private fun configureFabs() {
@@ -316,13 +314,11 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
         tabsRecycler.setHasFixedSize(true)
 
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            if (viewModel.isNewToolbarEnabled) {
-                handleFabStateUpdates()
-            }
-
-            handleSelectionModeCancellation()
+        if (viewModel.isNewToolbarEnabled) {
+            handleFabStateUpdates()
         }
+
+        handleSelectionModeCancellation()
 
         if (viewModel.isNewToolbarEnabled) {
             // Set the layout params for the tabs recycler view based on omnibar position
@@ -429,49 +425,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            lifecycleScope.launch {
-                viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
-                    tabsRecycler.invalidateItemDecorations()
-                    tabsAdapter.updateData(it.tabSwitcherItems)
+        lifecycleScope.launch {
+            viewModel.selectionViewState.flowWithLifecycle(lifecycle).collectLatest {
+                tabsRecycler.invalidateItemDecorations()
+                tabsAdapter.updateData(it.tabSwitcherItems)
 
-                    updateToolbarTitle(it.mode, it.tabs.size)
-                    updateTabGridItemDecorator()
+                updateToolbarTitle(it.mode, it.tabs.size)
+                updateTabGridItemDecorator()
 
-                    tabTouchHelper.mode = it.mode
+                tabTouchHelper.mode = it.mode
 
-                    invalidateOptionsMenu()
+                invalidateOptionsMenu()
 
-                    if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
-                        firstTimeLoadingTabsList = false
-                        scrollToActiveTab()
-                    }
-                }
-            }
-        } else {
-            viewModel.activeTab.observe(this) { tab ->
-                if (tab != null && !tab.deletable) {
-                    updateTabGridItemDecorator()
-                }
-            }
-
-            viewModel.tabSwitcherItemsLiveData.observe(this) { tabSwitcherItems ->
-                tabsAdapter.updateData(tabSwitcherItems)
-
-                val noTabSelected = tabSwitcherItems.none { (it as? NormalTab)?.isActive == true }
-                if (noTabSelected && tabSwitcherItems.isNotEmpty()) {
-                    updateTabGridItemDecorator()
-                }
-
-                if (firstTimeLoadingTabsList) {
+                if (firstTimeLoadingTabsList && it.tabs.isNotEmpty()) {
                     firstTimeLoadingTabsList = false
                     scrollToActiveTab()
-                }
-            }
-
-            viewModel.deletableTabs.observe(this) {
-                if (it.isNotEmpty()) {
-                    showTabDeletedSnackbar(it.last())
                 }
             }
         }
@@ -499,17 +467,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
                 val gridLayoutManager = getGridLayoutManager(columnCount)
                 tabsRecycler.layoutManager = gridLayoutManager
-
-                if (!tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    showListLayoutButton()
-                }
             }
             LayoutType.LIST -> {
                 tabsRecycler.layoutManager = LinearLayoutManager(this@TabSwitcherActivity)
-
-                if (!tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    showGridLayoutButton()
-                }
             }
         }
 
@@ -612,13 +572,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 )
                 finishAfterTransition()
             }
-            is CloseAllTabsRequest -> {
-                if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-                    showCloseAllTabsConfirmation(command.numTabs)
-                } else {
-                    showCloseAllTabsConfirmation()
-                }
-            }
+            is CloseAllTabsRequest -> showCloseAllTabsConfirmation(command.numTabs)
             is ShareLinks -> launchShareMultipleLinkChooser(command.links)
             is ShareLink -> launchShareLinkChooser(command.link, command.title)
             is BookmarkTabsRequest -> showBookmarkTabsConfirmation(command.tabIds)
@@ -644,32 +598,21 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        if (tabManagerFeatureFlags.multiSelection().isEnabled()) {
-            menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
+        menuInflater.inflate(R.menu.menu_tab_switcher_activity_with_selection, menu)
 
-            val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
-            val viewState = viewModel.selectionViewState.value
+        val popupBinding = PopupTabsMenuBinding.bind(popupMenu.contentView)
+        val viewState = viewModel.selectionViewState.value
 
-            val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
-            menu.createDynamicInterface(
-                numSelectedTabs,
-                popupBinding,
-                binding.mainFab,
-                binding.aiChatFab,
-                tabsRecycler,
-                toolbar,
-                viewState.dynamicInterface,
-            )
-        } else {
-            menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
-            layoutTypeMenuItem = menu.findItem(R.id.layoutTypeToolbarButton)
-
-            when (viewModel.layoutType.value) {
-                LayoutType.GRID -> showListLayoutButton()
-                LayoutType.LIST -> showGridLayoutButton()
-                null -> layoutTypeMenuItem?.isVisible = false
-            }
-        }
+        val numSelectedTabs = viewModel.selectionViewState.value.numSelectedTabs
+        menu.createDynamicInterface(
+            numSelectedTabs,
+            popupBinding,
+            binding.mainFab,
+            binding.aiChatFab,
+            tabsRecycler,
+            toolbar,
+            viewState.dynamicInterface,
+        )
 
         return true
     }
@@ -881,7 +824,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         // we don't want to purge during device rotation
         if (isFinishing) {
             launch {
-                if (!tabManagerFeatureFlags.multiSelection().isEnabled() || !skipTabPurge) {
+                if (!skipTabPurge) {
                     viewModel.purgeDeletableTabs()
                 }
             }

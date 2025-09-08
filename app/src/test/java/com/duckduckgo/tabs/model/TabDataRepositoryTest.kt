@@ -98,11 +98,6 @@ class TabDataRepositoryTest {
 
     private val mockAdClickManager: AdClickManager = mock()
 
-    @Before
-    fun before() {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
-    }
-
     @After
     fun after() {
         daoDeletableTabs.close()
@@ -633,8 +628,6 @@ class TabDataRepositoryTest {
 
     @Test
     fun whenPurgeDeletableTabsThenPurgeDeletableTabsAndClearData() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val testee = tabDataRepository()
         val tabIds = listOf("tabid1", "tabid2")
         whenever(mockDao.getDeletableTabIds()).thenReturn(tabIds)

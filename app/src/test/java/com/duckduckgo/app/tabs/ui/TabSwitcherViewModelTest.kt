@@ -163,7 +163,6 @@ class TabSwitcherViewModelTest {
         MockitoAnnotations.openMocks(this)
 
         swipingTabsFeature.self().setRawStoredState(State(enable = false))
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = false))
         tabManagerFeatureFlags.newToolbarFeature().setRawStoredState(State(enable = false))
         swipingTabsFeature.enabledForUsers().setRawStoredState(State(enable = true))
 
@@ -546,8 +545,6 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabClosedInNormalModeWithSwipeGestureThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val swipeGestureUsed = true
         val tab = tabSwitcherItems.first()
 
@@ -562,8 +559,6 @@ class TabSwitcherViewModelTest {
 
     @Test
     fun whenTabClosedUsingCloseButtonInNormalModeThenCallMarkDeletableAndSendUndoCommandAndSendPixel() = runTest {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         val swipeGestureUsed = false
         val tab = tabSwitcherItems.first()
 
@@ -1825,8 +1820,6 @@ class TabSwitcherViewModelTest {
     }
 
     private fun TestScope.prepareSelectionMode() {
-        tabManagerFeatureFlags.multiSelection().setRawStoredState(State(enable = true))
-
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             testee.selectionViewState.collect()
         }
