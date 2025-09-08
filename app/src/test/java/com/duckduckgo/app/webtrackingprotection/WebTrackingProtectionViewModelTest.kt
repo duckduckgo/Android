@@ -129,4 +129,17 @@ internal class WebTrackingProtectionViewModelTest {
             cancelAndConsumeRemainingEvents()
         }
     }
+
+    @Test
+    fun whenInitialisedThenProtectionsListPresent() = runTest {
+        whenever(mockFeatureToggle.isFeatureEnabled(eq(PrivacyFeatureName.GpcFeatureName.value), any())).thenReturn(false)
+        whenever(mockGpc.isEnabled()).thenReturn(true)
+
+        testee.viewState().test {
+            val item = awaitItem()
+            assertFalse(item.globalPrivacyControlEnabled)
+            assertEquals(9, item.protectionItems.size)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
 }

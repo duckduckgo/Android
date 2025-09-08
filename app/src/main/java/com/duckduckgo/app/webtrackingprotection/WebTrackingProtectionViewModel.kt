@@ -19,8 +19,10 @@ package com.duckduckgo.app.webtrackingprotection
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.webtrackingprotection.list.FeatureGridItem
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.privacy.config.api.Gpc
@@ -43,6 +45,7 @@ class WebTrackingProtectionViewModel @Inject constructor(
 
     data class ViewState(
         val globalPrivacyControlEnabled: Boolean = false,
+        val protectionItems: List<FeatureGridItem> = emptyList(),
     )
 
     sealed class Command {
@@ -59,6 +62,7 @@ class WebTrackingProtectionViewModel @Inject constructor(
             viewState.emit(
                 ViewState(
                     globalPrivacyControlEnabled = gpc.isEnabled() && featureToggle.isFeatureEnabled(PrivacyFeatureName.GpcFeatureName.value),
+                    protectionItems = getProtectionItems(),
                 ),
             )
         }
@@ -80,6 +84,56 @@ class WebTrackingProtectionViewModel @Inject constructor(
     fun onManageAllowListSelected() {
         viewModelScope.launch { command.send(Command.LaunchAllowList) }
         pixel.fire(AppPixelName.SETTINGS_MANAGE_ALLOWLIST)
+    }
+
+    private fun getProtectionItems(): List<FeatureGridItem> {
+        return listOf(
+            FeatureGridItem(
+                iconRes = R.drawable.ic_shield_protection,
+                titleRes = R.string.webTrackingProtectionThirdPartyTrackersTitle,
+                descriptionRes = R.string.webTrackingProtectionThirdPartyTrackersDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_ads_tracking_blocked,
+                titleRes = R.string.webTrackingProtectionTargetedAdsTitle,
+                descriptionRes = R.string.webTrackingProtectionTargetedAdsDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_fingerprint,
+                titleRes = R.string.webTrackingProtectionFingerprintTrackingTitle,
+                descriptionRes = R.string.webTrackingProtectionFingerprintTrackingDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_link_blocked,
+                titleRes = R.string.webTrackingProtectionLinkTrackingTitle,
+                descriptionRes = R.string.webTrackingProtectionLinkTrackingDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_profile_secure,
+                titleRes = R.string.webTrackingProtectionReferrerTrackingTitle,
+                descriptionRes = R.string.webTrackingProtectionReferrerTrackingDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_cookie_blocked,
+                titleRes = R.string.webTrackingProtectionFirstPartyCookiesTitle,
+                descriptionRes = R.string.webTrackingProtectionFirstPartyCookiesDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_device_laptop_secure,
+                titleRes = R.string.webTrackingProtectionDnsCnameCloakingTitle,
+                descriptionRes = R.string.webTrackingProtectionDnsCnameCloakingDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_eye_blocked,
+                titleRes = R.string.webTrackingProtectionGoogleAmpTrackingTitle,
+                descriptionRes = R.string.webTrackingProtectionGoogleAmpTrackingDescription,
+            ),
+            FeatureGridItem(
+                iconRes = R.drawable.ic_popup_blocked,
+                titleRes = R.string.webTrackingProtectionGoogleSigninPopupsTitle,
+                descriptionRes = R.string.webTrackingProtectionGoogleSigninPopupsDescription,
+            ),
+        )
     }
 
     companion object {
