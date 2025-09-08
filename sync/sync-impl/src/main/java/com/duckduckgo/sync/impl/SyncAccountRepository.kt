@@ -564,6 +564,8 @@ class AppSyncAccountRepository @Inject constructor(
     }
 
     override fun deleteAccount(): Result<Boolean> {
+        syncPixels.fireUserConfirmedToTurnOffSyncAndDelete(connectedDevicesCached.size)
+
         val token = syncStore.token.takeUnless {
             it.isNullOrEmpty()
         } ?: return Error(reason = "Delete account: Token Empty").alsoFireDeleteAccountErrorPixel()

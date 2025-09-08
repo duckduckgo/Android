@@ -878,18 +878,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Neka DuckDuckGo zaštiti više onoga što radiš online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Postavi nas kao svoj zadani preglednik kako bi se sve poveznice otvorile u DuckDuckGou.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne pitaj ponovno</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Prebaci svoj zadani preglednik kako bi se poveznice otvarale u DuckDuckGou.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne sad</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nije tvoj zadani preglednik. Osiguraj više zaštite.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Postavi kao zadano</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne pitaj ponovno</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blokira alate za praćenje kako bi zaštitio tvoje pregledavanje</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Brisanjem svojih kartica i podataka izbrisat ćeš povijest blokiranja alata za praćenje i vratiti ovaj broj na nulu.\n\nSakrij ovaj baner ako ga ne želiš vidjeti u prikazu kartica.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Sakrij baner</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Upozorenje: ova web lokacija može predstavljati sigurnosni rizik</string>
@@ -958,5 +953,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo također nudi <b>neobaveznu plaćenu</b> pretplatu, sa sigurnim <b>VPN-om</b> i <b>naprednom, privatnom umjetnom</b> inteligencijom.]]></string>
     <string name="settingsDuckAiRebranding">AI značajke</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Prikaži broj alata za praćenje (tragača) u prebacivaču kartica (Tab Switcher)</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Sakrij broj tragača?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Ovo možeš ponovno uključiti kroz Postavke &gt; Izgled.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Sakrij</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Zadrži</string>
 
 </resources>

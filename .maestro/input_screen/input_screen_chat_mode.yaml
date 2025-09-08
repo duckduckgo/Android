@@ -14,9 +14,7 @@ tags:
       # enable the Input Screen
       - runFlow: ../shared/open_ai_settings_screen.yaml
       - tapOn:
-          id: "trailingSwitch"
-          childOf:
-            id: "duckAiInputScreenEnabledToggle"
+          id: "duckAiInputScreenToggleWithAiImage"
       - action: back
       - action: back
 
@@ -28,7 +26,7 @@ tags:
       - tapOn:
           text: "Duck.ai"
       - assertVisible:
-          text: "Ask Duck.ai"
+          text: "Ask privately"
       - inputText: "hey"
       - tapOn:
           id: "actionSend"

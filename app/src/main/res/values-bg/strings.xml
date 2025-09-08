@@ -846,18 +846,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Доверете се на DuckDuckGo да защитава повече от нещата, които правите онлайн</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Направете ни браузър по подразбиране, за да отваряте връзките към сайтове в DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Не ме питай повече</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Сменете браузъра си по подразбиране, така че връзките да се отварят в DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Не сега</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo не е браузърът по подразбиране. Осигурете си по-добра защита.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Задаване по подразбиране</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Не ме питай повече</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo блокира тракерите и Ви защитава при сърфиране</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Когато изчистите разделите и данните, историята на блокираните тракери ще бъде изтрита и това число ще се нулира.\n\nСкрийте този банер, ако предпочитате да не го виждате в изгледа на разделите.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Скриване на банера</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Предупреждение: Този сайт може да представлява риск за сигурността</string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo също предлага <b>опция за платен абонамент</b> със защитена <b>VPN</b> услуга и <b>поверителен чат с усъвършенстван AI</b>.]]></string>
     <string name="settingsDuckAiRebranding">Функции с изкуствен интелект</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Показване на броя на тракерите в превключвателя на раздели</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Искате ли да скриете брояча на тракери?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Можете да го включите отново в Настройки &gt; Външен вид.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Скрий</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Запазване</string>
 
 </resources>

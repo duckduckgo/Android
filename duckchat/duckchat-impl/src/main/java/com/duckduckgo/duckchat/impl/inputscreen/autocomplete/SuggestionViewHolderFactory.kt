@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteBookmarkSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDefaultBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDividerBinding
+import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteDuckaiSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySearchSuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemAutocompleteInAppMessageBinding
@@ -277,6 +278,31 @@ class DividerViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
+class DuckAIPromptSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemAutocompleteDuckaiSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.DuckAIPromptViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+        longPressClickListener: (AutoCompleteSuggestion) -> Unit,
+    ) {
+        val bookmarkSuggestionViewHolder = holder as AutoCompleteViewHolder.DuckAIPromptViewHolder
+        bookmarkSuggestionViewHolder.bind(
+            suggestion as AutoCompleteSuggestion.AutoCompleteDuckAIPrompt,
+            immediateSearchClickListener,
+        )
+    }
+}
+
 sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     class SearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
@@ -393,6 +419,17 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
             )
             binding.messageCta.onCloseButtonClicked { deleteClickListener(item) }
             binding.messageCta.onPrimaryActionClicked { openSettingsClickListener() }
+        }
+    }
+
+    class DuckAIPromptViewHolder(val binding: ItemAutocompleteDuckaiSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
+        fun bind(
+            item: AutoCompleteSuggestion.AutoCompleteDuckAIPrompt,
+            itemClickListener: (AutoCompleteSuggestion) -> Unit,
+        ) = with(binding) {
+            title.text = item.phrase
+
+            root.setOnClickListener { itemClickListener(item) }
         }
     }
 }

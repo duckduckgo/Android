@@ -82,7 +82,7 @@ interface TextInput {
     fun doOnTextChanged(action: (CharSequence?, Int, Int, Int) -> Unit)
 
     sealed class Action {
-        object PerformEndAction : Action()
+        data object PerformEndAction : Action()
     }
 }
 

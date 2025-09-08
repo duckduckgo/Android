@@ -2,6 +2,8 @@ package com.duckduckgo.duckchat.impl.ui.inputscreen
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
@@ -10,13 +12,18 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion.AutoCompleteSearchSuggestion
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.extensions.toBinaryString
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.ShowKeyboard
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitChat
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.Command.SubmitSearch
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.InputFieldCommand
 import com.duckduckgo.duckchat.impl.inputscreen.ui.command.SearchCommand
+import com.duckduckgo.duckchat.impl.inputscreen.ui.session.InputScreenSessionStore
 import com.duckduckgo.duckchat.impl.inputscreen.ui.state.SubmitButtonIcon
 import com.duckduckgo.duckchat.impl.inputscreen.ui.viewmodel.InputScreenViewModel
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelParameters
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import java.io.IOException
@@ -52,6 +59,9 @@ class InputScreenViewModelTest {
     private val history: NavigationHistory = mock()
     private val voiceSearchAvailability: VoiceSearchAvailability = mock()
     private val autoCompleteSettings: AutoCompleteSettings = mock()
+    private val pixel: Pixel = mock()
+    private val inputScreenSessionStore: InputScreenSessionStore = mock()
+    private val duckChat: DuckChat = mock()
 
     @Before
     fun setup() {
@@ -70,6 +80,9 @@ class InputScreenViewModelTest {
             appCoroutineScope = coroutineRule.testScope,
             voiceSearchAvailability = voiceSearchAvailability,
             autoCompleteSettings = autoCompleteSettings,
+            pixel = pixel,
+            sessionStore = inputScreenSessionStore,
+            duckChat = duckChat,
         )
     }
 
@@ -404,7 +417,7 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when chat text is web url then submitButtonIcon is SEND`() {
+    fun `when chat text is web url then submitButtonIcon is SEND`() = runTest {
         val viewModel = createViewModel()
         viewModel.onChatSelected()
         viewModel.onChatInputTextChanged("https://example.com")
@@ -412,7 +425,7 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when chat text is not web url then submitButtonIcon is SEND`() {
+    fun `when chat text is not web url then submitButtonIcon is SEND`() = runTest {
         val viewModel = createViewModel()
         viewModel.onChatSelected()
         viewModel.onChatInputTextChanged("example")
@@ -434,9 +447,12 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onSearchSubmitted then emit SubmitSearch Command`() {
+    fun `when onSearchSubmitted then emit SubmitSearch Command`() = runTest {
         val viewModel = createViewModel()
         val query = "example"
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
         viewModel.onSearchSubmitted(query)
 
@@ -444,9 +460,12 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onChatSubmitted with web url then emit SubmitSearch Command`() {
+    fun `when onChatSubmitted with web url then emit SubmitSearch Command`() = runTest {
         val viewModel = createViewModel()
         val url = "https://example.com"
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
         viewModel.onChatSubmitted(url)
 
@@ -454,9 +473,12 @@ class InputScreenViewModelTest {
     }
 
     @Test
-    fun `when onChatSubmitted with query then emit SubmitChat Command`() {
+    fun `when onChatSubmitted with query then emit SubmitChat Command`() = runTest {
         val viewModel = createViewModel()
         val query = "example"
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
 
         viewModel.onChatSubmitted(query)
 
@@ -785,5 +807,163 @@ class InputScreenViewModelTest {
 
         // Should remain false because new tab page has content
         assertFalse(viewModel.visibilityState.value.showSearchLogo)
+    }
+
+    @Test
+    fun `when fireShownPixel then DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN daily pixel is fired`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.fireShownPixel()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SHOWN, type = Daily())
+    }
+
+    @Test
+    fun `when onSearchSubmitted then query submitted pixels are fired`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.setHasUsedSearchMode(any())).thenReturn(Unit)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_QUERY_SUBMITTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when onChatSubmitted then prompt submitted pixels are fired`() = runTest {
+        val viewModel = createViewModel()
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_PROMPT_SUBMITTED_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when onSearchSelected and user was in chat mode then mode switched pixel is fired`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onChatSelected()
+        viewModel.onSearchSelected()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+    }
+
+    @Test
+    fun `when onSearchSelected and user was not in chat mode then mode switched pixel is not fired`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onSearchSelected()
+
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+    }
+
+    @Test
+    fun `when onChatSelected and user was in search mode then mode switched pixel is fired`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onSearchSelected()
+        viewModel.onChatSelected()
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+    }
+
+    @Test
+    fun `when onChatSelected and user was not in search mode then mode switched pixel is not fired`() = runTest {
+        val viewModel = createViewModel()
+
+        viewModel.onChatSelected()
+
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_MODE_SWITCHED)
+    }
+
+    @Test
+    fun `when both search and chat modes used in same session then both modes pixel is fired`() = runTest {
+        val viewModel = createViewModel()
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(true)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when only search mode used then both modes pixel is not fired`() = runTest {
+        val viewModel = createViewModel()
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(true)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted("query")
+
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when only chat mode used then both modes pixel is not fired`() = runTest {
+        val viewModel = createViewModel()
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(true)
+
+        viewModel.onChatSubmitted("prompt")
+
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES)
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_OMNIBAR_SESSION_BOTH_MODES_DAILY, type = Daily())
+    }
+
+    @Test
+    fun `when onChatSelected then new line button is visible`() {
+        val viewModel = createViewModel()
+        viewModel.onChatSelected()
+        assertTrue(viewModel.visibilityState.value.newLineButtonVisible)
+    }
+
+    @Test
+    fun `when onSearchSelected then new line button is not visible`() {
+        val viewModel = createViewModel()
+        viewModel.onSearchSelected()
+        assertFalse(viewModel.visibilityState.value.newLineButtonVisible)
+    }
+
+    @Test
+    fun `when onSearchSubmitted with newlines then they are replaced with spaces`() = runTest {
+        val viewModel = createViewModel()
+        val queryWithNewlines = "first line\nsecond line\nthird line"
+        val expected = "first line second line third line"
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+
+        viewModel.onSearchSubmitted(queryWithNewlines)
+
+        assertEquals(SubmitSearch(expected), viewModel.command.value)
+    }
+
+    @Test
+    fun `when userSelectedAutocomplete with chat then command and pixel sent`() = runTest {
+        val viewModel = createViewModel()
+        val query = "example"
+
+        val duckAIPrompt = AutoComplete.AutoCompleteSuggestion.AutoCompleteDuckAIPrompt(query)
+
+        whenever(inputScreenSessionStore.hasUsedSearchMode()).thenReturn(false)
+        whenever(inputScreenSessionStore.hasUsedChatMode()).thenReturn(false)
+        whenever(duckChat.wasOpenedBefore()).thenReturn(false)
+        val params = mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to false.toBinaryString())
+
+        viewModel.userSelectedAutocomplete(duckAIPrompt)
+
+        assertEquals(SubmitChat(query), viewModel.command.value)
+
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_OPEN_AUTOCOMPLETE_EXPERIMENTAL, params)
+        verify(autoComplete).fireAutocompletePixel(any(), any(), any())
     }
 }

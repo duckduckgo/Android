@@ -23,7 +23,7 @@ sealed interface DownloadsScreens {
     /**
      * Launch the Downloads activity
      */
-    object DownloadsScreenNoParams : ActivityParams {
+    data object DownloadsScreenNoParams : ActivityParams {
         private fun readResolve(): Any = DownloadsScreenNoParams
     }
 }

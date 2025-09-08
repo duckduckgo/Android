@@ -69,9 +69,9 @@ interface SitePermissionsManager {
      * https://developer.mozilla.org/en-US/docs/Web/API/Permissions/query
      */
     sealed class SitePermissionQueryResponse {
-        object Granted : SitePermissionQueryResponse()
-        object Prompt : SitePermissionQueryResponse()
-        object Denied : SitePermissionQueryResponse()
+        data object Granted : SitePermissionQueryResponse()
+        data object Prompt : SitePermissionQueryResponse()
+        data object Denied : SitePermissionQueryResponse()
     }
 
     /**

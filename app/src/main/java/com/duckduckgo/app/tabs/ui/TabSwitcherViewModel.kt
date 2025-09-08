@@ -22,11 +22,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.senseofprotection.SenseOfProtectionExperiment
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_GRID_VIEW_BUTTON_CLICKED
-import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_DISMISSED
-import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_INFO_PANEL_TAPPED
 import com.duckduckgo.app.pixels.AppPixelName.TAB_MANAGER_LIST_VIEW_BUTTON_CLICKED
 import com.duckduckgo.app.pixels.duckchat.createWasUsedBeforePixelParams
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -41,8 +38,8 @@ import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.NormalTab
 import com.duckduckgo.app.tabs.ui.TabSwitcherItem.Tab.SelectableTab
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel
-import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackerAnimationInfoPanel.Companion.TRACKER_ANIMATION_PANEL_ID
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel
+import com.duckduckgo.app.tabs.ui.TabSwitcherItem.TrackersAnimationInfoPanel.Companion.TRACKER_ANIMATION_PANEL_ID
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.BookmarkTabsRequest
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.DismissAnimatedTileDismissalDialog
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.ShareLink
@@ -54,7 +51,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Normal
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.SelectionViewState.Mode.Selection
 import com.duckduckgo.app.trackerdetection.api.WebTrackersBlockedAppRepository
-import com.duckduckgo.common.ui.experiments.visual.store.ExperimentalThemingDataStore
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
@@ -82,7 +78,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -95,12 +90,11 @@ class TabSwitcherViewModel @Inject constructor(
     private val duckChat: DuckChat,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val tabManagerFeatureFlags: TabManagerFeatureFlags,
-    private val senseOfProtectionExperiment: SenseOfProtectionExperiment,
     private val webTrackersBlockedAppRepository: WebTrackersBlockedAppRepository,
     private val tabSwitcherDataStore: TabSwitcherDataStore,
     private val faviconManager: FaviconManager,
     private val savedSitesRepository: SavedSitesRepository,
-    experimentalThemingDataStore: ExperimentalThemingDataStore,
+    private val trackersAnimationInfoPanelPixels: TrackersAnimationInfoPanelPixels,
 ) : ViewModel() {
 
     val activeTab = tabRepository.liveSelectedTab
@@ -117,7 +111,7 @@ class TabSwitcherViewModel @Inject constructor(
             combine(
                 tabRepository.flowSelectedTab,
                 _selectionViewState,
-                tabSwitcherDataStore.isAnimationTileDismissed(),
+                tabSwitcherDataStore.isTrackersAnimationInfoTileHidden(),
             ) { activeTab, viewState, isAnimationTileDismissed ->
                 getTabItems(tabEntities, activeTab, isAnimationTileDismissed, viewState.mode)
             }
@@ -125,11 +119,11 @@ class TabSwitcherViewModel @Inject constructor(
 
     val tabSwitcherItemsLiveData: LiveData<List<TabSwitcherItem>> = tabSwitcherItemsFlow.asLiveData()
 
-    val isNewDesignEnabled: Boolean by lazy {
-        tabManagerFeatureFlags.newToolbarFeature().isEnabled() && experimentalThemingDataStore.isSingleOmnibarEnabled.value
+    val isNewToolbarEnabled: Boolean by lazy {
+        tabManagerFeatureFlags.newToolbarFeature().isEnabled()
     }
 
-    private val _selectionViewState = MutableStateFlow(SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
+    private val _selectionViewState = MutableStateFlow(SelectionViewState(isNewToolbarEnabled = isNewToolbarEnabled))
     val selectionViewState = combine(
         _selectionViewState,
         tabSwitcherItemsFlow,
@@ -141,7 +135,7 @@ class TabSwitcherViewModel @Inject constructor(
             layoutType = tabSwitcherData.layoutType,
             isDuckAIButtonVisible = showDuckAiButton,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState(isNewToolbarEnabled = isNewDesignEnabled))
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), SelectionViewState(isNewToolbarEnabled = isNewToolbarEnabled))
 
     val layoutType = tabRepository.tabSwitcherData
         .map { it.layoutType }
@@ -589,49 +583,38 @@ class TabSwitcherViewModel @Inject constructor(
     fun onDuckAIButtonClicked() {
         viewModelScope.launch {
             val params = duckChat.createWasUsedBeforePixelParams()
-            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_NEW_TAB_MENU, parameters = params)
+            pixel.fire(DuckChatPixelName.DUCK_CHAT_OPEN_TAB_SWITCHER_FAB, parameters = params)
 
             duckChat.openDuckChat()
         }
     }
 
     fun onTrackerAnimationInfoPanelClicked() {
-        pixel.fire(
-            pixel = TAB_MANAGER_INFO_PANEL_TAPPED,
-            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
-        )
+        trackersAnimationInfoPanelPixels.fireInfoPanelTapped()
         command.value = ShowAnimatedTileDismissalDialog
     }
 
     fun onTrackerAnimationTilePositiveButtonClicked() {
         viewModelScope.launch {
-            command.value = DismissAnimatedTileDismissalDialog
+            tabSwitcherDataStore.setTrackersAnimationInfoTileHidden(isHidden = true)
+            trackersAnimationInfoPanelPixels.fireInfoPanelDismissed()
         }
     }
 
     fun onTrackerAnimationTileNegativeButtonClicked() {
         viewModelScope.launch {
-            tabSwitcherDataStore.setIsAnimationTileDismissed(isDismissed = true)
-            val trackerCount = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
-            pixel.fire(
-                pixel = TAB_MANAGER_INFO_PANEL_DISMISSED,
-                parameters = mapOf("trackerCount" to trackerCount.toString()) +
-                    senseOfProtectionExperiment.getTabManagerPixelParams(),
-            )
+            command.value = DismissAnimatedTileDismissalDialog
         }
     }
 
     fun onTrackerAnimationInfoPanelVisible() {
-        pixel.fire(
-            pixel = AppPixelName.TAB_MANAGER_INFO_PANEL_IMPRESSIONS,
-            parameters = runBlocking { senseOfProtectionExperiment.getTabManagerPixelParams() },
-        )
+        trackersAnimationInfoPanelPixels.fireInfoPanelImpression()
     }
 
     private suspend fun getTabItems(
         tabEntities: List<TabEntity>,
         activeTab: TabEntity?,
-        isAnimationTileDismissed: Boolean,
+        isTrackersAnimationInfoPanelHidden: Boolean,
         mode: Mode,
     ): List<TabSwitcherItem> {
         val normalTabs = tabEntities.map {
@@ -639,14 +622,10 @@ class TabSwitcherViewModel @Inject constructor(
         }
 
         suspend fun getNormalTabItemsWithOptionalAnimationTile(): List<TabSwitcherItem> {
-            return if (senseOfProtectionExperiment.isUserEnrolledInVariant2CohortAndExperimentEnabled()) {
-                if (!isAnimationTileDismissed) {
-                    val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
+            return if (!isTrackersAnimationInfoPanelHidden) {
+                val trackerCountForLast7Days = webTrackersBlockedAppRepository.getTrackerCountForLast7Days()
 
-                    listOf(TrackerAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
-                } else {
-                    normalTabs
-                }
+                listOf(TrackersAnimationInfoPanel(trackerCountForLast7Days)) + normalTabs
             } else {
                 normalTabs
             }
@@ -673,7 +652,6 @@ class TabSwitcherViewModel @Inject constructor(
 
         val dynamicInterface = when (mode) {
             is Normal -> {
-                val isThereOnlyNewTabPage = tabs.size == 1 && tabs.first().isNewTabPage
                 DynamicInterface(
                     isFireButtonVisible = true,
                     isNewTabButtonVisible = isNewToolbarEnabled,
@@ -690,7 +668,7 @@ class TabSwitcherViewModel @Inject constructor(
                     isCloseOtherTabsVisible = false,
                     isCloseAllTabsDividerVisible = true,
                     isCloseAllTabsVisible = true,
-                    isMenuButtonEnabled = !isThereOnlyNewTabPage,
+                    isMenuButtonEnabled = true,
                     isMainFabVisible = !isNewToolbarEnabled,
                     isAIFabVisible = isDuckAIButtonVisible && !isNewToolbarEnabled,
                     mainFabType = FabType.NEW_TAB,

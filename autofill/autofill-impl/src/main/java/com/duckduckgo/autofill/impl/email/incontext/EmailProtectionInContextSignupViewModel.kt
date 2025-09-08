@@ -135,10 +135,10 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
 
     sealed interface ViewState {
         data class ShowingWebContent(val urlActions: UrlActions) : ViewState
-        object NavigatingBack : ViewState
-        object CancellingInContextSignUp : ViewState
-        object ConfirmingCancellationOfInContextSignUp : ViewState
-        object ExitingAsSuccess : ViewState
+        data object NavigatingBack : ViewState
+        data object CancellingInContextSignUp : ViewState
+        data object ConfirmingCancellationOfInContextSignUp : ViewState
+        data object ExitingAsSuccess : ViewState
     }
 
     data class UrlActions(
@@ -151,15 +151,15 @@ class EmailProtectionInContextSignupViewModel @Inject constructor(
     }
 
     sealed interface BackButtonAction {
-        object NavigateBack : BackButtonAction
-        object ExitTreatAsSuccess : BackButtonAction
+        data object NavigateBack : BackButtonAction
+        data object ExitTreatAsSuccess : BackButtonAction
     }
 
     sealed interface ExitButtonAction {
-        object Disabled : ExitButtonAction
-        object ExitWithoutConfirmation : ExitButtonAction
-        object ExitTreatAsSuccess : ExitButtonAction
-        object ExitWithConfirmation : ExitButtonAction
+        data object Disabled : ExitButtonAction
+        data object ExitWithoutConfirmation : ExitButtonAction
+        data object ExitTreatAsSuccess : ExitButtonAction
+        data object ExitWithConfirmation : ExitButtonAction
     }
 
     companion object {

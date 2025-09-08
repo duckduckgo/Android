@@ -49,6 +49,6 @@ class ShareOpenEndedNegativeFeedbackViewModel @Inject constructor() : ViewModel(
         ) : Command()
 
         data class ExitAndSubmitPositiveFeedback(val feedback: String) : Command()
-        object Exit : Command()
+        data object Exit : Command()
     }
 }

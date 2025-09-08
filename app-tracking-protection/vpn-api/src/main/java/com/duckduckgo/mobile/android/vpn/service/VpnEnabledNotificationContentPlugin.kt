@@ -84,7 +84,7 @@ interface VpnEnabledNotificationContentPlugin {
     }
 
     sealed class NotificationActions {
-        object VPNActions : NotificationActions()
+        data object VPNActions : NotificationActions()
         data class VPNFeatureActions(val actions: List<NotificationCompat.Action>) : NotificationActions()
     }
 }

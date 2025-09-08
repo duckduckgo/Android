@@ -121,6 +121,9 @@ android {
     compileOptions {
         coreLibraryDesugaringEnabled = true
     }
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         if (project.hasProperty("$syncDisableAuthRequirementBuildFlag")) {
             buildConfigField "boolean", "AUTH_REQUIRED", "false"

@@ -24,8 +24,6 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_DARK
-import com.duckduckgo.common.ui.DuckDuckGoTheme.EXPERIMENT_LIGHT
 import com.duckduckgo.common.ui.DuckDuckGoTheme.SYSTEM_DEFAULT
 import com.duckduckgo.common.ui.Theming.Constants.BROADCAST_THEME_CHANGED
 import com.duckduckgo.common.ui.Theming.Constants.FIXED_THEME_ACTIVITIES
@@ -35,15 +33,13 @@ enum class DuckDuckGoTheme {
     SYSTEM_DEFAULT,
     DARK,
     LIGHT,
-    EXPERIMENT_DARK,
-    EXPERIMENT_LIGHT,
     ;
 
     fun getOptionIndex(): Int {
         return when (this) {
             SYSTEM_DEFAULT -> 1
-            LIGHT, EXPERIMENT_LIGHT -> 2
-            DARK, EXPERIMENT_DARK -> 3
+            LIGHT -> 2
+            DARK -> 3
         }
     }
 }
@@ -73,8 +69,6 @@ fun AppCompatActivity.getThemeId(theme: DuckDuckGoTheme): Int {
     return when (theme) {
         SYSTEM_DEFAULT -> getSystemDefaultTheme()
         DARK -> R.style.Theme_DuckDuckGo_Dark
-        EXPERIMENT_DARK -> R.style.Theme_DuckDuckGo_Dark_Experiment
-        EXPERIMENT_LIGHT -> R.style.Theme_DuckDuckGo_Light_Experiment
         else -> R.style.Theme_DuckDuckGo_Light
     }
 }

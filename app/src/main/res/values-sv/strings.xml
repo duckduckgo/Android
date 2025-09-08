@@ -846,18 +846,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Låt DuckDuckGo skydda mer av det du gör online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Gör oss till din standardwebbläsare så att alla webbplatslänkar öppnas i DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Fråga inte igen</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Ändra din standardwebbläsare så att länkar öppnas i DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Inte nu</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo är inte din standardwebbläsare. Få mer skydd.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Ställ in som standard</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Fråga inte igen</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blockerar spårare för att skydda ditt surfande</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">När du rensar dina flikar och data kommer historiken för spårningsblockering att raderas och detta nummer att nollställas.\n\nDölj den här bannern om du inte vill se den i flikvyn.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Dölj banner</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Varning! Den här webbplatsen kan vara en säkerhetsrisk</string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo har också en <b>valfri betald prenumeration</b> med ett säkert <b>VPN</b> och <b>avancerad, privat AI</b>.]]></string>
     <string name="settingsDuckAiRebranding">AI-funktioner</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Visa spårarräknare i flikfäxlare</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Dölj spårarräknaren?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Du kan slå på detta igen i Inställningar &gt; Utseende.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Dölj</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Behåll</string>
 
 </resources>

@@ -846,18 +846,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Deixa o DuckDuckGo proteger melhor o que fazes online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Torna-nos o teu navegador predefinido para que todos os links dos sites sejam abertos no DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Não perguntar novamente</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Muda o teu navegador predefinido para que os links abram no DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Agora não</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">O DuckDuckGo não é o teu navegador predefinido. Obtém mais proteção.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Definir como predefinição</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Não perguntar novamente</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">O DuckDuckGo bloqueia rastreadores para proteger a tua navegação</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Limpar os separadores e os dados elimina o teu histórico de bloqueio de rastreadores e redefine este número para zero.\n\nOculta esta faixa se preferires não a ver na vista de separadores.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Ocultar faixa</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Aviso: este site pode ser um risco para a segurança</string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[A DuckDuckGo conta também com uma <b>subscrição paga</b> opcional, com uma <b>VPN segura</b> e <b>IA avançada e privada</b>.]]></string>
     <string name="settingsDuckAiRebranding">Funcionalidades de IA</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Mostrar contagem de rastreadores no Comutador de separadores</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Esconder a contagem de rastreadores?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Podes voltar a ativar isto em Definições &gt; Aparência.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Ocultar</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Manter</string>
 
 </resources>

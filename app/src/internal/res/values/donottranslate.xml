@@ -43,8 +43,6 @@
     <string name="devSettingsScreenUserAgentFirefox">Firefox</string>
     <string name="devSettingsScreenUserAgentDefault">Default</string>
     <string name="devSettingsScreenUserAgentWebView">UA WebView</string>
-    <string name="devSettingsShowTabSwitcherAnimatedTile">Reset TabSwitcher Animated Tile</string>
-    <string name="devSettingsShowTabSwitcherAnimatedSubtitle">Click here to reset the animated tile if you have previously dismissed it</string>
 
     <!-- Tabs and Saved Sites -->
     <string name="devSettingsScreenTabs">Tabs and Saved Sites</string>
@@ -54,9 +52,13 @@
     <string name="devSettingsTabsScreenAddTabsButtonText">Add Tabs</string>
     <string name="devSettingsTabsScreenClearTabsButtonText">Clear Tabs</string>
     <string name="devSettingsTabsBookmarksScreenHeader" instruction="Not translated">Current bookmarks count: %1$d</string>
+    <string name="devSettingsTabsFavoritesScreenHeader" instruction="Not translated">Current favorites count: %1$d</string>
     <string name="devSettingsTabsScreenBookmarksToAdd">Bookmarks to add</string>
+    <string name="devSettingsTabsScreenFavoritesToAdd">Favorites to add</string>
     <string name="devSettingsTabsScreenAddBookmarksButtonText">Add Bookmarks</string>
+    <string name="devSettingsTabsScreenAddFavoritesButtonText">Add Favorites</string>
     <string name="devSettingsTabsScreenClearBookmarksButtonText">Clear Bookmarks</string>
+    <string name="devSettingsTabsScreenClearFavoritesButtonText">Clear Favorites</string>
 
     <!-- Privacy Audit settings -->
     <string name="auditSettingsTitle">Audit Settings</string>

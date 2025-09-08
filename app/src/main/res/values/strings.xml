@@ -845,18 +845,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Let DuckDuckGo protect more of what you do online</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Make us your default browser so all site links open in DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Don\'t Ask Again</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Switch your default browser so links open in DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Not Now</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo isn\'t your default browser. Get more protection.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Set As Default</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Don\'t Ask Again</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo blocks trackers to protect your browsing</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Clearing your tabs and data will delete your tracker blocking history and reset this number to zero.\n\nHide this banner if you\'d prefer not to see it in the tabs view.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Hide Banner</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Warning: This site may be a security risk</string>
@@ -921,5 +916,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo also has an <b>optional paid subscription</b>, with a secure <b>VPN</b> and <b>advanced, private AI</b>.]]></string>
     <string name="settingsDuckAiRebranding">AI Features</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Show Tracker Count in Tab Switcher</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Hide tracker count?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">You can turn this back on in Settings > Appearance.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Hide</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Keep</string>
 
 </resources>

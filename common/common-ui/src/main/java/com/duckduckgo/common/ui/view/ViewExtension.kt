@@ -264,10 +264,10 @@ private inline fun <reified T : ViewGroup.LayoutParams> updateLayoutParam(
  */
 @RequiresApi(28)
 fun View.addBottomShadow(
-    shadowSizeDp: Float,
-    offsetYDp: Float = 2f,
-    insetDp: Float = 0f,
-    @ColorInt shadowColor: Int,
+    shadowSizeDp: Float = 12f,
+    offsetYDp: Float = 3f,
+    insetDp: Float = 3f,
+    @ColorInt shadowColor: Int = ContextCompat.getColor(context, com.duckduckgo.mobile.android.R.color.background_omnibar_shadow),
 ) {
     val shadowSize = shadowSizeDp.toPx(context)
     val offsetY = offsetYDp.toPx(context)
@@ -300,4 +300,5 @@ fun View.addBottomShadow(
 
     clipToOutline = false
     elevation = shadowSize
+    setAllParentsClip(false)
 }

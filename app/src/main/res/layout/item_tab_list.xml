@@ -20,7 +20,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/keyline_2"
     android:minHeight="72dp"
-    app:cardCornerRadius="@dimen/smallShapeCornerRadius">
+    style="@style/Widget.DuckDuckGo.TabCardView"
+    app:cardCornerRadius="@dimen/mediumShapeCornerRadius">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardContentsContainer"
@@ -59,14 +60,14 @@
             android:id="@+id/close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/selectable_circular_ripple"
             android:contentDescription="@string/closeContentDescription"
             android:padding="@dimen/keyline_2"
-            android:src="@drawable/ic_close_24_small"
+            android:src="@drawable/ic_close_16"
+            android:background="@drawable/selectable_circular_ripple"
+            app:tint="?attr/daxColorTabHighlight"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
 
         <ImageView
             android:id="@+id/selectionIndicator"
@@ -86,10 +87,11 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_2"
             android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_2"
             android:ellipsize="end"
             android:lines="1"
             android:textIsSelectable="false"
-            app:layout_constraintEnd_toStartOf="@id/close"
+            app:layout_constraintEnd_toStartOf="@id/selectionIndicator"
             app:layout_constraintStart_toEndOf="@id/favicon"
             app:layout_constraintTop_toTopOf="parent"
             app:typography="h3"

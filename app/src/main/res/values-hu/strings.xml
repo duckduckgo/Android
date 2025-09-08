@@ -846,18 +846,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Hagyd, hogy a DuckDuckGo jobban megvédje, amit online csinálsz</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Legyen a DuckDuckGo az alapértelmezett böngésződ, hogy minden weboldal linkje a DuckDuckGóban nyíljon meg.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne kérdezzen rá újra</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Állítsd be a DuckDuckGót alapértelmezett böngészőként, hogy a linkek a DuckDuckGóban nyíljanak meg</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Most nem</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">Nem a DuckDuckGo az alapértelmezett böngésződ. Erősítsd a védelmed!</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Beállítás alapértelmezettként</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Ne kérdezzen rá újra</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">A DuckDuckGo a böngészésed védelme érdekében blokkolja a nyomkövetőket</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">A lapjaid és adataid törlése eltávolítja a nyomkövető-blokkolási előzményeket, és nullára állítja ezt a számot.\n\nElrejtheted ezt a sávot, ha nem szeretnéd látni a lapok nézetében.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Szalaghirdetés elrejtése</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Figyelem: Ez a webhely biztonsági kockázatot jelenthet</string>
@@ -922,5 +917,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[A DuckDuckGo emellett <b>opcionális előfizetési lehetőséget</b> is kínál, amelyhez biztonságos <b>VPN</b> és <b>fejlett, privát AI-szolgáltatás</b> tartozik.]]></string>
     <string name="settingsDuckAiRebranding">AI funkciók</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Nyomkövető-számláló megjelenítése a lapváltóban</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Elrejted a nyomkövető-számlálót?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Bármikor visszakapcsolhatod a Beállítások &gt; Megjelenés menüben.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Elrejtés</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Megtartás.</string>
 
 </resources>

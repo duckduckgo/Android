@@ -16,18 +16,26 @@
 
 package com.duckduckgo.pir.impl.dashboard.messaging.handlers
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.GetDataBrokersResponse.DataBroker
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScanResult.ScanResultAddress
+import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse.ScannedBroker
+import com.duckduckgo.pir.impl.dashboard.state.PirDashboardInitialScanStateProvider
+import com.duckduckgo.pir.impl.store.PirRepository
 import com.squareup.anvil.annotations.ContributesMultibinding
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import logcat.logcat
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Handles the initial scan status message from Web which is used to retrieve the status of the initial scan.
@@ -36,11 +44,14 @@ import org.json.JSONObject
     scope = ActivityScope::class,
     boundType = PirWebJsMessageHandler::class,
 )
-class PirWebInitialScanStatusMessageHandler @Inject constructor() :
-    PirWebJsMessageHandler() {
+class PirWebInitialScanStatusMessageHandler @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val stateProvider: PirDashboardInitialScanStateProvider,
+    private val pirRepository: PirRepository,
+) : PirWebJsMessageHandler() {
 
-    override val methods: List<String> =
-        listOf(PirDashboardWebMessages.INITIAL_SCAN_STATUS.messageName)
+    override val message = PirDashboardWebMessages.INITIAL_SCAN_STATUS
 
     override fun process(
         jsMessage: JsMessage,
@@ -49,27 +60,73 @@ class PirWebInitialScanStatusMessageHandler @Inject constructor() :
     ) {
         logcat { "PIR-WEB: InitialScanStatusMessageHandler: process $jsMessage" }
 
-        jsMessaging.onResponse(
-            JsCallbackData(
-                params = JSONObject().apply {
-                    put(PirDashboardWebConstants.PARAM_SUCCESS, false)
-                    put(
-                        PirDashboardWebConstants.PARAM_VERSION,
-                        PirDashboardWebConstants.SCRIPT_API_VERSION,
-                    )
-                    // TODO: Replace with actual data
-                    putOpt(PARAM_RESULTS_FOUND, JSONArray())
-                    putOpt(PARAM_SCAN_PROGRESS, JSONArray())
-                },
-                featureName = jsMessage.featureName,
-                method = jsMessage.method,
-                id = jsMessage.id ?: "",
-            ),
-        )
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (!canRunScan()) {
+                jsMessaging.sendResponse(
+                    jsMessage = jsMessage,
+                    response = PirWebMessageResponse.InitialScanResponse.EMPTY,
+                )
+                return@launch
+            }
+
+            jsMessaging.sendResponse(
+                jsMessage = jsMessage,
+                response = PirWebMessageResponse.InitialScanResponse(
+                    resultsFound = getResultsFound(),
+                    scanProgress = PirWebMessageResponse.InitialScanResponse.ScanProgress(
+                        currentScans = stateProvider.getFullyCompletedBrokersTotal(),
+                        totalScans = stateProvider.getActiveBrokersAndMirrorSitesTotal(),
+                        scannedBrokers = getScannedBrokers(),
+                    ),
+                ),
+            )
+        }
     }
 
-    companion object {
-        const val PARAM_RESULTS_FOUND = "resultsFound"
-        const val PARAM_SCAN_PROGRESS = "scanProgress"
+    private suspend fun canRunScan(): Boolean {
+        return pirRepository.getUserProfileQueries().isNotEmpty()
+    }
+
+    private suspend fun getResultsFound(): List<ScanResult> {
+        return stateProvider.getScanResults().map {
+            ScanResult(
+                dataBroker = DataBroker(
+                    name = it.broker.name,
+                    url = it.broker.url,
+                    optOutUrl = it.broker.optOutUrl,
+                    parentURL = it.broker.parentUrl,
+                ),
+                name = it.extractedProfile.name,
+                addresses = it.extractedProfile.addresses.map { address ->
+                    ScanResultAddress(
+                        city = address.city,
+                        state = address.state,
+                    )
+                },
+                alternativeNames = it.extractedProfile.alternativeNames,
+                relatives = it.extractedProfile.relatives,
+                foundDate = it.extractedProfile.dateAddedInMillis.convertToSeconds(),
+                optOutSubmittedDate = it.optOutSubmittedDateInMillis?.convertToSeconds(),
+                estimatedRemovalDate = it.estimatedRemovalDateInMillis?.convertToSeconds(),
+                removedDate = it.optOutRemovedDateInMillis?.convertToSeconds(),
+                hasMatchingRecordOnParentBroker = it.hasMatchingRecordOnParentBroker,
+            )
+        }
+    }
+
+    private fun Long.convertToSeconds(): Long {
+        return TimeUnit.MILLISECONDS.toSeconds(this)
+    }
+
+    private suspend fun getScannedBrokers(): List<ScannedBroker> {
+        return stateProvider.getAllScannedBrokersStatus().map {
+            ScannedBroker(
+                name = it.broker.name,
+                url = it.broker.url,
+                optOutUrl = it.broker.optOutUrl,
+                parentURL = it.broker.parentUrl,
+                status = it.status.statusName,
+            )
+        }
     }
 }

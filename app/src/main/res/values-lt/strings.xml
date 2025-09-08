@@ -878,18 +878,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Leiskite „DuckDuckGo“ apsaugoti daugiau jūsų veiklos internete</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Nustatykite „DuckDuckGo“ kaip numatytąją naršyklę, kad visos svetainių nuorodos atsidarytų su ja.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Neklausk dar kartą</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Pakeiskite numatytąją naršyklę, kad nuorodos atsidarytų su „DuckDuckGo“.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne dabar</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">„DuckDuckGo“ nėra numatytoji naršyklė. Gauk daugiau apsaugos.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Nustatyti kaip numatytąjį</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Neklausk dar kartą</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">„DuckDuckGo“ blokuoja stebėjimo priemones, kad apsaugotų tavo naršymą</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Išvalius tavo skirtukus ir duomenis, bus ištrinta tavo sekimo blokavimo istorija ir ši vertė bus nustatyta į nulį.\n\nPaslėpk šią reklamjuostę, jei nenori jos matyti skirtukų rodinyje.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslėpti reklamjuostę</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Įspėjimas: ši svetainė gali kelti saugumo riziką</string>
@@ -958,5 +953,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[„DuckDuckGo“ taip pat turi <b>pasirenkamą mokamą prenumeratą</b> su saugiu <b>VPN</b> ir <b>pažangiu, privačiu dirbtiniu intelektu</b>.]]></string>
     <string name="settingsDuckAiRebranding">DI funkcijos</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Rodyti sekiklių skaičių skirtukų perjungiklyje</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Slėpti sekiklių skaičių?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Šią funkciją galima vėl įjungti nustatymuose &gt; Išvaizda.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Slėpti</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Laikyti</string>
 
 </resources>

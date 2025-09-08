@@ -135,6 +135,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_APPEARANCE_PRESSED("ms_appearance_setting_pressed"),
     SETTINGS_APPEARANCE_IS_FULL_URL_OPTION_TOGGLED("m_appearance_settings_is_full_url_option_toggled"),
     APPEARANCE_SETTINGS_IS_FULL_URL_ENABLED_DAILY("m_appearance_settings_is_full_url_enabled_daily"),
+    SETTINGS_APPEARANCE_IS_TRACKER_COUNT_IN_TAB_SWITCHER_TOGGLED("m_appearance_settings_is_tracker_count_in_tab_switcher_toggled"),
     SETTINGS_APP_ICON_PRESSED("ms_app_icon_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_PRESSED("ms_address_bar_position_setting_pressed"),
     SETTINGS_ADDRESS_BAR_POSITION_SELECTED_TOP("ms_address_bar_position_setting_selected_top"),
@@ -203,16 +204,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
-
-    AUTOCOMPLETE_BOOKMARK_SELECTION("m_autocomplete_click_bookmark"),
-    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_click_favorite"),
-    AUTOCOMPLETE_SEARCH_PHRASE_SELECTION("m_autocomplete_click_phrase"),
-    AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION("m_autocomplete_click_website"),
-
-    AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
-    AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
-
-    AUTOCOMPLETE_SWITCH_TO_TAB_SELECTION("m_autocomplete_click_switch_to_tab"),
 
     AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
     AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
@@ -340,6 +331,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     ADDRESS_BAR_NEW_TAB_PAGE_CLOSED("m_addressbar_focus_close_ntp"),
     ADDRESS_BAR_WEBSITE_CLOSED("m_addressbar_focus_close_website"),
     ADDRESS_BAR_SERP_CLOSED("m_addressbar_focus_close_serp"),
+    ADDRESS_BAR_NTP_FOCUSED("m_addressbar_focus_ntp"),
 
     KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
     KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
@@ -437,10 +429,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SET_AS_DEFAULT_PROMPT_IMPRESSION("m_set-as-default_prompt_impression"),
     SET_AS_DEFAULT_PROMPT_CLICK("m_set-as-default_prompt_click"),
     SET_AS_DEFAULT_PROMPT_DISMISSED("m_set-as-default_prompt_dismissed"),
+    SET_AS_DEFAULT_PROMPT_DO_NOT_ASK_AGAIN_CLICK("m_set-as-default_prompt_do_not_ask_again_click"),
     SET_AS_DEFAULT_IN_MENU_CLICK("m_set-as-default_in-menu_click"),
     SET_AS_DEFAULT_MESSAGE_IMPRESSION("m_set-as-default_message_impression"),
     SET_AS_DEFAULT_MESSAGE_CLICK("m_set-as-default_message_click"),
     SET_AS_DEFAULT_MESSAGE_DISMISSED("m_set-as-default_message_dismissed"),
+    SET_AS_DEFAULT_MESSAGE_DO_NOT_ASK_AGAIN_CLICK("m_set-as-default_message_do_not_ask_again_click"),
 
     MALICIOUS_SITE_DETECTED_IN_IFRAME("m_malicious-site-protection_iframe-loaded"),
 

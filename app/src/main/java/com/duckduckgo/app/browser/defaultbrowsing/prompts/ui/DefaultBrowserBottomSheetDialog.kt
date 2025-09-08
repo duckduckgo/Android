@@ -21,7 +21,10 @@ import android.content.Context
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat.getString
+import com.duckduckgo.app.browser.R as BrowserR
 import com.duckduckgo.app.browser.databinding.BottomSheetDefaultBrowserBinding
+import com.duckduckgo.common.utils.extensions.preventWidows
 import com.duckduckgo.mobile.android.R as CommonR
 import com.google.android.material.R
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -43,6 +46,11 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
         this.behavior.state = BottomSheetBehavior.STATE_EXPANDED
         this.behavior.isDraggable = false
 
+        binding.defaultBrowserBottomSheetDialogTitle.text =
+            getString(context, BrowserR.string.defaultBrowserBottomSheetDialogTitle).preventWidows()
+        binding.defaultBrowserBottomSheetDialogSubTitle.text =
+            getString(context, BrowserR.string.defaultBrowserBottomSheetDialogSubTitle).preventWidows()
+
         setOnShowListener { dialogInterface ->
             setRoundCorners(dialogInterface)
             eventListener?.onShown()
@@ -54,7 +62,10 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
             eventListener?.onSetBrowserButtonClicked()
         }
         binding.defaultBrowserBottomSheetDialogGhostButton.setOnClickListener {
-            eventListener?.onNotNowButtonClicked()
+            eventListener?.onDoNotAskAgainButtonClicked()
+        }
+        binding.defaultBrowserBottomSheetDialogCloseButton.setOnClickListener {
+            eventListener?.onCanceled()
         }
     }
 
@@ -79,6 +90,6 @@ class DefaultBrowserBottomSheetDialog(private val context: Context) : BottomShee
         fun onShown()
         fun onCanceled()
         fun onSetBrowserButtonClicked()
-        fun onNotNowButtonClicked()
+        fun onDoNotAskAgainButtonClicked()
     }
 }

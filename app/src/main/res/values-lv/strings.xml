@@ -862,18 +862,13 @@
 
     <!--    Default Browser Bottom Sheet Dialog -->
     <string name="defaultBrowserBottomSheetDialogTitle">Ļauj DuckDuckGo vairāk aizsargāt to, ko dari tiešsaistē</string>
-    <string name="defaultBrowserBottomSheetDialogSubTitle">Iestati mūs kā savu noklusējuma pārlūku, lai visas vietņu saites atvērtos DuckDuckGo.</string>
-    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Vairs nejautāt</string>
+    <string name="defaultBrowserBottomSheetDialogSubTitle">Pārslēdz savu noklusējuma pārlūkprogrammu, lai saites tiktu atvērtas DuckDuckGo.</string>
+    <string name="defaultBrowserBottomSheetDialogGhostButton" instruction="This text appears on a button">Ne tagad</string>
 
     <!-- Default Browser message -->
     <string name="newTabPageDefaultBrowserMessageHeading">DuckDuckGo nav tava noklusējuma pārlūkprogramma. Iegūsti vairāk aizsardzības.</string>
     <string name="newTabPageDefaultBrowserMessagePrimaryCta" instruction="This text appears on a button">Iestatīt kā noklusējumu</string>
     <string name="newTabPageDefaultBrowserMessageSecondaryCta" instruction="This text appears on a button">Vairs nejautāt</string>
-
-    <!--TabSwitcher Animation Tile Dialog-->
-    <string name="tabSwitcherAnimationTileRemovalDialogTitle">DuckDuckGo bloķē izsekotājus, lai aizsargātu tavu pārlūkošanu</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogBody">Notīrot savas cilnes un datus, tiks izdzēsta tava izsekotāja bloķēšanas vēsture un šis skaitlis tiks atiestatīts uz nulli.\n\nPaslēp šo reklāmkarogu, ja nevēlies to redzēt cilņu skatā.</string>
-    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Paslēpt reklāmkarogu</string>
 
     <!-- Threat protection -->
     <string name="maliciousSiteTitle">Brīdinājums: šī vietne var radīt drošības risku</string>
@@ -940,5 +935,12 @@
     <string name="onboardingPrivacyProDaxDialogDescriptionRebranding"><![CDATA[DuckDuckGo piedāvā arī <b>neobligātu maksas abonementu</b> ar drošu <b>VPN</b> un <b>uzlabotu, privātu mākslīgo intelektu</b>.]]></string>
     <string name="settingsDuckAiRebranding">Mākslīgā intelekta funkcijas</string>
     <string name="settingsDuckAi">Duck.ai</string>
+
+    <!--TabSwitcher Trackers Animation-->
+    <string name="showTrackerCountInTabSwitcher">Rādīt izsekotāju skaitu ciļņu pārslēdzējā</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogTitle" instruction="A title for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vai slēpt izsekotāju skaitu?</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogBody" instruction="A message for a dialog that shows when a user clicks a tile that shows them their current blocked tracker count">Vari to atkal ieslēgt sadaļā Iestatījumi &gt; Izskats.</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogPositiveButton">Paslēpt</string>
+    <string name="tabSwitcherAnimationTileRemovalDialogNegativeButton">Saglabāt</string>
 
 </resources>
