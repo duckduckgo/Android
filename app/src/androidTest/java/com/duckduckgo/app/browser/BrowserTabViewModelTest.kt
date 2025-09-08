@@ -5926,7 +5926,10 @@ class BrowserTabViewModelTest {
     fun whenUserSelectedAutocompleteWithAutoCompleteSwitchToTabSuggestionThenSwitchToTabCommandSentWithTabId() = runTest {
         val tabId = "tabId"
         val suggestion = AutoCompleteSwitchToTabSuggestion(phrase = "phrase", title = "title", url = "https://www.example.com", tabId = tabId)
+
+        whenever(mockDuckChat.wasOpenedBefore()).thenReturn(true)
         whenever(mockSavedSitesRepository.hasBookmarks()).thenReturn(false)
+        whenever(mockSavedSitesRepository.hasFavorites()).thenReturn(false)
         whenever(mockNavigationHistory.hasHistory()).thenReturn(false)
 
         testee.userSelectedAutocomplete(suggestion)

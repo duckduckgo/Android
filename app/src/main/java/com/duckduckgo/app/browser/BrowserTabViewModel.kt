@@ -947,7 +947,6 @@ class BrowserTabViewModel @Inject constructor(
         // send pixel before submitting the query and changing the autocomplete state to empty; otherwise will send the wrong params
         appCoroutineScope.launch(dispatchers.io()) {
             val autoCompleteViewState = currentAutoCompleteViewState()
-            autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
             withContext(dispatchers.main()) {
                 when (suggestion) {
                     is AutoCompleteDefaultSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
@@ -960,6 +959,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteSuggestion.AutoCompleteDuckAIPrompt -> onUserTappedDuckAiPromptAutocomplete(suggestion.phrase)
                 }
             }
+            autoComplete.fireAutocompletePixel(autoCompleteViewState.searchResults.suggestions, suggestion)
         }
     }
 
