@@ -44,7 +44,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
     @Test
     fun whenFeatureIsEnabledAndCapabilitySupportedThenCallScriptInjectionWithCorrectParams() = runTest {
         whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(any(), any())).thenReturn(true)
         whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
         testee.addDocumentStartJavaScript(mockWebView)
@@ -55,7 +55,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
     @Test
     fun whenFeatureIsDisabledAndCapabilitySupportedThenDoNotCallScriptInjection() = runTest {
         whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(false)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(any(), any())).thenReturn(true)
         whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
         testee.addDocumentStartJavaScript(mockWebView)
@@ -66,7 +66,7 @@ class ContentScopeScriptsAddDocumentStartJavaScriptPluginTest {
     @Test
     fun whenFeatureIsEnabledAndCapabilityNotSupportedThenDoNotCallScriptInjection() = runTest {
         whenever(mockWebViewCompatContentScopeScripts.isEnabled()).thenReturn(true)
-        whenever(mockWebViewCapabilityChecker.isSupported(any())).thenReturn(false)
+        whenever(mockWebViewCapabilityChecker.isSupported(any(), any())).thenReturn(false)
         whenever(mockWebViewCompatContentScopeScripts.getScript(any())).thenReturn("script")
 
         testee.addDocumentStartJavaScript(mockWebView)

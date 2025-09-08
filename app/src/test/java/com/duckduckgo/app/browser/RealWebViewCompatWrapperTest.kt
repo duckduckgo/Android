@@ -35,7 +35,7 @@ class RealWebViewCompatWrapperTest {
 
     @Test
     fun whenAddDocumentStartJavaScriptWithFeatureEnabledThenAddScript() = runTest {
-        whenever(mockWebViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(eq(DocumentStartJavaScript), any())).thenReturn(true)
 
         testee.addDocumentStartJavaScript(mockDuckDuckGoWebView, "script", setOf("*"))
 
@@ -44,7 +44,7 @@ class RealWebViewCompatWrapperTest {
 
     @Test
     fun whenAddDocumentStartJavaScriptWithFeatureDisabledThenDoNotAddScript() = runTest {
-        whenever(mockWebViewCapabilityChecker.isSupported(DocumentStartJavaScript)).thenReturn(false)
+        whenever(mockWebViewCapabilityChecker.isSupported(eq(DocumentStartJavaScript), any())).thenReturn(false)
 
         testee.addDocumentStartJavaScript(mockDuckDuckGoWebView, "script", setOf("*"))
 
@@ -53,7 +53,7 @@ class RealWebViewCompatWrapperTest {
 
     @Test
     fun whenAddMessageListenerWithFeatureEnabledThenAddListener() = runTest {
-        whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(eq(WebMessageListener), any())).thenReturn(true)
 
         testee.addWebMessageListener(mockDuckDuckGoWebView, "script", setOf("*")) { _, _, _, _, _ -> }
 
@@ -62,7 +62,7 @@ class RealWebViewCompatWrapperTest {
 
     @Test
     fun whenAddMessageListenerWithFeatureDisabledThenDoNotAddListener() = runTest {
-        whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(false)
+        whenever(mockWebViewCapabilityChecker.isSupported(eq(WebMessageListener), any())).thenReturn(false)
 
         testee.addWebMessageListener(mockDuckDuckGoWebView, "script", setOf("*")) { _, _, _, _, _ -> }
 
@@ -71,19 +71,19 @@ class RealWebViewCompatWrapperTest {
 
     @Test
     fun whenRemoveMessageListenerWithFeatureEnabledThenRemoveListener() = runTest {
-        whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(true)
+        whenever(mockWebViewCapabilityChecker.isSupported(eq(WebMessageListener), any())).thenReturn(true)
 
         testee.removeWebMessageListener(mockDuckDuckGoWebView, "script")
 
-        verify(mockDuckDuckGoWebView).safeRemoveWebMessageListener(eq("script"))
+        verify(mockDuckDuckGoWebView).safeRemoveWebMessageListener("script")
     }
 
     @Test
     fun whenRemoveMessageListenerWithFeatureDisabledThenDoNotRemoveListener() = runTest {
-        whenever(mockWebViewCapabilityChecker.isSupported(WebMessageListener)).thenReturn(false)
+        whenever(mockWebViewCapabilityChecker.isSupported(eq(WebMessageListener), any())).thenReturn(false)
 
         testee.removeWebMessageListener(mockDuckDuckGoWebView, "script")
 
-        verify(mockDuckDuckGoWebView, never()).safeRemoveWebMessageListener(eq("script"))
+        verify(mockDuckDuckGoWebView, never()).safeRemoveWebMessageListener("script")
     }
 }
