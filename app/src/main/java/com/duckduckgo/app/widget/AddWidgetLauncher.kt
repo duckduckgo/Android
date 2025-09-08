@@ -29,7 +29,6 @@ import com.duckduckgo.app.widget.ui.AddWidgetInstructionsActivity
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.widget.DuckAiOnlyWidget
 import com.duckduckgo.widget.SearchAndFavoritesWidget
 import com.duckduckgo.widget.SearchOnlyWidget
 import com.duckduckgo.widget.SearchWidget
@@ -100,10 +99,6 @@ class AppWidgetManagerAddWidgetLauncher @Inject constructor(
                 searchOnlyWidgetPrompt -> {
                     widgetLabel = it.getString(R.string.searchOnlyWidgetLabel)
                     ComponentName(it, SearchOnlyWidget::class.java)
-                }
-                duckAiOnlyWidgetPrompt -> {
-                    widgetLabel = it.getString(R.string.duckAiOnlyWidgetLabel)
-                    ComponentName(it, DuckAiOnlyWidget::class.java)
                 }
                 else -> {
                     widgetLabel = it.getString(R.string.favoritesWidgetLabel)

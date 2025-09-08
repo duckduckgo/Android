@@ -27,7 +27,6 @@ import com.duckduckgo.app.onboarding.di.OnboardingModule
 import com.duckduckgo.app.surrogates.di.ResourceSurrogateModule
 import com.duckduckgo.app.usage.di.AppUsageModule
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.widget.DuckAiOnlyWidget
 import com.duckduckgo.widget.EmptyFavoritesWidgetService
 import com.duckduckgo.widget.FavoritesWidgetService
 import com.duckduckgo.widget.SearchAndFavoritesWidget
@@ -88,8 +87,6 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     fun inject(searchWidget: SearchWidget)
 
     fun inject(searchOnlyWidget: SearchOnlyWidget)
-
-    fun inject(duckAiOnlyWidget: DuckAiOnlyWidget)
 
     fun inject(searchAndFavsWidget: SearchAndFavoritesWidget)
 
